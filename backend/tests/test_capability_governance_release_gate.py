@@ -53,6 +53,8 @@ def test_passing_report_is_immutable_signed_and_expires_when_pinned_input_change
     assert expired_report.conclusion == "expired"
     assert expired_report.signature != report.signature
     assert expired_report.report_hash != report.report_hash
+    assert gate.resolve(report.release_report_gid) == expired_report
+    assert gate.resolve(report.release_report_gid).conclusion == "expired"
 
 
 def test_release_gate_requires_idempotency_key_and_fails_active_waiver_after_expiry():

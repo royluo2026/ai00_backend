@@ -76,6 +76,12 @@ class ReleaseGate:
     def get(self, release_report_gid: int) -> ReleaseReport:
         return self._reports[release_report_gid]
 
+    def resolve(self, release_report_gid: int) -> ReleaseReport:
+        """Return the current immutable validity evidence for a report reference."""
+        report = self.get(release_report_gid)
+        expiry_gid = self._expiry_reports.get(report.release_report_gid)
+        return self._reports[expiry_gid] if expiry_gid is not None else report
+
     def _store(self, report: ReleaseReport, idempotency_key: str | None) -> ReleaseReport:
         self._reports[report.release_report_gid] = report
         if idempotency_key:
@@ -98,6 +104,13 @@ class ReleaseGate:
         expiry = self._expired_report(report)
         self._reports[expiry.release_report_gid] = expiry
         self._expiry_reports[report.release_report_gid] = expiry.release_report_gid
+        if self._audit_sink is not None:
+            self._audit_sink.append(
+                operation="release_report_expired", entity_gid=expiry.release_report_gid,
+                actor_gid="release_gate", request_gid=f"expire:{report.release_report_gid}",
+                detail={"supersedes_release_report_gid": report.release_report_gid, "conclusion": "expired"},
+                idempotency_key=f"release_report_expired:{report.release_report_gid}:{expiry.release_report_gid}",
+            )
         return expiry.release_report_gid
 
     def _expire_prior_passes(self, candidate: ReleaseCandidate) -> tuple[int, ...]:

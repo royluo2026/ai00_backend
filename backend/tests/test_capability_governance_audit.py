@@ -42,3 +42,20 @@ def test_services_emit_audit_events_for_proposal_review_waiver_and_gate():
     ReleaseGate(next_gid=iter(range(300, 400)).__next__, signer=lambda value: "sig", audit_sink=sink).evaluate(ReleaseCandidate("rev-a", "catalog-a", 101, 201), available=True, test_status="passed", approvals_complete=True, data_complete=True, idempotency_key="gate")
 
     assert {event.operation for event in sink.events} >= {"proposal", "review", "waiver", "gate"}
+
+
+def test_supersession_and_expiry_append_auditable_state_events():
+    sink = AuditSink(next_gid=iter(range(1, 100)).__next__)
+    proposals = ProposalService(next_gid=iter(range(100, 200)).__next__, audit_sink=sink)
+    first = proposals.detect(capability_id="craft.order.submit", capability_version_gid=17, base_snapshot_gid=31, previous_hash="sha256:old", proposed_descriptor_hash="sha256:a", evidence_hash="sha256:e", submitted_by_gid="author", idempotency_key="detect-a")
+    proposals.detect(capability_id="craft.order.submit", capability_version_gid=17, base_snapshot_gid=32, previous_hash="sha256:a", proposed_descriptor_hash="sha256:b", evidence_hash="sha256:e", submitted_by_gid="author", idempotency_key="detect-b")
+    supersession = next(event for event in sink.events if event.operation == "proposal_superseded")
+    assert supersession.entity_gid == first.proposal_gid
+    assert supersession.detail["after_status"] == "superseded"
+
+    gate = ReleaseGate(next_gid=iter(range(300, 400)).__next__, signer=lambda value: "sig", audit_sink=sink)
+    report = gate.evaluate(ReleaseCandidate("rev-a", "catalog-a", 101, 201), available=True, test_status="passed", approvals_complete=True, data_complete=True, idempotency_key="gate-a")
+    expiry_gid = gate.expire_changed_inputs(code_revision="rev-b")[0]
+    expiry = next(event for event in sink.events if event.operation == "release_report_expired")
+    assert expiry.entity_gid == expiry_gid
+    assert expiry.detail["supersedes_release_report_gid"] == report.release_report_gid

@@ -159,7 +159,9 @@ class ProposalService:
             return existing
         for gid, proposal in tuple(self._proposals.items()):
             if proposal.capability_id == capability_id and proposal.status not in {"released", "rejected", "withdrawn", "superseded", "expired", "stale"} and proposal.proposed_descriptor_hash != proposed_descriptor_hash:
-                self._proposals[gid] = replace(proposal, status="superseded", row_version=proposal.row_version + 1)
+                superseded = replace(proposal, status="superseded", row_version=proposal.row_version + 1)
+                self._proposals[gid] = superseded
+                self._audit(operation="proposal_superseded", entity_gid=gid, actor_gid=str(submitted_by_gid), idempotency_key=f"{key}:superseded:{gid}", detail={"before_status": proposal.status, "after_status": "superseded", "capability_id": proposal.capability_id})
         return self._record(key, Proposal(self._next_gid(), str(capability_id), int(capability_version_gid), int(base_snapshot_gid), str(previous_hash), str(proposed_descriptor_hash), str(evidence_hash), str(submitted_by_gid)), operation="proposal", actor_gid=str(submitted_by_gid))
 
     def transition(self, proposal_gid: int, target: str, *, expected_row_version: int, idempotency_key: str) -> Proposal:
