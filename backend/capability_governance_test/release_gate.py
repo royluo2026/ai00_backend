@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, replace
+from datetime import datetime, timezone
 import hashlib
 import json
 import os
@@ -10,6 +11,12 @@ from pathlib import Path
 from typing import Any, Literal
 
 from backend.plugin_platform.signing import sign
+
+from .audit import AuditSink
+
+
+class ReleaseGateError(RuntimeError):
+    """Raised when a release-gate write request is incomplete or invalid."""
 
 
 @dataclass(frozen=True)
@@ -57,12 +64,14 @@ def _blocking_codes(findings: Iterable[Any]) -> tuple[str, ...]:
 
 
 class ReleaseGate:
-    def __init__(self, *, next_gid: Callable[[], int], signer: Callable[[bytes], str] | None = None, signing_key_id: str | None = None) -> None:
+    def __init__(self, *, next_gid: Callable[[], int], signer: Callable[[bytes], str] | None = None, signing_key_id: str | None = None, audit_sink: AuditSink | None = None) -> None:
         self._next_gid = next_gid
         self._signer = signer or _default_signer
         self._signing_key_id = signing_key_id or os.environ.get("AI00_GOVERNANCE_RELEASE_SIGNING_KEY_ID", "")
+        self._audit_sink = audit_sink
         self._reports: dict[int, ReleaseReport] = {}
         self._idempotency: dict[str, ReleaseReport] = {}
+        self._expiry_reports: dict[int, int] = {}
 
     def get(self, release_report_gid: int) -> ReleaseReport:
         return self._reports[release_report_gid]
@@ -74,21 +83,28 @@ class ReleaseGate:
         return report
 
     def _expired_report(self, report: ReleaseReport) -> ReleaseReport:
-        """Re-sign the immutable report payload for its new expired conclusion."""
+        """Append a separately signed expiry report without touching prior evidence."""
         canonical = _canonical(report.candidate, "expired", report.blockers)
         digest = "sha256:" + hashlib.sha256(canonical).hexdigest()
         try:
             signature = self._signer(canonical)
         except Exception:
             signature = ""
-        return replace(report, conclusion="expired", report_hash=digest, signature=signature)
+        return ReleaseReport(self._next_gid(), report.candidate, "expired", report.blockers, digest, report.signing_key_id, signature)
+
+    def _append_expiry(self, report: ReleaseReport) -> int:
+        if report.release_report_gid in self._expiry_reports:
+            return self._expiry_reports[report.release_report_gid]
+        expiry = self._expired_report(report)
+        self._reports[expiry.release_report_gid] = expiry
+        self._expiry_reports[report.release_report_gid] = expiry.release_report_gid
+        return expiry.release_report_gid
 
     def _expire_prior_passes(self, candidate: ReleaseCandidate) -> tuple[int, ...]:
         expired: list[int] = []
         for gid, report in tuple(self._reports.items()):
             if report.conclusion == "pass" and report.candidate != candidate:
-                self._reports[gid] = self._expired_report(report)
-                expired.append(gid)
+                expired.append(self._append_expiry(report))
         return tuple(expired)
 
     def expire_changed_inputs(self, **candidate_inputs: Any) -> tuple[int, ...]:
@@ -97,13 +113,43 @@ class ReleaseGate:
             if report.conclusion != "pass":
                 continue
             if any(getattr(report.candidate, field) != value for field, value in candidate_inputs.items()):
-                self._reports[gid] = self._expired_report(report)
-                expired.append(gid)
+                expired.append(self._append_expiry(report))
         return tuple(expired)
 
-    def evaluate(self, candidate: ReleaseCandidate, *, available: bool = True, test_status: str | None = None, findings: Iterable[Any] = (), stale_evidence: bool = False, waivers: Iterable[Any] = (), approvals_complete: bool = False, data_complete: bool = False, idempotency_key: str | None = None, **unknown: Any) -> ReleaseReport:
+    @staticmethod
+    def _waiver_value(waiver: Any, name: str, default: Any = None) -> Any:
+        return waiver.get(name, default) if isinstance(waiver, Mapping) else getattr(waiver, name, default)
+
+    def _waiver_blocker(self, waiver: Any, *, candidate: ReleaseCandidate, evidence_hash: str, now: datetime) -> str | None:
+        status = str(self._waiver_value(waiver, "status", "")).lower()
+        if status in {"stale", "revoked"}:
+            return "stale_waiver"
+        if status == "expired":
+            return "expired_waiver"
+        if status != "active":
+            return "invalid_waiver"
+        starts_at, expires_at = self._waiver_value(waiver, "starts_at"), self._waiver_value(waiver, "expires_at")
+        if not isinstance(starts_at, datetime) or not isinstance(expires_at, datetime):
+            return "invalid_waiver"
+        starts_at = starts_at.replace(tzinfo=timezone.utc) if starts_at.tzinfo is None else starts_at.astimezone(timezone.utc)
+        expires_at = expires_at.replace(tzinfo=timezone.utc) if expires_at.tzinfo is None else expires_at.astimezone(timezone.utc)
+        if now >= expires_at:
+            return "expired_waiver"
+        if now < starts_at:
+            return "invalid_waiver"
+        if self._waiver_value(waiver, "code_hash") != candidate.code_revision or self._waiver_value(waiver, "catalog_hash") != candidate.product_catalog_release_id or self._waiver_value(waiver, "evidence_hash") != evidence_hash:
+            return "stale_waiver"
+        return None
+
+    def _audit(self, report: ReleaseReport, *, idempotency_key: str, actor_gid: str) -> None:
+        if self._audit_sink is not None:
+            self._audit_sink.append(operation="gate", entity_gid=report.release_report_gid, actor_gid=actor_gid, request_gid=idempotency_key, detail={"conclusion": report.conclusion, "blockers": report.blockers}, idempotency_key=f"gate:{idempotency_key}")
+
+    def evaluate(self, candidate: ReleaseCandidate, *, available: bool = True, test_status: str | None = None, findings: Iterable[Any] = (), stale_evidence: bool = False, waivers: Iterable[Any] = (), approvals_complete: bool = False, data_complete: bool = False, evidence_hash: str = "", now: datetime | None = None, idempotency_key: str | None = None, evaluated_by_gid: str = "release_gate", **unknown: Any) -> ReleaseReport:
         key = str(idempotency_key or "").strip()
-        if key and key in self._idempotency:
+        if not key:
+            raise ReleaseGateError("idempotency_key_required")
+        if key in self._idempotency:
             return self._idempotency[key]
         self._expire_prior_passes(candidate)
         blockers: set[str] = set()
@@ -116,10 +162,12 @@ class ReleaseGate:
         blockers.update(_blocking_codes(findings))
         if stale_evidence:
             blockers.add("stale_evidence")
+        moment = now or datetime.now(timezone.utc)
+        moment = moment.replace(tzinfo=timezone.utc) if moment.tzinfo is None else moment.astimezone(timezone.utc)
         for waiver in waivers:
-            status = waiver.get("status", "") if isinstance(waiver, Mapping) else getattr(waiver, "status", "")
-            if str(status).lower() == "expired":
-                blockers.add("expired_waiver")
+            blocker = self._waiver_blocker(waiver, candidate=candidate, evidence_hash=str(evidence_hash), now=moment)
+            if blocker:
+                blockers.add(blocker)
         if not approvals_complete:
             blockers.add("incomplete_approvals")
         if not data_complete:
@@ -141,7 +189,9 @@ class ReleaseGate:
             canonical = _canonical(candidate, conclusion, blockers)
             digest = "sha256:" + hashlib.sha256(canonical).hexdigest()
         report = ReleaseReport(self._next_gid(), candidate, conclusion, tuple(sorted(blockers)), digest, key_id, signature)
-        return self._store(report, key or None)
+        report = self._store(report, key)
+        self._audit(report, idempotency_key=key, actor_gid=str(evaluated_by_gid))
+        return report
 
 
-__all__ = ["ReleaseCandidate", "ReleaseGate", "ReleaseReport"]
+__all__ = ["ReleaseCandidate", "ReleaseGate", "ReleaseGateError", "ReleaseReport"]

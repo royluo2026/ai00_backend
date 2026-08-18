@@ -1,6 +1,9 @@
 import hashlib
+from datetime import datetime, timedelta, timezone
 
-from backend.capability_governance_test.release_gate import ReleaseCandidate, ReleaseGate
+import pytest
+
+from backend.capability_governance_test.release_gate import ReleaseCandidate, ReleaseGate, ReleaseGateError
 
 
 def _candidate() -> ReleaseCandidate:
@@ -16,6 +19,7 @@ def _passing_inputs(**overrides):
         "waivers": (),
         "approvals_complete": True,
         "data_complete": True,
+        "idempotency_key": "gate-1",
     }
     values.update(overrides)
     return values
@@ -43,8 +47,25 @@ def test_passing_report_is_immutable_signed_and_expires_when_pinned_input_change
     assert report.signature.startswith("signature:")
     assert report.report_hash.startswith("sha256:")
     expired = gate.expire_changed_inputs(code_revision="rev-b")
-    assert expired == (report.release_report_gid,)
-    expired_report = gate.get(report.release_report_gid)
+    assert expired != (report.release_report_gid,)
+    assert gate.get(report.release_report_gid) == report
+    expired_report = gate.get(expired[0])
     assert expired_report.conclusion == "expired"
     assert expired_report.signature != report.signature
     assert expired_report.report_hash != report.report_hash
+
+
+def test_release_gate_requires_idempotency_key_and_fails_active_waiver_after_expiry():
+    gate = ReleaseGate(next_gid=iter(range(1, 20)).__next__, signer=lambda value: "sig")
+    with pytest.raises(ReleaseGateError, match="idempotency_key_required"):
+        gate.evaluate(_candidate(), **_passing_inputs(idempotency_key=""))
+
+    report = gate.evaluate(_candidate(), **_passing_inputs(idempotency_key="gate-expired", waivers=({"status": "active", "starts_at": datetime(2026, 8, 1, tzinfo=timezone.utc), "expires_at": datetime(2026, 8, 2, tzinfo=timezone.utc), "code_hash": "rev-a", "catalog_hash": "catalog-a", "evidence_hash": "evidence-a"},), evidence_hash="evidence-a", now=datetime(2026, 8, 18, tzinfo=timezone.utc)))
+    assert report.conclusion == "fail"
+    assert "expired_waiver" in report.blockers
+
+
+def test_release_gate_rejects_stale_waiver_hashes():
+    report = ReleaseGate(next_gid=iter(range(1, 20)).__next__, signer=lambda value: "sig").evaluate(_candidate(), **_passing_inputs(idempotency_key="gate-stale", waivers=({"status": "active", "starts_at": datetime(2026, 8, 1, tzinfo=timezone.utc), "expires_at": datetime(2026, 9, 1, tzinfo=timezone.utc), "code_hash": "rev-old", "catalog_hash": "catalog-a", "evidence_hash": "evidence-a"},), evidence_hash="evidence-a", now=datetime(2026, 8, 18, tzinfo=timezone.utc)))
+    assert report.conclusion == "fail"
+    assert "stale_waiver" in report.blockers
