@@ -13,3 +13,6 @@
 @media (max-width:900px) { .health-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
 @media (max-width:680px) { .health-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media (max-width:460px) { .health-grid { grid-template-columns:1fr; } }
+.finding-summary { color:var(--gc-muted); margin:4px 0 10px; }
+.pager { display:flex; align-items:center; justify-content:center; gap:12px; margin:14px 0 4px; color:var(--gc-muted); }
+.pager button { padding:7px 12px; }

@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_0f0d36805d96edade5a5817513562500",
-  "catalog_hash": "sha256:0f0d36805d96edade5a5817513562500cee8c020bf9f30b9d0fa19361f3a04a4",
+  "release_id": "rel_35ce633b3f6542c9bd487abbee586b58",
+  "catalog_hash": "sha256:35ce633b3f6542c9bd487abbee586b588aafb919180a09a483c535ab95528949",
   "descriptors": [
     {
       "id": "base.capability_analysis.get",
@@ -1433,6 +1433,31 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 200
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "domain": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "severity": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "reason_code": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
           }
         },
         "required": [],
@@ -1530,6 +1555,21 @@
                   "minLength": 1,
                   "maxLength": 512
                 },
+                "root_cause_key": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "root_cause_label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "root_cause_count": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100000
+                },
                 "subject_version_gids": {
                   "type": "array",
                   "items": {
@@ -1607,6 +1647,16 @@
             "maxLength": 19
           },
           "total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "root_cause_total": {
             "type": "integer",
             "minimum": 0,
             "maximum": 100000
@@ -1710,6 +1760,21 @@
                   "minLength": 1,
                   "maxLength": 512
                 },
+                "root_cause_key": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "root_cause_label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "root_cause_count": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100000
+                },
                 "subject_version_gids": {
                   "type": "array",
                   "items": {
@@ -1790,6 +1855,16 @@
             "type": "integer",
             "minimum": 0,
             "maximum": 100000
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "root_cause_total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
           }
         },
         "required": [
@@ -1798,7 +1873,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:e4dc73658714f190f2047c63d4446ad2e3a456a5d66d9676bc4d648ca9f1188b",
+      "schema_hash": "sha256:f92c4830e132cd8a16bfb8f2560eceeba9673c5e51311b2715fa7391719b2ea5",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -4416,6 +4491,16 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 200
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "domain": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
           }
         },
         "required": [],
@@ -4591,6 +4676,11 @@
             "maximum": 100000
           },
           "governance_extension_capability_total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "offset": {
             "type": "integer",
             "minimum": 0,
             "maximum": 100000
@@ -4775,6 +4865,11 @@
             "type": "integer",
             "minimum": 0,
             "maximum": 100000
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
           }
         },
         "required": [
@@ -4783,7 +4878,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:f0a9870aa53ff58efd9c07b273790075a238334ac6d7e1f8a4aa2035fbba4121",
+      "schema_hash": "sha256:c2acb00484af2adcb22bf2c692c0fd9599e465f6bcc351443aa2ab5624839450",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -7670,8 +7765,8 @@
       "plugin_id": "test.governance",
       "module": "backend.capability_governance_test.provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:aab6d9683b2424b452194305612b3e71910fd53e88946121104556261f1a442f"
+      "artifact_hash": "sha256:4561f75f5de379ddef9b84a5a75a3538bf10fbb084f5353727ec67987f3cfe59"
     }
   ],
-  "created_at": "2026-08-19T09:15:39.677745Z"
+  "created_at": "2026-08-19T09:41:14.100815Z"
 }

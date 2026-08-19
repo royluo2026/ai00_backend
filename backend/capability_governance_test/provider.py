@@ -113,6 +113,7 @@ def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, A
             response[field] = str(result[field])
     for field in (
         "total", "product_capability_total", "governance_extension_capability_total",
+        "offset", "root_cause_total",
     ):
         if result.get(field) is not None:
             try:
@@ -155,6 +156,7 @@ def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, A
         response["findings"] = [_projection(finding, (
             "finding_gid", "code", "severity", "status", "fingerprint", "remediation_boundary",
             "subject_version_gids", "domains", "evidence", "reason_code", "reason", "subject_summary",
+            "root_cause_key", "root_cause_label", "root_cause_count",
         )) for finding in tuple(result.get("findings", result.get("items", ())))[:200]]
     elif capability_id == "base.capability_proposal.search":
         response["items"] = [_projection(proposal, (

@@ -45,6 +45,11 @@
     return Math.min(Math.max(requested, 1), maximum);
   }
 
+  function boundedOffset(value) {
+    const requested = typeof value === 'number' && Number.isFinite(value) ? Math.floor(value) : 0;
+    return Math.min(Math.max(requested, 0), 100000);
+  }
+
   function gid(value) {
     if (value === null || value === undefined || value === '') throw new Error('target_gid is required');
     return String(value);
@@ -103,13 +108,24 @@
     return unwrapInvocation(result);
   }
 
-  function searchRegistry({ query = '', limit } = {}) {
-    return invoke('base.capability_registry.search', { query: String(query), limit: boundedInteger(limit, COLLECTION_LIMIT, COLLECTION_MAX) });
+  function searchRegistry({ query = '', limit, offset = 0, domain = '' } = {}) {
+    const payload = { query: String(query), limit: boundedInteger(limit, COLLECTION_LIMIT, COLLECTION_MAX) };
+    const bounded = boundedOffset(offset);
+    if (bounded) payload.offset = bounded;
+    if (domain && domain !== 'all') payload.domain = String(domain);
+    return invoke('base.capability_registry.search', payload);
   }
 
-  function searchFindings({ query = '', targetGid } = {}) {
+  function searchFindings({ query = '', targetGid, limit, offset = 0, domain = '', severity = '', status = '', reasonCode = '' } = {}) {
     const payload = { query: String(query) };
     if (targetGid !== null && targetGid !== undefined && targetGid !== '') payload.target_gid = String(targetGid);
+    if (limit !== undefined) payload.limit = boundedInteger(limit, COLLECTION_LIMIT, COLLECTION_MAX);
+    const bounded = boundedOffset(offset);
+    if (bounded) payload.offset = bounded;
+    if (domain && domain !== 'all') payload.domain = String(domain);
+    if (severity && severity !== 'all') payload.severity = String(severity);
+    if (status && status !== 'all') payload.status = String(status);
+    if (reasonCode && reasonCode !== 'all') payload.reason_code = String(reasonCode);
     return invoke('base.capability_finding.search', payload);
   }
 
@@ -220,8 +236,8 @@
 
   async function loadDashboard(filters = {}) {
     const [registry, findings] = await Promise.all([
-      searchRegistry({ query: filters.query, limit: filters.limit }),
-      searchFindings({ query: filters.query }),
+      searchRegistry({ query: filters.query, limit: filters.limit, offset: filters.inventoryOffset, domain: filters.domain }),
+      searchFindings({ query: filters.query, offset: filters.findingOffset, limit: filters.findingLimit, domain: filters.domain, severity: filters.severity, status: filters.status, reasonCode: filters.reasonCode }),
     ]);
     const registryData = registry && registry.data ? registry.data : registry;
     const findingData = findings && findings.data ? findings.data : findings;
@@ -242,6 +258,7 @@
       productCapabilityTotal: productTotal,
       governanceExtensionCapabilityTotal: extensionTotal,
       findingTotal,
+      findingRootCauseTotal: findingData && Number.isFinite(Number(findingData.root_cause_total)) ? Number(findingData.root_cause_total) : null,
       registryTotal,
       productCatalogRelease: null,
       governanceExtensionRelease: null,

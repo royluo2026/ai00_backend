@@ -56,3 +56,67 @@ def test_finding_search_reports_full_total_before_returning_page() -> None:
 
     assert len(result["findings"]) == 1
     assert result["total"] == 3
+
+
+def test_registry_search_supports_offset_and_domain_filter() -> None:
+    entries = tuple(
+        SimpleNamespace(
+            capability_id=capability_id,
+            capability_version_gid=index,
+            owner_domain=domain,
+            major_version=1,
+        )
+        for index, (capability_id, domain) in enumerate(
+            (("craft.one", "craft"), ("craft.two", "craft"), ("digital_model.one", "digital_model")),
+            start=100,
+        )
+    )
+
+    class Store:
+        def list_entries(self):
+            return entries
+
+    result = CapabilityGovernanceService(Store()).base_capability_registry_search(
+        {"limit": 1, "offset": 1, "domain": "craft"}, _context(),
+    )
+
+    assert result["total"] == 2
+    assert [item.capability_id for item in result["items"]] == ["craft.two"]
+    assert result["offset"] == 1
+
+
+def test_findings_group_root_cause_by_reason_and_capability_and_page_server_side() -> None:
+    snapshot = SimpleNamespace(
+        snapshot_gid=100,
+        entries=(
+            SimpleNamespace(capability_id="craft.bop.read", major_version=1, capability_version_gid=501, owner_domain="craft"),
+            SimpleNamespace(capability_id="digital_model.model.read", major_version=1, capability_version_gid=502, owner_domain="digital_model"),
+        ),
+        document=SimpleNamespace(nodes=()),
+    )
+    subjects = lambda capability_id: (SimpleNamespace(capability_id=capability_id, major_version=1, evidence_key=""),)
+    findings = (
+        SimpleNamespace(code="gap", severity="blocking", fingerprint="fp-1", subjects=subjects("craft.bop.read"), evidence_keys=()),
+        SimpleNamespace(code="gap", severity="blocking", fingerprint="fp-2", subjects=subjects("craft.bop.read"), evidence_keys=()),
+        SimpleNamespace(code="gap", severity="warning", fingerprint="fp-3", subjects=subjects("digital_model.model.read"), evidence_keys=()),
+    )
+
+    class Store:
+        def latest_snapshot(self):
+            return snapshot
+
+        def get_findings(self, snapshot_gid):
+            return findings
+
+        def get_snapshot(self, snapshot_gid):
+            return snapshot if snapshot_gid == 100 else None
+
+    result = CapabilityGovernanceService(Store()).base_capability_finding_search(
+        {"limit": 1, "offset": 1, "domain": "craft", "reason_code": "gap"}, _context(),
+    )
+
+    assert result["total"] == 2
+    assert result["root_cause_total"] == 1
+    assert result["findings"][0]["root_cause_key"] == "gap:craft.bop.read@1"
+    assert result["findings"][0]["root_cause_count"] == 2
+    assert result["offset"] == 1

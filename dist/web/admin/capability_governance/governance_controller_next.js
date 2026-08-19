@@ -15,6 +15,16 @@
     return null;
   };
   const rowGid = (row) => normalizeGid(valueOf(row, 'gid', 'proposal_gid', 'finding_gid', 'audit_event_gid', 'capability_version_gid'));
+  const toInventoryRow = (item) => ({
+    gid: String(item && (item.gid || item.capability_version_gid) || ''),
+    capabilityId: item && (item.capabilityId || item.capability_id),
+    domain: item && (item.domain || item.owner_domain),
+    businessEffect: item && (item.businessEffect || item.business_effect),
+    semanticClass: item && (item.semanticClass || item.semantic_class),
+    lifecycle: item && (item.lifecycle || item.lifecycle_status),
+    health: item && item.health,
+    contract: item && (item.contract || item.contract_projection),
+  });
   const statusLabel = (status) => {
     const normalized = String(status || 'unverified').toLowerCase();
     const icon = ['pass', 'healthy', 'active'].includes(normalized) ? '✓'
@@ -92,7 +102,9 @@
       const target = event.target;
       if (target.matches('[data-testid="governance-search"]')) {
         this.state.filters = Object.assign({}, this.state.filters, { query: target.value });
+        this.state.inventoryPage = 1;
         this.render();
+        if (this.api && typeof this.api.searchRegistry === 'function') void this.loadInventoryPage({ page: 1 });
         return;
       }
       const section = target.dataset && target.dataset.filterSection;
@@ -100,7 +112,9 @@
       if (section && key) {
         const previous = this.state.sectionFilters[section] || {};
         this.state.sectionFilters[section] = Object.assign({}, previous, { [key]: target.value });
+        if (section === 'findings') this.state.findingPage = 1;
         this.render();
+        if (section === 'findings') void this.loadSection('findings');
       }
     }
 
@@ -120,7 +134,10 @@
         const selected = domain.dataset.domain || 'all';
         const current = this.state.filters.domain || 'all';
         this.state.filters = Object.assign({}, this.state.filters, { domain: selected !== 'all' && selected === current ? 'all' : selected });
-        return this.setSection('inventory');
+        this.state.inventoryPage = 1;
+        this.setSection('inventory');
+        if (this.api && typeof this.api.searchRegistry === 'function') void this.loadInventoryPage({ page: 1 });
+        return;
       }
       const row = event.target.closest('[data-row-gid]');
       if (row) return this.selectEntity(row.dataset.rowGid);
@@ -129,7 +146,16 @@
         if (action.dataset.action === 'refresh') return this.refresh();
         if (action.dataset.action === 'clear-domain-filter') {
           this.state.filters = Object.assign({}, this.state.filters, { domain: 'all' });
-          return this.setSection('inventory');
+          this.state.inventoryPage = 1;
+          this.setSection('inventory');
+          if (this.api && typeof this.api.searchRegistry === 'function') void this.loadInventoryPage({ page: 1 });
+          return;
+        }
+        if (action.dataset.action === 'inventory-next' || action.dataset.action === 'inventory-prev') {
+          return this.changePage('inventory', action.dataset.action === 'inventory-next' ? 1 : -1);
+        }
+        if (action.dataset.action === 'findings-next' || action.dataset.action === 'findings-prev') {
+          return this.changePage('findings', action.dataset.action === 'findings-next' ? 1 : -1);
         }
         if (action.dataset.action === 'clear-section-filter') {
           const sectionName = action.dataset.section || this.state.section;
@@ -144,6 +170,46 @@
       const key = normalizeGid(gid);
       this.state.selectedEntity = (this.state.rows || []).find((row) => rowGid(row) === key) || null;
       this.render();
+    }
+
+    async changePage(kind, delta) {
+      const pageKey = kind === 'inventory' ? 'inventoryPage' : 'findingPage';
+      const total = kind === 'inventory'
+        ? Number(this.state.registryTotal || 0) || (Number(this.state.productCapabilityTotal || 0) + Number(this.state.governanceExtensionCapabilityTotal || 0))
+        : Number(this.state.findingTotal || 0);
+      const size = kind === 'inventory' ? Number(this.state.catalogPageLimit || 100) : Number(this.state.findingPageLimit || 200);
+      const next = Math.max(1, Number(this.state[pageKey] || 1) + delta);
+      if (next === Number(this.state[pageKey] || 1) || (total && (next - 1) * size >= total)) return false;
+      this.state[pageKey] = next;
+      if (kind === 'inventory') return this.loadInventoryPage({ page: next });
+      return this.loadSection('findings');
+    }
+
+    async loadInventoryPage({ page = this.state.inventoryPage || 1 } = {}) {
+      if (!this.api || typeof this.api.searchRegistry !== 'function') return false;
+      const generation = (this.sectionGenerations.inventory || 0) + 1;
+      this.sectionGenerations.inventory = generation;
+      const pageSize = Number(this.state.catalogPageLimit || 100);
+      this.state.sectionBusy = this.state.sectionBusy.includes('inventory') ? this.state.sectionBusy : this.state.sectionBusy.concat('inventory');
+      this.render();
+      try {
+        const response = await this.api.searchRegistry({ query: this.state.filters.query, domain: this.state.filters.domain, limit: pageSize, offset: (page - 1) * pageSize });
+        if (generation !== this.sectionGenerations.inventory) return false;
+        const data = unwrap(response);
+        this.state.rows = (valueOf(data, 'items', 'rows') || []).map(toInventoryRow);
+        const total = valueOf(data, 'total', 'registryTotal');
+        if (total !== null) this.state.registryTotal = Number(total);
+        this.state.inventoryPage = page;
+        this.state.sectionErrors.inventory = null;
+        return true;
+      } catch (error) {
+        if (generation !== this.sectionGenerations.inventory) return false;
+        this.state.sectionErrors.inventory = error && error.message ? error.message : String(error);
+        return false;
+      } finally {
+        if (generation === this.sectionGenerations.inventory) this.state.sectionBusy = this.state.sectionBusy.filter((item) => item !== 'inventory');
+        this.render();
+      }
     }
 
     async refresh({ supersede = false } = {}) {
@@ -174,12 +240,18 @@
         if (productTotal !== null) this.state.productCapabilityTotal = Number(productTotal);
         if (extensionTotal !== null) this.state.governanceExtensionCapabilityTotal = Number(extensionTotal);
         if (findingTotal !== null) this.state.findingTotal = Number(findingTotal);
+        const registryTotal = valueOf(data, 'registry_total', 'registryTotal');
+        const findingRootCauseTotal = valueOf(data, 'finding_root_cause_total', 'findingRootCauseTotal');
+        if (registryTotal !== null) this.state.registryTotal = Number(registryTotal);
+        if (findingRootCauseTotal !== null) this.state.findingRootCauseTotal = Number(findingRootCauseTotal);
         const catalogLimit = valueOf(data, 'catalog_page_limit', 'catalogPageLimit');
         const findingLimit = valueOf(data, 'finding_page_limit', 'findingPageLimit');
         if (catalogLimit !== null) this.state.catalogPageLimit = Number(catalogLimit);
         if (findingLimit !== null) this.state.findingPageLimit = Number(findingLimit);
         this.state.rows = valueOf(data, 'rows', 'items') || [];
         this.state.findings = valueOf(data, 'findings') || this.state.findings || [];
+        this.state.inventoryPage = 1;
+        this.state.findingPage = 1;
         this.state.proposals = valueOf(data, 'proposals') || this.state.proposals || [];
         this.state.staleData = false;
         this.state.lastError = null;
@@ -213,7 +285,19 @@
         const filters = this.state.sectionFilters[section] || {};
         let response;
         if (section === 'health') response = await this.api.loadHealth(DOMAINS.map((item) => item.id), { snapshotGid: this.state.selectedSnapshotGid });
-        else if (section === 'findings') response = await this.api.searchFindings({ query: filters.query || this.state.filters.query, targetGid: this.state.selectedSnapshotGid });
+        else if (section === 'findings') {
+          const pageSize = Number(this.state.findingPageLimit || 200);
+          response = await this.api.searchFindings({
+            query: filters.query || this.state.filters.query,
+            targetGid: this.state.selectedSnapshotGid,
+            limit: pageSize,
+            offset: (Number(this.state.findingPage || 1) - 1) * pageSize,
+            domain: filters.domain,
+            severity: filters.severity,
+            status: filters.status,
+            reasonCode: filters.reasonCode,
+          });
+        }
         else if (section === 'changes') response = await this.api.loadProposals(filters);
         else response = await this.api.loadAudit(filters);
         if (generation !== this.sectionGenerations[section]) return false;
@@ -222,6 +306,8 @@
           this.state.findings = valueOf(data, 'findings', 'items') || [];
           const findingTotal = valueOf(data, 'total', 'finding_total', 'findingTotal');
           if (findingTotal !== null) this.state.findingTotal = Number(findingTotal);
+          const rootCauseTotal = valueOf(data, 'root_cause_total', 'finding_root_cause_total', 'findingRootCauseTotal');
+          if (rootCauseTotal !== null) this.state.findingRootCauseTotal = Number(rootCauseTotal);
         }
         if (section === 'changes') this.state.proposals = valueOf(data, 'items', 'proposals') || [];
         if (section === 'health') this.state.health = valueOf(data, 'items', 'health') || [];
@@ -299,7 +385,19 @@
     renderInventory() {
       const rows = filterRows(this.state.rows, this.state.filters);
       const domain = this.state.filters.domain || 'all';
-      return `<section><div class="filters"><label>搜索 <input data-testid="governance-search" value="${escapeHtml(this.state.filters.query)}" placeholder="能力 ID、GID、业务效果"></label><div class="domain-filter"><button type="button" data-domain="all">全部领域</button>${DOMAINS.map((item) => `<button type="button" data-domain="${item.id}">${escapeHtml(item.label)}</button>`).join('')}<button type="button" data-action="clear-domain-filter"${domain === 'all' ? ' disabled' : ''}>清除领域筛选</button></div></div><div class="inventory-table" role="table"><div class="inventory-head" role="row"><span>GID / Capability</span><span>业务效果</span><span>领域</span><span>状态</span></div>${rows.map((row) => `<button type="button" class="inventory-row" data-row-gid="${escapeHtml(rowGid(row))}" role="row"><span class="gid">${escapeHtml(rowGid(row))}<br><b>${escapeHtml(row.capabilityId || row.capability_id)}</b></span><span>${escapeHtml(row.businessEffect || row.business_effect)}</span><span>${escapeHtml(row.domain)}</span>${statusLabel(row.health || row.lifecycle)}</button>`).join('') || '<p class="empty">没有符合筛选条件的能力。</p>'}</div>${this.renderDrawer()}</section>`;
+      const total = this.state.registryTotal === null || this.state.registryTotal === undefined
+        ? Number(this.state.productCapabilityTotal || 0) + Number(this.state.governanceExtensionCapabilityTotal || 0)
+        : Number(this.state.registryTotal || 0);
+      const pageSize = Number(this.state.catalogPageLimit || 100);
+      return `<section><div class="filters"><label>搜索 <input data-testid="governance-search" value="${escapeHtml(this.state.filters.query)}" placeholder="能力 ID、GID、业务效果"></label><div class="domain-filter"><button type="button" data-domain="all">全部领域</button>${DOMAINS.map((item) => `<button type="button" data-domain="${item.id}">${escapeHtml(item.label)}</button>`).join('')}<button type="button" data-action="clear-domain-filter"${domain === 'all' ? ' disabled' : ''}>清除领域筛选</button></div></div><div class="inventory-table" role="table"><div class="inventory-head" role="row"><span>GID / Capability</span><span>业务效果</span><span>领域</span><span>状态</span></div>${rows.map((row) => `<button type="button" class="inventory-row" data-row-gid="${escapeHtml(rowGid(row))}" role="row"><span class="gid">${escapeHtml(rowGid(row))}<br><b>${escapeHtml(row.capabilityId || row.capability_id)}</b></span><span>${escapeHtml(row.businessEffect || row.business_effect)}</span><span>${escapeHtml(row.domain)}</span>${statusLabel(row.health || row.lifecycle)}</button>`).join('') || '<p class="empty">没有符合筛选条件的能力。</p>'}</div>${this.renderPager('inventory', total, this.state.inventoryPage, pageSize)}${this.renderDrawer()}</section>`;
+    }
+
+    renderPager(kind, total, page, pageSize) {
+      const safeTotal = Number(total || 0);
+      const safePage = Math.max(1, Number(page || 1));
+      const pages = Math.max(1, Math.ceil(safeTotal / Math.max(1, Number(pageSize || 1))));
+      const label = kind === 'inventory' ? '能力清单' : 'Finding';
+      return `<div class="pager" aria-label="${label}分页"><button type="button" data-action="${kind}-prev"${safePage <= 1 ? ' disabled' : ''}>上一页</button><span>第 ${safePage} 页 / 共 ${pages} 页 · 共 ${safeTotal} 条</span><button type="button" data-action="${kind}-next"${safePage >= pages ? ' disabled' : ''}>下一页</button></div>`;
     }
 
     renderDrawer() {
@@ -322,7 +420,9 @@
         const text = `${finding.code || finding.findingType || ''} ${finding.fingerprint || ''} ${reasonCode} ${finding.reason || ''} ${finding.subject_summary || finding.subjectSummary || ''}`.toLowerCase();
         return (filters.domain === 'all' || (Array.isArray(domains) ? domains.includes(filters.domain) : domains === filters.domain)) && (filters.severity === 'all' || filters.severity === severity) && (filters.status === 'all' || filters.status === status) && (filters.reasonCode === 'all' || filters.reasonCode === reasonCode) && (!filters.query || text.includes(filters.query.toLowerCase()));
       });
-      return `<section><h2>Finding 中心</h2><div class="filters"><label>搜索 <input data-filter-section="findings" data-filter-key="query" value="${escapeHtml(filters.query || '')}" placeholder="规则、指纹、原因"></label><label>领域 <select data-filter-section="findings" data-filter-key="domain"><option value="all">全部领域</option>${DOMAINS.map((domain) => `<option value="${domain.id}"${filters.domain === domain.id ? ' selected' : ''}>${escapeHtml(domain.label)}</option>`).join('')}</select></label><label>级别 <select data-filter-section="findings" data-filter-key="severity"><option value="all">全部级别</option><option value="blocking"${filters.severity === 'blocking' ? ' selected' : ''}>blocking</option><option value="critical"${filters.severity === 'critical' ? ' selected' : ''}>critical</option><option value="error"${filters.severity === 'error' ? ' selected' : ''}>error</option><option value="warning"${filters.severity === 'warning' ? ' selected' : ''}>warning</option></select></label><label>NOK 原因类别 <select data-filter-section="findings" data-filter-key="reasonCode"><option value="all">全部原因</option>${reasonCodes.map((code) => `<option value="${escapeHtml(code)}"${filters.reasonCode === code ? ' selected' : ''}>${escapeHtml(reasonLabel(code))}</option>`).join('')}</select></label><button type="button" data-action="clear-section-filter" data-section="findings">清除筛选</button></div>${findings.map((finding) => { const reasonCode = String(finding.reason_code || finding.reasonCode || finding.code || ''); const subject = finding.subject_summary || finding.subjectSummary || (finding.subjectVersionGids || finding.subject_version_gids || []).map(normalizeGid).join('、') || '—'; return `<article class="finding"><h3>${escapeHtml(finding.code || finding.findingType || 'finding')} ${statusLabel(finding.status)}</h3><p>主体：${escapeHtml(subject)}</p><p>领域：${(finding.domains || []).map(escapeHtml).join('、') || '跨领域'}</p><p>严重级别：${escapeHtml(finding.severity || 'warning')}</p><p>原因类别：${escapeHtml(reasonLabel(reasonCode))}</p><p>判定原因：${escapeHtml(finding.reason || '未提供判定原因')}</p><p>证据：${(finding.evidence || []).map(escapeHtml).join('、') || '—'}</p></article>`; }).join('') || '<p class="empty">没有符合条件的 Finding。</p>'}</section>`;
+      const rootTotal = this.state.findingRootCauseTotal === null ? new Set(findings.map((finding) => finding.root_cause_key || finding.rootCauseKey || `${finding.reason_code || finding.code}:${finding.subject_summary || ''}`)).size : this.state.findingRootCauseTotal;
+      const pageSize = Number(this.state.findingPageLimit || 200);
+      return `<section><h2>Finding 中心</h2><p class="finding-summary">根因组 ${escapeHtml(rootTotal)} 个；当前页 ${escapeHtml(findings.length)} 条 Finding。根因键 = 原因类别 + 具体 Capability，便于定位修复对象。</p><div class="filters"><label>搜索 <input data-filter-section="findings" data-filter-key="query" value="${escapeHtml(filters.query || '')}" placeholder="规则、指纹、原因、Capability"></label><label>领域 <select data-filter-section="findings" data-filter-key="domain"><option value="all">全部领域</option>${DOMAINS.map((domain) => `<option value="${domain.id}"${filters.domain === domain.id ? ' selected' : ''}>${escapeHtml(domain.label)}</option>`).join('')}</select></label><label>级别 <select data-filter-section="findings" data-filter-key="severity"><option value="all">全部级别</option><option value="blocking"${filters.severity === 'blocking' ? ' selected' : ''}>blocking</option><option value="critical"${filters.severity === 'critical' ? ' selected' : ''}>critical</option><option value="error"${filters.severity === 'error' ? ' selected' : ''}>error</option><option value="warning"${filters.severity === 'warning' ? ' selected' : ''}>warning</option></select></label><label>NOK 原因类别 <select data-filter-section="findings" data-filter-key="reasonCode"><option value="all">全部原因</option>${reasonCodes.map((code) => `<option value="${escapeHtml(code)}"${filters.reasonCode === code ? ' selected' : ''}>${escapeHtml(reasonLabel(code))}</option>`).join('')}</select></label><button type="button" data-action="clear-section-filter" data-section="findings">清除筛选</button></div>${findings.map((finding) => { const reasonCode = String(finding.reason_code || finding.reasonCode || finding.code || ''); const subject = finding.subject_summary || finding.subjectSummary || (finding.subjectVersionGids || finding.subject_version_gids || []).map(normalizeGid).join('、') || '—'; const rootLabel = finding.root_cause_label || finding.rootCauseLabel || `${reasonLabel(reasonCode)} · ${subject}`; return `<article class="finding"><h3>${escapeHtml(finding.code || finding.findingType || 'finding')} ${statusLabel(finding.status)}</h3><p>根因：${escapeHtml(rootLabel)}${finding.root_cause_count ? `（影响 ${escapeHtml(finding.root_cause_count)} 条证据）` : ''}</p><p>主体：${escapeHtml(subject)}</p><p>领域：${(finding.domains || []).map(escapeHtml).join('、') || '跨领域'}</p><p>严重级别：${escapeHtml(finding.severity || 'warning')}</p><p>原因类别：${escapeHtml(reasonLabel(reasonCode))}</p><p>判定原因：${escapeHtml(finding.reason || '未提供判定原因')}</p><p>证据：${(finding.evidence || []).map(escapeHtml).join('、') || '—'}</p></article>`; }).join('') || '<p class="empty">没有符合条件的 Finding。</p>'}${this.renderPager('findings', Number(this.state.findingTotal || findings.length), this.state.findingPage, pageSize)}</section>`;
     }
 
     renderChanges() {

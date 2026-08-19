@@ -46,6 +46,7 @@ WRITE_IDS = {
     "base.capability_release_gate.evaluate",
 }
 _LIMIT_SCHEMA = {"type": "integer", "minimum": 1, "maximum": 200}
+_OFFSET_SCHEMA = {"type": "integer", "minimum": 0, "maximum": 100000}
 _DEPTH_SCHEMA = {"type": "integer", "minimum": 1, "maximum": 4}
 _NODES_SCHEMA = {"type": "integer", "minimum": 1, "maximum": 500}
 _COUNT_SCHEMA = {"type": "integer", "minimum": 0, "maximum": 100000}
@@ -77,9 +78,13 @@ def _input_schema(capability_id: str) -> dict[str, object]:
         properties["idempotency_key"] = {"type": "string", "minLength": 1, "maxLength": 255}
         required = ("idempotency_key",)
     if capability_id == "base.capability_registry.search":
-        properties["limit"] = _LIMIT_SCHEMA
+        properties.update({"limit": _LIMIT_SCHEMA, "offset": _OFFSET_SCHEMA, "domain": _SMALL_STRING_SCHEMA})
     if capability_id == "base.capability_finding.search":
-        properties["limit"] = _LIMIT_SCHEMA
+        properties.update({
+            "limit": _LIMIT_SCHEMA, "offset": _OFFSET_SCHEMA, "domain": _SMALL_STRING_SCHEMA,
+            "severity": _SMALL_STRING_SCHEMA, "status": _SMALL_STRING_SCHEMA,
+            "reason_code": _SMALL_STRING_SCHEMA,
+        })
     if capability_id == "base.capability_proposal.search":
         properties.update({
             "domain": _SMALL_STRING_SCHEMA,
@@ -219,6 +224,8 @@ _FINDING_SCHEMA = _closed({
     "finding_gid": GID_SCHEMA, "status": _SMALL_STRING_SCHEMA,
     "reason_code": _SMALL_STRING_SCHEMA, "reason": STRING_SCHEMA,
     "subject_summary": STRING_SCHEMA,
+    "root_cause_key": STRING_SCHEMA, "root_cause_label": STRING_SCHEMA,
+    "root_cause_count": _COUNT_SCHEMA,
     "subject_version_gids": {"type": "array", "items": GID_SCHEMA, "maxItems": 20},
     "domains": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 20},
     "evidence": {"type": "array", "items": STRING_SCHEMA, "maxItems": 200},
@@ -325,6 +332,7 @@ def _output_schema(capability_id: str) -> dict[str, object]:
             "total": _COUNT_SCHEMA,
             "product_capability_total": _COUNT_SCHEMA,
             "governance_extension_capability_total": _COUNT_SCHEMA,
+            "offset": _COUNT_SCHEMA,
         })
     elif capability_id == "base.capability_registry.get":
         properties["item"] = _ITEM_SCHEMA
@@ -340,6 +348,8 @@ def _output_schema(capability_id: str) -> dict[str, object]:
     elif capability_id == "base.capability_finding.search":
         properties["findings"] = {"type": "array", "items": _FINDING_SCHEMA, "maxItems": 200}
         properties["total"] = _COUNT_SCHEMA
+        properties["offset"] = _COUNT_SCHEMA
+        properties["root_cause_total"] = _COUNT_SCHEMA
     elif capability_id == "base.capability_proposal.search":
         properties["items"] = {"type": "array", "items": _PROPOSAL_ITEM_SCHEMA, "maxItems": 200}
         properties["data"] = _QUERY_META_SCHEMA

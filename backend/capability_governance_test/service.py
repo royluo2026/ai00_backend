@@ -6,6 +6,7 @@ from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 import inspect
 from typing import Any
+import re
 
 from backend.capabilities.models_next import CapabilityBusinessError
 from backend.domain_ports.capability_governance_ai import GovernanceAdvisorPort
@@ -22,6 +23,7 @@ _MAX_GRAPH_DEPTH = 4
 _MAX_GRAPH_NODES = 500
 _PROMPT_READ_PERMISSION = "base.capability_repair_prompt.read"
 _DEFAULT_PORT = object()
+_MAX_OFFSET = 100000
 
 
 # Finding codes are the machine-stable NOK categories.  Keep their explanations
@@ -50,6 +52,46 @@ _FINDING_REASON_TEXT = {
 
 def _finding_reason(code: str) -> str:
     return _FINDING_REASON_TEXT.get(code, f"规则 {code} 判定该治理对象缺少满足发布要求的证据。")[:255]
+
+
+def _capability_refs(subjects: Any) -> tuple[str, ...]:
+    """Return stable capability/version references for an actionable root cause."""
+    refs: set[str] = set()
+    for subject in tuple(subjects or ()):
+        if isinstance(subject, Mapping):
+            capability_id = subject.get("capability_id") or subject.get("capabilityId")
+            major = subject.get("major_version", subject.get("majorVersion", 0))
+        else:
+            capability_id = getattr(subject, "capability_id", "")
+            major = getattr(subject, "major_version", 0)
+        capability_id = str(capability_id or "").strip()
+        if not capability_id:
+            continue
+        try:
+            major_value = int(major or 0)
+        except (TypeError, ValueError):
+            major_value = 0
+        refs.add(f"{capability_id}@{major_value}" if major_value else capability_id)
+    return tuple(sorted(refs))
+
+
+def _root_cause_fields(
+    code: str, *, subjects: Any = (), evidence: Any = (), record: Mapping[str, Any] | None = None,
+) -> tuple[str, str]:
+    """Build an actionable key: NOK category + concrete Capability target(s)."""
+    record = record or {}
+    refs = _capability_refs(subjects)
+    if not refs:
+        refs = tuple(str(item).strip() for item in record.get("capability_refs", ()) if str(item).strip())
+    if not refs:
+        summary = str(record.get("subject_summary", record.get("subjectSummary", "")))
+        refs = tuple(f"{match[0]}@{match[1]}" for match in re.findall(r"Capability：([^@、]+)@(\d+)", summary))
+    if refs:
+        target = "|".join(refs[:20])
+        return f"{code}:{target}", f"{_finding_reason(code)} · {target}"
+    evidence_values = tuple(str(item).strip() for item in evidence or () if str(item).strip())
+    fallback = evidence_values[0][:160] if evidence_values else "unresolved"
+    return f"{code}:unresolved:{fallback}", f"{_finding_reason(code)} · 未解析 Capability（{fallback}）"
 
 
 def _finding_subject_summary(
@@ -105,6 +147,8 @@ def _enrich_finding_record(snapshot: Any, item: Any) -> dict[str, Any]:
                 "finding_gid", "code", "finding_type", "severity", "status", "fingerprint",
                 "remediation_boundary", "subject_version_gids", "domains", "evidence",
                 "reason_code", "reason", "subject_summary",
+                "root_cause_key", "root_cause_label", "root_cause_count", "capability_refs",
+                "subjects", "evidence_keys",
             ):
                 if hasattr(item, field):
                     record[field] = getattr(item, field)
@@ -114,9 +158,29 @@ def _enrich_finding_record(snapshot: Any, item: Any) -> dict[str, Any]:
     if not str(record.get("reason", "")).strip():
         record["reason"] = _finding_reason(str(record["reason_code"]))
     subjects = tuple(record.get("subjects", ()) or ())
-    evidence = tuple(record.get("evidence", ()) or ())
+    evidence = tuple(record.get("evidence", record.get("evidence_keys", ())) or ())
+    if subjects and not record.get("capability_refs"):
+        record["capability_refs"] = _capability_refs(subjects)
+    if subjects and not record.get("domains"):
+        domain_by_capability = {
+            (str(getattr(entry, "capability_id", "")), int(getattr(entry, "major_version", 0) or 0)): str(getattr(entry, "owner_domain", ""))
+            for entry in getattr(getattr(snapshot, "document", snapshot), "entries", ())
+        }
+        # Some stores expose entries on the snapshot itself; use that shape too.
+        domain_by_capability.update({
+            (str(getattr(entry, "capability_id", "")), int(getattr(entry, "major_version", 0) or 0)): str(getattr(entry, "owner_domain", ""))
+            for entry in getattr(snapshot, "entries", ())
+        })
+        record["domains"] = tuple(sorted({
+            domain_by_capability.get((str(getattr(subject, "capability_id", "")), int(getattr(subject, "major_version", 0) or 0)), "")
+            for subject in subjects
+            if domain_by_capability.get((str(getattr(subject, "capability_id", "")), int(getattr(subject, "major_version", 0) or 0)), "")
+        }))
     if not str(record.get("subject_summary", record.get("subjectSummary", ""))).strip():
         record["subject_summary"] = _finding_subject_summary(snapshot, subjects, evidence)
+    key, label = _root_cause_fields(str(record["reason_code"]), subjects=subjects, evidence=evidence, record=record)
+    record["root_cause_key"] = str(record.get("root_cause_key") or key)
+    record["root_cause_label"] = str(record.get("root_cause_label") or label)[:512]
     return record
 
 
@@ -311,20 +375,24 @@ class CapabilityGovernanceService:
         binder(snapshot)
 
     def base_capability_registry_search(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
-        requested = payload.get("limit", _MAX_SEARCH)
-        try:
-            limit = min(max(1, int(requested)), _MAX_SEARCH)
-        except (TypeError, ValueError) as exc:
-            raise _business_error("invalid_input") from exc
+        limit = self._bounded_limit(payload.get("limit", _MAX_SEARCH))
+        offset = self._bounded_offset(payload.get("offset", 0))
         query = str(payload.get("query", "")).strip().lower()
+        domain = str(payload.get("domain", "")).strip().lower()
         entries = sorted(self._entries(), key=lambda item: str(getattr(item, "capability_id", "")))
-        matches = [item for item in entries if not query or query in str(getattr(item, "capability_id", "")).lower()]
+        matches = [
+            item for item in entries
+            if (not query or query in " ".join(
+                str(getattr(item, field, "")) for field in ("capability_id", "capability_version_gid", "business_effect", "owner_domain")
+            ).lower())
+            and (not domain or domain == str(getattr(item, "owner_domain", getattr(item, "domain", ""))).lower())
+        ]
         extension_matches = [
             item for item in matches
             if str(getattr(item, "capability_id", "")).lower().startswith("base.capability_")
         ]
         return self._completed(
-            "base.capability_registry.search", limit=limit, items=tuple(matches[:limit]),
+            "base.capability_registry.search", limit=limit, offset=offset, items=tuple(matches[offset:offset + limit]),
             total=len(matches),
             product_capability_total=len(matches) - len(extension_matches),
             governance_extension_capability_total=len(extension_matches),
@@ -486,11 +554,8 @@ class CapabilityGovernanceService:
         return result
 
     def base_capability_finding_search(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
-        requested = payload.get("limit", _MAX_SEARCH)
-        try:
-            limit = min(max(1, int(requested)), _MAX_SEARCH)
-        except (TypeError, ValueError) as exc:
-            raise _business_error("invalid_input") from exc
+        limit = self._bounded_limit(payload.get("limit", _MAX_SEARCH))
+        offset = self._bounded_offset(payload.get("offset", 0))
         snapshot = None
         if payload.get("target_gid") is not None:
             snapshot = self._snapshot(payload)
@@ -516,16 +581,55 @@ class CapabilityGovernanceService:
                     snapshot, getattr(analysis, "findings", ()), limit=_MAX_HEALTH_FINDINGS,
                 )
         query = str(payload.get("query", "")).strip().lower()
+        domain = str(payload.get("domain", "")).strip().lower()
+        severity = str(payload.get("severity", "")).strip().lower()
+        status = str(payload.get("status", "")).strip().lower()
+        reason_code = str(payload.get("reason_code", "")).strip().lower()
         if query:
             def field(item: Any, name: str) -> Any:
                 if isinstance(item, Mapping):
                     return item.get(name, "")
                 return getattr(item, name, "")
-            findings = tuple(item for item in findings if query in str(field(item, "code")).lower()
-                             or query in str(field(item, "fingerprint")).lower())
+            findings = tuple(item for item in findings if query in " ".join(
+                str(field(item, name)) for name in ("code", "fingerprint", "reason", "root_cause_key", "root_cause_label", "subject_summary")
+            ).lower())
+        def field(item: Any, name: str) -> Any:
+            if isinstance(item, Mapping):
+                return item.get(name, "")
+            return getattr(item, name, "")
+        if domain:
+            findings = tuple(item for item in findings if domain in {str(value).lower() for value in (field(item, "domains") or ())})
+        if severity:
+            findings = tuple(item for item in findings if str(field(item, "severity")).lower() == severity)
+        if status:
+            findings = tuple(item for item in findings if str(field(item, "status")).lower() == status)
+        if reason_code:
+            findings = tuple(item for item in findings if str(field(item, "reason_code") or field(item, "code")).lower() == reason_code)
+        root_counts: dict[str, int] = {}
+        for item in findings:
+            record = item if isinstance(item, Mapping) else getattr(item, "__dict__", {})
+            code = str(field(item, "reason_code") or field(item, "code") or "finding")
+            root_key, root_label = _root_cause_fields(code, evidence=field(item, "evidence"), record=record)
+            if isinstance(item, dict):
+                item.setdefault("root_cause_key", root_key)
+                item.setdefault("root_cause_label", root_label)
+            root_counts[root_key] = root_counts.get(root_key, 0) + 1
+        projected: list[Any] = []
+        for item in findings:
+            record = item if isinstance(item, Mapping) else getattr(item, "__dict__", {})
+            code = str(field(item, "reason_code") or field(item, "code") or "finding")
+            root_key, root_label = _root_cause_fields(code, evidence=field(item, "evidence"), record=record)
+            if isinstance(item, dict):
+                item["root_cause_key"] = root_key
+                item["root_cause_label"] = root_label
+                item["root_cause_count"] = root_counts[root_key]
+            else:
+                projected.append(dict(record, root_cause_key=root_key, root_cause_label=root_label, root_cause_count=root_counts[root_key]))
+                continue
+            projected.append(item)
         return self._completed(
-            "base.capability_finding.search", findings=tuple(findings[:limit]),
-            total=len(findings),
+            "base.capability_finding.search", findings=tuple(projected[offset:offset + limit]),
+            total=len(projected), offset=offset, root_cause_total=len(root_counts),
         )
 
     def base_capability_analysis_get(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
@@ -1114,6 +1218,13 @@ class CapabilityGovernanceService:
             raise _business_error("invalid_input") from exc
 
     @staticmethod
+    def _bounded_offset(value: Any) -> int:
+        try:
+            return min(max(0, int(value)), _MAX_OFFSET)
+        except (TypeError, ValueError) as exc:
+            raise _business_error("invalid_input") from exc
+
+    @staticmethod
     def _now_iso() -> str:
         return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
@@ -1299,6 +1410,9 @@ class CapabilityGovernanceService:
             )
             finding_domains = tuple(sorted(finding_domain_values))
             reason_code = code
+            root_key, root_label = _root_cause_fields(
+                reason_code, subjects=subjects, evidence=getattr(candidate, "evidence_keys", ()),
+            )
             records.append({
                 "finding_gid": str(finding_gid), "code": code,
                 "severity": str(getattr(candidate, "severity", "warning")), "status": "open",
@@ -1309,6 +1423,8 @@ class CapabilityGovernanceService:
                 "evidence": tuple(str(value) for value in getattr(candidate, "evidence_keys", ())[:200]),
                 "reason_code": reason_code,
                 "reason": _finding_reason(reason_code),
+                "root_cause_key": root_key,
+                "root_cause_label": root_label,
                 "subject_summary": _finding_subject_summary(
                     snapshot, subjects, tuple(getattr(candidate, "evidence_keys", ())),
                 ),
