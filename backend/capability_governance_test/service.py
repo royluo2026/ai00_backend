@@ -80,6 +80,10 @@ def _root_cause_fields(
 ) -> tuple[str, str]:
     """Build an actionable key: NOK category + concrete Capability target(s)."""
     record = record or {}
+    known_key = str(record.get("root_cause_key", "") or "").strip()
+    if known_key:
+        known_label = str(record.get("root_cause_label", "") or "").strip()
+        return known_key, known_label[:512] if known_label else f"{_finding_reason(code)} · {known_key.split(':', 1)[-1]}"
     refs = _capability_refs(subjects)
     if not refs:
         refs = tuple(str(item).strip() for item in record.get("capability_refs", ()) if str(item).strip())
@@ -92,6 +96,26 @@ def _root_cause_fields(
     evidence_values = tuple(str(item).strip() for item in evidence or () if str(item).strip())
     fallback = evidence_values[0][:160] if evidence_values else "unresolved"
     return f"{code}:unresolved:{fallback}", f"{_finding_reason(code)} · 未解析 Capability（{fallback}）"
+
+
+def _record_value(record: Any, name: str, default: Any = None) -> Any:
+    if isinstance(record, Mapping):
+        return record.get(name, default)
+    return getattr(record, name, default)
+
+
+def _root_cause_capability_refs(record: Any, root_key: str = "") -> tuple[str, ...]:
+    refs = _capability_refs(_record_value(record, "subjects", ()))
+    if not refs:
+        refs = tuple(str(value).strip() for value in (_record_value(record, "capability_refs", ()) or ()) if str(value).strip())
+    if not refs:
+        summary = str(_record_value(record, "subject_summary", _record_value(record, "subjectSummary", "")) or "")
+        refs = tuple(f"{match[0]}@{match[1]}" for match in re.findall(r"Capability：([^@、]+)@(\d+)", summary))
+    if not refs and ":" in root_key:
+        candidate = root_key.split(":", 1)[1]
+        if not candidate.startswith("unresolved:"):
+            refs = tuple(part for part in candidate.split("|") if part)
+    return tuple(dict.fromkeys(refs))[:20]
 
 
 def _finding_subject_summary(
@@ -397,6 +421,118 @@ class CapabilityGovernanceService:
             product_capability_total=len(matches) - len(extension_matches),
             governance_extension_capability_total=len(extension_matches),
         )
+
+    def base_capability_governance_snapshot_summary_get(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
+        """Return a bounded, agent-friendly summary of one verified snapshot.
+
+        The summary groups evidence rows by the actionable root-cause key
+        (reason category + concrete Capability) so an agent can triage with one
+        read call and then drill into the existing registry/finding APIs.
+        """
+        snapshot_payload = {"target_gid": payload.get("snapshot_gid")} if payload.get("snapshot_gid") is not None else {}
+        snapshot = self._snapshot(snapshot_payload) if snapshot_payload else self._latest_snapshot()
+        if snapshot is None:
+            raise _business_error("governance_dependency_unavailable")
+        limit = self._bounded_limit(payload.get("limit", 50))
+        offset = self._bounded_offset(payload.get("offset", 0))
+        raw_domains = payload.get("domains", ())
+        raw_severities = payload.get("severity", ())
+        if isinstance(raw_domains, (str, bytes, Mapping)) or isinstance(raw_severities, (str, bytes, Mapping)):
+            raise _business_error("invalid_input")
+        domains = {str(value).strip().lower() for value in tuple(raw_domains or ()) if str(value).strip()}
+        severities = {str(value).strip().lower() for value in tuple(raw_severities or ()) if str(value).strip()}
+        query = str(payload.get("query", "")).strip().lower()
+        findings = self._load_findings(snapshot, payload, context, limit=_MAX_HEALTH_FINDINGS)
+
+        def values(item: Any, field: str) -> Any:
+            return _record_value(item, field, ())
+
+        filtered: list[Any] = []
+        for item in findings:
+            item_domains = {str(value).lower() for value in (values(item, "domains") or ())}
+            severity = str(values(item, "severity") or "warning").lower()
+            code = str(values(item, "reason_code") or values(item, "code") or "finding")
+            root_key, root_label = _root_cause_fields(code, evidence=values(item, "evidence"), record=item)
+            searchable = " ".join((root_key, root_label, str(values(item, "reason") or ""), str(values(item, "subject_summary") or ""))).lower()
+            if domains and not domains.intersection(item_domains):
+                continue
+            if severities and severity not in severities:
+                continue
+            if query and query not in searchable:
+                continue
+            filtered.append(item)
+
+        severity_rank = {"blocking": 4, "critical": 3, "error": 2, "warning": 1, "info": 0}
+        groups: dict[str, dict[str, Any]] = {}
+        domain_finding_counts: dict[str, int] = {}
+        for item in filtered:
+            code = str(values(item, "reason_code") or values(item, "code") or "finding")
+            evidence = tuple(str(value) for value in (values(item, "evidence") or ()) if str(value).strip())
+            root_key, root_label = _root_cause_fields(code, evidence=evidence, record=item)
+            severity = str(values(item, "severity") or "warning")
+            item_domains = tuple(sorted({str(value) for value in (values(item, "domains") or ()) if str(value).strip()}))
+            group = groups.setdefault(root_key, {
+                "root_cause_key": root_key, "reason_code": code,
+                "root_cause_label": str(values(item, "root_cause_label") or root_label)[:512],
+                "capabilities": set(_root_cause_capability_refs(item, root_key)),
+                "domains": set(item_domains), "finding_count": 0,
+                "severity": severity, "evidence_refs": set(),
+            })
+            group["finding_count"] += 1
+            group["capabilities"].update(_root_cause_capability_refs(item, root_key))
+            group["domains"].update(item_domains)
+            group["evidence_refs"].update(evidence[:20])
+            if severity_rank.get(severity.lower(), 0) > severity_rank.get(str(group["severity"]).lower(), 0):
+                group["severity"] = severity
+            for domain in item_domains:
+                domain_finding_counts[domain] = domain_finding_counts.get(domain, 0) + 1
+
+        entries = tuple(getattr(snapshot, "entries", ()))
+        capability_total = sum(
+            1 for entry in entries
+            if not domains or str(getattr(entry, "owner_domain", getattr(entry, "domain", ""))).lower() in domains
+        )
+        ordered_groups = sorted(
+            groups.values(),
+            key=lambda item: (-severity_rank.get(str(item["severity"]).lower(), 0), str(item["root_cause_key"])),
+        )
+        root_causes = tuple({
+            **group,
+            "capabilities": tuple(sorted(group["capabilities"]))[:20],
+            "domains": tuple(sorted(group["domains"]))[:11],
+            "evidence_refs": tuple(sorted(group["evidence_refs"]))[:20],
+        } for group in ordered_groups)
+        domain_capability_counts: dict[str, int] = {}
+        for entry in entries:
+            domain = str(getattr(entry, "owner_domain", getattr(entry, "domain", ""))).strip()
+            if domain and (not domains or domain.lower() in domains):
+                domain_capability_counts[domain] = domain_capability_counts.get(domain, 0) + 1
+        domain_summaries = tuple({
+            "domain": domain,
+            "finding_count": domain_finding_counts.get(domain, 0),
+            "capability_count": count,
+        } for domain, count in sorted(domain_capability_counts.items()))
+        page = root_causes[offset:offset + limit]
+        document = getattr(snapshot, "document", snapshot)
+        result: dict[str, Any] = {
+            "snapshot_gid": str(getattr(snapshot, "snapshot_gid")),
+            "capability_total": capability_total,
+            "finding_total": len(filtered),
+            "root_cause_total": len(root_causes),
+            "blocking_total": sum(1 for item in filtered if str(values(item, "severity") or "").lower() == "blocking"),
+            "critical_total": sum(1 for item in filtered if str(values(item, "severity") or "").lower() == "critical"),
+            "limit": limit, "offset": offset,
+            "next_offset": offset + limit if offset + limit < len(root_causes) else None,
+            "root_causes": page,
+            "domain_summaries": domain_summaries,
+        }
+        catalog_release = str(getattr(document, "product_release_id", "")).strip()
+        snapshot_hash = str(getattr(document, "snapshot_hash", "")).strip()
+        if catalog_release:
+            result["catalog_release"] = catalog_release
+        if snapshot_hash:
+            result["snapshot_hash"] = snapshot_hash
+        return self._completed("base.capability_governance.snapshot.summary.get", **result)
 
     def base_capability_registry_get(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
         target = _gid(payload.get("target_gid"))

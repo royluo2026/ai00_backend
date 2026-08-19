@@ -85,6 +85,53 @@ def test_provider_uses_service_handlers_instead_of_placeholder_results():
     assert len(result["items"]) == 200
 
 
+def test_agent_summary_capability_is_registered_and_keeps_root_cause_projection():
+    class Service:
+        def base_capability_governance_snapshot_summary_get(self, payload, context):
+            return {
+                "capability_id": "base.capability_governance.snapshot.summary.get",
+                "status": "completed",
+                "snapshot_gid": "100",
+                "catalog_release": "catalog-r1",
+                "capability_total": 264,
+                "finding_total": 1573,
+                "root_cause_total": 86,
+                "blocking_total": 42,
+                "critical_total": 18,
+                "limit": 50,
+                "offset": 0,
+                "next_offset": 50,
+                "root_causes": ({
+                    "root_cause_key": "gap:craft.bop.read@1",
+                    "reason_code": "gap",
+                    "root_cause_label": "缺少实现绑定 · craft.bop.read@1",
+                    "capabilities": ("craft.bop.read@1",),
+                    "domains": ("craft",),
+                    "finding_count": 12,
+                    "severity": "blocking",
+                    "evidence_refs": ("provider:craft",),
+                },),
+                "domain_summaries": ({"domain": "craft", "finding_count": 12, "capability_count": 24},),
+                "secret": "must-not-cross-transport",
+            }
+
+    class Registry:
+        def register(self, spec, handler, *, descriptor=None):
+            if spec.id == "base.capability_governance.snapshot.summary.get":
+                self.spec = spec
+                self.handler = handler
+
+    registry = Registry()
+    register_governance_capabilities(registry, Service())
+
+    assert registry.spec.risk.value == "read"
+    result = registry.handler({}, _context())
+    assert result["root_causes"][0]["root_cause_key"] == "gap:craft.bop.read@1"
+    assert result["root_causes"][0]["finding_count"] == 12
+    assert result["domain_summaries"] == [{"domain": "craft", "finding_count": 12, "capability_count": 24}]
+    assert "secret" not in result
+
+
 def test_provider_drops_undeclared_service_response_fields():
     class Service:
         def base_capability_registry_search(self, payload, context):

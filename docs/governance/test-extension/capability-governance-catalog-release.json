@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_35ce633b3f6542c9bd487abbee586b58",
-  "catalog_hash": "sha256:35ce633b3f6542c9bd487abbee586b588aafb919180a09a483c535ab95528949",
+  "release_id": "rel_a6c187babb0c14d0d75f0920758ce5ba",
+  "catalog_hash": "sha256:a6c187babb0c14d0d75f0920758ce5baf2b7717779953a0552b52f2349c74a46",
   "descriptors": [
     {
       "id": "base.capability_analysis.get",
@@ -1874,6 +1874,654 @@
         "additionalProperties": false
       },
       "schema_hash": "sha256:f92c4830e132cd8a16bfb8f2560eceeba9673c5e51311b2715fa7391719b2ea5",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "base.capability_governance.snapshot.summary.get",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.capability_governance.snapshot.summary.get",
+      "description": "Test-only governance operation base.capability_governance.snapshot.summary.get.",
+      "use_when": "The test-governance profile needs this governed capability contract.",
+      "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "base.v2:system.capability.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "target_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "query": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255
+            },
+            "maxItems": 11
+          },
+          "severity": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255
+            },
+            "maxItems": 4
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "catalog_release": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "snapshot_hash": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "capability_total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "finding_total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "root_cause_total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "blocking_total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "critical_total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "next_offset": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "root_causes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "root_cause_key": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "reason_code": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "root_cause_label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "capabilities": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "maxItems": 20
+                },
+                "domains": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "maxItems": 11
+                },
+                "finding_count": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100000
+                },
+                "severity": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "evidence_refs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "maxItems": 20
+                }
+              },
+              "required": [
+                "root_cause_key",
+                "reason_code",
+                "finding_count",
+                "severity"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 200
+          },
+          "domain_summaries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "domain": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "finding_count": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100000
+                },
+                "capability_count": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100000
+                }
+              },
+              "required": [
+                "domain",
+                "finding_count",
+                "capability_count"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 11
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "catalog_release": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "snapshot_hash": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "capability_total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "finding_total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "root_cause_total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "blocking_total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "critical_total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "next_offset": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "root_causes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "root_cause_key": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "reason_code": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "root_cause_label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "capabilities": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "maxItems": 20
+                },
+                "domains": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "maxItems": 11
+                },
+                "finding_count": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100000
+                },
+                "severity": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "evidence_refs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "maxItems": 20
+                }
+              },
+              "required": [
+                "root_cause_key",
+                "reason_code",
+                "finding_count",
+                "severity"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 200
+          },
+          "domain_summaries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "domain": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "finding_count": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100000
+                },
+                "capability_count": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100000
+                }
+              },
+              "required": [
+                "domain",
+                "finding_count",
+                "capability_count"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 11
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:ae04d0350f85f188e25d9d4f8aef87e7dd9e5a5201b81e4f030d8a730402101d",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -4680,6 +5328,11 @@
             "minimum": 0,
             "maximum": 100000
           },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
           "offset": {
             "type": "integer",
             "minimum": 0,
@@ -4866,6 +5519,11 @@
             "minimum": 0,
             "maximum": 100000
           },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
           "offset": {
             "type": "integer",
             "minimum": 0,
@@ -4878,7 +5536,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:c2acb00484af2adcb22bf2c692c0fd9599e465f6bcc351443aa2ab5624839450",
+      "schema_hash": "sha256:15c96aacd2cf5024061a7507767f3566ac5a004b4b8a3418e51f2dee91e9f23a",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -7765,8 +8423,8 @@
       "plugin_id": "test.governance",
       "module": "backend.capability_governance_test.provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:4561f75f5de379ddef9b84a5a75a3538bf10fbb084f5353727ec67987f3cfe59"
+      "artifact_hash": "sha256:d98048b7804d299a708e4b0a3cc2b067396eecfdfb07ec8fcc5d549a14ba6a1f"
     }
   ],
-  "created_at": "2026-08-19T09:41:14.100815Z"
+  "created_at": "2026-08-19T10:07:08.604226Z"
 }

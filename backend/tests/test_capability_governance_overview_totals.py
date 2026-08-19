@@ -120,3 +120,44 @@ def test_findings_group_root_cause_by_reason_and_capability_and_page_server_side
     assert result["findings"][0]["root_cause_key"] == "gap:craft.bop.read@1"
     assert result["findings"][0]["root_cause_count"] == 2
     assert result["offset"] == 1
+
+
+def test_snapshot_summary_returns_bounded_root_cause_groups_for_agent() -> None:
+    snapshot = SimpleNamespace(
+        snapshot_gid=100,
+        document=SimpleNamespace(product_release_id="catalog-r1", snapshot_hash="snapshot-hash"),
+        entries=(
+            SimpleNamespace(capability_id="craft.bop.read", major_version=1, capability_version_gid=501, owner_domain="craft"),
+            SimpleNamespace(capability_id="digital_model.model.read", major_version=1, capability_version_gid=502, owner_domain="digital_model"),
+        ),
+    )
+    findings = (
+        {"finding_gid": "1", "code": "gap", "reason_code": "gap", "root_cause_key": "gap:craft.bop.read@1", "root_cause_label": "缺少实现绑定 · craft.bop.read@1", "root_cause_count": 2, "severity": "blocking", "status": "open", "domains": ("craft",), "evidence": ("provider:craft",)},
+        {"finding_gid": "2", "code": "gap", "reason_code": "gap", "root_cause_key": "gap:craft.bop.read@1", "root_cause_label": "缺少实现绑定 · craft.bop.read@1", "root_cause_count": 2, "severity": "blocking", "status": "open", "domains": ("craft",), "evidence": ("provider:craft",)},
+        {"finding_gid": "3", "code": "provider_missing", "reason_code": "provider_missing", "root_cause_key": "provider_missing:digital_model.model.read@1", "root_cause_label": "缺少 Provider · digital_model.model.read@1", "severity": "warning", "status": "open", "domains": ("digital_model",), "evidence": ("provider:digital",)},
+    )
+
+    class Store:
+        def latest_snapshot(self):
+            return snapshot
+
+        def get_findings(self, snapshot_gid):
+            return findings
+
+        def get_snapshot(self, snapshot_gid):
+            return snapshot if snapshot_gid == 100 else None
+
+    result = CapabilityGovernanceService(Store()).base_capability_governance_snapshot_summary_get(
+        {"limit": 1}, _context(),
+    )
+
+    assert result["snapshot_gid"] == "100"
+    assert result["catalog_release"] == "catalog-r1"
+    assert result["capability_total"] == 2
+    assert result["finding_total"] == 3
+    assert result["root_cause_total"] == 2
+    assert result["blocking_total"] == 2
+    assert len(result["root_causes"]) == 1
+    assert result["root_causes"][0]["root_cause_key"] == "gap:craft.bop.read@1"
+    assert result["root_causes"][0]["finding_count"] == 2
+    assert result["next_offset"] == 1

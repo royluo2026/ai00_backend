@@ -10,6 +10,7 @@ from backend.capability_v2.provider_loader import hash_domain_artifact
 READ_IDS = (
     "base.capability_registry.search",
     "base.capability_registry.get",
+    "base.capability_governance.snapshot.summary.get",
     "base.capability_graph.get",
     "base.capability_finding.search",
     "base.capability_analysis.get",
@@ -84,6 +85,14 @@ def _input_schema(capability_id: str) -> dict[str, object]:
             "limit": _LIMIT_SCHEMA, "offset": _OFFSET_SCHEMA, "domain": _SMALL_STRING_SCHEMA,
             "severity": _SMALL_STRING_SCHEMA, "status": _SMALL_STRING_SCHEMA,
             "reason_code": _SMALL_STRING_SCHEMA,
+        })
+    if capability_id == "base.capability_governance.snapshot.summary.get":
+        properties.update({
+            "snapshot_gid": GID_SCHEMA,
+            "domains": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 11},
+            "severity": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 4},
+            "limit": _LIMIT_SCHEMA,
+            "offset": _OFFSET_SCHEMA,
         })
     if capability_id == "base.capability_proposal.search":
         properties.update({
@@ -230,6 +239,18 @@ _FINDING_SCHEMA = _closed({
     "domains": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 20},
     "evidence": {"type": "array", "items": STRING_SCHEMA, "maxItems": 200},
 })
+_ROOT_CAUSE_SCHEMA = _closed({
+    "root_cause_key": STRING_SCHEMA, "reason_code": _SMALL_STRING_SCHEMA,
+    "root_cause_label": STRING_SCHEMA,
+    "capabilities": {"type": "array", "items": STRING_SCHEMA, "maxItems": 20},
+    "domains": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 11},
+    "finding_count": _COUNT_SCHEMA, "severity": _SMALL_STRING_SCHEMA,
+    "evidence_refs": {"type": "array", "items": STRING_SCHEMA, "maxItems": 20},
+}, ("root_cause_key", "reason_code", "finding_count", "severity"))
+_DOMAIN_SUMMARY_SCHEMA = _closed({
+    "domain": _SMALL_STRING_SCHEMA, "finding_count": _COUNT_SCHEMA,
+    "capability_count": _COUNT_SCHEMA,
+}, ("domain", "finding_count", "capability_count"))
 _BINDING_SCHEMA = _closed({
     "binding_gid": GID_SCHEMA, "capability_id": STRING_SCHEMA,
     "major_version": {"type": "integer", "minimum": 1},
@@ -332,7 +353,23 @@ def _output_schema(capability_id: str) -> dict[str, object]:
             "total": _COUNT_SCHEMA,
             "product_capability_total": _COUNT_SCHEMA,
             "governance_extension_capability_total": _COUNT_SCHEMA,
+            "limit": _LIMIT_SCHEMA,
             "offset": _COUNT_SCHEMA,
+        })
+    elif capability_id == "base.capability_governance.snapshot.summary.get":
+        properties.update({
+            "catalog_release": STRING_SCHEMA,
+            "snapshot_hash": _SMALL_STRING_SCHEMA,
+            "capability_total": _COUNT_SCHEMA,
+            "finding_total": _COUNT_SCHEMA,
+            "root_cause_total": _COUNT_SCHEMA,
+            "blocking_total": _COUNT_SCHEMA,
+            "critical_total": _COUNT_SCHEMA,
+            "limit": _LIMIT_SCHEMA,
+            "offset": _COUNT_SCHEMA,
+            "next_offset": {"type": ["integer", "null"], "minimum": 0, "maximum": 100000},
+            "root_causes": {"type": "array", "items": _ROOT_CAUSE_SCHEMA, "maxItems": 200},
+            "domain_summaries": {"type": "array", "items": _DOMAIN_SUMMARY_SCHEMA, "maxItems": 11},
         })
     elif capability_id == "base.capability_registry.get":
         properties["item"] = _ITEM_SCHEMA

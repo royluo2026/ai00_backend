@@ -102,7 +102,7 @@ def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, A
     response: dict[str, Any] = {"capability_id": capability_id, "status": str(result["status"])}
     if isinstance(result.get("data"), Mapping):
         response["data"] = _bounded_object(result["data"])
-    for field in ("items", "nodes", "findings"):
+    for field in ("items", "nodes", "findings", "root_causes", "domain_summaries"):
         if field in result:
             response[field] = _bounded_collection(result[field])
     for field in (
@@ -113,7 +113,8 @@ def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, A
             response[field] = str(result[field])
     for field in (
         "total", "product_capability_total", "governance_extension_capability_total",
-        "offset", "root_cause_total",
+        "offset", "root_cause_total", "capability_total", "finding_total", "blocking_total",
+        "critical_total", "limit",
     ):
         if result.get(field) is not None:
             try:
@@ -126,6 +127,19 @@ def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, A
             "owner_domain", "domain", "semantic_class", "business_effect", "lifecycle_status",
             "lifecycle", "descriptor_hash", "contract",
         )) for item in tuple(result.get("items", ()))[:200]]
+    elif capability_id == "base.capability_governance.snapshot.summary.get":
+        response["root_causes"] = [_projection(item, (
+            "root_cause_key", "reason_code", "root_cause_label", "capabilities", "domains",
+            "finding_count", "severity", "evidence_refs",
+        )) for item in tuple(result.get("root_causes", ()))[:200]]
+        response["domain_summaries"] = [_projection(item, (
+            "domain", "finding_count", "capability_count",
+        )) for item in tuple(result.get("domain_summaries", ()))[:11]]
+        if "next_offset" in result:
+            response["next_offset"] = result.get("next_offset")
+        for field in ("catalog_release", "snapshot_hash"):
+            if result.get(field) is not None:
+                response[field] = str(result[field])
     elif capability_id == "base.capability_registry.get" and result.get("item") is not None:
         response["item"] = _projection(result["item"], (
             "capability_id", "capability_version_gid", "capability_gid", "major_version",
