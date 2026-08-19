@@ -39,6 +39,7 @@
       this.onHashChange = this.onHashChange.bind(this);
       mount.addEventListener('click', this.onClick);
       mount.addEventListener('input', this.onInput);
+      mount.addEventListener('change', this.onInput);
       if (this.window && this.window.addEventListener) this.window.addEventListener('hashchange', this.onHashChange);
       this.readHash();
     }
@@ -46,6 +47,7 @@
     destroy() {
       this.root.removeEventListener('click', this.onClick);
       this.root.removeEventListener('input', this.onInput);
+      this.root.removeEventListener('change', this.onInput);
       if (this.window && this.window.removeEventListener) this.window.removeEventListener('hashchange', this.onHashChange);
     }
 
