@@ -54,10 +54,13 @@
   function createState(overrides) {
     return Object.assign({
       selectedSnapshotGid: null,
+      dashboardLoaded: false,
       productCatalogRelease: null,
       governanceExtensionRelease: null,
-      productCapabilityCount: 0,
-      governanceExtensionCapabilityCount: 0,
+      productCapabilityCount: null,
+      governanceExtensionCapabilityCount: null,
+      catalogPageLimit: 100,
+      findingPageLimit: 200,
       filters: { domain: 'all', query: '' },
       rows: [],
       findings: [],
