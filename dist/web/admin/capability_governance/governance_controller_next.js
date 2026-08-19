@@ -21,7 +21,10 @@
       : ['fail', 'blocked', 'broken'].includes(normalized) ? '!' : ['stale', 'expired', 'attention'].includes(normalized) ? '◷' : '•';
     return `<span class="status status-${escapeHtml(normalized)}"><span aria-hidden="true">${icon}</span> ${escapeHtml(normalized)}</span>`;
   };
-  const unwrap = (response) => response && response.data && typeof response.data === 'object' ? response.data : (response || {});
+  const unwrap = (response) => {
+    const hasCollection = response && (Array.isArray(response.items) || Array.isArray(response.findings) || Array.isArray(response.events) || response.release);
+    return hasCollection ? response : (response && response.data && typeof response.data === 'object' ? response.data : (response || {}));
+  };
 
   class CapabilityGovernanceController {
     constructor({ root: mount, api, state, location, window: browserWindow } = {}) {
@@ -125,6 +128,7 @@
         const response = await this.api.loadDashboard(Object.assign({}, this.state.filters, { limit: 100 }));
         if (generation !== this.refreshGeneration) return false;
         const data = unwrap(response);
+        if (response && response.data && typeof response.data === 'object' && response.items) this.state.sectionMeta[section] = response.data;
         const snapshot = valueOf(data, 'snapshot_gid', 'snapshotGid');
         const productRelease = valueOf(data, 'product_catalog_release', 'productCatalogRelease');
         const extensionRelease = valueOf(data, 'governance_extension_release', 'governanceExtensionRelease');
@@ -264,12 +268,16 @@
       const canReview = actionsFor(this.state.permissions).includes('decide-review');
       const filters = this.state.sectionFilters.changes || {};
       const proposals = (this.state.proposals || []).filter((proposal) => !filters.query || `${proposal.capability_id || proposal.capabilityId || ''} ${proposal.status || ''}`.toLowerCase().includes(filters.query.toLowerCase()));
-      return `<section><h2>变更与评审</h2><div class="filters"><label>搜索 <input data-filter-section="changes" data-filter-key="query" value="${escapeHtml(filters.query || '')}" placeholder="能力或提案 GID"></label><button type="button" data-action="clear-section-filter" data-section="changes">清除筛选</button></div>${proposals.map((proposal) => { const stale = ['stale', 'expired'].includes(String(proposal.status)); const gid = rowGid(proposal); return `<article class="proposal"><h3>${escapeHtml(proposal.capability_id || proposal.capabilityId || proposal.title || gid)}</h3><p class="gid">Proposal ${escapeHtml(gid)}</p>${statusLabel(proposal.status)}<p>Snapshot：${escapeHtml(normalizeGid(proposal.base_snapshot_gid || proposal.snapshotGid || proposal.snapshot_gid) || this.state.selectedSnapshotGid || '—')}</p><p>版本：${escapeHtml(proposal.capability_version_gid || '—')} · Row version：${escapeHtml(proposal.row_version || proposal.rowVersion || '—')}</p>${stale ? '<p class="notice">哈希或证据已过期，需重新生成提案。</p>' : ''}${canReview ? `<button type="button" data-action="decide-review" data-entity-gid="${escapeHtml(gid)}"${stale ? ' disabled title="哈希已变更，不能审批"' : ''}>决定评审</button>` : ''}</article>`; }).join('') || '<p class="empty">没有待评审变更；若数据源未接入，会在上方显示依赖状态。</p>'}</section>`;
+      const availability = this.state.sectionMeta.changes;
+      const metaNotice = availability && availability.available === false ? `<p class="notice">workflow 数据源未接入：${escapeHtml(availability.reason || 'governance_dependency_unavailable')}。当前仅显示已缓存提案。</p>` : '';
+      return `<section><h2>变更与评审</h2>${metaNotice}<div class="filters"><label>搜索 <input data-filter-section="changes" data-filter-key="query" value="${escapeHtml(filters.query || '')}" placeholder="能力或提案 GID"></label><button type="button" data-action="clear-section-filter" data-section="changes">清除筛选</button></div>${proposals.map((proposal) => { const stale = ['stale', 'expired'].includes(String(proposal.status)); const gid = rowGid(proposal); return `<article class="proposal"><h3>${escapeHtml(proposal.capability_id || proposal.capabilityId || proposal.title || gid)}</h3><p class="gid">Proposal ${escapeHtml(gid)}</p>${statusLabel(proposal.status)}<p>Snapshot：${escapeHtml(normalizeGid(proposal.base_snapshot_gid || proposal.snapshotGid || proposal.snapshot_gid) || this.state.selectedSnapshotGid || '—')}</p><p>版本：${escapeHtml(proposal.capability_version_gid || '—')} · Row version：${escapeHtml(proposal.row_version || proposal.rowVersion || '—')}</p>${stale ? '<p class="notice">哈希或证据已过期，需重新生成提案。</p>' : ''}${canReview ? `<button type="button" data-action="decide-review" data-entity-gid="${escapeHtml(gid)}"${stale ? ' disabled title="哈希已变更，不能审批"' : ''}>决定评审</button>` : ''}</article>`; }).join('') || '<p class="empty">没有待评审变更。</p>'}</section>`;
     }
 
     renderHealth() {
       const byDomain = new Map((this.state.health || []).map((item) => [item.domain, item]));
-      return `<section><h2>测试与健康</h2><p>✓ 通过 · ◷ 需关注 · ! 阻塞 · • 未验证。结论来自后端固定快照。</p><div class="health-grid">${DOMAINS.map((domain) => { const item = byDomain.get(domain.id) || {}; return `<article><b>${escapeHtml(domain.label)}</b><div>${statusLabel(item.status)}<small>${escapeHtml(item.finding_count === undefined ? '等待检查' : `${item.entry_count || 0} 能力 · ${item.finding_count || 0} Finding`)}</small></div></article>`; }).join('')}</div>${this.state.sectionStale.health ? '<p class="notice">健康查询失败，正在显示上次成功数据。</p>' : ''}</section>`;
+      const meta = this.state.sectionMeta.health;
+      const metaNotice = meta && meta.available === false ? '<p class="notice">快照数据源不可用，以下状态为未验证。</p>' : '';
+      return `<section><h2>测试与健康</h2><p>✓ 通过 · ◷ 需关注 · ! 阻塞 · • 未验证。结论来自后端固定快照。</p>${metaNotice}<div class="health-grid">${DOMAINS.map((domain) => { const item = byDomain.get(domain.id) || {}; return `<article><b>${escapeHtml(domain.label)}</b><div>${statusLabel(item.status)}<small>${escapeHtml(item.finding_count === undefined ? '等待检查' : `${item.entry_count || 0} 能力 · ${item.finding_count || 0} Finding`)}</small></div></article>`; }).join('')}</div>${this.state.sectionStale.health ? '<p class="notice">健康查询失败，正在显示上次成功数据。</p>' : ''}</section>`;
     }
 
     renderRelease() {
@@ -282,7 +290,9 @@
 
     renderAudit() {
       const filters = this.state.sectionFilters.audit || {};
-      return `<section><h2>审计</h2><p>只读、脱敏、不可编辑或删除。每条记录带操作者、能力、请求和结果。</p><div class="filters"><label>操作者 <input data-filter-section="audit" data-filter-key="actor" value="${escapeHtml(filters.actor || '')}"></label><label>能力 <input data-filter-section="audit" data-filter-key="capability" value="${escapeHtml(filters.capability || '')}"></label><label>结果 <select data-filter-section="audit" data-filter-key="result"><option value="">全部结果</option><option value="succeeded"${filters.result === 'succeeded' ? ' selected' : ''}>succeeded</option><option value="failed"${filters.result === 'failed' ? ' selected' : ''}>failed</option></select></label><button type="button" data-action="clear-section-filter" data-section="audit">清除筛选</button></div><div class="audit-list">${(this.state.auditEvents || []).map((event) => `<article class="finding"><h3>${escapeHtml(event.operation || event.event_type || 'audit')} ${statusLabel(event.status)}</h3><p>操作者：${escapeHtml(event.actor_gid || event.user_gid || '—')} · 请求：${escapeHtml(event.request_gid || event.request_id || '—')}</p><p>能力：${escapeHtml(event.capability_id || '—')} · 时间：${escapeHtml(event.occurred_at || event.created_at || '—')}</p></article>`).join('') || '<p class="empty">没有符合条件的审计记录。</p>'}</div></section>`;
+      const meta = this.state.sectionMeta.audit;
+      const metaNotice = meta && meta.available === false ? '<p class="notice">审计数据源不可用；未显示未经确认的空结果。</p>' : '';
+      return `<section><h2>审计</h2><p>只读、脱敏、不可编辑或删除。每条记录带操作者、能力、请求和结果。</p>${metaNotice}<div class="filters"><label>操作者 <input data-filter-section="audit" data-filter-key="actor" value="${escapeHtml(filters.actor || '')}"></label><label>能力 <input data-filter-section="audit" data-filter-key="capability" value="${escapeHtml(filters.capability || '')}"></label><label>结果 <select data-filter-section="audit" data-filter-key="result"><option value="">全部结果</option><option value="succeeded"${filters.result === 'succeeded' ? ' selected' : ''}>succeeded</option><option value="failed"${filters.result === 'failed' ? ' selected' : ''}>failed</option></select></label><button type="button" data-action="clear-section-filter" data-section="audit">清除筛选</button></div><div class="audit-list">${(this.state.auditEvents || []).map((event) => `<article class="finding"><h3>${escapeHtml(event.operation || event.event_type || 'audit')} ${statusLabel(event.status)}</h3><p>操作者：${escapeHtml(event.actor_gid || event.user_gid || '—')} · 请求：${escapeHtml(event.request_gid || event.request_id || '—')}</p><p>能力：${escapeHtml(event.capability_id || '—')} · 时间：${escapeHtml(event.occurred_at || event.created_at || '—')}</p></article>`).join('') || '<p class="empty">没有符合条件的审计记录。</p>'}</div></section>`;
     }
 
     render() {

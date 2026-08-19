@@ -68,6 +68,7 @@
       sectionBusy: [],
       sectionErrors: {},
       sectionStale: {},
+      sectionMeta: {},
       sectionFilters: {
         findings: { domain: 'all', severity: 'all', status: 'all', query: '' },
         changes: { domain: 'all', stage: 'all', query: '' },

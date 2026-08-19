@@ -167,7 +167,8 @@
   );
 
   function normalizeEnvelope(result) {
-    const value = result && result.data && typeof result.data === 'object' ? result.data : result;
+    const hasCollection = result && (Array.isArray(result.items) || Array.isArray(result.findings) || Array.isArray(result.events) || result.release);
+    const value = hasCollection ? result : (result && result.data && typeof result.data === 'object' ? result.data : result);
     return value && typeof value === 'object' ? value : {};
   }
 
