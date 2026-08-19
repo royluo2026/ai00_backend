@@ -151,6 +151,7 @@
       if (!this.api || typeof this.api.loadDashboard !== 'function' || (!supersede && this.state.busyActionKeys.includes(key))) return false;
       const generation = ++this.refreshGeneration;
       if (!this.state.busyActionKeys.includes(key)) this.state.busyActionKeys = this.state.busyActionKeys.concat(key);
+      let dashboardLoaded = false;
       this.render();
       try {
         const response = await this.api.loadDashboard(Object.assign({}, this.state.filters, { limit: 100 }));
@@ -170,6 +171,7 @@
         this.state.proposals = valueOf(data, 'proposals') || this.state.proposals || [];
         this.state.staleData = false;
         this.state.lastError = null;
+        dashboardLoaded = true;
         return true;
       } catch (error) {
         if (generation !== this.refreshGeneration) return false;
@@ -178,6 +180,9 @@
       } finally {
         if (generation === this.refreshGeneration) this.state.busyActionKeys = this.state.busyActionKeys.filter((item) => item !== key);
         this.render();
+        if (dashboardLoaded && generation === this.refreshGeneration && ['findings', 'changes', 'health', 'audit'].includes(this.state.section)) {
+          void this.loadSection(this.state.section);
+        }
       }
     }
 
