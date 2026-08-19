@@ -214,7 +214,7 @@ def test_provider_projects_workflow_mutation_and_release_records():
 
 
 def test_health_counts_blocking_exposure_findings_by_node_domain() -> None:
-    """Health must not report healthy when a route-only finding lacks a capability subject."""
+    """Health must surface a route-only blocking finding as blocked for its domain."""
     from backend.capability_governance_test.rules import FindingCandidate, FindingSubject
 
     entry = SimpleNamespace(
@@ -249,9 +249,9 @@ def test_health_counts_blocking_exposure_findings_by_node_domain() -> None:
     result = service.base_capability_health_get({"domains": ["craft"]}, _context())
 
     assert result["items"] == ({
-        "domain": "craft", "status": "attention", "snapshot_gid": "100",
+        "domain": "craft", "status": "blocked", "snapshot_gid": "100",
         "checked_at": result["items"][0]["checked_at"], "entry_count": 1,
-        "finding_count": 1, "severities": ["blocking"], "reason": "open_findings",
+        "finding_count": 1, "severities": ["blocking"], "reason": "blocking_findings",
     },)
 
 

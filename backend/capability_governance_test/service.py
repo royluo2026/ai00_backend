@@ -295,6 +295,8 @@ class CapabilityGovernanceService:
             severities = sorted({str((finding.get("severity") if isinstance(finding, Mapping) else getattr(finding, "severity", "warning"))) for finding in domain_findings})
             if not entries_by_domain[domain]:
                 status, reason = "blocked", "no_capabilities_in_snapshot"
+            elif any(severity.lower() in {"blocking", "critical"} for severity in severities):
+                status, reason = "blocked", "blocking_findings"
             elif domain_findings:
                 status, reason = "attention", "open_findings"
             else:
