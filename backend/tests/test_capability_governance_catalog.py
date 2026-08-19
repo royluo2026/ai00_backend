@@ -31,11 +31,12 @@ def test_test_governance_profile_injects_a_functional_service_not_none():
 
     result = registry.get("base.capability_registry.search").handler({"query": "capability"}, object())
 
-    assert result == {
-        "capability_id": "base.capability_registry.search",
-        "status": "completed",
-        "items": [],
-    }
+    assert result["capability_id"] == "base.capability_registry.search"
+    assert result["status"] == "completed"
+    assert result["items"] == []
+    assert result["total"] == 0
+    assert result["product_capability_total"] == 0
+    assert result["governance_extension_capability_total"] == 0
 
 
 def test_test_governance_extension_has_exact_base_owned_contracts():

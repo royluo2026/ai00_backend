@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_45d10f10c65f58addb445ba4cde37889",
-  "catalog_hash": "sha256:45d10f10c65f58addb445ba4cde3788967d17cb508b92b063eb7bcdd0532471b",
+  "release_id": "rel_0f0d36805d96edade5a5817513562500",
+  "catalog_hash": "sha256:0f0d36805d96edade5a5817513562500cee8c020bf9f30b9d0fa19361f3a04a4",
   "descriptors": [
     {
       "id": "base.capability_analysis.get",
@@ -1605,6 +1605,11 @@
             "pattern": "^[0-9]{1,19}$",
             "minLength": 1,
             "maxLength": 19
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
           }
         },
         "required": [
@@ -1780,6 +1785,11 @@
             "pattern": "^[0-9]{1,19}$",
             "minLength": 1,
             "maxLength": 19
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
           }
         },
         "required": [
@@ -1788,7 +1798,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:d512cf34a93428044e4172bf46e59782f9a176f947d97f51a1c790c5e35e8256",
+      "schema_hash": "sha256:e4dc73658714f190f2047c63d4446ad2e3a456a5d66d9676bc4d648ca9f1188b",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -4569,6 +4579,21 @@
             "pattern": "^[0-9]{1,19}$",
             "minLength": 1,
             "maxLength": 19
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "product_capability_total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "governance_extension_capability_total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
           }
         },
         "required": [
@@ -4735,6 +4760,21 @@
             "pattern": "^[0-9]{1,19}$",
             "minLength": 1,
             "maxLength": 19
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "product_capability_total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "governance_extension_capability_total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
           }
         },
         "required": [
@@ -4743,7 +4783,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:efd0888508446d0dd3c3e6a716ec6f09db7c936bbb93bee764376a70f29cd56d",
+      "schema_hash": "sha256:f0a9870aa53ff58efd9c07b273790075a238334ac6d7e1f8a4aa2035fbba4121",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -7630,8 +7670,8 @@
       "plugin_id": "test.governance",
       "module": "backend.capability_governance_test.provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:f58d212887fe001f7f07658dc6ae9e684af36fd8e75b9d046007aa5091cb95ee"
+      "artifact_hash": "sha256:aab6d9683b2424b452194305612b3e71910fd53e88946121104556261f1a442f"
     }
   ],
-  "created_at": "2026-08-19T08:32:05.170984Z"
+  "created_at": "2026-08-19T09:15:39.677745Z"
 }
