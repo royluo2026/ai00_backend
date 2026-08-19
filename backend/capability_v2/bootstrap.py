@@ -109,12 +109,14 @@ def get_capability_registry() -> CapabilityRegistry:
 def _install_default_test_governance_runtime() -> None:
     """Install bounded scanner/worker ports for the explicit test profile."""
     from backend.capability_governance_test.analysis import AnalysisRequest, run_deterministic_analysis
+    from backend.capability_governance_test.audit import AuditSink
     from backend.capability_governance_test.scanner import GovernanceScanner
     from backend.capability_governance_test.service import CapabilityGovernanceService
     from backend.capability_governance_test.store import MemoryGovernanceStore, SqlGovernanceStore
     from backend.capability_governance_test.worker import InMemoryRunLeaseStore, LeasedGovernanceWorker, SqlRunLeaseStore
     from backend.domain_ports.capability_governance_config import GovernanceSettings
     from backend.capability_v2.catalog import CatalogRelease
+    from backend.utils.gid import next_gid
 
     repository_root = Path(__file__).resolve().parents[2]
     product = CatalogRelease.model_validate_json(
@@ -145,6 +147,7 @@ def _install_default_test_governance_runtime() -> None:
         else:
             leases = InMemoryRunLeaseStore()
         worker = LeasedGovernanceWorker(leases, worker_id="capability-governance")
+        audit_sink = AuditSink(next_gid=next_gid)
 
         def test_runner(snapshot: Any, payload: Mapping[str, Any] | None = None) -> Mapping[str, Any]:
             result = run_deterministic_analysis(snapshot, AnalysisRequest())
@@ -156,6 +159,7 @@ def _install_default_test_governance_runtime() -> None:
             analysis_runner=run_deterministic_analysis,
             test_runner=test_runner,
             worker=worker,
+            audit_sink=audit_sink,
         )
 
     global _test_governance_store_factory, _test_governance_service_factory
