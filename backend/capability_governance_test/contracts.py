@@ -13,6 +13,9 @@ READ_IDS = (
     "base.capability_graph.get",
     "base.capability_finding.search",
     "base.capability_analysis.get",
+    "base.capability_proposal.search",
+    "base.capability_health.get",
+    "base.capability_audit.search",
 )
 ANALYZE_IDS = (
     "base.capability_analysis.run",
@@ -76,6 +79,29 @@ def _input_schema(capability_id: str) -> dict[str, object]:
         properties["limit"] = _LIMIT_SCHEMA
     if capability_id == "base.capability_finding.search":
         properties["limit"] = _LIMIT_SCHEMA
+    if capability_id == "base.capability_proposal.search":
+        properties.update({
+            "domain": _SMALL_STRING_SCHEMA,
+            "stage": _SMALL_STRING_SCHEMA,
+            "limit": _LIMIT_SCHEMA,
+            "cursor": _SMALL_STRING_SCHEMA,
+        })
+    if capability_id == "base.capability_health.get":
+        properties.update({
+            "domains": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 11},
+            "snapshot_gid": GID_SCHEMA,
+        })
+    if capability_id == "base.capability_audit.search":
+        properties.update({
+            "from": _SMALL_STRING_SCHEMA,
+            "to": _SMALL_STRING_SCHEMA,
+            "actor": _SMALL_STRING_SCHEMA,
+            "capability": _SMALL_STRING_SCHEMA,
+            "event_type": _SMALL_STRING_SCHEMA,
+            "result": _SMALL_STRING_SCHEMA,
+            "limit": _LIMIT_SCHEMA,
+            "cursor": _SMALL_STRING_SCHEMA,
+        })
     if capability_id == "base.capability_graph.get":
         properties.update({"max_depth": _DEPTH_SCHEMA, "max_nodes": _NODES_SCHEMA})
         required = ("target_gid", "max_depth", "max_nodes")
@@ -218,6 +244,40 @@ _PROPOSAL_SCHEMA = _closed({
     "proposal_gid": GID_SCHEMA, "status": _SMALL_STRING_SCHEMA,
     "row_version": _VERSION_SCHEMA,
 }, ("proposal_gid", "status", "row_version"))
+_PROPOSAL_ITEM_SCHEMA = _closed({
+    "proposal_gid": GID_SCHEMA,
+    "capability_id": STRING_SCHEMA,
+    "capability_version_gid": GID_SCHEMA,
+    "base_snapshot_gid": GID_SCHEMA,
+    "previous_hash": _VERSION_SCHEMA,
+    "proposed_descriptor_hash": _VERSION_SCHEMA,
+    "evidence_hash": _VERSION_SCHEMA,
+    "submitted_by_gid": _SMALL_STRING_SCHEMA,
+    "status": _SMALL_STRING_SCHEMA,
+    "row_version": _VERSION_SCHEMA,
+    "reviews": {"type": "array", "maxItems": 20, "items": _BOUNDED_OBJECT_SCHEMA},
+})
+_HEALTH_ITEM_SCHEMA = _closed({
+    "domain": _SMALL_STRING_SCHEMA,
+    "status": {"type": "string", "enum": ["healthy", "attention", "blocked", "unverified"]},
+    "snapshot_gid": GID_SCHEMA,
+    "checked_at": _SMALL_STRING_SCHEMA,
+    "entry_count": {"type": "integer", "minimum": 0, "maximum": 20000},
+    "finding_count": {"type": "integer", "minimum": 0, "maximum": 200},
+    "severities": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 20},
+    "reason": _SMALL_STRING_SCHEMA,
+})
+_AUDIT_ITEM_SCHEMA = _closed({
+    "audit_event_gid": GID_SCHEMA,
+    "operation": _SMALL_STRING_SCHEMA,
+    "capability_id": _SMALL_STRING_SCHEMA,
+    "event_type": _SMALL_STRING_SCHEMA,
+    "actor_gid": _SMALL_STRING_SCHEMA,
+    "request_gid": _SMALL_STRING_SCHEMA,
+    "status": _SMALL_STRING_SCHEMA,
+    "occurred_at": _SMALL_STRING_SCHEMA,
+    "detail": _BOUNDED_OBJECT_SCHEMA,
+})
 _WAIVER_SCHEMA = _closed({
     "waiver_gid": GID_SCHEMA, "status": _SMALL_STRING_SCHEMA,
     "row_version": _VERSION_SCHEMA,
@@ -251,6 +311,12 @@ def _output_schema(capability_id: str) -> dict[str, object]:
         })
     elif capability_id == "base.capability_finding.search":
         properties["findings"] = {"type": "array", "items": _FINDING_SCHEMA, "maxItems": 200}
+    elif capability_id == "base.capability_proposal.search":
+        properties["items"] = {"type": "array", "items": _PROPOSAL_ITEM_SCHEMA, "maxItems": 200}
+    elif capability_id == "base.capability_health.get":
+        properties["items"] = {"type": "array", "items": _HEALTH_ITEM_SCHEMA, "maxItems": 11}
+    elif capability_id == "base.capability_audit.search":
+        properties["items"] = {"type": "array", "items": _AUDIT_ITEM_SCHEMA, "maxItems": 200}
     elif capability_id in {"base.capability_analysis.run", "base.capability_test.run", "base.capability_analysis.get"}:
         properties["run"] = _RUN_SCHEMA
     elif capability_id == "base.capability_repair_prompt.generate":

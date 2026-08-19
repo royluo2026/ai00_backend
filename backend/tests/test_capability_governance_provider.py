@@ -272,3 +272,38 @@ def test_unconfigured_provider_fails_closed_instead_of_returning_empty_results()
 
     with pytest.raises(CapabilityBusinessError, match="provider_unavailable"):
         registry.get("base.capability_registry.search").handler({"query": "example"}, _context())
+
+
+def test_governance_read_capabilities_expose_proposals_health_and_audit():
+    from backend.capability_governance_test.audit import AuditSink
+
+    class ProposalStore:
+        def __init__(self):
+            self._snapshots = {100: _snapshot()}
+            self.persistent = False
+
+        def get_snapshot(self, snapshot_gid: int):
+            return self._snapshots.get(snapshot_gid)
+
+        def latest_snapshot(self):
+            return self._snapshots[100]
+
+        def list_entries(self):
+            return self._snapshots[100].entries
+
+    audit = AuditSink(next_gid=iter(range(1000, 1100)).__next__)
+    service = CapabilityGovernanceService(ProposalStore(), audit_sink=audit)
+    service._audit(operation="governance_scan", request_id="req-1", context=_context(), detail={})
+    registry = __import__("backend.capabilities.registry_next", fromlist=["CapabilityRegistry"]).CapabilityRegistry()
+    register_governance_capabilities(registry, service)
+
+    proposal = registry.get("base.capability_proposal.search").handler({"limit": 10}, _context())
+    health = registry.get("base.capability_health.get").handler({"domains": ["craft"]}, _context())
+    audit_result = registry.get("base.capability_audit.search").handler({"limit": 10}, _context())
+
+    assert proposal["capability_id"] == "base.capability_proposal.search"
+    assert proposal["status"] == "completed"
+    assert proposal["data"]["available"] is True
+    assert health["items"][0]["domain"] == "craft"
+    assert health["items"][0]["status"] in {"healthy", "attention", "blocked", "unverified"}
+    assert audit_result["items"][0]["operation"] == "governance_scan"

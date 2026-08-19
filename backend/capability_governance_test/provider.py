@@ -148,6 +148,22 @@ def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, A
             "finding_gid", "code", "severity", "status", "fingerprint", "remediation_boundary",
             "subject_version_gids", "domains", "evidence",
         )) for finding in tuple(result.get("findings", result.get("items", ())))[:200]]
+    elif capability_id == "base.capability_proposal.search":
+        response["items"] = [_projection(proposal, (
+            "proposal_gid", "capability_id", "capability_version_gid", "base_snapshot_gid",
+            "previous_hash", "proposed_descriptor_hash", "evidence_hash", "submitted_by_gid",
+            "status", "row_version", "domain", "reviews",
+        )) for proposal in tuple(result.get("items", ()))[:200]]
+    elif capability_id == "base.capability_health.get":
+        response["items"] = [_projection(item, (
+            "domain", "status", "snapshot_gid", "checked_at", "entry_count", "finding_count",
+            "severities", "reason",
+        )) for item in tuple(result.get("items", ()))[:11]]
+    elif capability_id == "base.capability_audit.search":
+        response["items"] = [_projection(item, (
+            "audit_event_gid", "operation", "capability_id", "event_type", "actor_gid",
+            "request_gid", "status", "occurred_at", "detail",
+        )) for item in tuple(result.get("items", ()))[:200]]
     elif capability_id in {"base.capability_analysis.run", "base.capability_test.run", "base.capability_analysis.get"}:
         run = result.get("run")
         if run is None and result.get("run_gid") is not None:

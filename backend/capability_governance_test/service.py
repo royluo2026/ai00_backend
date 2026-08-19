@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, replace
-from datetime import datetime
+from datetime import datetime, timezone
 import inspect
 from typing import Any
 
@@ -221,6 +221,110 @@ class CapabilityGovernanceService:
             if str(getattr(entry, "capability_version_gid", "")) == str(target):
                 return self._completed("base.capability_registry.get", item=entry)
         raise _business_error("resource_not_found")
+
+    def base_capability_proposal_search(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
+        """Return a bounded, read-only projection of governance proposals."""
+        limit = self._bounded_limit(payload.get("limit", _MAX_SEARCH))
+        query = str(payload.get("query", "")).strip().lower()
+        domain = str(payload.get("domain", "")).strip().lower()
+        stage = str(payload.get("stage", "")).strip().lower()
+        proposals = self._proposal_records()
+        def matches(item: Mapping[str, Any]) -> bool:
+            if domain and domain not in str(item.get("domain", "")).lower():
+                return False
+            if stage and stage != str(item.get("status", "")).lower():
+                return False
+            if query and query not in " ".join(str(item.get(field, "")) for field in ("proposal_gid", "capability_id", "status", "domain")).lower():
+                return False
+            return True
+        items = tuple(item for item in proposals if matches(item))[:limit]
+        return self._completed(
+            "base.capability_proposal.search", items=items,
+            data={"available": self._workflow_port is not None or not self._workflow_persistence_required,
+                  "checked_at": self._now_iso(), "next_cursor": None},
+        )
+
+    def base_capability_health_get(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
+        """Calculate per-domain health from one pinned snapshot and its findings."""
+        requested = payload.get("domains")
+        if requested is None:
+            domains = tuple(sorted({str(getattr(entry, "owner_domain", "")) for entry in self._entries() if getattr(entry, "owner_domain", None)}))
+            if not domains:
+                domains = ("base", "agent", "craft", "digital_model", "factory", "integration", "project_management", "simulation", "ontology", "knowledge", "device")
+        elif isinstance(requested, (str, bytes, Mapping)):
+            raise _business_error("invalid_input")
+        else:
+            domains = tuple(dict.fromkeys(str(value).strip() for value in requested if str(value).strip()))[:11]
+        snapshot = None
+        if payload.get("snapshot_gid") is not None:
+            snapshot = self._snapshot({"target_gid": payload.get("snapshot_gid")})
+        else:
+            snapshot = self._latest_snapshot()
+        if snapshot is None:
+            return self._completed(
+                "base.capability_health.get",
+                items=tuple({"domain": domain, "status": "unverified", "reason": "snapshot_unavailable", "checked_at": self._now_iso(), "entry_count": 0, "finding_count": 0, "severities": []} for domain in domains),
+                data={"available": False, "checked_at": self._now_iso()},
+            )
+        findings = self._load_findings(snapshot, payload, context)
+        grouped: dict[str, list[Mapping[str, Any]]] = {domain: [] for domain in domains}
+        for finding in findings:
+            values = finding.get("domains", ()) if isinstance(finding, Mapping) else getattr(finding, "domains", ())
+            for domain in values or ():
+                if str(domain) in grouped:
+                    grouped[str(domain)].append(finding)
+        entries_by_domain = {domain: 0 for domain in domains}
+        for entry in getattr(snapshot, "entries", ()):
+            owner = str(getattr(entry, "owner_domain", ""))
+            if owner in entries_by_domain:
+                entries_by_domain[owner] += 1
+        checked_at = self._now_iso()
+        items = []
+        for domain in domains:
+            domain_findings = grouped[domain]
+            severities = sorted({str((finding.get("severity") if isinstance(finding, Mapping) else getattr(finding, "severity", "warning"))) for finding in domain_findings})
+            if not entries_by_domain[domain]:
+                status, reason = "blocked", "no_capabilities_in_snapshot"
+            elif domain_findings:
+                status, reason = "attention", "open_findings"
+            else:
+                status, reason = "healthy", "snapshot_verified"
+            items.append({
+                "domain": domain, "status": status, "snapshot_gid": str(getattr(snapshot, "snapshot_gid")),
+                "checked_at": checked_at, "entry_count": entries_by_domain[domain],
+                "finding_count": len(domain_findings), "severities": severities, "reason": reason,
+            })
+        return self._completed(
+            "base.capability_health.get", items=tuple(items),
+            data={"available": True, "snapshot_gid": str(getattr(snapshot, "snapshot_gid")), "checked_at": checked_at},
+        )
+
+    def base_capability_audit_search(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
+        """Search only redacted audit projections from the configured sink."""
+        limit = self._bounded_limit(payload.get("limit", _MAX_SEARCH))
+        actor = str(payload.get("actor", "")).strip()
+        capability = str(payload.get("capability", "")).strip().lower()
+        event_type = str(payload.get("event_type", "")).strip().lower()
+        result = str(payload.get("result", "")).strip().lower()
+        events = self._audit_events()
+        items: list[dict[str, Any]] = []
+        for event in reversed(events):
+            item = self._audit_record(event)
+            if actor and actor != item.get("actor_gid"):
+                continue
+            if capability and capability not in str(item.get("capability_id", "")).lower():
+                continue
+            if event_type and event_type not in str(item.get("event_type", item.get("operation", ""))).lower():
+                continue
+            if result and result != str(item.get("status", "")).lower():
+                continue
+            items.append(item)
+            if len(items) >= limit:
+                break
+        return self._completed(
+            "base.capability_audit.search", items=tuple(items),
+            data={"available": self._audit_sink is not None, "checked_at": self._now_iso(), "next_cursor": None},
+        )
 
     def base_capability_graph_get(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
         snapshot = self._snapshot(payload)
@@ -876,6 +980,117 @@ class CapabilityGovernanceService:
         # Memory/SQL GovernanceStore implementations.
         snapshots = getattr(self._store, "_snapshots", None)
         return snapshots[max(snapshots)] if isinstance(snapshots, Mapping) and snapshots else None
+
+    @staticmethod
+    def _bounded_limit(value: Any) -> int:
+        try:
+            return min(max(1, int(value)), _MAX_SEARCH)
+        except (TypeError, ValueError) as exc:
+            raise _business_error("invalid_input") from exc
+
+    @staticmethod
+    def _now_iso() -> str:
+        return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+    def _proposal_records(self) -> tuple[dict[str, Any], ...]:
+        """Project the in-process or workflow-port proposal collection safely."""
+        source = self._proposals
+        list_method = getattr(source, "list", None)
+        if callable(list_method):
+            try:
+                values = tuple(list_method())
+            except Exception:
+                values = ()
+        else:
+            values = tuple(getattr(source, "_proposals", {}).values()) if isinstance(getattr(source, "_proposals", None), Mapping) else ()
+        records: list[dict[str, Any]] = []
+        for proposal in values[:_MAX_SEARCH]:
+            capability_id = str(getattr(proposal, "capability_id", ""))
+            records.append({
+                "proposal_gid": str(getattr(proposal, "proposal_gid", "")),
+                "capability_id": capability_id,
+                "capability_version_gid": str(getattr(proposal, "capability_version_gid", "")),
+                "base_snapshot_gid": str(getattr(proposal, "base_snapshot_gid", "")),
+                "previous_hash": str(getattr(proposal, "previous_hash", "")),
+                "proposed_descriptor_hash": str(getattr(proposal, "proposed_descriptor_hash", "")),
+                "evidence_hash": str(getattr(proposal, "evidence_hash", "")),
+                "submitted_by_gid": str(getattr(proposal, "submitted_by_gid", "")),
+                "status": str(getattr(proposal, "status", "detected")),
+                "row_version": str(getattr(proposal, "row_version", "1")),
+                "domain": capability_id.split(".", 1)[0] if "." in capability_id else "base",
+                "reviews": tuple(self._review_record(review) for review in getattr(proposal, "reviews", ()))[:20],
+            })
+        return tuple(records)
+
+    @staticmethod
+    def _review_record(review: Any) -> dict[str, Any]:
+        return {
+            "review_gid": str(getattr(review, "review_gid", "")),
+            "review_stage": str(getattr(review, "review_stage", "")),
+            "decision": str(getattr(review, "decision", "")),
+            "reviewer_gid": str(getattr(review, "reviewer_gid", "")),
+        }
+
+    def _load_findings(self, snapshot: Any, payload: Mapping[str, Any], context: object) -> tuple[Any, ...]:
+        loader = getattr(self._store, "get_findings", None) if self._store is not None else None
+        if callable(loader):
+            try:
+                return tuple(loader(int(getattr(snapshot, "snapshot_gid"))) or ())[:_MAX_SEARCH]
+            except Exception:
+                return ()
+        if self._analysis_runner is None:
+            return ()
+        try:
+            analysis = self._invoke_port(
+                self._analysis_runner, snapshot=snapshot, payload=payload, context=context,
+                kind="analysis", run_gid=str(getattr(snapshot, "snapshot_gid")),
+                request=AnalysisRequest(),
+            )
+            return self._finding_records(snapshot, getattr(analysis, "findings", ()))
+        except Exception:
+            return ()
+
+    def _audit_events(self) -> tuple[Any, ...]:
+        sink = self._audit_sink
+        if sink is None:
+            return ()
+        events = getattr(sink, "events", None)
+        if events is not None:
+            try:
+                return tuple(events)[-500:]
+            except Exception:
+                return ()
+        recent = getattr(sink, "recent", None)
+        if callable(recent):
+            try:
+                return tuple(recent(500))
+            except Exception:
+                return ()
+        return ()
+
+    @staticmethod
+    def _audit_record(event: Any) -> dict[str, Any]:
+        if isinstance(event, Mapping):
+            get = event.get
+        else:
+            get = lambda name, default=None: getattr(event, name, default)
+        detail = get("detail", {})
+        if not isinstance(detail, Mapping):
+            detail = {}
+        safe_detail = {str(key): str(value)[:512] for key, value in tuple(detail.items())[:50] if str(key).lower() not in {"token", "password", "secret", "credential", "authorization", "cookie"}}
+        capability_id = str(get("capability_id", ""))
+        operation = str(get("operation", get("event_type", "")))
+        return {
+            "audit_event_gid": str(get("audit_event_gid", get("gid", "0"))),
+            "operation": operation,
+            "capability_id": capability_id,
+            "event_type": str(get("event_type", operation)),
+            "actor_gid": str(get("actor_gid", get("user_gid", ""))),
+            "request_gid": str(get("request_gid", get("request_id", ""))),
+            "status": str(get("status", "recorded")),
+            "occurred_at": str(get("occurred_at", get("created_at", ""))),
+            "detail": safe_detail,
+        }
 
     def _finding_records(self, snapshot: Any, findings: Any) -> tuple[dict[str, Any], ...]:
         """Project deterministic candidates into read-only, UI-safe records."""
