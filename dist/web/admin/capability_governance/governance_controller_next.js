@@ -105,6 +105,14 @@
     }
 
     onClick(event) {
+      const healthDomain = event.target.closest('[data-health-domain]');
+      if (healthDomain) {
+        const domain = healthDomain.dataset.healthDomain || 'all';
+        this.state.sectionFilters.findings = Object.assign({}, this.state.sectionFilters.findings, {
+          domain, severity: 'all', status: 'all', reasonCode: 'all', query: '',
+        });
+        return this.setSection('findings');
+      }
       const section = event.target.closest('[data-section]');
       if (section) return this.setSection(section.dataset.section);
       const domain = event.target.closest('[data-domain]');
@@ -299,7 +307,7 @@
       const byDomain = new Map((this.state.health || []).map((item) => [item.domain, item]));
       const meta = this.state.sectionMeta.health;
       const metaNotice = meta && meta.available === false ? '<p class="notice">快照数据源不可用，以下状态为未验证。</p>' : '';
-      return `<section><h2>测试与健康</h2><p>✓ 通过 · ◷ 需关注 · ! 阻塞 · • 未验证。结论来自后端固定快照。</p>${metaNotice}<div class="health-grid">${DOMAINS.map((domain) => { const item = byDomain.get(domain.id) || {}; return `<article><b>${escapeHtml(domain.label)}</b><div>${statusLabel(item.status)}<small>${escapeHtml(item.finding_count === undefined ? '等待检查' : `${item.entry_count || 0} 能力 · ${item.finding_count || 0} Finding`)}</small></div></article>`; }).join('')}</div>${this.state.sectionStale.health ? '<p class="notice">健康查询失败，正在显示上次成功数据。</p>' : ''}</section>`;
+      return `<section><h2>测试与健康</h2><p>✓ 通过 · ◷ 需关注 · ! 阻塞 · • 未验证。结论来自后端固定快照；Finding 数是该领域的汇总，可点击进入明细。</p>${metaNotice}<div class="health-grid">${DOMAINS.map((domain) => { const item = byDomain.get(domain.id) || {}; const hasFindings = item.finding_count !== undefined; return `<article class="health-card" data-health-domain="${escapeHtml(domain.id)}"><b>${escapeHtml(domain.label)}</b><div class="health-card-status">${statusLabel(item.status)}</div><small class="health-card-count">${escapeHtml(item.finding_count === undefined ? '等待检查' : `${item.entry_count || 0} 项能力 · ${item.finding_count || 0} 条 Finding`)}</small>${hasFindings ? `<button type="button" class="health-card-link" data-health-domain="${escapeHtml(domain.id)}">查看该领域 Finding</button>` : ''}${item.reason ? `<small class="health-card-reason">原因：${escapeHtml(item.reason)}</small>` : ''}</article>`; }).join('')}</div>${this.state.sectionStale.health ? '<p class="notice">健康查询失败，正在显示上次成功数据。</p>' : ''}</section>`;
     }
 
     renderRelease() {
