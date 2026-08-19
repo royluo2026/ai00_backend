@@ -17,6 +17,7 @@ from .workflow import ProposalService, ReviewerContext, WaiverService, WorkflowE
 
 
 _MAX_SEARCH = 200
+_MAX_HEALTH_FINDINGS = 5000
 _MAX_GRAPH_DEPTH = 4
 _MAX_GRAPH_NODES = 500
 _PROMPT_READ_PERMISSION = "base.capability_repair_prompt.read"
@@ -275,7 +276,7 @@ class CapabilityGovernanceService:
                 items=tuple({"domain": domain, "status": "unverified", "reason": "snapshot_unavailable", "checked_at": self._now_iso(), "entry_count": 0, "finding_count": 0, "severities": []} for domain in domains),
                 data={"available": False, "checked_at": self._now_iso()},
             )
-        findings = self._load_findings(snapshot, payload, context)
+        findings = self._load_findings(snapshot, payload, context, limit=_MAX_HEALTH_FINDINGS)
         grouped: dict[str, list[Mapping[str, Any]]] = {domain: [] for domain in domains}
         for finding in findings:
             values = finding.get("domains", ()) if isinstance(finding, Mapping) else getattr(finding, "domains", ())
@@ -1040,11 +1041,13 @@ class CapabilityGovernanceService:
             "reviewer_gid": str(getattr(review, "reviewer_gid", "")),
         }
 
-    def _load_findings(self, snapshot: Any, payload: Mapping[str, Any], context: object) -> tuple[Any, ...]:
+    def _load_findings(
+        self, snapshot: Any, payload: Mapping[str, Any], context: object, *, limit: int = _MAX_SEARCH,
+    ) -> tuple[Any, ...]:
         loader = getattr(self._store, "get_findings", None) if self._store is not None else None
         if callable(loader):
             try:
-                return tuple(loader(int(getattr(snapshot, "snapshot_gid"))) or ())[:_MAX_SEARCH]
+                return tuple(loader(int(getattr(snapshot, "snapshot_gid"))) or ())[:limit]
             except Exception:
                 return ()
         if self._analysis_runner is None:
@@ -1055,7 +1058,7 @@ class CapabilityGovernanceService:
                 kind="analysis", run_gid=str(getattr(snapshot, "snapshot_gid")),
                 request=AnalysisRequest(),
             )
-            return self._finding_records(snapshot, getattr(analysis, "findings", ()))
+            return self._finding_records(snapshot, getattr(analysis, "findings", ()), limit=limit)
         except Exception:
             return ()
 
@@ -1128,7 +1131,9 @@ class CapabilityGovernanceService:
             "detail": safe_detail,
         }
 
-    def _finding_records(self, snapshot: Any, findings: Any) -> tuple[dict[str, Any], ...]:
+    def _finding_records(
+        self, snapshot: Any, findings: Any, *, limit: int = _MAX_SEARCH,
+    ) -> tuple[dict[str, Any], ...]:
         """Project deterministic candidates into read-only, UI-safe records."""
         entries = {
             (str(getattr(entry, "capability_id", "")), int(getattr(entry, "major_version", 0))): str(getattr(entry, "capability_version_gid", ""))
@@ -1138,8 +1143,13 @@ class CapabilityGovernanceService:
             (str(getattr(entry, "capability_id", "")), int(getattr(entry, "major_version", 0))): str(getattr(entry, "owner_domain", ""))
             for entry in getattr(snapshot, "entries", ())
         }
+        node_domains = {
+            str(getattr(node, "canonical_key", "")): str(getattr(node, "owner_domain", ""))
+            for node in getattr(getattr(snapshot, "document", snapshot), "nodes", ())
+            if getattr(node, "canonical_key", None)
+        }
         records: list[dict[str, Any]] = []
-        for candidate in tuple(findings or ())[:_MAX_SEARCH]:
+        for candidate in tuple(findings or ())[:limit]:
             code = str(getattr(candidate, "code", ""))
             fingerprint = str(getattr(candidate, "fingerprint", ""))
             if not code or not fingerprint:
@@ -1153,7 +1163,23 @@ class CapabilityGovernanceService:
                 entries[key] for subject in subjects
                 if (key := (str(getattr(subject, "capability_id", "")), int(getattr(subject, "major_version", 0)))) in entries
             )
-            finding_domains = tuple(sorted({domains[key] for subject in subjects if (key := (str(getattr(subject, "capability_id", "")), int(getattr(subject, "major_version", 0)))) in domains and domains[key]}))
+            finding_domain_values = {
+                domains[key]
+                for subject in subjects
+                if (key := (str(getattr(subject, "capability_id", "")), int(getattr(subject, "major_version", 0)))) in domains
+                and domains[key]
+            }
+            finding_domain_values.update(
+                node_domains[str(getattr(subject, "evidence_key", ""))]
+                for subject in subjects
+                if str(getattr(subject, "evidence_key", "")) in node_domains
+                and node_domains[str(getattr(subject, "evidence_key", ""))]
+            )
+            finding_domain_values.update(
+                node_domains[str(value)] for value in getattr(candidate, "evidence_keys", ())
+                if str(value) in node_domains and node_domains[str(value)]
+            )
+            finding_domains = tuple(sorted(finding_domain_values))
             records.append({
                 "finding_gid": str(finding_gid), "code": code,
                 "severity": str(getattr(candidate, "severity", "warning")), "status": "open",

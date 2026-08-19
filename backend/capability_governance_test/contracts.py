@@ -263,7 +263,9 @@ _HEALTH_ITEM_SCHEMA = _closed({
     "snapshot_gid": GID_SCHEMA,
     "checked_at": _SMALL_STRING_SCHEMA,
     "entry_count": {"type": "integer", "minimum": 0, "maximum": 20000},
-    "finding_count": {"type": "integer", "minimum": 0, "maximum": 200},
+    # The Finding center is paged at 200, but health reports the complete
+    # bounded total for a domain and may therefore exceed one page.
+    "finding_count": {"type": "integer", "minimum": 0, "maximum": 5000},
     "severities": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 20},
     "reason": _SMALL_STRING_SCHEMA,
 })

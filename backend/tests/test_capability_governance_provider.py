@@ -213,6 +213,128 @@ def test_provider_projects_workflow_mutation_and_release_records():
     }
 
 
+def test_health_counts_blocking_exposure_findings_by_node_domain() -> None:
+    """Health must not report healthy when a route-only finding lacks a capability subject."""
+    from backend.capability_governance_test.rules import FindingCandidate, FindingSubject
+
+    entry = SimpleNamespace(
+        capability_id="craft.example.read", major_version=1,
+        capability_version_gid=101, owner_domain="craft",
+    )
+    route = SimpleNamespace(
+        canonical_key="rest_route:craft:plugins/craft/routes.py:read_factory",
+        owner_domain="craft", node_type="rest_route",
+    )
+    snapshot = SimpleNamespace(
+        snapshot_gid=100, entries=(entry,),
+        document=SimpleNamespace(nodes=(route,), relations=(), bindings=(), capabilities=()),
+    )
+
+    class Store:
+        def get_snapshot(self, snapshot_gid: int):
+            return snapshot if snapshot_gid == 100 else None
+
+        def latest_snapshot(self):
+            return snapshot
+
+    finding = FindingCandidate(
+        "exposure_without_capability", "blocking",
+        subjects=(FindingSubject("", 0, "exposure", route.canonical_key),),
+        evidence_keys=(route.canonical_key,),
+    )
+    service = CapabilityGovernanceService(
+        Store(), analysis_runner=lambda snapshot, request: SimpleNamespace(findings=(finding,)),
+    )
+
+    result = service.base_capability_health_get({"domains": ["craft"]}, _context())
+
+    assert result["items"] == ({
+        "domain": "craft", "status": "attention", "snapshot_gid": "100",
+        "checked_at": result["items"][0]["checked_at"], "entry_count": 1,
+        "finding_count": 1, "severities": ["blocking"], "reason": "open_findings",
+    },)
+
+
+def test_health_count_is_not_limited_to_the_finding_center_page_size() -> None:
+    """Health totals must include all bounded findings, not only the first 200 rows."""
+    from backend.capability_governance_test.rules import FindingCandidate, FindingSubject
+
+    entry = SimpleNamespace(
+        capability_id="craft.example.read", major_version=1,
+        capability_version_gid=101, owner_domain="craft",
+    )
+    route = SimpleNamespace(
+        canonical_key="rest_route:craft:plugins/craft/routes.py:read_factory",
+        owner_domain="craft", node_type="rest_route",
+    )
+    snapshot = SimpleNamespace(
+        snapshot_gid=100, entries=(entry,),
+        document=SimpleNamespace(nodes=(route,), relations=(), bindings=(), capabilities=()),
+    )
+
+    class Store:
+        def get_snapshot(self, snapshot_gid: int):
+            return snapshot if snapshot_gid == 100 else None
+
+        def latest_snapshot(self):
+            return snapshot
+
+    subject = FindingSubject("", 0, "exposure", route.canonical_key)
+    findings = tuple(FindingCandidate(
+        "exposure_without_capability", "blocking", subjects=(subject,), evidence_keys=(f"{route.canonical_key}:{index}",)
+    ) for index in range(201))
+    service = CapabilityGovernanceService(
+        Store(), analysis_runner=lambda snapshot, request: SimpleNamespace(findings=findings),
+    )
+
+    result = service.base_capability_health_get({"domains": ["craft"]}, _context())
+
+    assert result["items"][0]["finding_count"] == 201
+
+
+def test_health_transport_accepts_bounded_counts_above_finding_page_size() -> None:
+    """The closed Gateway schema must allow health totals larger than one page."""
+    import asyncio
+    from backend.capability_governance_test.rules import FindingCandidate, FindingSubject
+    from backend.capabilities.registry_next import CapabilityRegistry
+
+    entry = SimpleNamespace(
+        capability_id="craft.example.read", major_version=1,
+        capability_version_gid=101, owner_domain="craft",
+    )
+    route = SimpleNamespace(
+        canonical_key="rest_route:craft:plugins/craft/routes.py:read_factory",
+        owner_domain="craft", node_type="rest_route",
+    )
+    snapshot = SimpleNamespace(
+        snapshot_gid=100, entries=(entry,),
+        document=SimpleNamespace(nodes=(route,), relations=(), bindings=(), capabilities=()),
+    )
+
+    class Store:
+        def get_snapshot(self, snapshot_gid: int):
+            return snapshot if snapshot_gid == 100 else None
+
+        def latest_snapshot(self):
+            return snapshot
+
+    subject = FindingSubject("", 0, "exposure", route.canonical_key)
+    findings = tuple(FindingCandidate(
+        "exposure_without_capability", "blocking", subjects=(subject,), evidence_keys=(f"{route.canonical_key}:{index}",)
+    ) for index in range(201))
+    registry = CapabilityRegistry()
+    register_governance_capabilities(registry, CapabilityGovernanceService(
+        Store(), analysis_runner=lambda snapshot, request: SimpleNamespace(findings=findings),
+    ))
+
+    result = asyncio.run(registry.invoke(
+        "base.capability_health.get", {"domains": ["craft"]},
+        CapabilityContext(user_gid="42", permissions=("system.capability.read",)),
+    ))
+
+    assert result.data["items"][0]["finding_count"] == 201
+
+
 def test_closed_provider_schema_admits_graph_bounds_required_by_service():
     from backend.capabilities.registry_next import CapabilityRegistry
 
