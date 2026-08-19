@@ -88,6 +88,50 @@ def test_scan_does_not_execute_scanned_modules_and_preserves_catalog_separation(
     assert document.extension_release_id == "extension-fixture"
 
 
+def test_scanner_can_bind_registry_snapshot_after_construction(valid_fixture: Path) -> None:
+    """A long-lived service can attach the authoritative registry before scanning."""
+    settings = GovernanceSettings(
+        deployment_profile="test-governance",
+        repository_root=valid_fixture,
+        allowlisted_relative_roots=("plugins",),
+    )
+    scanner = GovernanceScanner(
+        settings,
+        product_catalog=json.loads((valid_fixture / "product_catalog.json").read_text(encoding="utf-8")),
+        extension_catalog=json.loads((valid_fixture / "extension_catalog.json").read_text(encoding="utf-8")),
+        domain_manifests=json.loads((valid_fixture / "official_domains.json").read_text(encoding="utf-8")),
+    )
+
+    scanner.bind_registry_snapshot(_fixture_registry())
+    document = scanner.scan(code_revision="bound-after-construction")
+
+    assert any(binding.binding_type == "implemented_by" for binding in document.bindings)
+
+
+def test_scanner_matches_registry_package_module_to_provider_source() -> None:
+    """Registry handlers may expose a package module while source lives in provider.py."""
+    assert GovernanceScanner.registry_module_matches_source(
+        "craft_backend.capabilities",
+        "plugins/craft/craft_backend/capabilities/provider.py",
+    )
+    assert GovernanceScanner.registry_module_matches_source(
+        "craft_backend.capabilities.rule_descriptors",
+        "plugins/craft/craft_backend/capabilities/provider.py",
+    )
+    assert GovernanceScanner.registry_module_matches_source(
+        "knowledge_backend.capabilities.knowledge_next",
+        "plugins/knowledge/knowledge_backend/provider.py",
+    )
+    assert GovernanceScanner.registry_module_matches_source(
+        "backend.base.approval",
+        "backend/base/provider.py",
+    )
+    assert not GovernanceScanner.registry_module_matches_source(
+        "craft_backend.capabilities",
+        "plugins/craft/craft_backend/application/outcomes.py",
+    )
+
+
 def test_dynamic_table_expression_becomes_unresolved_evidence() -> None:
     """A dynamic SQL/table expression must never manufacture a table edge."""
     document = scan_fixture(FIXTURES / "invalid_provider")

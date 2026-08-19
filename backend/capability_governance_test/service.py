@@ -204,6 +204,15 @@ class CapabilityGovernanceService:
         if workflow_port is not None:
             self._release_gate = getattr(workflow_port, "release_gate", self._release_gate)
 
+    def bind_registry_snapshot(self, snapshot: Any) -> None:
+        """Bind the registry used by the scanner to the serving registry."""
+        if self._scanner is None:
+            return
+        binder = getattr(self._scanner, "bind_registry_snapshot", None)
+        if not callable(binder):
+            raise RuntimeError("governance_scanner_registry_binding_unavailable")
+        binder(snapshot)
+
     def base_capability_registry_search(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
         requested = payload.get("limit", _MAX_SEARCH)
         try:

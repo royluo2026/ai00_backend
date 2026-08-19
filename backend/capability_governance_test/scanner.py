@@ -159,6 +159,16 @@ class GovernanceScanner:
             return (target,) if self._is_safe_repository_file(target) else ()
         return tuple(sorted(path for path in target.rglob("*") if self._is_safe_repository_file(path)))
 
+    def bind_registry_snapshot(self, snapshot: Iterable[Any]) -> None:
+        """Attach the authoritative provider registrations before a scan.
+
+        The scanner is deliberately constructed before the capability registry
+        in the test-profile bootstrap.  Binding the immutable registry snapshot
+        afterwards keeps the scanner read-only while ensuring implementation
+        edges are derived from the same registrations that serve requests.
+        """
+        self._registry_snapshot = tuple(snapshot)
+
     def scan(self, code_revision: str) -> SnapshotDocument:
         """Create an immutable document without importing or executing scanned source."""
         product = self._require_catalog(self._product_catalog, "product_catalog_required")
@@ -472,7 +482,8 @@ class GovernanceScanner:
             module = registry_modules.get((capability.capability_id, capability.major_version))
             providers = [
                 unit for unit in units if unit.owner == capability.owner_domain and unit.node_type == "provider"
-                and module is not None and unit.source_path[:-3].replace("/", ".") == module
+                and module is not None
+                and self.registry_module_matches_source(module, unit.source_path)
             ]
             if not providers:
                 reason = "provider_not_resolved"
@@ -504,6 +515,40 @@ class GovernanceScanner:
             if isinstance(capability_id, str) and isinstance(version, int) and isinstance(module, str):
                 result[(capability_id, version)] = module
         return result
+
+    @staticmethod
+    def registry_module_matches_source(registry_module: str, source_path: str) -> bool:
+        """Match an imported handler module to its bounded provider source.
+
+        Domain registrations often import a descriptor submodule such as
+        ``craft_backend.capabilities.rule_descriptors`` while the serving
+        provider is the sibling ``capabilities/provider.py`` module.  Compare
+        normalized module suffixes and that explicit package-provider alias;
+        never infer a match from an unrelated application/outcome module.
+        """
+        if not isinstance(registry_module, str) or not registry_module.strip():
+            return False
+        if not isinstance(source_path, str) or not source_path.endswith(".py"):
+            return False
+        source_module = source_path[:-3].replace("/", ".").replace("\\", ".")
+        module = registry_module.strip().strip(".")
+        candidates = {module}
+        parts = module.split(".")
+        if len(parts) >= 2 and parts[-2] in {"capabilities", "capability"}:
+            candidates.add(".".join(parts[:-1]))
+        if any(
+            source_module == candidate
+            or source_module.endswith(f".{candidate}")
+            or source_module.endswith(f".{candidate}.provider")
+            for candidate in candidates
+        ):
+            return True
+        # Some domains keep their provider at ``<domain>_backend/provider.py``
+        # while registrations live in a capability submodule.  Fall back only
+        # to that same domain package's provider module; application/outcome
+        # modules remain deliberately excluded.
+        package = ".".join(parts[:2]) if parts[:1] == ["backend"] and len(parts) >= 2 else parts[0]
+        return source_module == f"{package}.provider" or source_module.endswith(f".{package}.provider")
 
     @staticmethod
     def _relation(from_key: str, to_key: str, relation_type: str) -> ImplementationRelation:

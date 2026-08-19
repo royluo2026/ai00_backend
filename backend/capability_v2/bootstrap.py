@@ -65,6 +65,9 @@ def build_test_governance_capability_registry(
         else CapabilityGovernanceService(store=governance_store)
     )
     register_governance_capabilities(registry, service_port=service)
+    binder = getattr(service, "bind_registry_snapshot", None)
+    if callable(binder):
+        binder(registry.snapshot())
     return registry
 
 
