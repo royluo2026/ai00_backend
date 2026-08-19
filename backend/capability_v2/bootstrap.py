@@ -141,7 +141,7 @@ def _install_default_test_governance_runtime() -> None:
         )
         if getattr(store, "persistent", False):
             from backend.db.connection import acquire_connection
-            leases = SqlRunLeaseStore(acquire_connection, worker_id="capability-governance")
+            leases = SqlRunLeaseStore(acquire_connection)
         else:
             leases = InMemoryRunLeaseStore()
         worker = LeasedGovernanceWorker(leases, worker_id="capability-governance")
