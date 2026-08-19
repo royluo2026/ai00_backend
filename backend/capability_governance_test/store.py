@@ -11,8 +11,11 @@ from typing import Any, Protocol
 from backend.utils.gid import next_gid
 
 from .models import (
+    CapabilityBinding,
     CapabilityProjection,
     ImmutableRecordError,
+    ImplementationNode,
+    ImplementationRelation,
     ScannedCapability,
     SnapshotDocument,
     SnapshotEntry,
@@ -254,10 +257,14 @@ class SqlGovernanceStore(GovernanceStore):
             product_release = str(_row_value(row, "catalog_release_id", 4))
 
             cursor.execute(
-                "SELECT snapshot_entry_gid, capability_gid, capability_version_gid, capability_id, "
-                "major_version, owner_domain, semantic_class, business_effect, lifecycle_status, "
-                "descriptor_hash, input_schema_hash, output_schema_hash, error_schema_hash, "
-                "policy_hash, provider_hash, descriptor_json "
+                "SELECT snapshot_entry.snapshot_entry_gid, capability_entry.capability_gid, "
+                "snapshot_entry.capability_version_gid, capability_entry.capability_id, "
+                "capability_version.major_version, capability_entry.owner_domain, "
+                "capability_version.semantic_class, capability_version.business_effect, "
+                "capability_version.lifecycle_status, snapshot_entry.descriptor_hash, "
+                "snapshot_entry.input_schema_hash, snapshot_entry.output_schema_hash, "
+                "snapshot_entry.error_schema_hash, snapshot_entry.policy_hash, "
+                "snapshot_entry.provider_hash, snapshot_entry.descriptor_json "
                 "FROM workmanship_base_capability_snapshot_entries AS snapshot_entry "
                 "JOIN workmanship_base_capability_versions AS capability_version "
                 "ON capability_version.capability_version_gid = snapshot_entry.capability_version_gid "
@@ -465,7 +472,11 @@ class SqlGovernanceStore(GovernanceStore):
                 or int(_row_value(row, "descriptor_count", 5)) != len(document.capabilities)):
             raise ImmutableRecordError("snapshot_hash_conflict")
         cursor.execute(
-            "SELECT snapshot_entry_gid, capability_gid, capability_version_gid, capability_id, major_version, owner_domain, semantic_class, business_effect, lifecycle_status, descriptor_hash "
+            "SELECT snapshot_entry_gid, capability_entry.capability_gid, "
+            "snapshot_entry.capability_version_gid, capability_entry.capability_id, "
+            "capability_version.major_version, capability_entry.owner_domain, "
+            "capability_version.semantic_class, capability_version.business_effect, "
+            "capability_version.lifecycle_status, snapshot_entry.descriptor_hash "
             "FROM workmanship_base_capability_snapshot_entries AS snapshot_entry "
             "JOIN workmanship_base_capability_versions AS capability_version "
             "ON capability_version.capability_version_gid = snapshot_entry.capability_version_gid "
