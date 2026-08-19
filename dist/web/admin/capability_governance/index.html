@@ -1,6 +1,73 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>能力治理中心（测试）</title>  <link rel="stylesheet" href="/assets/index-2ab005ec.css">
 </head>
-<body><div id="app"></div><script src="governance_model.js"></script><script src="governance_api.js"></script><script src="governance_controller.js"></script><script>
-  (() => { const parentUser = window.parent && window.parent._authUser; const permissions = parentUser && parentUser.permissions || []; const controller = new window.CapabilityGovernanceController({ root: document.getElementById('app'), api: window.CapabilityGovernanceApi, state: window.CapabilityGovernanceModel.createState({ permissions }) }); controller.render(); controller.refresh(); })();
+<body><div id="auth-status" data-testid="auth-status" style="margin:12px 24px 0;padding:8px 12px;border:1px solid #315777;border-radius:7px;background:#102337;color:#d7e7f5;font-size:13px" title="正在确认登录状态">正在确认登录状态…</div><div id="app"></div><script src="/web/core/web_compat.js"></script><script src="/web/core/auth_state.js"></script><script src="governance_model.js"></script><script src="governance_api.js"></script><script src="governance_controller_next.js"></script><script src="governance_controller.js"></script><script>
+  (() => {
+    const app = document.getElementById('app');
+    const authStatus = document.getElementById('auth-status');
+    const parentWindow = () => { try { return window.parent || window; } catch (_) { return window; } };
+    const readUser = () => { try { return parentWindow()._authUser || {}; } catch (_) { return {}; } };
+    const readMode = () => { try { return parentWindow()._authMode || 'none'; } catch (_) { return 'none'; } };
+    const standaloneProfileFetch = async () => {
+      const state = await window.electronAPI?.authGetState?.() || {};
+      const config = await window.electronAPI?.getConfig?.() || {};
+      const base = String(config.backendUrl || window.location.origin).replace(/\/$/, '');
+      const response = await fetch(`${base}/users/me`, {
+        headers: state.token ? { 'X-AI00-Token': state.token } : {},
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    };
+    const renderAuthStatus = (user, mode) => {
+      let status;
+      try {
+        status = parentWindow().AuthStateManager?.formatUserStatus(user, mode);
+      } catch (_) {}
+      if (!status) {
+        const role = user && (user.org_role || user.system_role || user.role);
+        const name = user && (user.name || user.display_name || user.email || user.gid);
+        const authenticated = Boolean(user && mode && mode !== 'none');
+        status = authenticated
+          ? { text: `${name || '当前用户'} · ${role || '角色待确认'}`, title: `已通过后端鉴权\n身份：${role || '未返回'}` }
+          : { text: '未登录', title: '未登录，尚未完成后端鉴权。' };
+      }
+      authStatus.textContent = `登录状态：${status.text}`;
+      authStatus.title = status.title;
+    };
+    renderAuthStatus(readUser(), readMode());
+    const profileFrom = (response) => {
+      const value = response && typeof response === 'object' ? response : {};
+      return value.data && typeof value.data === 'object' ? value.data : value;
+    };
+    const readPermissions = (user) => Array.isArray(user && user.permissions) ? user.permissions.slice() : [];
+    const controller = new window.CapabilityGovernanceController({
+      root: app,
+      api: window.CapabilityGovernanceApi,
+      state: window.CapabilityGovernanceModel.createState({ permissions: readPermissions(readUser()) }),
+    });
+    controller.render();
+    controller.refresh();
+
+    // auth_state.js refreshes /users/me asynchronously. If the iframe was
+    // created first, fetch the same trusted profile and update the action matrix.
+    (async () => {
+      const host = parentWindow();
+      let fetcher;
+      try { fetcher = host._cloudFetch || window._cloudFetch; } catch (_) { fetcher = window._cloudFetch; }
+      if (typeof fetcher !== 'function') fetcher = standaloneProfileFetch;
+      if (readPermissions(readUser()).length) return;
+      try {
+        const profile = profileFrom(await fetcher('/users/me'));
+        const permissions = readPermissions(profile);
+        renderAuthStatus(profile, 'feishu');
+        if (permissions.length) {
+          controller.state.permissions = permissions;
+          controller.render();
+        }
+      } catch (_) { /* dashboard/API error state remains visible */ }
+    })();
+    try {
+      parentWindow().addEventListener('ai00-auth-user-updated', () => renderAuthStatus(readUser(), readMode()));
+    } catch (_) {}
+  })();
 </script></body></html>

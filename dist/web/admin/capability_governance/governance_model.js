@@ -9,10 +9,10 @@
     { id: 'base', label: 'Base Platform' },
     { id: 'agent', label: 'Agent' },
     { id: 'craft', label: 'Craft' },
-    { id: 'digital-model', label: 'Digital Model' },
+    { id: 'digital_model', label: 'Digital Model' },
     { id: 'factory', label: 'Factory' },
     { id: 'integration', label: 'Integration' },
-    { id: 'project-management', label: 'Project Management' },
+    { id: 'project_management', label: 'Project Management' },
     { id: 'simulation', label: 'Simulation' },
     { id: 'ontology', label: 'Ontology' },
     { id: 'knowledge', label: 'Knowledge' },
@@ -31,7 +31,7 @@
     if (!granted.has('system.capability.read')) return [];
     const actions = ['view', 'export'];
     if (granted.has('system.capability.analyze')) actions.push('run-analysis', 'generate-repair-prompt');
-    if (granted.has('system.capability.govern')) actions.push('create-proposal', 'grant-waiver', 'revoke-waiver');
+    if (granted.has('system.capability.govern')) actions.push('run-scan', 'create-proposal', 'grant-waiver', 'revoke-waiver');
     if (granted.has('system.capability.release')) actions.push('decide-review', 'evaluate-release');
     return actions;
   }
@@ -60,6 +60,19 @@
       governanceExtensionCapabilityCount: 0,
       filters: { domain: 'all', query: '' },
       rows: [],
+      findings: [],
+      proposals: [],
+      health: [],
+      auditEvents: [],
+      releaseGate: null,
+      sectionBusy: [],
+      sectionErrors: {},
+      sectionStale: {},
+      sectionFilters: {
+        findings: { domain: 'all', severity: 'all', status: 'all', query: '' },
+        changes: { domain: 'all', stage: 'all', query: '' },
+        audit: { actor: '', capability: '', eventType: '', result: '' },
+      },
       selectedEntity: null,
       staleData: false,
       busyActionKeys: [],
