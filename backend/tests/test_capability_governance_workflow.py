@@ -11,7 +11,9 @@ from backend.capability_governance_test.workflow import (
 )
 
 
-NOW = datetime(2026, 8, 18, tzinfo=timezone.utc)
+# Keep expiry assertions relative to the test clock so the suite remains
+# deterministic when the calendar advances beyond the original fixture date.
+NOW = datetime.now(timezone.utc)
 
 
 def _reviewer(gid: str, *, role: str = "base_owner", permission: str = "system.capability.govern", domain: str = "base") -> ReviewerContext:
