@@ -90,17 +90,21 @@ def _check_governance_assets(base_url: str, html: str, results: list[dict[str, o
         "governance_model.js": "CapabilityGovernanceModel",
         "governance_api.js": "CapabilityGovernanceApi",
         "governance_controller.js": "CapabilityGovernanceController",
+        "governance_controller_next.js": "CapabilityGovernanceControllerNext",
     }
     linked_scripts = set(re.findall(r'<script[^>]+src="([^"/]+)"', html))
-    stylesheets = set(re.findall(r'<link[^>]+href="(/assets/[^"?#]+\.css)"', html))
+    stylesheet_refs = set(re.findall(r'<link[^>]+href="([^"?#]+\.css)"', html))
     for filename, marker in scripts.items():
+        if filename == "governance_controller_next.js" and filename not in linked_scripts:
+            continue
         if filename not in linked_scripts:
             errors.append(f"governance_html: missing script {filename}")
             continue
         _asset_result(base_url, f"/web/admin/capability_governance/{filename}", "text/javascript", marker, results, errors)
-    if not stylesheets:
+    if not stylesheet_refs:
         errors.append("governance_html: missing stylesheet")
-    for path in sorted(stylesheets):
+    for href in sorted(stylesheet_refs):
+        path = href if href.startswith("/") else f"/web/admin/capability_governance/{href}"
         _asset_result(base_url, path, "text/css", ".governance-shell", results, errors)
 
 
