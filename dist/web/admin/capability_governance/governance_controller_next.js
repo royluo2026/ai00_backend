@@ -166,8 +166,14 @@
         if (extensionRelease !== null) this.state.governanceExtensionRelease = extensionRelease;
         const productCount = valueOf(data, 'product_capability_count', 'productCapabilityCount');
         const extensionCount = valueOf(data, 'governance_extension_capability_count', 'governanceExtensionCapabilityCount');
+        const productTotal = valueOf(data, 'product_capability_total', 'productCapabilityTotal');
+        const extensionTotal = valueOf(data, 'governance_extension_capability_total', 'governanceExtensionCapabilityTotal');
+        const findingTotal = valueOf(data, 'finding_total', 'findingTotal');
         if (productCount !== null) this.state.productCapabilityCount = Number(productCount);
         if (extensionCount !== null) this.state.governanceExtensionCapabilityCount = Number(extensionCount);
+        if (productTotal !== null) this.state.productCapabilityTotal = Number(productTotal);
+        if (extensionTotal !== null) this.state.governanceExtensionCapabilityTotal = Number(extensionTotal);
+        if (findingTotal !== null) this.state.findingTotal = Number(findingTotal);
         const catalogLimit = valueOf(data, 'catalog_page_limit', 'catalogPageLimit');
         const findingLimit = valueOf(data, 'finding_page_limit', 'findingPageLimit');
         if (catalogLimit !== null) this.state.catalogPageLimit = Number(catalogLimit);
@@ -212,7 +218,11 @@
         else response = await this.api.loadAudit(filters);
         if (generation !== this.sectionGenerations[section]) return false;
         const data = unwrap(response);
-        if (section === 'findings') this.state.findings = valueOf(data, 'findings', 'items') || [];
+        if (section === 'findings') {
+          this.state.findings = valueOf(data, 'findings', 'items') || [];
+          const findingTotal = valueOf(data, 'total', 'finding_total', 'findingTotal');
+          if (findingTotal !== null) this.state.findingTotal = Number(findingTotal);
+        }
         if (section === 'changes') this.state.proposals = valueOf(data, 'items', 'proposals') || [];
         if (section === 'health') this.state.health = valueOf(data, 'items', 'health') || [];
         if (section === 'audit') this.state.auditEvents = valueOf(data, 'items', 'events') || [];
@@ -275,12 +285,15 @@
       const health = this.state.health || [];
       const attention = health.filter((item) => ['attention', 'blocked'].includes(String(item.status))).length;
       const loaded = Boolean(this.state.dashboardLoaded);
-      const catalogCount = this.state.productCapabilityCount === null ? '—' : this.state.productCapabilityCount;
-      const extensionCount = this.state.governanceExtensionCapabilityCount === null ? '—' : this.state.governanceExtensionCapabilityCount;
-      const findingCount = loaded ? (this.state.findings || []).length : '—';
+      const catalogCount = this.state.productCapabilityTotal === null ? '—' : this.state.productCapabilityTotal;
+      const extensionCount = this.state.governanceExtensionCapabilityTotal === null ? '—' : this.state.governanceExtensionCapabilityTotal;
+      const findingCount = !loaded || this.state.findingTotal === null ? '—' : this.state.findingTotal;
+      const catalogNote = !loaded ? '未加载' : this.state.productCapabilityTotal === null ? '全量统计未返回' : `全量产品能力；清单展示最多 ${escapeHtml(this.state.catalogPageLimit)} 条`;
+      const extensionNote = !loaded ? '未加载' : this.state.governanceExtensionCapabilityTotal === null ? '全量统计未返回' : `全量治理扩展；清单展示最多 ${escapeHtml(this.state.catalogPageLimit)} 条`;
+      const findingNote = !loaded ? '未加载' : this.state.findingTotal === null ? '全量统计未返回' : `全量开放 Finding；中心展示最多 ${escapeHtml(this.state.findingPageLimit)} 条${attention ? ` · ${attention} 个领域需关注` : ''}`;
       const snapshotText = this.state.selectedSnapshotGid || '—';
       const snapshotNote = this.state.staleData ? '◷ 刷新失败，保留上次成功数据' : this.state.selectedSnapshotGid ? '✓ 已绑定治理快照' : loaded ? '⚠ 快照未返回（目录查询不提供快照 GID）' : '未加载';
-      return `<section class="overview-grid"><article class="metric"><h2>Product Catalog</h2><strong>${escapeHtml(catalogCount)}</strong><p>${loaded ? `当前页能力（最多 ${escapeHtml(this.state.catalogPageLimit)} 条；不是全量总数）` : '未加载'}</p></article><article class="metric extension"><h2>Governance Extension</h2><strong>${escapeHtml(extensionCount)}</strong><p>${loaded ? `当前页治理扩展（最多 ${escapeHtml(this.state.catalogPageLimit)} 条；不是全量总数）` : '未加载'}</p></article><article class="metric"><h2>Open Findings</h2><strong>${escapeHtml(findingCount)}</strong><p>${loaded ? `当前页 Finding（最多 ${escapeHtml(this.state.findingPageLimit)} 条）${attention ? ` · ${attention} 个领域需关注` : ''}` : '未加载'}</p></article><article class="metric"><h2>Snapshot</h2><strong class="gid">${escapeHtml(snapshotText)}</strong><p>${snapshotNote}</p></article></section><section class="domain-summary"><h2>11 个真实领域</h2>${DOMAINS.map((domain) => { const item = health.find((candidate) => candidate.domain === domain.id); return `<button type="button" data-domain="${domain.id}">${escapeHtml(domain.label)} ${item ? statusLabel(item.status) : ''}</button>`; }).join('')}</section>`;
+      return `<section class="overview-grid"><article class="metric"><h2>Product Catalog</h2><strong>${escapeHtml(catalogCount)}</strong><p>${catalogNote}</p></article><article class="metric extension"><h2>Governance Extension</h2><strong>${escapeHtml(extensionCount)}</strong><p>${extensionNote}</p></article><article class="metric"><h2>Open Findings</h2><strong>${escapeHtml(findingCount)}</strong><p>${findingNote}</p></article><article class="metric"><h2>Snapshot</h2><strong class="gid">${escapeHtml(snapshotText)}</strong><p>${snapshotNote}</p></article></section><section class="domain-summary"><h2>11 个真实领域</h2>${DOMAINS.map((domain) => { const item = health.find((candidate) => candidate.domain === domain.id); return `<button type="button" data-domain="${domain.id}">${escapeHtml(domain.label)} ${item ? statusLabel(item.status) : ''}</button>`; }).join('')}</section>`;
     }
 
     renderInventory() {

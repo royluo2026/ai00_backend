@@ -227,12 +227,22 @@
     const findingData = findings && findings.data ? findings.data : findings;
     const rows = ((registryData && registryData.items) || []).map(toRow);
     const extensionRows = rows.filter(isGovernanceExtension);
+    const registryTotal = registryData && Number.isFinite(Number(registryData.total)) ? Number(registryData.total) : null;
+    const productTotal = registryData && Number.isFinite(Number(registryData.product_capability_total))
+      ? Number(registryData.product_capability_total) : null;
+    const extensionTotal = registryData && Number.isFinite(Number(registryData.governance_extension_capability_total))
+      ? Number(registryData.governance_extension_capability_total) : null;
+    const findingTotal = findingData && Number.isFinite(Number(findingData.total)) ? Number(findingData.total) : null;
     return {
       rows,
       findings: (findingData && (findingData.findings || findingData.items)) || [],
       snapshot_gid: (registryData && (registryData.snapshot_gid || registryData.snapshotGid)) || null,
       productCapabilityCount: rows.length - extensionRows.length,
       governanceExtensionCapabilityCount: extensionRows.length,
+      productCapabilityTotal: productTotal,
+      governanceExtensionCapabilityTotal: extensionTotal,
+      findingTotal,
+      registryTotal,
       productCatalogRelease: null,
       governanceExtensionRelease: null,
     };

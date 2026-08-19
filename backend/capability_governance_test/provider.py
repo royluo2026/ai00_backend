@@ -111,6 +111,14 @@ def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, A
     ):
         if result.get(field) is not None:
             response[field] = str(result[field])
+    for field in (
+        "total", "product_capability_total", "governance_extension_capability_total",
+    ):
+        if result.get(field) is not None:
+            try:
+                response[field] = min(max(0, int(result[field])), 100000)
+            except (TypeError, ValueError):
+                pass
     if capability_id == "base.capability_registry.search":
         response["items"] = [_projection(item, (
             "capability_id", "capability_version_gid", "capability_gid", "major_version",

@@ -319,7 +319,16 @@ class CapabilityGovernanceService:
         query = str(payload.get("query", "")).strip().lower()
         entries = sorted(self._entries(), key=lambda item: str(getattr(item, "capability_id", "")))
         matches = [item for item in entries if not query or query in str(getattr(item, "capability_id", "")).lower()]
-        return self._completed("base.capability_registry.search", limit=limit, items=tuple(matches[:limit]))
+        extension_matches = [
+            item for item in matches
+            if str(getattr(item, "capability_id", "")).lower().startswith("base.capability_")
+        ]
+        return self._completed(
+            "base.capability_registry.search", limit=limit, items=tuple(matches[:limit]),
+            total=len(matches),
+            product_capability_total=len(matches) - len(extension_matches),
+            governance_extension_capability_total=len(extension_matches),
+        )
 
     def base_capability_registry_get(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
         target = _gid(payload.get("target_gid"))
@@ -493,7 +502,7 @@ class CapabilityGovernanceService:
             if callable(custom_loader):
                 findings = tuple(
                     _enrich_finding_record(snapshot, item)
-                    for item in tuple(custom_loader(int(getattr(snapshot, "snapshot_gid"))) or ())[:_MAX_SEARCH]
+                    for item in tuple(custom_loader(int(getattr(snapshot, "snapshot_gid"))) or ())[:_MAX_HEALTH_FINDINGS]
                 )
             else:
                 if self._analysis_runner is None:
@@ -503,7 +512,9 @@ class CapabilityGovernanceService:
                     kind="analysis", run_gid=str(getattr(snapshot, "snapshot_gid")),
                     request=AnalysisRequest(),
                 )
-                findings = self._finding_records(snapshot, getattr(analysis, "findings", ()))
+                findings = self._finding_records(
+                    snapshot, getattr(analysis, "findings", ()), limit=_MAX_HEALTH_FINDINGS,
+                )
         query = str(payload.get("query", "")).strip().lower()
         if query:
             def field(item: Any, name: str) -> Any:
@@ -512,7 +523,10 @@ class CapabilityGovernanceService:
                 return getattr(item, name, "")
             findings = tuple(item for item in findings if query in str(field(item, "code")).lower()
                              or query in str(field(item, "fingerprint")).lower())
-        return self._completed("base.capability_finding.search", findings=tuple(findings[:limit]))
+        return self._completed(
+            "base.capability_finding.search", findings=tuple(findings[:limit]),
+            total=len(findings),
+        )
 
     def base_capability_analysis_get(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
         target = str(payload.get("target_gid", ""))

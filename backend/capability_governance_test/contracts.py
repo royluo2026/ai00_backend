@@ -48,6 +48,7 @@ WRITE_IDS = {
 _LIMIT_SCHEMA = {"type": "integer", "minimum": 1, "maximum": 200}
 _DEPTH_SCHEMA = {"type": "integer", "minimum": 1, "maximum": 4}
 _NODES_SCHEMA = {"type": "integer", "minimum": 1, "maximum": 500}
+_COUNT_SCHEMA = {"type": "integer", "minimum": 0, "maximum": 100000}
 _VERSION_SCHEMA = {"type": "string", "minLength": 1, "maxLength": 255}
 _SMALL_STRING_SCHEMA = {"type": "string", "minLength": 1, "maxLength": 255}
 _BOOLEAN_SCHEMA = {"type": "boolean"}
@@ -320,6 +321,11 @@ def _output_schema(capability_id: str) -> dict[str, object]:
     }
     if capability_id == "base.capability_registry.search":
         properties["items"] = {"type": "array", "items": _ITEM_SCHEMA, "maxItems": 200}
+        properties.update({
+            "total": _COUNT_SCHEMA,
+            "product_capability_total": _COUNT_SCHEMA,
+            "governance_extension_capability_total": _COUNT_SCHEMA,
+        })
     elif capability_id == "base.capability_registry.get":
         properties["item"] = _ITEM_SCHEMA
     elif capability_id == "base.capability_graph.get":
@@ -333,6 +339,7 @@ def _output_schema(capability_id: str) -> dict[str, object]:
         })
     elif capability_id == "base.capability_finding.search":
         properties["findings"] = {"type": "array", "items": _FINDING_SCHEMA, "maxItems": 200}
+        properties["total"] = _COUNT_SCHEMA
     elif capability_id == "base.capability_proposal.search":
         properties["items"] = {"type": "array", "items": _PROPOSAL_ITEM_SCHEMA, "maxItems": 200}
         properties["data"] = _QUERY_META_SCHEMA
