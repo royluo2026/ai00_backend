@@ -75,7 +75,7 @@ def test_check_probes_split_governance_controller_and_relative_css(monkeypatch):
         "/web/settings/index.html": '<div id="panel-plugin-market"></div><script src="settings.js?v=9"></script>',
         "/web/settings/settings.js": "panel-plugin-market",
         "/web/admin/capability_governance/index.html": (
-            '<link rel="stylesheet" href="governance.css">'
+            '<link rel="stylesheet" href="governance.css?v=20260819-health-layout">'
             '<script src="governance_model.js"></script>'
             '<script src="governance_api.js"></script>'
             '<script src="governance_controller_next.js"></script>'

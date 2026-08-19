@@ -93,7 +93,10 @@ def _check_governance_assets(base_url: str, html: str, results: list[dict[str, o
         "governance_controller_next.js": "CapabilityGovernanceControllerNext",
     }
     linked_scripts = set(re.findall(r'<script[^>]+src="([^"/]+)"', html))
-    stylesheet_refs = set(re.findall(r'<link[^>]+href="([^"?#]+\.css)"', html))
+    # Cache-busting query strings are valid on deployed assets; probe the
+    # underlying stylesheet path rather than treating the query as part of
+    # the filename.
+    stylesheet_refs = set(re.findall(r'<link[^>]+href="([^"?#]+\.css)(?:\?[^" ]*)?"', html))
     for filename, marker in scripts.items():
         if filename == "governance_controller_next.js" and filename not in linked_scripts:
             continue
