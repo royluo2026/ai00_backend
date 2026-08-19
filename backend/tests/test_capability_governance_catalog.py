@@ -43,7 +43,7 @@ def test_test_governance_extension_has_exact_base_owned_contracts():
     registrations = {key: registry.get(*key) for key in registry.keys() if key[0] in ALL_IDS}
 
     assert set(registrations) == {(capability_id, 1) for capability_id in ALL_IDS}
-    assert len(registrations) == 14
+    assert len(registrations) == len(ALL_IDS)
     assert provider_artifact(ROOT).plugin_id == "test.governance"
     for registration in registrations.values():
         assert registration.spec.owner == "base"
