@@ -1077,18 +1077,45 @@ class CapabilityGovernanceService:
         detail = get("detail", {})
         if not isinstance(detail, Mapping):
             detail = {}
-        safe_detail = {str(key): str(value)[:512] for key, value in tuple(detail.items())[:50] if str(key).lower() not in {"token", "password", "secret", "credential", "authorization", "cookie"}}
-        capability_id = str(get("capability_id", ""))
-        operation = str(get("operation", get("event_type", "")))
+        allowed_detail = {
+            "status", "capability_id", "before_status", "after_status", "finding_gid",
+            "conclusion", "blockers", "prompt_hash", "finding_count", "finding_types",
+        }
+        safe_detail: dict[str, Any] = {}
+        for key, value in tuple(detail.items())[:50]:
+            name = str(key)
+            if name.lower() in {"token", "password", "secret", "credential", "authorization", "cookie"} or name not in allowed_detail:
+                continue
+            if name in {"blockers", "finding_types"}:
+                if isinstance(value, (list, tuple)):
+                    safe_detail[name] = [str(item)[:255] for item in value[:200]]
+                continue
+            if name == "finding_count":
+                try:
+                    safe_detail[name] = min(max(0, int(value)), 5000)
+                except (TypeError, ValueError):
+                    continue
+            else:
+                safe_detail[name] = str(value)[:512]
+
+        def text_value(name: str, fallback: Any = None) -> str | None:
+            value = get(name, fallback)
+            if value is None:
+                return None
+            normalized = str(value).strip()
+            return normalized or None
+
+        capability_id = text_value("capability_id", detail.get("capability_id"))
+        operation = text_value("operation", get("event_type"))
         return {
             "audit_event_gid": str(get("audit_event_gid", get("gid", "0"))),
             "operation": operation,
             "capability_id": capability_id,
-            "event_type": str(get("event_type", operation)),
-            "actor_gid": str(get("actor_gid", get("user_gid", ""))),
-            "request_gid": str(get("request_gid", get("request_id", ""))),
-            "status": str(get("status", "recorded")),
-            "occurred_at": str(get("occurred_at", get("created_at", ""))),
+            "event_type": text_value("event_type", operation),
+            "actor_gid": text_value("actor_gid", get("user_gid")),
+            "request_gid": text_value("request_gid", get("request_id")),
+            "status": text_value("status", "recorded"),
+            "occurred_at": text_value("occurred_at", get("created_at")),
             "detail": safe_detail,
         }
 

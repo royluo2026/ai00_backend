@@ -267,6 +267,18 @@ _HEALTH_ITEM_SCHEMA = _closed({
     "severities": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 20},
     "reason": _SMALL_STRING_SCHEMA,
 })
+_AUDIT_DETAIL_SCHEMA = _closed({
+    "status": _SMALL_STRING_SCHEMA,
+    "capability_id": _SMALL_STRING_SCHEMA,
+    "before_status": _SMALL_STRING_SCHEMA,
+    "after_status": _SMALL_STRING_SCHEMA,
+    "finding_gid": GID_SCHEMA,
+    "conclusion": _SMALL_STRING_SCHEMA,
+    "blockers": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 200},
+    "prompt_hash": _VERSION_SCHEMA,
+    "finding_count": {"type": "integer", "minimum": 0, "maximum": 5000},
+    "finding_types": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 20},
+})
 _AUDIT_ITEM_SCHEMA = _closed({
     "audit_event_gid": GID_SCHEMA,
     "operation": _SMALL_STRING_SCHEMA,
@@ -276,8 +288,14 @@ _AUDIT_ITEM_SCHEMA = _closed({
     "request_gid": _SMALL_STRING_SCHEMA,
     "status": _SMALL_STRING_SCHEMA,
     "occurred_at": _SMALL_STRING_SCHEMA,
-    "detail": _BOUNDED_OBJECT_SCHEMA,
+    "detail": _AUDIT_DETAIL_SCHEMA,
 })
+_QUERY_META_SCHEMA = _closed({
+    "available": _BOOLEAN_SCHEMA,
+    "checked_at": _SMALL_STRING_SCHEMA,
+    "next_cursor": {"type": ["string", "null"]},
+    "snapshot_gid": GID_SCHEMA,
+}, ("available", "checked_at"))
 _WAIVER_SCHEMA = _closed({
     "waiver_gid": GID_SCHEMA, "status": _SMALL_STRING_SCHEMA,
     "row_version": _VERSION_SCHEMA,
@@ -313,10 +331,13 @@ def _output_schema(capability_id: str) -> dict[str, object]:
         properties["findings"] = {"type": "array", "items": _FINDING_SCHEMA, "maxItems": 200}
     elif capability_id == "base.capability_proposal.search":
         properties["items"] = {"type": "array", "items": _PROPOSAL_ITEM_SCHEMA, "maxItems": 200}
+        properties["data"] = _QUERY_META_SCHEMA
     elif capability_id == "base.capability_health.get":
         properties["items"] = {"type": "array", "items": _HEALTH_ITEM_SCHEMA, "maxItems": 11}
+        properties["data"] = _QUERY_META_SCHEMA
     elif capability_id == "base.capability_audit.search":
         properties["items"] = {"type": "array", "items": _AUDIT_ITEM_SCHEMA, "maxItems": 200}
+        properties["data"] = _QUERY_META_SCHEMA
     elif capability_id in {"base.capability_analysis.run", "base.capability_test.run", "base.capability_analysis.get"}:
         properties["run"] = _RUN_SCHEMA
     elif capability_id == "base.capability_repair_prompt.generate":

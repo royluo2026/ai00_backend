@@ -8,6 +8,7 @@ from backend.capability_governance_test.contracts import OUTPUT_SCHEMAS
 from backend.capability_governance_test.provider import register_governance_capabilities
 from backend.capability_governance_test.release_gate import ReleaseGate
 from backend.capability_governance_test.service import CapabilityGovernanceService
+from backend.scripts.build_capability_governance_catalog import current_release
 
 
 def _context() -> CapabilityContext:
@@ -294,6 +295,14 @@ def test_governance_read_capabilities_expose_proposals_health_and_audit():
     audit = AuditSink(next_gid=iter(range(1000, 1100)).__next__)
     service = CapabilityGovernanceService(ProposalStore(), audit_sink=audit)
     service._audit(operation="governance_scan", request_id="req-1", context=_context(), detail={})
+    audit.append(
+        operation="proposal",
+        entity_gid=100,
+        actor_gid="42",
+        request_gid="req-2",
+        detail={"status": "draft", "capability_id": "base.example.read", "blockers": ["missing_test"]},
+        idempotency_key="proposal:req-2",
+    )
     registry = __import__("backend.capabilities.registry_next", fromlist=["CapabilityRegistry"]).CapabilityRegistry()
     register_governance_capabilities(registry, service)
 
@@ -306,4 +315,11 @@ def test_governance_read_capabilities_expose_proposals_health_and_audit():
     assert proposal["data"]["available"] is True
     assert health["items"][0]["domain"] == "craft"
     assert health["items"][0]["status"] in {"healthy", "attention", "blocked", "unverified"}
-    assert audit_result["items"][0]["operation"] == "governance_scan"
+    assert audit_result["items"][0]["operation"] == "proposal"
+    descriptors = {item.id: item for item in current_release().descriptors}
+    for capability_id, result in (
+        ("base.capability_proposal.search", proposal),
+        ("base.capability_health.get", health),
+        ("base.capability_audit.search", audit_result),
+    ):
+        validate_payload(dict(descriptors[capability_id].output_schema), result, label=f"{capability_id}.output")
