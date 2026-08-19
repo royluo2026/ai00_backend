@@ -70,7 +70,7 @@
       sectionStale: {},
       sectionMeta: {},
       sectionFilters: {
-        findings: { domain: 'all', severity: 'all', status: 'all', query: '' },
+        findings: { domain: 'all', severity: 'all', status: 'all', reasonCode: 'all', query: '' },
         changes: { domain: 'all', stage: 'all', query: '' },
         audit: { actor: '', capability: '', eventType: '', result: '' },
       },

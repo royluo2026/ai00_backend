@@ -146,7 +146,7 @@ def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, A
     elif capability_id == "base.capability_finding.search":
         response["findings"] = [_projection(finding, (
             "finding_gid", "code", "severity", "status", "fingerprint", "remediation_boundary",
-            "subject_version_gids", "domains", "evidence",
+            "subject_version_gids", "domains", "evidence", "reason_code", "reason", "subject_summary",
         )) for finding in tuple(result.get("findings", result.get("items", ())))[:200]]
     elif capability_id == "base.capability_proposal.search":
         response["items"] = [_projection(proposal, (

@@ -24,6 +24,102 @@ _PROMPT_READ_PERMISSION = "base.capability_repair_prompt.read"
 _DEFAULT_PORT = object()
 
 
+# Finding codes are the machine-stable NOK categories.  Keep their explanations
+# in the governance service so every consumer (UI, agent and audit export) sees
+# the same fail-closed rationale without parsing implementation details.
+_FINDING_REASON_TEXT = {
+    "provider_missing": "目录声明了该 Capability，但没有找到对应的 Provider 注册或实现证据。",
+    "gap": "该 Capability 没有可验证的实现绑定，无法证明它可以执行。",
+    "exposure_without_capability": "发现公开入口，但没有找到它通过已声明 Capability 或 Gateway 暴露的证据。",
+    "provider_without_descriptor": "发现 Provider 实现，但没有找到对应的 Catalog 描述。",
+    "required_test_missing": "没有找到覆盖该 Capability 的测试用例证据。",
+    "repository_table_migration_mismatch": "Repository 写入的表没有找到对应迁移声明。",
+    "transaction_participant_missing": "强写 Capability 没有找到事务参与者证据。",
+    "permission_policy_mismatch": "Provider 的权限策略与 Catalog 声明不一致。",
+    "confirmation_policy_mismatch": "Provider 的确认策略与 Catalog 声明不一致。",
+    "catalog_schema_drift": "Provider 的输入、输出或错误 Schema 与 Catalog 不一致。",
+    "lifecycle_incompatibility": "Provider 生命周期状态与 Catalog 不兼容。",
+    "duplicate": "跨域 Capability 的合约与业务效果完全重叠，疑似重复。",
+    "semantic_overlap": "跨域 Capability 的业务效果存在重叠，需要确认边界。",
+    "cross_domain_conflict": "跨域 Capability 的策略或合约存在冲突。",
+    "lifecycle_pair_gap": "没有找到与该 Capability 配套的生命周期操作。",
+    "non_atomic_facade": "聚合 Facade 组合多个 Provider，但没有找到事务性证据。",
+    "stale_evidence": "当前证据与最新代码、Catalog 或 Snapshot 不一致。",
+}
+
+
+def _finding_reason(code: str) -> str:
+    return _FINDING_REASON_TEXT.get(code, f"规则 {code} 判定该治理对象缺少满足发布要求的证据。")[:255]
+
+
+def _finding_subject_summary(
+    snapshot: Any, subjects: tuple[Any, ...], evidence_keys: tuple[Any, ...] = (),
+) -> str:
+    """Resolve a compact, human-readable subject without exposing raw internals."""
+    document = getattr(snapshot, "document", snapshot)
+    nodes = {
+        str(getattr(node, "canonical_key", "")): node
+        for node in getattr(document, "nodes", ())
+        if getattr(node, "canonical_key", None)
+    }
+    labels = {
+        "rest_route": "REST 路由", "gateway": "Gateway", "mount_binding": "Mount",
+        "agent_tool": "Agent Tool", "mcp_tool": "MCP Tool", "legacy_api": "旧 API",
+    }
+    parts: list[str] = []
+    for subject in subjects[:20]:
+        capability_id = str(getattr(subject, "capability_id", "")).strip()
+        if capability_id:
+            major = int(getattr(subject, "major_version", 0) or 0)
+            parts.append(f"Capability：{capability_id}@{major}")
+            continue
+        evidence_key = str(getattr(subject, "evidence_key", "")).strip()
+        node = nodes.get(evidence_key)
+        if node is not None:
+            node_type = str(getattr(node, "node_type", "入口"))
+            label = labels.get(node_type, node_type or "入口")
+            symbol = str(getattr(node, "source_symbol", "") or getattr(node, "source_path", "") or evidence_key)
+            parts.append(f"{label}：{symbol}")
+        elif evidence_key:
+            parts.append(evidence_key)
+    for value in evidence_keys[:20]:
+        evidence_key = str(value).strip()
+        node = nodes.get(evidence_key)
+        if node is None:
+            continue
+        node_type = str(getattr(node, "node_type", "入口"))
+        label = labels.get(node_type, node_type or "入口")
+        symbol = str(getattr(node, "source_symbol", "") or getattr(node, "source_path", "") or evidence_key)
+        parts.append(f"{label}：{symbol}")
+    return "、".join(dict.fromkeys(parts))[:255] or "未解析主体"
+
+
+def _enrich_finding_record(snapshot: Any, item: Any) -> dict[str, Any]:
+    """Backfill explanations for findings loaded from a persisted store."""
+    if isinstance(item, Mapping):
+        record = dict(item)
+    else:
+        record = dict(getattr(item, "__dict__", {}))
+        if not record:
+            for field in (
+                "finding_gid", "code", "finding_type", "severity", "status", "fingerprint",
+                "remediation_boundary", "subject_version_gids", "domains", "evidence",
+                "reason_code", "reason", "subject_summary",
+            ):
+                if hasattr(item, field):
+                    record[field] = getattr(item, field)
+    code = str(record.get("code") or record.get("finding_type") or record.get("findingType") or "finding")
+    if not str(record.get("reason_code", "")).strip():
+        record["reason_code"] = code
+    if not str(record.get("reason", "")).strip():
+        record["reason"] = _finding_reason(str(record["reason_code"]))
+    subjects = tuple(record.get("subjects", ()) or ())
+    evidence = tuple(record.get("evidence", ()) or ())
+    if not str(record.get("subject_summary", record.get("subjectSummary", ""))).strip():
+        record["subject_summary"] = _finding_subject_summary(snapshot, subjects, evidence)
+    return record
+
+
 class _InlineGovernanceWorker:
     """Deterministic local worker used only when no worker port is supplied.
 
@@ -395,7 +491,10 @@ class CapabilityGovernanceService:
         if snapshot is not None:
             custom_loader = getattr(self._store, "get_findings", None)
             if callable(custom_loader):
-                findings = tuple(custom_loader(int(getattr(snapshot, "snapshot_gid"))) or ())[:_MAX_SEARCH]
+                findings = tuple(
+                    _enrich_finding_record(snapshot, item)
+                    for item in tuple(custom_loader(int(getattr(snapshot, "snapshot_gid"))) or ())[:_MAX_SEARCH]
+                )
             else:
                 if self._analysis_runner is None:
                     raise _business_error("governance_dependency_unavailable")
@@ -1049,7 +1148,10 @@ class CapabilityGovernanceService:
         loader = getattr(self._store, "get_findings", None) if self._store is not None else None
         if callable(loader):
             try:
-                return tuple(loader(int(getattr(snapshot, "snapshot_gid"))) or ())[:limit]
+                return tuple(
+                    _enrich_finding_record(snapshot, item)
+                    for item in tuple(loader(int(getattr(snapshot, "snapshot_gid"))) or ())[:limit]
+                )
             except Exception:
                 return ()
         if self._analysis_runner is None:
@@ -1182,6 +1284,7 @@ class CapabilityGovernanceService:
                 if str(value) in node_domains and node_domains[str(value)]
             )
             finding_domains = tuple(sorted(finding_domain_values))
+            reason_code = code
             records.append({
                 "finding_gid": str(finding_gid), "code": code,
                 "severity": str(getattr(candidate, "severity", "warning")), "status": "open",
@@ -1190,6 +1293,11 @@ class CapabilityGovernanceService:
                 "subject_version_gids": subject_gids,
                 "domains": finding_domains,
                 "evidence": tuple(str(value) for value in getattr(candidate, "evidence_keys", ())[:200]),
+                "reason_code": reason_code,
+                "reason": _finding_reason(reason_code),
+                "subject_summary": _finding_subject_summary(
+                    snapshot, subjects, tuple(getattr(candidate, "evidence_keys", ())),
+                ),
             })
         return tuple(records)
 

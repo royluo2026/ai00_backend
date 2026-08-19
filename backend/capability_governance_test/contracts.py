@@ -216,6 +216,8 @@ _FINDING_SCHEMA = _closed({
     "code": _SMALL_STRING_SCHEMA, "severity": _SMALL_STRING_SCHEMA,
     "fingerprint": _SMALL_STRING_SCHEMA, "remediation_boundary": _SMALL_STRING_SCHEMA,
     "finding_gid": GID_SCHEMA, "status": _SMALL_STRING_SCHEMA,
+    "reason_code": _SMALL_STRING_SCHEMA, "reason": STRING_SCHEMA,
+    "subject_summary": STRING_SCHEMA,
     "subject_version_gids": {"type": "array", "items": GID_SCHEMA, "maxItems": 20},
     "domains": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 20},
     "evidence": {"type": "array", "items": STRING_SCHEMA, "maxItems": 200},

@@ -21,6 +21,26 @@
       : ['fail', 'blocked', 'broken'].includes(normalized) ? '!' : ['stale', 'expired', 'attention'].includes(normalized) ? '◷' : '•';
     return `<span class="status status-${escapeHtml(normalized)}"><span aria-hidden="true">${icon}</span> ${escapeHtml(normalized)}</span>`;
   };
+  const REASON_LABELS = Object.freeze({
+    provider_missing: '缺少 Provider',
+    gap: '缺少实现绑定',
+    exposure_without_capability: '入口未绑定能力',
+    provider_without_descriptor: 'Provider 缺少目录描述',
+    required_test_missing: '缺少测试证据',
+    repository_table_migration_mismatch: '表与迁移不一致',
+    transaction_participant_missing: '缺少事务参与者',
+    permission_policy_mismatch: '权限策略不一致',
+    confirmation_policy_mismatch: '确认策略不一致',
+    catalog_schema_drift: '合约 Schema 漂移',
+    lifecycle_incompatibility: '生命周期不兼容',
+    duplicate: '疑似重复',
+    semantic_overlap: '语义重叠',
+    cross_domain_conflict: '跨域冲突',
+    lifecycle_pair_gap: '缺少生命周期配套',
+    non_atomic_facade: 'Facade 缺少事务证据',
+    stale_evidence: '证据已过期',
+  });
+  const reasonLabel = (code) => REASON_LABELS[code] || code || '未分类';
   const unwrap = (response) => {
     const hasCollection = response && (Array.isArray(response.items) || Array.isArray(response.findings) || Array.isArray(response.events) || response.release);
     return hasCollection ? response : (response && response.data && typeof response.data === 'object' ? response.data : (response || {}));
@@ -105,7 +125,7 @@
         }
         if (action.dataset.action === 'clear-section-filter') {
           const sectionName = action.dataset.section || this.state.section;
-          this.state.sectionFilters[sectionName] = Object.assign({}, this.state.sectionFilters[sectionName], { domain: 'all', severity: 'all', status: 'all', stage: 'all', query: '', actor: '', capability: '', eventType: '', result: '' });
+          this.state.sectionFilters[sectionName] = Object.assign({}, this.state.sectionFilters[sectionName], { domain: 'all', severity: 'all', status: 'all', reasonCode: 'all', stage: 'all', query: '', actor: '', capability: '', eventType: '', result: '' });
           return this.render();
         }
         this.dispatchAction(action.dataset.action, action.dataset.entityGid);
@@ -254,14 +274,16 @@
 
     renderFindings() {
       const filters = this.state.sectionFilters.findings || {};
+      const reasonCodes = [...new Set((this.state.findings || []).map((finding) => String(finding.reason_code || finding.reasonCode || finding.code || '').trim()).filter(Boolean))].sort();
       const findings = (this.state.findings || []).filter((finding) => {
         const domains = finding.domains || finding.domain || [];
         const severity = String(finding.severity || 'warning');
         const status = String(finding.status || 'open');
-        const text = `${finding.code || finding.findingType || ''} ${finding.fingerprint || ''}`.toLowerCase();
-        return (filters.domain === 'all' || (Array.isArray(domains) ? domains.includes(filters.domain) : domains === filters.domain)) && (filters.severity === 'all' || filters.severity === severity) && (filters.status === 'all' || filters.status === status) && (!filters.query || text.includes(filters.query.toLowerCase()));
+        const reasonCode = String(finding.reason_code || finding.reasonCode || finding.code || '');
+        const text = `${finding.code || finding.findingType || ''} ${finding.fingerprint || ''} ${reasonCode} ${finding.reason || ''} ${finding.subject_summary || finding.subjectSummary || ''}`.toLowerCase();
+        return (filters.domain === 'all' || (Array.isArray(domains) ? domains.includes(filters.domain) : domains === filters.domain)) && (filters.severity === 'all' || filters.severity === severity) && (filters.status === 'all' || filters.status === status) && (filters.reasonCode === 'all' || filters.reasonCode === reasonCode) && (!filters.query || text.includes(filters.query.toLowerCase()));
       });
-      return `<section><h2>Finding 中心</h2><div class="filters"><label>搜索 <input data-filter-section="findings" data-filter-key="query" value="${escapeHtml(filters.query || '')}" placeholder="规则、指纹"></label><label>领域 <select data-filter-section="findings" data-filter-key="domain"><option value="all">全部领域</option>${DOMAINS.map((domain) => `<option value="${domain.id}"${filters.domain === domain.id ? ' selected' : ''}>${escapeHtml(domain.label)}</option>`).join('')}</select></label><label>级别 <select data-filter-section="findings" data-filter-key="severity"><option value="all">全部级别</option><option value="error"${filters.severity === 'error' ? ' selected' : ''}>error</option><option value="warning"${filters.severity === 'warning' ? ' selected' : ''}>warning</option></select></label><button type="button" data-action="clear-section-filter" data-section="findings">清除筛选</button></div>${findings.map((finding) => `<article class="finding"><h3>${escapeHtml(finding.code || finding.findingType || 'finding')} ${statusLabel(finding.status)}</h3><p>主体：${(finding.subjectVersionGids || finding.subject_version_gids || []).map(normalizeGid).map(escapeHtml).join('、') || '—'}</p><p>领域：${(finding.domains || []).map(escapeHtml).join('、') || '跨领域'}</p><p>严重级别：${escapeHtml(finding.severity || 'warning')}</p><p>证据：${(finding.evidence || []).map(escapeHtml).join('、') || '—'}</p></article>`).join('') || '<p class="empty">没有符合条件的 Finding。</p>'}</section>`;
+      return `<section><h2>Finding 中心</h2><div class="filters"><label>搜索 <input data-filter-section="findings" data-filter-key="query" value="${escapeHtml(filters.query || '')}" placeholder="规则、指纹、原因"></label><label>领域 <select data-filter-section="findings" data-filter-key="domain"><option value="all">全部领域</option>${DOMAINS.map((domain) => `<option value="${domain.id}"${filters.domain === domain.id ? ' selected' : ''}>${escapeHtml(domain.label)}</option>`).join('')}</select></label><label>级别 <select data-filter-section="findings" data-filter-key="severity"><option value="all">全部级别</option><option value="blocking"${filters.severity === 'blocking' ? ' selected' : ''}>blocking</option><option value="critical"${filters.severity === 'critical' ? ' selected' : ''}>critical</option><option value="error"${filters.severity === 'error' ? ' selected' : ''}>error</option><option value="warning"${filters.severity === 'warning' ? ' selected' : ''}>warning</option></select></label><label>NOK 原因类别 <select data-filter-section="findings" data-filter-key="reasonCode"><option value="all">全部原因</option>${reasonCodes.map((code) => `<option value="${escapeHtml(code)}"${filters.reasonCode === code ? ' selected' : ''}>${escapeHtml(reasonLabel(code))}</option>`).join('')}</select></label><button type="button" data-action="clear-section-filter" data-section="findings">清除筛选</button></div>${findings.map((finding) => { const reasonCode = String(finding.reason_code || finding.reasonCode || finding.code || ''); const subject = finding.subject_summary || finding.subjectSummary || (finding.subjectVersionGids || finding.subject_version_gids || []).map(normalizeGid).join('、') || '—'; return `<article class="finding"><h3>${escapeHtml(finding.code || finding.findingType || 'finding')} ${statusLabel(finding.status)}</h3><p>主体：${escapeHtml(subject)}</p><p>领域：${(finding.domains || []).map(escapeHtml).join('、') || '跨领域'}</p><p>严重级别：${escapeHtml(finding.severity || 'warning')}</p><p>原因类别：${escapeHtml(reasonLabel(reasonCode))}</p><p>判定原因：${escapeHtml(finding.reason || '未提供判定原因')}</p><p>证据：${(finding.evidence || []).map(escapeHtml).join('、') || '—'}</p></article>`; }).join('') || '<p class="empty">没有符合条件的 Finding。</p>'}</section>`;
     }
 
     renderChanges() {

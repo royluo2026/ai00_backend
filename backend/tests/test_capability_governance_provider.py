@@ -255,6 +255,98 @@ def test_health_counts_blocking_exposure_findings_by_node_domain() -> None:
     },)
 
 
+def test_finding_records_explain_nok_reason_and_subject() -> None:
+    """Finding rows must explain the stable NOK category and concrete subject."""
+    from backend.capability_governance_test.rules import FindingCandidate, FindingSubject
+
+    route = SimpleNamespace(
+        canonical_key="rest_route:craft:plugins/craft/routes.py:read_factory",
+        owner_domain="craft", node_type="rest_route", source_symbol="read_factory",
+    )
+    snapshot = SimpleNamespace(
+        snapshot_gid=100, entries=(),
+        document=SimpleNamespace(nodes=(route,), relations=(), bindings=(), capabilities=()),
+    )
+
+    class Store:
+        def get_snapshot(self, snapshot_gid: int):
+            return snapshot if snapshot_gid == 100 else None
+
+        def latest_snapshot(self):
+            return snapshot
+
+    finding = FindingCandidate(
+        "exposure_without_capability", "blocking",
+        subjects=(FindingSubject("", 0, "exposure", route.canonical_key),),
+        evidence_keys=(route.canonical_key,),
+    )
+    service = CapabilityGovernanceService(
+        Store(), analysis_runner=lambda snapshot, request: SimpleNamespace(findings=(finding,)),
+    )
+
+    result = service.base_capability_finding_search({"target_gid": "100"}, _context())
+
+    assert result["findings"][0]["reason_code"] == "exposure_without_capability"
+    assert "公开入口" in result["findings"][0]["reason"]
+    assert result["findings"][0]["subject_summary"] == "REST 路由：read_factory"
+
+
+def test_finding_transport_preserves_explanation_fields() -> None:
+    """The closed provider response must not strip finding explanations."""
+    from backend.capabilities.registry_next import CapabilityRegistry
+
+    class Service:
+        def base_capability_finding_search(self, payload, context):
+            return {
+                "capability_id": "base.capability_finding.search", "status": "completed",
+                "findings": ({
+                    "finding_gid": 17, "code": "gap", "severity": "blocking", "status": "open",
+                    "fingerprint": "sha256:finding", "remediation_boundary": "catalog",
+                    "subject_version_gids": (), "domains": ("craft",), "evidence": ("evidence",),
+                    "reason_code": "gap", "reason": "缺少实现证据。", "subject_summary": "Capability：craft.example@1",
+                },),
+            }
+
+    registry = CapabilityRegistry()
+    register_governance_capabilities(registry, Service())
+    import asyncio
+    result = asyncio.run(registry.invoke(
+        "base.capability_finding.search", {},
+        CapabilityContext(user_gid="42", permissions=("system.capability.read",)),
+    ))
+
+    finding = result.data["findings"][0]
+    assert finding["reason_code"] == "gap"
+    assert finding["reason"] == "缺少实现证据。"
+    assert finding["subject_summary"] == "Capability：craft.example@1"
+
+
+def test_persisted_finding_backfills_explanation_fields() -> None:
+    """Older stored findings remain understandable after the schema extension."""
+    snapshot = SimpleNamespace(
+        snapshot_gid=100, entries=(),
+        document=SimpleNamespace(nodes=(), relations=(), bindings=(), capabilities=()),
+    )
+
+    class Store:
+        def get_snapshot(self, snapshot_gid: int):
+            return snapshot if snapshot_gid == 100 else None
+
+        def latest_snapshot(self):
+            return snapshot
+
+        def get_findings(self, snapshot_gid: int):
+            return ({"finding_gid": "17", "code": "gap", "severity": "blocking", "evidence": ()},)
+
+    result = CapabilityGovernanceService(Store()).base_capability_finding_search(
+        {"target_gid": "100"}, _context()
+    )
+
+    assert result["findings"][0]["reason_code"] == "gap"
+    assert "没有可验证的实现绑定" in result["findings"][0]["reason"]
+    assert result["findings"][0]["subject_summary"] == "未解析主体"
+
+
 def test_health_count_is_not_limited_to_the_finding_center_page_size() -> None:
     """Health totals must include all bounded findings, not only the first 200 rows."""
     from backend.capability_governance_test.rules import FindingCandidate, FindingSubject
