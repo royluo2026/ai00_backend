@@ -72,6 +72,18 @@ def test_governance_provider_artifact_uses_the_canonical_extension_hash():
     )
 
 
+def test_governance_catalog_artifact_matches_registered_extension():
+    """Every registered governance capability must be resolvable by HTTP."""
+    artifact = (ROOT / "docs/governance/test-extension/capability-governance-catalog-release.json").read_text(encoding="utf-8")
+    from backend.capability_v2.catalog import CatalogRelease
+
+    checked = CatalogRelease.model_validate_json(artifact)
+    expected = current_release()
+    assert checked.release_id == expected.release_id
+    assert checked.catalog_hash == expected.catalog_hash
+    assert {item.id for item in checked.descriptors} == set(ALL_IDS)
+
+
 def test_test_governance_registration_restores_base_schema_maps():
     inputs_before = dict(base_provider.INPUT_SCHEMAS)
     outputs_before = dict(base_provider.OUTPUT_SCHEMAS)
