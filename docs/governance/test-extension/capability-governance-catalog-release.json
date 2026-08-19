@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_66c5b3e06d77ba3b766310ea8aeef221",
-  "catalog_hash": "sha256:66c5b3e06d77ba3b766310ea8aeef22105956e8660a2f0d2714399731b83c48b",
+  "release_id": "rel_45d10f10c65f58addb445ba4cde37889",
+  "catalog_hash": "sha256:45d10f10c65f58addb445ba4cde3788967d17cb508b92b063eb7bcdd0532471b",
   "descriptors": [
     {
       "id": "base.capability_analysis.get",
@@ -23,6 +23,7 @@
         "worker": false,
         "local_runtime": false
       },
+      "exposure_policy_source": "provider_explicit",
       "automation_level": "A2",
       "authorization_policy": "base.v2:system.capability.read",
       "resource_selectors": [],
@@ -404,6 +405,7 @@
         "worker": false,
         "local_runtime": false
       },
+      "exposure_policy_source": "provider_explicit",
       "automation_level": "A1",
       "authorization_policy": "base.v2:system.capability.read,system.capability.analyze",
       "resource_selectors": [],
@@ -791,6 +793,7 @@
         "worker": false,
         "local_runtime": false
       },
+      "exposure_policy_source": "provider_explicit",
       "automation_level": "A2",
       "authorization_policy": "base.v2:system.capability.read",
       "resource_selectors": [],
@@ -1406,6 +1409,7 @@
         "worker": false,
         "local_runtime": false
       },
+      "exposure_policy_source": "provider_explicit",
       "automation_level": "A2",
       "authorization_policy": "base.v2:system.capability.read",
       "resource_selectors": [],
@@ -1510,6 +1514,21 @@
                   "type": "string",
                   "minLength": 1,
                   "maxLength": 255
+                },
+                "reason_code": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "subject_summary": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
                 },
                 "subject_version_gids": {
                   "type": "array",
@@ -1671,6 +1690,21 @@
                   "minLength": 1,
                   "maxLength": 255
                 },
+                "reason_code": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "subject_summary": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
                 "subject_version_gids": {
                   "type": "array",
                   "items": {
@@ -1754,7 +1788,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:de6d46217767f473aab3f689ba201052a3550b907f3c63628b7aea95418f3e34",
+      "schema_hash": "sha256:d512cf34a93428044e4172bf46e59782f9a176f947d97f51a1c790c5e35e8256",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1842,6 +1876,7 @@
         "worker": false,
         "local_runtime": false
       },
+      "exposure_policy_source": "provider_explicit",
       "automation_level": "A2",
       "authorization_policy": "base.v2:system.capability.read",
       "resource_selectors": [],
@@ -2485,6 +2520,7 @@
         "worker": false,
         "local_runtime": false
       },
+      "exposure_policy_source": "provider_explicit",
       "automation_level": "A2",
       "authorization_policy": "base.v2:system.capability.read",
       "resource_selectors": [],
@@ -2606,7 +2642,7 @@
                 "finding_count": {
                   "type": "integer",
                   "minimum": 0,
-                  "maximum": 200
+                  "maximum": 5000
                 },
                 "severities": {
                   "type": "array",
@@ -2780,7 +2816,7 @@
                 "finding_count": {
                   "type": "integer",
                   "minimum": 0,
-                  "maximum": 200
+                  "maximum": 5000
                 },
                 "severities": {
                   "type": "array",
@@ -2871,7 +2907,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:edc31dd8f083fdc0305c540a53c335e78e6e89d071574dc4d553e9bb76652a78",
+      "schema_hash": "sha256:52175d2d9b506f01c71ee8d769bf3b530bb4c401331d86b3a0ed33cf2b3db8b5",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -2959,6 +2995,7 @@
         "worker": false,
         "local_runtime": false
       },
+      "exposure_policy_source": "provider_explicit",
       "automation_level": "A2",
       "authorization_policy": "base.v2:system.capability.read",
       "resource_selectors": [],
@@ -3466,6 +3503,7 @@
         "worker": false,
         "local_runtime": false
       },
+      "exposure_policy_source": "provider_explicit",
       "automation_level": "A1",
       "authorization_policy": "base.v2:system.capability.read,system.capability.analyze,system.capability.govern",
       "resource_selectors": [],
@@ -3886,6 +3924,7 @@
         "worker": false,
         "local_runtime": false
       },
+      "exposure_policy_source": "provider_explicit",
       "automation_level": "A2",
       "authorization_policy": "base.v2:system.capability.read",
       "resource_selectors": [],
@@ -4343,6 +4382,7 @@
         "worker": false,
         "local_runtime": false
       },
+      "exposure_policy_source": "provider_explicit",
       "automation_level": "A2",
       "authorization_policy": "base.v2:system.capability.read",
       "resource_selectors": [],
@@ -4791,6 +4831,7 @@
         "worker": false,
         "local_runtime": false
       },
+      "exposure_policy_source": "provider_explicit",
       "automation_level": "A1",
       "authorization_policy": "base.v2:system.capability.read,system.capability.analyze,system.capability.govern,system.capability.release",
       "resource_selectors": [],
@@ -5246,6 +5287,7 @@
         "worker": false,
         "local_runtime": false
       },
+      "exposure_policy_source": "provider_explicit",
       "automation_level": "A2",
       "authorization_policy": "base.v2:system.capability.read,system.capability.analyze",
       "resource_selectors": [],
@@ -5672,6 +5714,7 @@
         "worker": false,
         "local_runtime": false
       },
+      "exposure_policy_source": "provider_explicit",
       "automation_level": "A1",
       "authorization_policy": "base.v2:system.capability.read,system.capability.analyze,system.capability.govern",
       "resource_selectors": [],
@@ -6075,6 +6118,7 @@
         "worker": false,
         "local_runtime": false
       },
+      "exposure_policy_source": "provider_explicit",
       "automation_level": "A1",
       "authorization_policy": "base.v2:system.capability.read,system.capability.analyze,system.capability.govern",
       "resource_selectors": [],
@@ -6399,6 +6443,7 @@
         "worker": false,
         "local_runtime": false
       },
+      "exposure_policy_source": "provider_explicit",
       "automation_level": "A1",
       "authorization_policy": "base.v2:system.capability.read,system.capability.analyze,system.capability.govern",
       "resource_selectors": [],
@@ -6786,6 +6831,7 @@
         "worker": false,
         "local_runtime": false
       },
+      "exposure_policy_source": "provider_explicit",
       "automation_level": "A1",
       "authorization_policy": "base.v2:system.capability.read,system.capability.analyze,system.capability.govern",
       "resource_selectors": [],
@@ -7205,6 +7251,7 @@
         "worker": false,
         "local_runtime": false
       },
+      "exposure_policy_source": "provider_explicit",
       "automation_level": "A1",
       "authorization_policy": "base.v2:system.capability.read,system.capability.analyze,system.capability.govern",
       "resource_selectors": [],
@@ -7583,8 +7630,8 @@
       "plugin_id": "test.governance",
       "module": "backend.capability_governance_test.provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:2f3be334172cbcc7d124150ef8ad17203fbce1b58dfd453eb496ab628c3bf66b"
+      "artifact_hash": "sha256:f58d212887fe001f7f07658dc6ae9e684af36fd8e75b9d046007aa5091cb95ee"
     }
   ],
-  "created_at": "2026-08-19T05:17:33.305808Z"
+  "created_at": "2026-08-19T08:32:05.170984Z"
 }
