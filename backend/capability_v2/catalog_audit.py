@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 
@@ -20,6 +20,13 @@ class CatalogAuditReport:
     # generated catalog.
     default_all_exposure_count: int
     generic_operation_ids: tuple[str, ...]
+    required_field_missing_counts: dict[str, int] = field(default_factory=dict)
+    invalid_error_schema_count: int = 0
+    test_evidence_not_run_count: int = 0
+
+    @property
+    def missing_fields(self) -> dict[str, int]:
+        return dict(self.required_field_missing_counts)
 
     def serialized(self) -> dict[str, object]:
         return {
@@ -28,6 +35,9 @@ class CatalogAuditReport:
             "open_arguments_count": self.open_arguments_count,
             "default_all_exposure_count": self.default_all_exposure_count,
             "generic_operation_ids": list(self.generic_operation_ids),
+            "required_field_missing_counts": self.missing_fields,
+            "invalid_error_schema_count": self.invalid_error_schema_count,
+            "test_evidence_not_run_count": self.test_evidence_not_run_count,
         }
 
 
@@ -49,6 +59,15 @@ def audit_catalog(path: Path) -> CatalogAuditReport:
     generic_ids: list[str] = []
     open_arguments = 0
     default_all = 0
+    missing_fields: dict[str, int] = {
+        field: 0 for field in (
+            "capability_version_gid", "error_schema", "transaction_policy",
+            "consumer_refs", "provider_ref", "api_refs", "test_refs",
+            "business_effect", "side_effects",
+        )
+    }
+    invalid_error_schema = 0
+    test_evidence_not_run = 0
     for entry in stable:
         capability_id = entry.get("id")
         if not isinstance(capability_id, str) or not capability_id:
@@ -69,12 +88,33 @@ def audit_catalog(path: Path) -> CatalogAuditReport:
             )
         ):
             default_all += 1
+        for field in missing_fields:
+            value = entry.get(field)
+            if value is None or value == "" or value == [] or value == {}:
+                missing_fields[field] += 1
+        error_schema = entry.get("error_schema")
+        if error_schema not in (None, []):
+            if not isinstance(error_schema, list) or any(
+                not isinstance(item, dict)
+                or not {"error_code", "message_template", "is_retryable", "is_caller_error"} <= set(item)
+                for item in error_schema
+            ):
+                invalid_error_schema += 1
+        test_refs = entry.get("test_refs")
+        if isinstance(test_refs, list) and any(
+            isinstance(item, dict) and item.get("result") in {"not_run", "skipped"}
+            for item in test_refs
+        ):
+            test_evidence_not_run += 1
     return CatalogAuditReport(
         stable_count=len(stable),
         generic_operation_count=len(generic_ids),
         open_arguments_count=open_arguments,
         default_all_exposure_count=default_all,
         generic_operation_ids=tuple(sorted(generic_ids)),
+        required_field_missing_counts=dict(sorted(missing_fields.items())),
+        invalid_error_schema_count=invalid_error_schema,
+        test_evidence_not_run_count=test_evidence_not_run,
     )
 
 

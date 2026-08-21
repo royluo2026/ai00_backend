@@ -15,6 +15,7 @@ from backend.capability_v2.catalog import (
     ProviderArtifact,
     build_release,
     compatibility_errors,
+    complete_governance_metadata,
 )
 from backend.capability_v2.catalog_store import InMemoryCatalogStore, SqlCatalogStore
 from backend.capability_v2.contracts import (
@@ -77,6 +78,27 @@ def test_catalog_hash_normalizes_derived_error_schema_from_domain_errors():
     release = build_release([descriptor])
 
     assert release.descriptors[0].error_schema[0]["error_code"] == "invalid_input"
+
+
+def test_complete_governance_metadata_backfills_stable_projection_fields():
+    descriptor = _descriptor("craft.routing.get").model_copy(update={
+        "lifecycle_status": LifecycleStatus.STABLE,
+    })
+
+    completed = complete_governance_metadata(
+        descriptor,
+        provider_ref="craft.provider.routing",
+        consumer_refs=("web.craft.routing",),
+        api_refs=("gateway.capability.invoke",),
+        test_refs=({"path": "backend/tests/test_craft_capability_contracts.py", "result": "declared"},),
+    )
+
+    assert completed.capability_version_gid.startswith("cv2_")
+    assert completed.business_effect
+    assert completed.side_effects
+    assert completed.transaction_policy["boundary"] == "provider"
+    assert completed.provider_ref == "craft.provider.routing"
+    assert completed.consumer_refs == ("web.craft.routing",)
 
 
 def test_catalog_hash_binds_execution_budget():

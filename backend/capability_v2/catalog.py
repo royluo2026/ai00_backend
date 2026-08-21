@@ -4,7 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Iterable, Mapping, Protocol
+from typing import TYPE_CHECKING, Any, Iterable, Mapping, Protocol
 
 from pydantic import Field, model_validator
 
@@ -76,6 +76,47 @@ def canonical_catalog_bytes(
         sort_keys=True,
         separators=(",", ":"),
     ).encode("utf-8")
+
+
+def complete_governance_metadata(
+    item: CapabilityDescriptorV2,
+    *,
+    provider_ref: str | None = None,
+    consumer_refs: tuple[str, ...] = (),
+    api_refs: tuple[str, ...] = (),
+    test_refs: tuple[Mapping[str, Any], ...] = (),
+) -> CapabilityDescriptorV2:
+    """Return a deterministic V2.1 projection without changing business schemas."""
+    digest = hashlib.sha256(f"{item.id}@{item.major_version}".encode("utf-8")).hexdigest()[:24]
+    allowed_consumers = tuple(
+        name for name, allowed in item.exposure.model_dump().items() if allowed
+    )
+    updates: dict[str, Any] = {
+        "capability_version_gid": item.capability_version_gid or f"cv2_{digest}",
+        "business_effect": item.business_effect or item.description,
+        "side_effects": item.side_effects or (
+            "Reads domain state without mutation."
+            if item.side_effect_level.value == "read"
+            else "Writes domain state through the owning Provider."
+        ),
+        "transaction_policy": item.transaction_policy or {
+            "mode": "provider",
+            "boundary": "provider",
+        },
+        "provider_ref": item.provider_ref or provider_ref or f"{item.owner_domain}.provider",
+        "consumer_refs": item.consumer_refs or consumer_refs or tuple(
+            f"exposure:{name}" for name in allowed_consumers
+        ),
+        "api_refs": item.api_refs or api_refs or (
+            f"gateway:/api/v1/capabilities/{item.id}:invoke",
+        ),
+        "test_refs": item.test_refs or test_refs,
+    }
+    if not item.error_schema and item.domain_errors:
+        updates["error_schema"] = tuple(
+            error.as_error_schema_entry() for error in item.domain_errors
+        )
+    return item.model_copy(update=updates)
 
 
 def _descriptor_document(item: CapabilityDescriptorV2) -> dict:
@@ -284,6 +325,7 @@ __all__ = [
     "ProviderArtifact",
     "build_release",
     "canonical_catalog_bytes",
+    "complete_governance_metadata",
     "compatibility_errors",
     "unbounded_collection_paths",
 ]

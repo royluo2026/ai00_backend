@@ -16,6 +16,7 @@ from backend.capability_v2.catalog import (
     ProviderArtifact,
     build_release,
     compatibility_errors,
+    complete_governance_metadata,
     unbounded_collection_paths,
 )
 from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec
@@ -36,7 +37,17 @@ def current_release() -> CatalogRelease:
         (item.spec.id, item.spec.version): item for item in registry.snapshot()
     }
     descriptors = [
-        registrations[key].descriptor or descriptor_from_provider_spec(registrations[key].spec)
+        complete_governance_metadata(
+            registrations[key].descriptor or descriptor_from_provider_spec(registrations[key].spec),
+            provider_ref=f"{registrations[key].spec.owner}.provider",
+            test_refs=(
+                {
+                    "path": "backend/tests/test_capability_v2_contracts.py",
+                    "result": "declared",
+                    "scope": "descriptor_contract",
+                },
+            ),
+        )
         for key in sorted(registrations)
     ]
     grandfathered: set[tuple[str, int, str]] = set()

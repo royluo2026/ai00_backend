@@ -8,7 +8,7 @@ Read bounded Craft rule-library records.
 - 不适用：The request evaluates a rule or publishes a rule release.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_2ea663d74c22d76684117ecc24c0d891`
+- Catalog Release：`rel_c7eb52bf9c442ee7729eef2c57b6e9e3`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -111,7 +111,7 @@ Read bounded Craft rule-library records.
 ```json
 {
   "capability_id": "craft.rule.library.read",
-  "catalog_release": "rel_2ea663d74c22d76684117ecc24c0d891",
+  "catalog_release": "rel_c7eb52bf9c442ee7729eef2c57b6e9e3",
   "major_version": 1,
   "payload": {
     "operation": "list"

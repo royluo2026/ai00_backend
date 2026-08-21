@@ -8,7 +8,7 @@ Deprecated compatibility alias for knowledge.document.history.get.
 - 不适用：New callers must use knowledge.document.history.get.
 - 生命周期：`deprecated`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_2ea663d74c22d76684117ecc24c0d891`
+- Catalog Release：`rel_c7eb52bf9c442ee7729eef2c57b6e9e3`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -91,7 +91,7 @@ Deprecated compatibility alias for knowledge.document.history.get.
 ```json
 {
   "capability_id": "knowledge.document.revisions",
-  "catalog_release": "rel_2ea663d74c22d76684117ecc24c0d891",
+  "catalog_release": "rel_c7eb52bf9c442ee7729eef2c57b6e9e3",
   "major_version": 1,
   "payload": {
     "document_gid": "example"

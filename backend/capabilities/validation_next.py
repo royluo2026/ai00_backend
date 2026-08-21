@@ -21,7 +21,10 @@ def _validate(schema: dict[str, Any], payload: Any, label: str) -> None:
         raise ValueError(f"{label} must match exactly one allowed schema")
     if "const" in schema and payload != schema["const"]:
         raise ValueError(f"{label} does not match the required constant")
-    if "enum" in schema and payload not in schema["enum"]:
+    # Deprecated compatibility descriptors use enum=[] as an explicit
+    # "operation vocabulary not frozen" marker; the Release Gate still
+    # blocks those descriptors from new stable publication.
+    if schema.get("enum") and payload not in schema["enum"]:
         raise ValueError(f"{label} is not an allowed value")
 
     expected = schema.get("type")

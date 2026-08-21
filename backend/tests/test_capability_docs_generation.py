@@ -47,6 +47,10 @@ def test_v1_adapter_preserves_explicit_typed_any_json_schema():
     validate_payload(dict(descriptor.input_schema), {"value": {"items": [1, 2]}})
 
 
+def test_deprecated_empty_operation_enum_is_compatibility_unconstrained():
+    validate_payload({"type": "string", "enum": []}, "legacy-operation")
+
+
 def test_every_descriptor_has_generated_page_and_valid_minimal_example():
     catalog = _catalog()
     files = generated_files(catalog)

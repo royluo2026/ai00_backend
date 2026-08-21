@@ -54,6 +54,38 @@ def test_audit_catalog_reports_generic_open_and_default_all_descriptors(tmp_path
     assert report.generic_operation_ids == ("project.change.apply",)
 
 
+def test_audit_catalog_reports_missing_v21_fields_and_unrun_test_evidence(tmp_path: Path) -> None:
+    catalog = tmp_path / "catalog.json"
+    catalog.write_text(
+        json.dumps({
+            "capabilities": [{
+                "id": "craft.read",
+                "lifecycle_status": "stable",
+                "input_schema": {"type": "object", "additionalProperties": False},
+                "exposure": {"web": True},
+                "capability_version_gid": None,
+                "error_schema": [],
+                "transaction_policy": {},
+                "consumer_refs": [],
+                "provider_ref": None,
+                "api_refs": [],
+                "test_refs": [{"path": "tests/test_craft.py", "result": "not_run"}],
+                "business_effect": None,
+                "side_effects": None,
+            }]
+        }),
+        encoding="utf-8",
+    )
+
+    report = audit_catalog(catalog)
+
+    assert report.required_field_missing_counts["capability_version_gid"] == 1
+    assert report.required_field_missing_counts["error_schema"] == 1
+    assert report.required_field_missing_counts["provider_ref"] == 1
+    assert report.required_field_missing_counts["business_effect"] == 1
+    assert report.test_evidence_not_run_count == 1
+
+
 def test_audit_catalog_fails_closed_for_missing_catalog(tmp_path: Path) -> None:
     with pytest.raises(CatalogAuditConfigurationError, match="missing catalog"):
         audit_catalog(tmp_path / "missing.json")
