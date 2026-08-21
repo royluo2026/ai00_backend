@@ -8,7 +8,7 @@ Compare Digital Model Versions semantically.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`digital_model`
-- Catalog Release：`rel_c7eb52bf9c442ee7729eef2c57b6e9e3`
+- Catalog Release：`rel_a3cc0d777045278c8b7cd40fd7ea1ec5`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -96,7 +96,7 @@ Compare Digital Model Versions semantically.
 ```json
 {
   "capability_id": "digital_model.version.compare",
-  "catalog_release": "rel_c7eb52bf9c442ee7729eef2c57b6e9e3",
+  "catalog_release": "rel_a3cc0d777045278c8b7cd40fd7ea1ec5",
   "major_version": 1,
   "payload": {
     "from_version_id": "example",

@@ -117,3 +117,17 @@ def test_audit_catalog_accepts_all_exposure_only_when_provider_explicit(tmp_path
     )
 
     assert audit_catalog(catalog).default_all_exposure_count == 0
+
+
+def test_audit_catalog_detects_known_multi_operation_ebom_descriptor_without_arguments_wrapper(tmp_path: Path) -> None:
+    catalog = tmp_path / "catalog.json"
+    catalog.write_text(json.dumps({"capabilities": [{
+        "id": "craft.ebom.change.apply", "lifecycle_status": "stable",
+        "input_schema": {"type": "object", "properties": {
+            "operation": {"type": "string", "enum": ["snapshot.delete", "part.add"]}
+        }},
+    }]}), encoding="utf-8")
+
+    report = audit_catalog(catalog)
+
+    assert report.generic_operation_ids == ("craft.ebom.change.apply",)

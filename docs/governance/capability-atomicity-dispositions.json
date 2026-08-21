@@ -1,6 +1,7 @@
 {
   "schema_version": "1",
   "dispositions": [
+    {"capability_id":"craft.ebom.change.apply","major_version":1,"disposition":"split","replacement_capabilities":["craft.ebom.snapshot.delete","craft.ebom.snapshot.update","craft.ebom.snapshot.status.update","craft.ebom.snapshot.vpps_stats.update","craft.ebom.part.create","craft.ebom.part.bulk_create","craft.ebom.part.update","craft.ebom.part.delete"],"evidence_refs":["plugins/craft/craft_backend/capabilities/ebom_change.py","plugins/craft/craft_backend/routers/ebom.py"]},
     {"capability_id":"knowledge.document.archive","major_version":1,"disposition":"split","replacement_capabilities":["knowledge.document.archive"],"evidence_refs":["plugins/knowledge/knowledge_backend/capabilities/reviewed.py"]},
     {"capability_id":"knowledge.entry.change.apply","major_version":1,"disposition":"split","replacement_capabilities":["knowledge.entry.create","knowledge.entry.update","knowledge.entry.delete"],"evidence_refs":["plugins/knowledge/knowledge_backend/capabilities/reviewed.py"]},
     {"capability_id":"knowledge.hub.change.apply","major_version":1,"disposition":"split","replacement_capabilities":["knowledge.hub.create","knowledge.hub.update","knowledge.hub.delete"],"evidence_refs":["plugins/knowledge/knowledge_backend/capabilities/reviewed.py"]},

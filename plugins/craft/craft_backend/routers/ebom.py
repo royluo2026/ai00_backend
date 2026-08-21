@@ -218,6 +218,10 @@ async def _invoke_ebom_change(request: Request, current_user: dict, principal, g
     return await _invoke_pbom(request, current_user, principal, gateway, capability_id="craft.ebom.change.apply", payload=payload, write=True)
 
 
+async def _invoke_ebom_atomic(request: Request, current_user: dict, principal, gateway, capability_id: str, payload: dict):
+    return await _invoke_pbom(request, current_user, principal, gateway, capability_id=capability_id, payload=payload, write=True)
+
+
 def _legacy_version(item: dict) -> dict:
     version_tag = item.get("version_tag") or ""
     return {
@@ -280,7 +284,7 @@ async def get_snapshot(
 
 @router.delete("/snapshots/{gid}")
 async def delete_snapshot(gid: str, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
-    return await _invoke_ebom_change(request, current_user, principal, gateway, {"operation": "snapshot.delete", "snapshot_gid": gid})
+    return await _invoke_ebom_atomic(request, current_user, principal, gateway, "craft.ebom.snapshot.delete", {"snapshot_gid": gid})
 
 
 def _legacy_delete_snapshot(gid: str, current_user: dict = Depends(_WRITE)):
@@ -306,7 +310,7 @@ class PatchSnapshotBody(BaseModel):
 
 @router.patch("/snapshots/{gid}")
 async def patch_snapshot(gid: str, body: PatchSnapshotBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
-    return await _invoke_ebom_change(request, current_user, principal, gateway, {"operation": "snapshot.patch", "snapshot_gid": gid, "changes": body.model_dump(exclude_none=True)})
+    return await _invoke_ebom_atomic(request, current_user, principal, gateway, "craft.ebom.snapshot.update", {"snapshot_gid": gid, "changes": body.model_dump(exclude_none=True)})
 
 
 def _legacy_patch_snapshot(gid: str, body: PatchSnapshotBody, current_user: dict = Depends(_WRITE)):
@@ -331,7 +335,7 @@ class VppsStatsBody(BaseModel):
 
 @router.patch("/snapshots/{gid}/vpps-stats", status_code=200)
 async def patch_vpps_stats(gid: str, body: VppsStatsBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
-    return await _invoke_ebom_change(request, current_user, principal, gateway, {"operation": "snapshot.vpps_stats.patch", "snapshot_gid": gid, **body.model_dump()})
+    return await _invoke_ebom_atomic(request, current_user, principal, gateway, "craft.ebom.snapshot.vpps_stats.update", {"snapshot_gid": gid, **body.model_dump()})
 
 
 def _legacy_patch_vpps_stats(gid: str, body: VppsStatsBody, current_user: dict = Depends(_WRITE)):
@@ -370,7 +374,7 @@ async def patch_snapshot_status(
     principal=Depends(get_authenticated_principal),
     gateway=Depends(get_default_gateway),
 ):
-    return await _invoke_ebom_change(request, current_user, principal, gateway, {"operation": "snapshot.status.patch", "snapshot_gid": gid, "status": body.status})
+    return await _invoke_ebom_atomic(request, current_user, principal, gateway, "craft.ebom.snapshot.status.update", {"snapshot_gid": gid, "status": body.status})
 
 
 def _legacy_patch_snapshot_status(
@@ -453,7 +457,7 @@ def _part_vals(part_gid, snap_gid, b):
 
 @router.post("/snapshots/{gid}/parts", status_code=201)
 async def add_part(gid: str, body: CreatePartBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
-    return await _invoke_ebom_change(request, current_user, principal, gateway, {"operation": "part.add", "snapshot_gid": gid, "part": body.model_dump()})
+    return await _invoke_ebom_atomic(request, current_user, principal, gateway, "craft.ebom.part.create", {"snapshot_gid": gid, "part": body.model_dump()})
 
 
 def _legacy_add_part(gid: str, body: CreatePartBody, current_user: dict = Depends(_WRITE)):
@@ -470,7 +474,7 @@ def _legacy_add_part(gid: str, body: CreatePartBody, current_user: dict = Depend
 
 @router.post("/snapshots/{gid}/parts/batch", status_code=201)
 async def add_parts_batch(gid: str, body: List[CreatePartBody], request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
-    return await _invoke_ebom_change(request, current_user, principal, gateway, {"operation": "part.add_batch", "snapshot_gid": gid, "parts": [item.model_dump() for item in body]})
+    return await _invoke_ebom_atomic(request, current_user, principal, gateway, "craft.ebom.part.bulk_create", {"snapshot_gid": gid, "parts": [item.model_dump() for item in body]})
 
 
 def _legacy_add_parts_batch(gid: str, body: List[CreatePartBody], current_user: dict = Depends(_WRITE)):
@@ -491,7 +495,7 @@ def _legacy_add_parts_batch(gid: str, body: List[CreatePartBody], current_user: 
 
 @router.patch("/parts/{gid}")
 async def update_part(gid: str, body: UpdatePartBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
-    return await _invoke_ebom_change(request, current_user, principal, gateway, {"operation": "part.update", "part_gid": gid, "changes": body.model_dump(exclude_none=True)})
+    return await _invoke_ebom_atomic(request, current_user, principal, gateway, "craft.ebom.part.update", {"part_gid": gid, "changes": body.model_dump(exclude_none=True)})
 
 
 def _legacy_update_part(gid: str, body: UpdatePartBody, current_user: dict = Depends(_WRITE)):
@@ -516,7 +520,7 @@ def _legacy_update_part(gid: str, body: UpdatePartBody, current_user: dict = Dep
 
 @router.delete("/parts/{gid}")
 async def delete_part(gid: str, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
-    return await _invoke_ebom_change(request, current_user, principal, gateway, {"operation": "part.delete", "part_gid": gid})
+    return await _invoke_ebom_atomic(request, current_user, principal, gateway, "craft.ebom.part.delete", {"part_gid": gid})
 
 
 def _legacy_delete_part(gid: str, current_user: dict = Depends(_WRITE)):

@@ -128,7 +128,9 @@ def _generic_entries(catalog: Mapping[str, Any]) -> list[Mapping[str, Any]]:
             continue
         schema = entry.get("input_schema")
         props = schema.get("properties") if isinstance(schema, dict) else None
-        if isinstance(props, dict) and {"operation", "arguments"} <= set(props):
+        if isinstance(props, dict) and "operation" in props and (
+            "arguments" in props or entry.get("id") == "craft.ebom.change.apply"
+        ):
             result.append(entry)
     return result
 

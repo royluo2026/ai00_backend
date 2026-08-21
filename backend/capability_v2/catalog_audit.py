@@ -74,10 +74,15 @@ def audit_catalog(path: Path) -> CatalogAuditReport:
             raise CatalogAuditConfigurationError("stable capability ID is invalid")
         schema = entry.get("input_schema")
         properties = schema.get("properties") if isinstance(schema, dict) else None
-        if isinstance(properties, dict) and {"operation", "arguments"} <= set(properties):
+        is_operation_envelope = (
+            isinstance(properties, dict)
+            and "operation" in properties
+            and ("arguments" in properties or capability_id == "craft.ebom.change.apply")
+        )
+        if is_operation_envelope:
             generic_ids.append(capability_id)
-            arguments = properties["arguments"]
-            if not isinstance(arguments, dict) or arguments.get("additionalProperties") is not False:
+            arguments = properties.get("arguments")
+            if arguments is not None and (not isinstance(arguments, dict) or arguments.get("additionalProperties") is not False):
                 open_arguments += 1
         exposure = entry.get("exposure")
         if (

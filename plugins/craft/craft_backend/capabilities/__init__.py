@@ -68,6 +68,10 @@ from .gbop_import_change import register_gbop_import_change_capability
 from .gbop_station_autolink_change import register_gbop_station_autolink_change_capability
 from .gbop_import_tc_change import register_gbop_import_tc_change_capability
 from .ebom_change import register_ebom_change_capability
+from .ebom_snapshot_change import register_ebom_snapshot_change_capabilities
+from .ebom_snapshot_status_change import register_ebom_snapshot_status_change_capability
+from .ebom_vpps_stats_change import register_ebom_vpps_stats_change_capability
+from .ebom_part_change import register_ebom_part_change_capabilities
 from .data_exchange import register_data_exchange_capability
 from .lark_exchange import register_lark_exchange_capabilities
 
@@ -143,6 +147,10 @@ def register_capabilities(registry: Any) -> None:
     register_gbop_station_autolink_change_capability(native)
     register_gbop_import_tc_change_capability(native)
     register_ebom_change_capability(native)
+    register_ebom_snapshot_change_capabilities(native)
+    register_ebom_snapshot_status_change_capability(native)
+    register_ebom_vpps_stats_change_capability(native)
+    register_ebom_part_change_capabilities(native)
     register_data_exchange_capability(native)
     register_lark_exchange_capabilities(native)
     register_reviewed_capabilities(registry)

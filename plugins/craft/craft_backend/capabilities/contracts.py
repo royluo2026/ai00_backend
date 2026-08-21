@@ -684,6 +684,22 @@ INPUT_SCHEMAS[("craft.ebom.change.apply", 1)] = _object({
     "part_gid": STRING, "part": {"type": "object", "additionalProperties": True}, "parts": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}},
 }, required=("operation",))
 OUTPUT_SCHEMAS[("craft.ebom.change.apply", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
+INPUT_SCHEMAS[("craft.ebom.snapshot.delete", 1)] = _object({"snapshot_gid": STRING}, required=("snapshot_gid",))
+OUTPUT_SCHEMAS[("craft.ebom.snapshot.delete", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
+INPUT_SCHEMAS[("craft.ebom.snapshot.update", 1)] = _object({"snapshot_gid": STRING, "changes": {"type": "object", "additionalProperties": True}}, required=("snapshot_gid", "changes"))
+OUTPUT_SCHEMAS[("craft.ebom.snapshot.update", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
+INPUT_SCHEMAS[("craft.ebom.snapshot.status.update", 1)] = _object({"snapshot_gid": STRING, "status": STRING}, required=("snapshot_gid", "status"))
+OUTPUT_SCHEMAS[("craft.ebom.snapshot.status.update", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
+INPUT_SCHEMAS[("craft.ebom.snapshot.vpps_stats.update", 1)] = _object({"snapshot_gid": STRING, "nok": INTEGER, "ignored": INTEGER, "total": INTEGER}, required=("snapshot_gid",))
+OUTPUT_SCHEMAS[("craft.ebom.snapshot.vpps_stats.update", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
+INPUT_SCHEMAS[("craft.ebom.part.create", 1)] = _object({"snapshot_gid": STRING, "part": {"type": "object", "additionalProperties": True}}, required=("snapshot_gid", "part"))
+OUTPUT_SCHEMAS[("craft.ebom.part.create", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
+INPUT_SCHEMAS[("craft.ebom.part.bulk_create", 1)] = _object({"snapshot_gid": STRING, "parts": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}}}, required=("snapshot_gid", "parts"))
+OUTPUT_SCHEMAS[("craft.ebom.part.bulk_create", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
+INPUT_SCHEMAS[("craft.ebom.part.update", 1)] = _object({"part_gid": STRING, "changes": {"type": "object", "additionalProperties": True}}, required=("part_gid", "changes"))
+OUTPUT_SCHEMAS[("craft.ebom.part.update", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
+INPUT_SCHEMAS[("craft.ebom.part.delete", 1)] = _object({"part_gid": STRING}, required=("part_gid",))
+OUTPUT_SCHEMAS[("craft.ebom.part.delete", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
 INPUT_SCHEMAS[("craft.data_exchange.lark.read", 1)] = _object({
     "operation": {"type": "string", "enum": ["sheets.read", "bitable.read"]}, "user_access_token": STRING,
     "spreadsheet_token": STRING, "sheet_range": STRING, "app_token": STRING, "table_id": STRING, "page_size": INTEGER,
