@@ -1,0 +1,7 @@
+{
+  "inventory_kind":"legacy_rest",
+  "entries":[
+    {"route_path":"/api/bop/entries","method":"GET","owner":"craft","migration_target_capability":"craft.bop.read","migration_deadline":"2026-11-21","source":"plugins/craft/craft_backend/routers/_bop/entries.py","allowed_consumers":["web"]},
+    {"route_path":"/api/ebom","method":"POST","owner":"craft","migration_target_capability":"craft.ebom.snapshot.create","migration_deadline":"2026-11-21","source":"plugins/craft/craft_backend/routers/ebom.py","allowed_consumers":["web"]}
+  ]
+}

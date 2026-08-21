@@ -1,0 +1,10 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "type":"object",
+  "required":["inventory_kind","entries"],
+  "properties":{
+    "inventory_kind":{"const":"legacy_rest"},
+    "entries":{"type":"array","items":{"$ref":"#/$defs/Entry"}}
+  },
+  "$defs":{"Entry":{"type":"object","required":["route_path","method","owner","migration_target_capability","migration_deadline","source"],"properties":{"route_path":{"type":"string","pattern":"^/api/"},"method":{"type":"string"},"owner":{"type":"string"},"migration_target_capability":{"type":"string"},"migration_deadline":{"type":"string","format":"date"},"source":{"type":"string"},"allowed_consumers":{"type":"array","items":{"type":"string"}},"exception_approval_reference":{"type":"string"}},"additionalProperties":false}}
+}

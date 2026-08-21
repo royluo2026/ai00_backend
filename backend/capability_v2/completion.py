@@ -8,6 +8,7 @@ from pathlib import Path, PurePosixPath
 from typing import Literal
 
 from .consumer_routes import scan_web_routes
+from .route_inventory import audit_route_inventory, load_route_inventory
 
 
 class CompletionConfigurationError(ValueError):
@@ -266,6 +267,19 @@ def _web_route_inventory_drift(
     return expected != report
 
 
+def _route_inventory_failures(root: Path, configuration: dict) -> list[str]:
+    failures: list[str] = []
+    for field in ("legacy_route_inventory_artifact", "bff_route_inventory_artifact"):
+        relative = configuration.get(field)
+        if relative is None:
+            continue
+        if not isinstance(relative, str) or not relative:
+            raise CompletionConfigurationError(f"{field} must be a repository-relative path")
+        inventory = load_route_inventory(_relative_path(root, relative, field=field))
+        failures.extend(f"{field}:{issue}" for issue in audit_route_inventory(inventory))
+    return failures
+
+
 def _production_path_count(root: Path, document: dict, kind: str) -> int:
     entries = document.get(kind, [])
     if not isinstance(entries, list):
@@ -334,6 +348,7 @@ def evaluate_completion(
         root, manifests, required_domains
     )
     failures.extend(_coverage_invariant_failures(root, configuration))
+    failures.extend(_route_inventory_failures(root, configuration))
     boundary = _load_json(root / "backend/governance/boundary_baseline.json")
     cross_domain_sql, internal_imports = _boundary_counts(boundary)
     consumer_bypasses = _consumer_bypasses(root, configuration)

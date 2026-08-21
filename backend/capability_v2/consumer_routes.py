@@ -70,7 +70,13 @@ class RouteScanReport:
 
 
 _SOURCE_SUFFIXES = {".cjs", ".html", ".js", ".jsx", ".mjs", ".ts", ".tsx"}
-_SKIP_DIRECTORIES = {".git", "__tests__", "dist", "node_modules", "tests"}
+_SKIP_DIRECTORIES = {".git", "__tests__", "node_modules", "tests"}
+
+
+def _is_skipped_directory(part: str) -> bool:
+    """Exclude generated bundles, including named dist-* build outputs."""
+
+    return part == "dist" or part.startswith("dist-") or part.startswith(".next")
 _ROUTE_LITERAL = re.compile(r"(?P<quote>['\"`])(?P<route>/api/[A-Za-z0-9_./:{}$-]+)")
 _EMPTY_ASSIGNMENT = re.compile(r"\b(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=\s*;")
 
@@ -168,7 +174,8 @@ def _iter_sources(root: Path, roots: Sequence[str]):
                 continue
             if candidate.suffix.lower() not in _SOURCE_SUFFIXES:
                 continue
-            if any(part in _SKIP_DIRECTORIES for part in candidate.relative_to(root).parts):
+            if any(part in _SKIP_DIRECTORIES or _is_skipped_directory(part)
+                   for part in candidate.relative_to(root).parts):
                 continue
             seen.add(candidate)
             yield candidate

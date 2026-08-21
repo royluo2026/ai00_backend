@@ -414,6 +414,26 @@ def test_web_route_inventory_drift_fails_closed(tmp_path: Path) -> None:
     assert "web_route_inventory_drift:1" in report.failed
 
 
+def test_completion_checks_optional_legacy_route_inventory_deadlines(tmp_path: Path) -> None:
+    root = _complete_repository(tmp_path)
+    configuration_path = root / "backend/governance/capability_v2_completion.json"
+    configuration = json.loads(configuration_path.read_text(encoding="utf-8"))
+    configuration["legacy_route_inventory_artifact"] = "docs/legacy-routes.json"
+    _write_json(root, "backend/governance/capability_v2_completion.json", configuration)
+    _write_json(root, "docs/legacy-routes.json", {
+        "inventory_kind": "legacy_rest",
+        "entries": [{
+            "route_path": "/api/legacy", "method": "GET", "owner": "craft",
+            "migration_target_capability": "craft.legacy.read",
+            "migration_deadline": "2020-01-01", "source": "web/app.js",
+        }],
+    })
+
+    report = evaluate_completion(root, mode="strict")
+
+    assert "legacy_route_inventory_artifact:expired:GET:/api/legacy" in report.failed
+
+
 def test_frozen_review_exposes_exact_capability_ids() -> None:
     root = Path(__file__).resolve().parents[2]
 

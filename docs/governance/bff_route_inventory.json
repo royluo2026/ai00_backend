@@ -1,0 +1,6 @@
+{
+  "inventory_kind":"bff",
+  "entries":[
+    {"route_path":"/api/capabilities/{capability_id}:invoke","method":"POST","owner":"base","migration_target_capability":"base.capability_gateway.invoke","migration_deadline":"2026-11-21","source":"backend/routers/capabilities.py","allowed_consumers":["web","plugin","agent"]}
+  ]
+}
