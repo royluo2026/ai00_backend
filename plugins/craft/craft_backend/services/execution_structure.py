@@ -106,8 +106,10 @@ class ExecutionStructureRepository:
                 entries = tuple(dict(row) for row in cursor.fetchall())
 
                 cursor.execute(
-                    "SELECT l.entry_gid, l.link_type, l.entity_gid, l.is_primary, "
-                    "l.snapshot_data, p.part_no, p.title AS part_name, p.quantity, p.unit "
+                    "SELECT l.gid AS link_gid, l.entry_gid, l.link_type, l.entity_gid, l.is_primary, "
+                    "l.snapshot_data, p.part_no, p.title AS part_name, p.parent_gid, "
+                    "p.quantity, p.unit, p.snapshot_gid, p.material, p.meta, p.created_at, p.updated_at, "
+                    "p.vpps, p.parent_part_gid, p.node_type, p.bom_row_id, p.seq_no, p.part_number "
                     "FROM workmanship_bop_bop_entry_links l "
                     "LEFT JOIN workmanship_bop_pbom p "
                     "ON l.link_type = 'pbom_part' AND p.gid = l.entity_gid "
@@ -122,12 +124,20 @@ class ExecutionStructureRepository:
                         entity_data.update(
                             {
                                 key: link.pop(key)
-                                for key in ("part_no", "part_name", "quantity", "unit")
+                                for key in (
+                                    "part_no", "part_name", "parent_gid", "quantity", "unit",
+                                    "snapshot_gid", "material", "meta", "created_at", "updated_at",
+                                    "vpps", "parent_part_gid", "node_type", "bom_row_id", "seq_no", "part_number",
+                                )
                                 if link.get(key) is not None
                             }
                         )
                         if "part_name" in entity_data:
                             entity_data["name"] = entity_data.pop("part_name")
+                        if "meta" in entity_data:
+                            entity_data["meta"] = _json_object(entity_data["meta"])
+                        if "created_at" in entity_data:
+                            entity_data["created_at"] = _transport(entity_data["created_at"])
                     link["entity_data"] = entity_data
                     links.append(link)
 
@@ -380,6 +390,67 @@ def linked_parts(aggregate: BopAggregate) -> list[dict[str, Any]]:
     for item in grouped.values():
         item["usage"].sort(key=lambda value: (value["entry_gid"], value.get("entry_title") or ""))
     return [grouped[key] for key in sorted(grouped)]
+
+
+def legacy_linked_parts(aggregate: BopAggregate) -> list[dict[str, Any]]:
+    """Project the historical one-row-per-primary-link response shape."""
+    rows: list[dict[str, Any]] = []
+    for link in aggregate.links:
+        if link.get("link_type") != "pbom_part" or not link.get("entity_gid"):
+            continue
+        if link.get("is_primary") in {False, 0}:
+            continue
+        data = _json_object(link.get("entity_data"))
+        rows.append(
+            {
+                "gid": str(link["entity_gid"]),
+                "name": data.get("name") or data.get("title") or "",
+                "parent_gid": data.get("parent_gid"),
+                "part_no": data.get("part_no"),
+                "quantity": data.get("quantity"),
+                "unit": data.get("unit"),
+                "snapshot_gid": data.get("snapshot_gid"),
+                "material": data.get("material"),
+                "meta": _json_object(data.get("meta")),
+                "entry_gid": link.get("entry_gid"),
+                "link_gid": link.get("link_gid"),
+                "created_at": _transport(data.get("created_at")),
+            }
+        )
+    return sorted(
+        rows,
+        key=lambda item: (
+            str(item.get("part_no") or ""),
+            str(item.get("gid") or ""),
+            str(item.get("entry_gid") or ""),
+        ),
+    )
+
+
+def legacy_pbom_items(aggregate: BopAggregate) -> list[dict[str, Any]]:
+    """Project the historical version PBOM rows from the same aggregate."""
+    rows: list[dict[str, Any]] = []
+    for link in aggregate.links:
+        if link.get("link_type") != "pbom_part" or not link.get("entity_gid"):
+            continue
+        data = _json_object(link.get("entity_data"))
+        rows.append(
+            {
+                "gid": str(link["entity_gid"]),
+                "title": data.get("name") or data.get("title"),
+                "vpps": data.get("vpps"),
+                "parent_part_gid": data.get("parent_part_gid"),
+                "node_type": data.get("node_type"),
+                "bom_row_id": data.get("bom_row_id"),
+                "seq_no": data.get("seq_no"),
+                "quantity": data.get("quantity"),
+                "unit": data.get("unit"),
+                "part_number": data.get("part_number"),
+                "created_at": _transport(data.get("created_at")),
+                "updated_at": _transport(data.get("updated_at")),
+            }
+        )
+    return sorted(rows, key=lambda item: (item.get("seq_no") is None, item.get("seq_no") or 0, item["gid"]))
 
 
 def project_work_package(

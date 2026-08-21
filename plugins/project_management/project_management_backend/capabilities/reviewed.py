@@ -4,9 +4,11 @@ from __future__ import annotations
 from typing import Any
 
 from backend.capability_v2.provider_contracts import CapabilityRisk, CapabilitySpec
+from backend.platform_sdk.access import build_access_scope
 
 from ..application.outcomes import project_outcome_port
-from .provider import register_capability
+from ..application.service import SUPPORTED_OPERATIONS
+from .provider import DEPRECATED_CAPABILITY_IDS, register_capability
 
 
 PROJECT_CAPABILITY_IDS = frozenset(
@@ -45,6 +47,61 @@ PROJECT_CAPABILITY_IDS = frozenset(
     }
 )
 
+_ARGUMENT_FIELDS = {
+    name: {"description": "Operation-specific value validated by the Project application layer."}
+    for name in (
+        "assignee_map", "assignee_role", "body", "brand", "color", "comment",
+        "content", "current_scope", "data", "dep_condition", "dep_group", "description",
+        "display_name", "due_offset_days", "edge_type", "entries", "expires_at",
+        "factory_gid", "gid", "include_archived", "include_deleted", "item_gid",
+        "item_title", "item_type", "jph", "key", "label", "list_gid",
+        "local_gid", "message", "model_year", "name", "new_list_gid",
+        "notify_on", "order_type", "owner_gid", "owner_team_gid", "owner_type",
+        "owner_user_gid", "permission", "platform", "priority", "project_code", "project_gid", "user_gid", "member_gid", "project_role",
+        "q", "read_scope", "recipient_gid", "reviewer_gid", "scope",
+        "section_gid", "share_scope", "shared_to", "sort_order", "source_gid",
+        "source_ref", "start_date", "status", "storage_scope", "suffix",
+        "target_gid", "target_scope", "target_type", "team_id", "template_gid",
+        "title", "title_pattern", "title_vars", "token", "type", "unread_only",
+        "updates", "vehicle_model_gid", "vehicle_type", "visibility", "want_permission",
+        "widgets", "write_scope",
+    )
+}
+
+
+def _operation_schema(capability_id: str) -> dict[str, Any]:
+    operations = SUPPORTED_OPERATIONS.get(capability_id, frozenset())
+    if not operations:
+        raise ValueError(f"missing Project operation contract: {capability_id}")
+    return {
+        "type": "object",
+        "required": ["operation", "arguments"],
+        "properties": {
+            "operation": {
+                "type": "string", "enum": sorted(operations),
+                "minLength": 1, "maxLength": 128,
+            },
+            "arguments": {
+                "type": "object", "properties": _ARGUMENT_FIELDS,
+                "additionalProperties": False,
+            },
+        },
+        "additionalProperties": False,
+    }
+
+
+def _disabled_operation_schema() -> dict[str, Any]:
+    return {
+        "type": "object",
+        "required": ["operation", "arguments"],
+        "properties": {
+            "operation": {"type": "string", "enum": []},
+            "arguments": {"type": "object", "properties": {}, "additionalProperties": False},
+        },
+        "additionalProperties": False,
+    }
+
+
 OPERATION_INPUT_SCHEMA = {
     "type": "object",
     "required": ["operation", "arguments"],
@@ -61,6 +118,20 @@ OPERATION_INPUT_SCHEMA = {
 
 def _handler(capability_id: str):
     def invoke(payload: dict[str, Any], context: object) -> dict[str, Any]:
+        # Access scope is server-derived for browser capability invocations.
+        # Callers may not forge team/project membership through the capability
+        # payload; the legacy REST adapter already supplied this projection.
+        if capability_id == "project.project.read" and payload.get("operation") == "projects.search":
+            arguments = payload.get("arguments")
+            if isinstance(arguments, dict) and "scope" not in arguments:
+                actor_gid = str(getattr(context, "user_gid", "") or "")
+                active_roles = set(getattr(context, "active_roles", ()) or ())
+                user = {
+                    "gid": actor_gid,
+                    "team_id": getattr(context, "team_gid", None),
+                    "org_role": next((role for role in ("super_admin", "team_admin") if role in active_roles), "member"),
+                }
+                payload = {**payload, "arguments": {**arguments, "scope": build_access_scope(user)}}
         return {"data": project_outcome_port.invoke(capability_id, payload, context)}
 
     return invoke
@@ -80,7 +151,15 @@ def register_reviewed_capabilities(registry: Any) -> None:
                 risk=CapabilityRisk.WRITE if is_write else CapabilityRisk.READ,
                 confirmation="user" if is_write else "none",
                 permissions=("project.manage_any",) if is_write else ("project.view",),
-                input_schema=OPERATION_INPUT_SCHEMA,
+                input_schema=(
+                    _disabled_operation_schema()
+                    if capability_id in DEPRECATED_CAPABILITY_IDS
+                    else (
+                        _operation_schema(capability_id)
+                        if capability_id in SUPPORTED_OPERATIONS
+                        else OPERATION_INPUT_SCHEMA
+                    )
+                ),
                 output_schema={
                     "type": "object",
                     "required": ["data"],

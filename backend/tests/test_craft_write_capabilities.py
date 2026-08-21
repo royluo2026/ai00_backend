@@ -204,6 +204,42 @@ def test_create_allows_only_governed_sources_and_archive_is_non_destructive():
         create_bop_version({"source": "clone", "source_gid": "v1", "version_tag": "V3"}, ctx())
 
 
+def test_create_preserves_legacy_version_identity_fields():
+    repository = MemoryRepository()
+    with patch("plugins.craft.craft_backend.capabilities.bop_writes.repository", repository):
+        created = create_bop_version(
+            {
+                "source": "empty",
+                "version_tag": "V4",
+                "bop_name": "Assembly BOP",
+                "version_family_gid": "family-1",
+                "project_gid": "project-1",
+                "factory_gid": "factory-1",
+                "vehicle_model_gid": "model-1",
+                "maturity": "concept",
+                "takt_time": 60,
+                "version_type": "working",
+                "pbom_version_gid": "pbom-1",
+                "owner_gid": "owner-1",
+                "data_stage": "draft",
+            },
+            ctx(),
+        ).data
+
+    version = repository.versions[created["version_gid"]]
+    assert {key: version[key] for key in (
+        "bop_name", "version_family_gid", "project_gid", "factory_gid",
+        "vehicle_model_gid", "maturity", "takt_time", "version_type",
+        "pbom_version_gid", "owner_gid", "data_stage",
+    )} == {
+        "bop_name": "Assembly BOP", "version_family_gid": "family-1",
+        "project_gid": "project-1", "factory_gid": "factory-1",
+        "vehicle_model_gid": "model-1", "maturity": "concept", "takt_time": 60,
+        "version_type": "working", "pbom_version_gid": "pbom-1",
+        "owner_gid": "owner-1", "data_stage": "draft",
+    }
+
+
 def test_create_remaps_cloned_entry_parent_references_to_the_new_version():
     repository = MemoryRepository()
     repository.versions["v1"]["entries"].append({
@@ -255,7 +291,10 @@ def test_mysql_write_repository_commits_revision_entries_and_links_atomically():
     connection = _SqlConnection(cursor)
     version = {
         "gid": "v1", "revision": 1, "version_tag": "V1", "bop_name": "Assembly",
-        "status": "active", "meta": {},
+        "status": "active", "factory_gid": "factory-1", "vehicle_model_gid": "model-1",
+        "maturity": "concept", "takt_time": 60, "version_type": "working",
+        "pbom_version_gid": "pbom-1", "owner_gid": "owner-1", "data_stage": "draft",
+        "visibility": "team", "meta": {},
         "entries": [{"gid": "e1", "node_type": "operation", "title": "Torque"}],
         "links": [{"gid": "l1", "entry_gid": "e1", "link_type": "part", "entity_gid": "p1"}],
     }
@@ -269,6 +308,7 @@ def test_mysql_write_repository_commits_revision_entries_and_links_atomically():
     assert connection.commits == 1
     assert connection.rollbacks == 0
     assert any("revision=revision+1" in sql and "revision=%s" in sql for sql in statements)
+    assert any("factory_gid=%s" in sql and "vehicle_model_gid=%s" in sql for sql in statements)
     assert any("INSERT INTO workmanship_bop_bop_entries" in sql for sql in statements)
     entry_call = next(call for call in cursor.calls if "INSERT INTO workmanship_bop_bop_entries" in call[0])
     assert "child_vpps" in entry_call[0]

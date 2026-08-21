@@ -6,16 +6,46 @@ GBOP 匹配 preview / confirm / auto-link。
 import json
 from typing import List, Literal
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
 from ...data.connection import get_conn
 from backend.platform_sdk.ids import next_gid
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.auth import get_authenticated_principal
+from backend.platform_sdk.factory import build_web_compatibility_envelope, invoke_compatibility
 
 from ._constants import _WRITE, _READ, _SKIP_LINK_TYPES, _SHARED_ENTITY_LINK_TYPES
 from ._helpers import _deep_copy_entity
 
 router = APIRouter(prefix="/api/bop", tags=["bop"])
+
+
+async def _invoke_legacy_gbop_read(request, current_user, principal, gateway, operation, payload, *, capability_id="craft.bop.gbop.legacy_read"):
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id=capability_id, payload={"operation": operation, **payload}, current_user=current_user,
+        principal=principal, request_id=request.headers.get("X-Request-ID") or f"craft_bop_gbop_legacy_read_{next_gid()}",
+        trace_id=request.headers.get("X-Trace-ID") or "craft_bop_gbop_legacy_read",
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"invalid_input": 400, "permission_denied": 403, "resource_not_found": 404}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data
+
+
+async def _invoke_gbop_change(request, current_user, principal, gateway, payload):
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.gbop.change.apply", payload=payload,
+        current_user=current_user, principal=principal,
+        request_id=request.headers.get("X-Request-ID") or f"craft_bop_gbop_change_{next_gid()}",
+        trace_id=request.headers.get("X-Trace-ID") or "craft_bop_gbop_change",
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request.headers.get("X-Request-ID") or f"craft_bop_gbop_change_{next_gid()}",
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"invalid_input": 400, "permission_denied": 403, "resource_not_found": 404}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data.get("data", result.data)
 
 class GbopMatchConfirmItem(BaseModel):
     pbom_entry_gid: str
@@ -29,7 +59,11 @@ class GbopMatchConfirmBody(BaseModel):
 
 
 @router.get("/pbom-versions/{pbom_gid}/gbop-match-preview")
-def gbop_match_preview(pbom_gid: str, _u=Depends(_READ)):
+async def gbop_match_preview(pbom_gid: str, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_legacy_gbop_read(request, _u, principal, gateway, "match_preview", {"pbom_gid": pbom_gid}, capability_id="craft.bop.gbop.legacy_read")
+
+
+def _legacy_gbop_match_preview(pbom_gid: str, _u=Depends(_READ)):
     """
     车型工序导航卡：返回 PBOM 零件与 GBOP 工序/操作的匹配预览（只读）。
     按 vpps 在 GBOP 参考版本中匹配工序/操作 entry，合并已有确认状态。
@@ -175,7 +209,11 @@ def gbop_match_preview(pbom_gid: str, _u=Depends(_READ)):
 
 
 @router.post("/pbom-versions/{pbom_gid}/gbop-match-confirm", status_code=200)
-def gbop_match_confirm(pbom_gid: str, body: GbopMatchConfirmBody, _u=Depends(_WRITE)):
+async def gbop_match_confirm(pbom_gid: str, body: GbopMatchConfirmBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_change(request, _u, principal, gateway, {"operation": "match_confirm", "pbom_gid": pbom_gid, "matches": [item.model_dump() for item in body.matches]})
+
+
+def _legacy_gbop_match_confirm(pbom_gid: str, body: GbopMatchConfirmBody, _u=Depends(_WRITE)):
     """
     整批确认匹配结果，幂等写入 gbop_match_staging。
     bop_version_gid 为 NULL，由后续 auto-link 填入。
@@ -211,7 +249,11 @@ def gbop_match_confirm(pbom_gid: str, body: GbopMatchConfirmBody, _u=Depends(_WR
 
 
 @router.post("/versions/{bop_gid}/gbop-auto-link", status_code=201)
-def gbop_auto_link(bop_gid: str, _u=Depends(_WRITE)):
+async def gbop_auto_link(bop_gid: str, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_change(request, _u, principal, gateway, {"operation": "auto_link", "bop_gid": bop_gid})
+
+
+def _legacy_gbop_auto_link(bop_gid: str, _u=Depends(_WRITE)):
     """
     BOP 版本创建后，从 gbop_match_staging 批量写入 bop_entries + 实体表（三表联动）。
     幂等：created_entry_gid IS NULL 的记录才处理，避免重复执行。
@@ -396,7 +438,11 @@ def gbop_auto_link(bop_gid: str, _u=Depends(_WRITE)):
 
 
 @router.get("/pbom-versions")
-def list_pbom_versions(project_gid: str, _u=Depends(_READ)):
+async def list_pbom_versions(project_gid: str, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_legacy_gbop_read(request, _u, principal, gateway, "list_pbom_versions", {"project_gid": project_gid}, capability_id="craft.bop.gbop.legacy_read")
+
+
+def _legacy_list_pbom_versions(project_gid: str, _u=Depends(_READ)):
     """列出指定项目下 status='ready' 的 PBOM 版本，供车型工序导航卡选择。"""
     print(f"[gbop] list_pbom_versions project_gid={project_gid!r}")
     with get_conn() as conn:
@@ -415,3 +461,8 @@ def list_pbom_versions(project_gid: str, _u=Depends(_READ)):
             rows = [dict(r) for r in cur.fetchall()]
             print(f"[gbop] list_pbom_versions -> {len(rows)} versions")
             return {"data": rows}
+
+
+# Preserve direct Python callers while HTTP requests use the Gateway endpoints.
+gbop_match_confirm_legacy = gbop_match_confirm = _legacy_gbop_match_confirm
+gbop_auto_link_legacy = gbop_auto_link = _legacy_gbop_auto_link

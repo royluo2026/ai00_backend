@@ -1,93 +1,49 @@
-"""
-backend/routers/rule_engine.py
-───────────────────────────────
-CEL 规则引擎 API。
+"""REST compatibility adapters for governed Craft rule evaluation."""
+from __future__ import annotations
 
-端点：
-  POST /api/rule-engine/check                         — 单条规则检验
-  POST /api/rule-engine/audit/bop-version/{gid}       — BOP 版本批量审计
-"""
-import logging
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 
-from ..data.connection import get_conn
-from ..rule_engine.checker import check_entry_rules
-from ..rule_engine.executor import RuleResult, check_rule
-from backend.platform_sdk.auth import get_current_user
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.auth import get_authenticated_principal, get_current_user
+from backend.platform_sdk.factory import build_web_compatibility_envelope, invoke_compatibility
+from backend.platform_sdk.ids import next_gid
 
 router = APIRouter(tags=["rule-engine"])
-_log = logging.getLogger(__name__)
 
-
-# ── 单条规则检验 ───────────────────────────────────────────────────────────────
 
 class CheckBody(BaseModel):
     rule_gid: str
     context: dict[str, Any] = {}
 
 
+async def _invoke_rule_engine(request, current_user, principal, gateway, operation, *, rule_gid=None, context=None, version_gid=None, dry_run=True):
+    request_id = request.headers.get("X-Request-ID") or f"craft_rule_engine_legacy_{next_gid()}"
+    payload = {"operation": operation}
+    if rule_gid:
+        payload["rule_gid"] = rule_gid
+    if context is not None:
+        payload["context"] = context
+    if version_gid:
+        payload["version_gid"] = version_gid
+    payload["dry_run"] = dry_run
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.rule.engine.evaluate", payload=payload, current_user=current_user,
+        principal=principal, request_id=request_id, trace_id=request.headers.get("X-Trace-ID") or request_id,
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "permission_denied": 403, "invalid_input": 400}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data["data"]
+
+
 @router.post("/api/rule-engine/check")
-def check_single_rule(body: CheckBody, _u=Depends(get_current_user)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "SELECT gid, name, expression, enforcement_level"
-                " FROM workmanship_know_craft_rules WHERE gid = %s",
-                (body.rule_gid,),
-            )
-            row = cur.fetchone()
-    if not row:
-        raise HTTPException(404, "规则不存在")
-    if not row["expression"]:
-        return {"rule_gid": body.rule_gid, "result": RuleResult.SKIP, "message": "规则无 CEL 表达式"}
+async def check_single_rule(body: CheckBody, request: Request, user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_rule_engine(request, user, principal, gateway, "check", rule_gid=body.rule_gid, context=body.context)
 
-    result, msg = check_rule(row["expression"], body.context)
-    return {
-        "rule_gid":         body.rule_gid,
-        "rule_name":        row["name"],
-        "result":           result.value,
-        "message":          msg,
-        "enforcement_level": row["enforcement_level"],
-    }
-
-
-# ── BOP 版本批量审计 ───────────────────────────────────────────────────────────
 
 @router.post("/api/rule-engine/audit/bop-version/{version_gid}")
-def audit_bop_version(
-    version_gid: str,
-    dry_run: bool = Query(True, description="True=只返回结果，False=同时创建 Issue"),
-    _u=Depends(get_current_user),
-):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "SELECT gid, node_type, title FROM workmanship_bop_bop_entries"
-                " WHERE version_gid = %s AND is_deleted = FALSE",
-                (version_gid,),
-            )
-            entries = [dict(r) for r in cur.fetchall()]
-
-    if not entries:
-        return {"version_gid": version_gid, "total_entries": 0, "violation_count": 0, "violations": []}
-
-    violations: list[dict] = []
-    for entry in entries:
-        warnings = check_entry_rules(entry["node_type"], entry["gid"])
-        if warnings:
-            violations.append({
-                "entry_gid":   entry["gid"],
-                "entry_title": entry.get("title", ""),
-                "node_type":   entry["node_type"],
-                "warnings":    warnings,
-            })
-
-    return {
-        "version_gid":     version_gid,
-        "total_entries":   len(entries),
-        "violation_count": len(violations),
-        "violations":      violations,
-    }
+async def audit_bop_version(version_gid: str, dry_run: bool = Query(True, description="True=只返回结果，False=同时创建 Issue"), request: Request = None, user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_rule_engine(request, user, principal, gateway, "audit", version_gid=version_gid, dry_run=dry_run)

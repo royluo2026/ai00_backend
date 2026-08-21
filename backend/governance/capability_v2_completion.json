@@ -34,12 +34,18 @@
   ],
   "coverage_invariants": {
     "domains": 11,
-    "stable_functions": 848,
+    "stable_functions": 911,
     "resolutions.unreviewed": 0
   },
   "starting_snapshot": {
     "candidate_capabilities": 87,
     "catalog_descriptors": 102,
     "proposed_final_catalog_capabilities": 173
-  }
+  },
+  "web_route_inventory_artifact": "docs/governance/capability-coverage-review/generated/web_route_inventory.json",
+  "web_allowlisted_legacy_routes": [
+    "/api/flows/capability-manifest",
+    "/api/flows/test-node",
+    "/api/flows/gen-script"
+  ]
 }

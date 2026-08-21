@@ -221,7 +221,7 @@ def mock_conn():
         "knowledge_backend.api.knowledge_entries_legacy.get_conn",
         "knowledge_backend.api.knowledge_hub_legacy.get_conn",
         "backend.routers.views.get_conn",
-        "agent_backend.routers.flows.get_agent_conn",
+            "agent_backend.infrastructure.repository.get_agent_conn",
         "craft_backend.routers.lists.get_conn",
         "craft_backend.routers.rules.get_conn",
     )

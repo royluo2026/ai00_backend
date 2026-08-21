@@ -13,6 +13,9 @@ from backend.capability_v2.descriptor_adapter import (
 from plugins.project_management.project_management_backend.capabilities import (
     register_capabilities,
 )
+from plugins.project_management.project_management_backend.capabilities.provider import (
+    DEPRECATED_CAPABILITY_IDS,
+)
 from plugins.project_management.project_management_backend.capabilities.projects import (
     register_project_capabilities,
     search_projects,
@@ -62,6 +65,10 @@ def test_all_project_capabilities_have_native_stable_contracts():
     for spec, _, descriptor in registry.items:
         assert descriptor is not None, spec.id
         assert descriptor.owner_domain == "project_management"
+        if spec.id in DEPRECATED_CAPABILITY_IDS:
+            assert descriptor.lifecycle_status == "deprecated"
+            assert descriptor.input_schema["properties"]["operation"]["enum"] == []
+            continue
         assert descriptor.lifecycle_status == "stable"
         assert descriptor.exposure.agent is True
         assert descriptor.exposure.plugin is True

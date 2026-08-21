@@ -314,6 +314,22 @@ class BopNavigationRepository:
             "entry": detail, "links": links,
         }
 
+    def resolve_entry_reference(self, entry_gid: str) -> dict[str, Any]:
+        """Resolve the current BOP version/revision needed by the legacy route."""
+        with self._connection_factory() as connection:
+            with connection.cursor() as db:
+                db.execute(
+                    "SELECT e.version_gid, v.revision "
+                    "FROM workmanship_bop_bop_entries e "
+                    "JOIN workmanship_bop_bop_versions v ON v.gid = e.version_gid "
+                    "WHERE e.gid=%s AND e.is_deleted=0",
+                    (entry_gid,),
+                )
+                row = db.fetchone()
+        if not row:
+            raise _error("entry_not_found", "BOP entry was not found", entry_gid=entry_gid)
+        return {"version_gid": str(row["version_gid"]), "revision": int(row["revision"])}
+
 
 repository = BopNavigationRepository()
 

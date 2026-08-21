@@ -234,6 +234,7 @@ def catalog_schema_drift(snapshot: SnapshotDocument, graph: ImplementationGraph 
 def required_test_missing(snapshot: SnapshotDocument, graph: ImplementationGraph | None = None) -> tuple[FindingCandidate, ...]:
     return tuple(FindingCandidate("required_test_missing", "blocking", (_capability_subject(capability),),
         (_capability_key(capability),), "release_evidence_boundary") for capability in snapshot.capabilities
+        if str(capability.lifecycle_status).lower() not in {"deprecated", "retired"}
         if not any(
             key in _typed_capability_bindings(snapshot, "tested_by", {"test_case"})
             for key in _bindings(snapshot, capability, "tested_by")

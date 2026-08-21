@@ -131,7 +131,7 @@ async def list_cloud_tasks(request: Request, project_gid: Optional[str] = Query(
 async def create_cloud_task(body: TaskBody, request: Request, current_user=Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)): return await _task_call(request, current_user, principal, gateway, "tasks.create", body.model_dump(), True)
 
 
-@router.get("/api/tasks/promote")
+@router.get("/api/tasks/promote", status_code=410)
 def get_promote_placeholder(): return {"detail": "POST to this endpoint to promote a local task"}
 
 
@@ -161,7 +161,7 @@ async def list_cloud_issues(request: Request, project_gid: Optional[str] = Query
 async def create_cloud_issue(body: IssueBody, request: Request, current_user=Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)): return await _issue_call(request, current_user, principal, gateway, "issues.create", body.model_dump(), True)
 
 
-@router.get("/api/issues/promote")
+@router.get("/api/issues/promote", status_code=410)
 def get_issue_promote_placeholder(): return {"detail": "POST to this endpoint to promote a local issue"}
 
 

@@ -8,6 +8,10 @@ from backend.capability_v2.descriptor_adapter import descriptor_from_provider_sp
 
 from .contracts import INPUT_SCHEMAS, OUTPUT_SCHEMAS
 
+DEPRECATED_LOCAL_DEVICE_CAPABILITIES = frozenset({
+    "local.device.change.apply", "local.device.read",
+})
+
 
 _ERRORS = tuple(DomainErrorContract(code=code, meaning=meaning, retryable=retryable) for code, meaning, retryable in (
     ("device_not_found", "The workstation is unavailable or is not owned by the caller.", False),
@@ -32,8 +36,18 @@ def descriptor_for(spec: Any):
     if governed.id == "vismockup.model.open":
         selectors.append(ResourceSelector(resource_type="artifact", payload_path="artifact_ref.artifact_id"))
     return descriptor.model_copy(update={
-        "lifecycle_status": LifecycleStatus.STABLE,
+        "lifecycle_status": (
+            LifecycleStatus.DEPRECATED
+            if governed.id in DEPRECATED_LOCAL_DEVICE_CAPABILITIES
+            else LifecycleStatus.STABLE
+        ),
+        "deprecation_message": (
+            "Legacy device lifecycle identity retained for compatibility; no "
+            "bound Local Runtime application outcome is currently registered."
+            if governed.id in DEPRECATED_LOCAL_DEVICE_CAPABILITIES else None
+        ),
         "exposure": ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True, local_runtime=is_local),
+        "exposure_policy_source": "provider_explicit",
         "automation_level": AutomationLevel.A1 if is_write else AutomationLevel.A2,
         "authorization_policy": "local-runtime.v2:agent.run",
         "resource_selectors": tuple(selectors), "data_classification": "confidential",
@@ -52,4 +66,4 @@ def register(registry: Any, spec: Any, handler: Any) -> None:
     registry.register(governed, handler, descriptor=descriptor_for(governed))
 
 
-__all__ = ["descriptor_for", "register"]
+__all__ = ["DEPRECATED_LOCAL_DEVICE_CAPABILITIES", "descriptor_for", "register"]

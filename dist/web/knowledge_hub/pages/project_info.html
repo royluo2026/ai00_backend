@@ -238,36 +238,6 @@ function _toast(msg, ms = 2500) {
 }
 function _val(id) { return document.getElementById(id)?.value ?? ''; }
 
-function _capabilityMutationId(capabilityId) {
-  const random = globalThis.crypto?.randomUUID?.()
-    || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
-  return `web-capability:${capabilityId}:${random}`;
-}
-
-async function _confirmCapabilityMutation(capabilityId, payload) {
-  const cf = _cf();
-  if (!cf) throw new Error('能力网关不可用');
-  const idempotencyKey = _capabilityMutationId(capabilityId);
-  const requestBody = { version: 1, payload, idempotency_key: idempotencyKey };
-  const confirmed = await cf(`/api/v1/capabilities/${encodeURIComponent(capabilityId)}:confirm`, {
-    method: 'POST',
-    headers: { 'X-AI00-Source': 'web' },
-    body: JSON.stringify(requestBody),
-  });
-  const token = confirmed?.data?.confirmation_token;
-  if (!token) throw new Error('未取得操作确认令牌');
-  const invoked = await cf(`/api/v1/capabilities/${encodeURIComponent(capabilityId)}:invoke`, {
-    method: 'POST',
-    headers: { 'X-AI00-Source': 'web' },
-    body: JSON.stringify({ ...requestBody, confirmation_token: token }),
-  });
-  if (invoked?.success !== true) {
-    const error = invoked?.data?.error || {};
-    throw new Error(error.message || error.code || '能力调用失败');
-  }
-  return invoked.data?.data;
-}
-
 // ── 全局共享缓存 ──────────────────────────────────────────────────
 let _vmMap   = {};  // gid → name（车型）
 let _userMap = {};  // gid → name（用户）
@@ -400,21 +370,9 @@ const SECTIONS = {
       };
     },
 
-    async create(_cf, body) {
-      return _confirmCapabilityMutation('project.project.change.apply', {
-        operation: 'projects.create', arguments: body,
-      });
-    },
-    async update(_cf, gid, body) {
-      return _confirmCapabilityMutation('project.project.change.apply', {
-        operation: 'projects.update', arguments: { gid, updates: body },
-      });
-    },
-    async remove(_cf, gid) {
-      return _confirmCapabilityMutation('project.project.change.apply', {
-        operation: 'projects.delete', arguments: { gid },
-      });
-    },
+    async create(cf, body) { return cf('/api/projects', { method:'POST', body: JSON.stringify(body) }); },
+    async update(cf, gid, body) { return cf(`/api/projects/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
+    async remove(cf, gid) { return cf(`/api/projects/${gid}`, { method:'DELETE' }); },
 
     searchFn(r, q) {
       return (r.name||'').toLowerCase().includes(q)
@@ -476,21 +434,9 @@ const SECTIONS = {
       return { name, brand: _val('fVmBrand').trim(), platform: _val('fVmPlatform').trim(), vehicle_type: _val('fVmType').trim() };
     },
 
-    async create(_cf, body) {
-      return _confirmCapabilityMutation('project.project.change.apply', {
-        operation: 'vehicle_models.create', arguments: body,
-      });
-    },
-    async update(_cf, gid, body) {
-      return _confirmCapabilityMutation('project.project.change.apply', {
-        operation: 'vehicle_models.update', arguments: { gid, ...body },
-      });
-    },
-    async remove(_cf, gid) {
-      return _confirmCapabilityMutation('project.project.change.apply', {
-        operation: 'vehicle_models.delete', arguments: { gid },
-      });
-    },
+    async create(cf, body) { return cf('/api/projects/vehicle_models', { method:'POST', body: JSON.stringify(body) }); },
+    async update(cf, gid, body) { return cf(`/api/projects/vehicle_models/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
+    async remove(cf, gid) { return cf(`/api/projects/vehicle_models/${gid}`, { method:'DELETE' }); },
 
     searchFn(r, q) {
       return (r.name||'').toLowerCase().includes(q)
@@ -535,25 +481,9 @@ const SECTIONS = {
       return { name };
     },
 
-    async create(_cf, body) {
-      return _confirmCapabilityMutation('factory.structure.create', {
-        kind: 'factory', name: body.name, attributes: {},
-      });
-    },
-    async update(_cf, gid, body) {
-      const current = _rows.find(row => row.gid === gid);
-      if (!current?.version) throw new Error('工厂版本信息缺失，请刷新后重试');
-      return _confirmCapabilityMutation('factory.structure.update', {
-        gid, expected_version: current.version, updates: { name: body.name },
-      });
-    },
-    async remove(_cf, gid) {
-      const current = _rows.find(row => row.gid === gid);
-      if (!current?.version) throw new Error('工厂版本信息缺失，请刷新后重试');
-      return _confirmCapabilityMutation('factory.structure.archive', {
-        gid, expected_version: current.version,
-      });
-    },
+    async create(cf, body) { return cf('/api/bop/factories', { method:'POST', body: JSON.stringify(body) }); },
+    async update(cf, gid, body) { return cf(`/api/bop/factories/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
+    async remove(cf, gid) { return cf(`/api/bop/factories/${gid}`, { method:'DELETE' }); },
 
     searchFn(r, q) { return (r.name||'').toLowerCase().includes(q); },
   },

@@ -36,7 +36,7 @@ def _aggregate(*, published: bool = True, revision: int = 7) -> BopAggregate:
             {"gid": "op-1", "parent_gid": "station-1", "node_type": "operation", "sort_order": 10, "title": "Position"},
         ),
         links=(
-            {"entry_gid": "op-1", "link_type": "pbom_part", "entity_gid": "part-1", "entity_data": {"part_no": "A-1", "name": "Bracket"}},
+            {"entry_gid": "op-1", "link_type": "pbom_part", "entity_gid": "part-1", "is_primary": True, "entity_data": {"part_no": "A-1", "name": "Bracket"}},
             {"entry_gid": "op-2", "link_type": "project_tools", "entity_gid": "tool-1", "entity_data": {"name": "Torque wrench"}},
         ),
     )
@@ -120,5 +120,77 @@ def test_linked_parts_reports_usage_locations():
             "part_no": "A-1",
             "name": "Bracket",
             "usage": [{"entry_gid": "op-1", "entry_title": "Position"}],
+        }
+    ]
+
+
+def test_linked_parts_exposes_legacy_compatibility_rows():
+    aggregate = _aggregate()
+    with patch.object(repository, "load_bop_aggregate", return_value=aggregate):
+        result = get_linked_parts(
+            {"version_gid": "v1"},
+            CapabilityContext(user_gid="u1"),
+        )
+
+    assert result.data["legacy_items"] == [
+        {
+            "gid": "part-1",
+            "name": "Bracket",
+            "parent_gid": None,
+            "part_no": "A-1",
+            "quantity": None,
+            "unit": None,
+            "snapshot_gid": None,
+            "material": None,
+            "meta": {},
+            "entry_gid": "op-1",
+            "link_gid": None,
+            "created_at": None,
+        }
+    ]
+
+
+def test_linked_parts_exposes_legacy_pbom_rows():
+    aggregate = _aggregate()
+    aggregate = BopAggregate(
+        version=aggregate.version,
+        entries=aggregate.entries,
+            links=(
+            {
+                **aggregate.links[0],
+                "entity_data": {
+                    **aggregate.links[0]["entity_data"],
+                    "vpps": "V1",
+                    "parent_part_gid": "parent-1",
+                    "node_type": "part",
+                    "bom_row_id": "row-1",
+                    "seq_no": 3,
+                    "quantity": 2,
+                    "unit": "pcs",
+                    "part_number": "A-1",
+                    "created_at": "2026-08-19T00:00:00+00:00",
+                    "updated_at": "2026-08-19T01:00:00+00:00",
+                },
+            },
+                aggregate.links[1],
+            ),
+    )
+    with patch.object(repository, "load_bop_aggregate", return_value=aggregate):
+        result = get_linked_parts({"version_gid": "v1"}, CapabilityContext(user_gid="u1"))
+
+    assert result.data["legacy_pbom_items"] == [
+        {
+            "gid": "part-1",
+            "title": "Bracket",
+            "vpps": "V1",
+            "parent_part_gid": "parent-1",
+            "node_type": "part",
+            "bom_row_id": "row-1",
+            "seq_no": 3,
+            "quantity": 2,
+            "unit": "pcs",
+            "part_number": "A-1",
+            "created_at": "2026-08-19T00:00:00+00:00",
+            "updated_at": "2026-08-19T01:00:00+00:00",
         }
     ]

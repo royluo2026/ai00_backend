@@ -1,6 +1,6 @@
 """Governed Craft BOP write Capabilities for the Phase 64 safety slice."""
 from __future__ import annotations
-import copy, hashlib, json, time
+import copy, hashlib, json, re, time
 from datetime import datetime, timezone
 from dataclasses import dataclass, field
 from typing import Any, Mapping
@@ -10,7 +10,7 @@ from ..data.connection import get_craft_conn
 
 _ALLOWED_COMMANDS = frozenset({"entry.create", "entry.update", "entry.archive", "link.attach", "link.detach", "version.metadata.update"})
 _ENTRY_FIELDS = frozenset({"parent_gid", "node_type", "sort_order", "title", "vpps", "vpps_desc", "parent_bop_title", "meta"})
-_VERSION_FIELDS = frozenset({"version_tag", "bop_name", "change_note", "maturity", "takt_time", "visibility", "data_stage", "pbom_version_gid"})
+_VERSION_FIELDS = frozenset({"version_tag", "bop_name", "change_note", "maturity", "takt_time", "visibility", "data_stage", "pbom_version_gid", "project_gid", "factory_gid", "vehicle_model_gid", "version_type", "owner_gid"})
 _SOURCE_KINDS = frozenset({"empty", "bop_version", "template", "import_preview"})
 _TTL_SECONDS = 300
 
@@ -89,6 +89,7 @@ class BopWriteRepository:
     def get_version(self, version_gid): raise NotImplementedError
     def save_version(self, version, *, expected_revision): raise NotImplementedError
     def create_version(self, version): raise NotImplementedError
+    def assert_pbom_ready(self, pbom_version_gid): return None
     def issue_confirmation(self, preview_gid, user_gid): raise NotImplementedError
     def consume_confirmation(self, preview_gid, user_gid, token): raise NotImplementedError
     def put_preview(self, preview): raise NotImplementedError
@@ -108,9 +109,18 @@ class BopWriteRepository:
 class MysqlBopWriteRepository(BopWriteRepository):
     def get_version(self, version_gid):
         with get_craft_conn() as conn, conn.cursor() as cur:
-            cur.execute("SELECT gid, project_gid, version_tag, bop_name, version_family_gid, parent_version_gid, revision, status, meta FROM workmanship_bop_bop_versions WHERE gid=%s AND is_deleted=0", (version_gid,)); row = cur.fetchone()
+            cur.execute("SELECT gid, project_gid, factory_gid, vehicle_model_gid, version_tag, bop_name, version_family_gid, parent_version_gid, revision, status, maturity, takt_time, version_type, pbom_version_gid, owner_gid, data_stage, meta FROM workmanship_bop_bop_versions WHERE gid=%s AND is_deleted=0", (version_gid,)); row = cur.fetchone()
             if not row: return None
             version = dict(row); cur.execute("SELECT gid, parent_gid, node_type, sort_order, title, vpps, vpps_desc, parent_bop_title, meta, is_deleted FROM workmanship_bop_bop_entries WHERE version_gid=%s", (version_gid,)); version["entries"] = [dict(item) for item in cur.fetchall() if not item.get("is_deleted")]; cur.execute("SELECT gid, entry_gid, link_type, entity_gid, is_primary FROM workmanship_bop_bop_entry_links WHERE version_gid=%s AND is_deleted=0", (version_gid,)); version["links"] = [dict(item) for item in cur.fetchall()]; return version
+
+    def assert_pbom_ready(self, pbom_version_gid):
+        if not pbom_version_gid:
+            return
+        with get_craft_conn() as conn, conn.cursor() as cur:
+            cur.execute("SELECT status FROM workmanship_bop_pbom_versions WHERE gid=%s", (pbom_version_gid,))
+            row = cur.fetchone()
+        if not row or row.get("status") != "ready":
+            raise CapabilityBusinessError("pbom_version_not_ready", "PBOM version is not ready")
     @staticmethod
     def _json(value):
         if isinstance(value, str):
@@ -161,13 +171,19 @@ class MysqlBopWriteRepository(BopWriteRepository):
     def _save_in_transaction(self, cur, version, expected_revision):
         cur.execute(
             "UPDATE workmanship_bop_bop_versions SET version_tag=%s,bop_name=%s,status=%s,"
-            "version_family_gid=%s,parent_version_gid=%s,meta=%s,archived_at=%s,revision=revision+1 "
+            "version_family_gid=%s,parent_version_gid=%s,project_gid=%s,factory_gid=%s,"
+            "vehicle_model_gid=%s,maturity=%s,takt_time=%s,version_type=%s,pbom_version_gid=%s,"
+            "owner_gid=%s,data_stage=%s,visibility=%s,meta=%s,archived_at=%s,revision=revision+1 "
             "WHERE gid=%s AND revision=%s AND is_deleted=0",
             (
                 version.get("version_tag") or "", version.get("bop_name") or "",
                 version.get("status") or "active", version.get("version_family_gid"),
-                version.get("parent_version_gid"), json.dumps(version.get("meta") or {}, ensure_ascii=False),
-                _db_datetime(version.get("archived_at")), version["gid"], expected_revision,
+                version.get("parent_version_gid"), version.get("project_gid"), version.get("factory_gid"),
+                version.get("vehicle_model_gid"), version.get("maturity"), version.get("takt_time"),
+                version.get("version_type"), version.get("pbom_version_gid"), version.get("owner_gid"),
+                version.get("data_stage"), version.get("visibility") or "team",
+                json.dumps(version.get("meta") or {}, ensure_ascii=False), _db_datetime(version.get("archived_at")),
+                version["gid"], expected_revision,
             ),
         )
         if cur.rowcount != 1:
@@ -190,14 +206,17 @@ class MysqlBopWriteRepository(BopWriteRepository):
             try:
                 cur.execute(
                     "INSERT INTO workmanship_bop_bop_versions "
-                    "(gid,version_tag,bop_name,status,revision,version_family_gid,parent_version_gid,project_gid,meta,lifecycle_state,created_by) "
-                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                    "(gid,version_tag,bop_name,status,revision,version_family_gid,parent_version_gid,project_gid,factory_gid,vehicle_model_gid,maturity,takt_time,version_type,pbom_version_gid,owner_gid,data_stage,meta,lifecycle_phase,lifecycle_state,visibility,created_by) "
+                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                     (
                         version["gid"], version.get("version_tag") or "", version.get("bop_name") or "",
                         version.get("status") or "active", version.get("revision", 1),
                         version.get("version_family_gid"), version.get("parent_version_gid"),
-                        version.get("project_gid"), json.dumps(version.get("meta") or {}, ensure_ascii=False),
-                        json.dumps({}, ensure_ascii=False), version.get("created_by"),
+                        version.get("project_gid"), version.get("factory_gid"), version.get("vehicle_model_gid"),
+                        version.get("maturity"), version.get("takt_time"), version.get("version_type"),
+                        version.get("pbom_version_gid"), version.get("owner_gid"), version.get("data_stage"),
+                        json.dumps(version.get("meta") or {}, ensure_ascii=False), "init",
+                        json.dumps({}, ensure_ascii=False), version.get("visibility") or "team", version.get("created_by"),
                     ),
                 )
                 self._write_entries(cur, version)
@@ -397,13 +416,29 @@ def create_bop_version(payload, context):
     source_version = source_version or {"entries": [], "links": [], "meta": {}}
     version_gid = str(next_gid())
     version = copy.deepcopy(source_version)
+    requested_name = payload.get("bop_name")
+    clean_name = re.sub(r"\s*[·＇・]\s*\S+$", "", str(requested_name or "")).strip()
+    if not clean_name:
+        clean_name = str(requested_name or "").strip()
+    pbom_version_gid = payload.get("pbom_version_gid", source_version.get("pbom_version_gid"))
+    repository.assert_pbom_ready(pbom_version_gid)
     version.update({
         "gid": version_gid,
         "version_tag": version_tag,
+        "bop_name": clean_name or source_version.get("bop_name") or "",
         "status": "active",
         "revision": 1,
         "parent_version_gid": source_version.get("gid"),
         "version_family_gid": _text(payload, "version_family_gid") or version_gid,
+        "project_gid": payload.get("project_gid", source_version.get("project_gid")),
+        "factory_gid": payload.get("factory_gid", source_version.get("factory_gid")),
+        "vehicle_model_gid": payload.get("vehicle_model_gid", source_version.get("vehicle_model_gid")),
+        "maturity": payload.get("maturity", source_version.get("maturity")),
+        "takt_time": payload.get("takt_time", source_version.get("takt_time")),
+        "version_type": payload.get("version_type", source_version.get("version_type")),
+        "pbom_version_gid": pbom_version_gid,
+        "owner_gid": payload.get("owner_gid", source_version.get("owner_gid")),
+        "data_stage": payload.get("data_stage", source_version.get("data_stage")),
         "created_by": context.user_gid,
     })
     source_entries = list(version.get("entries", []))
@@ -445,6 +480,6 @@ def register_bop_write_capabilities(registry):
     common = {"owner": "craft", "plugin_callable": False, "permissions": ("craft.write",), "tags": ("craft", "bop", "write")}
     registry.register(CapabilitySpec(id="craft.bop.draft.change.preview", description="Preview a typed BOP draft change without side effects.", risk="read", input_schema={"type": "object", "required": ["version_gid", "expected_revision", "commands"]}, output_schema={"type": "object", "required": ["preview_gid", "version_gid", "base_revision", "before_hash", "after_hash", "expires_at"]}, **common), preview_draft_change)
     registry.register(CapabilitySpec(id="craft.bop.draft.change.apply", description="Apply one exact typed BOP draft preview atomically.", risk="write", confirmation="user", idempotent=True, input_schema={"type": "object", "required": ["preview_gid"]}, output_schema={"type": "object", "required": ["version_gid", "revision", "before_hash", "after_hash"]}, **common), apply_draft_change)
-    registry.register(CapabilitySpec(id="craft.bop.version.create", description="Create a BOP draft from an empty, version, template or import preview source.", risk="write", confirmation="user", idempotent=False, input_schema={"type": "object", "required": ["source", "version_tag"]}, output_schema={"type": "object", "required": ["version_gid", "status", "revision", "entries_count"]}, **common), create_bop_version)
+    registry.register(CapabilitySpec(id="craft.bop.version.create", description="Create a BOP draft from an empty, version, template or import preview source.", risk="write", confirmation="user", idempotent=False, input_schema={"type": "object", "required": ["source", "version_tag"], "properties": {"source": {"type": "string"}, "version_tag": {"type": "string"}, "bop_name": {"type": "string"}, "version_family_gid": {"type": "string"}, "source_gid": {"type": "string"}, "template_gid": {"type": "string"}, "import_preview_gid": {"type": "string"}, "project_gid": {"type": "string"}, "factory_gid": {"type": "string"}, "vehicle_model_gid": {"type": "string"}, "maturity": {"type": "string"}, "takt_time": {"type": "number"}, "version_type": {"type": "string"}, "pbom_version_gid": {"type": "string"}, "owner_gid": {"type": "string"}, "data_stage": {"type": "string"}}, "additionalProperties": False}, output_schema={"type": "object", "required": ["version_gid", "status", "revision", "entries_count"]}, **common), create_bop_version)
     registry.register(CapabilitySpec(id="craft.bop.version.archive", description="Archive a BOP version without deleting its snapshot or references.", risk="write", confirmation="user", idempotent=True, input_schema={"type": "object", "required": ["version_gid", "expected_revision"]}, output_schema={"type": "object", "required": ["version_gid", "status", "revision", "before_hash", "after_hash"]}, **common), archive_bop_version)
     registry.register(CapabilitySpec(id="craft.bop.import.preview", description="Parse and hash a BOP import document without mutating Craft state.", risk="read", input_schema={"type": "object", "required": ["document"]}, output_schema={"type": "object", "required": ["import_preview_gid", "content_hash", "entry_count", "expires_at"]}, **common), import_preview)

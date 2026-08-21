@@ -7,15 +7,20 @@
 | Agent | `agent.audit.record` | rest |
 | Agent | `agent.flow.change.apply` | rest |
 | Agent | `agent.flow.read` | rest |
+| Agent | `agent.interaction.cancel` | none |
+| Agent | `agent.interaction.chat.change.apply` | none |
 | Agent | `agent.interaction.request` | agent |
 | Agent | `agent.memory.change.apply` | agent |
 | Agent | `agent.memory.read` | agent |
 | Agent | `agent.run.change.apply` | rest, agent |
 | Agent | `agent.run.read` | agent |
+| Agent | `agent.runtime.config.read` | none |
+| Agent | `agent.script.generate` | none |
 | Agent | `agent.session.change.apply` | rest, agent |
 | Agent | `agent.session.read` | rest, agent |
 | Agent | `agent.skill.change.apply` | rest |
 | Agent | `agent.skill.read` | rest |
+| Agent | `agent.tool_catalog.read` | none |
 | Base Platform | `base.annotation.change.apply` | rest |
 | Base Platform | `base.annotation.read` | rest |
 | Base Platform | `base.authorization.grant.change.apply` | rest |
@@ -52,27 +57,65 @@
 | Base Platform | `system.job.get` | none |
 | Base Platform | `system.lineage.get` | none |
 | Base Platform | `system.search` | agent |
+| Craft | `craft.bop.alt_hierarchy.read` | web, rest |
 | Craft | `craft.bop.draft.change.apply` | rest |
 | Craft | `craft.bop.draft.change.preview` | rest, agent |
+| Craft | `craft.bop.entry.bulk.change.apply` | none |
+| Craft | `craft.bop.entry.change.apply` | none |
 | Craft | `craft.bop.entry.detail.get` | none |
+| Craft | `craft.bop.entry.legacy_read` | web, rest |
+| Craft | `craft.bop.entry.search` | web, rest |
+| Craft | `craft.bop.entry_link.change.apply` | none |
 | Craft | `craft.bop.execution_structure.get` | rest, agent |
 | Craft | `craft.bop.execution_structure.preview` | none |
+| Craft | `craft.bop.fork.change.apply` | none |
+| Craft | `craft.bop.fork_preset.change.apply` | web, rest |
+| Craft | `craft.bop.fork_preset.read` | web, rest |
+| Craft | `craft.bop.gbop.change.apply` | none |
+| Craft | `craft.bop.gbop.legacy_read` | web, rest |
 | Craft | `craft.bop.import.preview` | rest |
+| Craft | `craft.bop.lifecycle.change.apply` | web, rest |
+| Craft | `craft.bop.lifecycle.checkpoint.change.apply` | none |
+| Craft | `craft.bop.lifecycle.checkpoint.rollback.apply` | none |
+| Craft | `craft.bop.lifecycle.history.change.apply` | none |
+| Craft | `craft.bop.lifecycle.read` | web, rest |
+| Craft | `craft.bop.lifecycle.state.change.apply` | none |
+| Craft | `craft.bop.lifecycle.state.read` | web, rest |
+| Craft | `craft.bop.lifecycle.stats.refresh.apply` | none |
+| Craft | `craft.bop.lifecycle.step.rollback.apply` | none |
+| Craft | `craft.bop.line_operation_catia.read` | web, rest |
 | Craft | `craft.bop.linked_parts.get` | rest |
+| Craft | `craft.bop.pbom.change_point.get` | web, rest |
+| Craft | `craft.bop.pbom_lifecycle.read` | web, rest |
+| Craft | `craft.bop.picture.upload` | none |
+| Craft | `craft.bop.staging.change.apply` | none |
+| Craft | `craft.bop.staging.lifecycle.change.apply` | none |
+| Craft | `craft.bop.staging.read` | web, rest |
 | Craft | `craft.bop.structure.outline.get` | none |
+| Craft | `craft.bop.template.change.apply` | none |
 | Craft | `craft.bop.validation.get` | none |
 | Craft | `craft.bop.validation.run` | none |
 | Craft | `craft.bop.version.archive` | rest |
 | Craft | `craft.bop.version.compare` | none |
 | Craft | `craft.bop.version.create` | rest |
+| Craft | `craft.bop.version.freeze.change.apply` | none |
 | Craft | `craft.bop.version.get` | rest |
+| Craft | `craft.bop.version.layout.change.apply` | none |
+| Craft | `craft.bop.version.legacy_read` | web, rest |
+| Craft | `craft.bop.version.lifecycle.change.apply` | web, rest |
 | Craft | `craft.bop.version.list` | none |
+| Craft | `craft.bop.version.snapshot.change.apply` | none |
 | Craft | `craft.bop.work_package.get` | rest |
 | Craft | `craft.canvas.change.apply` | rest, agent |
 | Craft | `craft.canvas.read` | rest, agent |
 | Craft | `craft.data_exchange.export` | rest |
+| Craft | `craft.data_exchange.lark.read` | none |
+| Craft | `craft.data_exchange.lark.write` | none |
 | Craft | `craft.ebom.change.apply` | rest |
+| Craft | `craft.ebom.legacy_read` | web, rest |
 | Craft | `craft.ebom.read` | rest |
+| Craft | `craft.ebom.vpps_check.read` | web, rest |
+| Craft | `craft.gbop.catalog.read` | web, rest |
 | Craft | `craft.gbop.change.apply` | rest |
 | Craft | `craft.gbop.draft.change.apply` | none |
 | Craft | `craft.gbop.draft.change.preview` | none |
@@ -80,9 +123,15 @@
 | Craft | `craft.gbop.draft.get` | none |
 | Craft | `craft.gbop.draft.search` | none |
 | Craft | `craft.gbop.draft.submit` | none |
+| Craft | `craft.gbop.entity.change.apply` | none |
+| Craft | `craft.gbop.import.change.apply` | none |
+| Craft | `craft.gbop.import.tc.change.apply` | none |
 | Craft | `craft.gbop.item.knowledge.list` | none |
 | Craft | `craft.gbop.item.search` | none |
 | Craft | `craft.gbop.item.usage.get` | none |
+| Craft | `craft.gbop.navigation.change.apply` | web, rest |
+| Craft | `craft.gbop.navigation.read` | web, rest |
+| Craft | `craft.gbop.process_hierarchy.read` | web, rest |
 | Craft | `craft.gbop.read` | rest |
 | Craft | `craft.gbop.release.activate` | none |
 | Craft | `craft.gbop.release.archive` | none |
@@ -90,6 +139,11 @@
 | Craft | `craft.gbop.release.get` | none |
 | Craft | `craft.gbop.release.publish` | none |
 | Craft | `craft.gbop.release.search` | none |
+| Craft | `craft.gbop.station_autolink.change.apply` | none |
+| Craft | `craft.gbop.station_autolink.preview` | web, rest |
+| Craft | `craft.gbop.version.change.apply` | none |
+| Craft | `craft.library.change.apply` | web, rest |
+| Craft | `craft.library.read` | web, rest |
 | Craft | `craft.manufacturing_resource.change.apply` | rest |
 | Craft | `craft.manufacturing_resource.read` | rest |
 | Craft | `craft.pbom.draft.change.apply` | none |
@@ -109,7 +163,10 @@
 | Craft | `craft.rule.draft.revise` | none |
 | Craft | `craft.rule.draft.search` | none |
 | Craft | `craft.rule.draft.submit` | none |
+| Craft | `craft.rule.engine.evaluate` | web, rest |
 | Craft | `craft.rule.evaluate` | none |
+| Craft | `craft.rule.library.change.apply` | web, rest |
+| Craft | `craft.rule.library.read` | web, rest |
 | Craft | `craft.rule.read` | rest, agent |
 | Craft | `craft.rule.release.activate` | none |
 | Craft | `craft.rule.release.get` | none |
@@ -118,6 +175,10 @@
 | Craft | `craft.rule.waiver.create` | none |
 | Craft | `craft.rule.waiver.revoke` | none |
 | Craft | `craft.rule.waiver.search` | none |
+| Craft | `craft.standard_operation.change.apply` | web, rest |
+| Craft | `craft.standard_operation.read` | web, rest |
+| Craft | `craft.vpps_audit.change.apply` | web, rest |
+| Craft | `craft.vpps_audit.read` | web, rest |
 | Device | `local.command.get` | none |
 | Device | `local.device.change.apply` | rest |
 | Device | `local.device.read` | rest |
@@ -184,6 +245,8 @@
 | Knowledge | `knowledge.document.search` | none |
 | Knowledge | `knowledge.entry.change.apply` | none |
 | Knowledge | `knowledge.get` | rest, agent |
+| Knowledge | `knowledge.hub.change.apply` | web, rest |
+| Knowledge | `knowledge.hub.read` | web, rest |
 | Knowledge | `knowledge.migration.status` | none |
 | Knowledge | `knowledge.personalization.change.apply` | none |
 | Knowledge | `knowledge.personalization.read` | none |

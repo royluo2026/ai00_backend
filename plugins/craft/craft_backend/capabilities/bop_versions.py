@@ -5,6 +5,7 @@ import base64
 import json
 from dataclasses import dataclass
 from datetime import date, datetime
+from decimal import Decimal
 from typing import Any, Mapping
 
 from backend.capability_v2.provider_contracts import (
@@ -30,6 +31,7 @@ meta, snapshot_data, created_at, updated_at
 _LIST_FIELDS = frozenset(
     {
         "project_gid",
+        "factory_gid",
         "status",
         "query",
         "include_archived",
@@ -54,6 +56,8 @@ def _json_object(value: Any) -> dict[str, Any]:
 def _transport_value(value: Any) -> Any:
     if isinstance(value, (datetime, date)):
         return value.isoformat()
+    if isinstance(value, Decimal):
+        return float(value)
     return value
 
 
@@ -100,6 +104,7 @@ def _decode_cursor(value: str) -> tuple[str, str]:
 @dataclass(frozen=True)
 class BopVersionQuery:
     project_gid: str | None = None
+    factory_gid: str | None = None
     status: str | None = None
     query: str | None = None
     include_archived: bool = False
@@ -127,6 +132,7 @@ class BopVersionQuery:
         cursor_value = _optional_text(payload, "cursor")
         return cls(
             project_gid=_optional_text(payload, "project_gid"),
+            factory_gid=_optional_text(payload, "factory_gid"),
             status=_optional_text(payload, "status"),
             query=_optional_text(payload, "query"),
             include_archived=include_archived,
@@ -159,6 +165,9 @@ class BopVersionRepository:
         if query.project_gid:
             where.append("project_gid = %s")
             params.append(query.project_gid)
+        if query.factory_gid:
+            where.append("factory_gid = %s")
+            params.append(query.factory_gid)
         if query.status:
             where.append("status = %s")
             params.append(query.status)
@@ -226,9 +235,24 @@ def _summary(row: Mapping[str, Any]) -> dict[str, Any]:
         "bop_name": row.get("bop_name"),
         "family_gid": row.get("version_family_gid"),
         "project_gid": row.get("project_gid"),
+        "factory_gid": row.get("factory_gid"),
+        "vehicle_model_gid": row.get("vehicle_model_gid"),
+        "parent_version_gid": row.get("parent_version_gid"),
+        "pbom_version_gid": row.get("pbom_version_gid"),
+        "owner_gid": row.get("owner_gid"),
         "status": row.get("status"),
         "lifecycle_phase": row.get("lifecycle_phase"),
         "revision": _revision(row),
+        "version_type": row.get("version_type"),
+        "maturity": row.get("maturity"),
+        "data_stage": row.get("data_stage"),
+        "visibility": row.get("visibility"),
+        "takt_time": row.get("takt_time"),
+        "change_note": row.get("change_note"),
+        "frozen_at": _transport_value(row.get("frozen_at")),
+        "published_at": _transport_value(row.get("published_at")),
+        "archived_at": _transport_value(row.get("archived_at")),
+        "created_at": _transport_value(row.get("created_at")),
         "updated_at": _transport_value(row.get("updated_at")),
         "archived": bool(row.get("archived_at")),
     }
@@ -355,6 +379,7 @@ def register_bop_version_capabilities(registry: Any) -> None:
                 "type": "object",
                 "properties": {
                     "project_gid": {"type": "string"},
+                    "factory_gid": {"type": "string"},
                     "status": {"type": "string"},
                     "query": {"type": "string"},
                     "include_archived": {"type": "boolean"},

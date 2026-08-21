@@ -20,12 +20,13 @@ from backend.capability_v2.domain_manifest import load_domain_manifests
 PRODUCT_CATALOG = REPOSITORY_ROOT / "docs/governance/capability-catalog-release.json"
 EXTENSION_CATALOG = REPOSITORY_ROOT / "docs/governance/test-extension/capability-governance-catalog-release.json"
 OFFICIAL_DOMAINS = REPOSITORY_ROOT / "backend/capability_v2/official_domains.json"
+ACCEPTANCE_MANIFEST = REPOSITORY_ROOT / "backend/tests/acceptance/fixtures/case-manifest.json"
 EXPECTED_OFFICIAL_DOMAIN_COUNT = 11
 EXPECTED_OFFICIAL_DOMAINS = (
     "agent", "base", "craft", "device", "digital_model", "factory", "integration",
     "knowledge", "ontology", "project_management", "simulation",
 )
-PINNED_STABLE_PRODUCT_DESCRIPTOR_COUNT = 267
+PINNED_STABLE_PRODUCT_DESCRIPTOR_COUNT = 317
 
 
 def _inside_repository(path: Path) -> Path:
@@ -39,9 +40,15 @@ def _inside_repository(path: Path) -> Path:
 
 def run_offline_scan(output: Path) -> dict[str, object]:
     """Produce one portable document from checked-in trusted inputs only."""
+    # Bind the scanner to the same official registry that serves requests.  A
+    # catalog-only scan can only emit ``declared_in`` edges and falsely reports
+    # every capability as missing its provider.
+    from backend.capability_v2.bootstrap import build_capability_registry
+
     product = CatalogRelease.model_validate_json(PRODUCT_CATALOG.read_text(encoding="utf-8"))
     extension = CatalogRelease.model_validate_json(EXTENSION_CATALOG.read_text(encoding="utf-8"))
     manifests = load_domain_manifests(OFFICIAL_DOMAINS)
+    acceptance_manifest = json.loads(ACCEPTANCE_MANIFEST.read_text(encoding="utf-8"))
     if len(manifests.domains) != EXPECTED_OFFICIAL_DOMAIN_COUNT:
         raise RuntimeError("official_domain_count_mismatch")
     if tuple(sorted(item.domain_id for item in manifests.domains)) != EXPECTED_OFFICIAL_DOMAINS:
@@ -49,11 +56,15 @@ def run_offline_scan(output: Path) -> dict[str, object]:
     stable_count = sum(item.lifecycle_status.value == "stable" for item in product.descriptors)
     if stable_count != PINNED_STABLE_PRODUCT_DESCRIPTOR_COUNT:
         raise RuntimeError("pinned_product_descriptor_count_mismatch")
+    registry = build_capability_registry(REPOSITORY_ROOT)
     document = GovernanceScanner(
         GovernanceSettings("test-governance", REPOSITORY_ROOT),
+        registry_snapshot=registry.snapshot(),
         product_catalog=product,
         extension_catalog=extension,
         domain_manifests=manifests,
+        acceptance_manifest=acceptance_manifest,
+        acceptance_manifest_path=ACCEPTANCE_MANIFEST.relative_to(REPOSITORY_ROOT).as_posix(),
     ).scan(code_revision="offline")
     report = {
         "mode": "offline",

@@ -19,7 +19,7 @@ from __future__ import annotations
 import json
 import os
 import uuid
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from fastapi.responses import StreamingResponse
 
 from backend.platform_sdk.auth import get_current_user, require_role
@@ -31,18 +31,36 @@ from ..ai_assistant.tool_registry import (
     get_all_tools_with_skills, WRITE_TOOLS_CONFIRM,
     _READ_TOOLS, _WRITE_TOOLS_CONFIRM, _WRITE_TOOLS_NO_CONFIRM, _SYSTEM_TOOLS,
 )
+from ..api.compatibility import invoke_agent_capability
+from ..application.interaction_state import consume_abort
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.auth import get_authenticated_principal
+from backend.platform_sdk.factory import build_web_compatibility_envelope, invoke_compatibility
 
 router = APIRouter(prefix="/api/ai", tags=["ai_chat"])
 _log = __import__('logging').getLogger(__name__)
 
 # ── 流式中断标志（session_gid → True）────────────────────────────────────────
-_abort_flags: dict[str, bool] = {}
-
 _DEFAULT_MODEL    = "anthropic/claude-sonnet-4-6"
 _MAX_ITER         = 30
 _TOKEN_BUDGET     = 200_000
 _WRAP_UP_ITER     = 8
 _TOOL_MAX_CALLS   = 3
+
+
+async def _invoke_interaction_chat(request, user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"agent_interaction_chat_{uuid.uuid4().hex}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="agent.interaction.chat.change.apply", payload=payload,
+        current_user=user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"invalid_input": 400, "permission_denied": 403, "resource_not_found": 404}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data.get("data", result.data)
 _TOOL_RESULT_MAX  = 12_000
 
 _CHJ_GATEWAY_HOST     = "api-hub.inner.chj.cloud"
@@ -304,7 +322,7 @@ def _chat_stream_gen(
     for _iter in range(_MAX_ITER):
         _iter_count = _iter + 1
         # 中断检查
-        if _abort_flags.pop(session_gid, False):
+        if consume_abort(session_gid):
             yield f'data: {json.dumps({"type":"done","session_id":session_gid,"total_tokens":_total_tokens,"model":model,"iter_count":_iter_count})}\n\n'
             return
 
@@ -538,7 +556,16 @@ def _require_legacy_session_owner(session_gid: str | None, user_gid: str) -> Non
 # ── FastAPI 路由 ──────────────────────────────────────────────────────────────
 
 @router.post("/chat/stream")
-def chat_stream(
+async def chat_stream(
+    body: dict, request: Request,
+    _user: dict = Depends(get_current_user),
+    x_ai00_token: str = Header(alias="X-AI00-Token"),
+    principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway),
+):
+    return await _invoke_interaction_chat(request, _user, principal, gateway, {"operation": "chat_stream", "body": body, "ai00_token": x_ai00_token})
+
+
+def _legacy_chat_stream(
     body: dict,
     _user: dict = Depends(get_current_user),
     x_ai00_token: str = Header(alias="X-AI00-Token"),
@@ -638,7 +665,16 @@ def _chat_sync_tolerant(body: dict, user: dict) -> dict:
 
 
 @router.post("/chat")
-def chat_sync(
+async def chat_sync(
+    body: dict, request: Request,
+    _user: dict = Depends(get_current_user),
+    x_ai00_token: str = Header(alias="X-AI00-Token"),
+    principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway),
+):
+    return await _invoke_interaction_chat(request, _user, principal, gateway, {"operation": "chat_sync", "body": body, "ai00_token": x_ai00_token})
+
+
+def _legacy_chat_sync(
     body: dict,
     _user: dict = Depends(get_current_user),
     x_ai00_token: str = Header(alias="X-AI00-Token"),
@@ -706,7 +742,15 @@ def chat_sync(
 
 
 @router.post("/confirm")
-def confirm_tool(
+async def confirm_tool(
+    body: dict, request: Request,
+    _user: dict = Depends(get_current_user),
+    principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway),
+):
+    return await _invoke_interaction_chat(request, _user, principal, gateway, {"operation": "confirm", "body": body})
+
+
+def _legacy_confirm_tool(
     body: dict,
     _user: dict = Depends(get_current_user),
 ):
@@ -775,7 +819,15 @@ def confirm_tool(
 
 
 @router.post("/confirm/sync")
-def confirm_tool_sync(
+async def confirm_tool_sync(
+    body: dict, request: Request,
+    _user: dict = Depends(get_current_user),
+    principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway),
+):
+    return await _invoke_interaction_chat(request, _user, principal, gateway, {"operation": "confirm_sync", "body": body})
+
+
+def _legacy_confirm_tool_sync(
     body: dict,
     _user: dict = Depends(get_current_user),
 ):
@@ -861,7 +913,7 @@ def confirm_tool_sync(
 
 
 @router.post("/abort")
-def abort_stream(
+async def abort_stream(
     body: dict,
     _user: dict = Depends(get_current_user),
     x_ai00_token: str = Header(alias="X-AI00-Token"),
@@ -869,126 +921,88 @@ def abort_stream(
     if _pi_proxy.enabled():
         return {"ok": True}
     session_gid = body.get("session_gid") or body.get("session_id", "")
-    _require_legacy_session_owner(session_gid, _user.get("gid", ""))
     if session_gid:
-        _abort_flags[session_gid] = True
+        return await invoke_agent_capability("agent.interaction.cancel", {"session_gid": session_gid}, _user)
     return {"ok": True}
 
 
 # ── 会话管理 ──────────────────────────────────────────────────────────────────
 
 @router.get("/sessions")
-def list_sessions(
+async def list_sessions(
     _user: dict = Depends(get_current_user),
     x_ai00_token: str = Header(alias="X-AI00-Token"),
 ):
-    if _pi_proxy.enabled():
-        return _pi_call(_pi_proxy.list_sessions, x_ai00_token)
-    user_gid = _user.get("gid", "")
-    sessions = _store.list_sessions(user_gid=user_gid)
-    return {"sessions": [s for s in sessions if "_sub_" not in s.get("gid", "")]}
+    data = await invoke_agent_capability("agent.session.read", {"operation": "list"}, _user)
+    payload = data.get("data", data) if isinstance(data, dict) else {}
+    return {"sessions": [s for s in payload.get("sessions", []) if "_sub_" not in s.get("gid", "")]}
 
 
 @router.delete("/sessions/{gid}")
-def delete_session(
+async def delete_session(
     gid: str,
     _user: dict = Depends(get_current_user),
     x_ai00_token: str = Header(alias="X-AI00-Token"),
 ):
-    if _pi_proxy.enabled():
-        return _pi_call(_pi_proxy.delete_session, x_ai00_token, gid)
-    _require_legacy_session_owner(gid, _user.get("gid", ""))
-    _store.delete_session(gid)
-    return {"success": True}
+    data = await invoke_agent_capability(
+        "agent.session.change.apply", {"operation": "delete", "session_gid": gid}, _user
+    )
+    return data.get("data", data) if isinstance(data, dict) else data
 
 
 @router.get("/sessions/{gid}")
-def get_session(
+async def get_session(
     gid: str,
     _user: dict = Depends(get_current_user),
     x_ai00_token: str = Header(alias="X-AI00-Token"),
 ):
     """返回会话的所有轮次（前端恢复历史对话用）。"""
-    if _pi_proxy.enabled():
-        return _pi_call(_pi_proxy.get_session, x_ai00_token, gid)
-    _require_legacy_session_owner(gid, _user.get("gid", ""))
-    turns = _store.get_turns(gid)
-    return {"turns": turns}
+    data = await invoke_agent_capability(
+        "agent.session.read", {"operation": "get", "session_gid": gid}, _user
+    )
+    return data.get("data", data) if isinstance(data, dict) else data
 
 
 @router.post("/sessions/new")
-def new_session(
+async def new_session(
     body: dict = {},
     _user: dict = Depends(get_current_user),
     x_ai00_token: str = Header(alias="X-AI00-Token"),
 ):
-    if _pi_proxy.enabled():
-        return _pi_call(_pi_proxy.new_session, x_ai00_token)
-    user_gid = _user.get("gid", "")
-    gid = _store.create_session(user_gid=user_gid)
-    return {"session_gid": gid}
+    data = await invoke_agent_capability("agent.session.change.apply", {"operation": "create"}, _user)
+    return data.get("data", data) if isinstance(data, dict) else data
 
 
 # ── 工具列表 ──────────────────────────────────────────────────────────────────
 
 @router.get("/tools")
-def list_tools(
+async def list_tools(
     _user: dict = Depends(get_current_user),
     x_ai00_token: str = Header(alias="X-AI00-Token"),
 ):
     if _pi_proxy.enabled():
         return _pi_call(_pi_proxy.list_tools, x_ai00_token)
-    def _fmt(tools, category, need_confirm):
-        return [
-            {
-                "name":         t["name"],
-                "description":  t["description"],
-                "category":     category,
-                "need_confirm": need_confirm,
-                "params":       list(t["input_schema"].get("properties", {}).keys()),
-            }
-            for t in tools
-        ]
-    return {
-        "read":             _fmt(_READ_TOOLS,             "read",             False),
-        "write_confirm":    _fmt(_WRITE_TOOLS_CONFIRM,    "write_confirm",    True),
-        "write_no_confirm": _fmt(_WRITE_TOOLS_NO_CONFIRM, "write_no_confirm", False),
-        "system":           _fmt(_SYSTEM_TOOLS,           "system",           False),
-        "total":            len(_READ_TOOLS) + len(_WRITE_TOOLS_CONFIRM) + len(_WRITE_TOOLS_NO_CONFIRM) + len(_SYSTEM_TOOLS),
-    }
+    return await invoke_agent_capability("agent.tool_catalog.read", {"operation": "list"}, _user)
 
 
 # ── AI 配置 ───────────────────────────────────────────────────────────────────
 
 @router.get("/admin-config")
-def get_admin_config(
+async def get_admin_config(
     _user: dict = Depends(get_current_user),
 ):
-    """全局 AI 配置：所有登录用户可读（超管可写）。"""
-    if _pi_proxy.enabled():
-        return {"source": "pi_runtime", "model": "由 Agent Runtime 管理", "has_key": True, "key_preview": "", "is_admin": (_user.get("org_role") or _user.get("system_role", "")) == "super_admin"}
-    cfg = _get_ai_config()
-    is_admin = (_user.get("org_role") or _user.get("system_role", "")) == "super_admin"
-    result: dict = {
-        "source":      cfg.get("source", "none"),
-        "model":       cfg.get("model", ""),
-        "has_key":     bool(cfg.get("api_key")),
-        "key_preview": _mask_key(cfg["api_key"]) if cfg.get("api_key") else "",
-        "is_admin":    is_admin,
-    }
-    if is_admin:
-        result["api_base"] = cfg.get("api_base", "")
-    return result
+    """全局 AI 配置：由 Agent Runtime Capability 提供只读元数据。"""
+    return await invoke_agent_capability("agent.runtime.config.read", {}, _user)
 
 
-@router.post("/admin-config")
+@router.post("/admin-config", status_code=410)
 def save_admin_config(
     body: dict,
     _user: dict = Depends(require_role("super_admin")),
 ):
     raise HTTPException(
-        status_code=409,
-        detail="模型密钥由 Agent Runtime 部署 Secret 管理，禁止写入业务数据库",
+        status_code=410,
+        detail="模型密钥由 Agent Runtime 部署 Secret 管理；旧配置写入入口已退役",
     )
 
 @router.post("/test-connection")
@@ -1093,3 +1107,10 @@ def _test_connection_raw(cfg: dict) -> dict:
         return {"success": False, "error": f"HTTP {r.status_code}: {msg or text[:200]}"}
     except Exception as e:
         return {"success": False, "error": f"测试连接失败: {str(e)[:200]}"}
+
+
+# Preserve direct Python callers while HTTP requests enter through Gateway.
+chat_stream_legacy = chat_stream = _legacy_chat_stream
+chat_sync_legacy = chat_sync = _legacy_chat_sync
+confirm_tool_legacy = confirm_tool = _legacy_confirm_tool
+confirm_tool_sync_legacy = confirm_tool_sync = _legacy_confirm_tool_sync

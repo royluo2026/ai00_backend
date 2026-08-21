@@ -8,7 +8,7 @@ Read PBOM parts explicitly linked to a BOP and their usage locations.
 - 不适用：The caller is searching PBOM candidate parts.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_118d91d38b08fcecd96ddea0005a02b5`
+- Catalog Release：`rel_3010694218f96365eda536567f35d198`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -87,7 +87,7 @@ Read PBOM parts explicitly linked to a BOP and their usage locations.
 ```json
 {
   "capability_id": "craft.bop.linked_parts.get",
-  "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
+  "catalog_release": "rel_3010694218f96365eda536567f35d198",
   "major_version": 1,
   "payload": {
     "version_gid": "example"
@@ -104,7 +104,103 @@ Read PBOM parts explicitly linked to a BOP and their usage locations.
   "additionalProperties": false,
   "properties": {
     "items": {
-      "description": "Provider-validated transport value."
+      "items": {
+        "description": "Provider-validated linked part."
+      },
+      "maxItems": 500,
+      "type": "array"
+    },
+    "legacy_items": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "created_at": {
+            "description": "Provider-validated transport value."
+          },
+          "entry_gid": {
+            "description": "Provider-validated transport value."
+          },
+          "gid": {
+            "description": "Provider-validated transport value."
+          },
+          "link_gid": {
+            "description": "Provider-validated transport value."
+          },
+          "material": {
+            "description": "Provider-validated transport value."
+          },
+          "meta": {
+            "description": "Provider-validated transport value."
+          },
+          "name": {
+            "description": "Provider-validated transport value."
+          },
+          "parent_gid": {
+            "description": "Provider-validated transport value."
+          },
+          "part_no": {
+            "description": "Provider-validated transport value."
+          },
+          "quantity": {
+            "description": "Provider-validated transport value."
+          },
+          "snapshot_gid": {
+            "description": "Provider-validated transport value."
+          },
+          "unit": {
+            "description": "Provider-validated transport value."
+          }
+        },
+        "type": "object"
+      },
+      "maxItems": 500,
+      "type": "array"
+    },
+    "legacy_pbom_items": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bom_row_id": {
+            "description": "Provider-validated transport value."
+          },
+          "created_at": {
+            "description": "Provider-validated transport value."
+          },
+          "gid": {
+            "description": "Provider-validated transport value."
+          },
+          "node_type": {
+            "description": "Provider-validated transport value."
+          },
+          "parent_part_gid": {
+            "description": "Provider-validated transport value."
+          },
+          "part_number": {
+            "description": "Provider-validated transport value."
+          },
+          "quantity": {
+            "description": "Provider-validated transport value."
+          },
+          "seq_no": {
+            "description": "Provider-validated transport value."
+          },
+          "title": {
+            "description": "Provider-validated transport value."
+          },
+          "unit": {
+            "description": "Provider-validated transport value."
+          },
+          "updated_at": {
+            "description": "Provider-validated transport value."
+          },
+          "vpps": {
+            "description": "Provider-validated transport value."
+          }
+        },
+        "type": "object"
+      },
+      "maxItems": 500,
+      "type": "array"
     },
     "revision": {
       "description": "Provider-validated transport value."

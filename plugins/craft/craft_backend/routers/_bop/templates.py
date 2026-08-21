@@ -6,16 +6,35 @@ backend/routers/_bop/templates.py
 import json
 from typing import Dict
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
 from ...data.connection import get_conn
 from backend.platform_sdk.ids import next_gid
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.auth import get_authenticated_principal
+from backend.platform_sdk.factory import build_web_compatibility_envelope, invoke_compatibility
 
 from ._constants import _WRITE, _VER_COLS, _VER_KEYS, _AI00_LEVEL, _SHARED_ENTITY_LINK_TYPES, _SKIP_LINK_TYPES
 from ._helpers import _not_found, _sync_child_vpps, _deep_copy_entity
 
 router = APIRouter(prefix="/api/bop", tags=["bop"])
+
+
+async def _invoke_template_change(request, current_user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"craft_bop_template_change_{next_gid()}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.template.change.apply", payload=payload,
+        current_user=current_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        error = result.error
+        code = error.code if error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "invalid_input": 400, "invalid_state": 409}.get(code, 422), detail=error.model_dump(mode="json") if error else None)
+    return result.data
 
 
 class SaveAsTemplateBody(BaseModel):
@@ -25,7 +44,11 @@ class SaveAsTemplateBody(BaseModel):
 
 
 @router.post("/versions/{src_gid}/save-as-template", status_code=201)
-def save_as_template(src_gid: str, body: SaveAsTemplateBody, _u=Depends(_WRITE)):
+async def _save_as_template_endpoint(src_gid: str, body: SaveAsTemplateBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_template_change(request, _u, principal, gateway, {"operation": "save_as_template", "source_version_gid": src_gid, **body.model_dump(exclude_unset=True)})
+
+
+def _legacy_save_as_template(src_gid: str, body: SaveAsTemplateBody, _u=Depends(_WRITE)):
     user_gid = _u.get('gid') if isinstance(_u, dict) else None
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -199,7 +222,11 @@ def save_as_template(src_gid: str, body: SaveAsTemplateBody, _u=Depends(_WRITE))
 
 
 @router.post("/versions/{template_gid}/update-from/{src_gid}", status_code=200)
-def update_template_from(template_gid: str, src_gid: str, _u=Depends(_WRITE)):
+async def _update_template_from_endpoint(template_gid: str, src_gid: str, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_template_change(request, _u, principal, gateway, {"operation": "update_from", "template_gid": template_gid, "source_version_gid": src_gid})
+
+
+def _legacy_update_template_from(template_gid: str, src_gid: str, _u=Depends(_WRITE)):
     user_gid = _u.get('gid') if isinstance(_u, dict) else None
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -301,3 +328,8 @@ def update_template_from(template_gid: str, src_gid: str, _u=Depends(_WRITE)):
             updated = dict(cur.fetchone())
             conn.commit()
             return {"data": updated, "entries_count": len(gid_map_uf)}
+
+
+# Keep direct Python callers compatible while FastAPI uses the governed endpoints above.
+save_as_template = _legacy_save_as_template
+update_template_from = _legacy_update_template_from

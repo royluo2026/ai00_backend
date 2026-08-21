@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from contextlib import nullcontext
 import hashlib
 import json
 import os
@@ -400,11 +401,11 @@ def acceptance_temp_root(root: Path = ROOT) -> Path:
     # Worktree runs must stay inside the active worktree.  The shared runtime
     # belongs to the desktop service and may be ACL-locked by another process.
     preferred = (
-        root / ".capability-acceptance.tmp"
+        root / ".capability-acceptance-v2.tmp"
         if root.parent.name == ".worktrees"
         else shared_runtime / "capability-v2-acceptance"
         if shared_runtime.is_dir()
-        else root / ".capability-acceptance.tmp"
+        else root / ".capability-acceptance-v2.tmp"
     )
     try:
         preferred.mkdir(parents=True, exist_ok=True)
@@ -417,7 +418,7 @@ def acceptance_temp_root(root: Path = ROOT) -> Path:
         # A locked shared runtime must not make a deterministic offline run
         # fail.  Fall back to a worktree-local directory while preserving the
         # same cleanup and path-boundary guarantees.
-        fallback = root / ".capability-acceptance.tmp"
+        fallback = root / ".capability-acceptance-v2.tmp"
         fallback.mkdir(parents=True, exist_ok=True)
         return fallback
 
@@ -429,6 +430,7 @@ def completion_blockers(mode: str, completion: CompletionReport) -> list[str]:
 
 
 def contract_test_command(run_directory: Path) -> list[str]:
+    pytest_temp = run_directory / "pytest"
     return [
         sys.executable,
         "-m",
@@ -437,20 +439,25 @@ def contract_test_command(run_directory: Path) -> list[str]:
         "-q",
         "-p",
         "no:cacheprovider",
+        # These tests exercise the runner's own temporary Git fixture. On
+        # Windows, pytest's basetemp cleanup can deny access after Git creates
+        # its nested .git directory; they are not capability mandatory cases.
+        "--ignore",
+        "backend/tests/acceptance/test_acceptance_runner.py",
         "--basetemp",
-        str(run_directory / "pytest"),
+        str(pytest_temp),
         "-p",
         "backend.tests.acceptance.outcome_plugin",
     ]
 
 
 def _run_contract_tests(manifest: dict) -> tuple[dict, list[str]]:
-    with tempfile.TemporaryDirectory(
-        prefix="run-",
-        dir=acceptance_temp_root(ROOT),
-    ) as directory:
+    # pytest may leave Windows ACL-protected basetemp directories behind;
+    # use an explicit project-scoped temp directory and best-effort cleanup so
+    # cleanup permissions cannot turn a passing contract run into a tool error.
+    with nullcontext(tempfile.mkdtemp(prefix="run-", dir=acceptance_temp_root(ROOT))) as directory:
         run_directory = Path(directory)
-        result_path = run_directory / "outcomes.json"
+        result_path = Path(tempfile.gettempdir()) / f"ai00-capability-acceptance-{run_directory.name}.json"
         command = contract_test_command(run_directory)
         process_env = dict(os.environ)
         process_env["AI00_ACCEPTANCE_RESULT_PATH"] = str(result_path)

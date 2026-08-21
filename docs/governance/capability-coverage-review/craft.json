@@ -3,9 +3,9 @@
   "domain": "Craft",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:64602206106986110f50861a395f117be85bf01ec0e8661db5e90bf2d8eccbd8",
-    "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
-    "catalog_sha256": "sha256:61bcf07ae6d1bd42b65de1d7a80b55ed6a21d67f782d81920e922fb46095076a"
+    "registry_sha256": "sha256:f8d765156a25c374d7e807820ab8603bacafc1687bdbc5dd37e24c1c597d035e",
+    "catalog_release": "rel_3010694218f96365eda536567f35d198",
+    "catalog_sha256": "sha256:1fa8c7b227193cfa27eb9c94d40ddb882899132ee6132351a60b54312ef1f280"
   },
   "unreviewed_functions": {},
   "excluded_functions": {
@@ -17,19 +17,6 @@
       ],
       "evidence": "The stable surface rest:POST:/api/bop/pics/upload is implemented at plugins/craft/craft_backend/routers/_bop/entries.py.",
       "reason": "rest:POST:/api/bop/pics/upload is a binary upload or legacy identifier-resolution adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
-      "classification": "transport_adapter",
-      "owner": "Craft",
-      "reviewer": "capability-v2-architecture-review",
-      "reviewed_at": "2026-08-11"
-    },
-    "rest:POST:/api/bop/resolve-gids": {
-      "resolution": "excluded",
-      "target_capability": null,
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/_bop/entries.py"
-      ],
-      "evidence": "The stable surface rest:POST:/api/bop/resolve-gids is implemented at plugins/craft/craft_backend/routers/_bop/entries.py.",
-      "reason": "rest:POST:/api/bop/resolve-gids is a binary upload or legacy identifier-resolution adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "classification": "transport_adapter",
       "owner": "Craft",
       "reviewer": "capability-v2-architecture-review",
@@ -89,6 +76,65 @@
     }
   },
   "capabilities": {
+    "craft.bop.alt_hierarchy.read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.alt_hierarchy.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_alt_hierarchy.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bounded BOP alternative hierarchy provider is registered with an explicit read contract.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/versions/{version_gid}/alt-hier": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/entries.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The BOP alternative hierarchy route is a Gateway adapter for craft.bop.alt_hierarchy.read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "BOP alternative hierarchy reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.alt_hierarchy.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "BOP alternative hierarchy reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.alt_hierarchy.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.alt_hierarchy.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.alt_hierarchy.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.alt_hierarchy.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.alt_hierarchy.read"
+        }
+      }
+    },
     "craft.bop.draft.change.apply": {
       "kind": "existing",
       "function_dispositions": {
@@ -205,16 +251,6 @@
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
         },
-        "rest:PATCH:/api/bop/pbom-diff-queue/{item_gid}": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/lifecycle.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:PATCH:/api/bop/pbom-diff-queue/{item_gid} implements the reviewed craft.bop.draft.change.apply business outcome from plugins/craft/craft_backend/routers/_bop/lifecycle.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
         "rest:PATCH:/api/bop/posts/{gid}": {
           "resolution": "existing_capability",
           "source_paths": [
@@ -262,26 +298,6 @@
           ],
           "owner": "Craft",
           "evidence": "The stable surface rest:PATCH:/api/bop/versions/{gid}/lifecycle/init-state implements the reviewed craft.bop.draft.change.apply business outcome from plugins/craft/craft_backend/routers/_bop/lifecycle.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:PATCH:/api/bop/versions/{gid}/pbom-match": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/lifecycle.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:PATCH:/api/bop/versions/{gid}/pbom-match implements the reviewed craft.bop.draft.change.apply business outcome from plugins/craft/craft_backend/routers/_bop/lifecycle.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:PATCH:/api/bop/versions/{gid}/vehicle-ops-stats": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/lifecycle.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:PATCH:/api/bop/versions/{gid}/vehicle-ops-stats implements the reviewed craft.bop.draft.change.apply business outcome from plugins/craft/craft_backend/routers/_bop/lifecycle.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
         },
@@ -495,16 +511,6 @@
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
         },
-        "rest:POST:/api/bop/versions/{gid}/pbom-diff-queue": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/lifecycle.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:POST:/api/bop/versions/{gid}/pbom-diff-queue implements the reviewed craft.bop.draft.change.apply business outcome from plugins/craft/craft_backend/routers/_bop/lifecycle.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
         "rest:POST:/api/bop/versions/{gid}/promote": {
           "resolution": "existing_capability",
           "source_paths": [
@@ -512,16 +518,6 @@
           ],
           "owner": "Craft",
           "evidence": "The stable surface rest:POST:/api/bop/versions/{gid}/promote implements the reviewed craft.bop.draft.change.apply business outcome from plugins/craft/craft_backend/routers/_bop/versions.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:POST:/api/bop/versions/{gid}/publish": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/versions.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:POST:/api/bop/versions/{gid}/publish implements the reviewed craft.bop.draft.change.apply business outcome from plugins/craft/craft_backend/routers/_bop/versions.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
         },
@@ -736,36 +732,6 @@
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
         },
-        "rest:GET:/api/bop/versions/{gid}/pbom-diff-queue": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/lifecycle.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/versions/{gid}/pbom-diff-queue implements the reviewed craft.bop.draft.change.preview business outcome from plugins/craft/craft_backend/routers/_bop/lifecycle.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bop/versions/{gid}/pbom-link-stats": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/lifecycle.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/versions/{gid}/pbom-link-stats implements the reviewed craft.bop.draft.change.preview business outcome from plugins/craft/craft_backend/routers/_bop/lifecycle.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bop/versions/{version_gid}/auto-link-preview": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/entries.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/versions/{version_gid}/auto-link-preview implements the reviewed craft.bop.draft.change.preview business outcome from plugins/craft/craft_backend/routers/_bop/entries.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
         "rest:GET:/api/vpps-operations": {
           "resolution": "existing_capability",
           "source_paths": [
@@ -841,6 +807,104 @@
         }
       }
     },
+    "craft.bop.entry.bulk.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.entry.bulk.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_entry_bulk_change.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.bop.entry.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.entry.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_entry_change.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
     "craft.bop.entry.detail.get": {
       "kind": "existing",
       "function_dispositions": {
@@ -851,6 +915,253 @@
             "plugins/craft/craft_backend/capabilities/bop_navigation.py",
             "plugins/craft/craft_backend/capabilities/contracts.py",
             "plugins/craft/craft_backend/capabilities/provider.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.bop.entry.legacy_read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.entry.legacy_read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_entry_legacy_read.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "Bounded legacy BOP entry read projections are registered with an explicit read contract.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/versions/{version_gid}/auto-link-preview": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/entries.py"
+          ],
+          "owner": "Craft",
+          "evidence": "Auto-link preview is a Gateway adapter for craft.bop.entry.legacy_read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/entry-links": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/entries.py"
+          ],
+          "owner": "Craft",
+          "evidence": "Entry-link reads are a Gateway adapter for craft.bop.entry.legacy_read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/versions/{version_gid}/link-summary": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/entries.py"
+          ],
+          "owner": "Craft",
+          "evidence": "Link-summary reads are a Gateway adapter for craft.bop.entry.legacy_read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/entity-detail": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/entries.py"
+          ],
+          "owner": "Craft",
+          "evidence": "Entity-detail reads are a Gateway adapter for craft.bop.entry.legacy_read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:POST:/api/bop/resolve-gids": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/entries.py"
+          ],
+          "owner": "Craft",
+          "evidence": "GID resolution is a Gateway adapter for craft.bop.entry.legacy_read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/pbom/search": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/entries.py"
+          ],
+          "owner": "Craft",
+          "evidence": "PBOM search is a Gateway adapter for craft.bop.entry.legacy_read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/versions/{version_gid}/line-operations": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/entries.py"
+          ],
+          "owner": "Craft",
+          "evidence": "Line-operation reads are a Gateway adapter for craft.bop.entry.legacy_read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/versions/{version_gid}/history": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/entries.py"
+          ],
+          "owner": "Craft",
+          "evidence": "Version history reads are a Gateway adapter for craft.bop.entry.legacy_read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/entries/{gid}/history": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/entries.py"
+          ],
+          "owner": "Craft",
+          "evidence": "Entry history reads are a Gateway adapter for craft.bop.entry.legacy_read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "Legacy BOP entry reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.entry.legacy_read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Legacy BOP entry reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.entry.legacy_read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.entry.legacy_read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.entry.legacy_read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.entry.legacy_read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.entry.legacy_read"
+        }
+      }
+    },
+    "craft.bop.entry.search": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.entry.search": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_entry_search.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bounded BOP entry search provider is registered with an explicit read contract.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/entries/search": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/entries.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The BOP entry search route is a Gateway adapter for craft.bop.entry.search.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "BOP entry search uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.entry.search"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "BOP entry search uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.entry.search"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.entry.search"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.entry.search"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.entry.search"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.entry.search"
+        }
+      }
+    },
+    "craft.bop.entry_link.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.entry_link.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_entry_link_change.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
           ],
           "owner": "Craft",
           "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
@@ -918,26 +1229,6 @@
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         },
-        "rest:GET:/api/bop/entity-detail": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/entries.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/entity-detail implements the reviewed craft.bop.execution_structure.get business outcome from plugins/craft/craft_backend/routers/_bop/entries.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bop/entries/search": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/entries.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/entries/search implements the reviewed craft.bop.execution_structure.get business outcome from plugins/craft/craft_backend/routers/_bop/entries.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
         "rest:GET:/api/bop/entries/{gid}": {
           "resolution": "existing_capability",
           "source_paths": [
@@ -945,26 +1236,6 @@
           ],
           "owner": "Craft",
           "evidence": "The stable surface rest:GET:/api/bop/entries/{gid} implements the reviewed craft.bop.execution_structure.get business outcome from plugins/craft/craft_backend/routers/_bop/entries.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bop/entries/{gid}/history": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/entries.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/entries/{gid}/history implements the reviewed craft.bop.execution_structure.get business outcome from plugins/craft/craft_backend/routers/_bop/entries.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bop/entry-links": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/entries.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/entry-links implements the reviewed craft.bop.execution_structure.get business outcome from plugins/craft/craft_backend/routers/_bop/entries.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
         },
@@ -978,86 +1249,6 @@
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
         },
-        "rest:GET:/api/bop/versions/{gid}/layout-config": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/versions.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/versions/{gid}/layout-config implements the reviewed craft.bop.execution_structure.get business outcome from plugins/craft/craft_backend/routers/_bop/versions.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bop/versions/{gid}/lifecycle": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/lifecycle.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/versions/{gid}/lifecycle implements the reviewed craft.bop.execution_structure.get business outcome from plugins/craft/craft_backend/routers/_bop/lifecycle.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bop/versions/{gid}/lifecycle/history": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/lifecycle.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/versions/{gid}/lifecycle/history implements the reviewed craft.bop.execution_structure.get business outcome from plugins/craft/craft_backend/routers/_bop/lifecycle.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bop/versions/{gid}/lifecycle/lines/{line_gid}/checkpoints": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/lifecycle.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/versions/{gid}/lifecycle/lines/{line_gid}/checkpoints implements the reviewed craft.bop.execution_structure.get business outcome from plugins/craft/craft_backend/routers/_bop/lifecycle.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bop/versions/{gid}/lifecycle/lines/{line_gid}/history": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/lifecycle.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/versions/{gid}/lifecycle/lines/{line_gid}/history implements the reviewed craft.bop.execution_structure.get business outcome from plugins/craft/craft_backend/routers/_bop/lifecycle.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bop/versions/{gid}/lifecycle/lines/{line_gid}/operation-log": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/lifecycle.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/versions/{gid}/lifecycle/lines/{line_gid}/operation-log implements the reviewed craft.bop.execution_structure.get business outcome from plugins/craft/craft_backend/routers/_bop/lifecycle.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bop/versions/{version_gid}/alt-hier": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/entries.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/versions/{version_gid}/alt-hier implements the reviewed craft.bop.execution_structure.get business outcome from plugins/craft/craft_backend/routers/_bop/entries.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bop/versions/{version_gid}/bop-tree": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/versions.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/versions/{version_gid}/bop-tree implements the reviewed craft.bop.execution_structure.get business outcome from plugins/craft/craft_backend/routers/_bop/versions.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
         "rest:GET:/api/bop/versions/{version_gid}/entries": {
           "resolution": "existing_capability",
           "source_paths": [
@@ -1066,56 +1257,6 @@
           "owner": "Craft",
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bop/versions/{version_gid}/history": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/entries.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/versions/{version_gid}/history implements the reviewed craft.bop.execution_structure.get business outcome from plugins/craft/craft_backend/routers/_bop/entries.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bop/versions/{version_gid}/line-operations": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/entries.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/versions/{version_gid}/line-operations implements the reviewed craft.bop.execution_structure.get business outcome from plugins/craft/craft_backend/routers/_bop/entries.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bop/versions/{version_gid}/link-summary": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/entries.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/versions/{version_gid}/link-summary implements the reviewed craft.bop.execution_structure.get business outcome from plugins/craft/craft_backend/routers/_bop/entries.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bop/versions/{version_gid}/staging": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/staging.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/versions/{version_gid}/staging implements the reviewed craft.bop.execution_structure.get business outcome from plugins/craft/craft_backend/routers/_bop/staging.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bop/versions/{version_gid}/station-part-map": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/versions.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/versions/{version_gid}/station-part-map implements the reviewed craft.bop.execution_structure.get business outcome from plugins/craft/craft_backend/routers/_bop/versions.py.",
-          "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -1204,6 +1345,301 @@
         }
       }
     },
+    "craft.bop.fork.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.fork.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_fork_change.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.bop.fork_preset.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.fork_preset.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_fork_preset_change.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "Fork preset CRUD is implemented by a bounded Craft Provider over the existing fork-preset table; it does not execute a version fork or mutate BOP entries.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:POST:/api/bop/fork-presets": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/fork.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The fork preset create route is a Gateway adapter for craft.bop.fork_preset.change.apply.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:PATCH:/api/bop/fork-presets/{gid}": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/fork.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The fork preset update route is a Gateway adapter for craft.bop.fork_preset.change.apply.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:DELETE:/api/bop/fork-presets/{gid}": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/fork.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The fork preset delete route is a Gateway adapter for craft.bop.fork_preset.change.apply.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "Fork preset CRUD uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.fork_preset.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Fork preset CRUD uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.fork_preset.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.fork_preset.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.fork_preset.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.fork_preset.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.fork_preset.change.apply"
+        }
+      }
+    },
+    "craft.bop.fork_preset.read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.fork_preset.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_fork_preset_read.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "Fork preset list/get are bounded read-only Provider projections; mutation and fork execution remain separate.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/fork-presets": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/fork.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The fork preset list route is a Gateway adapter for craft.bop.fork_preset.read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/fork-presets/{gid}": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/fork.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The fork preset detail route is a Gateway adapter for craft.bop.fork_preset.read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "Fork preset reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.fork_preset.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Fork preset reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.fork_preset.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.fork_preset.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.fork_preset.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.fork_preset.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.fork_preset.read"
+        }
+      }
+    },
+    "craft.bop.gbop.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.gbop.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_gbop_change.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.bop.gbop.legacy_read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.gbop.legacy_read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_gbop_legacy_read.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "Legacy GBOP matching reads are registered with an explicit read contract.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "Legacy GBOP reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.gbop.legacy_read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Legacy GBOP reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.gbop.legacy_read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.gbop.legacy_read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.gbop.legacy_read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.gbop.legacy_read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.gbop.legacy_read"
+        }
+      }
+    },
     "craft.bop.import.preview": {
       "kind": "existing",
       "function_dispositions": {
@@ -1264,6 +1700,596 @@
         }
       }
     },
+    "craft.bop.lifecycle.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.lifecycle.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_lifecycle_change.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "BOP lifecycle metadata and PBOM diff-queue mutations use one transactional Provider with explicit bounded operations; phase transitions and line-history operations remain separate.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:PATCH:/api/bop/versions/{gid}/pbom-match": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/lifecycle.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The PBOM match metadata route is a Gateway adapter for craft.bop.lifecycle.change.apply.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:PATCH:/api/bop/versions/{gid}/vehicle-ops-stats": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/lifecycle.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The vehicle-operations preparation stats route is a Gateway adapter for craft.bop.lifecycle.change.apply.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:POST:/api/bop/versions/{gid}/pbom-diff-queue": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/lifecycle.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The PBOM diff-queue generation route is a Gateway adapter for craft.bop.lifecycle.change.apply.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:PATCH:/api/bop/pbom-diff-queue/{item_gid}": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/lifecycle.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The PBOM diff-queue item update route is a Gateway adapter for craft.bop.lifecycle.change.apply.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "BOP lifecycle changes use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.lifecycle.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "BOP lifecycle changes use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.lifecycle.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.lifecycle.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.lifecycle.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.lifecycle.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.lifecycle.change.apply"
+        }
+      }
+    },
+    "craft.bop.lifecycle.checkpoint.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.lifecycle.checkpoint.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_checkpoint_change.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.bop.lifecycle.checkpoint.rollback.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.lifecycle.checkpoint.rollback.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_checkpoint_rollback.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.bop.lifecycle.history.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.lifecycle.history.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_lifecycle_history_change.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.bop.lifecycle.read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.lifecycle.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_lifecycle_read.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bounded BOP lifecycle history/checkpoint read provider is registered with an explicit contract.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/versions/{gid}/lifecycle/history": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/lifecycle.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The lifecycle history route is a Gateway adapter for craft.bop.lifecycle.read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/versions/{gid}/lifecycle/lines/{line_gid}/checkpoints": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/lifecycle.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The lifecycle checkpoints route is a Gateway adapter for craft.bop.lifecycle.read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/versions/{gid}/lifecycle/lines/{line_gid}/history": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/lifecycle.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The line lifecycle history route is a Gateway adapter for craft.bop.lifecycle.read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/versions/{gid}/lifecycle/lines/{line_gid}/operation-log": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/lifecycle.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The lifecycle operation log route is a Gateway adapter for craft.bop.lifecycle.read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "BOP lifecycle reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.lifecycle.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "BOP lifecycle reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.lifecycle.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.lifecycle.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.lifecycle.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.lifecycle.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.lifecycle.read"
+        }
+      }
+    },
+    "craft.bop.lifecycle.state.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.lifecycle.state.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_lifecycle_state_change.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.bop.lifecycle.state.read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.lifecycle.state.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_lifecycle_state.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The aggregate lifecycle dashboard projection is registered as a bounded read Capability.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/versions/{gid}/lifecycle": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/lifecycle.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The lifecycle dashboard route is a Gateway adapter for craft.bop.lifecycle.state.read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "Aggregate lifecycle reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.lifecycle.state.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Aggregate lifecycle reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.lifecycle.state.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.lifecycle.state.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.lifecycle.state.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.lifecycle.state.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.lifecycle.state.read"
+        }
+      }
+    },
+    "craft.bop.lifecycle.stats.refresh.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.lifecycle.stats.refresh.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_lifecycle_stats_refresh.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.bop.lifecycle.step.rollback.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.lifecycle.step.rollback.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_lifecycle_step_rollback.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.bop.line_operation_catia.read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.line_operation_catia.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_line_operation_catia.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bounded BOP line-operation CATIA projection is registered with an explicit read contract.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/versions/{version_gid}/line-op-catia-parts": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/entries.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The BOP line-operation CATIA route is a Gateway adapter for craft.bop.line_operation_catia.read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "BOP line-operation CATIA reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.line_operation_catia.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "BOP line-operation CATIA reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.line_operation_catia.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.line_operation_catia.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.line_operation_catia.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.line_operation_catia.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.line_operation_catia.read"
+        }
+      }
+    },
     "craft.bop.linked_parts.get": {
       "kind": "existing",
       "function_dispositions": {
@@ -1287,16 +2313,6 @@
           ],
           "owner": "Craft",
           "evidence": "The stable surface rest:GET:/api/bop/versions/{gid}/pbom-change-point implements the reviewed craft.bop.linked_parts.get business outcome from plugins/craft/craft_backend/routers/_bop/pbom.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bop/versions/{version_gid}/line-op-catia-parts": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/entries.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/versions/{version_gid}/line-op-catia-parts implements the reviewed craft.bop.linked_parts.get business outcome from plugins/craft/craft_backend/routers/_bop/entries.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
         },
@@ -1355,6 +2371,330 @@
         }
       }
     },
+    "craft.bop.pbom.change_point.get": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.pbom.change_point.get": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/pbom_change_point.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The PBOM change-point compatibility route is bound to a bounded Craft Provider Capability.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "PBOM change-point reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.pbom.change_point.get"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "PBOM change-point reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.pbom.change_point.get"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.pbom.change_point.get"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.pbom.change_point.get"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.pbom.change_point.get"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.pbom.change_point.get"
+        }
+      }
+    },
+    "craft.bop.pbom_lifecycle.read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.pbom_lifecycle.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_pbom_lifecycle_read.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bounded PBOM/BOP lifecycle read provider is registered with an explicit contract.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/versions/{gid}/pbom-link-stats": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/lifecycle.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The PBOM link stats route is a Gateway adapter for craft.bop.pbom_lifecycle.read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/versions/{gid}/pbom-diff-queue": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/lifecycle.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The PBOM diff queue read route is a Gateway adapter for craft.bop.pbom_lifecycle.read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "PBOM/BOP lifecycle reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.pbom_lifecycle.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "PBOM/BOP lifecycle reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.pbom_lifecycle.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.pbom_lifecycle.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.pbom_lifecycle.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.pbom_lifecycle.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.pbom_lifecycle.read"
+        }
+      }
+    },
+    "craft.bop.picture.upload": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.picture.upload": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_picture_upload.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.bop.staging.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.staging.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_staging_change.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.bop.staging.lifecycle.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.staging.lifecycle.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_staging_lifecycle_change.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.bop.staging.read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.staging.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_staging_read.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The BOP staging list projection is registered with an explicit read contract.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/versions/{version_gid}/staging": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/staging.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The staging list route is a Gateway adapter for craft.bop.staging.read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "BOP staging reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.staging.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "BOP staging reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.staging.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.staging.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.staging.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.staging.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.staging.read"
+        }
+      }
+    },
     "craft.bop.structure.outline.get": {
       "kind": "existing",
       "function_dispositions": {
@@ -1365,6 +2705,55 @@
             "plugins/craft/craft_backend/capabilities/bop_navigation.py",
             "plugins/craft/craft_backend/capabilities/contracts.py",
             "plugins/craft/craft_backend/capabilities/provider.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.bop.template.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.template.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_template_change.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
           ],
           "owner": "Craft",
           "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
@@ -1519,26 +2908,6 @@
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
-        },
-        "rest:DELETE:/api/bop/version-families/{family_gid}/archive": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/versions.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:DELETE:/api/bop/version-families/{family_gid}/archive implements the reviewed craft.bop.version.archive business outcome from plugins/craft/craft_backend/routers/_bop/versions.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:POST:/api/bop/version-families/{family_gid}/archive": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/versions.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:POST:/api/bop/version-families/{family_gid}/archive implements the reviewed craft.bop.version.archive business outcome from plugins/craft/craft_backend/routers/_bop/versions.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
@@ -1641,56 +3010,6 @@
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         },
-        "rest:DELETE:/api/bop/fork-presets/{gid}": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/fork.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:DELETE:/api/bop/fork-presets/{gid} implements the reviewed craft.bop.version.create business outcome from plugins/craft/craft_backend/routers/_bop/fork.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bop/fork-presets": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/fork.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/fork-presets implements the reviewed craft.bop.version.create business outcome from plugins/craft/craft_backend/routers/_bop/fork.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bop/fork-presets/{gid}": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/fork.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/fork-presets/{gid} implements the reviewed craft.bop.version.create business outcome from plugins/craft/craft_backend/routers/_bop/fork.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:PATCH:/api/bop/fork-presets/{gid}": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/fork.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:PATCH:/api/bop/fork-presets/{gid} implements the reviewed craft.bop.version.create business outcome from plugins/craft/craft_backend/routers/_bop/fork.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:POST:/api/bop/fork-presets": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/fork.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:POST:/api/bop/fork-presets implements the reviewed craft.bop.version.create business outcome from plugins/craft/craft_backend/routers/_bop/fork.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
         "rest:POST:/api/bop/versions": {
           "resolution": "existing_capability",
           "source_paths": [
@@ -1756,6 +3075,55 @@
         }
       }
     },
+    "craft.bop.version.freeze.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.version.freeze.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_version_freeze_change.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
     "craft.bop.version.get": {
       "kind": "existing",
       "function_dispositions": {
@@ -1817,6 +3185,213 @@
         }
       }
     },
+    "craft.bop.version.layout.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.version.layout.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_version_layout_change.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.bop.version.legacy_read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.version.legacy_read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_version_legacy_read.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bounded legacy BOP version projections are registered with an explicit read contract.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/versions/{gid}/layout-config": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/versions.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The BOP layout config route is a Gateway adapter for craft.bop.version.legacy_read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/versions/{version_gid}/bop-tree": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/versions.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The BOP tree route is a Gateway adapter for craft.bop.version.legacy_read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/versions/{version_gid}/station-part-map": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/versions.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The station-part map route is a Gateway adapter for craft.bop.version.legacy_read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "Legacy BOP version reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.version.legacy_read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Legacy BOP version reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.version.legacy_read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.version.legacy_read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.version.legacy_read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.version.legacy_read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.version.legacy_read"
+        }
+      }
+    },
+    "craft.bop.version.lifecycle.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.version.lifecycle.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_version_lifecycle_change.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "BOP publication and version-family archival mutations use one transactional Provider with explicit operations.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:POST:/api/bop/versions/{gid}/publish": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/versions.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The publish route is a Gateway adapter for craft.bop.version.lifecycle.change.apply.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:POST:/api/bop/version-families/{family_gid}/archive": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/versions.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The archive-family route is a Gateway adapter for craft.bop.version.lifecycle.change.apply.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:DELETE:/api/bop/version-families/{family_gid}/archive": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/versions.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The unarchive-family route is a Gateway adapter for craft.bop.version.lifecycle.change.apply.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "BOP version lifecycle changes use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.version.lifecycle.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "BOP version lifecycle changes use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.bop.version.lifecycle.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.version.lifecycle.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.version.lifecycle.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.version.lifecycle.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.bop.version.lifecycle.change.apply"
+        }
+      }
+    },
     "craft.bop.version.list": {
       "kind": "existing",
       "function_dispositions": {
@@ -1839,6 +3414,55 @@
           ],
           "owner": "Craft",
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.bop.version.snapshot.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.bop.version.snapshot.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/bop_version_snapshot_change.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
@@ -1996,6 +3620,9 @@
           "resolution": "existing_capability",
           "source_paths": [
             "backend/capabilities/agreed_catalog.py",
+            "plugins/craft/craft_backend/capabilities/canvas.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/reviewed.py",
             "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
           ],
           "owner": "Craft",
@@ -2085,6 +3712,9 @@
           "resolution": "existing_capability",
           "source_paths": [
             "backend/capabilities/agreed_catalog.py",
+            "plugins/craft/craft_backend/capabilities/canvas.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/reviewed.py",
             "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
           ],
           "owner": "Craft",
@@ -2164,6 +3794,9 @@
           "resolution": "existing_capability",
           "source_paths": [
             "backend/capabilities/agreed_catalog.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/data_exchange.py",
+            "plugins/craft/craft_backend/capabilities/reviewed.py",
             "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
           ],
           "owner": "Craft",
@@ -2203,6 +3836,104 @@
           "enabled": false,
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "craft.data_exchange.export"
+        }
+      }
+    },
+    "craft.data_exchange.lark.read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.data_exchange.lark.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/lark_exchange.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.data_exchange.lark.write": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.data_exchange.lark.write": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/lark_exchange.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
       }
     },
@@ -2303,6 +4034,9 @@
           "resolution": "existing_capability",
           "source_paths": [
             "backend/capabilities/agreed_catalog.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/ebom_change.py",
+            "plugins/craft/craft_backend/capabilities/reviewed.py",
             "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
           ],
           "owner": "Craft",
@@ -2345,19 +4079,68 @@
         }
       }
     },
-    "craft.ebom.read": {
+    "craft.ebom.legacy_read": {
       "kind": "existing",
       "function_dispositions": {
+        "capability:craft.ebom.legacy_read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/ebom_legacy_read.py"
+          ],
+          "owner": "Craft",
+          "evidence": "EBOM snapshot diff is implemented as a bounded, read-only Provider projection with an explicit legacy response contract.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
         "rest:GET:/api/ebom/diff": {
           "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ebom.py"
           ],
           "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/ebom/diff implements the reviewed craft.ebom.read business outcome from plugins/craft/craft_backend/routers/ebom.py.",
+          "evidence": "The EBOM diff route is a Gateway adapter for craft.ebom.legacy_read.",
           "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "EBOM diff uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.ebom.legacy_read"
         },
+        "rest": {
+          "enabled": true,
+          "reason": "EBOM diff uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.ebom.legacy_read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.ebom.legacy_read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.ebom.legacy_read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.ebom.legacy_read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.ebom.legacy_read"
+        }
+      }
+    },
+    "craft.ebom.read": {
+      "kind": "existing",
+      "function_dispositions": {
         "rest:GET:/api/ebom/snapshots": {
           "resolution": "existing_capability",
           "source_paths": [
@@ -2385,16 +4168,6 @@
           ],
           "owner": "Craft",
           "evidence": "The stable surface rest:GET:/api/ebom/snapshots/{gid}/parts implements the reviewed craft.ebom.read business outcome from plugins/craft/craft_backend/routers/ebom.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/ebom/vpps_check": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/ebom.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/ebom/vpps_check implements the reviewed craft.ebom.read business outcome from plugins/craft/craft_backend/routers/ebom.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
         },
@@ -2441,6 +4214,114 @@
           "enabled": false,
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "craft.ebom.read"
+        }
+      }
+    },
+    "craft.ebom.vpps_check.read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.ebom.vpps_check.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/vpps_check.py"
+          ],
+          "owner": "Craft",
+          "evidence": "VPPS validation is an explicit bounded read-only Provider projection implementing the four legacy deterministic checks and concession reporting.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/ebom/vpps_check": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ebom.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The VPPS check route is a Gateway adapter for craft.ebom.vpps_check.read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "VPPS validation uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.ebom.vpps_check.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "VPPS validation uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.ebom.vpps_check.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.ebom.vpps_check.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.ebom.vpps_check.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.ebom.vpps_check.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.ebom.vpps_check.read"
+        }
+      }
+    },
+    "craft.gbop.catalog.read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.gbop.catalog.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/gbop_catalog.py"
+          ],
+          "owner": "Craft",
+          "evidence": "GBOP catalog read routes are bound to a bounded Craft Provider Capability with explicit collection limits.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "GBOP catalog reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.gbop.catalog.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "GBOP catalog reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.gbop.catalog.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.gbop.catalog.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.gbop.catalog.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.gbop.catalog.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.gbop.catalog.read"
         }
       }
     },
@@ -3027,6 +4908,153 @@
         }
       }
     },
+    "craft.gbop.entity.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.gbop.entity.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/gbop_entity_change.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.gbop.import.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.gbop.import.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/gbop_import_change.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.gbop.import.tc.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.gbop.import.tc.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/gbop_import_tc_change.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
     "craft.gbop.item.knowledge.list": {
       "kind": "existing",
       "function_dispositions": {
@@ -3182,19 +5210,156 @@
         }
       }
     },
+    "craft.gbop.navigation.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.gbop.navigation.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/gbop_navigation_change.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The navigation mutation provider is a new governed Craft capability with explicit confirm and auto-link operations.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "GBOP navigation mutations use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.gbop.navigation.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "GBOP navigation mutations use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.gbop.navigation.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.gbop.navigation.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.gbop.navigation.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.gbop.navigation.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.gbop.navigation.change.apply"
+        }
+      }
+    },
+    "craft.gbop.navigation.read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.gbop.navigation.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/gbop_navigation.py"
+          ],
+          "owner": "Craft",
+          "evidence": "GBOP navigation summary and auto-link status routes are bound to a read-only navigation Provider Capability.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "GBOP navigation reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.gbop.navigation.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "GBOP navigation reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.gbop.navigation.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.gbop.navigation.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.gbop.navigation.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.gbop.navigation.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.gbop.navigation.read"
+        }
+      }
+    },
+    "craft.gbop.process_hierarchy.read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.gbop.process_hierarchy.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/gbop_process_hierarchy.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The process hierarchy provider is a new governed Craft capability with an explicit contract and bounded read implementation.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "GBOP process hierarchy reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.gbop.process_hierarchy.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "GBOP process hierarchy reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.gbop.process_hierarchy.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.gbop.process_hierarchy.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.gbop.process_hierarchy.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.gbop.process_hierarchy.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.gbop.process_hierarchy.read"
+        }
+      }
+    },
     "craft.gbop.read": {
       "kind": "existing",
       "function_dispositions": {
-        "rest:GET:/api/gbop/bop-versions/{bop_gid}/station-autolink-preview": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/gbop.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/gbop/bop-versions/{bop_gid}/station-autolink-preview implements the reviewed craft.gbop.read business outcome from plugins/craft/craft_backend/routers/gbop.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
         "rest:GET:/api/gbop/entries/{entry_gid}/links": {
           "resolution": "existing_capability",
           "source_paths": [
@@ -3573,6 +5738,7 @@
           "resolution": "existing_capability",
           "source_paths": [
             "backend/capabilities/agreed_catalog.py",
+            "plugins/craft/craft_backend/capabilities/contracts.py",
             "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
           ],
           "owner": "Craft",
@@ -3612,6 +5778,261 @@
           "enabled": false,
           "reason": "No approved exposure for this consumer in the existing Registry.",
           "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.gbop.station_autolink.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.gbop.station_autolink.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/gbop_station_autolink_change.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.gbop.station_autolink.preview": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.gbop.station_autolink.preview": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/station_autolink_preview.py"
+          ],
+          "owner": "Craft",
+          "evidence": "Station auto-link preview is a bounded, read-only Provider projection with no binding mutation.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/gbop/bop-versions/{bop_gid}/station-autolink-preview": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/gbop.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The station auto-link preview route is a Gateway adapter for craft.gbop.station_autolink.preview.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "Station auto-link preview uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.gbop.station_autolink.preview"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Station auto-link preview uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.gbop.station_autolink.preview"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.gbop.station_autolink.preview"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.gbop.station_autolink.preview"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.gbop.station_autolink.preview"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.gbop.station_autolink.preview"
+        }
+      }
+    },
+    "craft.gbop.version.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.gbop.version.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/gbop_version_change.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.library.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.library.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/library_change.py"
+          ],
+          "owner": "Craft",
+          "evidence": "Legacy Craft library mutation routes are bound to the governed Craft library change Provider Capability.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "Legacy Craft library mutations use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.library.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Legacy Craft library mutations use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.library.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.library.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.library.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.library.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.library.change.apply"
+        }
+      }
+    },
+    "craft.library.read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.library.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/library_read.py"
+          ],
+          "owner": "Craft",
+          "evidence": "Legacy Craft library read routes are bound to the Craft library Provider Capability.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "Legacy Craft library reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.library.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Legacy Craft library reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.library.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this read-only compatibility adapter.",
+          "policy_ref": "craft.library.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this read-only compatibility adapter.",
+          "policy_ref": "craft.library.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this read-only compatibility adapter.",
+          "policy_ref": "craft.library.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this read-only compatibility adapter.",
+          "policy_ref": "craft.library.read"
         }
       }
     },
@@ -4681,16 +7102,6 @@
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bop/pbom/search": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/entries.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/pbom/search implements the reviewed craft.pbom.part.search business outcome from plugins/craft/craft_backend/routers/_bop/entries.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
@@ -4882,16 +7293,6 @@
     "craft.pbom.version.get": {
       "kind": "existing",
       "function_dispositions": {
-        "rest:GET:/api/bop/pbom-versions/{pbom_gid}/gbop-match-preview": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/gbop.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/pbom-versions/{pbom_gid}/gbop-match-preview implements the reviewed craft.pbom.snapshot.get business outcome from plugins/craft/craft_backend/routers/_bop/gbop.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
         "capability:craft.pbom.version.get": {
           "resolution": "existing_capability",
           "source_paths": [
@@ -4904,6 +7305,16 @@
           "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/bop/pbom-versions/{pbom_gid}/gbop-match-preview": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/gbop.py"
+          ],
+          "owner": "Craft",
+          "evidence": "GBOP match preview is a Gateway adapter for craft.bop.gbop.legacy_read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
         }
       },
       "consumer_exposure": {
@@ -4994,26 +7405,6 @@
     "craft.pbom.version.search": {
       "kind": "existing",
       "function_dispositions": {
-        "rest:GET:/api/bop/pbom-snapshots": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/entries.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/pbom-snapshots implements the reviewed craft.pbom.snapshot.get business outcome from plugins/craft/craft_backend/routers/_bop/entries.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bop/pbom-versions": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/_bop/gbop.py"
-          ],
-          "owner": "Craft",
-          "evidence": "The stable surface rest:GET:/api/bop/pbom-versions implements the reviewed craft.pbom.snapshot.get business outcome from plugins/craft/craft_backend/routers/_bop/gbop.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
         "capability:craft.pbom.version.search": {
           "resolution": "existing_capability",
           "source_paths": [
@@ -5025,6 +7416,26 @@
           "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/bop/pbom-snapshots": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/entries.py"
+          ],
+          "owner": "Craft",
+          "evidence": "PBOM snapshot listing is a Gateway adapter for craft.bop.entry.legacy_read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        },
+        "rest:GET:/api/bop/pbom-versions": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/_bop/gbop.py"
+          ],
+          "owner": "Craft",
+          "evidence": "Ready PBOM version listing is a Gateway adapter for craft.bop.gbop.legacy_read.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
         }
       },
       "consumer_exposure": {
@@ -5436,6 +7847,55 @@
         }
       }
     },
+    "craft.rule.engine.evaluate": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.rule.engine.evaluate": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/rule_engine.py"
+          ],
+          "owner": "Craft",
+          "evidence": "Legacy rule-engine evaluation and BOP audit routes are bound to the governed Craft rule-engine Provider Capability.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "Rule evaluation uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.rule.engine.evaluate"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Rule evaluation uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.rule.engine.evaluate"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.rule.engine.evaluate"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.rule.engine.evaluate"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.rule.engine.evaluate"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.rule.engine.evaluate"
+        }
+      }
+    },
     "craft.rule.evaluate": {
       "kind": "existing",
       "function_dispositions": {
@@ -5482,6 +7942,104 @@
           "enabled": false,
           "reason": "No approved exposure for this consumer in the existing Registry.",
           "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.rule.library.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.rule.library.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/rule_library.py"
+          ],
+          "owner": "Craft",
+          "evidence": "Legacy Craft rule CRUD routes are bound to the governed rule-library mutation Provider Capability.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "Rule-library mutations use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.rule.library.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Rule-library mutations use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.rule.library.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.rule.library.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.rule.library.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.rule.library.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.rule.library.change.apply"
+        }
+      }
+    },
+    "craft.rule.library.read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.rule.library.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/rule_library.py"
+          ],
+          "owner": "Craft",
+          "evidence": "Legacy Craft rule CRUD read routes are bound to the governed rule-library read Provider Capability.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "Rule-library reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.rule.library.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Rule-library reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.rule.library.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.rule.library.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.rule.library.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.rule.library.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.rule.library.read"
         }
       }
     },
@@ -5904,6 +8462,202 @@
           "enabled": false,
           "reason": "No approved exposure for this consumer in the existing Registry.",
           "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.standard_operation.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.standard_operation.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/standard_operation.py"
+          ],
+          "owner": "Craft",
+          "evidence": "Legacy standard-operation mutation routes are bound to the governed Craft standard-operation Provider Capability.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "Standard-operation mutations use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.standard_operation.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Standard-operation mutations use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.standard_operation.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.standard_operation.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.standard_operation.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.standard_operation.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.standard_operation.change.apply"
+        }
+      }
+    },
+    "craft.standard_operation.read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.standard_operation.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/standard_operation.py"
+          ],
+          "owner": "Craft",
+          "evidence": "Legacy standard-operation read routes are bound to the governed Craft standard-operation Provider Capability.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "Standard-operation reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.standard_operation.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Standard-operation reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.standard_operation.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.standard_operation.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.standard_operation.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.standard_operation.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.standard_operation.read"
+        }
+      }
+    },
+    "craft.vpps_audit.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.vpps_audit.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/vpps_audit.py"
+          ],
+          "owner": "Craft",
+          "evidence": "Legacy VPPS audit mutation routes are bound to the governed Craft VPPS audit Provider Capability.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "VPPS audit mutations use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.vpps_audit.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "VPPS audit mutations use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.vpps_audit.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.vpps_audit.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.vpps_audit.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.vpps_audit.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.vpps_audit.change.apply"
+        }
+      }
+    },
+    "craft.vpps_audit.read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.vpps_audit.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/vpps_audit.py"
+          ],
+          "owner": "Craft",
+          "evidence": "Legacy VPPS audit read routes are bound to the governed Craft VPPS audit Provider Capability.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-20"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "VPPS audit reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.vpps_audit.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "VPPS audit reads use the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "craft.vpps_audit.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved plugin exposure for this compatibility adapter.",
+          "policy_ref": "craft.vpps_audit.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved agent exposure for this compatibility adapter.",
+          "policy_ref": "craft.vpps_audit.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved MCP exposure for this compatibility adapter.",
+          "policy_ref": "craft.vpps_audit.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved local runtime exposure for this compatibility adapter.",
+          "policy_ref": "craft.vpps_audit.read"
         }
       }
     }

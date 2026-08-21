@@ -16,7 +16,6 @@ from .provider import register_capability
 READ_CAPABILITIES = {
     "base.annotation.read",
     "base.authorization.grant.read",
-    "base.export_template.read",
     "base.identity.session.get",
     "base.plugin.marketplace.search",
     "base.saved_view.read",
@@ -25,7 +24,6 @@ READ_CAPABILITIES = {
 WRITE_CAPABILITIES = {
     "base.annotation.change.apply",
     "base.authorization.grant.change.apply",
-    "base.export_template.change.apply",
     "base.identity.directory.sync",
     "base.identity.role.assign",
     "base.plugin.marketplace.publisher.register",

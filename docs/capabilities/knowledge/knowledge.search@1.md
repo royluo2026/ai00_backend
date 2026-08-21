@@ -1,14 +1,14 @@
 # knowledge.search@1
 
-按标题、Markdown 正文和标签搜索知识条目.
+按标题、Markdown 正文、标签及兼容筛选条件搜索知识条目.
 
 ## 使用判断
 
-- 适用：按标题、Markdown 正文和标签搜索知识条目.
+- 适用：按标题、Markdown 正文、标签及兼容筛选条件搜索知识条目.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_118d91d38b08fcecd96ddea0005a02b5`
+- Catalog Release：`rel_3010694218f96365eda536567f35d198`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -70,13 +70,22 @@
 {
   "additionalProperties": false,
   "properties": {
+    "context_class_gid": {
+      "type": "string"
+    },
     "entry_type": {
       "type": "string"
     },
+    "include_content": {
+      "type": "boolean"
+    },
     "limit": {
-      "maximum": 100,
+      "maximum": 500,
       "minimum": 1,
       "type": "integer"
+    },
+    "list_gid": {
+      "type": "string"
     },
     "query": {
       "type": "string"
@@ -91,7 +100,7 @@
 ```json
 {
   "capability_id": "knowledge.search",
-  "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
+  "catalog_release": "rel_3010694218f96365eda536567f35d198",
   "major_version": 1,
   "payload": {}
 }
@@ -166,6 +175,24 @@
             },
             "type": "object"
           },
+          "context_class_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "contributors": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {},
+              "type": "object"
+            },
+            "maxItems": 100,
+            "type": "array"
+          },
+          "created_at": {
+            "type": "string"
+          },
           "creator_gid": {
             "type": "string"
           },
@@ -177,6 +204,12 @@
           },
           "gid": {
             "type": "string"
+          },
+          "list_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "maintainer_gid": {
             "type": "string"
@@ -213,6 +246,12 @@
           "source_label": {
             "type": "string"
           },
+          "source_project_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "status": {
             "type": "string"
           },
@@ -237,7 +276,7 @@
         ],
         "type": "object"
       },
-      "maxItems": 100,
+      "maxItems": 500,
       "type": "array"
     },
     "query": {

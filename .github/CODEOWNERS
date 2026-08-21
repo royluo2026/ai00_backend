@@ -112,6 +112,13 @@
 # Shared kernel and governance require platform review in addition to domain contract tests.
 /backend/capability_v2/** @ai00/base-maintainers
 /backend/domain_ports/** @ai00/base-maintainers
+/backend/core/** @ai00/base-maintainers
+/backend/platform_sdk/** @ai00/base-maintainers
+/docs/governance/** @ai00/base-maintainers
+/dist/web/core/** @ai00/base-maintainers
+/dist/web/workspace/** @ai00/base-maintainers
+/dist/web/workbench/** @ai00/base-maintainers
+/dist/web/components/** @ai00/base-maintainers
 /docs/governance/domain-ownership.json @ai00/base-maintainers
 /docs/governance/domain-dependency-baseline.json @ai00/base-maintainers
 /docs/governance/capability-catalog-release.json @ai00/base-maintainers

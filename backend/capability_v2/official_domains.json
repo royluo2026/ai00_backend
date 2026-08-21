@@ -7,7 +7,7 @@
         "plugin_id": "official.agent",
         "module": "agent_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:a2744d85e5c8b1186edc9d5696c27f96914ec294c062b885abd273fc32a1d265"
+        "artifact_hash": "sha256:47b0f66932c58262b70e055f36c39a3bdfc1f746e7ac895d7af0104c115afbe2"
       },
       "artifact_path": "plugins/agent/agent_backend",
       "allowed_owners": [
@@ -36,7 +36,7 @@
         "plugin_id": "official.base",
         "module": "backend.base.official_provider",
         "version": "1.0.0",
-        "artifact_hash": "sha256:e234025083bc1d909037bc0968840cc519c0b2b6c2d6e46e0ae49a4ce597dc66"
+        "artifact_hash": "sha256:567756c9d50418c81d9a361d209a71e925e2605f69ff484f8e70d01a05e239e4"
       },
       "artifact_path": "backend/base",
       "allowed_owners": [
@@ -82,7 +82,7 @@
         "plugin_id": "official.craft",
         "module": "craft_backend.capabilities",
         "version": "1.2.0",
-        "artifact_hash": "sha256:c8757f8bf6d2946136a8d6754256955e1828411e818516dcbd9b4594fdc07324"
+        "artifact_hash": "sha256:3ef899977f3ef27adf615b3587bb4ea20870ed6a7de1534ad4d3ea103f014500"
       },
       "artifact_path": "plugins/craft/craft_backend",
       "allowed_owners": [
@@ -112,7 +112,7 @@
         "plugin_id": "official.device",
         "module": "device_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:59b3407a0a293878bfe31b0a2882ed1d49d871895e447442245bcad57e4c6b4f"
+        "artifact_hash": "sha256:34e21eb2cddd975d511c2ed55a2add066c9315ca10d44f7b2929bcaf8ae4d233"
       },
       "artifact_path": "plugins/device/device_backend",
       "allowed_owners": [
@@ -138,7 +138,7 @@
         "plugin_id": "official.digital-model",
         "module": "digital_model_backend.capabilities",
         "version": "1.1.0",
-        "artifact_hash": "sha256:f093d7c34bed8c6913a2c7ea3c9ad21c323a32104e636e58101ff3b55dae140f"
+        "artifact_hash": "sha256:50e277afef510ddcdd7b818362496cf6c022a533fbc57f97bce2a11271df7281"
       },
       "artifact_path": "plugins/digital_model/digital_model_backend",
       "allowed_owners": [
@@ -163,7 +163,7 @@
         "plugin_id": "official.factory",
         "module": "factory_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:6ff57787aa68831fafd356da37fb0fdfc12fcec13e2f75ca68ed9dbd2125538d"
+        "artifact_hash": "sha256:cf420e668159b24e8451268f95e6cbb90f2d8fad7dc317a897ee8f13195c062f"
       },
       "artifact_path": "plugins/factory/factory_backend",
       "allowed_owners": [
@@ -190,7 +190,7 @@
         "plugin_id": "official.integration",
         "module": "integration_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:64c72ccbea6583a0ad2f281fc84073875303b93644525f2088cbd1f9f7158449"
+        "artifact_hash": "sha256:715c89842662fbdd4941613d58c02076cb62c20f1ba35d8d24cdf2d1d8cce713"
       },
       "artifact_path": "plugins/integration/integration_backend",
       "allowed_owners": [
@@ -214,7 +214,7 @@
         "plugin_id": "official.knowledge",
         "module": "knowledge_backend.capabilities",
         "version": "2.0.0",
-        "artifact_hash": "sha256:503fe71b3f77b596938ea902a8b465a6eb6e570a37b64b573e5fb6002036ff4d"
+        "artifact_hash": "sha256:9065a80cf151bcb8c344e6879f3392f6bfa43b342a8152659e44e05a9a127475"
       },
       "artifact_path": "plugins/knowledge/knowledge_backend",
       "allowed_owners": [
@@ -242,7 +242,7 @@
         "plugin_id": "official.ontology",
         "module": "ontology_backend.capabilities",
         "version": "2.0.0",
-        "artifact_hash": "sha256:2a0135d6b05a2e0895507eced1dd866bf7bf19cc6eebe0e945744ac96c7cc283"
+        "artifact_hash": "sha256:be2cb24632b718d53e028d893618f55cad4b257170932e5b20775e1bd55c5948"
       },
       "artifact_path": "plugins/ontology/ontology_backend",
       "allowed_owners": [
@@ -268,7 +268,7 @@
         "plugin_id": "official.project-management",
         "module": "project_management_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:6e4b953176dcab75986a34b14c8278f3736adabd412d6864db1afbbfc577bd15"
+        "artifact_hash": "sha256:f544796664ad3c848116c0d34f9b94b870b8f5bb235e3481ae611f935b22c3e2"
       },
       "artifact_path": "plugins/project_management/project_management_backend",
       "allowed_owners": [
@@ -294,7 +294,7 @@
         "plugin_id": "official.simulation",
         "module": "simulation_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:2e2cf3f4ae4c715ee00597b8f9f70f4ee74dda95b7aeb620ce9c2060f1c35ea4"
+        "artifact_hash": "sha256:5c1fccaa2219f6833c24237667039685e322cefcffc7ca6f0287d28cfc0a2b39"
       },
       "artifact_path": "plugins/simulation/simulation_backend",
       "allowed_owners": [

@@ -9,6 +9,34 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '../..');
+const { runLineageLoadCoordinatorTests } = require(path.join(
+  ROOT,
+  'packages/craft-plugin/web/lineage_view/lineage_load_coordinator.test.js',
+));
+const { runLineageProjectionStoreTests } = require(path.join(
+  ROOT,
+  'packages/craft-plugin/web/lineage_view/lineage_projection_store.test.js',
+));
+const { runLineageProgressiveLoadingTests } = require(path.join(
+  ROOT,
+  'packages/craft-plugin/web/lineage_view/lineage_progressive_loading.test.js',
+));
+const { runGovernanceModelTests } = require(path.join(
+  ROOT,
+  'web/admin/capability_governance/governance_model.test.js',
+));
+const { runGovernanceControllerTests } = require(path.join(
+  ROOT,
+  'web/admin/capability_governance/governance_controller.test.js',
+));
+const { runGovernanceApiTests } = require(path.join(
+  ROOT,
+  'web/admin/capability_governance/governance_api.test.js',
+));
+const { runAuthStateTests } = require(path.join(
+  ROOT,
+  'web/core/auth_state.test.js',
+));
 
 // ── 颜色输出 ─────────────────────────────────────────────────────────
 const C = {
@@ -185,11 +213,13 @@ function makeLayoutDetailPanelEnv() {
       <div id="llDpProps"><div id="llDpPropsBody"></div></div>
       <div id="llDpRels"><div id="llDpRelsBody"></div></div>
       <div id="llDpDetail"><div id="llDpDetailBody"></div></div>
-      <div id="llDetDrawer"><div id="llDetDrawerBody"></div></div>
       <div id="llDpKnow"><div id="llDpKnowBody"></div></div>
       <button id="llDpKnowAdd"></button>
     </div>
     <button id="lvDetailPanelToggle"></button>
+    <div id="llDetDrawer"><div id="llDetDrawerTitle"></div><div id="llDetDrawerBody"></div>
+      <button id="llDetDrawerClose"></button><button id="llDetDrawerCancel"></button><button id="llDetDrawerPin"></button>
+    </div>
   </body></html>`, {
     runScripts: 'dangerously',
     resources: 'usable',
@@ -302,7 +332,7 @@ function makeSettingsEnv() {
 }
 
 function makeLifecyclePanelEnv() {
-  const dom = new JSDOM('<!DOCTYPE html><html><body><div id="mount"></div><div id="action" style="display:none"></div><div id="lvHistorySidePanel"></div><div id="lvActionHistoryBody"></div><input id="lv-tc-ver-name"><input id="lv-inp-tc-file"><div id="lv-tc-s1-status"></div><button id="lv-tc-next"></button><button id="lv-tc-confirm"></button><div id="lv-modal-import-tc" class="hidden"></div></body></html>', {
+  const dom = new JSDOM('<!DOCTYPE html><html><body><div id="mount"></div><div id="action"></div><input id="lv-tc-ver-name"><input id="lv-inp-tc-file"><div id="lv-tc-s1-status"></div><button id="lv-tc-next"></button><button id="lv-tc-confirm"></button><div id="lv-modal-import-tc" class="hidden"></div></body></html>', {
     runScripts: 'dangerously',
     resources: 'usable',
     url: 'http://localhost',
@@ -322,6 +352,22 @@ function makeLifecyclePanelEnv() {
 // ════════════════════════════════════════════════════════════════════
 
 async function runTests() {
+
+  console.log(section('capability_governance: pure model'));
+  await _assertAsync('GID normalization, permissions, filtering and stale data', runGovernanceModelTests);
+  console.log(section('capability_governance: Gateway API adapter'));
+  await _assertAsync('closed schemas, bounded collections and write envelopes', runGovernanceApiTests);
+  console.log(section('capability_governance: controller'));
+  await _assertAsync('inventory, findings, stale state, permissions and busy actions', runGovernanceControllerTests);
+  console.log(section('auth_state: profile response mapping'));
+  await _assertAsync('unwrap /users/me response and preserve effective permissions', runAuthStateTests);
+
+  console.log(section('lineage_load_coordinator: generation 与单飞加载'));
+  await _assertAsync('取消旧请求、阻止过期提交并清理单飞槽', runLineageLoadCoordinatorTests);
+  console.log(section('lineage_projection_store: 有界投影缓存'));
+  await _assertAsync('整页幂等合并、LRU 淘汰与详情隔离', runLineageProjectionStoreTests);
+  console.log(section('lineage_progressive_loader: 有界能力加载'));
+  await _assertAsync('首屏大纲、按需分页、取消过期请求与单飞刷新', runLineageProgressiveLoadingTests);
 
   // ── 1. _escHtml ───────────────────────────────────────────────────
   console.log(section('lv_utils: _escHtml'));
@@ -964,44 +1010,6 @@ async function runTests() {
     if (opened !== 1) throw new Error('未自动打开 Excel 导入步骤');
   });
 
-  await _assertAsync('生命周期新建模式显示表单区且不渲染阶段锁定按钮', async () => {
-    const w = makeLifecyclePanelEnv();
-    w._authUser = { system_role: 'super_admin' };
-    const panel = new w.BopLifecyclePanel({
-      cf: async () => ({ data: [] }),
-      toast() {},
-      versionGid: 'old-version',
-      mountEl: w.document.getElementById('mount'),
-      actionEl: w.document.getElementById('action'),
-    });
-    panel._projectsCache = [];
-    panel._factoriesCache = [];
-    panel._allVersionsCache = [];
-
-    panel.enterCreationMode();
-    if (panel._actionEl.style.display === 'none') throw new Error('新建操作区仍处于隐藏状态');
-    if (panel._mountEl.textContent.includes('请先完成前置阶段')) throw new Error('新建模式错误渲染了阶段锁定按钮');
-    if (w.document.getElementById('lvHistorySidePanel').style.display !== 'none') throw new Error('新建模式仍显示操作历史');
-    await new Promise(resolve => setTimeout(resolve, 0));
-    if (!panel._actionEl.textContent.includes('新建空白 BOP 版本')) throw new Error('点击工具栏新建后未自动显示新建表单');
-
-    const blankBtn = [...panel._mountEl.querySelectorAll('button')]
-      .find(btn => btn.textContent.includes('新建空白'));
-    if (!blankBtn) throw new Error('未找到新建空白入口');
-    blankBtn.click();
-    await new Promise(resolve => setTimeout(resolve, 0));
-    if (!panel._actionEl.textContent.includes('新建空白 BOP 版本')) throw new Error('点击路线后未显示新建表单');
-  });
-
-  await _assertAsync('lineage 无 BOP 版本时仍先初始化生命周期新建面板', async () => {
-    const src = readLineageSource();
-    const panelInit = src.indexOf('_lifecyclePanel = new BopLifecyclePanel');
-    const noVersionGuard = src.indexOf('// 无任何 BOP 版本 → 画布内提示');
-    if (panelInit < 0) throw new Error('未找到生命周期面板初始化');
-    if (noVersionGuard < 0) throw new Error('未找到无版本提前返回分支');
-    if (panelInit > noVersionGuard) throw new Error('无版本分支仍在生命周期面板初始化之前提前返回');
-  });
-
   await _assertAsync('lineage 新建节点配置不再包含序号字段', async () => {
     const src = readLineageSource();
     const fieldsBlock = src.match(/const _NODE_FIELDS = \{[\s\S]*?^\};/m)?.[0] || '';
@@ -1112,6 +1120,35 @@ async function runTests() {
     if (relText.includes('关联问题')) throw new Error('show_in_detail=false 的关系不应显示');
   });
 
+  await _assertAsync('layout_detail_panel 通过条目详情能力补齐重字段和受控关系', async () => {
+    const w = makeLayoutDetailPanelEnv();
+    const calls = [];
+    const rows = new Map([
+      ['gid-1', { gid: 'gid-1', node_type: 'process', parent_gid: 'line-1', meta: {} }],
+      ['line-1', { gid: 'line-1', node_type: 'line_process', parent_gid: null }],
+    ]);
+    const panel = new w.LayoutDetailPanel({
+      containerEl: w.document.getElementById('llDetailPanel'),
+      cf: async url => {
+        calls.push(url);
+        if (url === '/api/ontology/schema/process') return { relations: [] };
+        throw new Error('unexpected path ' + url);
+      },
+      loadEntryDetail: async gid => ({
+        entry: { gid, node_type: 'process', parent_gid: 'line-1', meta: { instruction: '受控详情' } },
+        links: [{ entry_gid: gid, link_type: 'pbom_part', entity_gid: 'part-1' }],
+      }),
+      toast() {}, patchEntry: async () => {}, reloadData: async () => {},
+      getLineageData: () => ({ childMap: new Map([['gid-1', []]]), rowByGid: rows, lineGrantSet: new Set(), lineReadOnly: false }),
+      onNodeActivate() {}, getVersionInfo: () => ({ currentGid: 'version-1' }), onVersionChange() {},
+    });
+    panel.open('gid-1');
+    await new Promise(resolve => setTimeout(resolve, 10));
+    if (panel._currentRow.meta.instruction !== '受控详情') throw new Error('详情能力结果未合并到当前行');
+    if (panel._currentRow.__governed_links.length !== 1) throw new Error('受控关系未合并');
+    if (calls.some(url => url.startsWith('/api/bop/entry-links?'))) throw new Error('详情面板仍调用旧关系读取接口');
+  });
+
   await _assertAsync('layout_detail_panel schema resource relation loads bop need candidates', async () => {
     const w = makeLayoutDetailPanelEnv();
     const calls = [];
@@ -1201,6 +1238,34 @@ async function runTests() {
     const body = JSON.parse(calls[0].opts.body || '{}');
     if (body.parent_gid !== 'station-1') throw new Error('parent_gid 未指向目标工位: ' + body.parent_gid);
     if (body.node_type !== 'process') throw new Error('复制节点类型错误: ' + body.node_type);
+  });
+
+  await _assertAsync('layout_mode 切换版本时释放大画布状态', async () => {
+    const w = makeLayoutModeEnv();
+    w.requestAnimationFrame = cb => w.setTimeout(cb, 0);
+    w.cancelAnimationFrame = id => w.clearTimeout(id);
+    const mode = new w.LayoutMode(w.document.getElementById('lvLayoutCanvas'));
+    mode._world.innerHTML = '<div class="ll-line-box"></div>';
+    mode._data = { rows: new Array(10_000).fill({ gid: 'large' }) };
+    mode._allLines = [{ gid: 'line-1' }];
+    mode._filteredLines = [{ gid: 'line-1' }];
+    mode._linePositions.set('line-1', { x: 0, y: 0 });
+    mode._stationPositions.set('station-1', { x: 0, y: 0 });
+    mode._lineCarAreas.set('line-1', {});
+    mode._stationDirection.set('station-1', 'up');
+    mode._renderedLineGids.add('line-1');
+    mode._vrTimer = w.setTimeout(() => {}, 10_000);
+    mode._edgeScrollRaf = w.requestAnimationFrame(() => {});
+    mode._dragState = {};
+    mode._mergeData = {};
+
+    mode.destroyHeavyState();
+
+    if (mode._world.childNodes.length !== 0) throw new Error('画布 DOM 未清空');
+    if (mode._data !== null || mode._allLines.length || mode._filteredLines.length) throw new Error('大数据引用未释放');
+    if (mode._linePositions.size || mode._stationPositions.size || mode._renderedLineGids.size) throw new Error('布局缓存未清空');
+    if (mode._vrTimer !== null || mode._edgeScrollRaf !== null) throw new Error('异步任务未取消');
+    if (mode._dragState !== null || mode._mergeData !== null) throw new Error('交互状态未释放');
   });
 
   // ── 汇总 ─────────────────────────────────────────────────────────

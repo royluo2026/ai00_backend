@@ -171,6 +171,17 @@ def test_entry_detail_decodes_json_and_transports_datetimes():
     assert result["links"][0]["snapshot_data"] == {"part_no": "P1"}
 
 
+def test_entry_reference_resolves_current_version_and_revision():
+    repository, cursor = _repository([
+        {"one": {"version_gid": "v1", "revision": 5}},
+    ])
+
+    assert repository.resolve_entry_reference("e1") == {
+        "version_gid": "v1", "revision": 5,
+    }
+    assert cursor.statements[0][1] == ("e1",)
+
+
 def test_entry_detail_rejects_more_than_five_hundred_links_without_truncation():
     repository, cursor = _repository([
         {"one": {"revision": 5}},

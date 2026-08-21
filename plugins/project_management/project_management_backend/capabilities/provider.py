@@ -25,6 +25,16 @@ DOMAIN_ERRORS = tuple(
     )
 )
 
+# These IDs were approved in the historical catalog but have no Project
+# application outcome or repository port. Keep their identity discoverable,
+# but remove them from the stable invocation surface until implemented.
+DEPRECATED_CAPABILITY_IDS = frozenset({
+    "project.activity.aggregate",
+    "project.bitable_binding.change.apply",
+    "project.bitable_binding.read",
+    "project.craft_scope.read",
+})
+
 
 def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
     descriptor = descriptor_from_provider_spec(spec)
@@ -32,10 +42,20 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
     return CapabilityDescriptorV2.model_validate(
         {
             **descriptor.model_dump(),
-            "lifecycle_status": LifecycleStatus.STABLE,
+            "lifecycle_status": (
+                LifecycleStatus.DEPRECATED
+                if spec.id in DEPRECATED_CAPABILITY_IDS
+                else LifecycleStatus.STABLE
+            ),
+            "deprecation_message": (
+                "Approved legacy identity retained for compatibility; no governed "
+                "Project application outcome is currently registered."
+                if spec.id in DEPRECATED_CAPABILITY_IDS else None
+            ),
             "exposure": ExposurePolicy(
                 web=True, api=True, plugin=True, agent=True, mcp=True
             ),
+            "exposure_policy_source": "provider_explicit",
             "automation_level": AutomationLevel.A1 if is_write else AutomationLevel.A2,
             "authorization_policy": "project_management.v2:"
             + (",".join(spec.permissions) or "authenticated"),
@@ -60,4 +80,4 @@ def register_capability(registry: Any, spec: Any, handler: Any) -> None:
     registry.register(governed, handler, descriptor=descriptor_for(governed))
 
 
-__all__ = ["descriptor_for", "register_capability"]
+__all__ = ["DEPRECATED_CAPABILITY_IDS", "descriptor_for", "register_capability"]

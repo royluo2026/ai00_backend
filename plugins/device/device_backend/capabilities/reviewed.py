@@ -6,7 +6,7 @@ from typing import Any
 from backend.capability_v2.provider_contracts import CapabilityRisk, CapabilitySpec
 
 from ..application.outcomes import device_outcome_port
-from .provider import register
+from .provider import DEPRECATED_LOCAL_DEVICE_CAPABILITIES, register
 
 
 LOCAL_DEVICE_CAPABILITIES = frozenset(
@@ -43,4 +43,7 @@ def register_reviewed_capabilities(registry: Any) -> None:
         )
 
 
-__all__ = ["LOCAL_DEVICE_CAPABILITIES", "register_reviewed_capabilities"]
+__all__ = [
+    "DEPRECATED_LOCAL_DEVICE_CAPABILITIES", "LOCAL_DEVICE_CAPABILITIES",
+    "register_reviewed_capabilities",
+]

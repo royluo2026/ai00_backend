@@ -1,4 +1,6 @@
 import sys
+import asyncio
+from types import SimpleNamespace
 from pathlib import Path
 
 import pytest
@@ -66,26 +68,49 @@ class DummyUser(dict):
     pass
 
 
-def test_create_version_insert_includes_required_defaults(monkeypatch):
-    cursor = FakeCursor(fetchone_results=[{'gid': 'created-version'}])
-    conn = FakeConn(cursor)
+def test_create_version_delegates_to_governed_capability(monkeypatch):
+    captured = {}
 
-    monkeypatch.setattr(versions, 'get_conn', FakeGetConn(conn))
-    monkeypatch.setattr(versions, 'next_gid', lambda: 'new-version-gid')
+    async def invoke(*args, **kwargs):
+        captured["payload"] = args[5]
+        captured["write"] = kwargs["write"]
+        return {"version_gid": "created-version", "status": "active", "revision": 1, "entries_count": 0}
 
+    monkeypatch.setattr(versions, '_invoke_factory', invoke)
     body = versions.CreateBopVersionBody(version_tag='V001', bop_name='空白版本')
-    result = versions.create_version(body, DummyUser(gid='user-1'))
+    result = asyncio.run(versions.create_version(body, SimpleNamespace(headers={}), DummyUser(gid='user-1'), object(), object()))
 
-    insert_sql, insert_params = next((sql, params) for sql, params in cursor.executed if 'INSERT INTO workmanship_bop_bop_versions' in sql)
-    assert 'status' in insert_sql
-    assert 'meta' in insert_sql
-    assert 'lifecycle_phase' in insert_sql
-    assert 'lifecycle_state' in insert_sql
-    assert insert_params[9] == 'active'
-    assert insert_params[10] == '{}'
-    assert insert_params[11] == 'init'
-    assert insert_params[12] == '{}'
-    assert result == {'data': {'gid': 'created-version'}}
+    assert captured["payload"]["source"] == "empty"
+    assert captured["payload"]["version_tag"] == "V001"
+    assert captured["write"] is True
+    assert result["data"]["gid"] == "created-version"
+
+
+def test_update_version_uses_revision_pinned_preview_and_apply(monkeypatch):
+    calls = []
+
+    async def invoke(*args, **kwargs):
+        capability = args[4]
+        payload = args[5]
+        calls.append((capability, payload, kwargs.get("write", False)))
+        if capability == "craft.bop.version.get":
+            if len([item for item in calls if item[0] == capability]) == 1:
+                return {"version_gid": "v1", "revision": 3}
+            return {"version_gid": "v1", "revision": 4, "version_tag": "V2"}
+        if capability == "craft.bop.draft.change.preview":
+            return {"preview_gid": "preview-1"}
+        return {"version_gid": "v1", "revision": 4}
+
+    monkeypatch.setattr(versions, '_invoke_factory', invoke)
+    body = versions.UpdateBopVersionBody(version_tag="V2")
+    result = asyncio.run(versions.update_version("v1", body, SimpleNamespace(headers={}), DummyUser(gid='user-1'), object(), object()))
+
+    assert calls[0][0] == "craft.bop.version.get"
+    assert calls[1][0] == "craft.bop.draft.change.preview"
+    assert calls[1][1]["expected_revision"] == 3
+    assert calls[1][1]["commands"][0]["changes"] == {"version_tag": "V2"}
+    assert calls[2] == ("craft.bop.draft.change.apply", {"preview_gid": "preview-1"}, True)
+    assert result["data"]["version_tag"] == "V2"
 
 
 def test_fork_version_insert_includes_required_defaults(monkeypatch):

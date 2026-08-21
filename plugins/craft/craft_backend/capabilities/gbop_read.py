@@ -9,6 +9,10 @@ from backend.capability_v2.provider_contracts import CapabilityBusinessError, Ca
 from ..data.connection import get_craft_conn
 
 _STATUSES = frozenset({"exact", "modified", "outdated", "inherited", "broken"})
+_VERSION_COLUMNS = (
+    "gid,name,version_family_gid,status,frozen_at,archived_at,"
+    "vehicle_model,team_id,created_by,created_at,updated_at"
+)
 
 
 def _json(value: Any) -> dict[str, Any]:
@@ -27,6 +31,16 @@ def _required(payload: Mapping[str, Any], name: str) -> str:
 
 
 class GbopRepository:
+    def list_versions(self, include_archived: bool = False) -> list[dict[str, Any]]:
+        where = "" if include_archived else " WHERE archived_at IS NULL"
+        with get_craft_conn() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    f"SELECT {_VERSION_COLUMNS} FROM workmanship_tpl_gbop_versions"
+                    f"{where} ORDER BY version_family_gid, created_at, gid"
+                )
+                return [dict(row) for row in cursor.fetchall()]
+
     def resolve_active_release(self) -> dict[str, Any]:
         with get_craft_conn() as conn:
             with conn.cursor() as cursor:
@@ -97,6 +111,24 @@ def search_gbop_items(payload: dict[str, Any], _context: CapabilityContext) -> C
     rows = repository.search_items(str(release["gid"]), query.strip() if query else None, limit)
     items = [{name: row.get(name) for name in ("gid", "parent_gid", "node_type", "vpps", "vpps_desc", "vpps_part", "part_feed", "importance", "torque_importance")} for row in rows]
     return CapabilityOutput(data={"active_release_gid": str(release["gid"]), "items": items})
+
+
+def _version_row(row: Mapping[str, Any]) -> dict[str, Any]:
+    result = dict(row)
+    for name in ("frozen_at", "archived_at", "created_at", "updated_at"):
+        if result.get(name) is not None:
+            result[name] = str(result[name])
+    return result
+
+
+def search_gbop_releases(payload: dict[str, Any], _context: CapabilityContext) -> CapabilityOutput:
+    include_archived = payload.get("include_archived", False)
+    if not isinstance(include_archived, bool):
+        raise ValueError("include_archived must be a boolean")
+    rows = repository.list_versions(include_archived=include_archived)
+    if len(rows) > 500:
+        raise ValueError("GBOP version inventory exceeds the bounded limit of 500")
+    return CapabilityOutput(data={"items": [_version_row(row) for row in rows]})
 
 
 def _provenance(row: Mapping[str, Any]) -> str:

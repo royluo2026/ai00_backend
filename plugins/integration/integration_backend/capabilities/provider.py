@@ -24,6 +24,7 @@ def descriptor_for(spec) -> CapabilityDescriptorV2:
         **base.model_dump(), "owner_domain": "integration",
         "lifecycle_status": LifecycleStatus.STABLE,
         "exposure": ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True),
+        "exposure_policy_source": "provider_explicit",
         "automation_level": AutomationLevel.A1 if write else AutomationLevel.A2,
         "authorization_policy": "integration.v2:" + ",".join(spec.permissions),
         "data_classification": "confidential", "delegation_policy": "scoped",

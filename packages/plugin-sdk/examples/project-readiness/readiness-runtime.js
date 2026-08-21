@@ -11,6 +11,16 @@ export const DECLARED_CAPABILITIES = [
   'plugin.storage.put',
 ];
 
+function createReportId(cryptoSource = globalThis.crypto) {
+  if (typeof cryptoSource?.randomUUID === 'function') return cryptoSource.randomUUID();
+  if (typeof cryptoSource?.getRandomValues !== 'function') throw new Error('Secure random generation is unavailable');
+  const bytes = cryptoSource.getRandomValues(new Uint8Array(16));
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, value => value.toString(16).padStart(2, '0'));
+  return `${hex.slice(0, 4).join('')}-${hex.slice(4, 6).join('')}-${hex.slice(6, 8).join('')}-${hex.slice(8, 10).join('')}-${hex.slice(10).join('')}`;
+}
+
 function data(result) {
   if (!result?.ok || result.status !== 'completed') {
     const error = new Error(result?.error?.message || result?.error?.code || 'Capability invocation failed');
@@ -77,7 +87,7 @@ export async function runReadinessCheck(client, project, options = {}) {
 
   const evaluated = evaluateReadiness({ project:{ status:'ok', ...project }, craft, model, runs });
   return {
-    report_id:options.reportId || crypto.randomUUID(), checked_at:options.now || new Date().toISOString(),
+    report_id:options.reportId || createReportId(), checked_at:options.now || new Date().toISOString(),
     project:{ object_ref:projectRef, title:project.title || projectRef, summary:project.summary || '' },
     overall_status:evaluated.overall_status, domains:evaluated.domains,
     evidence_refs:{ bop_version_gid:craft.version_gid || null, craft_commit_ref:craft.craft_commit_ref || null, model_id:model.model_id || null, model_version_id:model.version_id || null, model_snapshot_hash:model.snapshot_hash || null, simulation_run_id:evaluated.matched_run?.run_id || null },

@@ -8,7 +8,7 @@ Create a published Markdown document revision in immutable OIS storage.
 - 不适用：Updating an existing document.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_118d91d38b08fcecd96ddea0005a02b5`
+- Catalog Release：`rel_3010694218f96365eda536567f35d198`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -112,7 +112,7 @@ Create a published Markdown document revision in immutable OIS storage.
 ```json
 {
   "capability_id": "knowledge.document.create",
-  "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
+  "catalog_release": "rel_3010694218f96365eda536567f35d198",
   "major_version": 1,
   "payload": {
     "markdown": "example",

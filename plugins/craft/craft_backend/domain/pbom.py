@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
+from typing import Any
 
 
 class ImmutableVersionError(ValueError):
@@ -24,6 +25,10 @@ class PbomVersion:
     gid: str
     project_ref: str
     version_tag: str
+    name: str | None = None
+    source_type: str | None = None
+    created_at: str | None = None
+    meta: dict[str, Any] | None = None
     status: PbomVersionStatus = PbomVersionStatus.DRAFT
     knowledge_revision_ref: str | None = None
     ontology_release_ref: str | None = None

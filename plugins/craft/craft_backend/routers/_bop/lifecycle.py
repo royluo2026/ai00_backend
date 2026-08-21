@@ -7,11 +7,14 @@ import json
 from typing import Optional, List
 from datetime import date
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 
 from ...data.connection import get_conn
 from backend.platform_sdk.ids import next_gid
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.auth import get_authenticated_principal
+from backend.platform_sdk.factory import build_web_compatibility_envelope, invoke_compatibility
 
 from ._constants import _WRITE, _READ
 from . import _history
@@ -23,6 +26,132 @@ _NEXT_PHASE = {
     'refine': 'publish_cycle',
     'publish_cycle': 'archived',
 }
+
+
+async def _invoke_lifecycle_read(request, current_user, principal, gateway, capability_id, operation, gid, *, line_gid=None, limit=50):
+    payload = {"operation": operation, "gid": gid, "limit": limit}
+    if line_gid:
+        payload["line_gid"] = line_gid
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id=capability_id, payload=payload, current_user=current_user, principal=principal,
+        request_id=request.headers.get("X-Request-ID") or f"craft_bop_lifecycle_legacy_{next_gid()}", trace_id=request.headers.get("X-Trace-ID") or "craft_bop_lifecycle",
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"invalid_input": 400, "permission_denied": 403, "resource_not_found": 404}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data
+
+
+async def _invoke_lifecycle_change(request, current_user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"craft_bop_lifecycle_change_{next_gid()}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.lifecycle.change.apply", payload=payload,
+        current_user=current_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        error = result.error
+        code = error.code if error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "invalid_input": 400, "response_limit_exceeded": 413, "confirmation_required": 409}.get(code, 422), detail=error.model_dump(mode="json") if error else None)
+    return result.data["data"]
+
+
+async def _invoke_lifecycle_state_change(request, current_user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"craft_bop_lifecycle_state_change_{next_gid()}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.lifecycle.state.change.apply", payload=payload,
+        current_user=current_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        error = result.error
+        code = error.code if error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "invalid_input": 400, "invalid_state": 409}.get(code, 422), detail=error.model_dump(mode="json") if error else None)
+    return result.data["data"]
+
+
+async def _invoke_checkpoint_change(request, current_user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"craft_bop_checkpoint_change_{next_gid()}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.lifecycle.checkpoint.change.apply", payload=payload,
+        current_user=current_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        error = result.error
+        code = error.code if error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "invalid_input": 400}.get(code, 422), detail=error.model_dump(mode="json") if error else None)
+    return result.data["data"]
+
+
+async def _invoke_checkpoint_rollback(request, current_user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"craft_bop_checkpoint_rollback_{next_gid()}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.lifecycle.checkpoint.rollback.apply", payload=payload,
+        current_user=current_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        error = result.error
+        code = error.code if error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "invalid_input": 400, "invalid_state": 409}.get(code, 422), detail=error.model_dump(mode="json") if error else None)
+    return result.data["data"]
+
+
+async def _invoke_lifecycle_history_change(request, current_user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"craft_bop_lifecycle_history_change_{next_gid()}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.lifecycle.history.change.apply", payload=payload,
+        current_user=current_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        error = result.error
+        code = error.code if error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "invalid_input": 400, "invalid_state": 409}.get(code, 422), detail=error.model_dump(mode="json") if error else None)
+    return result.data["data"]
+
+
+async def _invoke_lifecycle_step_rollback(request, current_user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"craft_bop_lifecycle_step_rollback_{next_gid()}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.lifecycle.step.rollback.apply", payload=payload,
+        current_user=current_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        error = result.error
+        code = error.code if error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "invalid_input": 400}.get(code, 422), detail=error.model_dump(mode="json") if error else None)
+    return result.data["data"]
+
+
+async def _invoke_lifecycle_stats_refresh(request, current_user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"craft_bop_lifecycle_stats_refresh_{next_gid()}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.lifecycle.stats.refresh.apply", payload=payload,
+        current_user=current_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        error = result.error
+        code = error.code if error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "invalid_input": 400}.get(code, 422), detail=error.model_dump(mode="json") if error else None)
+    return result.data["data"]
 
 
 # ─── Pydantic 模型 ────────────────────────────────────────────────────────────
@@ -205,7 +334,11 @@ def _compute_stats(cur, version_gid: str, line_gid: Optional[str]) -> dict:
 # ─── 端点 ─────────────────────────────────────────────────────────────────────
 
 @router.patch("/versions/{gid}/lifecycle/init-state", status_code=200)
-def update_init_state(gid: str, body: InitStateBody, _u=Depends(_WRITE)):
+async def update_init_state(gid: str, body: InitStateBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_lifecycle_state_change(request, _u, principal, gateway, {"operation": "init.update", "version_gid": gid, **body.model_dump(exclude_unset=True)})
+
+
+def _legacy_update_init_state(gid: str, body: InitStateBody, _u=Depends(_WRITE)):
     """更新 lifecycle_state.init：保存路线选择和步骤完成状态"""
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -242,8 +375,19 @@ def update_init_state(gid: str, body: InitStateBody, _u=Depends(_WRITE)):
 
 
 @router.get("/versions/{gid}/lifecycle")
-def get_lifecycle(gid: str, _u=Depends(_READ)):
+async def get_lifecycle(gid: str, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
     """返回当前阶段、lifecycle_state、全局 stats、各阶段历史、操作列表。"""
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.lifecycle.state.read", payload={"version_gid": gid}, current_user=_u,
+        principal=principal, request_id=request.headers.get("X-Request-ID") or f"craft_bop_lifecycle_state_legacy_{next_gid()}", trace_id=request.headers.get("X-Trace-ID") or "craft_bop_lifecycle_state",
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"invalid_input": 400, "permission_denied": 403, "resource_not_found": 404}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data
+
+
+def _legacy_get_lifecycle(gid: str, _u=Depends(_READ)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -358,7 +502,11 @@ def _list_family_versions(cur, family_gid: str) -> list:
 
 
 @router.post("/versions/{gid}/lifecycle/refresh-stats", status_code=202)
-def refresh_stats(gid: str, background_tasks: BackgroundTasks, _u=Depends(_WRITE)):
+async def _refresh_stats_endpoint(gid: str, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_lifecycle_stats_refresh(request, _u, principal, gateway, {"version_gid": gid})
+
+
+def _legacy_refresh_stats(gid: str, background_tasks: BackgroundTasks, _u=Depends(_WRITE)):
     """重新计算所有指标，写入今日快照行。后台执行，立即返回。"""
     import asyncio
     from concurrent.futures import ThreadPoolExecutor
@@ -440,8 +588,16 @@ def refresh_stats(gid: str, background_tasks: BackgroundTasks, _u=Depends(_WRITE
     return {"accepted": True, "message": "refresh started", "version_gid": gid}
 
 
+# Keep direct Python callers compatible while FastAPI uses the governed endpoint above.
+refresh_stats = _legacy_refresh_stats
+
+
 @router.get("/versions/{gid}/lifecycle/history")
-def get_lifecycle_history(gid: str, _u=Depends(_READ)):
+async def get_lifecycle_history(gid: str, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_lifecycle_read(request, _u, principal, gateway, "craft.bop.lifecycle.read", "history", gid)
+
+
+def _legacy_get_lifecycle_history(gid: str, _u=Depends(_READ)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -453,7 +609,11 @@ def get_lifecycle_history(gid: str, _u=Depends(_READ)):
 
 
 @router.post("/versions/{gid}/lifecycle/confirm-phase", status_code=200)
-def confirm_phase(gid: str, body: ConfirmPhaseBody, _u=Depends(_WRITE)):
+async def confirm_phase(gid: str, body: ConfirmPhaseBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_lifecycle_state_change(request, _u, principal, gateway, {"operation": "phase.confirm", "version_gid": gid, **body.model_dump(exclude_unset=True)})
+
+
+def _legacy_confirm_phase(gid: str, body: ConfirmPhaseBody, _u=Depends(_WRITE)):
     """PM 确认当前阶段完成，推进到下一阶段"""
     user_gid  = _u.get('gid')  if isinstance(_u, dict) else None
     user_name = _u.get('name') if isinstance(_u, dict) else None
@@ -502,7 +662,11 @@ def confirm_phase(gid: str, body: ConfirmPhaseBody, _u=Depends(_WRITE)):
 
 
 @router.get("/versions/{gid}/lifecycle/lines/{line_gid}/checkpoints")
-def list_checkpoints(gid: str, line_gid: str, _u=Depends(_READ)):
+async def list_checkpoints(gid: str, line_gid: str, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_lifecycle_read(request, _u, principal, gateway, "craft.bop.lifecycle.read", "checkpoints", gid, line_gid=line_gid)
+
+
+def _legacy_list_checkpoints(gid: str, line_gid: str, _u=Depends(_READ)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -515,7 +679,11 @@ def list_checkpoints(gid: str, line_gid: str, _u=Depends(_READ)):
 
 
 @router.post("/versions/{gid}/lifecycle/lines/{line_gid}/checkpoints", status_code=201)
-def create_checkpoint(gid: str, line_gid: str, body: CheckpointBody, _u=Depends(_WRITE)):
+async def create_checkpoint(gid: str, line_gid: str, body: CheckpointBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_checkpoint_change(request, _u, principal, gateway, {"operation": "create", "version_gid": gid, "line_gid": line_gid, **body.model_dump(exclude_unset=True)})
+
+
+def _legacy_create_checkpoint(gid: str, line_gid: str, body: CheckpointBody, _u=Depends(_WRITE)):
     """为指定线体打快照"""
     user_gid  = _u.get('gid')  if isinstance(_u, dict) else None
     user_name = _u.get('name') if isinstance(_u, dict) else None
@@ -563,7 +731,13 @@ def create_checkpoint(gid: str, line_gid: str, body: CheckpointBody, _u=Depends(
     "/versions/{gid}/lifecycle/lines/{line_gid}/rollback/{checkpoint_gid}",
     status_code=200
 )
-def rollback_to_checkpoint(
+async def rollback_to_checkpoint(
+    gid: str, line_gid: str, checkpoint_gid: str, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)
+):
+    return await _invoke_checkpoint_rollback(request, _u, principal, gateway, {"version_gid": gid, "line_gid": line_gid, "checkpoint_gid": checkpoint_gid})
+
+
+def _legacy_rollback_to_checkpoint(
     gid: str, line_gid: str, checkpoint_gid: str, _u=Depends(_WRITE)
 ):
     """将指定线体回滚到某个 Checkpoint 快照"""
@@ -643,7 +817,19 @@ def rollback_to_checkpoint(
 
 
 @router.get("/versions/{gid}/lifecycle/lines/{line_gid}/history")
-def get_line_history(
+async def get_line_history(
+    gid: str,
+    line_gid: str,
+    request: Request,
+    limit: int = Query(50, le=200),
+    _u=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    return await _invoke_lifecycle_read(request, _u, principal, gateway, "craft.bop.lifecycle.read", "line_history", gid, line_gid=line_gid, limit=limit)
+
+
+def _legacy_get_line_history(
     gid: str,
     line_gid: str,
     limit: int = Query(50, le=200),
@@ -661,7 +847,18 @@ def get_line_history(
 
 
 @router.post("/versions/{gid}/lifecycle/lines/{line_gid}/undo")
-def undo_line_history(
+async def _undo_line_history_endpoint(
+    gid: str,
+    line_gid: str,
+    request: Request,
+    _u=Depends(_WRITE),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    return await _invoke_lifecycle_history_change(request, _u, principal, gateway, {"operation": "undo", "version_gid": gid, "line_gid": line_gid})
+
+
+def _legacy_undo_line_history(
     gid: str,
     line_gid: str,
     _u=Depends(_WRITE),
@@ -713,7 +910,18 @@ def undo_line_history(
 
 
 @router.post("/versions/{gid}/lifecycle/lines/{line_gid}/redo")
-def redo_line_history(
+async def _redo_line_history_endpoint(
+    gid: str,
+    line_gid: str,
+    request: Request,
+    _u=Depends(_WRITE),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    return await _invoke_lifecycle_history_change(request, _u, principal, gateway, {"operation": "redo", "version_gid": gid, "line_gid": line_gid})
+
+
+def _legacy_redo_line_history(
     gid: str,
     line_gid: str,
     _u=Depends(_WRITE),
@@ -774,8 +982,25 @@ def redo_line_history(
             }
 
 
+# Keep direct Python callers compatible while FastAPI uses the governed endpoints above.
+undo_line_history = _legacy_undo_line_history
+redo_line_history = _legacy_redo_line_history
+
+
 @router.get("/versions/{gid}/lifecycle/lines/{line_gid}/operation-log")
-def get_operation_log(
+async def get_operation_log(
+    gid: str,
+    line_gid: str,
+    request: Request,
+    limit: int = Query(50, le=200),
+    _u=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    return await _invoke_lifecycle_read(request, _u, principal, gateway, "craft.bop.lifecycle.read", "operation_log", gid, line_gid=line_gid, limit=limit)
+
+
+def _legacy_get_operation_log(
     gid: str,
     line_gid: str,
     limit: int = Query(50, le=200),
@@ -807,7 +1032,11 @@ _UNDO_STEP_NODE_TYPES = {
 
 
 @router.post("/versions/{gid}/lifecycle/undo-step", status_code=200)
-def undo_lifecycle_step(gid: str, body: UndoStepBody, _u=Depends(_WRITE)):
+async def _undo_lifecycle_step_endpoint(gid: str, body: UndoStepBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_lifecycle_step_rollback(request, _u, principal, gateway, {"version_gid": gid, **body.model_dump(exclude_unset=True)})
+
+
+def _legacy_undo_lifecycle_step(gid: str, body: UndoStepBody, _u=Depends(_WRITE)):
     """
     撤销生命周期步骤：
     - lines_added / stations_added / processes_added：递归软删 bop_entries + 对应 bop_entry_links
@@ -931,16 +1160,31 @@ def undo_lifecycle_step(gid: str, body: UndoStepBody, _u=Depends(_WRITE)):
             }
 
 
+# Keep direct Python callers compatible while FastAPI uses the governed endpoint above.
+undo_lifecycle_step = _legacy_undo_lifecycle_step
+
+
 # ─── PBOM-BOP 连接统计 ────────────────────────────────────────────────────────
 
 @router.get("/versions/{gid}/pbom-link-stats", status_code=200)
-def get_pbom_link_stats(gid: str, _u=Depends(_READ)):
+async def get_pbom_link_stats(gid: str, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
     """
     返回当前 BOP 版本中 PBOM 零件的链接统计：
       linked     - 已通过 bop_entry_links(link_type='pbom_part') 关联的 PBOM 部件数
       total      - 关联 PBOM 版本中的零件总数（从 pbom_version_gid 读取）
       pbom_version_gid - BOP 版本 meta.pbom_match.pbom_version_gid（上次关联的 PBOM 版本）
     """
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.pbom_lifecycle.read", payload={"operation": "link_stats", "gid": gid}, current_user=_u,
+        principal=principal, request_id=request.headers.get("X-Request-ID") or f"craft_bop_pbom_link_stats_legacy_{next_gid()}", trace_id=request.headers.get("X-Trace-ID") or "craft_bop_pbom_link_stats",
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"invalid_input": 400, "permission_denied": 403, "resource_not_found": 404}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data
+
+
+def _legacy_get_pbom_link_stats(gid: str, _u=Depends(_READ)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             # 1. 从 bop_versions.meta 拿上次记录的 pbom_version_gid
@@ -995,7 +1239,11 @@ class VehicleOpsStatsBody(BaseModel):
 
 
 @router.patch("/versions/{gid}/pbom-match", status_code=200)
-def patch_pbom_match(gid: str, body: PbomMatchBody, _u=Depends(_WRITE)):
+async def patch_pbom_match(gid: str, body: PbomMatchBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_lifecycle_change(request, _u, principal, gateway, {"operation": "pbom_match.update", "version_gid": gid, **body.model_dump()})
+
+
+def _legacy_patch_pbom_match(gid: str, body: PbomMatchBody, _u=Depends(_WRITE)):
     """将 PBOM 连接元数据写入 bop_versions.meta.pbom_match。"""
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -1017,7 +1265,11 @@ def patch_pbom_match(gid: str, body: PbomMatchBody, _u=Depends(_WRITE)):
 
 
 @router.patch("/versions/{gid}/vehicle-ops-stats", status_code=200)
-def patch_vehicle_ops_stats(gid: str, body: VehicleOpsStatsBody, _u=Depends(_WRITE)):
+async def patch_vehicle_ops_stats(gid: str, body: VehicleOpsStatsBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_lifecycle_change(request, _u, principal, gateway, {"operation": "vehicle_ops_stats.update", "version_gid": gid, **body.model_dump()})
+
+
+def _legacy_patch_vehicle_ops_stats(gid: str, body: VehicleOpsStatsBody, _u=Depends(_WRITE)):
     """将车型工序准备统计写入 bop_versions.meta.vehicle_ops_prep。"""
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -1051,7 +1303,11 @@ class DiffQueuePatchBody(BaseModel):
 
 
 @router.post("/versions/{gid}/pbom-diff-queue", status_code=201)
-def generate_pbom_diff_queue(gid: str, body: DiffQueueGenerateBody, _u=Depends(_WRITE)):
+async def generate_pbom_diff_queue(gid: str, body: DiffQueueGenerateBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_lifecycle_change(request, _u, principal, gateway, {"operation": "pbom_diff_queue.generate", "version_gid": gid, **body.model_dump()})
+
+
+def _legacy_generate_pbom_diff_queue(gid: str, body: DiffQueueGenerateBody, _u=Depends(_WRITE)):
     """
     生成 PBOM 差异工作队列：对比两个 PBOM 版本，将差异零件写入 bop_pbom_diff_queue。
     已有未处理（pending）条目先清除，重新生成。
@@ -1117,8 +1373,19 @@ def generate_pbom_diff_queue(gid: str, body: DiffQueueGenerateBody, _u=Depends(_
 
 
 @router.get("/versions/{gid}/pbom-diff-queue", status_code=200)
-def get_pbom_diff_queue(gid: str, status: Optional[str] = None, _u=Depends(_READ)):
+async def get_pbom_diff_queue(gid: str, request: Request, status: Optional[str] = None, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
     """查询 PBOM 差异工作队列"""
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.pbom_lifecycle.read", payload={"operation": "diff_queue", "gid": gid, "status": status}, current_user=_u,
+        principal=principal, request_id=request.headers.get("X-Request-ID") or f"craft_bop_pbom_diff_queue_legacy_{next_gid()}", trace_id=request.headers.get("X-Trace-ID") or "craft_bop_pbom_diff_queue",
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"invalid_input": 400, "permission_denied": 403}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data
+
+
+def _legacy_get_pbom_diff_queue(gid: str, status: Optional[str] = None, _u=Depends(_READ)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             try:
@@ -1140,7 +1407,11 @@ def get_pbom_diff_queue(gid: str, status: Optional[str] = None, _u=Depends(_READ
 
 
 @router.patch("/pbom-diff-queue/{item_gid}", status_code=200)
-def patch_pbom_diff_item(item_gid: str, body: DiffQueuePatchBody, _u=Depends(_WRITE)):
+async def patch_pbom_diff_item(item_gid: str, body: DiffQueuePatchBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_lifecycle_change(request, _u, principal, gateway, {"operation": "pbom_diff_queue.item.update", "item_gid": item_gid, **body.model_dump()})
+
+
+def _legacy_patch_pbom_diff_item(item_gid: str, body: DiffQueuePatchBody, _u=Depends(_WRITE)):
     """更新差异队列条目状态"""
     with get_conn() as conn:
         with conn.cursor() as cur:

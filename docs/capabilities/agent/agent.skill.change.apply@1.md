@@ -8,7 +8,7 @@ Execute the governed agent.skill.change.apply Agent outcome.
 - 不适用：The outcome belongs to another business domain; invoke that domain Capability instead.
 - 生命周期：`stable`
 - 所属领域：`agent`
-- Catalog Release：`rel_118d91d38b08fcecd96ddea0005a02b5`
+- Catalog Release：`rel_3010694218f96365eda536567f35d198`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -75,14 +75,62 @@ Execute the governed agent.skill.change.apply Agent outcome.
       "properties": {},
       "type": "object"
     },
+    "description": {
+      "minLength": 1,
+      "type": "string"
+    },
     "expected_version": {
       "minimum": 0,
       "type": "integer"
+    },
+    "flow_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "flowdef": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "icon": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "inputs_json": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "is_confirmed": {
+      "type": "boolean"
+    },
+    "is_pinned": {
+      "type": "boolean"
+    },
+    "is_write": {
+      "type": [
+        "boolean",
+        "string"
+      ]
     },
     "limit": {
       "maximum": 200,
       "minimum": 1,
       "type": "integer"
+    },
+    "mode": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "offset": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "operation": {
+      "minLength": 1,
+      "type": "string"
     },
     "query": {
       "minLength": 1,
@@ -92,7 +140,60 @@ Execute the governed agent.skill.change.apply Agent outcome.
       "minLength": 1,
       "type": "string"
     },
+    "resource_type": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "result_json": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "run_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "scope": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "scope_filter": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "session_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "skill_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "skill_type": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "sort_order": {
+      "type": "integer"
+    },
     "status": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "tags": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "title": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "tool_name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "user_gid": {
       "minLength": 1,
       "type": "string"
     }
@@ -106,7 +207,7 @@ Execute the governed agent.skill.change.apply Agent outcome.
 ```json
 {
   "capability_id": "agent.skill.change.apply",
-  "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
+  "catalog_release": "rel_3010694218f96365eda536567f35d198",
   "major_version": 1,
   "payload": {}
 }
@@ -130,6 +231,10 @@ Execute the governed agent.skill.change.apply Agent outcome.
         "object",
         "string"
       ]
+    },
+    "gid": {
+      "minLength": 1,
+      "type": "string"
     },
     "interaction_id": {
       "minLength": 1,
@@ -169,7 +274,26 @@ Execute the governed agent.skill.change.apply Agent outcome.
         },
         "type": "object"
       },
+      "maxItems": 500,
       "type": "array"
+    },
+    "limit": {
+      "maximum": 500,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "logs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "maxItems": 500,
+      "type": "array"
+    },
+    "offset": {
+      "minimum": 0,
+      "type": "integer"
     },
     "resource_gid": {
       "minLength": 1,
@@ -179,9 +303,38 @@ Execute the governed agent.skill.change.apply Agent outcome.
       "minLength": 1,
       "type": "string"
     },
+    "session_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "sessions": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "maxItems": 50,
+      "type": "array"
+    },
     "status": {
       "minLength": 1,
       "type": "string"
+    },
+    "success": {
+      "type": "boolean"
+    },
+    "total": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "turns": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "maxItems": 500,
+      "type": "array"
     },
     "version": {
       "minimum": 0,

@@ -8,7 +8,7 @@ Discover BOP version summaries with bounded cursor pagination.
 - 不适用：The caller already has one exact version GID.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_118d91d38b08fcecd96ddea0005a02b5`
+- Catalog Release：`rel_3010694218f96365eda536567f35d198`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -74,6 +74,10 @@ Discover BOP version summaries with bounded cursor pagination.
       "minLength": 1,
       "type": "string"
     },
+    "factory_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
     "include_archived": {
       "type": "boolean"
     },
@@ -103,7 +107,7 @@ Discover BOP version summaries with bounded cursor pagination.
 ```json
 {
   "capability_id": "craft.bop.version.list",
-  "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
+  "catalog_release": "rel_3010694218f96365eda536567f35d198",
   "major_version": 1,
   "payload": {}
 }
@@ -124,7 +128,57 @@ Discover BOP version summaries with bounded cursor pagination.
           "archived": {
             "type": "boolean"
           },
+          "archived_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "bop_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "change_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data_stage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "factory_gid": {
             "anyOf": [
               {
                 "type": "string"
@@ -144,6 +198,16 @@ Discover BOP version summaries with bounded cursor pagination.
               }
             ]
           },
+          "frozen_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "lifecycle_phase": {
             "anyOf": [
               {
@@ -154,7 +218,57 @@ Discover BOP version summaries with bounded cursor pagination.
               }
             ]
           },
+          "maturity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "owner_gid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "parent_version_gid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "pbom_version_gid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "project_gid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "published_at": {
             "anyOf": [
               {
                 "type": "string"
@@ -190,7 +304,20 @@ Discover BOP version summaries with bounded cursor pagination.
               }
             ]
           },
+          "takt_time": {
+            "description": "Provider-validated transport value."
+          },
           "updated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "vehicle_model_gid": {
             "anyOf": [
               {
                 "type": "string"
@@ -213,6 +340,26 @@ Discover BOP version summaries with bounded cursor pagination.
                 "type": "null"
               }
             ]
+          },
+          "version_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "visibility": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -221,9 +368,24 @@ Discover BOP version summaries with bounded cursor pagination.
           "bop_name",
           "family_gid",
           "project_gid",
+          "factory_gid",
+          "vehicle_model_gid",
+          "parent_version_gid",
+          "pbom_version_gid",
+          "owner_gid",
           "status",
           "lifecycle_phase",
           "revision",
+          "version_type",
+          "maturity",
+          "data_stage",
+          "visibility",
+          "takt_time",
+          "change_note",
+          "frozen_at",
+          "published_at",
+          "archived_at",
+          "created_at",
           "updated_at",
           "archived"
         ],

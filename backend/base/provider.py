@@ -56,6 +56,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
     updates = {
         "lifecycle_status": LifecycleStatus.STABLE,
         "exposure": ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True),
+        "exposure_policy_source": "provider_explicit",
         "automation_level": AutomationLevel.A0 if capability_id in _LIFECYCLE else (AutomationLevel.A1 if is_write else AutomationLevel.A2),
         "authorization_policy": "base.v2:system.plugin.manage" if capability_id in _LIFECYCLE else "base.v2:" + (",".join(governed.permissions) or "authenticated"),
         "resource_selectors": (ResourceSelector(resource_type=resource[0], payload_path=resource[1]),) if resource else (),

@@ -15,6 +15,7 @@ def descriptor_for(spec):
     return CapabilityDescriptorV2.model_validate({
         **base.model_dump(), "owner_domain": "ontology", "lifecycle_status": LifecycleStatus.STABLE,
         "exposure": ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True),
+        "exposure_policy_source": "provider_explicit",
         "automation_level": AutomationLevel.A0 if spec.id == "ontology.release.activate" else (AutomationLevel.A1 if write else AutomationLevel.A2),
         "authorization_policy": "ontology.v2:" + (",".join(spec.permissions) or "authenticated"),
         "data_classification": "confidential", "delegation_policy": "scoped", "agent_output_schema": base.output_schema,

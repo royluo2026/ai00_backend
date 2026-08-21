@@ -1281,6 +1281,51 @@
         "plugins/agent/agent_backend/capabilities/contracts.py"
       ]
     },
+    "capability:agent.interaction.cancel": {
+      "function_id": "capability:agent.interaction.cancel",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.interaction.cancel",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/agent/agent_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:agent.interaction.chat.change.apply": {
+      "function_id": "capability:agent.interaction.chat.change.apply",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.interaction.chat.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/agent/agent_backend/capabilities/contracts.py",
+        "plugins/agent/agent_backend/capabilities/interaction_chat_change.py"
+      ]
+    },
     "capability:agent.interaction.request": {
       "function_id": "capability:agent.interaction.request",
       "domain": "Agent",
@@ -1397,6 +1442,51 @@
         "plugins/agent/agent_backend/capabilities/contracts.py"
       ]
     },
+    "capability:agent.runtime.config.read": {
+      "function_id": "capability:agent.runtime.config.read",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.runtime.config.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/agent/agent_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:agent.script.generate": {
+      "function_id": "capability:agent.script.generate",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.script.generate",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/agent/agent_backend/capabilities/contracts.py",
+        "plugins/agent/agent_backend/capabilities/provider.py"
+      ]
+    },
     "capability:agent.session.change.apply": {
       "function_id": "capability:agent.session.change.apply",
       "domain": "Agent",
@@ -1489,6 +1579,28 @@
         "plugins/agent/agent_backend/capabilities/contracts.py"
       ]
     },
+    "capability:agent.tool_catalog.read": {
+      "function_id": "capability:agent.tool_catalog.read",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.tool_catalog.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/agent/agent_backend/capabilities/contracts.py"
+      ]
+    },
     "capability:base.project.search": {
       "function_id": "capability:base.project.search",
       "domain": "Project Management",
@@ -1510,6 +1622,29 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/project_management/project_management_backend/capabilities/projects.py"
+      ]
+    },
+    "capability:craft.bop.alt_hierarchy.read": {
+      "function_id": "capability:craft.bop.alt_hierarchy.read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.alt_hierarchy.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_alt_hierarchy.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
       ]
     },
     "capability:craft.bop.draft.change.apply": {
@@ -1562,6 +1697,52 @@
         "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
+    "capability:craft.bop.entry.bulk.change.apply": {
+      "function_id": "capability:craft.bop.entry.bulk.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.entry.bulk.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_entry_bulk_change.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.entry.change.apply": {
+      "function_id": "capability:craft.bop.entry.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.entry.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_entry_change.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
     "capability:craft.bop.entry.detail.get": {
       "function_id": "capability:craft.bop.entry.detail.get",
       "domain": "Craft",
@@ -1585,6 +1766,75 @@
         "plugins/craft/craft_backend/capabilities/bop_navigation.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
         "plugins/craft/craft_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:craft.bop.entry.legacy_read": {
+      "function_id": "capability:craft.bop.entry.legacy_read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.entry.legacy_read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_entry_legacy_read.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.entry.search": {
+      "function_id": "capability:craft.bop.entry.search",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.entry.search",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_entry_search.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.entry_link.change.apply": {
+      "function_id": "capability:craft.bop.entry_link.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.entry_link.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_entry_link_change.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
       ]
     },
     "capability:craft.bop.execution_structure.get": {
@@ -1637,6 +1887,121 @@
         "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
+    "capability:craft.bop.fork.change.apply": {
+      "function_id": "capability:craft.bop.fork.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.fork.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_fork_change.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.fork_preset.change.apply": {
+      "function_id": "capability:craft.bop.fork_preset.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.fork_preset.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_fork_preset_change.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.fork_preset.read": {
+      "function_id": "capability:craft.bop.fork_preset.read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.fork_preset.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_fork_preset_read.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.gbop.change.apply": {
+      "function_id": "capability:craft.bop.gbop.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.gbop.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_gbop_change.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.gbop.legacy_read": {
+      "function_id": "capability:craft.bop.gbop.legacy_read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.gbop.legacy_read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_gbop_legacy_read.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
     "capability:craft.bop.import.preview": {
       "function_id": "capability:craft.bop.import.preview",
       "domain": "Craft",
@@ -1658,6 +2023,236 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/bop_writes.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.lifecycle.change.apply": {
+      "function_id": "capability:craft.bop.lifecycle.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.lifecycle.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_lifecycle_change.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.lifecycle.checkpoint.change.apply": {
+      "function_id": "capability:craft.bop.lifecycle.checkpoint.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.lifecycle.checkpoint.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_checkpoint_change.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.lifecycle.checkpoint.rollback.apply": {
+      "function_id": "capability:craft.bop.lifecycle.checkpoint.rollback.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.lifecycle.checkpoint.rollback.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_checkpoint_rollback.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.lifecycle.history.change.apply": {
+      "function_id": "capability:craft.bop.lifecycle.history.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.lifecycle.history.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_lifecycle_history_change.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.lifecycle.read": {
+      "function_id": "capability:craft.bop.lifecycle.read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.lifecycle.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_lifecycle_read.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.lifecycle.state.change.apply": {
+      "function_id": "capability:craft.bop.lifecycle.state.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.lifecycle.state.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_lifecycle_state_change.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.lifecycle.state.read": {
+      "function_id": "capability:craft.bop.lifecycle.state.read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.lifecycle.state.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_lifecycle_state.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.lifecycle.stats.refresh.apply": {
+      "function_id": "capability:craft.bop.lifecycle.stats.refresh.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.lifecycle.stats.refresh.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_lifecycle_stats_refresh.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.lifecycle.step.rollback.apply": {
+      "function_id": "capability:craft.bop.lifecycle.step.rollback.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.lifecycle.step.rollback.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_lifecycle_step_rollback.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.line_operation_catia.read": {
+      "function_id": "capability:craft.bop.line_operation_catia.read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.line_operation_catia.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_line_operation_catia.py",
         "plugins/craft/craft_backend/capabilities/contracts.py"
       ]
     },
@@ -1686,6 +2281,144 @@
         "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
+    "capability:craft.bop.pbom.change_point.get": {
+      "function_id": "capability:craft.bop.pbom.change_point.get",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.pbom.change_point.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/pbom_change_point.py"
+      ]
+    },
+    "capability:craft.bop.pbom_lifecycle.read": {
+      "function_id": "capability:craft.bop.pbom_lifecycle.read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.pbom_lifecycle.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_pbom_lifecycle_read.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.picture.upload": {
+      "function_id": "capability:craft.bop.picture.upload",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.picture.upload",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_picture_upload.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.staging.change.apply": {
+      "function_id": "capability:craft.bop.staging.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.staging.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_staging_change.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.staging.lifecycle.change.apply": {
+      "function_id": "capability:craft.bop.staging.lifecycle.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.staging.lifecycle.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_staging_lifecycle_change.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.staging.read": {
+      "function_id": "capability:craft.bop.staging.read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.staging.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_staging_read.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
     "capability:craft.bop.structure.outline.get": {
       "function_id": "capability:craft.bop.structure.outline.get",
       "domain": "Craft",
@@ -1709,6 +2442,29 @@
         "plugins/craft/craft_backend/capabilities/bop_navigation.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
         "plugins/craft/craft_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:craft.bop.template.change.apply": {
+      "function_id": "capability:craft.bop.template.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.template.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_template_change.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
       ]
     },
     "capability:craft.bop.validation.get": {
@@ -1831,6 +2587,29 @@
         "plugins/craft/craft_backend/capabilities/contracts.py"
       ]
     },
+    "capability:craft.bop.version.freeze.change.apply": {
+      "function_id": "capability:craft.bop.version.freeze.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.version.freeze.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_version_freeze_change.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
     "capability:craft.bop.version.get": {
       "function_id": "capability:craft.bop.version.get",
       "domain": "Craft",
@@ -1856,6 +2635,75 @@
         "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
+    "capability:craft.bop.version.layout.change.apply": {
+      "function_id": "capability:craft.bop.version.layout.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.version.layout.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_version_layout_change.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.version.legacy_read": {
+      "function_id": "capability:craft.bop.version.legacy_read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.version.legacy_read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_version_legacy_read.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.version.lifecycle.change.apply": {
+      "function_id": "capability:craft.bop.version.lifecycle.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.version.lifecycle.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_version_lifecycle_change.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
     "capability:craft.bop.version.list": {
       "function_id": "capability:craft.bop.version.list",
       "domain": "Craft",
@@ -1877,6 +2725,29 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/bop_versions.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.version.snapshot.change.apply": {
+      "function_id": "capability:craft.bop.version.snapshot.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.version.snapshot.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_version_snapshot_change.py",
         "plugins/craft/craft_backend/capabilities/contracts.py"
       ]
     },
@@ -1926,6 +2797,9 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
+        "plugins/craft/craft_backend/capabilities/canvas.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/reviewed.py",
         "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
       ]
     },
@@ -1949,6 +2823,9 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
+        "plugins/craft/craft_backend/capabilities/canvas.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/reviewed.py",
         "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
       ]
     },
@@ -1972,7 +2849,56 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/data_exchange.py",
+        "plugins/craft/craft_backend/capabilities/reviewed.py",
         "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+      ]
+    },
+    "capability:craft.data_exchange.lark.read": {
+      "function_id": "capability:craft.data_exchange.lark.read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.data_exchange.lark.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/lark_exchange.py"
+      ]
+    },
+    "capability:craft.data_exchange.lark.write": {
+      "function_id": "capability:craft.data_exchange.lark.write",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.data_exchange.lark.write",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/lark_exchange.py"
       ]
     },
     "capability:craft.ebom.change.apply": {
@@ -1995,7 +2921,33 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/ebom_change.py",
+        "plugins/craft/craft_backend/capabilities/reviewed.py",
         "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+      ]
+    },
+    "capability:craft.ebom.legacy_read": {
+      "function_id": "capability:craft.ebom.legacy_read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.ebom.legacy_read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/ebom_legacy_read.py"
       ]
     },
     "capability:craft.ebom.read": {
@@ -2019,6 +2971,52 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+      ]
+    },
+    "capability:craft.ebom.vpps_check.read": {
+      "function_id": "capability:craft.ebom.vpps_check.read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.ebom.vpps_check.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/vpps_check.py"
+      ]
+    },
+    "capability:craft.gbop.catalog.read": {
+      "function_id": "capability:craft.gbop.catalog.read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.catalog.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/gbop_catalog.py"
       ]
     },
     "capability:craft.gbop.change.apply": {
@@ -2182,6 +3180,75 @@
         "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
       ]
     },
+    "capability:craft.gbop.entity.change.apply": {
+      "function_id": "capability:craft.gbop.entity.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.entity.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/gbop_entity_change.py"
+      ]
+    },
+    "capability:craft.gbop.import.change.apply": {
+      "function_id": "capability:craft.gbop.import.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.import.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/gbop_import_change.py"
+      ]
+    },
+    "capability:craft.gbop.import.tc.change.apply": {
+      "function_id": "capability:craft.gbop.import.tc.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.import.tc.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/gbop_import_tc_change.py"
+      ]
+    },
     "capability:craft.gbop.item.knowledge.list": {
       "function_id": "capability:craft.gbop.item.knowledge.list",
       "domain": "Craft",
@@ -2257,6 +3324,75 @@
         "plugins/craft/craft_backend/capabilities/gbop_descriptors.py",
         "plugins/craft/craft_backend/capabilities/gbop_read.py",
         "plugins/craft/craft_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:craft.gbop.navigation.change.apply": {
+      "function_id": "capability:craft.gbop.navigation.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.navigation.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/gbop_navigation_change.py"
+      ]
+    },
+    "capability:craft.gbop.navigation.read": {
+      "function_id": "capability:craft.gbop.navigation.read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.navigation.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/gbop_navigation.py"
+      ]
+    },
+    "capability:craft.gbop.process_hierarchy.read": {
+      "function_id": "capability:craft.gbop.process_hierarchy.read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.process_hierarchy.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/gbop_process_hierarchy.py"
       ]
     },
     "capability:craft.gbop.read": {
@@ -2417,7 +3553,123 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py",
         "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
+      ]
+    },
+    "capability:craft.gbop.station_autolink.change.apply": {
+      "function_id": "capability:craft.gbop.station_autolink.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.station_autolink.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/gbop_station_autolink_change.py"
+      ]
+    },
+    "capability:craft.gbop.station_autolink.preview": {
+      "function_id": "capability:craft.gbop.station_autolink.preview",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.station_autolink.preview",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/station_autolink_preview.py"
+      ]
+    },
+    "capability:craft.gbop.version.change.apply": {
+      "function_id": "capability:craft.gbop.version.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.version.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/gbop_version_change.py"
+      ]
+    },
+    "capability:craft.library.change.apply": {
+      "function_id": "capability:craft.library.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.library.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/library_change.py"
+      ]
+    },
+    "capability:craft.library.read": {
+      "function_id": "capability:craft.library.read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.library.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/library_read.py"
       ]
     },
     "capability:craft.manufacturing_resource.change.apply": {
@@ -2877,6 +4129,29 @@
         "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
       ]
     },
+    "capability:craft.rule.engine.evaluate": {
+      "function_id": "capability:craft.rule.engine.evaluate",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.rule.engine.evaluate",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/rule_engine.py"
+      ]
+    },
     "capability:craft.rule.evaluate": {
       "function_id": "capability:craft.rule.evaluate",
       "domain": "Craft",
@@ -2898,6 +4173,52 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
+      ]
+    },
+    "capability:craft.rule.library.change.apply": {
+      "function_id": "capability:craft.rule.library.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.rule.library.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/rule_library.py"
+      ]
+    },
+    "capability:craft.rule.library.read": {
+      "function_id": "capability:craft.rule.library.read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.rule.library.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/rule_library.py"
       ]
     },
     "capability:craft.rule.read": {
@@ -3082,6 +4403,98 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
+      ]
+    },
+    "capability:craft.standard_operation.change.apply": {
+      "function_id": "capability:craft.standard_operation.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.standard_operation.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/standard_operation.py"
+      ]
+    },
+    "capability:craft.standard_operation.read": {
+      "function_id": "capability:craft.standard_operation.read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.standard_operation.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/standard_operation.py"
+      ]
+    },
+    "capability:craft.vpps_audit.change.apply": {
+      "function_id": "capability:craft.vpps_audit.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.vpps_audit.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/vpps_audit.py"
+      ]
+    },
+    "capability:craft.vpps_audit.read": {
+      "function_id": "capability:craft.vpps_audit.read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.vpps_audit.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/vpps_audit.py"
       ]
     },
     "capability:digital_model.component.search": {
@@ -4439,6 +5852,50 @@
         "plugins/knowledge/knowledge_backend/capabilities/knowledge_next.py"
       ]
     },
+    "capability:knowledge.hub.change.apply": {
+      "function_id": "capability:knowledge.hub.change.apply",
+      "domain": "Knowledge",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "knowledge.hub.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/knowledge/knowledge_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:knowledge.hub.read": {
+      "function_id": "capability:knowledge.hub.read",
+      "domain": "Knowledge",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "knowledge.hub.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/knowledge/knowledge_backend/capabilities/reviewed.py"
+      ]
+    },
     "capability:knowledge.migration.status": {
       "function_id": "capability:knowledge.migration.status",
       "domain": "Knowledge",
@@ -4864,6 +6321,7 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/device/device_backend/capabilities/contracts.py",
+        "plugins/device/device_backend/capabilities/provider.py",
         "plugins/device/device_backend/capabilities/reviewed.py"
       ]
     },
@@ -4888,6 +6346,7 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/device/device_backend/capabilities/contracts.py",
+        "plugins/device/device_backend/capabilities/provider.py",
         "plugins/device/device_backend/capabilities/reviewed.py"
       ]
     },
@@ -5516,6 +6975,7 @@
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/provider.py",
         "plugins/project_management/project_management_backend/capabilities/reviewed.py"
       ]
     },
@@ -5582,6 +7042,7 @@
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/provider.py",
         "plugins/project_management/project_management_backend/capabilities/reviewed.py"
       ]
     },
@@ -5604,6 +7065,7 @@
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/provider.py",
         "plugins/project_management/project_management_backend/capabilities/reviewed.py"
       ]
     },
@@ -5692,6 +7154,7 @@
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/provider.py",
         "plugins/project_management/project_management_backend/capabilities/reviewed.py"
       ]
     },
@@ -7236,7 +8699,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.version.create",
+      "target_capability": "craft.bop.fork_preset.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -7390,7 +8853,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.version.archive",
+      "target_capability": "craft.bop.version.lifecycle.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -8294,7 +9757,7 @@
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
-        "plugins/agent/agent_backend/routers/skills.py"
+        "plugins/agent/agent_backend/routers/skills_v2.py"
       ]
     },
     "rest:DELETE:/api/std_op/operations/{gid}": {
@@ -8978,7 +10441,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.execution_structure.get",
+      "target_capability": "craft.bop.entry.legacy_read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9000,7 +10463,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.execution_structure.get",
+      "target_capability": "craft.bop.entry.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9022,17 +10485,17 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "ontology.mapping.assess",
+      "target_capability": null,
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "candidate",
+      "classification": "unstable_product_surface",
+      "migration_status": "excluded",
       "owner": "Ontology",
-      "exclusion_reason": null,
+      "exclusion_reason": "Retired cross-domain ontology endpoint must not become an independently invokable Capability.",
       "source_paths": [
         "plugins/craft/craft_backend/routers/ontology.py"
       ]
@@ -9066,7 +10529,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.execution_structure.get",
+      "target_capability": "craft.bop.entry.legacy_read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9088,7 +10551,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.execution_structure.get",
+      "target_capability": "craft.bop.entry.legacy_read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9220,7 +10683,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.version.create",
+      "target_capability": "craft.bop.fork_preset.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9242,7 +10705,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.version.create",
+      "target_capability": "craft.bop.fork_preset.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9396,7 +10859,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.pbom.part.search",
+      "target_capability": "craft.bop.entry.legacy_read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9484,7 +10947,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.execution_structure.get",
+      "target_capability": "craft.bop.version.legacy_read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9506,7 +10969,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.execution_structure.get",
+      "target_capability": "craft.bop.lifecycle.state.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9528,7 +10991,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.execution_structure.get",
+      "target_capability": "craft.bop.lifecycle.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9550,7 +11013,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.execution_structure.get",
+      "target_capability": "craft.bop.lifecycle.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9572,7 +11035,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.execution_structure.get",
+      "target_capability": "craft.bop.lifecycle.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9594,7 +11057,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.execution_structure.get",
+      "target_capability": "craft.bop.lifecycle.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9638,7 +11101,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.draft.change.preview",
+      "target_capability": "craft.bop.pbom_lifecycle.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9660,7 +11123,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.draft.change.preview",
+      "target_capability": "craft.bop.pbom_lifecycle.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9682,7 +11145,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.execution_structure.get",
+      "target_capability": "craft.bop.alt_hierarchy.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9704,7 +11167,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.draft.change.preview",
+      "target_capability": "craft.bop.entry.legacy_read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9726,7 +11189,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.execution_structure.get",
+      "target_capability": "craft.bop.version.legacy_read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9770,7 +11233,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.execution_structure.get",
+      "target_capability": "craft.bop.entry.legacy_read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9792,7 +11255,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.linked_parts.get",
+      "target_capability": "craft.bop.line_operation_catia.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9814,7 +11277,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.execution_structure.get",
+      "target_capability": "craft.bop.entry.legacy_read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9836,7 +11299,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.execution_structure.get",
+      "target_capability": "craft.bop.entry.legacy_read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9902,7 +11365,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.execution_structure.get",
+      "target_capability": "craft.bop.staging.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -9924,7 +11387,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.execution_structure.get",
+      "target_capability": "craft.bop.version.legacy_read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -10254,7 +11717,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.ebom.read",
+      "target_capability": "craft.ebom.legacy_read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -10342,7 +11805,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.ebom.read",
+      "target_capability": "craft.ebom.vpps_check.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -10814,7 +12277,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.gbop.read",
+      "target_capability": "craft.gbop.station_autolink.preview",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -11418,17 +12881,17 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "ontology.concept.resolve",
+      "target_capability": null,
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "candidate",
+      "classification": "unstable_product_surface",
+      "migration_status": "excluded",
       "owner": "Ontology",
-      "exclusion_reason": null,
+      "exclusion_reason": "Retired ontology compatibility endpoint must not become an independently invokable Capability.",
       "source_paths": [
         "plugins/craft/craft_backend/routers/ontology.py"
       ]
@@ -11506,17 +12969,17 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "ontology.concept.get",
+      "target_capability": null,
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "candidate",
+      "classification": "unstable_product_surface",
+      "migration_status": "excluded",
       "owner": "Ontology",
-      "exclusion_reason": null,
+      "exclusion_reason": "Retired ontology compatibility endpoint must not become an independently invokable Capability.",
       "source_paths": [
         "plugins/craft/craft_backend/routers/ontology.py"
       ]
@@ -11535,10 +12998,10 @@
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "operations",
+      "classification": "unstable_product_surface",
       "migration_status": "excluded",
       "owner": "Ontology",
-      "exclusion_reason": "rest:GET:/api/ontology/db-tables is a database-introspection endpoint used to configure Ontology bindings; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "exclusion_reason": "Retired ontology compatibility endpoint must not become an independently invokable Capability.",
       "source_paths": [
         "plugins/craft/craft_backend/routers/ontology.py"
       ]
@@ -11572,17 +13035,17 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "ontology.concept.resolve",
+      "target_capability": null,
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "candidate",
+      "classification": "unstable_product_surface",
+      "migration_status": "excluded",
       "owner": "Ontology",
-      "exclusion_reason": null,
+      "exclusion_reason": "Retired ontology compatibility endpoint must not become an independently invokable Capability.",
       "source_paths": [
         "plugins/craft/craft_backend/routers/ontology.py"
       ]
@@ -11594,17 +13057,17 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "ontology.concept.resolve",
+      "target_capability": null,
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "candidate",
+      "classification": "unstable_product_surface",
+      "migration_status": "excluded",
       "owner": "Ontology",
-      "exclusion_reason": null,
+      "exclusion_reason": "Retired ontology compatibility endpoint must not become an independently invokable Capability.",
       "source_paths": [
         "plugins/craft/craft_backend/routers/ontology.py"
       ]
@@ -11616,17 +13079,17 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "ontology.release.diff",
+      "target_capability": null,
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "candidate",
+      "classification": "unstable_product_surface",
+      "migration_status": "excluded",
       "owner": "Ontology",
-      "exclusion_reason": null,
+      "exclusion_reason": "Retired ontology compatibility endpoint must not become an independently invokable Capability.",
       "source_paths": [
         "plugins/craft/craft_backend/routers/ontology.py"
       ]
@@ -11660,17 +13123,17 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "ontology.concept.resolve",
+      "target_capability": null,
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "candidate",
+      "classification": "unstable_product_surface",
+      "migration_status": "excluded",
       "owner": "Ontology",
-      "exclusion_reason": null,
+      "exclusion_reason": "Retired ontology compatibility endpoint must not become an independently invokable Capability.",
       "source_paths": [
         "plugins/craft/craft_backend/routers/ontology.py"
       ]
@@ -12068,7 +13531,7 @@
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
-        "plugins/agent/agent_backend/routers/skills.py"
+        "plugins/agent/agent_backend/routers/skills_v2.py"
       ]
     },
     "rest:GET:/api/std_op/operations": {
@@ -13311,17 +14774,17 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "ontology.mapping.change.apply",
+      "target_capability": null,
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "mapped",
+      "classification": "unstable_product_surface",
       "migration_status": "registered",
       "owner": "Ontology",
-      "exclusion_reason": null,
+      "exclusion_reason": "Retired cross-domain ontology endpoint must not become an independently invokable Capability.",
       "source_paths": [
         "plugins/craft/craft_backend/routers/ontology.py"
       ]
@@ -13421,7 +14884,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.version.create",
+      "target_capability": "craft.bop.fork_preset.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -13487,7 +14950,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.draft.change.apply",
+      "target_capability": "craft.bop.lifecycle.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -13619,7 +15082,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.draft.change.apply",
+      "target_capability": "craft.bop.lifecycle.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -13641,7 +15104,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.draft.change.apply",
+      "target_capability": "craft.bop.lifecycle.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -15363,7 +16826,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.version.create",
+      "target_capability": "craft.bop.fork_preset.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -15539,14 +17002,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.entry.legacy_read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "transport_adapter",
+      "classification": "mapped",
       "migration_status": "excluded",
       "owner": "Craft",
       "exclusion_reason": "rest:POST:/api/bop/resolve-gids is a binary upload or legacy identifier-resolution adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
@@ -15583,7 +17046,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.version.archive",
+      "target_capability": "craft.bop.version.lifecycle.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -15869,7 +17332,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.draft.change.apply",
+      "target_capability": "craft.bop.lifecycle.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -15913,7 +17376,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.bop.draft.change.apply",
+      "target_capability": "craft.bop.version.lifecycle.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -17695,7 +19158,7 @@
       ],
       "data_classification": "internal",
       "classification": "transport_adapter",
-      "migration_status": "excluded",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": "rest:POST:/api/import-export/lark-bitable/read is a raw Lark sheet or bitable transfer adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
@@ -17717,7 +19180,7 @@
       ],
       "data_classification": "internal",
       "classification": "transport_adapter",
-      "migration_status": "excluded",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": "rest:POST:/api/import-export/lark-bitable/write is a raw Lark sheet or bitable transfer adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
@@ -17739,7 +19202,7 @@
       ],
       "data_classification": "internal",
       "classification": "transport_adapter",
-      "migration_status": "excluded",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": "rest:POST:/api/import-export/lark-sheets/read is a raw Lark sheet or bitable transfer adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
@@ -17761,7 +19224,7 @@
       ],
       "data_classification": "internal",
       "classification": "transport_adapter",
-      "migration_status": "excluded",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": "rest:POST:/api/import-export/lark-sheets/write is a raw Lark sheet or bitable transfer adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
@@ -18071,17 +19534,17 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "ontology.schema.change.apply",
+      "target_capability": null,
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "mapped",
+      "classification": "unstable_product_surface",
       "migration_status": "registered",
       "owner": "Ontology",
-      "exclusion_reason": null,
+      "exclusion_reason": "Retired ontology compatibility endpoint must not become an independently invokable Capability.",
       "source_paths": [
         "plugins/craft/craft_backend/routers/ontology.py"
       ]
@@ -18137,17 +19600,17 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "ontology.schema.change.apply",
+      "target_capability": null,
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "mapped",
+      "classification": "unstable_product_surface",
       "migration_status": "registered",
       "owner": "Ontology",
-      "exclusion_reason": null,
+      "exclusion_reason": "Retired ontology compatibility endpoint must not become an independently invokable Capability.",
       "source_paths": [
         "plugins/craft/craft_backend/routers/ontology.py"
       ]
@@ -18159,17 +19622,17 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "ontology.mapping.assess",
+      "target_capability": null,
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "candidate",
+      "classification": "unstable_product_surface",
+      "migration_status": "excluded",
       "owner": "Ontology",
-      "exclusion_reason": null,
+      "exclusion_reason": "Retired ontology compatibility endpoint must not become an independently invokable Capability.",
       "source_paths": [
         "plugins/craft/craft_backend/routers/ontology.py"
       ]
@@ -18501,7 +19964,7 @@
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
-        "plugins/agent/agent_backend/routers/skills.py"
+        "plugins/agent/agent_backend/routers/skills_v2.py"
       ]
     },
     "rest:POST:/api/skills/seed-system": {
@@ -19839,7 +21302,7 @@
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
-        "plugins/agent/agent_backend/routers/skills.py"
+        "plugins/agent/agent_backend/routers/skills_v2.py"
       ]
     },
     "rest:PUT:/api/task-dependencies/{gid}": {
@@ -20502,8 +21965,8 @@
         "dist/web/container_card/modes/mode_spreadsheet.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/auth_state.js:55": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/auth_state.js:55",
+    "web_gap:dynamic_fetch:dist/web/core/auth_state.js:104": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/auth_state.js:104",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21052,8 +22515,8 @@
         "dist/web/core/notification_manager.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:168": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:168",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:167": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:167",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21074,8 +22537,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:198": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:198",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:197": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:197",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21096,8 +22559,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:237": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:237",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:236": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:236",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21118,8 +22581,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:279": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:279",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:278": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:278",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21140,8 +22603,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:287": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:287",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:286": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:286",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21162,8 +22625,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:297": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:297",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:296": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:296",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21184,8 +22647,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:310": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:310",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:306": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:306",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21206,8 +22669,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:317": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:317",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:33": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:33",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21228,8 +22691,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:34": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:34",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:361": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:361",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21250,52 +22713,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:356": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:356",
-      "domain": "Base Platform",
-      "stability": "experimental",
-      "current_consumers": [
-        "Web"
-      ],
-      "target_capability": null,
-      "exposure": "Web/REST",
-      "automation_level": "interactive",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "dist/web/core/web_compat.js"
-      ]
-    },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:429": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:429",
-      "domain": "Base Platform",
-      "stability": "experimental",
-      "current_consumers": [
-        "Web"
-      ],
-      "target_capability": null,
-      "exposure": "Web/REST",
-      "automation_level": "interactive",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "dist/web/core/web_compat.js"
-      ]
-    },
-    "web_gap:dynamic_fetch:dist/web/main.js:1043": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1043",
+    "web_gap:dynamic_fetch:dist/web/main.js:1063": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1063",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21316,8 +22735,8 @@
         "dist/web/main.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/main.js:1099": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1099",
+    "web_gap:dynamic_fetch:dist/web/main.js:1093": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1093",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21338,8 +22757,8 @@
         "dist/web/main.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/main.js:1210": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1210",
+    "web_gap:dynamic_fetch:dist/web/main.js:1203": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1203",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21360,8 +22779,8 @@
         "dist/web/main.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/main.js:1484": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1484",
+    "web_gap:dynamic_fetch:dist/web/main.js:1477": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1477",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21382,8 +22801,8 @@
         "dist/web/main.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/main.js:1494": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1494",
+    "web_gap:dynamic_fetch:dist/web/main.js:1487": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1487",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21404,8 +22823,8 @@
         "dist/web/main.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/main.js:1527": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1527",
+    "web_gap:dynamic_fetch:dist/web/main.js:1520": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1520",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21426,8 +22845,8 @@
         "dist/web/main.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/main.js:635": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:635",
+    "web_gap:dynamic_fetch:dist/web/main.js:655": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:655",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21448,8 +22867,8 @@
         "dist/web/main.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/main.js:676": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:676",
+    "web_gap:dynamic_fetch:dist/web/main.js:696": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:696",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21492,8 +22911,8 @@
         "dist/web/settings/plugin_center.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/settings/settings.js:934": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/settings/settings.js:934",
+    "web_gap:dynamic_fetch:dist/web/settings/settings.js:1216": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/settings/settings.js:1216",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21536,8 +22955,8 @@
         "dist/web/team_space/team_space.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5653": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5653",
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5630": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5630",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [

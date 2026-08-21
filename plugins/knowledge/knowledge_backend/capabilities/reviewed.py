@@ -9,9 +9,99 @@ from ..provider import register_capability
 CAPABILITY_IDS = (
     "knowledge.entry.change.apply", "knowledge.space.change.apply",
     "knowledge.document.archive", "knowledge.personalization.change.apply",
-    "knowledge.personalization.read",
+    "knowledge.personalization.read", "knowledge.hub.read", "knowledge.hub.change.apply",
 )
-SCHEMA = {"type": "object", "required": ["operation", "arguments"], "properties": {"operation": {"type": "string"}, "arguments": {}}, "additionalProperties": False}
+_STRING = {"type": "string"}
+_TAGS = {"type": "array", "items": _STRING, "maxItems": 100}
+_LIST = {"type": "array", "items": {"type": "object", "additionalProperties": True}, "maxItems": 500}
+_STRING_LIST = {"type": "array", "items": _STRING, "maxItems": 500}
+_JSON_OBJECT = {"type": "object", "additionalProperties": True}
+_ENTRY_UPDATES = {
+    "type": "object",
+    "properties": {
+        "title": _STRING, "entry_type": _STRING, "status": _STRING,
+        "share_scope": _STRING, "list_gid": _STRING, "source_gid": _STRING,
+        "source_label": _STRING, "maintainer_gid": _STRING,
+        "contributors": _LIST, "attachments": _LIST, "tags": _TAGS,
+        "content_ref": _JSON_OBJECT, "content_md": _STRING,
+        "related_part_nos": _STRING_LIST, "related_operation_gids": _STRING_LIST,
+        "context_class_gid": _STRING,
+    },
+    "additionalProperties": False,
+}
+_SPACE_UPDATES = {
+    "type": "object",
+    "properties": {"name": _STRING, "visibility": _STRING},
+    "additionalProperties": False,
+}
+_FOLDER_UPDATES = {
+    "type": "object",
+    "properties": {"name": {"type": "string", "maxLength": 512}, "sort_order": {"type": "integer", "minimum": -1000000, "maximum": 1000000}, "parent_gid": _STRING},
+    "additionalProperties": False,
+}
+_ITEM_UPDATES = {
+    "type": "object",
+    "properties": {
+        "folder_gid": _STRING, "title": {"type": "string", "maxLength": 512}, "status": _STRING,
+        "content_body": {"type": "object", "additionalProperties": True}, "content_md": {"type": "string", "maxLength": 200000},
+        "file_path": _STRING, "url": _STRING, "site_ref": {"type": "object", "additionalProperties": True},
+        "tags": _TAGS, "is_pinned": {"type": "boolean"}, "is_hidden": {"type": "boolean"},
+        "scope_type": _STRING, "team_gid": _STRING,
+    },
+    "additionalProperties": False,
+}
+
+
+def _schema(operations, properties):
+    return {
+        "type": "object",
+        "required": ["operation", "arguments"],
+        "properties": {
+            "operation": {"type": "string", "enum": list(operations)},
+            "arguments": {
+                "type": "object", "properties": properties,
+                "additionalProperties": False,
+            },
+        },
+        "additionalProperties": False,
+    }
+
+
+SCHEMAS = {
+    "knowledge.entry.change.apply": _schema(
+        ("entries.create", "entries.update", "entries.delete"),
+        {"gid": _STRING, "title": _STRING, "entry_type": _STRING,
+         "status": _STRING, "share_scope": _STRING, "list_gid": _STRING,
+         "source_gid": _STRING, "source_label": _STRING, "maintainer_gid": _STRING,
+         "contributors": _LIST, "attachments": _LIST, "tags": _TAGS,
+         "content_ref": _JSON_OBJECT, "content_md": _STRING,
+         "related_part_nos": _STRING_LIST, "related_operation_gids": _STRING_LIST,
+         "context_class_gid": _STRING, "updates": _ENTRY_UPDATES},
+    ),
+    "knowledge.space.change.apply": _schema(
+        ("spaces.update", "spaces.archive"),
+        {"gid": _STRING, "updates": _SPACE_UPDATES},
+    ),
+    "knowledge.document.archive": _schema(("documents.archive",), {"gid": _STRING}),
+    "knowledge.personalization.change.apply": _schema(
+        ("favorites.toggle", "recent.record"), {"gid": _STRING}
+    ),
+    "knowledge.personalization.read": _schema(("favorites.list", "recent.list"), {"limit": {"type": "integer", "minimum": 1, "maximum": 200}}),
+    "knowledge.hub.read": _schema(
+        ("folders.list", "items.list", "items.get", "items.history.get"),
+        {"gid": _STRING, "folder_gid": _STRING, "scope_type": _STRING, "team_gid": _STRING,
+         "show_hidden": {"type": "boolean"}, "q": _STRING, "limit": {"type": "integer", "minimum": 1, "maximum": 200}},
+    ),
+    "knowledge.hub.change.apply": _schema(
+        ("folders.create", "folders.update", "folders.delete", "items.create", "items.update", "items.delete"),
+        {"gid": _STRING, "parent_gid": _STRING, "scope_type": _STRING, "team_gid": _STRING,
+         "name": {"type": "string", "maxLength": 512}, "sort_order": {"type": "integer", "minimum": -1000000, "maximum": 1000000},
+         "folder_gid": _STRING, "item_type": _STRING, "title": {"type": "string", "maxLength": 512},
+         "status": _STRING, "content_body": {"type": "object", "additionalProperties": True}, "content_md": {"type": "string", "maxLength": 200000},
+         "file_path": _STRING, "url": _STRING, "site_ref": {"type": "object", "additionalProperties": True},
+         "tags": _TAGS, "updates": _ITEM_UPDATES},
+    ),
+}
 
 
 def register_reviewed_capabilities(registry):
@@ -21,9 +111,8 @@ def register_reviewed_capabilities(registry):
             id=capability_id, owner="knowledge", description=f"Execute {capability_id}.",
             use_when="A governed consumer needs this Knowledge outcome.", do_not_use_when="The resource belongs to another domain.",
             risk=CapabilityRisk.READ if read else CapabilityRisk.WRITE, confirmation="none" if read else "user",
-            permissions=("knowledge.read",) if read else ("knowledge.write",), input_schema=SCHEMA,
+            permissions=("knowledge.read",) if read else ("knowledge.write",), input_schema=SCHEMAS[capability_id],
             output_schema={"type": "object", "required": ["data"], "properties": {"data": {}}}, tags=("knowledge",), plugin_callable=True,
         )
         def handler(payload, context, *, _id=capability_id): return {"data": knowledge_outcomes.invoke(_id, payload, context)}
         register_capability(registry, spec, handler)
-

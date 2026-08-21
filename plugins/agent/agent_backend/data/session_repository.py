@@ -5,6 +5,7 @@ import uuid
 from collections.abc import Callable
 
 from .connection import get_agent_conn
+from backend.capability_v2.provider_contracts import CapabilityBusinessError
 
 SESSIONS_TABLE = "workmanship_app_ai_sessions"
 TURNS_TABLE = "workmanship_app_ai_turns"
@@ -91,6 +92,44 @@ class SessionRepository:
     def delete_session(self, session_gid: str) -> None:
         with self._connection_factory() as conn, conn.cursor() as cur:
             cur.execute(f"DELETE FROM {SESSIONS_TABLE} WHERE gid=%s", (session_gid,))
+
+    def delete_owned_session(self, session_gid: str, user_gid: str) -> bool:
+        with self._connection_factory() as conn, conn.cursor() as cur:
+            cur.execute(
+                f"DELETE FROM {SESSIONS_TABLE} WHERE gid=%s AND user_gid=%s",
+                (session_gid, user_gid),
+            )
+            return cur.rowcount == 1
+
+    def get_session(self, session_gid: str, user_gid: str) -> list[dict]:
+        with self._connection_factory() as conn, conn.cursor() as cur:
+            cur.execute(
+                f"SELECT gid FROM {SESSIONS_TABLE} WHERE gid=%s AND user_gid=%s",
+                (session_gid, user_gid),
+            )
+            if not cur.fetchone():
+                raise CapabilityBusinessError(
+                    "resource_not_found", "Agent session was not found",
+                    details={"session_gid": session_gid},
+                )
+            cur.execute(
+                f"SELECT role, content, tool_calls FROM {TURNS_TABLE} "
+                f"WHERE session_gid=%s ORDER BY sort_order ASC LIMIT %s",
+                (session_gid, 501),
+            )
+            rows = cur.fetchall()
+        if len(rows) > 500:
+            raise CapabilityBusinessError(
+                "dataset_too_large", "Agent session history exceeds the bounded response limit",
+                details={"limit": 500, "session_gid": session_gid},
+            )
+        result = []
+        for row in rows:
+            tool_calls = row.get("tool_calls") or []
+            if isinstance(tool_calls, str):
+                tool_calls = json.loads(tool_calls)
+            result.append({"role": row["role"], "content": row["content"], "tool_calls": tool_calls})
+        return result
 
     def compress_session(self, session_gid: str, summary_text: str, keep_recent: int = 15) -> None:
         if keep_recent < 1:

@@ -50,7 +50,7 @@ def _ownership() -> dict:
 def test_every_first_class_domain_has_an_independent_release_owner():
     document = _ownership()
 
-    assert document["schema_version"] == 1
+    assert document["schema_version"] == 2
     assert set(document["domains"]) == EXPECTED_DOMAINS
     for name, domain in document["domains"].items():
         assert domain["maintainers"], name

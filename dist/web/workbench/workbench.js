@@ -5289,25 +5289,6 @@
 
   function _getAppItem(id) { return _ALL_APP_ITEMS.find(i => i.id === id); }
 
-  async function _loadRegistryAppItems() {
-    try {
-      const registry = await window.parent?.electronAPI?.getPluginRegistry?.();
-      const items = window.PluginRegistryModel?.appItems(registry) || [];
-      let added = 0;
-      for (const item of items) {
-        if (_ALL_APP_ITEMS.some(existing => existing.id === item.id)) continue;
-        _ALL_APP_ITEMS.push(item);
-        added++;
-      }
-      if (added) {
-        _appState = _loadAppState();
-        _renderAppPanel();
-      }
-    } catch (error) {
-      console.warn('[Workbench] plugin registry App items unavailable:', error);
-    }
-  }
-
   function _appItemAllowed(item) {
     const authMode = window.parent?._authMode || window._authMode || 'none';
     if (authMode !== 'feishu' && item.requiresAuth) return false;
@@ -5624,10 +5605,6 @@
     aiBubbleInner.className = 'wb-fc-bubble';
     aiBubbleInner.textContent = '…';
     aiBubble.appendChild(aiBubbleInner);
-    const evidenceBox = document.createElement('div');
-    evidenceBox.className = 'wb-fc-evidence';
-    evidenceBox.hidden = true;
-    aiBubble.appendChild(evidenceBox);
     msgs.appendChild(aiBubble);
     msgs.scrollTop = msgs.scrollHeight;
 
@@ -5665,25 +5642,6 @@
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let answer = '';
-      const evidenceMap = new Map();
-      const renderEvidence = () => {
-        const evidence = [...evidenceMap.values()];
-        evidenceBox.replaceChildren();
-        evidenceBox.hidden = evidence.length === 0;
-        if (!evidence.length) return;
-        const title = document.createElement('div');
-        title.className = 'wb-fc-evidence-title';
-        title.textContent = '引用来源';
-        evidenceBox.appendChild(title);
-        evidence.forEach((item) => {
-          const row = document.createElement('div');
-          row.className = 'wb-fc-evidence-item';
-          const revision = item?.metadata?.revision_no ? ` · revision ${item.metadata.revision_no}` : '';
-          row.textContent = `${item.summary || item.reference}${revision}${item.digest ? ` · ${item.digest}` : ''}`;
-          row.title = item.reference || '';
-          evidenceBox.appendChild(row);
-        });
-      };
       aiBubbleInner.textContent = '';
 
       while (true) {
@@ -5698,12 +5656,6 @@
               answer += evt.content || '';
               aiBubbleInner.textContent = answer;
               msgs.scrollTop = msgs.scrollHeight;
-            } else if (evt.type === 'tool_end' && Array.isArray(evt.evidence)) {
-              evt.evidence.forEach((item) => {
-                if (!item?.reference) return;
-                evidenceMap.set(`${item.reference}|${item.digest || ''}`, item);
-              });
-              renderEvidence();
             } else if (evt.type === 'error') {
               aiBubbleInner.textContent = '错误：' + (evt.message || '未知');
             }
@@ -5787,7 +5739,6 @@
 
     // App 面板
     _renderAppPanel();
-    void _loadRegistryAppItems();
 
     // AI 球
     _initAiBall();

@@ -13,6 +13,8 @@ from backend.capability_v2.provider_contracts import (
 
 from ..services.execution_structure import (
     build_execution_structure,
+    legacy_linked_parts,
+    legacy_pbom_items,
     linked_parts,
     project_work_package,
     repository,
@@ -116,6 +118,14 @@ def get_linked_parts(
     aggregate = repository.load_bop_aggregate(version_gid, expected_revision=None)
     revision = aggregate.version["revision"]
     items = linked_parts(aggregate)
+    legacy_items = legacy_linked_parts(aggregate)
+    legacy_pbom = legacy_pbom_items(aggregate)
+    if len(legacy_items) > 500 or len(legacy_pbom) > 500:
+        raise CapabilityBusinessError(
+            "dataset_too_large",
+            "Linked PBOM parts exceed the bounded compatibility response limit",
+            details={"limit": 500, "linked_count": len(legacy_items), "pbom_count": len(legacy_pbom)},
+        )
     evidence = EvidenceRef(
         kind="craft.bop.linked_parts",
         reference=f"craft://bop/version/{version_gid}/linked-parts/r{revision}",
@@ -123,7 +133,13 @@ def get_linked_parts(
         metadata={"version_gid": version_gid, "revision": revision},
     )
     return CapabilityOutput(
-        data={"version_gid": version_gid, "revision": revision, "items": items},
+        data={
+            "version_gid": version_gid,
+            "revision": revision,
+            "items": items,
+            "legacy_items": legacy_items,
+            "legacy_pbom_items": legacy_pbom,
+        },
         evidence=(evidence,),
     )
 

@@ -189,38 +189,38 @@ async def list_class_axioms(gid: str, include_inherited: bool = True, _u=Depends
     return await _invoke("ontology.concept.get", {"stable_gid": gid, "kind": "concept", "view": "schema"}, _u, _p)
 
 
-@router.get("/api/ontology/db-tables")
+@router.get("/api/ontology/db-tables", status_code=410)
 def list_db_tables(_u=Depends(get_current_user)): _retired()
 
-@router.get("/api/ontology/node-type-suggestions")
+@router.get("/api/ontology/node-type-suggestions", status_code=410)
 def list_node_type_suggestions(_u=Depends(get_current_user)): _retired()
 
-@router.get("/api/ontology/unbound-classes")
+@router.get("/api/ontology/unbound-classes", status_code=410)
 def list_unbound_classes(_u=Depends(get_current_user)): _retired()
 
-@router.get("/api/ontology/classes/{gid}/individuals")
+@router.get("/api/ontology/classes/{gid}/individuals", status_code=410)
 def list_class_individuals(gid: str, limit: int = 20, _u=Depends(get_current_user)): _retired()
 
-@router.post("/api/ontology/classes/{gid}/sync-from-table")
+@router.post("/api/ontology/classes/{gid}/sync-from-table", status_code=410)
 def sync_props_from_table(gid: str, _u=Depends(get_current_user)): _retired()
 
-@router.post("/api/ontology/seed")
+@router.post("/api/ontology/seed", status_code=410)
 def seed_from_bop(_u=Depends(get_current_user)): _retired()
 
-@router.get("/api/bop/entries/{entry_gid}/entity-props")
+@router.get("/api/bop/entries/{entry_gid}/entity-props", status_code=410)
 def get_entity_props(entry_gid: str, _u=Depends(get_current_user)): _retired()
 
-@router.patch("/api/bop/entries/{entry_gid}/entity-props")
+@router.patch("/api/bop/entries/{entry_gid}/entity-props", status_code=410)
 def patch_entity_props(entry_gid: str, body: dict, _u=Depends(get_current_user)): _retired()
 
-@router.get("/api/ontology/schema-diff")
+@router.get("/api/ontology/schema-diff", status_code=410)
 def schema_diff(_u=Depends(get_current_user)): _retired()
 
-@router.get("/api/ontology/node-type-config")
+@router.get("/api/ontology/node-type-config", status_code=410)
 def get_node_type_config(_u=Depends(get_current_user)): _retired()
 
-@router.post("/api/ontology/validate/{entry_gid}")
+@router.post("/api/ontology/validate/{entry_gid}", status_code=410)
 def validate_entry(entry_gid: str, _u=Depends(get_current_user)): _retired()
 
-@router.get("/api/ontology/agent-schema")
+@router.get("/api/ontology/agent-schema", status_code=410)
 def get_agent_schema(_u=Depends(get_current_user)): _retired()

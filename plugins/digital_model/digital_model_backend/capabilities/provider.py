@@ -47,6 +47,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
     updates = {
         "lifecycle_status": LifecycleStatus.STABLE,
         "exposure": ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True),
+        "exposure_policy_source": "provider_explicit",
         "automation_level": AutomationLevel.A1 if is_write else AutomationLevel.A2,
         "authorization_policy": "digital_model.v2:" + ",".join(governed.permissions),
         "resource_selectors": tuple(

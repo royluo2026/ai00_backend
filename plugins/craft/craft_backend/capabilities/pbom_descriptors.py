@@ -36,7 +36,8 @@ def _search(payload: dict, _context: CapabilityContext) -> CapabilityOutput:
 
 def _create(payload: dict, _context: CapabilityContext) -> CapabilityOutput:
     version = PbomVersion(
-        gid=str(next_gid()), project_ref=str(payload["project_ref"]), version_tag=str(payload["version_tag"]),
+        gid=str(next_gid()), project_ref=str(payload.get("project_ref") or payload.get("project_gid") or ""), version_tag=str(payload["version_tag"]),
+        name=str(payload.get("name") or payload["version_tag"]), source_type=str(payload.get("source_type") or "native"),
         knowledge_revision_ref=payload.get("knowledge_revision_ref"), ontology_release_ref=payload.get("ontology_release_ref"),
         revision_commit_ref=payload.get("revision_commit_ref"),
     )

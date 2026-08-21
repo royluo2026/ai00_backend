@@ -1,6 +1,120 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "resolution": "The most specific matching code path wins; equal-specificity claims are invalid.",
+  "table_ownership_source": "backend/governance/domain_table_ownership.json",
+  "frontend_repository": "workmanship-web",
+  "shared_paths": [
+    {
+      "path": "backend/capability_v2/**",
+      "maintainers": ["@ai00/base-maintainers"],
+      "review_policy": "platform_and_affected_domains",
+      "required_checks": ["capability contracts", "gateway regression", "affected domain tests"]
+    },
+    {
+      "path": "backend/domain_ports/**",
+      "maintainers": ["@ai00/base-maintainers"],
+      "review_policy": "platform_and_affected_domains",
+      "required_checks": ["port compatibility", "affected domain tests"]
+    },
+    {
+      "path": "backend/core/**",
+      "maintainers": ["@ai00/base-maintainers"],
+      "review_policy": "platform_and_affected_domains",
+      "required_checks": ["backend regression", "affected domain tests"]
+    },
+    {
+      "path": "backend/platform_sdk/**",
+      "maintainers": ["@ai00/base-maintainers"],
+      "review_policy": "platform_and_affected_domains",
+      "required_checks": ["SDK contract tests", "affected domain tests"]
+    },
+    {
+      "path": "docs/governance/**",
+      "maintainers": ["@ai00/base-maintainers"],
+      "review_policy": "platform_and_affected_domains",
+      "required_checks": ["governance consistency check"]
+    },
+    {
+      "path": "dist/web/core/**",
+      "maintainers": ["@ai00/base-maintainers"],
+      "review_policy": "platform_and_affected_domains",
+      "required_checks": ["frontend tests", "affected domain smoke tests"]
+    },
+    {
+      "path": "dist/web/workspace/**",
+      "maintainers": ["@ai00/base-maintainers"],
+      "review_policy": "platform_and_affected_domains",
+      "required_checks": ["frontend tests", "workspace smoke tests"]
+    },
+    {
+      "path": "dist/web/workbench/**",
+      "maintainers": ["@ai00/base-maintainers"],
+      "review_policy": "platform_and_affected_domains",
+      "required_checks": ["frontend tests", "workbench smoke tests"]
+    },
+    {
+      "path": "dist/web/components/**",
+      "maintainers": ["@ai00/base-maintainers"],
+      "review_policy": "platform_and_affected_domains",
+      "required_checks": ["frontend tests", "affected domain smoke tests"]
+    }
+  ],
+  "frontend_shared_paths": [
+    {
+      "path": "packages/core/**",
+      "maintainers": ["@ai00/base-maintainers"],
+      "review_policy": "platform_and_affected_domains",
+      "required_checks": ["frontend tests", "application shell smoke tests"]
+    },
+    {
+      "path": "packages/plugin-sdk/**",
+      "maintainers": ["@ai00/base-maintainers"],
+      "review_policy": "platform_and_affected_domains",
+      "required_checks": ["plugin SDK tests", "enabled plugin smoke tests"]
+    },
+    {
+      "path": "web/core/**",
+      "maintainers": ["@ai00/base-maintainers"],
+      "review_policy": "platform_and_affected_domains",
+      "required_checks": ["frontend tests", "authentication smoke tests"]
+    },
+    {
+      "path": "web/workspace/**",
+      "maintainers": ["@ai00/base-maintainers"],
+      "review_policy": "platform_and_affected_domains",
+      "required_checks": ["frontend tests", "workspace smoke tests"]
+    },
+    {
+      "path": "web/workbench/**",
+      "maintainers": ["@ai00/base-maintainers"],
+      "review_policy": "platform_and_affected_domains",
+      "required_checks": ["frontend tests", "workbench smoke tests"]
+    },
+    {
+      "path": "web/components/**",
+      "maintainers": ["@ai00/base-maintainers"],
+      "review_policy": "platform_and_affected_domains",
+      "required_checks": ["frontend tests", "affected domain smoke tests"]
+    },
+    {
+      "path": "web/settings/**",
+      "maintainers": ["@ai00/base-maintainers"],
+      "review_policy": "platform_and_affected_domains",
+      "required_checks": ["frontend tests", "settings smoke tests"]
+    },
+    {
+      "path": "web/login/**",
+      "maintainers": ["@ai00/base-maintainers"],
+      "review_policy": "platform_and_affected_domains",
+      "required_checks": ["frontend tests", "login smoke tests"]
+    },
+    {
+      "path": "web/admin/capability_governance/**",
+      "maintainers": ["@ai00/base-maintainers"],
+      "review_policy": "platform_and_affected_domains",
+      "required_checks": ["governance UI tests", "governance API smoke tests"]
+    }
+  ],
   "shared_import_prefixes": [
     "backend.capability_v2",
     "backend.domain_ports",
@@ -9,6 +123,10 @@
   ],
   "domains": {
     "Base Platform": {
+      "domain_id": "base",
+      "table_owner": "base",
+      "capability_prefixes": ["base.", "identity.", "plugin.", "semantic.", "system."],
+      "frontend_paths": ["packages/core/**", "packages/plugin-sdk/**", "web/core/**", "web/workspace/**", "web/workbench/**", "web/components/**", "web/settings/**", "web/login/**", "web/admin/capability_governance/**"],
       "maintainers": ["@ai00/base-maintainers"],
       "artifact": "ai00-base-platform",
       "module_prefixes": ["backend.system_capabilities", "backend.plugin_platform"],
@@ -45,6 +163,10 @@
       "documentation_paths": ["docs/capabilities/base-platform/**"]
     },
     "Agent": {
+      "domain_id": "agent",
+      "table_owner": "agent",
+      "capability_prefixes": ["agent."],
+      "frontend_paths": ["packages/agent-plugin/**"],
       "maintainers": ["@ai00/agent-maintainers"],
       "artifact": "ai00-agent-runtime",
       "module_prefixes": ["plugins.agent"],
@@ -62,6 +184,10 @@
       "documentation_paths": ["docs/capabilities/agent/**"]
     },
     "Craft": {
+      "domain_id": "craft",
+      "table_owner": "craft",
+      "capability_prefixes": ["craft."],
+      "frontend_paths": ["packages/craft-plugin/**"],
       "maintainers": ["@ai00/craft-maintainers"],
       "artifact": "ai00-craft-plugin",
       "module_prefixes": ["plugins.craft"],
@@ -79,6 +205,10 @@
       "documentation_paths": ["docs/capabilities/craft/**"]
     },
     "Digital Model": {
+      "domain_id": "digital_model",
+      "table_owner": "digital_model",
+      "capability_prefixes": ["digital_model."],
+      "frontend_paths": ["packages/sim-plugin/web/cad_sim/structure_tree.js", "packages/sim-plugin/web/cad_sim/viewer3d.js"],
       "maintainers": ["@ai00/digital-model-maintainers"],
       "artifact": "ai00-digital-model-plugin",
       "module_prefixes": ["plugins.digital_model"],
@@ -92,6 +222,10 @@
       "documentation_paths": ["docs/capabilities/digital-model/**"]
     },
     "Factory": {
+      "domain_id": "factory",
+      "table_owner": "factory",
+      "capability_prefixes": ["factory."],
+      "frontend_paths": ["web/knowledge_hub/pages/factory_info.html"],
       "maintainers": ["@ai00/factory-maintainers"],
       "artifact": "ai00-factory-plugin",
       "module_prefixes": ["plugins.factory"],
@@ -102,6 +236,10 @@
       "documentation_paths": ["docs/capabilities/factory/**"]
     },
     "Integration": {
+      "domain_id": "integration",
+      "table_owner": "integration",
+      "capability_prefixes": ["integration."],
+      "frontend_paths": ["web/ext_datasource/**", "web/feishu/**"],
       "maintainers": ["@ai00/integration-maintainers"],
       "artifact": "ai00-integration-plugin",
       "module_prefixes": ["plugins.integration"],
@@ -112,6 +250,10 @@
       "documentation_paths": ["docs/capabilities/integration/**"]
     },
     "Project Management": {
+      "domain_id": "project_management",
+      "table_owner": "project_management",
+      "capability_prefixes": ["base.project.", "project."],
+      "frontend_paths": ["web/admin/task_planning.html", "web/team_space/**", "web/share/**"],
       "maintainers": ["@ai00/project-management-maintainers"],
       "artifact": "ai00-project-management-plugin",
       "module_prefixes": ["plugins.project_management"],
@@ -136,6 +278,10 @@
       "documentation_paths": ["docs/capabilities/project-management/**"]
     },
     "Simulation": {
+      "domain_id": "simulation",
+      "table_owner": "simulation",
+      "capability_prefixes": ["simulation."],
+      "frontend_paths": ["packages/sim-plugin/**"],
       "maintainers": ["@ai00/simulation-maintainers"],
       "artifact": "ai00-simulation-plugin",
       "module_prefixes": ["plugins.simulation"],
@@ -146,6 +292,10 @@
       "documentation_paths": ["docs/capabilities/simulation/**"]
     },
     "Ontology": {
+      "domain_id": "ontology",
+      "table_owner": "ontology",
+      "capability_prefixes": ["ontology."],
+      "frontend_paths": ["web/ontology/**"],
       "maintainers": ["@ai00/ontology-maintainers"],
       "artifact": "ai00-ontology-domain",
       "module_prefixes": ["plugins.ontology", "backend.ontology"],
@@ -167,6 +317,10 @@
       "documentation_paths": ["docs/capabilities/ontology/**"]
     },
     "Knowledge": {
+      "domain_id": "knowledge",
+      "table_owner": "knowledge",
+      "capability_prefixes": ["knowledge."],
+      "frontend_paths": ["web/knowledge/**", "web/knowledge_hub/**", "web/my_files/**", "web/content_tree/**", "web/md_workspace/**"],
       "maintainers": ["@ai00/knowledge-maintainers"],
       "artifact": "ai00-knowledge-domain",
       "module_prefixes": ["plugins.knowledge", "backend.knowledge"],
@@ -201,6 +355,10 @@
       "documentation_paths": ["docs/capabilities/knowledge/**"]
     },
     "Device": {
+      "domain_id": "device",
+      "table_owner": "device",
+      "capability_prefixes": ["device."],
+      "frontend_paths": [],
       "maintainers": ["@ai00/local-runtime-maintainers"],
       "artifact": "ai00-device",
       "module_prefixes": ["plugins.device"],

@@ -6,9 +6,9 @@ Execute the reviewed project.craft_scope.read project outcome.
 
 - 适用：A governed consumer needs this Project Management outcome.
 - 不适用：The operation belongs to another domain.
-- 生命周期：`stable`
+- 生命周期：`deprecated`
 - 所属领域：`project_management`
-- Catalog Release：`rel_118d91d38b08fcecd96ddea0005a02b5`
+- Catalog Release：`rel_3010694218f96365eda536567f35d198`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -71,11 +71,12 @@ Execute the reviewed project.craft_scope.read project outcome.
   "additionalProperties": false,
   "properties": {
     "arguments": {
-      "description": "Operation-specific object validated by the Project application layer."
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
     },
     "operation": {
-      "maxLength": 128,
-      "minLength": 1,
+      "enum": [],
       "type": "string"
     }
   },
@@ -92,10 +93,10 @@ Execute the reviewed project.craft_scope.read project outcome.
 ```json
 {
   "capability_id": "project.craft_scope.read",
-  "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
+  "catalog_release": "rel_3010694218f96365eda536567f35d198",
   "major_version": 1,
   "payload": {
-    "arguments": "example",
+    "arguments": {},
     "operation": "example"
   }
 }

@@ -1,6 +1,6 @@
 from __future__ import annotations
 from backend.capability_v2.provider_contracts import CapabilityOutput, CapabilitySpec
-from .gbop_read import get_gbop_item_usage, list_gbop_item_knowledge, search_gbop_items
+from .gbop_read import get_gbop_item_usage, list_gbop_item_knowledge, search_gbop_items, search_gbop_releases
 
 GBOP_CAPABILITY_IDS = (
  "craft.gbop.draft.create", "craft.gbop.draft.get", "craft.gbop.draft.search", "craft.gbop.draft.change.preview",
@@ -10,7 +10,12 @@ GBOP_CAPABILITY_IDS = (
 )
 
 _READS = {item for item in GBOP_CAPABILITY_IDS if item.endswith((".get", ".search", ".compare", ".list"))}
-_EXISTING = {"craft.gbop.item.search": search_gbop_items, "craft.gbop.item.usage.get": get_gbop_item_usage, "craft.gbop.item.knowledge.list": list_gbop_item_knowledge}
+_EXISTING = {
+    "craft.gbop.release.search": search_gbop_releases,
+    "craft.gbop.item.search": search_gbop_items,
+    "craft.gbop.item.usage.get": get_gbop_item_usage,
+    "craft.gbop.item.knowledge.list": list_gbop_item_knowledge,
+}
 
 def _generic(capability_id):
     def handler(payload, context): return CapabilityOutput(data={"capability_id": capability_id, "ref": payload.get("ref"), "status": "accepted", "lineage_refs": payload.get("lineage_refs", [])})

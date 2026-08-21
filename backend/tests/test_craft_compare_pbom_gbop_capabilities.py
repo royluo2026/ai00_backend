@@ -7,6 +7,7 @@ from backend.capabilities.registry_next import CapabilityRegistry
 from plugins.craft.craft_backend.capabilities import register_capabilities
 from plugins.craft.craft_backend.capabilities.gbop_read import (
     get_gbop_item_usage,
+    search_gbop_releases,
     repository as gbop_repository,
 )
 from plugins.craft.craft_backend.capabilities.pbom_read import search_pbom_parts
@@ -70,3 +71,20 @@ def test_gbop_usage_returns_only_explicit_provenance_statuses():
         "inherited",
         "broken",
     }
+
+
+def test_gbop_release_search_returns_compatibility_version_inventory():
+    with patch.object(
+        gbop_repository,
+        "list_versions",
+        return_value=[{
+            "gid": "v-1", "name": "V1", "version_family_gid": "family-1",
+            "status": "draft", "frozen_at": None, "archived_at": None,
+            "vehicle_model": "M1", "team_id": "team-1", "created_by": "u-1",
+            "created_at": "2026-08-20 00:00:00", "updated_at": "2026-08-20 00:00:00",
+        }],
+    ):
+        result = search_gbop_releases({"include_archived": False}, CapabilityContext(user_gid="u1"))
+
+    assert result.data["items"][0]["gid"] == "v-1"
+    assert result.data["items"][0]["status"] == "draft"

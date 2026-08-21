@@ -27,6 +27,7 @@ class ScanPolicyError(RuntimeError):
 
 
 _TABLE = re.compile(r"\b(workmanship_[a-z][a-z0-9_]*)\b", re.IGNORECASE)
+_MIGRATION_FILE = re.compile(r"^\d{12}_.+\.sql$", re.IGNORECASE)
 _MAX_SOURCE_BYTES = 2 * 1024 * 1024
 _CLASS_TYPES = (
     ("gateway", "gateway"),
@@ -93,6 +94,37 @@ def _node_type(name: str, path: str) -> str | None:
     return None
 
 
+def _is_http_route_handler(item: ast.AST) -> bool:
+    """Return whether an AST declaration is explicitly mounted as an HTTP route."""
+    if not isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        return False
+    methods = {"get", "post", "put", "patch", "delete", "head", "options", "api_route"}
+    for decorator in item.decorator_list:
+        target = decorator.func if isinstance(decorator, ast.Call) else decorator
+        if isinstance(target, ast.Attribute) and target.attr in methods:
+            return True
+    return False
+
+
+def _is_retired_http_route(item: ast.AST) -> bool:
+    """Return whether an HTTP handler is explicitly retired with status 410."""
+    if not isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        return False
+    for decorator in item.decorator_list:
+        if not isinstance(decorator, ast.Call):
+            continue
+        for keyword in decorator.keywords:
+            if keyword.arg == "status_code" and isinstance(keyword.value, ast.Constant) and keyword.value.value == 410:
+                return True
+    for node in ast.walk(item):
+        if not isinstance(node, ast.Call) or _dotted_name(node.func).split(".")[-1] != "HTTPException":
+            continue
+        status = node.args[0] if node.args else next((keyword.value for keyword in node.keywords if keyword.arg == "status_code"), None)
+        if isinstance(status, ast.Constant) and status.value == 410:
+            return True
+    return False
+
+
 def _normalise_relative(path: Path) -> str:
     return PurePosixPath(path.as_posix()).as_posix()
 
@@ -132,12 +164,16 @@ class GovernanceScanner:
         product_catalog: Mapping[str, Any] | Any | None = None,
         extension_catalog: Mapping[str, Any] | Any | None = None,
         domain_manifests: Mapping[str, Any] | Any | None = None,
+        acceptance_manifest: Mapping[str, Any] | Any | None = None,
+        acceptance_manifest_path: str = "backend/tests/acceptance/fixtures/case-manifest.json",
     ) -> None:
         self.settings = settings
         self._registry_snapshot = tuple(registry_snapshot or ())
         self._product_catalog = product_catalog
         self._extension_catalog = extension_catalog
         self._domain_manifests = domain_manifests
+        self._acceptance_manifest = acceptance_manifest
+        self._acceptance_manifest_path = acceptance_manifest_path
 
     def scan_path(self, requested: Path) -> tuple[Path, ...]:
         """Resolve a caller's repository-relative root only when it is allowlisted."""
@@ -175,11 +211,16 @@ class GovernanceScanner:
         extension = _json_document(self._extension_catalog) if self._extension_catalog is not None else None
         manifests = self._require_manifest(self._domain_manifests)
         domains = self._domains(manifests)
-        units, tables, unresolved = self._parse_allowlisted_sources(domains)
+        units, tables, unresolved, source_trees, source_imports = self._parse_allowlisted_sources(domains)
         nodes, relations = self._build_nodes_and_relations(units, tables, unresolved)
         capabilities = self._scan_capabilities(product, domains)
-        bindings, extra_relations = self._bind_capabilities(capabilities, nodes, units, domains)
+        bindings, extra_relations = self._bind_capabilities(
+            capabilities, nodes, units, domains, source_trees, source_imports,
+        )
         relations.extend(extra_relations)
+        test_bindings, test_relations = self._bind_acceptance_tests(capabilities, nodes)
+        bindings.extend(test_bindings)
+        relations.extend(test_relations)
         ordered_nodes = tuple(sorted(nodes.values(), key=lambda item: item.canonical_key))
         ordered_relations = tuple(sorted(
             self._unique_relations(relations),
@@ -240,7 +281,10 @@ class GovernanceScanner:
 
     def _parse_allowlisted_sources(
         self, domains: Mapping[str, Mapping[str, Any]],
-    ) -> tuple[list[_AstUnit], list[_TableReference], list[tuple[str, str, str]]]:
+    ) -> tuple[
+        list[_AstUnit], list[_TableReference], list[tuple[str, str, str]],
+        dict[tuple[str, str], ast.Module], dict[tuple[str, str], dict[str, tuple[str, str, str]]],
+    ]:
         roots: dict[str, tuple[str, bool]] = {}
         for owner, manifest in domains.items():
             roots[str(manifest["artifact_path"])] = (owner, False)
@@ -257,6 +301,8 @@ class GovernanceScanner:
         units: list[_AstUnit] = []
         tables: list[_TableReference] = []
         unresolved: list[tuple[str, str, str]] = []
+        source_trees: dict[tuple[str, str], ast.Module] = {}
+        source_imports: dict[tuple[str, str], dict[str, tuple[str, str, str]]] = {}
         deferred_table_names: list[tuple[str, str, int, str, str]] = []
         for relative_root, (owner, is_migration_path) in sorted(roots.items()):
             paths = self._scan_declared_manifest_path(relative_root)
@@ -269,13 +315,25 @@ class GovernanceScanner:
                 except (OSError, UnicodeDecodeError):
                     continue
                 if path.suffix == ".sql":
-                    tables.extend(_TableReference(owner, relative, table.lower(), None, is_migration_path) for table in _TABLE.findall(source))
+                    is_migration_file = is_migration_path or bool(_MIGRATION_FILE.fullmatch(path.name))
+                    tables.extend(_TableReference(owner, relative, table.lower(), None, is_migration_file) for table in _TABLE.findall(source))
                     continue
                 try:
                     tree = ast.parse(source, filename=relative)
                 except SyntaxError:
                     unresolved.append((owner, relative, "syntax_error"))
                     continue
+                source_trees[(owner, relative)] = tree
+                imports: dict[str, tuple[str, str, str]] = {}
+                for item in tree.body:
+                    if not isinstance(item, ast.ImportFrom):
+                        continue
+                    target_path = self._resolve_import_source(relative, item.module, item.level)
+                    if target_path is None:
+                        continue
+                    for alias in item.names:
+                        imports[alias.asname or alias.name] = (owner, target_path, alias.name)
+                source_imports[(owner, relative)] = imports
                 source_hash = _source_hash(source)
                 imported_symbols = tuple(sorted({
                     alias.asname or alias.name.rsplit(".", 1)[-1]
@@ -285,6 +343,10 @@ class GovernanceScanner:
                 classes = [node for node in tree.body if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef))]
                 for item in classes:
                     found_type = _node_type(item.name, relative)
+                    if found_type in {"rest_route", "legacy_api"} and (
+                        _is_retired_http_route(item) or not _is_http_route_handler(item)
+                    ):
+                        found_type = None
                     if found_type:
                         units.append(_AstUnit(owner, relative, item.name, found_type, item, source_hash, imported_symbols))
                 for assignment in ast.walk(tree):
@@ -327,7 +389,28 @@ class GovernanceScanner:
                 tables.append(_TableReference(owner, source_path, next(iter(candidates)), target_symbol))
             else:
                 unresolved.append((owner, source_path, f"dynamic_table:{lineno}"))
-        return units, tables, unresolved
+        return units, tables, unresolved, source_trees, source_imports
+
+    @staticmethod
+    def _resolve_import_source(source_path: str, module: str | None, level: int) -> str | None:
+        """Resolve a relative Python import to one repository source path."""
+        if level < 0:
+            return None
+        if level:
+            parts = list(PurePosixPath(source_path).parent.parts)
+            for _ in range(level - 1):
+                if not parts:
+                    return None
+                parts.pop()
+            if module:
+                parts.extend(module.split("."))
+        elif module and (module.startswith("backend.") or module.startswith("plugins.")):
+            parts = module.split(".")
+        else:
+            return None
+        if not parts:
+            return None
+        return PurePosixPath(*parts).as_posix() + ".py"
 
     def _scan_declared_manifest_path(self, relative_root: str) -> tuple[Path, ...]:
         """Read one path declared by the official manifest, never a caller path.
@@ -467,13 +550,17 @@ class GovernanceScanner:
         nodes: dict[str, ImplementationNode],
         units: list[_AstUnit],
         domains: Mapping[str, Mapping[str, Any]],
+        source_trees: Mapping[tuple[str, str], ast.Module],
+        source_imports: Mapping[tuple[str, str], Mapping[str, tuple[str, str, str]]],
     ) -> tuple[list[CapabilityBinding], list[ImplementationRelation]]:
         bindings: list[CapabilityBinding] = []
         relations: list[ImplementationRelation] = []
         registry_modules = self._registry_modules()
+        descriptor_keys: dict[tuple[str, int], str] = {}
         for capability in capabilities:
             descriptor_path = f"catalog/{capability.capability_id}@{capability.major_version}"
             descriptor_key = node_key("descriptor", capability.owner_domain, descriptor_path)
+            descriptor_keys[(capability.capability_id, capability.major_version)] = descriptor_key
             nodes[descriptor_key] = ImplementationNode(
                 descriptor_key, capability.owner_domain, "descriptor", descriptor_path,
                 capability.descriptor_hash, capability.capability_id,
@@ -502,6 +589,271 @@ class GovernanceScanner:
             for gateway in gateways:
                 bindings.append(self._binding(capability, gateway.key, "exposed_by"))
                 relations.append(self._relation(descriptor_key, gateway.key, "exposes"))
+
+        for route in units:
+            if route.node_type not in {"rest_route", "legacy_api"}:
+                continue
+            for capability in self._route_capabilities(
+                route.tree,
+                capabilities,
+                source_trees.get((route.owner, route.source_path)),
+                source_trees=source_trees,
+                source_imports=source_imports,
+                source_owner=route.owner,
+                source_path=route.source_path,
+            ):
+                descriptor_key = descriptor_keys[(capability.capability_id, capability.major_version)]
+                bindings.append(self._binding(capability, route.key, "exposed_by"))
+                relations.append(self._relation(descriptor_key, route.key, "exposes"))
+        return bindings, relations
+
+    @staticmethod
+    def _route_capabilities(
+        tree: ast.AST,
+        capabilities: Iterable[ScannedCapability],
+        module_tree: ast.Module | None = None,
+        *,
+        source_trees: Mapping[tuple[str, str], ast.Module] | None = None,
+        source_imports: Mapping[tuple[str, str], Mapping[str, tuple[str, str, str]]] | None = None,
+        source_owner: str = "",
+        source_path: str = "",
+    ) -> tuple[ScannedCapability, ...]:
+        """Resolve only explicit capability literals inside a decorated route."""
+        by_id: dict[str, list[ScannedCapability]] = defaultdict(list)
+        by_version: dict[str, ScannedCapability] = {}
+        for capability in capabilities:
+            by_id[capability.capability_id].append(capability)
+            by_version[f"{capability.capability_id}@{capability.major_version}"] = capability
+        literals = {
+            node.value.strip()
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Constant) and isinstance(node.value, str) and node.value.strip()
+        }
+        resolved: dict[tuple[str, int], ScannedCapability] = {}
+        for literal in literals:
+            capability = by_version.get(literal)
+            if capability is not None:
+                resolved[(capability.capability_id, capability.major_version)] = capability
+                continue
+            matches = by_id.get(literal, ())
+            if len(matches) == 1:
+                capability = matches[0]
+                resolved[(capability.capability_id, capability.major_version)] = capability
+
+        if module_tree is not None and isinstance(tree, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            trees = source_trees or {(source_owner, source_path): module_tree}
+            imports_by_source = source_imports or {}
+            visiting: set[tuple[str, str, str, tuple[tuple[str, object], ...]]] = set()
+
+            def function_aliases(owner: str, path: str) -> dict[str, ast.AST]:
+                tree_for_source = trees.get((owner, path))
+                if tree_for_source is None:
+                    return {}
+                functions = {
+                    item.name: item for item in tree_for_source.body
+                    if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef))
+                }
+                aliases: dict[str, ast.AST] = {}
+                for assignment in tree_for_source.body:
+                    if not isinstance(assignment, ast.Assign) or not isinstance(assignment.value, ast.Call):
+                        continue
+                    if not isinstance(assignment.value.func, ast.Name):
+                        continue
+                    factory = functions.get(assignment.value.func.id)
+                    if factory is None:
+                        continue
+                    returns = [
+                        item.value for item in factory.body
+                        if isinstance(item, ast.Return) and isinstance(item.value, (ast.Tuple, ast.List))
+                    ]
+                    if not returns:
+                        continue
+                    returned_names = [item.id for item in returns[-1].elts if isinstance(item, ast.Name)]
+                    nested = {
+                        item.name: item for item in ast.walk(factory)
+                        if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef))
+                    }
+                    targets = assignment.targets[0] if assignment.targets else None
+                    target_names = [item.id for item in targets.elts] if isinstance(targets, (ast.Tuple, ast.List)) else []
+                    for alias, returned in zip(target_names, returned_names):
+                        if returned in nested:
+                            aliases[alias] = nested[returned]
+                return aliases
+
+            def function_for(owner: str, path: str, name: str) -> tuple[str, str, ast.AST] | None:
+                tree_for_source = trees.get((owner, path))
+                if tree_for_source is None:
+                    return None
+                for item in tree_for_source.body:
+                    if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)) and item.name == name:
+                        return owner, path, item
+                alias = function_aliases(owner, path).get(name)
+                if alias is not None:
+                    return owner, path, alias
+                imported = imports_by_source.get((owner, path), {}).get(name)
+                if imported is None:
+                    return None
+                target_owner, target_path, target_name = imported
+                target_tree = trees.get((target_owner, target_path))
+                if target_tree is None:
+                    return None
+                for item in target_tree.body:
+                    if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)) and item.name == target_name:
+                        return target_owner, target_path, item
+                return None
+
+            def evaluate(value: ast.AST, environment: Mapping[str, object]) -> object | None:
+                if isinstance(value, ast.Constant) and isinstance(value.value, (bool, str)):
+                    return value.value
+                if isinstance(value, ast.Name):
+                    return environment.get(value.id)
+                if isinstance(value, ast.IfExp):
+                    condition = evaluate(value.test, environment)
+                    if isinstance(condition, bool):
+                        return evaluate(value.body if condition else value.orelse, environment)
+                if isinstance(value, ast.Compare) and len(value.ops) == 1 and len(value.comparators) == 1:
+                    left = evaluate(value.left, environment)
+                    right = evaluate(value.comparators[0], environment)
+                    if isinstance(left, (bool, str)) and isinstance(right, (bool, str)):
+                        if isinstance(value.ops[0], ast.Eq):
+                            return left == right
+                        if isinstance(value.ops[0], ast.NotEq):
+                            return left != right
+                return None
+
+            def call_environment(
+                function: ast.AST,
+                call: ast.Call,
+                parent_environment: Mapping[str, object],
+            ) -> dict[str, object]:
+                if not isinstance(function, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    return {}
+                parameters = [*function.args.posonlyargs, *function.args.args, *function.args.kwonlyargs]
+                environment: dict[str, object] = {}
+                for parameter, argument in zip(parameters, call.args):
+                    value = evaluate(argument, parent_environment)
+                    if value is not None:
+                        environment[parameter.arg] = value
+                for keyword in call.keywords:
+                    if keyword.arg is not None:
+                        value = evaluate(keyword.value, parent_environment)
+                        if value is not None:
+                            environment[keyword.arg] = value
+                defaults = [*function.args.defaults]
+                for parameter, default in zip(parameters[-len(defaults):] if defaults else (), defaults):
+                    environment.setdefault(parameter.arg, evaluate(default, parent_environment))
+                for parameter, default in zip(function.args.kwonlyargs, function.args.kw_defaults):
+                    if default is not None:
+                        environment.setdefault(parameter.arg, evaluate(default, parent_environment))
+                return environment
+
+            def visit(function: ast.AST, environment: Mapping[str, object], owner: str, path: str) -> None:
+                key = (owner, path, getattr(function, "name", ""), tuple(sorted(environment.items(), key=lambda item: item[0])))
+                if key in visiting:
+                    return
+                visiting.add(key)
+                local_environment = dict(environment)
+                for statement in getattr(function, "body", ()):
+                    assignment = statement.value if isinstance(statement, ast.Expr) else statement
+                    if isinstance(assignment, (ast.Assign, ast.AnnAssign)):
+                        value = evaluate(assignment.value, local_environment)
+                        targets = assignment.targets if isinstance(assignment, ast.Assign) else (assignment.target,)
+                        if value is not None:
+                            for target in targets:
+                                if isinstance(target, ast.Name):
+                                    local_environment[target.id] = value
+                for call in ast.walk(function):
+                    if not isinstance(call, ast.Call):
+                        continue
+                    for keyword in call.keywords:
+                        if keyword.arg != "capability_id":
+                            continue
+                        literal = evaluate(keyword.value, local_environment)
+                        capability = by_version.get(str(literal)) if isinstance(literal, str) else None
+                        if capability is None and isinstance(literal, str):
+                            matches = by_id.get(literal, ())
+                            capability = matches[0] if len(matches) == 1 else None
+                        if capability is not None:
+                            resolved[(capability.capability_id, capability.major_version)] = capability
+                    if isinstance(call.func, ast.Name):
+                        target = function_for(owner, path, call.func.id)
+                        if target is not None:
+                            target_owner, target_path, target_function = target
+                            visit(
+                                target_function,
+                                call_environment(target_function, call, local_environment),
+                                target_owner,
+                                target_path,
+                            )
+                visiting.remove(key)
+
+            visit(tree, {}, source_owner, source_path)
+        return tuple(resolved[key] for key in sorted(resolved))
+
+    def _bind_acceptance_tests(
+        self,
+        capabilities: list[ScannedCapability],
+        nodes: dict[str, ImplementationNode],
+    ) -> tuple[list[CapabilityBinding], list[ImplementationRelation]]:
+        """Bind only executable test node ids explicitly declared by the acceptance manifest."""
+        if self._acceptance_manifest is None:
+            return [], []
+        manifest = _json_document(self._acceptance_manifest)
+        declared = manifest.get("capabilities")
+        if not isinstance(declared, Mapping):
+            raise ScanPolicyError("acceptance_manifest_invalid")
+        by_key = {
+            f"{item.capability_id}@{item.major_version}": item
+            for item in capabilities
+        }
+        bindings: list[CapabilityBinding] = []
+        relations: list[ImplementationRelation] = []
+        for raw_key, raw_cases in sorted(declared.items(), key=lambda item: str(item[0])):
+            if not isinstance(raw_key, str) or raw_key not in by_key:
+                raise ScanPolicyError("acceptance_manifest_capability_invalid")
+            capability = by_key[raw_key]
+            if capability.lifecycle_status != "stable" or not isinstance(raw_cases, Mapping):
+                raise ScanPolicyError("acceptance_manifest_capability_invalid")
+            descriptor_key = node_key(
+                "descriptor", capability.owner_domain,
+                f"catalog/{capability.capability_id}@{capability.major_version}",
+            )
+            for case_name, raw_node_id in sorted(raw_cases.items(), key=lambda item: str(item[0])):
+                if not isinstance(case_name, str) or not isinstance(raw_node_id, str):
+                    raise ScanPolicyError("acceptance_manifest_case_invalid")
+                source_path, separator, source_symbol = raw_node_id.partition("::")
+                if (
+                    not separator
+                    or not source_symbol.startswith("test_")
+                    or not source_path.endswith(".py")
+                    or Path(source_path).is_absolute()
+                    or ".." in PurePosixPath(source_path).parts
+                ):
+                    raise ScanPolicyError("acceptance_manifest_case_invalid")
+                source = (self.settings.repository_root / Path(PurePosixPath(source_path))).resolve()
+                try:
+                    source.relative_to(self.settings.repository_root.resolve())
+                except ValueError as exc:
+                    raise ScanPolicyError("acceptance_manifest_case_invalid") from exc
+                if not self._is_safe_repository_file(source):
+                    raise ScanPolicyError("acceptance_manifest_case_invalid")
+                relative_source = source.relative_to(self.settings.repository_root).as_posix()
+                key = node_key("test_case", capability.owner_domain, relative_source, raw_node_id)
+                nodes[key] = ImplementationNode(
+                    key,
+                    capability.owner_domain,
+                    "test_case",
+                    relative_source,
+                    _source_hash(source.read_text(encoding="utf-8")),
+                    raw_node_id,
+                    metadata={
+                        "case_type": case_name,
+                        "test_node_id": raw_node_id,
+                        "acceptance_manifest": self._acceptance_manifest_path,
+                    },
+                )
+                bindings.append(self._binding(capability, key, "tested_by"))
+                relations.append(self._relation(descriptor_key, key, "tested_by"))
         return bindings, relations
 
     def _registry_modules(self) -> dict[tuple[str, int], str]:
@@ -547,6 +899,11 @@ class GovernanceScanner:
         # while registrations live in a capability submodule.  Fall back only
         # to that same domain package's provider module; application/outcome
         # modules remain deliberately excluded.
+        if source_module == "backend.base.provider" and (
+            module.startswith("backend.capabilities.")
+            or module.startswith("backend.plugin_platform.")
+        ):
+            return True
         package = ".".join(parts[:2]) if parts[:1] == ["backend"] and len(parts) >= 2 else parts[0]
         return source_module == f"{package}.provider" or source_module.endswith(f".{package}.provider")
 

@@ -8,7 +8,7 @@ craft.gbop.release.search
 - 不适用：The subject is a project BOP.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_118d91d38b08fcecd96ddea0005a02b5`
+- Catalog Release：`rel_3010694218f96365eda536567f35d198`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -70,26 +70,8 @@ craft.gbop.release.search
 {
   "additionalProperties": false,
   "properties": {
-    "evidence": {
-      "description": "Provider-validated transport value."
-    },
-    "item_gid": {
-      "description": "Provider-validated transport value."
-    },
-    "limit": {
-      "description": "Provider-validated transport value."
-    },
-    "lineage_refs": {
-      "description": "Provider-validated transport value."
-    },
-    "query": {
-      "description": "Provider-validated transport value."
-    },
-    "ref": {
-      "description": "Provider-validated transport value."
-    },
-    "release_ref": {
-      "description": "Provider-validated transport value."
+    "include_archived": {
+      "type": "boolean"
     }
   },
   "type": "object"
@@ -101,7 +83,7 @@ craft.gbop.release.search
 ```json
 {
   "capability_id": "craft.gbop.release.search",
-  "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
+  "catalog_release": "rel_3010694218f96365eda536567f35d198",
   "major_version": 1,
   "payload": {}
 }
@@ -115,36 +97,58 @@ craft.gbop.release.search
 {
   "additionalProperties": false,
   "properties": {
-    "active_release_gid": {
-      "description": "Provider-validated transport value."
-    },
-    "capability_id": {
-      "description": "Provider-validated transport value."
-    },
-    "evidence": {
-      "description": "Provider-validated transport value."
-    },
-    "item_gid": {
-      "description": "Provider-validated transport value."
-    },
     "items": {
-      "description": "Provider-validated transport value."
-    },
-    "lineage_refs": {
-      "description": "Provider-validated transport value."
-    },
-    "ref": {
-      "description": "Provider-validated transport value."
-    },
-    "release_ref": {
-      "description": "Provider-validated transport value."
-    },
-    "status": {
-      "description": "Provider-validated transport value."
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "archived_at": {
+            "description": "Provider-validated transport value."
+          },
+          "created_at": {
+            "description": "Provider-validated transport value."
+          },
+          "created_by": {
+            "description": "Provider-validated transport value."
+          },
+          "frozen_at": {
+            "description": "Provider-validated transport value."
+          },
+          "gid": {
+            "description": "Provider-validated transport value."
+          },
+          "name": {
+            "description": "Provider-validated transport value."
+          },
+          "status": {
+            "description": "Provider-validated transport value."
+          },
+          "team_id": {
+            "description": "Provider-validated transport value."
+          },
+          "updated_at": {
+            "description": "Provider-validated transport value."
+          },
+          "vehicle_model": {
+            "description": "Provider-validated transport value."
+          },
+          "version_family_gid": {
+            "description": "Provider-validated transport value."
+          }
+        },
+        "required": [
+          "gid",
+          "name",
+          "version_family_gid",
+          "status"
+        ],
+        "type": "object"
+      },
+      "maxItems": 500,
+      "type": "array"
     }
   },
   "required": [
-    "status"
+    "items"
   ],
   "type": "object"
 }

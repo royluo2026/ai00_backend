@@ -7,6 +7,7 @@ from backend.capabilities.plugin_marketplace_next import register_plugin_marketp
 from backend.capabilities.system_shared_next import register_system_shared_capabilities
 from backend.plugin_platform.storage import register_plugin_storage_capabilities
 from backend.base.reviewed_capabilities import register_reviewed_base_capabilities
+from backend.base.export_templates import register_export_template_capability
 from backend.base.approval import register_approval_capabilities
 from backend.base.collaboration import register_collaboration_capabilities
 
@@ -17,6 +18,7 @@ def register_capabilities(registry: Any) -> None:
     )
     register_plugin_storage_capabilities(registry)
     register_reviewed_base_capabilities(registry)
+    register_export_template_capability(registry)
     register_approval_capabilities(registry)
     register_collaboration_capabilities(registry)
 

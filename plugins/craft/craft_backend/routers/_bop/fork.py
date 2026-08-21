@@ -6,11 +6,15 @@ BOP Fork（可控字段 fork / clone）+ Fork 预设 CRUD + Smart Fork + Stage-A
 import json
 from typing import Dict, List, Literal, Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
 from ...data.connection import get_conn
 from backend.platform_sdk.ids import next_gid
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.auth import get_authenticated_principal
+from backend.platform_sdk.factory import build_web_compatibility_envelope, invoke_compatibility
+from uuid import uuid4
 
 from ._constants import (
     _WRITE, _READ,
@@ -25,6 +29,22 @@ from ._helpers import (
 )
 
 router = APIRouter(prefix="/api/bop", tags=["bop"])
+
+
+async def _invoke_fork_change(request, current_user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"craft_bop_fork_change_{uuid4().hex}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.fork.change.apply", payload=payload,
+        current_user=current_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        error = result.error
+        code = error.code if error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "invalid_input": 400, "invalid_state": 409}.get(code, 422), detail=error.model_dump(mode="json") if error else None)
+    return result.data["data"]
 
 
 # ── Pydantic 模型 ─────────────────────────────────────────────────────────────
@@ -76,7 +96,11 @@ class StageAdvanceBody(BaseModel):
 # ══════════════════════════════════════════════════════════════
 
 @router.post("/versions/{source_gid}/fork", status_code=201)
-def fork_version(source_gid: str, body: ForkBody, _u=Depends(_WRITE)):
+async def _fork_version_endpoint(source_gid: str, body: ForkBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_fork_change(request, _u, principal, gateway, {"operation": "fork", "source_version_gid": source_gid, **body.model_dump(exclude_unset=True)})
+
+
+def _legacy_fork_version(source_gid: str, body: ForkBody, _u=Depends(_WRITE)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(f"SELECT {_VER_COLS} FROM workmanship_bop_bop_versions WHERE gid=%s", (source_gid,))
@@ -206,7 +230,36 @@ def fork_version(source_gid: str, body: ForkBody, _u=Depends(_WRITE)):
 # ══════════════════════════════════════════════════════════════
 
 @router.get("/fork-presets")
-def list_fork_presets(team_gid: Optional[str] = None, _u=Depends(_READ)):
+async def list_fork_presets(team_gid: Optional[str] = None, request: Request = None, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    request_id = request.headers.get("X-Request-ID") or f"craft_bop_fork_presets_{uuid4().hex}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.fork_preset.read",
+        payload={"operation": "list", "team_gid": team_gid}, current_user=_u, principal=principal,
+        request_id=request_id, trace_id=request.headers.get("X-Trace-ID") or request_id,
+    ))
+    if not result.ok:
+        error = result.error
+        raise HTTPException(status_code={"forbidden": 403, "invalid_input": 400}.get(error.code if error else "", 422), detail=error.model_dump(mode="json") if error else None)
+    return result.data["data"]
+
+
+async def _invoke_fork_preset_change(request, user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"craft_bop_fork_preset_change_{uuid4().hex}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.fork_preset.change.apply", payload=payload,
+        current_user=user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        error = result.error
+        code = error.code if error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "invalid_input": 400, "confirmation_required": 409}.get(code, 422), detail=error.model_dump(mode="json") if error else None)
+    return result.data["data"]
+
+
+def _legacy_list_fork_presets(team_gid: Optional[str] = None, _u=Depends(_READ)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             if team_gid:
@@ -224,7 +277,11 @@ def list_fork_presets(team_gid: Optional[str] = None, _u=Depends(_READ)):
 
 
 @router.post("/fork-presets", status_code=201)
-def create_fork_preset(body: CreateForkPresetBody, _u=Depends(_WRITE)):
+async def create_fork_preset(body: CreateForkPresetBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_fork_preset_change(request, _u, principal, gateway, {"operation": "create", **body.model_dump()})
+
+
+def _legacy_create_fork_preset(body: CreateForkPresetBody, _u=Depends(_WRITE)):
     gid = str(next_gid())
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -245,7 +302,11 @@ def create_fork_preset(body: CreateForkPresetBody, _u=Depends(_WRITE)):
 
 
 @router.patch("/fork-presets/{gid}")
-def update_fork_preset(gid: str, body: UpdateForkPresetBody, _u=Depends(_WRITE)):
+async def update_fork_preset(gid: str, body: UpdateForkPresetBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_fork_preset_change(request, _u, principal, gateway, {"operation": "update", "gid": gid, "updates": body.model_dump(exclude_unset=True)})
+
+
+def _legacy_update_fork_preset(gid: str, body: UpdateForkPresetBody, _u=Depends(_WRITE)):
     data = body.model_dump(exclude_unset=True)
     if not data:
         raise HTTPException(400, "无更新字段")
@@ -273,7 +334,20 @@ def update_fork_preset(gid: str, body: UpdateForkPresetBody, _u=Depends(_WRITE))
 
 
 @router.get("/fork-presets/{gid}")
-def get_fork_preset(gid: str, _u=Depends(_READ)):
+async def get_fork_preset(gid: str, request: Request = None, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    request_id = request.headers.get("X-Request-ID") or f"craft_bop_fork_preset_{uuid4().hex}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.fork_preset.read",
+        payload={"operation": "get", "gid": gid}, current_user=_u, principal=principal,
+        request_id=request_id, trace_id=request.headers.get("X-Trace-ID") or request_id,
+    ))
+    if not result.ok:
+        error = result.error
+        raise HTTPException(status_code={"resource_not_found": 404, "forbidden": 403, "invalid_input": 400}.get(error.code if error else "", 422), detail=error.model_dump(mode="json") if error else None)
+    return result.data["data"]
+
+
+def _legacy_get_fork_preset(gid: str, _u=Depends(_READ)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(f"SELECT {_PRESET_COLS} FROM workmanship_bop_bop_fork_presets WHERE gid=%s", (gid,))
@@ -283,7 +357,12 @@ def get_fork_preset(gid: str, _u=Depends(_READ)):
 
 
 @router.delete("/fork-presets/{gid}", status_code=204)
-def delete_fork_preset(gid: str, _u=Depends(_WRITE)):
+async def delete_fork_preset(gid: str, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    await _invoke_fork_preset_change(request, _u, principal, gateway, {"operation": "delete", "gid": gid})
+    return None
+
+
+def _legacy_delete_fork_preset(gid: str, _u=Depends(_WRITE)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("DELETE FROM workmanship_bop_bop_fork_presets WHERE gid=%s", (gid,))
@@ -296,7 +375,11 @@ def delete_fork_preset(gid: str, _u=Depends(_WRITE)):
 # ══════════════════════════════════════════════════════════════
 
 @router.post("/versions/{source_gid}/smart-fork", status_code=201)
-def smart_fork_version(source_gid: str, body: SmartForkBody, _u=Depends(_WRITE)):
+async def _smart_fork_version_endpoint(source_gid: str, body: SmartForkBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_fork_change(request, _u, principal, gateway, {"operation": "smart_fork", "source_version_gid": source_gid, **body.model_dump(exclude_unset=True)})
+
+
+def _legacy_smart_fork_version(source_gid: str, body: SmartForkBody, _u=Depends(_WRITE)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(f"SELECT {_VER_COLS} FROM workmanship_bop_bop_versions WHERE gid=%s", (source_gid,))
@@ -592,7 +675,11 @@ def smart_fork_version(source_gid: str, body: SmartForkBody, _u=Depends(_WRITE))
 # ══════════════════════════════════════════════════════════════
 
 @router.post("/versions/{src_gid}/stage-advance", status_code=201)
-def stage_advance(src_gid: str, body: StageAdvanceBody, _u=Depends(_WRITE)):
+async def _stage_advance_endpoint(src_gid: str, body: StageAdvanceBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_fork_change(request, _u, principal, gateway, {"operation": "stage_advance", "source_version_gid": src_gid, **body.model_dump(exclude_unset=True)})
+
+
+def _legacy_stage_advance(src_gid: str, body: StageAdvanceBody, _u=Depends(_WRITE)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(f"SELECT {_VER_COLS} FROM workmanship_bop_bop_versions WHERE gid=%s", (src_gid,))
@@ -693,3 +780,9 @@ def stage_advance(src_gid: str, body: StageAdvanceBody, _u=Depends(_WRITE)):
 
             conn.commit()
             return {"data": new_ver, "entries_count": len(gid_map_sa)}
+
+
+# Keep direct Python callers compatible while FastAPI uses the governed endpoints above.
+fork_version = _legacy_fork_version
+smart_fork_version = _legacy_smart_fork_version
+stage_advance = _legacy_stage_advance

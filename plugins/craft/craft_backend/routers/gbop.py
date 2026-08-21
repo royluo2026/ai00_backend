@@ -30,22 +30,157 @@ GBOP 标准工序库 V3 API（树形结构 + 独立工艺/操作实体 + entry_l
   POST           /api/gbop/versions/{gid}/fork              Fork 版本
 """
 import json
+import base64
 from typing import Dict, List, Literal, Optional
 
 import io
 
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Query, Request, UploadFile
 from pydantic import BaseModel
 
 from ..data.connection import get_conn
 from backend.platform_sdk.auth import require_role
 from backend.platform_sdk.ids import next_gid
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.auth import get_authenticated_principal
+from backend.platform_sdk.factory import build_web_compatibility_envelope, invoke_compatibility
+from .factory import _invoke as _invoke_factory
 
 router = APIRouter(prefix="/api/gbop", tags=["gbop"])
 
 _WRITE = require_role("super_admin", "team_admin", "project_admin", "knowledge_admin", "member")
 _READ = require_role("super_admin", "team_admin", "project_admin",
                      "rule_admin", "knowledge_admin", "member")
+
+
+async def _invoke_gbop_catalog(request, current_user, principal, gateway, capability_id, operation, *, version_gid=None, entry_gid=None):
+    request_id = request.headers.get("X-Request-ID") or f"craft_gbop_catalog_legacy_{next_gid()}"
+    payload = {"operation": operation}
+    if version_gid:
+        payload["version_gid"] = version_gid
+    if entry_gid:
+        payload["entry_gid"] = entry_gid
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id=capability_id, payload=payload, current_user=current_user, principal=principal,
+        request_id=request_id, trace_id=request.headers.get("X-Trace-ID") or request_id,
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "permission_denied": 403, "invalid_input": 400, "conflict": 409}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data["data"]
+
+
+async def _invoke_gbop_navigation(request, current_user, principal, gateway, capability_id, operation, pbom_version_gid):
+    request_id = request.headers.get("X-Request-ID") or f"craft_gbop_navigation_legacy_{next_gid()}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id=capability_id, payload={"operation": operation, "pbom_version_gid": pbom_version_gid},
+        current_user=current_user, principal=principal, request_id=request_id, trace_id=request.headers.get("X-Trace-ID") or request_id,
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "permission_denied": 403, "invalid_input": 400}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data["data"]
+
+
+async def _invoke_gbop_process_hierarchy(request, current_user, principal, gateway, capability_id, pbom_version_gid):
+    request_id = request.headers.get("X-Request-ID") or f"craft_gbop_process_hierarchy_legacy_{next_gid()}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id=capability_id, payload={"pbom_version_gid": pbom_version_gid},
+        current_user=current_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "permission_denied": 403, "invalid_input": 400}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data["data"]
+
+
+async def _invoke_gbop_navigation_change(request, current_user, principal, gateway, capability_id, operation, pbom_version_gid):
+    request_id = request.headers.get("X-Request-ID") or f"craft_gbop_navigation_change_legacy_{next_gid()}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id=capability_id, payload={"operation": operation, "pbom_version_gid": pbom_version_gid},
+        current_user=current_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "permission_denied": 403, "invalid_input": 400, "conflict": 409}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data["data"]
+
+
+async def _invoke_gbop_version_change(request, current_user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"craft_gbop_version_change_{next_gid()}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.gbop.version.change.apply", payload=payload,
+        current_user=current_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "invalid_input": 400, "invalid_state": 409, "permission_denied": 403}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data.get("data", result.data)
+
+
+async def _invoke_gbop_entity_change(request, current_user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"craft_gbop_entity_change_{next_gid()}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.gbop.entity.change.apply", payload=payload,
+        current_user=current_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "invalid_input": 400, "invalid_state": 409, "permission_denied": 403}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data.get("data", result.data)
+
+
+async def _invoke_gbop_import_change(request, current_user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"craft_gbop_import_change_{next_gid()}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.gbop.import.change.apply", payload=payload,
+        current_user=current_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "invalid_input": 400, "invalid_state": 409, "permission_denied": 403}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data.get("data", result.data)
+
+
+async def _invoke_gbop_station_autolink_change(request, current_user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"craft_gbop_station_autolink_change_{next_gid()}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.gbop.station_autolink.change.apply", payload=payload,
+        current_user=current_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "invalid_input": 400, "invalid_state": 409, "permission_denied": 403}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data.get("data", result.data)
+
+
+async def _invoke_gbop_import_tc_change(request, current_user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"craft_gbop_import_tc_change_{next_gid()}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.gbop.import.tc.change.apply", payload=payload,
+        current_user=current_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "invalid_input": 400, "invalid_state": 409, "permission_denied": 403}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data.get("data", result.data)
 
 
 # ── Pydantic Models ──────────────────────────────────────────────
@@ -277,28 +412,30 @@ def _calc_level(cur, parent_gid: Optional[str]) -> int:
 # ── Version CRUD ─────────────────────────────────────────────────
 
 @router.get("/versions")
-def list_versions(
+async def list_versions(
+    request: Request,
     include_archived: bool = False,
-    current_user: dict = Depends(_READ)
+    current_user: dict = Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
 ):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            conditions = []
-            params = []
-            if not include_archived:
-                conditions.append("archived_at IS NULL")
-            where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
-            cur.execute(
-                f"SELECT {_VER_COLS} FROM workmanship_tpl_gbop_versions "
-                f"{where} ORDER BY version_family_gid, created_at",
-                params
-            )
-            rows = cur.fetchall()
-    return {"data": [_ver_row(r) for r in rows]}
+    data = await _invoke_factory(
+        request,
+        current_user,
+        principal,
+        gateway,
+        "craft.gbop.release.search",
+        {"include_archived": include_archived},
+    )
+    return {"data": [_ver_row(item) for item in data.get("items", [])]}
 
 
 @router.post("/versions", status_code=201)
-def create_version(body: CreateVersionBody, current_user: dict = Depends(_WRITE)):
+async def create_version(body: CreateVersionBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_version_change(request, current_user, principal, gateway, {"operation": "create", **body.model_dump(exclude_unset=True)})
+
+
+def _legacy_create_version(body: CreateVersionBody, current_user: dict = Depends(_WRITE)):
     gid = str(next_gid())
     family_gid = body.version_family_gid or gid
     with get_conn() as conn:
@@ -317,7 +454,11 @@ def create_version(body: CreateVersionBody, current_user: dict = Depends(_WRITE)
 
 
 @router.patch("/versions/{gid}")
-def update_version(gid: str, body: UpdateVersionBody, current_user: dict = Depends(_WRITE)):
+async def update_version(gid: str, body: UpdateVersionBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_version_change(request, current_user, principal, gateway, {"operation": "update", "gid": gid, "updates": body.model_dump(exclude_unset=True)})
+
+
+def _legacy_update_version(gid: str, body: UpdateVersionBody, current_user: dict = Depends(_WRITE)):
     data = body.model_dump(exclude_unset=True)
     if not data:
         raise HTTPException(400, "无更新字段")
@@ -343,7 +484,11 @@ def update_version(gid: str, body: UpdateVersionBody, current_user: dict = Depen
 
 
 @router.post("/versions/{gid}/freeze")
-def freeze_version(gid: str, _u=Depends(_WRITE)):
+async def freeze_version(gid: str, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_version_change(request, _u, principal, gateway, {"operation": "freeze", "gid": gid})
+
+
+def _legacy_freeze_version(gid: str, _u=Depends(_WRITE)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -360,7 +505,11 @@ def freeze_version(gid: str, _u=Depends(_WRITE)):
 
 
 @router.post("/version-families/{family_gid}/archive")
-def archive_family(family_gid: str, _u=Depends(_WRITE)):
+async def archive_family(family_gid: str, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_version_change(request, _u, principal, gateway, {"operation": "archive_family", "family_gid": family_gid})
+
+
+def _legacy_archive_family(family_gid: str, _u=Depends(_WRITE)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -374,7 +523,11 @@ def archive_family(family_gid: str, _u=Depends(_WRITE)):
 
 
 @router.delete("/version-families/{family_gid}/archive")
-def unarchive_family(family_gid: str, _u=Depends(_WRITE)):
+async def unarchive_family(family_gid: str, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_version_change(request, _u, principal, gateway, {"operation": "unarchive_family", "family_gid": family_gid})
+
+
+def _legacy_unarchive_family(family_gid: str, _u=Depends(_WRITE)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -390,44 +543,16 @@ def unarchive_family(family_gid: str, _u=Depends(_WRITE)):
 # ── Entry CRUD ───────────────────────────────────────────────────
 
 @router.get("/versions/{version_gid}/entries")
-def list_entries(version_gid: str, current_user: dict = Depends(_READ)):
-    """获取全部节点，每条 entry 附带 links 数组"""
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                f"SELECT {_ENTRY_COLS} FROM workmanship_tpl_gbop_entries "
-                f"WHERE version_gid=%s ORDER BY seq_no, created_at",
-                (version_gid,)
-            )
-            entries = cur.fetchall()
-
-            # 批量获取该版本所有 entry_links
-            cur.execute(
-                f"SELECT {_LINK_COLS} FROM workmanship_tpl_gbop_entry_links "
-                f"WHERE entry_gid IN (SELECT gid FROM workmanship_tpl_gbop_entries WHERE version_gid=%s)",
-                (version_gid,)
-            )
-            links = cur.fetchall()
-
-    # 按 entry_gid 分组 links
-    links_by_entry = {}
-    for lk in links:
-        eg = lk['entry_gid']
-        if eg not in links_by_entry:
-            links_by_entry[eg] = []
-        links_by_entry[eg].append(_link_row(lk))
-
-    result = []
-    for e in entries:
-        d = _entry_row(e)
-        d['links'] = links_by_entry.get(e['gid'], [])
-        result.append(d)
-
-    return {"data": result}
+async def list_entries(version_gid: str, request: Request, current_user: dict = Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_catalog(request, current_user, principal, gateway, "craft.gbop.catalog.read", "entries.list", version_gid=version_gid)
 
 
 @router.post("/entries", status_code=201)
-def create_entry(body: CreateEntryBody, current_user: dict = Depends(_WRITE)):
+async def create_entry(body: CreateEntryBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_entity_change(request, current_user, principal, gateway, {"operation": "entry.create", **body.model_dump(exclude_unset=True)})
+
+
+def _legacy_create_entry(body: CreateEntryBody, current_user: dict = Depends(_WRITE)):
     gid = str(next_gid())
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -455,7 +580,11 @@ def create_entry(body: CreateEntryBody, current_user: dict = Depends(_WRITE)):
 
 
 @router.patch("/entries/{gid}")
-def update_entry(gid: str, body: UpdateEntryBody, current_user: dict = Depends(_WRITE)):
+async def update_entry(gid: str, body: UpdateEntryBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_entity_change(request, current_user, principal, gateway, {"operation": "entry.update", "gid": gid, "updates": body.model_dump(exclude_unset=True)})
+
+
+def _legacy_update_entry(gid: str, body: UpdateEntryBody, current_user: dict = Depends(_WRITE)):
     data = body.model_dump(exclude_unset=True)
     if not data:
         raise HTTPException(400, "无更新字段")
@@ -499,7 +628,11 @@ def update_entry(gid: str, body: UpdateEntryBody, current_user: dict = Depends(_
 
 
 @router.delete("/entries/{gid}")
-def delete_entry(gid: str, current_user: dict = Depends(_WRITE)):
+async def delete_entry(gid: str, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_entity_change(request, current_user, principal, gateway, {"operation": "entry.delete", "gid": gid})
+
+
+def _legacy_delete_entry(gid: str, current_user: dict = Depends(_WRITE)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT version_gid FROM workmanship_tpl_gbop_entries WHERE gid=%s", (gid,))
@@ -523,20 +656,16 @@ def delete_entry(gid: str, current_user: dict = Depends(_WRITE)):
 # ── Process CRUD ─────────────────────────────────────────────────
 
 @router.get("/versions/{version_gid}/processes")
-def list_processes(version_gid: str, current_user: dict = Depends(_READ)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                f"SELECT {_PROC_COLS} FROM workmanship_tpl_gbop_processes "
-                f"WHERE version_gid=%s ORDER BY created_at",
-                (version_gid,)
-            )
-            rows = cur.fetchall()
-    return {"data": [_entity_row(r) for r in rows]}
+async def list_processes(version_gid: str, request: Request, current_user: dict = Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_catalog(request, current_user, principal, gateway, "craft.gbop.catalog.read", "processes.list", version_gid=version_gid)
 
 
 @router.post("/processes", status_code=201)
-def create_process(body: CreateProcessBody, current_user: dict = Depends(_WRITE)):
+async def create_process(body: CreateProcessBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_entity_change(request, current_user, principal, gateway, {"operation": "process.create", **body.model_dump(exclude_unset=True)})
+
+
+def _legacy_create_process(body: CreateProcessBody, current_user: dict = Depends(_WRITE)):
     """一键创建：process + entry + link"""
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -600,7 +729,11 @@ def create_process(body: CreateProcessBody, current_user: dict = Depends(_WRITE)
 
 
 @router.patch("/processes/{gid}")
-def update_process(gid: str, body: UpdateProcessBody, current_user: dict = Depends(_WRITE)):
+async def update_process(gid: str, body: UpdateProcessBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_entity_change(request, current_user, principal, gateway, {"operation": "process.update", "gid": gid, "updates": body.model_dump(exclude_unset=True)})
+
+
+def _legacy_update_process(gid: str, body: UpdateProcessBody, current_user: dict = Depends(_WRITE)):
     data = body.model_dump(exclude_unset=True)
     if not data:
         raise HTTPException(400, "无更新字段")
@@ -637,7 +770,11 @@ def update_process(gid: str, body: UpdateProcessBody, current_user: dict = Depen
 
 
 @router.delete("/processes/{gid}")
-def delete_process(gid: str, current_user: dict = Depends(_WRITE)):
+async def delete_process(gid: str, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_entity_change(request, current_user, principal, gateway, {"operation": "process.delete", "gid": gid})
+
+
+def _legacy_delete_process(gid: str, current_user: dict = Depends(_WRITE)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT version_gid FROM workmanship_tpl_gbop_processes WHERE gid=%s", (gid,))
@@ -658,20 +795,16 @@ def delete_process(gid: str, current_user: dict = Depends(_WRITE)):
 # ── Operation CRUD ───────────────────────────────────────────────
 
 @router.get("/versions/{version_gid}/operations")
-def list_operations(version_gid: str, current_user: dict = Depends(_READ)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                f"SELECT {_OP_COLS} FROM workmanship_tpl_gbop_operations "
-                f"WHERE version_gid=%s ORDER BY created_at",
-                (version_gid,)
-            )
-            rows = cur.fetchall()
-    return {"data": [_entity_row(r) for r in rows]}
+async def list_operations(version_gid: str, request: Request, current_user: dict = Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_catalog(request, current_user, principal, gateway, "craft.gbop.catalog.read", "operations.list", version_gid=version_gid)
 
 
 @router.post("/operations", status_code=201)
-def create_operation(body: CreateOperationBody, current_user: dict = Depends(_WRITE)):
+async def create_operation(body: CreateOperationBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_entity_change(request, current_user, principal, gateway, {"operation": "operation.create", **body.model_dump(exclude_unset=True)})
+
+
+def _legacy_create_operation(body: CreateOperationBody, current_user: dict = Depends(_WRITE)):
     """一键创建：operation + entry + link"""
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -735,7 +868,11 @@ def create_operation(body: CreateOperationBody, current_user: dict = Depends(_WR
 
 
 @router.patch("/operations/{gid}")
-def update_operation(gid: str, body: UpdateOperationBody, current_user: dict = Depends(_WRITE)):
+async def update_operation(gid: str, body: UpdateOperationBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_entity_change(request, current_user, principal, gateway, {"operation": "operation.update", "gid": gid, "updates": body.model_dump(exclude_unset=True)})
+
+
+def _legacy_update_operation(gid: str, body: UpdateOperationBody, current_user: dict = Depends(_WRITE)):
     data = body.model_dump(exclude_unset=True)
     if not data:
         raise HTTPException(400, "无更新字段")
@@ -772,7 +909,11 @@ def update_operation(gid: str, body: UpdateOperationBody, current_user: dict = D
 
 
 @router.delete("/operations/{gid}")
-def delete_operation(gid: str, current_user: dict = Depends(_WRITE)):
+async def delete_operation(gid: str, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_entity_change(request, current_user, principal, gateway, {"operation": "operation.delete", "gid": gid})
+
+
+def _legacy_delete_operation(gid: str, current_user: dict = Depends(_WRITE)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT version_gid FROM workmanship_tpl_gbop_operations WHERE gid=%s", (gid,))
@@ -792,7 +933,11 @@ def delete_operation(gid: str, current_user: dict = Depends(_WRITE)):
 # ── Entry Links CRUD ─────────────────────────────────────────────
 
 @router.post("/entry-links", status_code=201)
-def create_entry_link(body: CreateEntryLinkBody, current_user: dict = Depends(_WRITE)):
+async def create_entry_link(body: CreateEntryLinkBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_entity_change(request, current_user, principal, gateway, {"operation": "link.create", **body.model_dump(exclude_unset=True)})
+
+
+def _legacy_create_entry_link(body: CreateEntryLinkBody, current_user: dict = Depends(_WRITE)):
     gid = str(next_gid())
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -817,7 +962,11 @@ def create_entry_link(body: CreateEntryLinkBody, current_user: dict = Depends(_W
 
 
 @router.delete("/entry-links/{gid}")
-def delete_entry_link(gid: str, current_user: dict = Depends(_WRITE)):
+async def delete_entry_link(gid: str, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_entity_change(request, current_user, principal, gateway, {"operation": "link.delete", "gid": gid})
+
+
+def _legacy_delete_entry_link(gid: str, current_user: dict = Depends(_WRITE)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -837,21 +986,18 @@ def delete_entry_link(gid: str, current_user: dict = Depends(_WRITE)):
 
 
 @router.get("/entries/{entry_gid}/links")
-def get_entry_links(entry_gid: str, current_user: dict = Depends(_READ)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                f"SELECT {_LINK_COLS} FROM workmanship_tpl_gbop_entry_links WHERE entry_gid=%s",
-                (entry_gid,)
-            )
-            rows = cur.fetchall()
-    return {"data": [_link_row(r) for r in rows]}
+async def get_entry_links(entry_gid: str, request: Request, current_user: dict = Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_catalog(request, current_user, principal, gateway, "craft.gbop.catalog.read", "entry_links.list", entry_gid=entry_gid)
 
 
 # ── Import ───────────────────────────────────────────────────────
 
 @router.post("/versions/{version_gid}/import-vpps-parts", status_code=201)
-def import_vpps_parts(version_gid: str, body: ImportVppsPartsBody, current_user: dict = Depends(_WRITE)):
+async def import_vpps_parts(version_gid: str, body: ImportVppsPartsBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_import_change(request, current_user, principal, gateway, {"operation": "import_vpps_parts", "version_gid": version_gid, **body.model_dump(exclude_unset=True)})
+
+
+def _legacy_import_vpps_parts(version_gid: str, body: ImportVppsPartsBody, current_user: dict = Depends(_WRITE)):
     """从 workmanship_tpl_vpps_parts 导入 L1-3 节点，按 parent_vpps 匹配建立父子关系"""
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -923,7 +1069,11 @@ def import_vpps_parts(version_gid: str, body: ImportVppsPartsBody, current_user:
 
 
 @router.post("/versions/{version_gid}/import-entries", status_code=201)
-def import_entries(version_gid: str, body: ImportEntriesBody, current_user: dict = Depends(_WRITE)):
+async def import_entries(version_gid: str, body: ImportEntriesBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_import_change(request, current_user, principal, gateway, {"operation": "import_entries", "version_gid": version_gid, "entries": body.entries})
+
+
+def _legacy_import_entries(version_gid: str, body: ImportEntriesBody, current_user: dict = Depends(_WRITE)):
     """批量导入条目（从前端解析后的 JSON 数组）"""
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -974,6 +1124,16 @@ def import_entries(version_gid: str, body: ImportEntriesBody, current_user: dict
 
 @router.post("/versions/{version_gid}/import-tc-excel", status_code=201)
 async def import_tc_excel(
+    version_gid: str,
+    file: UploadFile = File(...),
+    request: Request = None,
+    current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway),
+):
+    content = await file.read()
+    return await _invoke_gbop_import_tc_change(request, current_user, principal, gateway, {"operation": "import_tc_excel", "version_gid": version_gid, "filename": file.filename, "content_b64": base64.b64encode(content).decode("ascii")})
+
+
+async def _legacy_import_tc_excel(
     version_gid: str,
     file: UploadFile = File(...),
     current_user: dict = Depends(_WRITE),
@@ -1249,7 +1409,11 @@ async def import_tc_excel(
 # ── Fork ─────────────────────────────────────────────────────────
 
 @router.post("/versions/{source_gid}/fork", status_code=201)
-def fork_version(source_gid: str, body: ForkBody, current_user: dict = Depends(_WRITE)):
+async def fork_version(source_gid: str, body: ForkBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_version_change(request, current_user, principal, gateway, {"operation": "fork", "source_gid": source_gid, **body.model_dump(exclude_unset=True)})
+
+
+def _legacy_fork_version(source_gid: str, body: ForkBody, current_user: dict = Depends(_WRITE)):
     """Fork 版本：复制 entries + processes + operations + entry_links，重映射所有 gid"""
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -1435,82 +1599,35 @@ def fork_version(source_gid: str, body: ForkBody, current_user: dict = Depends(_
 # ══════════════════════════════════════════════════════════════════
 
 @router.get("/pbom-versions/{pbom_gid}/gbop-nav-link-summary")
-def gbop_nav_link_summary(pbom_gid: str, _u=Depends(_READ)):
-    """
-    返回 gbop_nav_bindings 的 link-summary 格式：
-    { gbop_op_entry_gid: { bop_entry_gid, is_valid, pbom_entry_gid } }
-    供 AssocPanel 的 gbop_nav 适配器使用。
-    """
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                SELECT gbop_op_entry_gid, pbom_entry_gid, confirmed
-                FROM workmanship_bop_gbop_nav_bindings
-                WHERE pbom_version_gid = %s
-                """,
-                (pbom_gid,),
-            )
-            rows = cur.fetchall()
-    link_map: dict = {}
-    for r in rows:
-        op_gid = r['gbop_op_entry_gid']
-        if op_gid not in link_map:
-            link_map[op_gid] = {
-                'bop_entry_gid': r['pbom_entry_gid'],
-                'is_valid': True,
-            }
-    return {"data": link_map}
+async def gbop_nav_link_summary(pbom_gid: str, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_navigation(request, _u, principal, gateway, "craft.gbop.navigation.read", "link_summary", pbom_gid)
 
 
 @router.get("/pbom-versions/{pbom_gid}/vpps-auto-link-status")
-def gbop_vpps_auto_link_status(pbom_gid: str, _u=Depends(_READ)):
-    """
-    返回当前 pbom 版本的 Auto-Link 状态：
-    pending_count > 0 表示有未提交绑定，前端应禁止再次 Auto-Link。
-    """
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "SELECT COUNT(*) AS cnt FROM workmanship_bop_gbop_nav_bindings "
-                "WHERE pbom_version_gid=%s AND confirmed=FALSE",
-                (pbom_gid,),
-            )
-            pending_count = cur.fetchone()['cnt']
-            cur.execute(
-                "SELECT COUNT(*) AS cnt FROM workmanship_bop_gbop_nav_bindings "
-                "WHERE pbom_version_gid=%s AND confirmed=TRUE",
-                (pbom_gid,),
-            )
-            confirmed_count = cur.fetchone()['cnt']
-    return {"data": {"pending_count": pending_count, "confirmed_count": confirmed_count}}
+async def gbop_vpps_auto_link_status(pbom_gid: str, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_navigation(request, _u, principal, gateway, "craft.gbop.navigation.read", "auto_link_status", pbom_gid)
 
 
 @router.post("/pbom-versions/{pbom_gid}/vpps-auto-link-confirm", status_code=200)
-def gbop_vpps_auto_link_confirm(pbom_gid: str, _u=Depends(_WRITE)):
+async def gbop_vpps_auto_link_confirm(pbom_gid: str, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
     """
     将当前 pbom 版本所有未提交(confirmed=FALSE)的 Auto-Link 绑定整体确认。
     确认后 Auto-Link 可再次执行。
     """
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "UPDATE workmanship_bop_gbop_nav_bindings SET confirmed=TRUE "
-                "WHERE pbom_version_gid=%s AND confirmed=FALSE",
-                (pbom_gid,),
-            )
-            updated = cur.rowcount
-        conn.commit()
-    return {"ok": True, "confirmed": updated}
+    return await _invoke_gbop_navigation_change(request, _u, principal, gateway, "craft.gbop.navigation.change.apply", "confirm", pbom_gid)
 
 
 @router.post("/pbom-versions/{pbom_gid}/vpps-auto-link", status_code=200)
-def gbop_vpps_auto_link(pbom_gid: str, current_user: dict = Depends(_WRITE)):
+async def gbop_vpps_auto_link(pbom_gid: str, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
     """
     Auto-Link：遍历 PBOM 零件的 vpps，
     在 workmanship_tpl_gbop_entries 中找 vpps_part 相同且 part_feed=TRUE 的操作节点，
     向上溯源找到父工序节点，批量写入 workmanship_bop_gbop_nav_bindings（幂等）。
     """
+    return await _invoke_gbop_navigation_change(request, current_user, principal, gateway, "craft.gbop.navigation.change.apply", "auto_link", pbom_gid)
+
+
+def _legacy_gbop_vpps_auto_link(pbom_gid: str, current_user: dict = Depends(_WRITE)):
     # 有未提交绑定时拒绝重复执行
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -1642,117 +1759,18 @@ def gbop_vpps_auto_link(pbom_gid: str, current_user: dict = Depends(_WRITE)):
 
 
 @router.get("/pbom-versions/{pbom_gid}/process-hierarchy")
-def gbop_process_hierarchy(pbom_gid: str, _u=Depends(_READ)):
+async def gbop_process_hierarchy(pbom_gid: str, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
     """
     工序视图：返回三级树 process → operation → [parts]。
     骨架来自 workmanship_tpl_gbop_entries（全部 process/operation），
     零件绑定来自 workmanship_bop_gbop_nav_bindings（仅 part_feed=TRUE 的操作才有零件）。
     """
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            # 1. 取所有活跃 GBOP 版本的 process / operation entry
-            cur.execute(
-                """
-                SELECT e.gid, e.vpps, e.vpps_desc, e.node_type,
-                       e.seq_no, e.parent_gid, e.part_feed
-                FROM workmanship_tpl_gbop_entries e
-                JOIN workmanship_tpl_gbop_versions v ON v.gid = e.version_gid
-                WHERE e.node_type IN ('process', 'operation')
-                  AND v.archived_at IS NULL
-                ORDER BY e.seq_no 
-                """,
-            )
-            all_entries = [dict(r) for r in cur.fetchall()]
-
-            if not all_entries:
-                return {"data": []}
-
-            # 2. 取该 PBOM 版本所有绑定
-            cur.execute(
-                """
-                SELECT gbop_op_entry_gid, pbom_entry_gid, confirmed
-                FROM workmanship_bop_gbop_nav_bindings
-                WHERE pbom_version_gid = %s
-                """,
-                (pbom_gid,),
-            )
-            bindings = [dict(r) for r in cur.fetchall()]
-
-            # 3. 查 workmanship_bop_pbom 零件信息
-            part_gids = list({b['pbom_entry_gid'] for b in bindings})
-            part_map: dict = {}
-            if part_gids:
-                _ph = ",".join(["%s"] * len(part_gids))
-                cur.execute(
-                    f"SELECT gid, vpps, title, part_no FROM workmanship_bop_pbom WHERE gid IN ({_ph})",
-                    part_gids,
-                )
-                for r in cur.fetchall():
-                    part_map[r['gid']] = dict(r)
-
-            # 4. 建 op_gid → parts 映射
-            op_parts: dict = {}
-            for b in bindings:
-                og = b['gbop_op_entry_gid']
-                part_row = part_map.get(b['pbom_entry_gid'])
-                if part_row:
-                    op_parts.setdefault(og, []).append({
-                        'pbom_entry_gid': b['pbom_entry_gid'],
-                        'vpps':      part_row.get('vpps', ''),
-                        'title':     part_row.get('title', ''),
-                        'part_no':   part_row.get('part_no', ''),
-                        'confirmed': b['confirmed'],
-                    })
-
-            # 5. 建 entry_map 与 proc→ops 树
-            entry_map = {e['gid']: e for e in all_entries}
-
-            proc_ops: dict = {}   # proc_gid → [op_entry]
-
-            for e in all_entries:
-                if e['node_type'] != 'operation':
-                    continue
-                pg = e.get('parent_gid')
-                if pg and pg in entry_map and entry_map[pg]['node_type'] == 'process':
-                    proc_ops.setdefault(pg, []).append(e)
-
-            # 6. 组装结果
-            result = []
-            for e in all_entries:
-                if e['node_type'] != 'process':
-                    continue
-                pg = e['gid']
-                operations = []
-                for op in proc_ops.get(pg, []):
-                    operations.append({
-                        'entry_gid': op['gid'],
-                        'vpps':      op.get('vpps', ''),
-                        'title':     op.get('vpps_desc') or op.get('vpps', op['gid']),
-                        'seq_no':    op.get('seq_no') or 0,
-                        'part_feed': op.get('part_feed', False),
-                        'parts':     op_parts.get(op['gid'], []),
-                    })
-                operations.sort(key=lambda x: x['seq_no'])
-                result.append({
-                    'process_entry_gid': pg,
-                    'vpps':       e.get('vpps', ''),
-                    'title':      e.get('vpps_desc') or e.get('vpps', '（无工序）'),
-                    'seq_no':     e.get('seq_no') or 0,
-                    'operations': operations,
-                    'op_count':   len(operations),
-                    'part_count': sum(len(o['parts']) for o in operations),
-                })
-
-            result.sort(key=lambda x: x['seq_no'])
-            return {"data": result}
-
-
+    return await _invoke_gbop_process_hierarchy(request, _u, principal, gateway, "craft.gbop.process_hierarchy.read", pbom_gid)
 # ══════════════════════════════════════════════════════════════════
 # BOP 版本 → GBOP nav bindings 工位自动关联（预览 + 执行）
 # ══════════════════════════════════════════════════════════════════
 
-@router.get("/bop-versions/{bop_gid}/station-autolink-preview")
-def station_autolink_preview(
+def _legacy_station_autolink_preview(
     bop_gid: str,
     pbom_version_gid: Optional[str] = Query(None, description="覆盖 BOP 版本绑定的 PBOM，用于 PBOM 升级后重新选择"),
     _u=Depends(_READ),
@@ -2007,13 +2025,57 @@ def station_autolink_preview(
     }
 
 
+@router.get("/bop-versions/{bop_gid}/station-autolink-preview")
+async def station_autolink_preview(
+    bop_gid: str,
+    pbom_version_gid: Optional[str] = Query(None, description="覆盖 BOP 版本绑定的 PBOM，用于 PBOM 升级后重新选择"),
+    request: Request = None,
+    _u=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    """Preview station auto-link candidates through the Capability Gateway."""
+    request_id = request.headers.get("X-Request-ID") or f"craft_station_autolink_preview_{next_gid()}"
+    result = await invoke_compatibility(
+        gateway,
+        build_web_compatibility_envelope(
+            gateway,
+            capability_id="craft.gbop.station_autolink.preview",
+            payload={
+                "operation": "preview",
+                "bop_gid": bop_gid,
+                "pbom_version_gid": pbom_version_gid,
+            },
+            current_user=_u,
+            principal=principal,
+            request_id=request_id,
+            trace_id=request.headers.get("X-Trace-ID") or request_id,
+        ),
+    )
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(
+            status_code={
+                "resource_not_found": 404,
+                "permission_denied": 403,
+                "invalid_input": 400,
+            }.get(code, 422),
+            detail=result.error.model_dump(mode="json") if result.error else None,
+        )
+    return result.data["data"]
+
+
 class StationAutolinkBody(BaseModel):
     pbom_version_gid: Optional[str] = None   # 覆盖/补填 BOP 版本绑定的 PBOM
     line_gids: Optional[List[str]] = None     # 仅处理指定线体下的工位；空=全部
 
 
 @router.post("/bop-versions/{bop_gid}/station-autolink", status_code=200)
-def station_autolink(bop_gid: str, body: StationAutolinkBody = StationAutolinkBody(), current_user: dict = Depends(_WRITE)):
+async def station_autolink(bop_gid: str, body: StationAutolinkBody = StationAutolinkBody(), request: Request = None, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_gbop_station_autolink_change(request, current_user, principal, gateway, {"operation": "apply", "bop_gid": bop_gid, **body.model_dump(exclude_unset=True)})
+
+
+def _legacy_station_autolink(bop_gid: str, body: StationAutolinkBody = StationAutolinkBody(), current_user: dict = Depends(_WRITE)):
     """
     工位自动关联执行：
     1. 取 BOP 版本 → pbom_version_gid（可由 body 覆盖，若覆盖则同时写入 bop_versions）
@@ -2345,7 +2407,16 @@ def station_autolink(bop_gid: str, body: StationAutolinkBody = StationAutolinkBo
 
 
 @router.post("/bop-versions/{bop_gid}/station-autolink-undo", status_code=200)
-def station_autolink_undo(
+async def station_autolink_undo(
+    bop_gid: str,
+    request: Request,
+    mode: str = Query("soft", description="soft=软删除（默认）；hard=硬删除（超管专属）"),
+    _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway),
+):
+    return await _invoke_gbop_station_autolink_change(request, _u, principal, gateway, {"operation": "undo", "bop_gid": bop_gid, "mode": mode})
+
+
+def _legacy_station_autolink_undo(
     bop_gid: str,
     mode: str = Query("soft", description="soft=软删除（默认）；hard=硬删除（超管专属）"),
     _u=Depends(_WRITE),
@@ -2459,3 +2530,29 @@ def station_autolink_undo(
             conn.commit()
 
     return {"ok": True, "deleted": len(all_gids)}
+
+
+# Existing in-process callers retain the legacy implementation; HTTP routes
+# above are the governed Gateway endpoints.
+create_version_legacy = create_version = _legacy_create_version
+update_version_legacy = update_version = _legacy_update_version
+freeze_version_legacy = freeze_version = _legacy_freeze_version
+archive_family_legacy = archive_family = _legacy_archive_family
+unarchive_family_legacy = unarchive_family = _legacy_unarchive_family
+fork_version_legacy = fork_version = _legacy_fork_version
+create_entry_legacy = create_entry = _legacy_create_entry
+update_entry_legacy = update_entry = _legacy_update_entry
+delete_entry_legacy = delete_entry = _legacy_delete_entry
+create_process_legacy = create_process = _legacy_create_process
+update_process_legacy = update_process = _legacy_update_process
+delete_process_legacy = delete_process = _legacy_delete_process
+create_operation_legacy = create_operation = _legacy_create_operation
+update_operation_legacy = update_operation = _legacy_update_operation
+delete_operation_legacy = delete_operation = _legacy_delete_operation
+create_entry_link_legacy = create_entry_link = _legacy_create_entry_link
+delete_entry_link_legacy = delete_entry_link = _legacy_delete_entry_link
+import_vpps_parts_legacy = import_vpps_parts = _legacy_import_vpps_parts
+import_entries_legacy = import_entries = _legacy_import_entries
+station_autolink_legacy = station_autolink = _legacy_station_autolink
+station_autolink_undo = _legacy_station_autolink_undo
+import_tc_excel_legacy = import_tc_excel = _legacy_import_tc_excel

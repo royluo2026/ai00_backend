@@ -1,31 +1,20 @@
-"""
-backend/routers/vpps_audit.py
-──────────────────────────────
-VPPS 操作审计 API
+"""REST compatibility adapters for governed Craft VPPS operation auditing."""
+from __future__ import annotations
 
-端点：
-  POST /api/vpps-operations/rule4-bulk-ignore
-  GET  /api/vpps-operations
-  GET  /api/vpps-operations/rule4-ignores
-  POST /api/vpps-operations/{gid}/revert
-"""
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
-from ..data.connection import get_conn
-from ..vpps_audit import MySqlVppsOperationRepository, VppsAuditService
-from backend.platform_sdk.auth import get_current_user, require_role
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.auth import get_authenticated_principal, get_current_user, require_role
+from backend.platform_sdk.factory import build_web_compatibility_envelope, invoke_compatibility
+from backend.platform_sdk.ids import next_gid
 
 router = APIRouter(prefix="/api/vpps-operations", tags=["vpps_audit"])
-
-_READ  = require_role("super_admin", "team_admin", "project_admin",
-                      "rule_admin", "knowledge_admin", "member")
+_READ = require_role("super_admin", "team_admin", "project_admin", "rule_admin", "knowledge_admin", "member")
 _WRITE = require_role("super_admin", "team_admin", "project_admin", "member")
 
-
-# ── Request Bodies ────────────────────────────────────────────────────────────
 
 class IgnoreRow(BaseModel):
     pbom_row_gid: str
@@ -45,100 +34,37 @@ class RevertBody(BaseModel):
     reverted_by_name: Optional[str] = None
 
 
-# ── 辅助：序列化 VppsOperation ────────────────────────────────────────────────
+async def _invoke_vpps_audit(request, current_user, principal, gateway, capability_id, operation, *, pbom_version_gid=None, operation_type=None, gid=None, rows=None, actor_gid=None, actor_name=None):
+    request_id = request.headers.get("X-Request-ID") or f"craft_vpps_audit_legacy_{next_gid()}"
+    payload = {"operation": operation}
+    for key, value in (("pbom_version_gid", pbom_version_gid), ("operation_type", operation_type), ("gid", gid), ("rows", rows), ("actor_gid", actor_gid), ("actor_name", actor_name)):
+        if value is not None:
+            payload[key] = value
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id=capability_id, payload=payload, current_user=current_user,
+        principal=principal, request_id=request_id, trace_id=request.headers.get("X-Trace-ID") or request_id,
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "permission_denied": 403, "invalid_input": 400}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data["data"]
 
-def _op_to_dict(op) -> dict:
-    return {
-        "gid":              op.gid,
-        "pbom_version_gid": op.pbom_version_gid,
-        "pbom_row_gid":     op.pbom_row_gid,
-        "operation_type":   op.operation_type,
-        "rule_no":          op.rule_no,
-        "field_name":       op.field_name,
-        "original_value":   op.original_value,
-        "new_value":        op.new_value,
-        "actor_gid":        op.actor_gid,
-        "actor_name":       op.actor_name,
-        "created_at":       op.created_at.isoformat() if op.created_at else None,
-        "notes":            op.notes,
-        "is_active":        op.is_active,
-        "reverted_at":      op.reverted_at.isoformat() if op.reverted_at else None,
-        "reverted_by_gid":  op.reverted_by_gid,
-        "reverted_by_name": op.reverted_by_name,
-    }
-
-
-# ── 端点 ──────────────────────────────────────────────────────────────────────
 
 @router.post("/rule4-bulk-ignore", dependencies=[Depends(_WRITE)])
-def rule4_bulk_ignore(body: BulkIgnoreRule4Body, user: dict = Depends(get_current_user)):
-    """一键忽略规则4全部 NOK 行。幂等：已忽略的行会被跳过。"""
-    actor_gid  = body.actor_gid  or user["gid"]
-    actor_name = body.actor_name or user.get("name", "")
-    rows = [r.model_dump() for r in body.rows]
-
-    with get_conn() as conn:
-        repo    = MySqlVppsOperationRepository(conn)
-        service = VppsAuditService(repo)
-        ops     = service.bulk_ignore_rule4(
-            pbom_version_gid=body.pbom_version_gid,
-            rows=rows,
-            actor_gid=actor_gid,
-            actor_name=actor_name,
-        )
-        conn.commit()
-
-    return {
-        "success":    True,
-        "created":    len(ops),
-        "operations": [_op_to_dict(o) for o in ops],
-    }
+async def rule4_bulk_ignore(body: BulkIgnoreRule4Body, request: Request, user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_vpps_audit(request, user, principal, gateway, "craft.vpps_audit.change.apply", "rule4_bulk_ignore", pbom_version_gid=body.pbom_version_gid, rows=[row.model_dump() for row in body.rows], actor_gid=body.actor_gid or user.get("gid"), actor_name=body.actor_name or user.get("name", ""))
 
 
 @router.get("", dependencies=[Depends(_READ)])
-def list_operations(
-    pbom_version_gid: str,
-    operation_type: Optional[str] = None,
-    user: dict = Depends(get_current_user),
-):
-    """返回指定 PBOM 版本的 is_active 操作记录列表。"""
-    with get_conn() as conn:
-        repo    = MySqlVppsOperationRepository(conn)
-        service = VppsAuditService(repo)
-        ops     = service.get_active_operations(pbom_version_gid, operation_type)
-
-    return {"success": True, "data": [_op_to_dict(o) for o in ops]}
+async def list_operations(pbom_version_gid: str, operation_type: Optional[str] = None, request: Request = None, user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_vpps_audit(request, user, principal, gateway, "craft.vpps_audit.read", "list", pbom_version_gid=pbom_version_gid, operation_type=operation_type)
 
 
 @router.get("/rule4-ignores", dependencies=[Depends(_READ)])
-def get_rule4_ignores(pbom_version_gid: str, user: dict = Depends(get_current_user)):
-    """返回该 PBOM 版本中已忽略的 rule4 pbom_row_gid 集合及操作详情。"""
-    with get_conn() as conn:
-        repo    = MySqlVppsOperationRepository(conn)
-        service = VppsAuditService(repo)
-        ops     = service.get_active_operations(pbom_version_gid, "rule4_bulk_ignore")
-        gids    = {op.pbom_row_gid for op in ops}
-
-    return {
-        "success":          True,
-        "ignored_row_gids": sorted(gids),
-        "operations":       [_op_to_dict(o) for o in ops],
-    }
+async def get_rule4_ignores(pbom_version_gid: str, request: Request, user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_vpps_audit(request, user, principal, gateway, "craft.vpps_audit.read", "rule4_ignores", pbom_version_gid=pbom_version_gid)
 
 
 @router.post("/{gid}/revert", dependencies=[Depends(_WRITE)])
-def revert_operation(gid: str, body: RevertBody, user: dict = Depends(get_current_user)):
-    """撤销指定操作（is_active → FALSE）。"""
-    reverted_by_gid  = body.reverted_by_gid  or user["gid"]
-    reverted_by_name = body.reverted_by_name or user.get("name", "")
-
-    with get_conn() as conn:
-        repo    = MySqlVppsOperationRepository(conn)
-        service = VppsAuditService(repo)
-        op      = service.revert_operation(gid, reverted_by_gid, reverted_by_name)
-        conn.commit()
-
-    if not op:
-        raise HTTPException(status_code=404, detail="操作不存在或已撤销")
-
-    return {"success": True, "operation": _op_to_dict(op)}
+async def revert_operation(gid: str, body: RevertBody, request: Request, user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_vpps_audit(request, user, principal, gateway, "craft.vpps_audit.change.apply", "revert", gid=gid, actor_gid=body.reverted_by_gid or user.get("gid"), actor_name=body.reverted_by_name or user.get("name", ""))

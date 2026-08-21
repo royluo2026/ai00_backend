@@ -137,8 +137,12 @@ ENTRY_SCHEMA = _object({
     "entry_type": {"type": "string"},
     "status": {"type": "string"},
     "share_scope": {"type": "string"},
+    "list_gid": {"type": ["string", "null"]},
+    "context_class_gid": {"type": ["string", "null"]},
     "tags": {"type": "array", "items": {"type": "string"}},
     "creator_gid": {"type": "string"},
+    "source_project_gid": {"type": ["string", "null"]},
+    "created_at": {"type": "string"},
     "updated_at": {"type": "string"},
     "content_md": {"type": "string"},
     "content_ref": {"type": "object", "properties": {
@@ -148,6 +152,7 @@ ENTRY_SCHEMA = _object({
     }},
     "related_part_nos": {"type": "array", "items": {"type": "string"}},
     "related_operation_gids": {"type": "array", "items": {"type": "string"}},
+    "contributors": {"type": "array", "maxItems": 100, "items": {"type": "object"}},
     "attachments": {"type": "array", "items": {"type": "object", "properties": {
         "name": {"type": "string"}, "url": {"type": "string"},
         "object_key": {"type": "string"}, "sha256": {"type": "string"},
@@ -160,7 +165,7 @@ ENTRY_SCHEMA = _object({
 }, ("object_ref", "gid", "title", "status"))
 
 ENTRY_SEARCH_SCHEMA = _object({
-    "items": {"type": "array", "items": ENTRY_SCHEMA, "maxItems": 100},
+    "items": {"type": "array", "items": ENTRY_SCHEMA, "maxItems": 500},
     "total": {"type": "integer", "minimum": 0},
     "query": {"type": "string"},
 }, ("items", "total", "query"))

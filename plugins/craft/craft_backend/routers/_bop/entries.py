@@ -12,12 +12,15 @@ import uuid as _uuid
 from datetime import datetime, date
 from typing import Dict, List, Literal, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from pydantic import BaseModel
 
 from ...data.connection import get_conn
 from backend.platform_sdk.ids import next_gid
 from backend.platform_sdk.identity import resolve_identity_labels
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.auth import get_authenticated_principal
+from backend.platform_sdk.factory import build_web_compatibility_envelope, invoke_compatibility
 
 from ._constants import (
     _WRITE, _READ, _SUPER_ADMIN,
@@ -35,6 +38,8 @@ from ._helpers import (
     legacy_entries_max_from_env,
 )
 from . import _history
+from ..factory import _invoke as _invoke_factory
+from ...services.bop_navigation import repository as _bop_navigation_repository
 
 _log = logging.getLogger(__name__)
 
@@ -54,6 +59,86 @@ def legacy_entries_usage_snapshot() -> dict[str, int]:
         return dict(_LEGACY_ENTRIES_USAGE)
 
 router = APIRouter(prefix="/api/bop", tags=["bop"])
+
+
+async def _invoke_legacy_entry_read(request, current_user, principal, gateway, operation, payload, *, capability_id="craft.bop.entry.legacy_read"):
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway,
+        capability_id=capability_id,
+        payload={"operation": operation, **payload},
+        current_user=current_user,
+        principal=principal,
+        request_id=request.headers.get("X-Request-ID") or f"craft_bop_entry_legacy_read_{next_gid()}",
+        trace_id=request.headers.get("X-Trace-ID") or "craft_bop_entry_legacy_read",
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"invalid_input": 400, "permission_denied": 403, "resource_not_found": 404}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data
+
+
+async def _invoke_entry_link_change(request, current_user, principal, gateway, payload):
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.entry_link.change.apply", payload=payload,
+        current_user=current_user, principal=principal,
+        request_id=request.headers.get("X-Request-ID") or f"craft_bop_entry_link_change_{next_gid()}",
+        trace_id=request.headers.get("X-Trace-ID") or "craft_bop_entry_link_change",
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request.headers.get("X-Request-ID") or f"craft_bop_entry_link_change_{next_gid()}",
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        error = result.error
+        code = error.code if error else "provider_error"
+        raise HTTPException(status_code={"invalid_input": 400, "invalid_state": 400, "permission_denied": 403, "resource_not_found": 404}.get(code, 422), detail=error.model_dump(mode="json") if error else None)
+    return result.data["data"]
+
+
+async def _invoke_entry_change(request, current_user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"craft_bop_entry_change_{next_gid()}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.entry.change.apply", payload=payload,
+        current_user=current_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        error = result.error
+        code = error.code if error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "invalid_input": 400, "invalid_state": 409, "permission_denied": 403}.get(code, 422), detail=error.model_dump(mode="json") if error else None)
+    return result.data.get("data", result.data)
+
+
+async def _invoke_picture_upload(request, current_user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"craft_bop_picture_upload_{next_gid()}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.picture.upload", payload=payload,
+        current_user=current_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        error = result.error
+        code = error.code if error else "provider_error"
+        raise HTTPException(status_code={"invalid_input": 400, "permission_denied": 403}.get(code, 422), detail=error.model_dump(mode="json") if error else None)
+    return result.data["data"]
+
+
+async def _invoke_entry_bulk_change(request, current_user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"craft_bop_entry_bulk_change_{next_gid()}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.entry.bulk.change.apply", payload=payload,
+        current_user=current_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        error = result.error
+        code = error.code if error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "invalid_input": 400, "invalid_state": 409, "permission_denied": 403}.get(code, 422), detail=error.model_dump(mode="json") if error else None)
+    return result.data.get("data", result.data)
 
 
 # ── Pydantic 模型 ─────────────────────────────────────────────────────────────
@@ -162,71 +247,49 @@ class AutoLinkBody(BaseModel):
 # ══════════════════════════════════════════════════════════════
 
 @router.get("/versions/{version_gid}/alt-hier")
-def get_alt_hier(version_gid: str, _u=Depends(_READ)):
+async def get_alt_hier(version_gid: str, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
     """返回 BOP 树结构，每个条目附带其关联 pbom_part 的 catia_occurrence_name 列表。
     用于 cad_sim 页"备选层次结构"与 VisMockup 节点的 catiaOccurrenceName 匹配。
     """
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                SELECT e.gid, e.parent_gid, e.node_type, e.sort_order,
-                       e.title, e.vpps, e.level, e.ai00_level,
-                       p.gid        AS part_gid,
-                       p.part_no,
-                       p.catia_occurrence_name,
-                       p.title      AS part_name,
-                       p.vpps       AS part_vpps,
-                       p.quantity
-                FROM workmanship_bop_bop_entries e
-                LEFT JOIN workmanship_bop_bop_entry_links l
-                    ON l.entry_gid = e.gid AND l.link_type = 'pbom_part'
-                LEFT JOIN workmanship_bop_pbom p ON p.gid = l.entity_gid
-                WHERE e.version_gid = %s AND e.is_deleted = FALSE
-                ORDER BY e.sort_order 
-                """,
-                (version_gid,),
-            )
-            rows = cur.fetchall()
-
-    # 按 entry_gid 聚合：每个 entry 可能有多个 pbom_part 行
-    entries: dict = {}
-    for r in rows:
-        gid = r["gid"]
-        if gid not in entries:
-            entries[gid] = {
-                "gid":        gid,
-                "parent_gid": r["parent_gid"],
-                "node_type":  r["node_type"],
-                "sort_order": r["sort_order"],
-                "title":      r["title"],
-                "vpps":       r["vpps"],
-                "level":      r["level"],
-                "ai00_level": r["ai00_level"],
-                "parts":      [],
-            }
-        if r["part_gid"]:
-            entries[gid]["parts"].append({
-                "gid":      r["part_gid"],
-                "part_no":  r["part_no"] or "",
-                "catia_occ": r["catia_occurrence_name"] or "",
-                "name":     r["part_name"] or "",
-                "vpps":     r["part_vpps"] or "",
-                "quantity": r["quantity"],
-            })
-
-    return {"entries": list(entries.values())}
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.alt_hierarchy.read", payload={"version_gid": version_gid}, current_user=_u,
+        principal=principal, request_id=request.headers.get("X-Request-ID") or f"craft_bop_alt_hierarchy_legacy_{next_gid()}",
+        trace_id=request.headers.get("X-Trace-ID") or request.headers.get("X-Request-ID") or "craft_bop_alt_hierarchy",
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"invalid_input": 400, "permission_denied": 403}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data
 
 
 @router.get("/versions/{version_gid}/line-op-catia-parts")
-def get_line_op_catia_parts(
+async def get_line_op_catia_parts(
+    request: Request,
     version_gid: str,
     line_entry_gid: str = Query(...),
     _u=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
 ):
     """返回指定线体节点下所有 operation 条目及其关联零件的 catia_occurrence_name 列表。
     按 sort_order DESC 排序（倒序 = 最后装的最先拆），供一键截图流程使用。
     """
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.line_operation_catia.read", payload={"line_entry_gid": line_entry_gid}, current_user=_u,
+        principal=principal, request_id=request.headers.get("X-Request-ID") or f"craft_bop_line_operation_catia_legacy_{next_gid()}",
+        trace_id=request.headers.get("X-Trace-ID") or "craft_bop_line_operation_catia",
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"invalid_input": 400, "permission_denied": 403}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data
+
+
+def _legacy_get_line_op_catia_parts(
+    version_gid: str,
+    line_entry_gid: str = Query(...),
+    _u=Depends(_READ),
+):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -321,110 +384,96 @@ def list_entries(version_gid: str, response: Response, _u=Depends(_READ)):
 
 
 @router.get("/versions/{version_gid}/pbom")
-def get_version_pbom(version_gid: str, _u=Depends(_READ)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                SELECT pe.gid, pe.title, pe.vpps, pe.parent_part_gid,
-                       pe.node_type, pe.bom_row_id, pe.seq_no,
-                       pe.quantity, pe.unit, pe.part_number,
-                       pe.created_at, pe.updated_at
-                FROM workmanship_bop_pbom pe
-                JOIN workmanship_bop_bop_entry_links l ON l.entity_gid = pe.gid
-                JOIN workmanship_bop_bop_entries e ON e.gid = l.entry_gid
-                WHERE e.version_gid = %s
-                  AND l.link_type = 'pbom_part'
-                  AND e.is_deleted = FALSE
-                ORDER BY pe.seq_no
-                """,
-                (version_gid,),
-            )
-            rows = [dict(r) for r in cur.fetchall()]
-    return {"data": rows}
+async def get_version_pbom(
+    version_gid: str,
+    request: Request,
+    _u=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    data = await _invoke_factory(
+        request,
+        _u,
+        principal,
+        gateway,
+        "craft.bop.linked_parts.get",
+        {"version_gid": version_gid},
+    )
+    return {"data": data.get("legacy_pbom_items", [])}
 
 
 @router.get("/versions/{version_gid}/linked-parts")
-def get_version_linked_parts(version_gid: str, _u=Depends(_READ)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                SELECT pe.gid, pe.title AS name, pe.parent_gid,
-                       pe.part_no, pe.quantity, pe.unit,
-                       pe.snapshot_gid, pe.material, pe.meta,
-                       l.entry_gid, l.gid AS link_gid,
-                       pe.created_at
-                FROM workmanship_bop_bop_entry_links l
-                JOIN workmanship_bop_pbom pe ON pe.gid = l.entity_gid
-                JOIN workmanship_bop_bop_entries e ON e.gid = l.entry_gid
-                WHERE e.version_gid = %s
-                  AND l.link_type = 'pbom_part'
-                  AND l.is_primary = TRUE
-                  AND e.is_deleted = FALSE
-                ORDER BY pe.part_no
-                """,
-                (version_gid,),
-            )
-            rows = [dict(r) for r in cur.fetchall()]
-    return {"data": rows}
+async def get_version_linked_parts(
+    version_gid: str,
+    request: Request,
+    _u=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    data = await _invoke_factory(
+        request,
+        _u,
+        principal,
+        gateway,
+        "craft.bop.linked_parts.get",
+        {"version_gid": version_gid},
+    )
+    return {"data": data.get("legacy_items", [])}
 
 
 @router.get("/entries/search")
-def search_entries(
+async def search_entries(
+    request: Request,
     q: Optional[str] = Query(None),
     node_types: Optional[str] = Query(None),
     limit: int = Query(200, le=500),
     _u=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
 ):
-    type_list = [t.strip() for t in node_types.split(",")] if node_types else None
-    like = f"%{q}%" if q else None
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            if type_list:
-                placeholders = ",".join(["%s"] * len(type_list))
-                type_clause = f"AND e.node_type IN ({placeholders})"
-                type_params = type_list
-            else:
-                type_clause = ""
-                type_params = []
-            like_clause = "AND COALESCE(e.title,'') LIKE %s" if like else ""
-            like_params = [like] if like else []
-            cur.execute(
-                f"""
-                SELECT e.gid,
-                       COALESCE(e.title, '') AS title,
-                       e.node_type,
-                       v.gid AS version_gid, v.version_tag
-                FROM workmanship_bop_bop_entries e
-                JOIN workmanship_bop_bop_versions v ON v.gid = e.version_gid
-                WHERE e.is_deleted = FALSE
-                  {type_clause}
-                  {like_clause}
-                ORDER BY v.version_tag, e.sort_order
-                LIMIT %s
-                """,
-                type_params + like_params + [limit],
-            )
-            rows = [dict(r) for r in cur.fetchall()]
-    return {"data": rows}
+    payload = {"q": q, "node_types": [item.strip() for item in node_types.split(",")] if node_types else [], "limit": limit}
+    request_id = request.headers.get("X-Request-ID")
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.entry.search", payload=payload, current_user=_u,
+        principal=principal, request_id=request_id or f"craft_bop_entry_search_legacy_{next_gid()}",
+        trace_id=request.headers.get("X-Trace-ID") or request_id or "craft_bop_entry_search",
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"invalid_input": 400, "permission_denied": 403}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data
 
 
 @router.get("/entries/{gid}")
-def get_entry(gid: str, _u=Depends(_READ)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(_ENTRY_BY_GID_SQL, (gid,))
-            row = cur.fetchone()
-    if not row:
+async def get_entry(
+    gid: str,
+    request: Request,
+    _u=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    reference = _bop_navigation_repository.resolve_entry_reference(gid)
+    data = await _invoke_factory(
+        request,
+        _u,
+        principal,
+        gateway,
+        "craft.bop.entry.detail.get",
+        {**reference, "entry_gid": gid},
+    )
+    entry = dict(data.get("entry") or {})
+    if not entry:
         raise HTTPException(status_code=404, detail="条目不存在")
-    data = dict(row)
-    data['process_flow_pic'] = _resolve_bop_pic_items(data.get('process_flow_pic') or [])
-    return {"data": data}
+    entry["process_flow_pic"] = _resolve_bop_pic_items(entry.get("process_flow_pic") or [])
+    return {"data": entry}
 
 
 @router.post("/entries", status_code=201)
-def create_entry(body: CreateEntryBody, _u=Depends(_WRITE)):
+async def create_entry(body: CreateEntryBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_entry_bulk_change(request, _u, principal, gateway, {"operation": "create", **body.model_dump(exclude_unset=True)})
+
+
+def _legacy_create_entry(body: CreateEntryBody, _u=Depends(_WRITE)):
     entry_gid  = str(next_gid())
     entity_gid = str(next_gid())
     link_gid   = str(next_gid())
@@ -557,7 +606,11 @@ def create_entry(body: CreateEntryBody, _u=Depends(_WRITE)):
 
 
 @router.patch("/entries/{gid}")
-def update_entry(gid: str, body: UpdateEntryBody, _u=Depends(_WRITE)):
+async def update_entry(gid: str, body: UpdateEntryBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_entry_change(request, _u, principal, gateway, {"operation": "update", "entry_gid": gid, "updates": body.model_dump(exclude_unset=True)})
+
+
+def _legacy_update_entry(gid: str, body: UpdateEntryBody, _u=Depends(_WRITE)):
     data = body.model_dump(exclude_unset=True)
     if not data:
         raise HTTPException(400, "无更新字段")
@@ -661,7 +714,11 @@ def update_entry(gid: str, body: UpdateEntryBody, _u=Depends(_WRITE)):
 
 
 @router.post("/pics/upload")
-def upload_bop_pic(body: BopPicUploadBody, _u=Depends(_WRITE)):
+async def upload_bop_pic(body: BopPicUploadBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_picture_upload(request, _u, principal, gateway, body.model_dump())
+
+
+def _legacy_upload_bop_pic(body: BopPicUploadBody, _u=Depends(_WRITE)):
     _log.info(
         "bop pic upload request filename=%s mime=%s b64_len=%s",
         body.filename,
@@ -723,7 +780,11 @@ def upload_bop_pic(body: BopPicUploadBody, _u=Depends(_WRITE)):
     return {"url": f"/static/uploads/bop_pics/{name}"}
 
 @router.delete("/entries/{gid}", status_code=200)
-def delete_entry(gid: str, _u=Depends(_WRITE)):
+async def delete_entry(gid: str, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_entry_change(request, _u, principal, gateway, {"operation": "delete", "entry_gid": gid})
+
+
+def _legacy_delete_entry(gid: str, _u=Depends(_WRITE)):
     # 自有实体类型（1:1 归属 entry，随 entry 一起软删除）
     _OWNED_ENTITY_TYPES = {'bop_line', 'bop_station', 'bop_process', 'bop_steps', 'bop_operator'}
 
@@ -815,8 +876,13 @@ class PurgeEntriesBody(BaseModel):
 
 
 @router.post("/versions/{version_gid}/purge-entries", status_code=200)
-def purge_version_entries(version_gid: str, body: PurgeEntriesBody,
-                          _u=Depends(_SUPER_ADMIN)):
+async def purge_version_entries(version_gid: str, body: PurgeEntriesBody, request: Request,
+                                _u=Depends(_SUPER_ADMIN), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_entry_bulk_change(request, _u, principal, gateway, {"operation": "purge", "version_gid": version_gid, **body.model_dump(exclude_unset=True)})
+
+
+def _legacy_purge_version_entries(version_gid: str, body: PurgeEntriesBody,
+                                  _u=Depends(_SUPER_ADMIN)):
     """
     超管：按版本批量清空全部条目及其私有实体记录。
     mode=soft  → is_deleted=TRUE / deleted_at=NOW()（可通过 DB 恢复）
@@ -888,7 +954,11 @@ def purge_version_entries(version_gid: str, body: PurgeEntriesBody,
 
 
 @router.post("/versions/{version_gid}/import-tc", status_code=201)
-def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
+async def import_tc_entries(version_gid: str, body: ImportTcBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_entry_bulk_change(request, _u, principal, gateway, {"operation": "import_tc", "version_gid": version_gid, "rows": body.rows})
+
+
+def _legacy_import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
     """批量导入 TC CSV 解析结果"""
     _IMPORT_ENTITY_MAP = {
         'line_process':     ('workmanship_bop_bop_line',       'bop_line'),
@@ -1241,13 +1311,21 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
 
 
 @router.post("/versions/{version_gid}/copy-from/{src_gid}", status_code=201)
-def copy_entries_from(version_gid: str, src_gid: str, _u=Depends(_WRITE)):
+async def copy_entries_from(version_gid: str, src_gid: str, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_entry_bulk_change(request, _u, principal, gateway, {"operation": "copy", "version_gid": version_gid, "source_gid": src_gid})
+
+
+def _legacy_copy_entries_from(version_gid: str, src_gid: str, _u=Depends(_WRITE)):
     """从另一 BOP 版本复制全部条目"""
     return _do_copy(version_gid, src_gid, set_gbop_source=False)
 
 
 @router.post("/versions/{version_gid}/copy-from-gbop/{src_gid}", status_code=201)
-def copy_entries_from_gbop(version_gid: str, src_gid: str, _u=Depends(_WRITE)):
+async def copy_entries_from_gbop(version_gid: str, src_gid: str, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_entry_bulk_change(request, _u, principal, gateway, {"operation": "copy_from_gbop", "version_gid": version_gid, "source_gid": src_gid})
+
+
+def _legacy_copy_entries_from_gbop(version_gid: str, src_gid: str, _u=Depends(_WRITE)):
     """从 GBOP 版本导入全部条目，并记录 gbop_source_gid 溯源"""
     return _do_copy(version_gid, src_gid, set_gbop_source=True)
 
@@ -1257,7 +1335,11 @@ def copy_entries_from_gbop(version_gid: str, src_gid: str, _u=Depends(_WRITE)):
 # ══════════════════════════════════════════════════════════════
 
 @router.get("/versions/{version_gid}/auto-link-preview")
-def auto_link_preview(version_gid: str, _u=Depends(_READ)):
+async def auto_link_preview(version_gid: str, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_legacy_entry_read(request, _u, principal, gateway, "auto_link_preview", {"version_gid": version_gid}, capability_id="craft.bop.entry.legacy_read")
+
+
+def _legacy_auto_link_preview(version_gid: str, _u=Depends(_READ)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT project_gid FROM workmanship_bop_bop_versions WHERE gid=%s", (version_gid,))
@@ -1322,7 +1404,11 @@ def auto_link_preview(version_gid: str, _u=Depends(_READ)):
 
 
 @router.post("/versions/{version_gid}/auto-link", status_code=200)
-def auto_link_entries(version_gid: str, body: AutoLinkBody = AutoLinkBody(), _u=Depends(_WRITE)):
+async def auto_link_entries(version_gid: str, body: AutoLinkBody = AutoLinkBody(), request: Request = None, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_entry_bulk_change(request, _u, principal, gateway, {"operation": "auto_link", "version_gid": version_gid, **body.model_dump(exclude_unset=True)})
+
+
+def _legacy_auto_link_entries(version_gid: str, body: AutoLinkBody = AutoLinkBody(), _u=Depends(_WRITE)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT project_gid FROM workmanship_bop_bop_versions WHERE gid=%s", (version_gid,))
@@ -1528,7 +1614,18 @@ def auto_link_entries(version_gid: str, body: AutoLinkBody = AutoLinkBody(), _u=
 # ══════════════════════════════════════════════════════════════
 
 @router.get("/entry-links")
-def list_entry_links(
+async def list_entry_links(
+    entry_gid: Optional[str] = Query(None),
+    recursive: bool = Query(False),
+    request: Request = None,
+    _u=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    return await _invoke_legacy_entry_read(request, _u, principal, gateway, "entry_links", {"entry_gid": entry_gid, "recursive": recursive}, capability_id="craft.bop.entry.legacy_read")
+
+
+def _legacy_list_entry_links(
     entry_gid: Optional[str] = Query(None),
     recursive: bool = Query(False),
     _u=Depends(_READ),
@@ -1593,7 +1690,11 @@ def list_entry_links(
 
 
 @router.post("/entry-links", status_code=201)
-def create_entry_link(body: CreateEntryLinkBody, _u=Depends(_WRITE)):
+async def create_entry_link(body: CreateEntryLinkBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_entry_link_change(request, _u, principal, gateway, {"operation": "attach", **body.model_dump()})
+
+
+def _legacy_create_entry_link(body: CreateEntryLinkBody, _u=Depends(_WRITE)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -1632,7 +1733,12 @@ def create_entry_link(body: CreateEntryLinkBody, _u=Depends(_WRITE)):
 
 
 @router.delete("/entry-links/{gid}", status_code=204)
-def delete_entry_link(gid: str, _u=Depends(_WRITE)):
+async def delete_entry_link(gid: str, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    await _invoke_entry_link_change(request, _u, principal, gateway, {"operation": "detach", "link_gid": gid})
+    return None
+
+
+def _legacy_delete_entry_link(gid: str, _u=Depends(_WRITE)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -1667,7 +1773,18 @@ def delete_entry_link(gid: str, _u=Depends(_WRITE)):
 # ══════════════════════════════════════════════════════════════
 
 @router.get("/versions/{version_gid}/link-summary")
-def get_link_summary(
+async def get_link_summary(
+    version_gid: str,
+    link_type: Optional[str] = Query(None),
+    request: Request = None,
+    _u=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    return await _invoke_legacy_entry_read(request, _u, principal, gateway, "link_summary", {"version_gid": version_gid, "link_type": link_type}, capability_id="craft.bop.entry.legacy_read")
+
+
+def _legacy_get_link_summary(
     version_gid: str,
     link_type: Optional[str] = Query(None),
     _u=Depends(_READ),
@@ -1734,7 +1851,18 @@ def get_link_summary(
 
 
 @router.get("/entity-detail")
-def get_entity_detail(
+async def get_entity_detail(
+    link_type: str = Query(...),
+    ref_gid: str = Query(...),
+    request: Request = None,
+    _u=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    return await _invoke_legacy_entry_read(request, _u, principal, gateway, "entity_detail", {"link_type": link_type, "ref_gid": ref_gid}, capability_id="craft.bop.entry.legacy_read")
+
+
+def _legacy_get_entity_detail(
     link_type: str = Query(...),
     ref_gid: str = Query(...),
     _u=Depends(_READ),
@@ -1771,7 +1899,11 @@ def get_entity_detail(
 
 
 @router.patch("/entity-detail")
-def patch_entity_detail(body: EntityPatchBody, _u=Depends(_WRITE)):
+async def patch_entity_detail(body: EntityPatchBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_entry_bulk_change(request, _u, principal, gateway, {"operation": "entity_detail.patch", **body.model_dump(exclude_unset=True)})
+
+
+def _legacy_patch_entity_detail(body: EntityPatchBody, _u=Depends(_WRITE)):
     table_info = _LINK_TARGET_TABLES.get(body.link_type)
     if not table_info:
         raise HTTPException(400, f"未知 link_type: {body.link_type}")
@@ -1822,7 +1954,11 @@ class ResolveGidsBody(BaseModel):
 
 
 @router.post("/resolve-gids")
-def resolve_gids(body: ResolveGidsBody, _u=Depends(_READ)):
+async def resolve_gids(body: ResolveGidsBody, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_legacy_entry_read(request, _u, principal, gateway, "resolve_gids", {"gids": body.gids}, capability_id="craft.bop.entry.legacy_read")
+
+
+def _legacy_resolve_gids(body: ResolveGidsBody, _u=Depends(_READ)):
     """批量把 _gid 字段值解析为人类可读名称。"""
     result: dict = resolve_identity_labels(body.gids)
     with get_conn() as conn:
@@ -1849,7 +1985,20 @@ def resolve_gids(body: ResolveGidsBody, _u=Depends(_READ)):
 # ══════════════════════════════════════════════════════════════
 
 @router.get("/pbom/search")
-def search_pbom_parts(
+async def search_pbom_parts(
+    q: Optional[str] = Query(None),
+    vpps: Optional[str] = Query(None),
+    snapshot_gid: Optional[str] = Query(None),
+    limit: int = Query(50, le=200),
+    request: Request = None,
+    _u=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    return await _invoke_legacy_entry_read(request, _u, principal, gateway, "pbom_search", {"q": q, "vpps": vpps, "snapshot_gid": snapshot_gid, "limit": limit}, capability_id="craft.bop.entry.legacy_read")
+
+
+def _legacy_search_pbom_parts(
     q: Optional[str] = Query(None),
     vpps: Optional[str] = Query(None),
     snapshot_gid: Optional[str] = Query(None),
@@ -1879,7 +2028,18 @@ def search_pbom_parts(
 
 
 @router.get("/pbom-snapshots")
-def list_pbom_snapshots(
+async def list_pbom_snapshots(
+    project_gid: Optional[str] = Query(None),
+    limit: int = Query(50, le=200),
+    request: Request = None,
+    _u=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    return await _invoke_legacy_entry_read(request, _u, principal, gateway, "pbom_snapshots", {"project_gid": project_gid, "limit": limit}, capability_id="craft.bop.entry.legacy_read")
+
+
+def _legacy_list_pbom_snapshots(
     project_gid: Optional[str] = Query(None),
     limit: int = Query(50, le=200),
     _u=Depends(_READ),
@@ -1906,7 +2066,18 @@ def list_pbom_snapshots(
 
 
 @router.get("/versions/{version_gid}/line-operations")
-def get_line_operations(
+async def get_line_operations(
+    version_gid: str,
+    line_entry_gid: str = Query(...),
+    request: Request = None,
+    _u=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    return await _invoke_legacy_entry_read(request, _u, principal, gateway, "line_operations", {"version_gid": version_gid, "line_entry_gid": line_entry_gid}, capability_id="craft.bop.entry.legacy_read")
+
+
+def _legacy_get_line_operations(
     version_gid: str,
     line_entry_gid: str = Query(...),
     _u=Depends(_READ),
@@ -1963,7 +2134,11 @@ def get_line_operations(
 # ── 节点操作历史 ───────────────────────────────────────────────────────────────
 
 @router.get("/versions/{version_gid}/history")
-def get_version_history(version_gid: str, limit: int = Query(100, le=500), _u=Depends(_READ)):
+async def get_version_history(version_gid: str, limit: int = Query(100, le=500), request: Request = None, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_legacy_entry_read(request, _u, principal, gateway, "version_history", {"version_gid": version_gid, "limit": limit}, capability_id="craft.bop.entry.legacy_read")
+
+
+def _legacy_get_version_history(version_gid: str, limit: int = Query(100, le=500), _u=Depends(_READ)):
     """查询整个 BOP 版本的操作历史（所有节点，时间倒序）"""
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -1993,7 +2168,11 @@ def get_version_history(version_gid: str, limit: int = Query(100, le=500), _u=De
 
 
 @router.get("/entries/{gid}/history")
-def get_entry_history(gid: str, _u=Depends(_READ)):
+async def get_entry_history(gid: str, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_legacy_entry_read(request, _u, principal, gateway, "entry_history", {"entry_gid": gid}, capability_id="craft.bop.entry.legacy_read")
+
+
+def _legacy_get_entry_history(gid: str, _u=Depends(_READ)):
     """查询某条 BOP 节点的操作历史记录（最近50条，倒序）"""
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -2023,7 +2202,11 @@ def get_entry_history(gid: str, _u=Depends(_READ)):
 
 
 @router.post("/entries/{gid}/history/{log_gid}/rollback")
-def rollback_entry_history(gid: str, log_gid: str, _u=Depends(_WRITE)):
+async def rollback_entry_history(gid: str, log_gid: str, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_entry_bulk_change(request, _u, principal, gateway, {"operation": "history.rollback", "gid": gid, "log_gid": log_gid})
+
+
+def _legacy_rollback_entry_history(gid: str, log_gid: str, _u=Depends(_WRITE)):
     """撤销一条操作记录（支持 update_entry / create_entry）"""
     import json as _j
     with get_conn() as conn:
@@ -2132,3 +2315,15 @@ def rollback_entry_history(gid: str, log_gid: str, _u=Depends(_WRITE)):
             cur.execute(_ENTRY_BY_GID_SQL, (gid,))
             row = cur.fetchone()
             return {"ok": True, "entry": dict(row) if row else {}}
+
+
+# Compatibility aliases keep existing in-process callers on the legacy implementation;
+# HTTP routes above always enter through the Capability Gateway.
+create_entry_legacy = create_entry = _legacy_create_entry
+purge_version_entries_legacy = purge_version_entries = _legacy_purge_version_entries
+import_tc_entries_legacy = import_tc_entries = _legacy_import_tc_entries
+copy_entries_from_legacy = copy_entries_from = _legacy_copy_entries_from
+copy_entries_from_gbop_legacy = copy_entries_from_gbop = _legacy_copy_entries_from_gbop
+auto_link_entries_legacy = auto_link_entries = _legacy_auto_link_entries
+patch_entity_detail_legacy = patch_entity_detail = _legacy_patch_entity_detail
+rollback_entry_history_legacy = rollback_entry_history = _legacy_rollback_entry_history

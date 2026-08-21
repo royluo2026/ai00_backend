@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
   "domains": 11,
-  "stable_functions": 848,
+  "stable_functions": 911,
   "resolutions": {
-    "existing_capability": 745,
+    "existing_capability": 798,
     "new_capability": 0,
-    "excluded": 103,
+    "excluded": 113,
     "unreviewed": 0
   },
   "candidate_capabilities": 0,
   "candidate_additions_by_domain": {},
   "function_dispositions_by_domain": {
     "Agent": {
-      "existing_capability": 58,
+      "existing_capability": 63,
       "new_capability": 0,
       "excluded": 9,
       "unreviewed": 0
@@ -24,9 +24,9 @@
       "unreviewed": 0
     },
     "Craft": {
-      "existing_capability": 319,
+      "existing_capability": 376,
       "new_capability": 0,
-      "excluded": 6,
+      "excluded": 5,
       "unreviewed": 0
     },
     "Device": {
@@ -54,15 +54,15 @@
       "unreviewed": 0
     },
     "Knowledge": {
-      "existing_capability": 37,
+      "existing_capability": 39,
       "new_capability": 0,
       "excluded": 0,
       "unreviewed": 0
     },
     "Ontology": {
-      "existing_capability": 42,
+      "existing_capability": 31,
       "new_capability": 0,
-      "excluded": 1,
+      "excluded": 12,
       "unreviewed": 0
     },
     "Project Management": {
@@ -84,8 +84,8 @@
     "functions_per_candidate": 0
   },
   "enabled_exposures": {
-    "web": 2,
-    "rest": 97,
+    "web": 35,
+    "rest": 130,
     "plugin": 0,
     "agent": 27,
     "mcp": 0,
@@ -93,9 +93,9 @@
   },
   "code_extractions": 58,
   "debt_backlog": {},
-  "catalog_descriptors": 270,
-  "current_catalog_capabilities": 267,
-  "proposed_final_catalog_capabilities": 267,
+  "catalog_descriptors": 333,
+  "current_catalog_capabilities": 317,
+  "proposed_final_catalog_capabilities": 317,
   "evidence": {
     "module_dependencies": 0,
     "boundary_violations": 0,

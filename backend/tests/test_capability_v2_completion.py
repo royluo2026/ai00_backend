@@ -379,6 +379,41 @@ def test_current_repository_reports_three_goal_completion() -> None:
     assert "domain_not_independent:base:migration_path" not in report.failed
 
 
+def test_web_consumer_bypass_is_evaluated_when_web_root_is_supplied(tmp_path: Path) -> None:
+    root = _complete_repository(tmp_path)
+    web = root / "web"
+    web.mkdir()
+    (web / "app.js").write_text(
+        "fetch('/api/bop/entries', { method: 'POST' });\n", encoding="utf-8"
+    )
+
+    report = evaluate_completion(root, mode="strict", web_root=web)
+
+    assert report.web_consumer_bypasses == 1
+    assert report.complete is False
+    assert "web_consumer_bypasses:1" in report.failed
+
+
+def test_web_route_inventory_drift_fails_closed(tmp_path: Path) -> None:
+    root = _complete_repository(tmp_path)
+    web = root / "web"
+    web.mkdir()
+    (web / "app.js").write_text(
+        "fetch('/api/capabilities/project.task.read', { method: 'POST' });\n",
+        encoding="utf-8",
+    )
+    configuration_path = root / "backend/governance/capability_v2_completion.json"
+    configuration = json.loads(configuration_path.read_text(encoding="utf-8"))
+    configuration["web_route_inventory_artifact"] = "docs/route-inventory.json"
+    _write_json(root, "backend/governance/capability_v2_completion.json", configuration)
+    _write_json(root, "docs/route-inventory.json", {"counts": {"legacy": 99}})
+
+    report = evaluate_completion(root, mode="strict", web_root=web)
+
+    assert report.complete is False
+    assert "web_route_inventory_drift:1" in report.failed
+
+
 def test_frozen_review_exposes_exact_capability_ids() -> None:
     root = Path(__file__).resolve().parents[2]
 

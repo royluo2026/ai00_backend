@@ -8,7 +8,7 @@ Execute knowledge.personalization.change.apply.
 - 不适用：The resource belongs to another domain.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_118d91d38b08fcecd96ddea0005a02b5`
+- Catalog Release：`rel_3010694218f96365eda536567f35d198`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -72,10 +72,18 @@ Execute knowledge.personalization.change.apply.
   "properties": {
     "arguments": {
       "additionalProperties": false,
-      "properties": {},
+      "properties": {
+        "gid": {
+          "type": "string"
+        }
+      },
       "type": "object"
     },
     "operation": {
+      "enum": [
+        "favorites.toggle",
+        "recent.record"
+      ],
       "type": "string"
     }
   },
@@ -92,11 +100,11 @@ Execute knowledge.personalization.change.apply.
 ```json
 {
   "capability_id": "knowledge.personalization.change.apply",
-  "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
+  "catalog_release": "rel_3010694218f96365eda536567f35d198",
   "major_version": 1,
   "payload": {
     "arguments": {},
-    "operation": "example"
+    "operation": "favorites.toggle"
   }
 }
 ```

@@ -1,14 +1,14 @@
 # craft.canvas.change.apply@1
 
-Execute the reviewed craft.canvas.change.apply Craft outcome.
+Create, update, delete or share Craft canvases.
 
 ## 使用判断
 
-- 适用：A governed consumer needs this Craft-owned outcome.
-- 不适用：The operation belongs to another business domain.
+- 适用：A governed consumer needs a scoped Craft canvas mutation.
+- 不适用：The change belongs to a BOP execution canvas.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_118d91d38b08fcecd96ddea0005a02b5`
+- Catalog Release：`rel_3010694218f96365eda536567f35d198`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -70,22 +70,27 @@ Execute the reviewed craft.canvas.change.apply Craft outcome.
 {
   "additionalProperties": false,
   "properties": {
-    "arguments": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
-    },
-    "expected_version": {
-      "type": "integer"
-    },
-    "operation": {
+    "gid": {
       "minLength": 1,
       "type": "string"
+    },
+    "operation": {
+      "enum": [
+        "save",
+        "delete",
+        "toggle_shared"
+      ],
+      "type": "string"
+    },
+    "record": {
+      "additionalProperties": false,
+      "maxProperties": 10,
+      "properties": {},
+      "type": "object"
     }
   },
   "required": [
-    "operation",
-    "arguments"
+    "operation"
   ],
   "type": "object"
 }
@@ -96,11 +101,10 @@ Execute the reviewed craft.canvas.change.apply Craft outcome.
 ```json
 {
   "capability_id": "craft.canvas.change.apply",
-  "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
+  "catalog_release": "rel_3010694218f96365eda536567f35d198",
   "major_version": 1,
   "payload": {
-    "arguments": {},
-    "operation": "example"
+    "operation": "save"
   }
 }
 ```
@@ -113,14 +117,17 @@ Execute the reviewed craft.canvas.change.apply Craft outcome.
 {
   "additionalProperties": false,
   "properties": {
-    "data": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+    "gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "success": {
+      "type": "boolean"
     }
   },
   "required": [
-    "data"
+    "success",
+    "gid"
   ],
   "type": "object"
 }

@@ -131,10 +131,7 @@ async function _fetchLogs() {
 
     // Fallback: manual fetch with token
     const token = window.top?._authToken || window.parent?.parent?._authToken || window.parent?._authToken || '';
-    const runtimeConfig = window.top?.AI00RuntimeConfig || window.parent?.AI00RuntimeConfig || window.AI00RuntimeConfig;
-    const appConfig = (await window.top?.electronAPI?.getConfig?.()) || (await window.parent?.electronAPI?.getConfig?.()) || {};
-    const runtimeBase = await runtimeConfig?.getRuntimeBackendBase?.(appConfig.backendUrl || '');
-    const baseUrl = (runtimeBase || appConfig.backendUrl || window.location.origin).replace(/\/$/, '');
+    const baseUrl = 'http://127.0.0.1:8080';
     const resp = await fetch(`${baseUrl}${path}`, {
       headers: token ? { 'X-AI00-Token': token } : { 'X-AI00-Token': '' },
     });

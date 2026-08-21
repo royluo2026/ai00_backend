@@ -80,3 +80,30 @@ test('classifies exhausted business candidates as blocked but provider denial as
     { code:'provider_failed', error:'failed' },
   ]), 'inaccessible');
 });
+
+test('creates a report id when crypto.randomUUID is unavailable on local HTTP', async () => {
+  const originalCrypto = globalThis.crypto;
+  Object.defineProperty(globalThis, 'crypto', {
+    configurable: true,
+    value: {
+      getRandomValues(bytes) {
+        for (let index = 0; index < bytes.length; index += 1) bytes[index] = index;
+        return bytes;
+      },
+    },
+  });
+  try {
+    const client = { invoke: async id => {
+      const fixtures = {
+        'craft.bop.version.list': complete({ items: [] }),
+        'digital_model.model.search': complete({ items: [] }),
+        'simulation.run.search': complete({ items: [] }),
+      };
+      return fixtures[id];
+    } };
+    const report = await runtime.runReadinessCheck(client, { object_ref:'project:p1', title:'P1' }, { now:'2026-08-17T00:00:00Z' });
+    assert.equal(report.report_id, '00010203-0405-4607-8809-0a0b0c0d0e0f');
+  } finally {
+    Object.defineProperty(globalThis, 'crypto', { configurable: true, value: originalCrypto });
+  }
+});

@@ -17,10 +17,11 @@ ERRORS = tuple(DomainErrorContract(code=code, meaning=meaning, retryable=retryab
 
 def descriptor_for(spec) -> CapabilityDescriptorV2:
     base = descriptor_from_provider_spec(spec); write = base.side_effect_level is not SideEffectLevel.READ
-    interaction = spec.id == "agent.interaction.request"
+    interaction = spec.id in {"agent.interaction.request", "agent.script.generate"}
     return CapabilityDescriptorV2.model_validate({
         **base.model_dump(), "owner_domain": "agent", "lifecycle_status": LifecycleStatus.STABLE,
         "exposure": ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True),
+        "exposure_policy_source": "provider_explicit",
         "automation_level": AutomationLevel.A1 if write else AutomationLevel.A2,
         "authorization_policy": "agent.v2:" + ",".join(spec.permissions),
         "data_classification": "confidential", "delegation_policy": "scoped",

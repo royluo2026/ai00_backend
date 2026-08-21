@@ -135,6 +135,14 @@ def test_strong_write_without_any_provider_has_transaction_participant_finding()
     assert finding.severity == "blocking"
 
 
+def test_deprecated_capability_does_not_require_new_release_test() -> None:
+    capability = _capability(lifecycle_status="deprecated")
+
+    codes = {finding.code for finding in run_deterministic_analysis(_snapshot(capability), AnalysisRequest()).findings}
+
+    assert "required_test_missing" not in codes
+
+
 def test_invalid_provider_bindings_do_not_count_as_provider_evidence() -> None:
     capability = _capability()
     worker = ImplementationNode("worker:craft:create", "craft", "worker", "craft/worker.py", "sha256:" + "1" * 64)

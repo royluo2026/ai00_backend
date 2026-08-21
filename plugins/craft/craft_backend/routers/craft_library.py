@@ -20,12 +20,15 @@ import json
 from datetime import datetime
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 
 from ..data.connection import get_conn
 from backend.platform_sdk.auth import get_current_user, require_role
 from backend.platform_sdk.ids import next_gid
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.auth import get_authenticated_principal
+from backend.platform_sdk.factory import build_web_compatibility_envelope, invoke_compatibility
 
 router = APIRouter(prefix="/api/craft_lib", tags=["craft_library"])
 _log = __import__('logging').getLogger(__name__)
@@ -33,6 +36,46 @@ _log = __import__('logging').getLogger(__name__)
 _READ = require_role("super_admin", "team_admin", "project_admin",
                      "rule_admin", "knowledge_admin", "member")
 _WRITE = require_role("super_admin", "team_admin", "knowledge_admin")
+
+
+async def _invoke_library(request, current_user, principal, gateway, operation, *, q=None):
+    request_id = request.headers.get("X-Request-ID") or f"craft_library_legacy_{next_gid()}"
+    arguments = {"operation": operation}
+    if q:
+        arguments["q"] = q
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.library.read", payload=arguments,
+        current_user=current_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "permission_denied": 403, "invalid_input": 400}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data["data"].get("items", [])
+
+
+async def _invoke_change(request, current_user, principal, gateway, operation, *, gid=None, record=None, items=None, meta=None, alias=None):
+    request_id = request.headers.get("X-Request-ID") or f"craft_library_legacy_{next_gid()}"
+    arguments = {"operation": operation}
+    if gid is not None:
+        arguments["gid"] = gid
+    if record is not None:
+        arguments["record"] = record
+    if items is not None:
+        arguments["items"] = items
+    if meta is not None:
+        arguments["meta"] = meta
+    if alias is not None:
+        arguments["alias"] = alias
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.library.change.apply", payload=arguments,
+        current_user=current_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "permission_denied": 403, "invalid_input": 400}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data["data"]
 
 
 class TemplateBody(BaseModel):
@@ -197,30 +240,13 @@ _TOOL_COLS = ("gid, vpps, name, gun_model, matou_part_no, importance, gun_type, 
 
 
 @router.get("/tools")
-def list_tools(current_user: dict = Depends(_READ)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                f"SELECT {_TOOL_COLS} FROM workmanship_tpl_vpps_tools ORDER BY created_at DESC"
-            )
-            rows = cur.fetchall()
-    return {"success": True, "data": [
-        {"gid": r["gid"], "vpps": r["vpps"], "name": r["name"],
-         "gun_model": r["gun_model"], "matou_part_no": r["matou_part_no"],
-         "importance": r["importance"], "gun_type": r["gun_type"],
-         "wireless": r["wireless"], "output_square": r["output_square"],
-         "torque_min": r["torque_min"], "torque_recommended": r["torque_recommended"],
-         "cad_model_no": r["cad_model_no"], "socket_model": r["socket_model"],
-         "fastener_type": r["fastener_type"], "fastener_params": r["fastener_params"],
-         "extension_model": r["extension_model"], "socket_cad_no": r["socket_cad_no"],
-         "extension_cad_no": r["extension_cad_no"], "status": r["status"],
-         "created_at": str(r["created_at"])}
-        for r in rows
-    ]}
+async def list_tools(request: Request, current_user: dict = Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return {"success": True, "data": await _invoke_library(request, current_user, principal, gateway, "tools.list")}
 
 
 @router.post("/tools", status_code=201)
-def create_tool(body: ToolBody, current_user: dict = Depends(_WRITE)):
+async def create_tool(body: ToolBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_change(request, current_user, principal, gateway, "tools.create", record=body.dict(exclude_unset=True))
     gid = str(next_gid())
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -243,7 +269,8 @@ def create_tool(body: ToolBody, current_user: dict = Depends(_WRITE)):
 
 
 @router.delete("/tools/{gid}")
-def delete_tool(gid: str, current_user: dict = Depends(_WRITE)):
+async def delete_tool(gid: str, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_change(request, current_user, principal, gateway, "tools.delete", gid=gid)
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("DELETE FROM workmanship_tpl_vpps_tools WHERE gid = %s", (gid,))
@@ -254,7 +281,8 @@ def delete_tool(gid: str, current_user: dict = Depends(_WRITE)):
 
 
 @router.patch("/tools/{gid}")
-def update_tool(gid: str, body: ToolBody, current_user: dict = Depends(_WRITE)):
+async def update_tool(gid: str, body: ToolBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_change(request, current_user, principal, gateway, "tools.update", gid=gid, record=body.dict(exclude_unset=True))
     allowed = ["vpps","name","gun_model","matou_part_no","importance","gun_type",
                "wireless","output_square","torque_min","torque_recommended","cad_model_no",
                "socket_model","fastener_type","fastener_params","extension_model",
@@ -263,51 +291,58 @@ def update_tool(gid: str, body: ToolBody, current_user: dict = Depends(_WRITE)):
 
 
 @router.post("/tools/{gid}/obsolete")
-def obsolete_tool(gid: str, current_user: dict = Depends(_WRITE)):
+async def obsolete_tool(gid: str, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_change(request, current_user, principal, gateway, "tools.obsolete", gid=gid)
     return _obsolete_template("workmanship_tpl_vpps_tools", gid, current_user)
 
 
 # ── 设备模板 ──────────────────────────────────────────────────────
 
 @router.get("/equipments")
-def list_equipments(current_user: dict = Depends(_READ)):
-    return _list_template("workmanship_tpl_vpps_equipments", current_user)
+async def list_equipments(request: Request, current_user: dict = Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return {"success": True, "data": await _invoke_library(request, current_user, principal, gateway, "equipments.list")}
 
 
 @router.post("/equipments", status_code=201)
-def create_equipment(body: TemplateBody, current_user: dict = Depends(_WRITE)):
+async def create_equipment(body: TemplateBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_change(request, current_user, principal, gateway, "equipments.create", record=body.dict(exclude_unset=True))
     return _create_template("workmanship_tpl_vpps_equipments", body, current_user)
 
 
 @router.post("/equipments/{gid}/obsolete")
-def obsolete_equipment(gid: str, current_user: dict = Depends(_WRITE)):
+async def obsolete_equipment(gid: str, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_change(request, current_user, principal, gateway, "equipments.obsolete", gid=gid)
     return _obsolete_template("workmanship_tpl_vpps_equipments", gid, current_user)
 
 
 @router.patch("/equipments/{gid}")
-def update_equipment(gid: str, body: UpdateTemplateBody, current_user: dict = Depends(_WRITE)):
+async def update_equipment(gid: str, body: UpdateTemplateBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_change(request, current_user, principal, gateway, "equipments.update", gid=gid, record=body.dict(exclude_unset=True))
     return _patch_record("workmanship_tpl_vpps_equipments", gid, body, ["name", "category", "spec"])
 
 
 # ── 工装模板 ──────────────────────────────────────────────────────
 
 @router.get("/fixtures")
-def list_fixtures(current_user: dict = Depends(_READ)):
-    return _list_template("workmanship_tpl_vpps_fixtures", current_user)
+async def list_fixtures(request: Request, current_user: dict = Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return {"success": True, "data": await _invoke_library(request, current_user, principal, gateway, "fixtures.list")}
 
 
 @router.post("/fixtures", status_code=201)
-def create_fixture(body: TemplateBody, current_user: dict = Depends(_WRITE)):
+async def create_fixture(body: TemplateBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_change(request, current_user, principal, gateway, "fixtures.create", record=body.dict(exclude_unset=True))
     return _create_template("workmanship_tpl_vpps_fixtures", body, current_user)
 
 
 @router.post("/fixtures/{gid}/obsolete")
-def obsolete_fixture(gid: str, current_user: dict = Depends(_WRITE)):
+async def obsolete_fixture(gid: str, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_change(request, current_user, principal, gateway, "fixtures.obsolete", gid=gid)
     return _obsolete_template("workmanship_tpl_vpps_fixtures", gid, current_user)
 
 
 @router.patch("/fixtures/{gid}")
-def update_fixture(gid: str, body: UpdateTemplateBody, current_user: dict = Depends(_WRITE)):
+async def update_fixture(gid: str, body: UpdateTemplateBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_change(request, current_user, principal, gateway, "fixtures.update", gid=gid, record=body.dict(exclude_unset=True))
     return _patch_record("workmanship_tpl_vpps_fixtures", gid, body, ["name", "category", "spec"])
 
 
@@ -319,27 +354,13 @@ _FASTENER_COLS = ("gid, fastener_type, part_no, name, thread_spec, model, "
 
 
 @router.get("/fasteners")
-def list_fasteners(current_user: dict = Depends(_READ)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                f"SELECT {_FASTENER_COLS} FROM workmanship_tpl_fastener_spec ORDER BY created_at DESC"
-            )
-            rows = cur.fetchall()
-    return {"success": True, "data": [
-        {"gid": r["gid"], "fastener_type": r["fastener_type"], "part_no": r["part_no"],
-         "name": r["name"], "thread_spec": r["thread_spec"], "model": r["model"],
-         "shank_length": r["shank_length"], "guide_type": r["guide_type"],
-         "guide_length": r["guide_length"], "has_adhesive": r["has_adhesive"],
-         "drive_size": r["drive_size"], "flange_diameter": r["flange_diameter"],
-         "first_vehicle": r["first_vehicle"], "status": r["status"],
-         "created_at": str(r["created_at"])}
-        for r in rows
-    ]}
+async def list_fasteners(request: Request, current_user: dict = Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return {"success": True, "data": await _invoke_library(request, current_user, principal, gateway, "fasteners.list")}
 
 
 @router.post("/fasteners", status_code=201)
-def create_fastener(body: FastenerBody, current_user: dict = Depends(_WRITE)):
+async def create_fastener(body: FastenerBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_change(request, current_user, principal, gateway, "fasteners.create", record=body.dict(exclude_unset=True))
     gid = str(next_gid())
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -360,7 +381,8 @@ def create_fastener(body: FastenerBody, current_user: dict = Depends(_WRITE)):
 
 
 @router.delete("/fasteners/{gid}")
-def delete_fastener(gid: str, current_user: dict = Depends(_WRITE)):
+async def delete_fastener(gid: str, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_change(request, current_user, principal, gateway, "fasteners.delete", gid=gid)
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("DELETE FROM workmanship_tpl_fastener_spec WHERE gid = %s", (gid,))
@@ -371,7 +393,8 @@ def delete_fastener(gid: str, current_user: dict = Depends(_WRITE)):
 
 
 @router.patch("/fasteners/{gid}")
-def update_fastener(gid: str, body: UpdateFastenerBody, current_user: dict = Depends(_WRITE)):
+async def update_fastener(gid: str, body: UpdateFastenerBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_change(request, current_user, principal, gateway, "fasteners.update", gid=gid, record=body.dict(exclude_unset=True))
     return _patch_record("workmanship_tpl_fastener_spec", gid, body,
                          ["fastener_type", "part_no", "name", "thread_spec", "model",
                           "shank_length", "guide_type", "guide_length", "has_adhesive",
@@ -381,48 +404,19 @@ def update_fastener(gid: str, body: UpdateFastenerBody, current_user: dict = Dep
 # ── 标准零件名 ────────────────────────────────────────────────────
 
 @router.get("/part_names")
-def list_part_names(
+async def list_part_names(
     q: Optional[str] = Query(None),
-    current_user: dict = Depends(_READ)
+    request: Request = None,
+    current_user: dict = Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
 ):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            if q:
-                cur.execute(
-                    "SELECT gid, vpps_description, part_category, description, "
-                    "level, vpps_desc_cn, vpps, importance, vehicle_model, parent_vpps, status, meta, "
-                    "flex_type, ref_main_vpps, ref_main_vpps_desc, "
-                    "ref_install_direction, ref_static_clearance, ref_install_clearance, alias, created_at "
-                    "FROM workmanship_tpl_vpps_parts WHERE vpps_description LIKE %s ORDER BY vpps_description",
-                    (f"%{q}%",)
-                )
-            else:
-                cur.execute(
-                    "SELECT gid, vpps_description, part_category, description, "
-                    "level, vpps_desc_cn, vpps, importance, vehicle_model, parent_vpps, status, meta, "
-                    "flex_type, ref_main_vpps, ref_main_vpps_desc, "
-                    "ref_install_direction, ref_static_clearance, ref_install_clearance, alias, created_at "
-                    "FROM workmanship_tpl_vpps_parts ORDER BY vpps_description"
-                )
-            rows = cur.fetchall()
-    return {"success": True, "data": [
-        {"gid": r["gid"], "vpps_description": r["vpps_description"], "part_category": r["part_category"],
-         "description": r["description"], "level": r["level"], "vpps_desc_cn": r["vpps_desc_cn"],
-         "vpps": r["vpps"], "importance": r["importance"], "vehicle_model": r["vehicle_model"],
-         "parent_vpps": r["parent_vpps"], "status": r["status"], "meta": r["meta"] or {},
-         "flex_type": r["flex_type"], "ref_main_vpps": r["ref_main_vpps"],
-         "ref_main_vpps_desc": r["ref_main_vpps_desc"],
-         "ref_install_direction": r["ref_install_direction"],
-         "ref_static_clearance": r["ref_static_clearance"],
-         "ref_install_clearance": r["ref_install_clearance"],
-         "alias": list(r["alias"] or []),
-         "created_at": str(r["created_at"])}
-        for r in rows
-    ]}
+    return {"success": True, "data": await _invoke_library(request, current_user, principal, gateway, "part_names.list", q=q)}
 
 
 @router.post("/part_names", status_code=201)
-def create_part_name(body: PartNameBody, current_user: dict = Depends(_WRITE)):
+async def create_part_name(body: PartNameBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_change(request, current_user, principal, gateway, "part_names.create", record=body.dict(exclude_unset=True))
     if body.flex_type not in _FLEX_TYPE_VALUES:
         raise HTTPException(status_code=422, detail=f"flex_type 必须是 {sorted(_FLEX_TYPE_VALUES)} 之一")
     gid = str(next_gid())
@@ -449,7 +443,8 @@ def create_part_name(body: PartNameBody, current_user: dict = Depends(_WRITE)):
 
 
 @router.delete("/part_names/{gid}")
-def delete_part_name(gid: str, current_user: dict = Depends(_WRITE)):
+async def delete_part_name(gid: str, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_change(request, current_user, principal, gateway, "part_names.delete", gid=gid)
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("DELETE FROM workmanship_tpl_vpps_parts WHERE gid = %s", (gid,))
@@ -460,7 +455,8 @@ def delete_part_name(gid: str, current_user: dict = Depends(_WRITE)):
 
 
 @router.patch("/part_names/{gid}")
-def update_part_name(gid: str, body: PartNameBody, current_user: dict = Depends(_WRITE)):
+async def update_part_name(gid: str, body: PartNameBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_change(request, current_user, principal, gateway, "part_names.update", gid=gid, record=body.dict(exclude_unset=True))
     if body.dict(exclude_unset=True).get("flex_type") not in (None, *_FLEX_TYPE_VALUES):
         raise HTTPException(status_code=422, detail=f"flex_type 必须是 {sorted(_FLEX_TYPE_VALUES)} 之一")
     allowed = [
@@ -492,7 +488,8 @@ class BatchAddFromPbomBody(BaseModel):
 
 
 @router.post("/part_names/batch_add_from_pbom")
-def batch_add_part_names_from_pbom(body: BatchAddFromPbomBody, current_user: dict = Depends(_WRITE)):
+async def batch_add_part_names_from_pbom(body: BatchAddFromPbomBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_change(request, current_user, principal, gateway, "part_names.batch_add_from_pbom", items=[item.dict() for item in body.entries], meta=body.meta)
     """将 PBOM 中"无主数据"零件批量写入 vpps_parts（已存在则跳过）。"""
     added = 0
     skipped = 0
@@ -535,7 +532,8 @@ class BatchAcceptAliasBody(BaseModel):
 
 
 @router.post("/part_names/batch_accept_alias")
-def batch_accept_vpps_alias(body: BatchAcceptAliasBody, current_user: dict = Depends(_WRITE)):
+async def batch_accept_vpps_alias(body: BatchAcceptAliasBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_change(request, current_user, principal, gateway, "part_names.batch_accept_alias", items=[item.dict() for item in body.items], meta=body.meta)
     """批量接受 VPPS 描述别名，并在 meta 中记录来源信息。"""
     user_name = current_user.get("name") or current_user.get("email") or current_user.get("sub", "?")
     now_str = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
@@ -580,7 +578,8 @@ def batch_accept_vpps_alias(body: BatchAcceptAliasBody, current_user: dict = Dep
 
 
 @router.post("/part_names/{gid}/accept_alias")
-def accept_vpps_alias(gid: str, body: AcceptAliasBody, current_user: dict = Depends(_WRITE)):
+async def accept_vpps_alias(gid: str, body: AcceptAliasBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_change(request, current_user, principal, gateway, "part_names.accept_alias", gid=gid, alias=body.alias, record={"pbom_part_gid": body.pbom_part_gid})
     user_name = current_user.get("name") or current_user.get("email") or current_user.get("sub", "?")
     now_str   = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
     note = f'[别名] {user_name} @ {now_str}: 接受别名"{body.alias}"'

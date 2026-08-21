@@ -6,6 +6,7 @@ from plugins.project_management.project_management_backend.capabilities.provider
 from plugins.project_management.project_management_backend.capabilities.reviewed import register_reviewed_capabilities
 from backend.capabilities.registry_next import CapabilityRegistry
 from plugins.craft.craft_backend.capabilities.contracts import INPUT_SCHEMAS, OUTPUT_SCHEMAS
+from plugins.project_management.project_management_backend.capabilities import reviewed as project_reviewed
 
 
 def test_execution_structure_is_available_to_governed_plugins():
@@ -44,11 +45,33 @@ def test_project_management_permissions_match_live_role_model():
     assert registry.get("project.project.change.apply").spec.permissions == ("project.manage_any",)
     assert registry.get("project.project.read").spec.permissions == ("project.view",)
     arguments = registry.get("project.project.change.apply").spec.input_schema["properties"]["arguments"]
-    assert "Operation-specific" in arguments["description"]
-    assert "type" not in arguments
+    assert arguments["additionalProperties"] is False
+    assert "projects.create" in registry.get("project.project.change.apply").spec.input_schema["properties"]["operation"]["enum"]
     result = registry.get("project.project.change.apply").spec.output_schema["properties"]["data"]
-    assert "Operation-specific" in result["description"]
+    assert "description" in result
     assert "type" not in result
+
+
+def test_project_search_scope_is_derived_for_direct_capability_consumers(monkeypatch):
+    captured = {}
+    monkeypatch.setattr(
+        project_reviewed,
+        "build_access_scope",
+        lambda user: {"user_gid": user["gid"], "team_gids": ["team-1"], "project_gids": ["project-1"], "is_admin": False},
+    )
+    monkeypatch.setattr(
+        project_reviewed.project_outcome_port,
+        "invoke",
+        lambda capability_id, payload, context: captured.update({"capability_id": capability_id, "payload": payload}) or {"success": True, "data": []},
+    )
+
+    handler = project_reviewed._handler("project.project.read")
+    result = handler({"operation": "projects.search", "arguments": {}}, type("Context", (), {"user_gid": "u1", "team_gid": "team-1", "active_roles": ()})())
+
+    assert result["data"]["data"] == []
+    assert captured["payload"]["arguments"]["scope"] == {
+        "user_gid": "u1", "team_gids": ["team-1"], "project_gids": ["project-1"], "is_admin": False,
+    }
 
 
 def test_craft_unconstrained_transport_leaves_do_not_become_empty_objects():

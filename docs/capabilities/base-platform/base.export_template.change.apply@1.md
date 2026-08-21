@@ -1,14 +1,14 @@
 # base.export_template.change.apply@1
 
-Execute the reviewed base.export_template.change.apply Base outcome.
+Create, update, or delete a Base export template.
 
 ## 使用判断
 
-- 适用：Execute the reviewed base.export_template.change.apply Base outcome.
-- 不适用：Use the owning domain's governed Capability.
+- 适用：A consumer needs a confirmed, idempotent export-template mutation.
+- 不适用：The consumer only needs to list templates.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_118d91d38b08fcecd96ddea0005a02b5`
+- Catalog Release：`rel_3010694218f96365eda536567f35d198`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -70,13 +70,7 @@ Execute the reviewed base.export_template.change.apply Base outcome.
 {
   "additionalProperties": false,
   "properties": {
-    "expected_version": {
-      "type": "integer"
-    },
-    "operation": {
-      "type": "string"
-    },
-    "resource": {
+    "config": {
       "type": [
         "object",
         "array",
@@ -85,6 +79,51 @@ Execute the reviewed base.export_template.change.apply Base outcome.
         "boolean",
         "null"
       ]
+    },
+    "gid": {
+      "type": "string"
+    },
+    "is_shared": {
+      "type": "boolean"
+    },
+    "module": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "operation": {
+      "enum": [
+        "create",
+        "update",
+        "delete"
+      ],
+      "type": "string"
+    },
+    "updates": {
+      "additionalProperties": false,
+      "properties": {
+        "config": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        },
+        "is_shared": {
+          "type": "boolean"
+        },
+        "module": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "type": "object"
     }
   },
   "required": [
@@ -99,10 +138,10 @@ Execute the reviewed base.export_template.change.apply Base outcome.
 ```json
 {
   "capability_id": "base.export_template.change.apply",
-  "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
+  "catalog_release": "rel_3010694218f96365eda536567f35d198",
   "major_version": 1,
   "payload": {
-    "operation": "example"
+    "operation": "create"
   }
 }
 ```
@@ -115,19 +154,16 @@ Execute the reviewed base.export_template.change.apply Base outcome.
 {
   "additionalProperties": false,
   "properties": {
-    "result": {
-      "type": [
-        "object",
-        "array",
-        "string",
-        "number",
-        "boolean",
-        "null"
-      ]
+    "gid": {
+      "type": "string"
+    },
+    "operation": {
+      "type": "string"
     }
   },
   "required": [
-    "result"
+    "operation",
+    "gid"
   ],
   "type": "object"
 }

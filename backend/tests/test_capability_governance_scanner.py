@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import importlib
+import shutil
 from pathlib import Path
 import sys
 from types import ModuleType, SimpleNamespace
@@ -11,6 +12,7 @@ import pytest
 from backend.capability_governance_test.config import GovernanceSettings
 from backend.capability_governance_test.graph import ImplementationGraph, node_key
 from backend.capability_governance_test.scanner import GovernanceScanner, ScanPolicyError
+from backend.scripts.run_capability_governance_scan import run_offline_scan
 
 
 FIXTURES = Path(__file__).parent / "fixtures" / "capability_governance_scan"
@@ -126,6 +128,14 @@ def test_scanner_matches_registry_package_module_to_provider_source() -> None:
         "backend.base.approval",
         "backend/base/provider.py",
     )
+    assert GovernanceScanner.registry_module_matches_source(
+        "backend.capabilities.system_shared_next",
+        "backend/base/provider.py",
+    )
+    assert GovernanceScanner.registry_module_matches_source(
+        "backend.plugin_platform.storage",
+        "backend/base/provider.py",
+    )
     assert not GovernanceScanner.registry_module_matches_source(
         "craft_backend.capabilities",
         "plugins/craft/craft_backend/application/outcomes.py",
@@ -140,6 +150,17 @@ def test_dynamic_table_expression_becomes_unresolved_evidence() -> None:
     assert not any(node.node_type == "database_table" for node in document.nodes)
     assert not any(binding.binding_type == "implemented_by" for binding in document.bindings)
     assert any(node.source_symbol == "provider_not_resolved" for node in document.nodes)
+
+
+def test_retired_promotion_placeholders_are_not_public_exposure_findings() -> None:
+    report = run_offline_scan(Path(".runtime/promotion-retirement-scan.json"))
+    nodes = {item["canonical_key"]: item for item in report["snapshot"]["nodes"]}
+
+    assert not any(
+        node["source_symbol"] in {"get_promote_placeholder", "get_issue_promote_placeholder"}
+        for node in nodes.values()
+        if node["node_type"] in {"rest_route", "legacy_api"}
+    )
 
 
 def test_partial_static_table_expression_is_unresolved() -> None:
@@ -164,6 +185,89 @@ def test_scanner_emits_declared_exposure_runtime_and_migration_categories(valid_
     assert any(
         any(path.endswith("0002_factory_schema.sql") for path in node.metadata.get("declared_by", ()))
         for node in document.nodes if node.node_type == "database_table"
+    )
+
+
+def test_scanner_binds_explicit_capability_route_and_excludes_route_models(valid_fixture: Path) -> None:
+    """Only decorated handlers expose capabilities; route models remain ordinary AST nodes."""
+    document = scan_fixture(valid_fixture)
+
+    assert any(
+        binding.binding_type == "exposed_by"
+        and binding.capability_id == "craft.bop.factory.create"
+        and binding.node_canonical_key.endswith("routes.py:create_factory")
+        for binding in document.bindings
+    )
+    assert any(
+        binding.binding_type == "exposed_by"
+        and binding.capability_id == "craft.bop.factory.create"
+        and binding.node_canonical_key.endswith("routes.py:create_factory_via_helper")
+        for binding in document.bindings
+    )
+    assert not any(
+        node.node_type == "rest_route" and node.canonical_key.endswith(":routes.py:CreateFactoryBody")
+        for node in document.nodes
+    )
+    assert not any(
+        node.node_type == "rest_route" and node.source_symbol == "retired_factory_route"
+        for node in document.nodes
+    )
+
+
+def test_scanner_binds_explicit_capability_legacy_api(tmp_path: Path, valid_fixture: Path) -> None:
+    root = tmp_path / "legacy-binding"
+    shutil.copytree(valid_fixture, root)
+    legacy = root / "plugins/craft/craft_backend/legacy_api.py"
+    legacy.write_text(
+        "from fastapi import APIRouter\nrouter = APIRouter()\n@router.get('/legacy')\n"
+        "def legacy_factory_route():\n    return {'capability': 'craft.bop.factory.create'}\n",
+        encoding="utf-8",
+    )
+    document = scan_fixture(root)
+    assert any(
+        binding.binding_type == "exposed_by"
+        and binding.capability_id == "craft.bop.factory.create"
+        and binding.node_canonical_key.endswith("legacy_api.py:legacy_factory_route")
+        for binding in document.bindings
+    )
+
+
+def test_scanner_binds_explicit_acceptance_manifest_cases(valid_fixture: Path) -> None:
+    """Only executable manifest node ids create tested_by evidence."""
+    manifest = {
+        "schema_version": 1,
+        "catalog_release": "product-fixture",
+        "mandatory_cases": ["success"],
+        "capabilities": {
+            "craft.bop.factory.create@1": {
+                "success": (
+                    "plugins/craft/craft_backend/tests/test_factory.py::"
+                    "test_success_case[craft.bop.factory.create@1]"
+                ),
+            },
+        },
+    }
+
+    document = GovernanceScanner(
+        GovernanceSettings(
+            deployment_profile="test-governance",
+            repository_root=valid_fixture,
+            allowlisted_relative_roots=("plugins",),
+        ),
+        product_catalog=json.loads((valid_fixture / "product_catalog.json").read_text(encoding="utf-8")),
+        extension_catalog=json.loads((valid_fixture / "extension_catalog.json").read_text(encoding="utf-8")),
+        domain_manifests=json.loads((valid_fixture / "official_domains.json").read_text(encoding="utf-8")),
+        registry_snapshot=_fixture_registry(),
+        acceptance_manifest=manifest,
+    ).scan(code_revision="fixture-acceptance")
+
+    test_nodes = [node for node in document.nodes if node.node_type == "test_case"]
+    assert any("test_factory.py" in node.source_path for node in test_nodes)
+    assert any(
+        binding.binding_type == "tested_by"
+        and binding.capability_id == "craft.bop.factory.create"
+        and binding.node_canonical_key in {node.canonical_key for node in test_nodes}
+        for binding in document.bindings
     )
 
 
@@ -203,6 +307,18 @@ def test_offline_runner_does_not_require_provider_bootstrap(monkeypatch: pytest.
     runner = importlib.import_module("backend.scripts.run_capability_governance_scan")
 
     assert callable(runner.run_offline_scan)
+
+
+def test_offline_runner_attaches_authoritative_registry_bindings(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Offline snapshots must include implementation bindings from the official registry."""
+    runner = importlib.import_module("backend.scripts.run_capability_governance_scan")
+    output = runner.REPOSITORY_ROOT / ".runtime" / "pytest-offline-scan-bindings.json"
+    try:
+        report = runner.run_offline_scan(output)
+        binding_types = {binding["binding_type"] for binding in report["snapshot"]["bindings"]}
+        assert "implemented_by" in binding_types
+    finally:
+        output.unlink(missing_ok=True)
 
 
 def test_snapshot_hash_is_repeatable_and_does_not_include_generated_identity(

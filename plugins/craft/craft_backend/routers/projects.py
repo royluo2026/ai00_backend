@@ -69,6 +69,22 @@ async def _invoke_project(request, user, principal, gateway, operation, argument
     return result.data["data"]
 
 
+async def _invoke_project_member(request, user, principal, gateway, operation, arguments, *, write=False, capability_id=None):
+    request_id = request.headers.get("X-Request-ID") or f"project_member_{uuid4().hex}"
+    capability_id = capability_id or ("project.member.change.apply" if write else "project.member.read")
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id=capability_id,
+        payload={"operation": operation, "arguments": arguments}, current_user=user, principal=principal,
+        request_id=request_id, trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") if write else None,
+        approval_reference=request.headers.get("X-Capability-Approval") if write else None,
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else ""
+        raise HTTPException(status_code={"not_found": 404, "forbidden": 403, "invalid_input": 400}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data["data"]
+
+
 class CreateProjectBody(BaseModel):
     project_code: str                         # 项目代号，必填
     model_year: Optional[int] = None          # 年款，4位年份
@@ -201,7 +217,11 @@ async def delete_project(gid: str, request: Request, current_user: dict = Depend
 # ── 项目成员 ──────────────────────────────────────────────────────
 
 @router.get("/{gid}/members")
-def list_project_members(gid: str, current_user: dict = Depends(get_current_user)):
+async def list_project_members(gid: str, request: Request, current_user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_project_member(request, current_user, principal, gateway, "members.list", {"project_gid": gid}, capability_id="project.member.read")
+
+
+def _legacy_list_project_members(gid: str, current_user: dict = Depends(get_current_user)):
     titles = line_titles_for_project(gid)
     rows = list_project_access_entries(gid, titles)
     seen = set()
@@ -235,14 +255,38 @@ async def add_project_member(gid: str, body: AddMemberBody, request: Request, cu
 
 
 @router.delete("/{gid}/members/{member_gid}")
-def remove_project_member(gid: str, member_gid: str, current_user: dict = Depends(_PROJECT_WRITE)):
+async def remove_project_member(gid: str, member_gid: str, request: Request, current_user: dict = Depends(_PROJECT_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_project_member(request, current_user, principal, gateway, "members.remove", {"project_gid": gid, "member_gid": member_gid}, write=True, capability_id="project.member.change.apply")
+
+
+def _legacy_remove_project_member(gid: str, member_gid: str, current_user: dict = Depends(_PROJECT_WRITE)):
     if not remove_project_access_member(gid, member_gid):
         raise HTTPException(status_code=404, detail="成员记录不存在")
     return {"success": True}
 
 
+# Existing in-process callers retain the compatibility implementations;
+# HTTP requests use the Project Capability Gateway endpoints above.
+list_project_members_legacy = list_project_members = _legacy_list_project_members
+remove_project_member_legacy = remove_project_member = _legacy_remove_project_member
+
+
 @router.get("/{gid}/bop-lines")
-def get_project_bop_lines(gid: str, current_user: dict = Depends(get_current_user)):
+async def get_project_bop_lines(gid: str, request: Request, current_user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    request_id = request.headers.get("X-Request-ID") or f"craft_project_bop_lines_{uuid4().hex}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.entry.legacy_read",
+        payload={"operation": "project_bop_lines", "project_gid": gid, "limit": 500},
+        current_user=current_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+    ))
+    if not result.ok:
+        error = result.error
+        raise HTTPException(status_code={"forbidden": 403, "invalid_input": 400}.get(error.code if error else "", 422), detail=error.model_dump(mode="json") if error else None)
+    return {"success": True, "data": result.data["data"]}
+
+
+def _legacy_get_project_bop_lines(gid: str, current_user: dict = Depends(get_current_user)):
     """返回项目所有活动 BOP 版本的线体，同名合并，附带所有相关 gid。"""
     return {"success": True, "data": project_bop_lines(gid)}
 

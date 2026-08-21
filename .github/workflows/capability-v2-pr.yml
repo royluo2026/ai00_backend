@@ -28,5 +28,6 @@ jobs:
       - run: python backend/scripts/generate_capability_docs.py --check
       - run: python backend/scripts/build_user_function_registry.py --check
       - run: python backend/scripts/build_capability_acceptance_manifest.py --check
+      - run: python backend/scripts/check_domain_change_governance.py --check
       - run: python backend/scripts/check_domain_dependencies.py
       - run: python -m pytest backend/tests -q

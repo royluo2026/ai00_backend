@@ -1,19 +1,17 @@
-"""Craft-owned rule CRUD API."""
+"""REST compatibility adapters for governed Craft rule-library CRUD."""
 from __future__ import annotations
 
-import json
-import logging
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 
-from backend.platform_sdk.auth import build_profile, get_current_user
-from backend.platform_sdk.ids import next_display_id, next_gid
-from ..data.connection import get_conn
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.auth import get_authenticated_principal, get_current_user
+from backend.platform_sdk.factory import build_web_compatibility_envelope, invoke_compatibility
+from backend.platform_sdk.ids import next_gid
 
 router = APIRouter(tags=["rules"])
-_log = logging.getLogger(__name__)
 
 
 class RuleBody(BaseModel):
@@ -28,128 +26,42 @@ class RuleBody(BaseModel):
     rule_definition: dict = {}
 
 
-def _row_to_dict(row: dict) -> dict:
-    return {
-        "gid": row["gid"], "display_id": row.get("display_id") or "",
-        "code": row.get("code") or "", "name": row["name"],
-        "rule_type": row.get("rule_type") or "process",
-        "enforcement_level": row.get("enforcement_level") or "advisory",
-        "status": row.get("status") or "draft",
-        "share_scope": row.get("share_scope") or "team",
-        "list_gid": row.get("list_gid"), "context_class_gid": row.get("context_class_gid"),
-        "rule_definition": row.get("rule_definition") or {},
-        "deviation_count": row.get("deviation_count") or 0,
-        "created_at": str(row["created_at"]), "updated_at": str(row["updated_at"]),
-    }
-
-
-def _visible_projects(user: dict) -> tuple[bool, list[str]]:
-    role = user.get("org_role") or user.get("system_role", "external")
-    if role in {"super_admin", "team_admin", "rule_admin"}:
-        return True, []
-    profile = build_profile(user)
-    project_gids = sorted({
-        str(grant.get("scope_gid")) for grant in profile.get("grants", [])
-        if grant.get("scope_gid") and str(grant.get("scope_type") or "project") == "project"
-    })
-    return False, project_gids
+async def _invoke_rule_library(request, current_user, principal, gateway, capability_id, operation, *, gid=None, record=None, status=None, list_gid=None, q=None, limit=None):
+    request_id = request.headers.get("X-Request-ID") or f"craft_rule_library_legacy_{next_gid()}"
+    payload = {"operation": operation}
+    for key, value in (("gid", gid), ("record", record), ("status", status), ("list_gid", list_gid), ("q", q), ("limit", limit)):
+        if value is not None:
+            payload[key] = value
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id=capability_id, payload=payload, current_user=current_user,
+        principal=principal, request_id=request_id, trace_id=request.headers.get("X-Trace-ID") or request_id,
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "permission_denied": 403, "invalid_input": 400}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data["data"]
 
 
 @router.get("/api/rules")
-def list_rules(
-    status: Optional[str] = Query(None), list_gid: Optional[str] = Query(None),
-    q: Optional[str] = Query(None), limit: Optional[int] = Query(None),
-    current_user: dict = Depends(get_current_user),
-):
-    uid = current_user["gid"]
-    is_admin, projects = _visible_projects(current_user)
-    clauses = ["(r.share_scope IN ('global','team') OR r.creator_gid=%s"]
-    params: list = [uid]
-    if is_admin:
-        clauses[0] += " OR r.share_scope='project')"
-    else:
-        # Non-admin project visibility cannot be inferred by joining the
-        # Project database. Project-scoped rule composition uses capabilities.
-        clauses[0] += ")"
-    if status:
-        clauses.append("r.status=%s"); params.append(status)
-    if list_gid:
-        clauses.append("r.list_gid=%s"); params.append(list_gid)
-    if q:
-        clauses.append("(r.name LIKE %s OR r.code LIKE %s)"); params.extend([f"%{q}%", f"%{q}%"])
-    bounded_limit = max(1, min(int(limit or 200), 500))
-    try:
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    f"SELECT r.* FROM workmanship_know_craft_rules r WHERE {' AND '.join(clauses)} "
-                    f"ORDER BY r.created_at DESC LIMIT {bounded_limit}", params,
-                )
-                rows = cur.fetchall()
-        return {"success": True, "data": [_row_to_dict(dict(row)) for row in rows]}
-    except Exception as exc:
-        _log.warning("list_rules error: %s", exc)
-        return {"success": True, "data": []}
+async def list_rules(status: Optional[str] = Query(None), list_gid: Optional[str] = Query(None), q: Optional[str] = Query(None), limit: Optional[int] = Query(None), request: Request = None, current_user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_rule_library(request, current_user, principal, gateway, "craft.rule.library.read", "list", status=status, list_gid=list_gid, q=q, limit=limit)
 
 
 @router.post("/api/rules", status_code=201)
-def create_rule(body: RuleBody, current_user: dict = Depends(get_current_user)):
-    gid = str(next_gid())
-    display_id = f"R-C{next_display_id('rules_display_seq'):08d}"
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                """INSERT INTO workmanship_know_craft_rules
-                   (gid,display_id,code,name,rule_type,enforcement_level,status,share_scope,
-                    list_gid,context_class_gid,rule_definition,applicable_scope,attachments,creator_gid)
-                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
-                (gid, display_id, body.code, body.name, body.rule_type, body.enforcement_level,
-                 body.status, body.share_scope, body.list_gid, body.context_class_gid,
-                 json.dumps(body.rule_definition), "{}", "[]", current_user["gid"]),
-            )
-        conn.commit()
-    return {"success": True, "data": {"gid": gid}}
+async def create_rule(body: RuleBody, request: Request, current_user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_rule_library(request, current_user, principal, gateway, "craft.rule.library.change.apply", "create", record=body.model_dump())
 
 
 @router.get("/api/rules/{gid}")
-def get_rule(gid: str, _user: dict = Depends(get_current_user)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT * FROM workmanship_know_craft_rules WHERE gid=%s", (gid,))
-            row = cur.fetchone()
-    if not row:
-        raise HTTPException(status_code=404, detail="规则不存在")
-    return {"success": True, "data": _row_to_dict(dict(row))}
+async def get_rule(gid: str, request: Request, current_user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_rule_library(request, current_user, principal, gateway, "craft.rule.library.read", "get", gid=gid)
 
 
 @router.patch("/api/rules/{gid}")
-def update_rule(gid: str, body: dict, _user: dict = Depends(get_current_user)):
-    allowed = {"code", "name", "rule_type", "enforcement_level", "status", "share_scope", "list_gid", "context_class_gid", "rule_definition", "expression"}
-    updates = {key: (json.dumps(value) if key == "rule_definition" else value) for key, value in body.items() if key in allowed}
-    if not updates:
-        raise HTTPException(status_code=400, detail="没有可更新的字段")
-    params = list(updates.values()) + [gid]
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(f"UPDATE workmanship_know_craft_rules SET {','.join(f'{key}=%s' for key in updates)},updated_at=NOW() WHERE gid=%s", params)
-            if cur.rowcount == 0:
-                raise HTTPException(status_code=404, detail="规则不存在")
-        conn.commit()
-    return {"success": True}
+async def update_rule(gid: str, body: dict, request: Request, current_user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_rule_library(request, current_user, principal, gateway, "craft.rule.library.change.apply", "update", gid=gid, record=body)
 
 
 @router.delete("/api/rules/{gid}")
-def delete_rule(gid: str, current_user: dict = Depends(get_current_user)):
-    role = current_user.get("org_role") or current_user.get("system_role", "external")
-    admin = role in {"super_admin", "team_admin", "rule_admin"}
-    sql = "DELETE FROM workmanship_know_craft_rules WHERE gid=%s"
-    params: list = [gid]
-    if not admin:
-        sql += " AND creator_gid=%s"; params.append(current_user["gid"])
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(sql, params)
-            if cur.rowcount == 0:
-                raise HTTPException(status_code=404, detail="规则不存在或无权限")
-        conn.commit()
-    return {"success": True}
+async def delete_rule(gid: str, request: Request, current_user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_rule_library(request, current_user, principal, gateway, "craft.rule.library.change.apply", "delete", gid=gid)

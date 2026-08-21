@@ -8,7 +8,7 @@ Execute knowledge.entry.change.apply.
 - 不适用：The resource belongs to another domain.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_118d91d38b08fcecd96ddea0005a02b5`
+- Catalog Release：`rel_3010694218f96365eda536567f35d198`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -72,10 +72,173 @@ Execute knowledge.entry.change.apply.
   "properties": {
     "arguments": {
       "additionalProperties": false,
-      "properties": {},
+      "properties": {
+        "attachments": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "maxItems": 500,
+          "type": "array"
+        },
+        "content_md": {
+          "type": "string"
+        },
+        "content_ref": {
+          "additionalProperties": false,
+          "properties": {},
+          "type": "object"
+        },
+        "context_class_gid": {
+          "type": "string"
+        },
+        "contributors": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "maxItems": 500,
+          "type": "array"
+        },
+        "entry_type": {
+          "type": "string"
+        },
+        "gid": {
+          "type": "string"
+        },
+        "list_gid": {
+          "type": "string"
+        },
+        "maintainer_gid": {
+          "type": "string"
+        },
+        "related_operation_gids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 500,
+          "type": "array"
+        },
+        "related_part_nos": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 500,
+          "type": "array"
+        },
+        "share_scope": {
+          "type": "string"
+        },
+        "source_gid": {
+          "type": "string"
+        },
+        "source_label": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 100,
+          "type": "array"
+        },
+        "title": {
+          "type": "string"
+        },
+        "updates": {
+          "additionalProperties": false,
+          "properties": {
+            "attachments": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {},
+                "type": "object"
+              },
+              "maxItems": 500,
+              "type": "array"
+            },
+            "content_md": {
+              "type": "string"
+            },
+            "content_ref": {
+              "additionalProperties": false,
+              "properties": {},
+              "type": "object"
+            },
+            "context_class_gid": {
+              "type": "string"
+            },
+            "contributors": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {},
+                "type": "object"
+              },
+              "maxItems": 500,
+              "type": "array"
+            },
+            "entry_type": {
+              "type": "string"
+            },
+            "list_gid": {
+              "type": "string"
+            },
+            "maintainer_gid": {
+              "type": "string"
+            },
+            "related_operation_gids": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 500,
+              "type": "array"
+            },
+            "related_part_nos": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 500,
+              "type": "array"
+            },
+            "share_scope": {
+              "type": "string"
+            },
+            "source_gid": {
+              "type": "string"
+            },
+            "source_label": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string"
+            },
+            "tags": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 100,
+              "type": "array"
+            },
+            "title": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
       "type": "object"
     },
     "operation": {
+      "enum": [
+        "entries.create",
+        "entries.update",
+        "entries.delete"
+      ],
       "type": "string"
     }
   },
@@ -92,11 +255,11 @@ Execute knowledge.entry.change.apply.
 ```json
 {
   "capability_id": "knowledge.entry.change.apply",
-  "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
+  "catalog_release": "rel_3010694218f96365eda536567f35d198",
   "major_version": 1,
   "payload": {
     "arguments": {},
-    "operation": "example"
+    "operation": "entries.create"
   }
 }
 ```

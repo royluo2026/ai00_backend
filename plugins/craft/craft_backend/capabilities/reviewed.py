@@ -19,6 +19,8 @@ def _handler(capability_id: str):
 
 def register_reviewed_capabilities(registry: Any) -> None:
     for capability_id in sorted(CRAFT_REVIEWED_CAPABILITIES):
+        if capability_id in {"craft.canvas.read", "craft.canvas.change.apply", "craft.data_exchange.export", "craft.ebom.change.apply"}:
+            continue
         is_write = capability_id in WRITE_CAPABILITIES
         register_capability(
             registry,

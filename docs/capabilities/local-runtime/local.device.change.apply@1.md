@@ -6,9 +6,9 @@ Execute the reviewed local.device.change.apply device outcome.
 
 - 适用：A governed consumer manages its Local Runtime devices.
 - 不适用：The request executes a VisMockup workstation action.
-- 生命周期：`stable`
+- 生命周期：`deprecated`
 - 所属领域：`device`
-- Catalog Release：`rel_118d91d38b08fcecd96ddea0005a02b5`
+- Catalog Release：`rel_3010694218f96365eda536567f35d198`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -76,7 +76,7 @@ Execute the reviewed local.device.change.apply device outcome.
       "type": "object"
     },
     "operation": {
-      "minLength": 1,
+      "enum": [],
       "type": "string"
     }
   },
@@ -93,7 +93,7 @@ Execute the reviewed local.device.change.apply device outcome.
 ```json
 {
   "capability_id": "local.device.change.apply",
-  "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
+  "catalog_release": "rel_3010694218f96365eda536567f35d198",
   "major_version": 1,
   "payload": {
     "arguments": {},

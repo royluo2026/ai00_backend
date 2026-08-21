@@ -133,9 +133,10 @@ def main() -> int:
     parser.add_argument("--mode", choices=("progress", "strict"), required=True)
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--report", type=Path)
+    parser.add_argument("--web-root", type=Path, help="scan a Web worktree for legacy routes")
     parser.add_argument("--governance-acceptance-report", type=Path)
     args = parser.parse_args()
-    report = evaluate_completion(args.root, mode=args.mode)
+    report = evaluate_completion(args.root, mode=args.mode, web_root=args.web_root)
     rendered_report = report.serialized()
     governance_acceptance = None
     if args.governance_acceptance_report:

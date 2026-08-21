@@ -1,128 +1,30 @@
-"""
-backend/routers/_bop/pbom.py
-─────────────────────────────
-PBOM 变化点查询（场景 C 关联面板支撑）。
-"""
-from fastapi import APIRouter, Depends, HTTPException
+"""REST compatibility adapter for governed PBOM change-point comparison."""
+from __future__ import annotations
 
-from ...data.connection import get_conn
+from fastapi import APIRouter, Depends, HTTPException, Request
+
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.auth import get_authenticated_principal
+from backend.platform_sdk.factory import build_web_compatibility_envelope, invoke_compatibility
+from backend.platform_sdk.ids import next_gid
 
 from ._constants import _READ
 
 router = APIRouter(prefix="/api/bop", tags=["bop"])
 
 
+async def _invoke_pbom_change_point(request, current_user, principal, gateway, version_gid):
+    request_id = request.headers.get("X-Request-ID") or f"craft_pbom_change_point_legacy_{next_gid()}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.pbom.change_point.get", payload={"operation": "get", "version_gid": version_gid},
+        current_user=current_user, principal=principal, request_id=request_id, trace_id=request.headers.get("X-Trace-ID") or request_id,
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "permission_denied": 403, "invalid_input": 400}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data["data"]
+
+
 @router.get("/versions/{gid}/pbom-change-point")
-def pbom_change_point(gid: str, _u=Depends(_READ)):
-    """
-    对比当前阶段与父阶段的 PBOM，返回变化点列表（只读）。
-    稳定业务键：bom_row + vpps。
-    """
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "SELECT pbom_version_gid, parent_version_gid FROM workmanship_bop_bop_versions WHERE gid=%s",
-                (gid,)
-            )
-            ver = cur.fetchone()
-            if not ver:
-                raise HTTPException(404, f"BOP 版本 {gid} 不存在")
-            ver = dict(ver)
-
-            cur_pbom_gid = ver.get('pbom_version_gid')
-            parent_ver_gid = ver.get('parent_version_gid')
-
-            if not cur_pbom_gid:
-                return {"data": [], "reason": "当前版本未绑定 PBOM"}
-            if not parent_ver_gid:
-                return {"data": [], "reason": "当前版本无父版本，无从对比"}
-
-            cur.execute(
-                "SELECT pbom_version_gid FROM workmanship_bop_bop_versions WHERE gid=%s",
-                (parent_ver_gid,)
-            )
-            parent_ver = cur.fetchone()
-            ref_pbom_gid = dict(parent_ver)['pbom_version_gid'] if parent_ver else None
-
-            if not ref_pbom_gid:
-                return {"data": [], "reason": "父版本未绑定 PBOM，无从对比"}
-
-            cur.execute(
-                """
-                SELECT gid, bom_row, vpps, title, part_no, quantity, unit,
-                       node_type, updated_at
-                FROM workmanship_bop_pbom
-                WHERE snapshot_gid=%s AND is_deleted=FALSE
-                """,
-                (cur_pbom_gid,)
-            )
-            cur_rows = {
-                (r['bom_row'], r['vpps']): dict(r)
-                for r in cur.fetchall()
-                if r['bom_row'] or r['vpps']
-            }
-
-            cur.execute(
-                """
-                SELECT gid, bom_row, vpps, title, part_no, quantity, unit,
-                       node_type, updated_at
-                FROM workmanship_bop_pbom
-                WHERE snapshot_gid=%s AND is_deleted=FALSE
-                """,
-                (ref_pbom_gid,)
-            )
-            ref_rows = {
-                (r['bom_row'], r['vpps']): dict(r)
-                for r in cur.fetchall()
-                if r['bom_row'] or r['vpps']
-            }
-
-            changes = []
-            _COMPARE_FIELDS = ('title', 'part_no', 'quantity', 'unit', 'node_type')
-
-            for key, cur_row in cur_rows.items():
-                if key not in ref_rows:
-                    changes.append({
-                        'change_type': 'added',
-                        'bom_row': cur_row.get('bom_row'),
-                        'vpps': cur_row.get('vpps'),
-                        'current': cur_row,
-                        'reference': None,
-                    })
-                else:
-                    ref_row = ref_rows[key]
-                    diff = {
-                        f: (cur_row.get(f), ref_row.get(f))
-                        for f in _COMPARE_FIELDS
-                        if cur_row.get(f) != ref_row.get(f)
-                    }
-                    if diff:
-                        changes.append({
-                            'change_type': 'modified',
-                            'bom_row': cur_row.get('bom_row'),
-                            'vpps': cur_row.get('vpps'),
-                            'current': cur_row,
-                            'reference': ref_row,
-                            'diff': diff,
-                        })
-
-            for key, ref_row in ref_rows.items():
-                if key not in cur_rows:
-                    changes.append({
-                        'change_type': 'deleted',
-                        'bom_row': ref_row.get('bom_row'),
-                        'vpps': ref_row.get('vpps'),
-                        'current': None,
-                        'reference': ref_row,
-                    })
-
-            return {
-                "data": changes,
-                "current_pbom_version_gid": cur_pbom_gid,
-                "reference_pbom_version_gid": ref_pbom_gid,
-                "summary": {
-                    "added": sum(1 for c in changes if c['change_type'] == 'added'),
-                    "modified": sum(1 for c in changes if c['change_type'] == 'modified'),
-                    "deleted": sum(1 for c in changes if c['change_type'] == 'deleted'),
-                },
-            }
+async def pbom_change_point(gid: str, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_pbom_change_point(request, _u, principal, gateway, gid)

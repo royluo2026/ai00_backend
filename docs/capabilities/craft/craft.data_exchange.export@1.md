@@ -1,14 +1,14 @@
 # craft.data_exchange.export@1
 
-Execute the reviewed craft.data_exchange.export Craft outcome.
+Export bounded Craft datasets to Excel or Feishu Sheets.
 
 ## 使用判断
 
-- 适用：A governed consumer needs this Craft-owned outcome.
-- 不适用：The operation belongs to another business domain.
+- 适用：A governed Craft consumer needs a data-exchange export.
+- 不适用：The operation mutates Craft business entities.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_118d91d38b08fcecd96ddea0005a02b5`
+- Catalog Release：`rel_3010694218f96365eda536567f35d198`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -70,22 +70,54 @@ Execute the reviewed craft.data_exchange.export Craft outcome.
 {
   "additionalProperties": false,
   "properties": {
-    "arguments": {
+    "columns": {
+      "maxItems": 200,
+      "type": "array"
+    },
+    "diff_rows": {
+      "maxItems": 5000,
+      "type": "array"
+    },
+    "filename": {
+      "type": "string"
+    },
+    "label_a": {
+      "type": "string"
+    },
+    "label_b": {
+      "type": "string"
+    },
+    "operation": {
+      "enum": [
+        "excel",
+        "diff_report",
+        "diff_lark_sheet"
+      ],
+      "type": "string"
+    },
+    "rows": {
+      "maxItems": 5000,
+      "type": "array"
+    },
+    "sheet_id": {
+      "type": "string"
+    },
+    "spreadsheet_token": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "template_config": {
       "additionalProperties": false,
       "properties": {},
       "type": "object"
     },
-    "expected_version": {
-      "type": "integer"
-    },
-    "operation": {
+    "user_access_token": {
       "minLength": 1,
       "type": "string"
     }
   },
   "required": [
-    "operation",
-    "arguments"
+    "operation"
   ],
   "type": "object"
 }
@@ -96,11 +128,10 @@ Execute the reviewed craft.data_exchange.export Craft outcome.
 ```json
 {
   "capability_id": "craft.data_exchange.export",
-  "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
+  "catalog_release": "rel_3010694218f96365eda536567f35d198",
   "major_version": 1,
   "payload": {
-    "arguments": {},
-    "operation": "example"
+    "operation": "excel"
   }
 }
 ```
@@ -113,15 +144,23 @@ Execute the reviewed craft.data_exchange.export Craft outcome.
 {
   "additionalProperties": false,
   "properties": {
-    "data": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+    "file_b64": {
+      "type": "string"
+    },
+    "filename": {
+      "type": "string"
+    },
+    "sheet_id": {
+      "type": "string"
+    },
+    "spreadsheet_token": {
+      "type": "string"
+    },
+    "written_rows": {
+      "minimum": 0,
+      "type": "integer"
     }
   },
-  "required": [
-    "data"
-  ],
   "type": "object"
 }
 ```

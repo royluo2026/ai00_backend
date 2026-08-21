@@ -140,6 +140,8 @@ _OPERATIONS = {
     ),
     "project.project.read": frozenset({"projects.search", "projects.get", "vehicle_models.list"}),
     "project.project.change.apply": frozenset({"projects.create", "projects.update", "projects.delete", "vehicle_models.create", "vehicle_models.update", "vehicle_models.delete"}),
+    "project.member.read": frozenset({"members.list"}),
+    "project.member.change.apply": frozenset({"members.add", "members.remove"}),
     "project.task_template.read": frozenset({"task_templates.list", "task_templates.get"}),
     "project.task_template.change.apply": frozenset({"task_templates.create", "task_templates.update", "task_templates.delete", "task_templates.items.create", "task_templates.items.update", "task_templates.items.delete", "task_templates.instantiate"}),
     "project.approval.read": frozenset({"approval.orders.search", "approval.orders.get"}),
@@ -155,6 +157,11 @@ _OPERATIONS = {
     "project.issue.read": frozenset({"issues.search", "issues.get"}),
     "project.issue.change.apply": frozenset({"issues.create", "issues.promote", "issues.update", "issues.delete"}),
 }
+
+# Public read-only projection used by the descriptor builder.  Keeping the
+# dispatch table in the application layer prevents the schema from becoming a
+# second hand-maintained operation list.
+SUPPORTED_OPERATIONS = _OPERATIONS
 
 
 def _required_text(arguments: Mapping[str, Any], name: str) -> str:
@@ -613,6 +620,18 @@ class ProjectManagementApplication:
         team_gid = str(getattr(context, "team_gid", "") or "")
         if not user_gid:
             raise CapabilityBusinessError("unauthenticated", "user identity is required")
+        if operation.startswith("members."):
+            from backend.platform_sdk.project_access import add_project_member, list_all_project_memberships, remove_project_member
+            project_gid = _required_text(arguments, "project_gid")
+            if operation == "members.list":
+                rows = [row for row in list_all_project_memberships() if str(row.get("project_gid") or "") == project_gid]
+                return {"success": True, "data": rows}
+            if operation == "members.add":
+                member_gid = add_project_member(project_gid, _required_text(arguments, "user_gid"), str(arguments.get("project_role") or "member"), arguments.get("section_gid"))
+                return {"success": True, "data": {"gid": member_gid}}
+            if not remove_project_member(project_gid, _required_text(arguments, "member_gid")):
+                raise CapabilityBusinessError("not_found", "member not found")
+            return {"success": True}
         if operation == "projects.search":
             scope = arguments.get("scope")
             if not isinstance(scope, Mapping) or str(scope.get("user_gid") or "") != user_gid:

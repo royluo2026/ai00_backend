@@ -23,6 +23,7 @@ def descriptor_for(spec) -> CapabilityDescriptorV2:
         "owner_domain": "factory",
         "lifecycle_status": LifecycleStatus.STABLE,
         "exposure": ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True),
+        "exposure_policy_source": "provider_explicit",
         "automation_level": AutomationLevel.A0 if spec.id == "factory.asset.scrap" else (AutomationLevel.A1 if write else AutomationLevel.A2),
         "authorization_policy": "factory.v2:" + ",".join(spec.permissions),
         "data_classification": "confidential", "delegation_policy": "scoped",

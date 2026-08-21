@@ -51,9 +51,24 @@ def test_list_output_contract_accepts_empty_cursor_and_version_summaries():
                 "bop_name": "Assembly BOP",
                 "family_gid": None,
                 "project_gid": "project-1",
+                "factory_gid": None,
+                "vehicle_model_gid": None,
+                "parent_version_gid": None,
+                "pbom_version_gid": None,
+                "owner_gid": None,
                 "status": "draft",
                 "lifecycle_phase": None,
                 "revision": 1,
+                "version_type": None,
+                "maturity": None,
+                "data_stage": None,
+                "visibility": None,
+                "takt_time": None,
+                "change_note": None,
+                "frozen_at": None,
+                "published_at": None,
+                "archived_at": None,
+                "created_at": None,
                 "updated_at": "2026-08-13T13:00:00",
                 "archived": False,
             }],
@@ -64,6 +79,7 @@ def test_list_output_contract_accepts_empty_cursor_and_version_summaries():
 
 
 def test_list_query_is_bounded_and_cursor_is_validated():
+    assert BopVersionQuery.from_payload({"factory_gid": "factory-1"}).factory_gid == "factory-1"
     with pytest.raises(ValueError, match="page_size"):
         BopVersionQuery.from_payload({"page_size": 101})
     with pytest.raises(ValueError, match="cursor"):

@@ -7,6 +7,8 @@ from dataclasses import asdict, dataclass
 from pathlib import Path, PurePosixPath
 from typing import Literal
 
+from .consumer_routes import scan_web_routes
+
 
 class CompletionConfigurationError(ValueError):
     """Raised when completion evidence is malformed or cannot be verified."""
@@ -24,6 +26,7 @@ class CompletionReport:
     consumer_bypasses: int
     catalog_capabilities: int
     failed: tuple[str, ...]
+    web_consumer_bypasses: int = 0
 
     @property
     def complete(self) -> bool:
@@ -246,6 +249,23 @@ def _catalog_capability_count(root: Path) -> int:
     return len(capability_ids)
 
 
+def _web_route_inventory_drift(
+    root: Path,
+    configuration: dict,
+    report: dict,
+) -> bool:
+    """Return whether checked-in Web route evidence differs from a fresh scan."""
+    relative = configuration.get("web_route_inventory_artifact")
+    if relative is None:
+        return False
+    if not isinstance(relative, str) or not relative:
+        raise CompletionConfigurationError(
+            "web_route_inventory_artifact must be a repository-relative path"
+        )
+    expected = _load_json(_relative_path(root, relative, field="web_route_inventory_artifact"))
+    return expected != report
+
+
 def _production_path_count(root: Path, document: dict, kind: str) -> int:
     entries = document.get(kind, [])
     if not isinstance(entries, list):
@@ -283,6 +303,7 @@ def _production_path_count(root: Path, document: dict, kind: str) -> int:
 def evaluate_completion(
     root: Path,
     mode: Literal["progress", "strict"] = "progress",
+    web_root: Path | None = None,
 ) -> CompletionReport:
     """Evaluate the three completion goals from repository-owned evidence."""
 
@@ -316,6 +337,31 @@ def evaluate_completion(
     boundary = _load_json(root / "backend/governance/boundary_baseline.json")
     cross_domain_sql, internal_imports = _boundary_counts(boundary)
     consumer_bypasses = _consumer_bypasses(root, configuration)
+    web_consumer_bypasses = 0
+    if web_root is not None:
+        web_prefixes = configuration.get(
+            "web_legacy_route_prefixes",
+            [
+                "/api/bop", "/api/gbop", "/api/ontology", "/api/projects",
+                "/api/flows", "/api/factory", "/api/simulation", "/api/device",
+            ],
+        )
+        if not isinstance(web_prefixes, list):
+            raise CompletionConfigurationError("web_legacy_route_prefixes must be an array")
+        allowlisted_routes = configuration.get("web_allowlisted_legacy_routes", [])
+        if not isinstance(allowlisted_routes, list) or not all(
+            isinstance(value, str) and value for value in allowlisted_routes
+        ):
+            raise CompletionConfigurationError(
+                "web_allowlisted_legacy_routes must be an array of routes"
+            )
+        web_scan = scan_web_routes(
+            Path(web_root), roots=(".",), legacy_prefixes=tuple(web_prefixes),
+            allowlisted_legacy_routes=tuple(allowlisted_routes),
+        )
+        web_consumer_bypasses = web_scan.legacy_count
+        if _web_route_inventory_drift(root, configuration, web_scan.serialized()):
+            failures.append("web_route_inventory_drift:1")
     catalog_capabilities = _catalog_capability_count(root)
     production_paths = _load_json(
         root / "backend/governance/capability_v2_production_paths.json",
@@ -330,6 +376,8 @@ def evaluate_completion(
         failures.append(f"internal_imports:{internal_imports}")
     if consumer_bypasses:
         failures.append(f"consumer_bypasses:{consumer_bypasses}")
+    if web_consumer_bypasses:
+        failures.append(f"web_consumer_bypasses:{web_consumer_bypasses}")
     if not sync_paths:
         failures.append("sync_production_paths:0")
     if not async_paths:
@@ -345,6 +393,7 @@ def evaluate_completion(
         consumer_bypasses=consumer_bypasses,
         catalog_capabilities=catalog_capabilities,
         failed=tuple(sorted(failures)),
+        web_consumer_bypasses=web_consumer_bypasses,
     )
 
 

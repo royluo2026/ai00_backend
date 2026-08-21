@@ -9,18 +9,41 @@ GET    /api/canvases/{gid}    — 获取单个画布（含 data 字段）
 DELETE /api/canvases/{gid}    — 删除画布
 PATCH  /api/canvases/{gid}/shared — 切换共享状态
 """
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request, HTTPException
 from ..data.connection import get_conn
 from backend.platform_sdk.auth import get_current_user
 from backend.platform_sdk.ids import next_gid
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.auth import get_authenticated_principal
+from backend.platform_sdk.factory import build_web_compatibility_envelope, invoke_compatibility
 
 router = APIRouter(prefix="/api/canvases", tags=["canvases"])
 
 
+async def _invoke_canvas(request, current_user, principal, gateway, capability_id, operation, *, gid=None, record=None):
+    request_id = request.headers.get("X-Request-ID") or f"craft_canvas_legacy_{next_gid()}"
+    payload = {"operation": operation}
+    if gid:
+        payload["gid"] = gid
+    if record is not None:
+        payload["record"] = record
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id=capability_id, payload=payload, current_user=current_user,
+        principal=principal, request_id=request_id, trace_id=request.headers.get("X-Trace-ID") or request_id,
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "permission_denied": 403, "invalid_input": 400}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data["data"]
+
+
 @router.get("")
-def list_canvases(
+async def list_canvases(
+    request: Request,
     _user: dict = Depends(get_current_user),
+    principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway),
 ):
+    return await _invoke_canvas(request, _user, principal, gateway, "craft.canvas.read", "list")
     user_gid = _user.get("gid", "")
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -46,10 +69,13 @@ def list_canvases(
 
 
 @router.post("")
-def save_canvas(
+async def save_canvas(
     body: dict,
+    request: Request,
     _user: dict = Depends(get_current_user),
+    principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway),
 ):
+    return await _invoke_canvas(request, _user, principal, gateway, "craft.canvas.change.apply", "save", gid=body.get("gid"), record=body)
     gid       = body.get("gid") or ""
     title     = body.get("title") or "未命名画布"
     data      = body.get("data") or {}
@@ -92,10 +118,13 @@ def save_canvas(
 
 
 @router.get("/{gid}")
-def load_canvas(
+async def load_canvas(
     gid: str,
+    request: Request,
     _user: dict = Depends(get_current_user),
+    principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway),
 ):
+    return await _invoke_canvas(request, _user, principal, gateway, "craft.canvas.read", "get", gid=gid)
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("""
@@ -117,10 +146,13 @@ def load_canvas(
 
 
 @router.delete("/{gid}")
-def delete_canvas(
+async def delete_canvas(
     gid: str,
+    request: Request,
     _user: dict = Depends(get_current_user),
+    principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway),
 ):
+    return await _invoke_canvas(request, _user, principal, gateway, "craft.canvas.change.apply", "delete", gid=gid)
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT gid FROM workmanship_app_wfc_canvases WHERE gid = %s", (gid,))
@@ -133,11 +165,14 @@ def delete_canvas(
 
 
 @router.patch("/{gid}/shared")
-def toggle_shared(
+async def toggle_shared(
     gid: str,
     body: dict,
+    request: Request,
     _user: dict = Depends(get_current_user),
+    principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway),
 ):
+    return await _invoke_canvas(request, _user, principal, gateway, "craft.canvas.change.apply", "toggle_shared", gid=gid, record=body)
     is_shared = bool(body.get("is_shared", False))
     with get_conn() as conn:
         with conn.cursor() as cur:

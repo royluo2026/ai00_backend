@@ -1,6 +1,7 @@
 """Atomic construction and publication of the official Capability registry."""
 from __future__ import annotations
 
+import json
 import sys
 import threading
 import os
@@ -129,6 +130,9 @@ def _install_default_test_governance_runtime() -> None:
         (repository_root / "docs/governance/test-extension/capability-governance-catalog-release.json").read_text(encoding="utf-8")
     )
     manifests = load_domain_manifests(repository_root / "backend/capability_v2/official_domains.json")
+    acceptance_manifest = json.loads(
+        (repository_root / "backend/tests/acceptance/fixtures/case-manifest.json").read_text(encoding="utf-8")
+    )
 
     def store_factory() -> Any:
         try:
@@ -143,6 +147,7 @@ def _install_default_test_governance_runtime() -> None:
             product_catalog=product,
             extension_catalog=extension,
             domain_manifests=manifests,
+            acceptance_manifest=acceptance_manifest,
         )
         if getattr(store, "persistent", False):
             from backend.db.connection import acquire_connection

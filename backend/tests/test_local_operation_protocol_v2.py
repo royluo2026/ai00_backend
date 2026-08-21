@@ -110,7 +110,11 @@ def test_native_local_provider_is_stable_and_exposed_to_plugins_and_agents():
     for capability_id, registration in registrations.items():
         descriptor = registration.descriptor
         assert descriptor.owner_domain == "device"
-        assert descriptor.lifecycle_status.value == "stable"
+        if capability_id.startswith("local.device."):
+            assert descriptor.lifecycle_status.value == "deprecated"
+            assert descriptor.input_schema["properties"]["operation"]["enum"] == []
+        else:
+            assert descriptor.lifecycle_status.value == "stable"
         assert descriptor.exposure.plugin and descriptor.exposure.agent and descriptor.exposure.mcp
         expected_operation_policy = (
             "none"

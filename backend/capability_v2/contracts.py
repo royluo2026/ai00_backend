@@ -309,6 +309,10 @@ class CapabilityDescriptorV2(FrozenModel):
     side_effect_level: SideEffectLevel = SideEffectLevel.READ
     execution_mode: ExecutionMode = ExecutionMode.CLOUD_SYNC
     exposure: ExposurePolicy
+    # Exposure must come from an explicitly reviewed provider policy. The
+    # adapter default is retained only for legacy/test conversion and is not a
+    # release-approved exposure grant.
+    exposure_policy_source: Literal["adapter_default", "provider_explicit"] = "adapter_default"
     automation_level: AutomationLevel
     authorization_policy: str = Field(min_length=1, max_length=255)
     resource_selectors: tuple[ResourceSelector, ...] = ()

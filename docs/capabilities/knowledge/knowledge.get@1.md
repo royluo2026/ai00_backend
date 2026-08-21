@@ -8,7 +8,7 @@
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_118d91d38b08fcecd96ddea0005a02b5`
+- Catalog Release：`rel_3010694218f96365eda536567f35d198`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -86,7 +86,7 @@
 ```json
 {
   "capability_id": "knowledge.get",
-  "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
+  "catalog_release": "rel_3010694218f96365eda536567f35d198",
   "major_version": 1,
   "payload": {
     "gid": "example"
@@ -159,6 +159,24 @@
       },
       "type": "object"
     },
+    "context_class_gid": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "contributors": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "maxItems": 100,
+      "type": "array"
+    },
+    "created_at": {
+      "type": "string"
+    },
     "creator_gid": {
       "type": "string"
     },
@@ -170,6 +188,12 @@
     },
     "gid": {
       "type": "string"
+    },
+    "list_gid": {
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "maintainer_gid": {
       "type": "string"
@@ -205,6 +229,12 @@
     },
     "source_label": {
       "type": "string"
+    },
+    "source_project_gid": {
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "status": {
       "type": "string"

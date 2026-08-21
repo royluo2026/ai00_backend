@@ -20,6 +20,8 @@ def test_knowledge_provider_is_complete_against_frozen_review():
     assert {descriptor.id for _, descriptor in registry.items} == set(review["capabilities"]) | {
         "knowledge.reference_data.read",
         "knowledge.reference_data.change.apply",
+        "knowledge.hub.read",
+        "knowledge.hub.change.apply",
     }
     assert {descriptor.owner_domain for _, descriptor in registry.items} == {"knowledge"}
 

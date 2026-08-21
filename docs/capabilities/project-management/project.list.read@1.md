@@ -8,7 +8,7 @@ Execute the reviewed project.list.read project outcome.
 - 不适用：The operation belongs to another domain.
 - 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_118d91d38b08fcecd96ddea0005a02b5`
+- Catalog Release：`rel_3010694218f96365eda536567f35d198`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -71,9 +71,256 @@ Execute the reviewed project.list.read project outcome.
   "additionalProperties": false,
   "properties": {
     "arguments": {
-      "description": "Operation-specific object validated by the Project application layer."
+      "additionalProperties": false,
+      "properties": {
+        "assignee_map": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "assignee_role": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "body": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "brand": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "color": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "comment": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "content": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "current_scope": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "data": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "dep_condition": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "dep_group": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "description": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "display_name": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "due_offset_days": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "edge_type": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "entries": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "expires_at": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "factory_gid": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "gid": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "include_archived": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "include_deleted": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "item_gid": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "item_title": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "item_type": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "jph": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "key": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "label": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "list_gid": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "local_gid": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "member_gid": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "message": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "model_year": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "name": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "new_list_gid": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "notify_on": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "order_type": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "owner_gid": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "owner_team_gid": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "owner_type": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "owner_user_gid": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "permission": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "platform": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "priority": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "project_code": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "project_gid": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "project_role": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "q": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "read_scope": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "recipient_gid": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "reviewer_gid": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "scope": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "section_gid": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "share_scope": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "shared_to": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "sort_order": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "source_gid": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "source_ref": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "start_date": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "status": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "storage_scope": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "suffix": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "target_gid": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "target_scope": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "target_type": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "team_id": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "template_gid": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "title": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "title_pattern": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "title_vars": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "token": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "type": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "unread_only": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "updates": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "user_gid": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "vehicle_model_gid": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "vehicle_type": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "visibility": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "want_permission": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "widgets": {
+          "description": "Operation-specific value validated by the Project application layer."
+        },
+        "write_scope": {
+          "description": "Operation-specific value validated by the Project application layer."
+        }
+      },
+      "type": "object"
     },
     "operation": {
+      "enum": [
+        "item_entries.get",
+        "lists.search"
+      ],
       "maxLength": 128,
       "minLength": 1,
       "type": "string"
@@ -92,11 +339,11 @@ Execute the reviewed project.list.read project outcome.
 ```json
 {
   "capability_id": "project.list.read",
-  "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
+  "catalog_release": "rel_3010694218f96365eda536567f35d198",
   "major_version": 1,
   "payload": {
-    "arguments": "example",
-    "operation": "example"
+    "arguments": {},
+    "operation": "item_entries.get"
   }
 }
 ```

@@ -23,16 +23,16 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
 from ..data.connection import get_conn
 from backend.platform_sdk.auth import require_role
 from backend.platform_sdk.ids import next_gid
-from backend.platform_sdk.export_templates import (
-    create_export_template, delete_export_template,
-    list_export_templates, update_export_template,
-)
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.auth import get_authenticated_principal
+from backend.platform_sdk.factory import build_web_compatibility_envelope, invoke_compatibility
+from uuid import uuid4
 
 router = APIRouter(prefix="/api/import-export", tags=["import-export"])
 
@@ -109,16 +109,150 @@ def _row_to_dict(row, keys):
 # ── 模板 CRUD ─────────────────────────────────────────────────────────────────
 
 @router.get("/templates")
-def list_templates(module: str = "", user=Depends(_READ)):
-    return {"success": True, "data": list_export_templates(user["gid"], module)}
+async def list_templates(
+    request: Request,
+    module: str = "",
+    user=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    request_id = request.headers.get("X-Request-ID") or f"base_export_template_{uuid4().hex}"
+    result = await invoke_compatibility(
+        gateway,
+        build_web_compatibility_envelope(
+            gateway,
+            capability_id="base.export_template.read",
+            payload={"module": module, "limit": 500},
+            current_user=user,
+            principal=principal,
+            request_id=request_id,
+            trace_id=request.headers.get("X-Trace-ID") or request_id,
+        ),
+    )
+    if not result.ok:
+        error = result.error
+        code = error.code if error else "provider_error"
+        raise HTTPException(
+            status_code={
+                "resource_not_found": 404,
+                "permission_denied": 403,
+                "invalid_input": 400,
+                "response_limit_exceeded": 413,
+            }.get(code, 422),
+            detail=error.model_dump(mode="json") if error else None,
+        )
+    return {"success": True, "data": result.data["data"]["items"]}
+
+
+async def _invoke_template_change(request, user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"base_export_template_change_{uuid4().hex}"
+    result = await invoke_compatibility(
+        gateway,
+        build_web_compatibility_envelope(
+            gateway,
+            capability_id="base.export_template.change.apply",
+            payload=payload,
+            current_user=user,
+            principal=principal,
+            request_id=request_id,
+            trace_id=request.headers.get("X-Trace-ID") or request_id,
+            idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+            approval_reference=request.headers.get("X-Capability-Approval"),
+        ),
+    )
+    if not result.ok:
+        error = result.error
+        code = error.code if error else "provider_error"
+        raise HTTPException(
+            status_code={
+                "resource_not_found": 404,
+                "permission_denied": 403,
+                "invalid_input": 400,
+                "confirmation_required": 409,
+            }.get(code, 422),
+            detail=error.model_dump(mode="json") if error else None,
+        )
+    return result.data["data"]
+
+
+async def _invoke_data_exchange(request, user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"craft_data_exchange_{uuid4().hex}"
+    result = await invoke_compatibility(
+        gateway,
+        build_web_compatibility_envelope(
+            gateway,
+            capability_id="craft.data_exchange.export",
+            payload=payload,
+            current_user=user,
+            principal=principal,
+            request_id=request_id,
+            trace_id=request.headers.get("X-Trace-ID") or request_id,
+            idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+            approval_reference=request.headers.get("X-Capability-Approval"),
+        ),
+    )
+    if not result.ok:
+        error = result.error
+        code = error.code if error else "provider_error"
+        raise HTTPException(
+            status_code={"invalid_input": 400, "confirmation_required": 409}.get(code, 422),
+            detail=error.model_dump(mode="json") if error else None,
+        )
+    return result.data["data"]
+
+
+async def _invoke_lark_read(request, user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"craft_lark_read_{uuid4().hex}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.data_exchange.lark.read", payload=payload,
+        current_user=user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+    ))
+    if not result.ok:
+        error = result.error
+        code = error.code if error else "provider_error"
+        raise HTTPException(status_code={"invalid_input": 400, "permission_denied": 403, "response_limit_exceeded": 413}.get(code, 422), detail=error.model_dump(mode="json") if error else None)
+    return result.data["data"]
+
+
+async def _invoke_lark_write(request, user, principal, gateway, payload):
+    request_id = request.headers.get("X-Request-ID") or f"craft_lark_write_{uuid4().hex}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.data_exchange.lark.write", payload=payload,
+        current_user=user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        error = result.error
+        code = error.code if error else "provider_error"
+        raise HTTPException(status_code={"invalid_input": 400, "permission_denied": 403, "confirmation_required": 409}.get(code, 422), detail=error.model_dump(mode="json") if error else None)
+    return result.data["data"]
 
 
 @router.post("/templates")
-def create_template(body: CreateTemplateBody, user=Depends(_READ)):
-    gid = create_export_template(
-        user["gid"], body.name, body.module, body.config, body.is_shared
+async def create_template(
+    body: CreateTemplateBody,
+    request: Request,
+    user=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    data = await _invoke_template_change(
+        request,
+        user,
+        principal,
+        gateway,
+        {
+            "operation": "create",
+            "name": body.name,
+            "module": body.module,
+            "config": body.config,
+            "is_shared": body.is_shared,
+        },
     )
-    return {"success": True, "data": {"gid": gid, "name": body.name, "config": body.config}}
+    return {"success": True, "data": data}
 
 
 def _template_admin(user: dict) -> bool:
@@ -127,31 +261,64 @@ def _template_admin(user: dict) -> bool:
 
 
 @router.patch("/templates/{gid}")
-def update_template(gid: str, body: UpdateTemplateBody, user=Depends(_READ)):
-    try:
-        update_export_template(gid, user["gid"], _template_admin(user), body.model_dump())
-    except LookupError as exc:
-        raise HTTPException(404, str(exc)) from exc
-    except PermissionError as exc:
-        raise HTTPException(403, str(exc)) from exc
-    return {"success": True}
+async def update_template(
+    gid: str,
+    body: UpdateTemplateBody,
+    request: Request,
+    user=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    data = await _invoke_template_change(
+        request,
+        user,
+        principal,
+        gateway,
+        {
+            "operation": "update",
+            "gid": gid,
+            "updates": body.model_dump(exclude_none=True),
+        },
+    )
+    return {"success": True, "data": data}
 
 
 @router.delete("/templates/{gid}")
-def delete_template(gid: str, user=Depends(_READ)):
-    try:
-        delete_export_template(gid, user["gid"], _template_admin(user))
-    except LookupError as exc:
-        raise HTTPException(404, str(exc)) from exc
-    except PermissionError as exc:
-        raise HTTPException(403, str(exc)) from exc
-    return {"success": True}
+async def delete_template(
+    gid: str,
+    request: Request,
+    user=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    data = await _invoke_template_change(
+        request,
+        user,
+        principal,
+        gateway,
+        {"operation": "delete", "gid": gid},
+    )
+    return {"success": True, "data": data}
 
 
 # ── Excel 导出 ────────────────────────────────────────────────────────────────
 
 @router.post("/export/excel")
-def export_excel(body: ExportExcelBody, user=Depends(_READ)):
+async def export_excel(
+    body: ExportExcelBody,
+    request: Request,
+    user=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    data = await _invoke_data_exchange(
+        request, user, principal, gateway,
+        {"operation": "excel", "template_config": body.template_config, "rows": body.rows, "filename": body.filename},
+    )
+    return {"success": True, "data": data}
+
+
+def _legacy_export_excel(body: ExportExcelBody, user=Depends(_READ)):
     """依据 template_config + rows 生成带样式 .xlsx，返回 base64。"""
     try:
         import openpyxl
@@ -225,7 +392,47 @@ def export_excel(body: ExportExcelBody, user=Depends(_READ)):
 # ── Excel 解析（导入） ────────────────────────────────────────────────────────
 
 @router.post("/import/parse-excel")
-def parse_excel(body: ParseExcelBody, user=Depends(_READ)):
+async def parse_excel(
+    body: ParseExcelBody,
+    request: Request,
+    user=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    parsed = _legacy_parse_excel(body, user)
+    parsed_data = parsed.get("data", {})
+    document = {
+        "version_tag": body.filename.rsplit(".", 1)[0] or "import",
+        "bop_name": body.filename,
+        "entries": [
+            dict(zip(parsed_data.get("headers", []), row))
+            for row in parsed_data.get("rows", [])
+        ],
+    }
+    request_id = request.headers.get("X-Request-ID") or f"craft_bop_import_preview_{uuid4().hex}"
+    result = await invoke_compatibility(
+        gateway,
+        build_web_compatibility_envelope(
+            gateway,
+            capability_id="craft.bop.import.preview",
+            payload={"document": document},
+            current_user=user,
+            principal=principal,
+            request_id=request_id,
+            trace_id=request.headers.get("X-Trace-ID") or request_id,
+        ),
+    )
+    if not result.ok:
+        error = result.error
+        raise HTTPException(
+            status_code=400 if error and error.code == "invalid_input" else 422,
+            detail=error.model_dump(mode="json") if error else None,
+        )
+    parsed_data["import_preview"] = result.data["data"]
+    return parsed
+
+
+def _legacy_parse_excel(body: ParseExcelBody, user=Depends(_READ)):
     """接收 base64 编码的 Excel / CSV 文件，返回 {headers, rows, warnings}。"""
     try:
         file_bytes = base64.b64decode(body.file_b64)
@@ -330,7 +537,11 @@ def parse_excel(body: ParseExcelBody, user=Depends(_READ)):
 # ── 飞书电子表格 ──────────────────────────────────────────────────────────────
 
 @router.post("/lark-sheets/read")
-async def lark_sheets_read(body: LarkSheetsReadBody, user=Depends(_READ)):
+async def lark_sheets_read(body: LarkSheetsReadBody, request: Request, user=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_lark_read(request, user, principal, gateway, {"operation": "sheets.read", **body.model_dump()})
+
+
+async def _legacy_lark_sheets_read(body: LarkSheetsReadBody, user=Depends(_READ)):
     """读取飞书电子表格数据，返回 {headers, rows}。"""
     url = (
         f"https://open.feishu.cn/open-apis/sheets/v2/spreadsheets"
@@ -358,7 +569,11 @@ async def lark_sheets_read(body: LarkSheetsReadBody, user=Depends(_READ)):
 
 
 @router.post("/lark-sheets/write")
-async def lark_sheets_write(body: LarkSheetsWriteBody, user=Depends(_READ)):
+async def lark_sheets_write(body: LarkSheetsWriteBody, request: Request, user=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_lark_write(request, user, principal, gateway, {"operation": "sheets.write", "user_access_token": body.user_access_token, "spreadsheet_token": body.spreadsheet_token, "sheet_id": body.sheet_id, "values": [body.headers] + body.rows})
+
+
+async def _legacy_lark_sheets_write(body: LarkSheetsWriteBody, user=Depends(_READ)):
     """向飞书电子表格写入数据（覆盖指定 sheet）。"""
     values = [body.headers] + body.rows
     url = (
@@ -391,7 +606,11 @@ async def lark_sheets_write(body: LarkSheetsWriteBody, user=Depends(_READ)):
 # ── 飞书多维表 ────────────────────────────────────────────────────────────────
 
 @router.post("/lark-bitable/read")
-async def lark_bitable_read(body: LarkBitableReadBody, user=Depends(_READ)):
+async def lark_bitable_read(body: LarkBitableReadBody, request: Request, user=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_lark_read(request, user, principal, gateway, {"operation": "bitable.read", **body.model_dump()})
+
+
+async def _legacy_lark_bitable_read(body: LarkBitableReadBody, user=Depends(_READ)):
     """读取飞书多维表所有记录，返回 {headers, rows}。"""
     base_url = (
         f"https://open.feishu.cn/open-apis/bitable/v1/apps"
@@ -432,7 +651,11 @@ async def lark_bitable_read(body: LarkBitableReadBody, user=Depends(_READ)):
 
 
 @router.post("/lark-bitable/write")
-async def lark_bitable_write(body: LarkBitableWriteBody, user=Depends(_READ)):
+async def lark_bitable_write(body: LarkBitableWriteBody, request: Request, user=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_lark_write(request, user, principal, gateway, {"operation": "bitable.write", **body.model_dump()})
+
+
+async def _legacy_lark_bitable_write(body: LarkBitableWriteBody, user=Depends(_READ)):
     """批量写入飞书多维表记录。"""
     url = (
         f"https://open.feishu.cn/open-apis/bitable/v1/apps"
@@ -500,7 +723,24 @@ class DiffReportBody(BaseModel):
 
 
 @router.post("/export/diff-report")
-def export_diff_report(body: DiffReportBody, user=Depends(_READ)):
+async def export_diff_report(
+    body: DiffReportBody,
+    request: Request,
+    user=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    data = await _invoke_data_exchange(
+        request, user, principal, gateway,
+        {
+            "operation": "diff_report", "columns": body.columns, "diff_rows": body.diff_rows,
+            "label_a": body.label_a, "label_b": body.label_b, "filename": body.filename,
+        },
+    )
+    return {"success": True, "data": data}
+
+
+def _legacy_export_diff_report(body: DiffReportBody, user=Depends(_READ)):
     """生成差异对比 .xlsx（A侧列 + B侧列，行按 diffStatus 着色）。"""
     try:
         import openpyxl
@@ -655,7 +895,26 @@ class DiffLarkSheetBody(BaseModel):
 
 
 @router.post("/export/diff-lark-sheet")
-async def export_diff_lark_sheet(body: DiffLarkSheetBody, user=Depends(_READ)):
+async def export_diff_lark_sheet(
+    body: DiffLarkSheetBody,
+    request: Request,
+    user=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    data = await _invoke_data_exchange(
+        request, user, principal, gateway,
+        {
+            "operation": "diff_lark_sheet", "user_access_token": body.user_access_token,
+            "spreadsheet_token": body.spreadsheet_token, "sheet_id": body.sheet_id,
+            "columns": body.columns, "diff_rows": body.diff_rows,
+            "label_a": body.label_a, "label_b": body.label_b,
+        },
+    )
+    return {"success": True, "data": data}
+
+
+async def _legacy_export_diff_lark_sheet(body: DiffLarkSheetBody, user=Depends(_READ)):
     """将 diff 结果展开为平铺行写入飞书电子表格（含状态列）。"""
     STATUS_LABEL = {
         "added":    "+新增",

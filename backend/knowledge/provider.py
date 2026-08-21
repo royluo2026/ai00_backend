@@ -81,6 +81,7 @@ def descriptor_for(spec):
             mcp=not deprecated,
             worker=spec.id == "knowledge.proposal.outbox.retry",
         ),
+        "exposure_policy_source": "provider_explicit",
         "automation_level": AutomationLevel.A1 if is_write else AutomationLevel.A2,
         "authorization_policy": "knowledge.v2:" + (",".join(spec.permissions) or "authenticated"),
         "resource_selectors": selectors,

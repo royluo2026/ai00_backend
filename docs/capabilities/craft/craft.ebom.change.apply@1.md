@@ -1,14 +1,14 @@
 # craft.ebom.change.apply@1
 
-Execute the reviewed craft.ebom.change.apply Craft outcome.
+Apply bounded PBOM compatibility snapshot and part mutations through the governed Craft Provider.
 
 ## 使用判断
 
-- 适用：A governed consumer needs this Craft-owned outcome.
-- 不适用：The operation belongs to another business domain.
+- 适用：A legacy EBOM/PBOM REST consumer creates, updates, deletes or transitions a PBOM snapshot or part.
+- 不适用：The operation is a read, PBOM version lifecycle transition, or BOP/GBOP mutation.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_118d91d38b08fcecd96ddea0005a02b5`
+- Catalog Release：`rel_3010694218f96365eda536567f35d198`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -70,22 +70,62 @@ Execute the reviewed craft.ebom.change.apply Craft outcome.
 {
   "additionalProperties": false,
   "properties": {
-    "arguments": {
+    "changes": {
       "additionalProperties": false,
       "properties": {},
       "type": "object"
     },
-    "expected_version": {
+    "ignored": {
+      "type": "integer"
+    },
+    "nok": {
       "type": "integer"
     },
     "operation": {
+      "enum": [
+        "snapshot.delete",
+        "snapshot.patch",
+        "snapshot.status.patch",
+        "snapshot.vpps_stats.patch",
+        "part.add",
+        "part.add_batch",
+        "part.update",
+        "part.delete"
+      ],
+      "type": "string"
+    },
+    "part": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "part_gid": {
       "minLength": 1,
       "type": "string"
+    },
+    "parts": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "maxItems": 500,
+      "type": "array"
+    },
+    "snapshot_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "status": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "total": {
+      "type": "integer"
     }
   },
   "required": [
-    "operation",
-    "arguments"
+    "operation"
   ],
   "type": "object"
 }
@@ -96,11 +136,10 @@ Execute the reviewed craft.ebom.change.apply Craft outcome.
 ```json
 {
   "capability_id": "craft.ebom.change.apply",
-  "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
+  "catalog_release": "rel_3010694218f96365eda536567f35d198",
   "major_version": 1,
   "payload": {
-    "arguments": {},
-    "operation": "example"
+    "operation": "snapshot.delete"
   }
 }
 ```

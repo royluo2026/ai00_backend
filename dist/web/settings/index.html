@@ -4,10 +4,9 @@
   <meta charset="UTF-8">
   <title>系统设置</title>
   
-  <link rel="stylesheet" href="/assets/index-d67a20f2.css">
+  <link rel="stylesheet" href="/assets/index-61754b16.css">
 </head>
 <body>
-  <script src="/web/shared/random_id.js"></script>
   <script src="/web/core/web_compat.js"></script>
   <script src="/web/icons.js"></script>
 
@@ -33,7 +32,7 @@
       <div class="nav-item perm-panel" data-panel="feature-flags" data-perm-role="super_admin">功能开关</div>
       <div class="nav-item" data-panel="follows-cleanup">关注清理</div>
       <div class="nav-item" data-panel="notif-prefs">通知设置</div>
-      <div class="nav-item" data-panel="plugin-market">插件中心</div>
+      <div class="nav-item" data-panel="plugin-market">插件市场</div>
       <div class="nav-item" data-panel="list-defaults">清单设置</div>
       <div class="nav-item" data-panel="about">关于 / 卸载</div>
 
@@ -450,79 +449,73 @@
         </div>
       </div>
 
-      <!-- 轻量插件中心：可用 / 已安装 / 上传管理 -->
+      <!-- 插件管理（Phase 7A：Obsidian 风格）-->
       <div class="settings-panel" id="panel-plugin-market">
-        <div class="panel-title">插件中心</div>
-        <p class="pm-intro">统一查看、安装和管控团队插件。插件能力由服务端授权，所有生命周期操作都会留痕。</p>
+        <div class="panel-title">插件管理</div>
 
-        <div class="pm-tabs" role="tablist" aria-label="插件中心">
-          <button class="pm-tab active" data-tab="available" role="tab">可用插件</button>
-          <button class="pm-tab" data-tab="installed" role="tab">已安装</button>
-          <button class="pm-tab" data-tab="upload" role="tab">上传管理</button>
+        <!-- Tab 切换：已安装 / 浏览市场 -->
+        <div style="display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--border-default,#313244);padding-bottom:0;">
+          <button class="pm-tab active" data-tab="installed"
+                  style="padding:6px 14px;font-size:13px;background:none;border:none;border-bottom:2px solid var(--color-primary,#89b4fa);color:var(--text-normal);cursor:pointer;margin-bottom:-1px;">
+            已安装
+          </button>
+          <button class="pm-tab" data-tab="market"
+                  style="padding:6px 14px;font-size:13px;background:none;border:none;border-bottom:2px solid transparent;color:var(--text-muted);cursor:pointer;margin-bottom:-1px;">
+            浏览市场
+          </button>
         </div>
 
-        <div id="pm-pane-available" class="pm-pane">
-          <div class="pm-toolbar">
-            <div>
-              <strong id="pm-month-label">月度使用情况</strong>
-              <div class="pm-hint">核心指标：本月、上月、月增量、成功率</div>
-            </div>
-            <div class="pm-toolbar-actions">
-              <input id="pm-search" class="setting-input pm-search" type="search" placeholder="搜索名称或插件 ID" autocomplete="off">
-              <select id="pm-state-filter" class="setting-select pm-state-filter" aria-label="安装状态筛选">
-                <option value="">全部状态</option>
-                <option value="available">未安装</option>
-                <option value="disabled">已停用</option>
-                <option value="enabled">已启用</option>
-                <option value="upgrading">更新中</option>
-                <option value="failed">失败</option>
-                <option value="rolled_back">已回滚</option>
-                <option value="revoked">已撤销</option>
-              </select>
-              <button class="btn-secondary" id="pm-btn-refresh">刷新</button>
+        <!-- 已安装面板 -->
+        <div id="pm-pane-installed">
+          <div class="setting-group">
+            <div id="pm-installed-list" style="display:flex;flex-direction:column;gap:4px">
+              <div class="empty-state" style="padding:20px;text-align:center;color:var(--text-muted)">加载中...</div>
             </div>
           </div>
-          <div id="pm-load-error" class="pm-load-error" hidden></div>
-          <div id="pm-available-list" class="pm-list"><div class="empty-state">加载中...</div></div>
-        </div>
 
-        <div id="pm-pane-installed" class="pm-pane" hidden>
-          <div id="pm-installed-list" class="pm-list"><div class="empty-state">加载中...</div></div>
-        </div>
-
-        <div id="pm-pane-upload" class="pm-pane" hidden>
-          <div class="setting-group">
-            <div class="setting-group-title">上传新版本</div>
-            <p class="pm-hint">管理员上传 ZIP、manifest JSON 与开发者签名；校验通过后进入待审核队列。</p>
-            <div class="pm-upload-grid">
-              <label>插件 ZIP<input type="file" id="pm-package" accept=".zip,application/zip"></label>
-              <label>Manifest JSON<input type="file" id="pm-manifest-file" accept=".json,application/json"></label>
-              <label class="pm-span-2">开发者签名<textarea id="pm-publisher-signature" rows="3" placeholder="Base64 Ed25519 签名"></textarea></label>
+          <div class="setting-group" style="margin-top:20px">
+            <div class="setting-group-title">从 URL 安装</div>
+            <p style="font-size:12px;color:var(--text-muted);margin:0 0 10px">
+              直接输入插件 zip 包的下载地址安装
+            </p>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input type="text" id="pm-install-url"
+                     placeholder="https://example.com/my-plugin.zip"
+                     style="flex:1;padding:8px 12px;background:var(--bg-primary);border:1px solid var(--border-default);border-radius:6px;color:var(--text-normal);font-size:13px">
+              <button class="btn-primary" id="pm-btn-install-url" style="white-space:nowrap">安装</button>
             </div>
-            <div class="pm-actions"><button class="btn-primary" id="pm-btn-upload">上传并提交</button><span id="pm-upload-feedback" class="pm-feedback"></span></div>
+            <div id="pm-install-feedback" style="margin-top:8px;font-size:12px;min-height:16px"></div>
           </div>
-          <div class="setting-group">
-            <div class="pm-toolbar"><div><div class="setting-group-title">待审核版本</div><div class="pm-hint">批准后由平台签名并进入可用插件列表。</div></div><button class="btn-secondary" id="pm-btn-close-month">生成上月快照</button></div>
-            <div id="pm-review-list" class="pm-list"><div class="empty-state">加载中...</div></div>
+        </div>
+
+        <!-- 市场浏览面板 -->
+        <div id="pm-pane-market" style="display:none">
+          <!-- 注册表地址 + 刷新 -->
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+            <input type="text" id="pm-registry-url"
+                   placeholder="插件注册表 URL（plugin-registry.json）"
+                   style="flex:1;padding:7px 12px;background:var(--bg-primary);border:1px solid var(--border-default);border-radius:6px;color:var(--text-normal);font-size:12px">
+            <button class="btn-secondary" id="pm-btn-refresh-market" style="white-space:nowrap;font-size:12px;padding:7px 12px;">
+              刷新
+            </button>
+          </div>
+
+          <!-- 搜索框 -->
+          <div style="margin-bottom:12px;">
+            <input type="text" id="pm-market-search"
+                   placeholder="搜索插件名称或描述..."
+                   style="width:100%;box-sizing:border-box;padding:8px 12px;background:var(--bg-secondary);border:1px solid var(--border-default);border-radius:6px;color:var(--text-normal);font-size:13px">
+          </div>
+
+          <!-- 插件列表 -->
+          <div id="pm-market-list" style="display:flex;flex-direction:column;gap:6px">
+            <div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">
+              输入注册表地址后点击「刷新」加载插件清单
+            </div>
           </div>
         </div>
       </div>
 
-      <aside id="pm-detail-drawer" class="pm-drawer" aria-hidden="true">
-        <div class="pm-drawer-head"><strong id="pm-detail-title">插件详情</strong><button id="pm-detail-close" class="pm-icon-btn" aria-label="关闭详情">×</button></div>
-        <div id="pm-detail-body" class="pm-drawer-body"></div>
-      </aside>
-      <div id="pm-drawer-mask" class="pm-drawer-mask" hidden></div>
-
-      <div id="pm-dialog" class="pm-dialog-mask" hidden>
-        <div class="pm-dialog" role="dialog" aria-modal="true" aria-labelledby="pm-dialog-title">
-          <strong id="pm-dialog-title"></strong>
-          <div id="pm-dialog-message" class="pm-dialog-message"></div>
-          <textarea id="pm-dialog-input" class="setting-input pm-dialog-input" rows="3" hidden></textarea>
-          <div class="pm-dialog-actions"><button id="pm-dialog-cancel" class="btn-secondary">取消</button><button id="pm-dialog-confirm" class="btn-primary">确认</button></div>
-        </div>
-      </div>
-      <div id="pm-toast-region" class="pm-toast-region" aria-live="polite"></div>
       <!-- 关注清理 -->
       <div class="settings-panel" id="panel-follows-cleanup">
         <div class="panel-title">关注清理</div>
@@ -659,7 +652,7 @@
           <div class="setting-item" id="ff-item-plugin_system">
             <div class="setting-item-info">
               <div class="setting-item-label">插件系统</div>
-              <div class="setting-item-desc">关闭后隐藏插件中心入口，所有已启用插件停止加载</div>
+              <div class="setting-item-desc">关闭后隐藏插件市场入口，所有已启用插件停止加载</div>
             </div>
             <label class="toggle-switch">
               <input type="checkbox" id="ff-plugin_system" data-flag-key="plugin_system">
@@ -790,8 +783,5 @@
 
   <script src="/web/event_bus.js"></script>
   <script src="settings.js?v=9"></script>
-  <script src="plugin_center_model.js?v=1"></script>
-  <script src="plugin_center_api.js?v=1"></script>
-  <script src="plugin_center.js?v=2"></script>
 </body>
 </html>

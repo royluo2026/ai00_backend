@@ -60,7 +60,6 @@ WORKSPACE_TEMPLATE = _object(
 REVIEWED_READ_CAPABILITIES = {
     "base.annotation.read",
     "base.authorization.grant.read",
-    "base.export_template.read",
     "base.identity.session.get",
     "base.plugin.marketplace.search",
     "base.saved_view.read",
@@ -69,7 +68,6 @@ REVIEWED_READ_CAPABILITIES = {
 REVIEWED_WRITE_CAPABILITIES = {
     "base.annotation.change.apply",
     "base.authorization.grant.change.apply",
-    "base.export_template.change.apply",
     "base.identity.directory.sync",
     "base.identity.role.assign",
     "base.plugin.marketplace.publisher.register",
@@ -129,6 +127,23 @@ INPUT_SCHEMAS = {
     "system.change_impact.preview": _object({"change_ref": STRING}, ("change_ref",)),
     "semantic.context.get": _object({"named_view": STRING, "depth": INTEGER, "limit": INTEGER}, ("named_view",)),
     "system.worker.outbox.health": _object({}),
+    "base.export_template.read": _object(
+        {"module": {**STRING, "maxLength": 128}, "limit": {"type": "integer", "minimum": 1, "maximum": 500}}
+    ),
+    "base.export_template.change.apply": _object(
+        {
+            "operation": {"type": "string", "enum": ["create", "update", "delete"]},
+            "gid": STRING,
+            "name": STRING,
+            "module": STRING,
+            "config": ANY_JSON,
+            "is_shared": BOOLEAN,
+            "updates": _object(
+                {"name": STRING, "module": STRING, "config": ANY_JSON, "is_shared": BOOLEAN}
+            ),
+        },
+        ("operation",),
+    ),
     **{
         capability_id: REVIEWED_INPUT
         for capability_id in REVIEWED_READ_CAPABILITIES | REVIEWED_WRITE_CAPABILITIES
@@ -216,6 +231,21 @@ OUTPUT_SCHEMAS = {
         }),
         "open_alerts": INTEGER,
     }, ("heartbeat", "outbox_counts", "open_alerts")),
+    "base.export_template.read": _object(
+        {
+            "items": {
+                "type": "array",
+                "maxItems": 500,
+                "items": {"type": "object", "additionalProperties": True},
+            },
+            "total": {"type": "integer", "minimum": 0},
+            "module": STRING,
+        },
+        ("items", "total", "module"),
+    ),
+    "base.export_template.change.apply": _object(
+        {"operation": STRING, "gid": STRING}, ("operation", "gid")
+    ),
     **{
         capability_id: REVIEWED_OUTPUT
         for capability_id in REVIEWED_READ_CAPABILITIES | REVIEWED_WRITE_CAPABILITIES

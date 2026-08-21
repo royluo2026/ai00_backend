@@ -7,36 +7,54 @@ from ...data.connection import get_craft_conn
 from ...domain.pbom import PbomVersion, PbomVersionStatus
 
 
+_PART_COLUMNS = (
+    "gid,snapshot_gid,part_no,title,quantity,unit,material,parent_gid,vpps,vpps_desc,parent_vpps,parent_vpps_name,"
+    "bom_row,bom_row_label,component_id,component_type,component_version_status,purchase_status,variable_formula,"
+    "torque,torque_importance,ownership_user,level,home,configuration,parent_bom_row,remark,temp_vpps,"
+    "catia_occurrence_name,catia_file_name,catia_uuid,default_matrix,abs_matrix,rel_matrix,local_bbox,ecn,fna,"
+    "geo_main_part,ref_main_vpps_desc,ref_main_vpps,main_part_consistency,geo_evidence,lr_side,meta,created_at "
+)
+
+
 class SqlPbomRepository:
+    @staticmethod
+    def _version(row: dict) -> PbomVersion:
+        value = dict(row)
+        value["status"] = PbomVersionStatus(value["status"])
+        if value.get("created_at") is not None:
+            value["created_at"] = str(value["created_at"])
+        if isinstance(value.get("meta"), str):
+            value["meta"] = json.loads(value["meta"] or "{}")
+        return PbomVersion(**value)
+
     def get_version(self, version_gid: str) -> PbomVersion | None:
         with get_craft_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
-                "SELECT gid,project_ref,version_tag,status,knowledge_revision_ref,ontology_release_ref,"
+                "SELECT gid,project_ref,version_tag,name,source_type,created_at,meta,status,knowledge_revision_ref,ontology_release_ref,"
                 "revision_commit_ref,revision FROM workmanship_bop_pbom_versions WHERE gid=%s",
                 (version_gid,),
             )
             row = cursor.fetchone()
         if not row:
             return None
-        value = dict(row)
-        value["status"] = PbomVersionStatus(value["status"])
-        return PbomVersion(**value)
+        return self._version(dict(row))
 
     def create_version(self, version: PbomVersion) -> PbomVersion:
         with get_craft_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
                 "INSERT INTO workmanship_bop_pbom_versions "
                 "(gid,project_ref,project_gid,version_tag,name,source_type,status,knowledge_revision_ref,"
-                "ontology_release_ref,revision_commit_ref,revision) VALUES (%s,%s,%s,%s,%s,'native',%s,%s,%s,%s,%s)",
-                (version.gid, version.project_ref, version.project_ref, version.version_tag, version.version_tag,
+                "ontology_release_ref,revision_commit_ref,revision,meta) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                (version.gid, version.project_ref, version.project_ref, version.version_tag, version.name or version.version_tag,
+                 version.source_type or "native",
                  version.status.value, version.knowledge_revision_ref, version.ontology_release_ref,
-                 version.revision_commit_ref, version.revision),
+                 version.revision_commit_ref, version.revision, json.dumps(version.meta or {}, ensure_ascii=False)),
             )
             conn.commit()
         return version
 
     def search_versions(self, project_ref: str | None, limit: int) -> list[PbomVersion]:
-        sql = "SELECT gid,project_ref,version_tag,status,knowledge_revision_ref,ontology_release_ref,revision_commit_ref,revision FROM workmanship_bop_pbom_versions"
+        sql = "SELECT gid,project_ref,version_tag,name,source_type,created_at,meta,status,knowledge_revision_ref,ontology_release_ref,revision_commit_ref,revision FROM workmanship_bop_pbom_versions"
         params: list[Any] = []
         if project_ref:
             sql += " WHERE project_ref=%s"
@@ -46,18 +64,18 @@ class SqlPbomRepository:
         with get_craft_conn() as conn, conn.cursor() as cursor:
             cursor.execute(sql, params)
             rows = cursor.fetchall()
-        return [PbomVersion(**{**dict(row), "status": PbomVersionStatus(row["status"])}) for row in rows]
+        return [self._version(dict(row)) for row in rows]
 
     def list_parts(self, version_gid: str, query: str | None = None, limit: int = 100) -> list[dict[str, Any]]:
         where = ["snapshot_gid=%s", "is_deleted=0"]
         params: list[Any] = [version_gid]
         if query:
-            where.append("(part_no LIKE %s OR title LIKE %s)")
-            params.extend([f"%{query}%", f"%{query}%"])
-        params.append(limit)
+            where.append("(part_no LIKE %s OR title LIKE %s OR vpps LIKE %s)")
+            params.extend([f"%{query}%", f"%{query}%", f"%{query}%"])
+        params.append(min(max(int(limit), 1), 500))
         with get_craft_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
-                "SELECT gid,snapshot_gid,part_no,title,quantity,unit,parent_gid,component_id,meta "
+                "SELECT " + _PART_COLUMNS +
                 "FROM workmanship_bop_pbom WHERE " + " AND ".join(where) + " ORDER BY part_no LIMIT %s",
                 params,
             )

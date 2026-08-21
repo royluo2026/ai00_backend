@@ -10,12 +10,16 @@ PBOM API（pbom_versions / pbom）
 """
 from typing import Optional, List
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 
 from ..data.connection import get_conn
 from backend.platform_sdk.auth import get_current_user, require_role
 from backend.platform_sdk.ids import next_gid
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.auth import get_authenticated_principal
+from backend.platform_sdk.factory import build_web_compatibility_envelope, invoke_compatibility
+from uuid import uuid4
 
 # Compatibility path stays mounted until the production consumer-cutover task;
 # all native Provider contracts use PBOM naming now.
@@ -191,62 +195,95 @@ class UpdatePartBody(BaseModel):
     lr_side: Optional[str] = None
 
 
+async def _invoke_pbom(request: Request, current_user: dict, principal, gateway, capability_id: str, payload: dict, *, write: bool = False):
+    request_id = request.headers.get("X-Request-ID") or f"craft_pbom_{uuid4().hex}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway,
+        capability_id=capability_id,
+        payload=payload,
+        current_user=current_user,
+        principal=principal,
+        request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=(request.headers.get("X-Idempotency-Key") or request_id) if write else None,
+        approval_reference=request.headers.get("X-Capability-Approval") if write else None,
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"resource_not_found": 404, "permission_denied": 403, "invalid_input": 400, "version_conflict": 409}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data["data"]
+
+
+async def _invoke_ebom_change(request: Request, current_user: dict, principal, gateway, payload: dict):
+    return await _invoke_pbom(request, current_user, principal, gateway, capability_id="craft.ebom.change.apply", payload=payload, write=True)
+
+
+def _legacy_version(item: dict) -> dict:
+    version_tag = item.get("version_tag") or ""
+    return {
+        "gid": item.get("gid", ""),
+        "project_gid": item.get("project_gid") or item.get("project_ref"),
+        "version_tag": version_tag,
+        "name": item.get("name") or version_tag,
+        "source_type": item.get("source_type") or "native",
+        "status": item.get("status", "draft"),
+        "created_at": item.get("created_at") or "",
+    }
+
+
 # ── 版本端点 ─────────────────────────────────────────────────────
 
 @router.get("/snapshots")
-def list_snapshots(
+async def list_snapshots(
     project_gid: Optional[str] = Query(None),
-    current_user: dict = Depends(_READ)
+    request: Request = None,
+    current_user: dict = Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
 ):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            if project_gid:
-                cur.execute(
-                    f"SELECT {_VER_COLS} FROM workmanship_bop_pbom_versions "
-                    "WHERE project_gid = %s ORDER BY created_at DESC",
-                    (project_gid,)
-                )
-            else:
-                cur.execute(
-                    f"SELECT {_VER_COLS} FROM workmanship_bop_pbom_versions "
-                    "ORDER BY created_at DESC LIMIT 200"
-                )
-            rows = cur.fetchall()
-    return {"success": True, "data": [_row_to_ver(dict(r)) for r in rows]}
+    data = await _invoke_pbom(request, current_user, principal, gateway, "craft.pbom.version.search", {
+        "project_ref": project_gid,
+        "limit": 200,
+    })
+    return {"success": True, "data": [_legacy_version(item) for item in data.get("items", [])]}
 
 
 @router.post("/snapshots", status_code=201)
-def create_snapshot(body: CreateVersionBody, current_user: dict = Depends(_WRITE)):
-    gid = str(next_gid())
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "INSERT INTO workmanship_bop_pbom_versions (gid, project_gid, version_tag, name, source_type, status, meta, visibility, shared_team_gid, shared_project_gid) "
-                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                (gid, body.project_gid or None, body.version_tag, body.name, body.source_type, 'draft', '{}', 'project', None, None)
-            )
-        conn.commit()
-    return {"success": True, "data": {"gid": gid}}
+async def create_snapshot(
+    body: CreateVersionBody,
+    request: Request = None,
+    current_user: dict = Depends(_WRITE),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    data = await _invoke_pbom(request, current_user, principal, gateway, "craft.pbom.version.create", {
+        "project_ref": body.project_gid or "",
+        "project_gid": body.project_gid,
+        "version_tag": body.version_tag,
+        "name": body.name,
+        "source_type": body.source_type,
+    }, write=True)
+    return {"success": True, "data": {"gid": data.get("gid", "")}}
 
 
 @router.get("/snapshots/{gid}")
-def get_snapshot(gid: str, current_user: dict = Depends(_READ)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                f"SELECT {_VER_COLS}, meta FROM workmanship_bop_pbom_versions WHERE gid = %s",
-                (gid,)
-            )
-            row = cur.fetchone()
-    if not row:
-        raise HTTPException(status_code=404, detail="PBOM 版本不存在")
-    d = _row_to_ver(dict(row))
-    d["meta"] = row["meta"]
-    return {"success": True, "data": d}
+async def get_snapshot(
+    gid: str,
+    request: Request = None,
+    current_user: dict = Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    data = await _invoke_pbom(request, current_user, principal, gateway, "craft.pbom.version.get", {"version_gid": gid})
+    return {"success": True, "data": _legacy_version(data) | {"meta": data.get("meta") or {}}}
 
 
 @router.delete("/snapshots/{gid}")
-def delete_snapshot(gid: str, current_user: dict = Depends(_WRITE)):
+async def delete_snapshot(gid: str, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_ebom_change(request, current_user, principal, gateway, {"operation": "snapshot.delete", "snapshot_gid": gid})
+
+
+def _legacy_delete_snapshot(gid: str, current_user: dict = Depends(_WRITE)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("DELETE FROM workmanship_bop_pbom_versions WHERE gid = %s", (gid,))
@@ -268,7 +305,11 @@ class PatchSnapshotBody(BaseModel):
     shared_project_gid: Optional[str] = None
 
 @router.patch("/snapshots/{gid}")
-def patch_snapshot(gid: str, body: PatchSnapshotBody, current_user: dict = Depends(_WRITE)):
+async def patch_snapshot(gid: str, body: PatchSnapshotBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_ebom_change(request, current_user, principal, gateway, {"operation": "snapshot.patch", "snapshot_gid": gid, "changes": body.model_dump(exclude_none=True)})
+
+
+def _legacy_patch_snapshot(gid: str, body: PatchSnapshotBody, current_user: dict = Depends(_WRITE)):
     updates = {k: v for k, v in body.model_dump().items() if v is not None and k in _PBOM_PATCH_ALLOWED}
     if not updates:
         raise HTTPException(status_code=400, detail="无更新字段")
@@ -289,7 +330,11 @@ class VppsStatsBody(BaseModel):
 
 
 @router.patch("/snapshots/{gid}/vpps-stats", status_code=200)
-def patch_vpps_stats(gid: str, body: VppsStatsBody, current_user: dict = Depends(_WRITE)):
+async def patch_vpps_stats(gid: str, body: VppsStatsBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_ebom_change(request, current_user, principal, gateway, {"operation": "snapshot.vpps_stats.patch", "snapshot_gid": gid, **body.model_dump()})
+
+
+def _legacy_patch_vpps_stats(gid: str, body: VppsStatsBody, current_user: dict = Depends(_WRITE)):
     """将 VPPS 核对结果写入 pbom_versions.meta.vpps_check，供生命周期面板读取。"""
     import json as _json
     from datetime import datetime, timezone
@@ -317,7 +362,18 @@ class PatchVersionStatusBody(BaseModel):
     status: str
 
 @router.patch("/snapshots/{gid}/status")
-def patch_snapshot_status(
+async def patch_snapshot_status(
+    gid: str,
+    body: PatchVersionStatusBody,
+    request: Request,
+    current_user: dict = Depends(_WRITE),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    return await _invoke_ebom_change(request, current_user, principal, gateway, {"operation": "snapshot.status.patch", "snapshot_gid": gid, "status": body.status})
+
+
+def _legacy_patch_snapshot_status(
     gid: str,
     body: PatchVersionStatusBody,
     current_user: dict = Depends(_WRITE),
@@ -339,16 +395,24 @@ def patch_snapshot_status(
 # ── 零件端点 ─────────────────────────────────────────────────────
 
 @router.get("/snapshots/{gid}/parts")
-def list_parts(gid: str, current_user: dict = Depends(_READ)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                f"SELECT {_PART_COLS} FROM workmanship_bop_pbom "
-                "WHERE snapshot_gid = %s ORDER BY level , created_at",
-                (gid,)
-            )
-            rows = cur.fetchall()
-    return {"success": True, "data": [_row_to_part(dict(r)) for r in rows]}
+async def list_parts(
+    gid: str,
+    limit: int = Query(500, ge=1, le=500),
+    request: Request = None,
+    current_user: dict = Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    data = await _invoke_pbom(request, current_user, principal, gateway, "craft.pbom.part.search", {
+        "version_gid": gid,
+        "limit": limit,
+    })
+    rows = []
+    for item in data.get("items", []):
+        row = dict(item)
+        row.setdefault("name", row.get("title", ""))
+        rows.append(_row_to_part(row))
+    return {"success": True, "data": rows}
 
 
 _INSERT_PART_SQL = (
@@ -388,7 +452,11 @@ def _part_vals(part_gid, snap_gid, b):
 
 
 @router.post("/snapshots/{gid}/parts", status_code=201)
-def add_part(gid: str, body: CreatePartBody, current_user: dict = Depends(_WRITE)):
+async def add_part(gid: str, body: CreatePartBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_ebom_change(request, current_user, principal, gateway, {"operation": "part.add", "snapshot_gid": gid, "part": body.model_dump()})
+
+
+def _legacy_add_part(gid: str, body: CreatePartBody, current_user: dict = Depends(_WRITE)):
     part_gid = str(next_gid())
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -401,7 +469,11 @@ def add_part(gid: str, body: CreatePartBody, current_user: dict = Depends(_WRITE
 
 
 @router.post("/snapshots/{gid}/parts/batch", status_code=201)
-def add_parts_batch(gid: str, body: List[CreatePartBody], current_user: dict = Depends(_WRITE)):
+async def add_parts_batch(gid: str, body: List[CreatePartBody], request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_ebom_change(request, current_user, principal, gateway, {"operation": "part.add_batch", "snapshot_gid": gid, "parts": [item.model_dump() for item in body]})
+
+
+def _legacy_add_parts_batch(gid: str, body: List[CreatePartBody], current_user: dict = Depends(_WRITE)):
     """批量添加零件（用于 Excel 导入）"""
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -418,7 +490,11 @@ def add_parts_batch(gid: str, body: List[CreatePartBody], current_user: dict = D
 
 
 @router.patch("/parts/{gid}")
-def update_part(gid: str, body: UpdatePartBody, current_user: dict = Depends(_WRITE)):
+async def update_part(gid: str, body: UpdatePartBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_ebom_change(request, current_user, principal, gateway, {"operation": "part.update", "part_gid": gid, "changes": body.model_dump(exclude_none=True)})
+
+
+def _legacy_update_part(gid: str, body: UpdatePartBody, current_user: dict = Depends(_WRITE)):
     # workmanship_bop_pbom.name 已重命名为 title，做列名映射
     _COL_REMAP = {'name': 'title'}
     raw = {k: v for k, v in body.model_dump().items() if v is not None}
@@ -439,7 +515,11 @@ def update_part(gid: str, body: UpdatePartBody, current_user: dict = Depends(_WR
 
 
 @router.delete("/parts/{gid}")
-def delete_part(gid: str, current_user: dict = Depends(_WRITE)):
+async def delete_part(gid: str, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_ebom_change(request, current_user, principal, gateway, {"operation": "part.delete", "part_gid": gid})
+
+
+def _legacy_delete_part(gid: str, current_user: dict = Depends(_WRITE)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("DELETE FROM workmanship_bop_pbom WHERE gid = %s", (gid,))
@@ -507,8 +587,7 @@ def _load_parts(cur, snapshot_gid: str) -> list[dict]:
     return [dict(r) for r in cur.fetchall()]
 
 
-@router.get("/vpps_check")
-def vpps_check(
+def _legacy_vpps_check(
     snapshot_gid: str = Query(..., description="PBOM 快照 GID"),
     _u=Depends(_READ),
 ):
@@ -808,8 +887,36 @@ def vpps_check(
     }
 
 
-@router.get("/diff")
-def diff_snapshots(
+@router.get("/vpps_check")
+async def vpps_check(
+    snapshot_gid: str = Query(..., description="PBOM 快照 GID"),
+    request: Request = None,
+    _u=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    """Run deterministic VPPS checks through the governed read Capability."""
+    request_id = request.headers.get("X-Request-ID") or f"craft_ebom_vpps_{uuid4().hex}"
+    result = await invoke_compatibility(
+        gateway,
+        build_web_compatibility_envelope(
+            gateway,
+            capability_id="craft.ebom.vpps_check.read",
+            payload={"operation": "check", "snapshot_gid": snapshot_gid},
+            current_user=_u,
+            principal=principal,
+            request_id=request_id,
+            trace_id=request.headers.get("X-Trace-ID") or request_id,
+        ),
+    )
+    if not result.ok:
+        error = result.error
+        status = {"resource_not_found": 404, "forbidden": 403, "invalid_input": 400}.get(error.code if error else "", 422)
+        raise HTTPException(status_code=status, detail=error.model_dump(mode="json") if error else None)
+    return result.data["data"]
+
+
+def _legacy_diff_snapshots(
     base_gid:   str = Query(..., description="基准 PBOM 快照 GID"),
     target_gid: str = Query(..., description="目标 PBOM 快照 GID"),
     _u=Depends(_READ),
@@ -900,3 +1007,43 @@ def diff_snapshots(
         "deleted":  deleted,
         "modified": modified,
     }
+
+
+@router.get("/diff")
+async def diff_snapshots(
+    base_gid: str = Query(..., description="基准 PBOM 快照 GID"),
+    target_gid: str = Query(..., description="目标 PBOM 快照 GID"),
+    request: Request = None,
+    _u=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    """Compare two PBOM snapshots through the bounded legacy-read Capability."""
+    request_id = request.headers.get("X-Request-ID") or f"craft_ebom_diff_{uuid4().hex}"
+    result = await invoke_compatibility(
+        gateway,
+        build_web_compatibility_envelope(
+            gateway,
+            capability_id="craft.ebom.legacy_read",
+            payload={
+                "operation": "diff",
+                "base_gid": base_gid,
+                "target_gid": target_gid,
+            },
+            current_user=_u,
+            principal=principal,
+            request_id=request_id,
+            trace_id=request.headers.get("X-Trace-ID") or request_id,
+        ),
+    )
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(
+            status_code={
+                "resource_not_found": 404,
+                "permission_denied": 403,
+                "invalid_input": 400,
+            }.get(code, 422),
+            detail=result.error.model_dump(mode="json") if result.error else None,
+        )
+    return result.data["data"]

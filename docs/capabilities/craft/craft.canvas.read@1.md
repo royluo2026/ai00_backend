@@ -1,14 +1,14 @@
 # craft.canvas.read@1
 
-Execute the reviewed craft.canvas.read Craft outcome.
+Read owned and shared Craft canvases.
 
 ## 使用判断
 
-- 适用：A governed consumer needs this Craft-owned outcome.
-- 不适用：The operation belongs to another business domain.
+- 适用：A governed consumer needs Craft canvas state.
+- 不适用：The object is a BOP execution canvas.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_118d91d38b08fcecd96ddea0005a02b5`
+- Catalog Release：`rel_3010694218f96365eda536567f35d198`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -70,22 +70,20 @@ Execute the reviewed craft.canvas.read Craft outcome.
 {
   "additionalProperties": false,
   "properties": {
-    "arguments": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
-    },
-    "expected_version": {
-      "type": "integer"
+    "gid": {
+      "minLength": 1,
+      "type": "string"
     },
     "operation": {
-      "minLength": 1,
+      "enum": [
+        "list",
+        "get"
+      ],
       "type": "string"
     }
   },
   "required": [
-    "operation",
-    "arguments"
+    "operation"
   ],
   "type": "object"
 }
@@ -96,11 +94,10 @@ Execute the reviewed craft.canvas.read Craft outcome.
 ```json
 {
   "capability_id": "craft.canvas.read",
-  "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
+  "catalog_release": "rel_3010694218f96365eda536567f35d198",
   "major_version": 1,
   "payload": {
-    "arguments": {},
-    "operation": "example"
+    "operation": "list"
   }
 }
 ```
@@ -117,11 +114,34 @@ Execute the reviewed craft.canvas.read Craft outcome.
       "additionalProperties": false,
       "properties": {},
       "type": "object"
+    },
+    "gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "is_shared": {
+      "type": "boolean"
+    },
+    "items": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "maxItems": 500,
+      "type": "array"
+    },
+    "owner_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "updated_at": {
+      "type": "string"
     }
   },
-  "required": [
-    "data"
-  ],
   "type": "object"
 }
 ```

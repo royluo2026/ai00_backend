@@ -13,12 +13,85 @@ from ...data.connection import get_conn
 from backend.platform_sdk.ids import next_gid
 from backend.capability_v2.gateway import get_default_gateway
 from backend.platform_sdk.auth import get_authenticated_principal
+from backend.platform_sdk.factory import build_web_compatibility_envelope, invoke_compatibility
 from ..factory import _invoke as _invoke_factory
 
 from ._constants import _WRITE, _READ, _VER_COLS, _VER_KEYS, _SEC_COLS, _SEC_KEYS, _STA_COLS, _STA_KEYS
 from ._helpers import _row, _rows, _not_found, _snapshot_links, _clear_snapshots, _copy_entries_and_links
 
 router = APIRouter(prefix="/api/bop", tags=["bop"])
+
+
+async def _invoke_legacy_version_read(request, current_user, principal, gateway, capability_id, operation, version_gid):
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id=capability_id, payload={"operation": operation, "version_gid": version_gid}, current_user=current_user,
+        principal=principal, request_id=request.headers.get("X-Request-ID") or f"craft_bop_version_legacy_read_{next_gid()}", trace_id=request.headers.get("X-Trace-ID") or "craft_bop_version_legacy_read",
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"invalid_input": 400, "permission_denied": 403, "resource_not_found": 404}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data
+
+
+async def _invoke_version_lifecycle_change(request, current_user, principal, gateway, payload):
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.version.lifecycle.change.apply", payload=payload,
+        current_user=current_user, principal=principal,
+        request_id=request.headers.get("X-Request-ID") or f"craft_bop_version_lifecycle_{next_gid()}",
+        trace_id=request.headers.get("X-Trace-ID") or "craft_bop_version_lifecycle",
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(status_code={"invalid_input": 400, "invalid_state": 400, "permission_denied": 403, "resource_not_found": 404}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data
+
+
+async def _invoke_version_layout_change(request, current_user, principal, gateway, payload):
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.version.layout.change.apply", payload=payload,
+        current_user=current_user, principal=principal,
+        request_id=request.headers.get("X-Request-ID") or f"craft_bop_version_layout_{next_gid()}",
+        trace_id=request.headers.get("X-Trace-ID") or "craft_bop_version_layout",
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request.headers.get("X-Request-ID") or f"craft_bop_version_layout_{next_gid()}",
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        error = result.error
+        code = error.code if error else "provider_error"
+        raise HTTPException(status_code={"invalid_input": 400, "permission_denied": 403, "resource_not_found": 404}.get(code, 422), detail=error.model_dump(mode="json") if error else None)
+    return result.data["data"]
+
+
+async def _invoke_version_freeze_change(request, current_user, principal, gateway, payload):
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.version.freeze.change.apply", payload=payload,
+        current_user=current_user, principal=principal,
+        request_id=request.headers.get("X-Request-ID") or f"craft_bop_version_freeze_{next_gid()}",
+        trace_id=request.headers.get("X-Trace-ID") or "craft_bop_version_freeze",
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request.headers.get("X-Request-ID") or f"craft_bop_version_freeze_{next_gid()}",
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        error = result.error
+        code = error.code if error else "provider_error"
+        raise HTTPException(status_code={"invalid_input": 400, "invalid_state": 400, "permission_denied": 403, "resource_not_found": 404}.get(code, 422), detail=error.model_dump(mode="json") if error else None)
+    return result.data["data"]
+
+
+async def _invoke_version_snapshot_change(request, current_user, principal, gateway, payload):
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="craft.bop.version.snapshot.change.apply", payload=payload,
+        current_user=current_user, principal=principal,
+        request_id=request.headers.get("X-Request-ID") or f"craft_bop_version_snapshot_{next_gid()}",
+        trace_id=request.headers.get("X-Trace-ID") or "craft_bop_version_snapshot",
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request.headers.get("X-Request-ID") or f"craft_bop_version_snapshot_{next_gid()}",
+        approval_reference=request.headers.get("X-Capability-Approval"),
+    ))
+    if not result.ok:
+        error = result.error
+        code = error.code if error else "provider_error"
+        raise HTTPException(status_code={"invalid_input": 400, "invalid_state": 400, "permission_denied": 403, "resource_not_found": 404}.get(code, 422), detail=error.model_dump(mode="json") if error else None)
+    return result.data["data"]
 
 
 # ── Pydantic 模型 ─────────────────────────────────────────────────────────────
@@ -140,107 +213,142 @@ class ResetFieldsBody(BaseModel):
 # ══════════════════════════════════════════════════════════════
 
 @router.get("/versions")
-def list_versions(
+async def list_versions(
+    request: Request,
     project_gid: Optional[str] = None,
     factory_gid: Optional[str] = None,
     include_archived: bool = False,
     _u=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
 ):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            where = ["is_deleted = FALSE"]
-            params = []
-            if not include_archived:
-                where.append("archived_at IS NULL")
-            if project_gid:
-                where.append("project_gid=%s"); params.append(project_gid)
-            if factory_gid:
-                where.append("factory_gid=%s"); params.append(factory_gid)
-            w = "WHERE " + " AND ".join(where)
-            cur.execute(
-                f"SELECT {_VER_COLS} FROM workmanship_bop_bop_versions {w} "
-                f"ORDER BY version_family_gid , created_at",
-                params
-            )
-            return {"data": _rows(cur, _VER_KEYS)}
+    data = await _invoke_factory(
+        request,
+        _u,
+        principal,
+        gateway,
+        "craft.bop.version.list",
+        {
+            "project_gid": project_gid,
+            "factory_gid": factory_gid,
+            "include_archived": include_archived,
+            "page_size": 100,
+        },
+    )
+    items = []
+    for item in data.get("items", []):
+        legacy = dict(item)
+        legacy.setdefault("gid", legacy.get("version_gid"))
+        legacy.setdefault("version_family_gid", legacy.get("family_gid"))
+        items.append(legacy)
+    return {"data": items}
 
 
 @router.post("/versions", status_code=201)
-def create_version(body: CreateBopVersionBody, _u=Depends(_WRITE)):
-    gid = str(next_gid())
-    family_gid = body.version_family_gid or gid
-    # 净化 bop_name：强制去掉 "  ·  <data_stage>" 后缀，版本族名只保留项目名
-    import re as _re
-    clean_bop_name = _re.sub(r'\s*[·＇・]\s*\S+$', '', (body.bop_name or '')).strip()
-    if not clean_bop_name:
-        clean_bop_name = (body.bop_name or '').strip()
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            if body.pbom_version_gid:
-                cur.execute(
-                    "SELECT status FROM workmanship_bop_pbom_versions WHERE gid=%s",
-                    (body.pbom_version_gid,)
-                )
-                pbom_ver = cur.fetchone()
-                if not pbom_ver or pbom_ver['status'] != 'ready':
-                    raise HTTPException(400, "PBOM 版本尚未就绪（status != 'ready'），无法关联该 PBOM 版本")
-            cur.execute(
-                f"INSERT INTO workmanship_bop_bop_versions "
-                f"(gid,version_tag,bop_name,version_family_gid,"
-                f"project_gid,factory_gid,vehicle_model_gid,maturity,takt_time,"
-                f"status,meta,lifecycle_phase,lifecycle_state,visibility,version_type,pbom_version_gid,owner_gid,data_stage) "
-                f"VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-                (gid, body.version_tag, clean_bop_name, family_gid,
-                 body.project_gid, body.factory_gid,
-                 body.vehicle_model_gid, body.maturity, body.takt_time,
-                 'active', json.dumps({}), 'init', json.dumps({}), 'team', body.version_type,
-                 body.pbom_version_gid, body.owner_gid, body.data_stage)
-            )
-            conn.commit()
-            cur.execute(f"SELECT {_VER_COLS} FROM workmanship_bop_bop_versions WHERE gid=%s", (gid,))
-            return {"data": _row(cur, _VER_KEYS)}
+async def create_version(
+    body: CreateBopVersionBody,
+    request: Request,
+    _u=Depends(_WRITE),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    payload = {"source": "empty", **body.model_dump(exclude_none=True)}
+    data = await _invoke_factory(
+        request, _u, principal, gateway, "craft.bop.version.create", payload, write=True
+    )
+    legacy = dict(data)
+    legacy.setdefault("gid", legacy.get("version_gid"))
+    legacy.setdefault("version_family_gid", payload.get("version_family_gid") or data.get("version_gid"))
+    for name in (
+        "version_tag", "bop_name", "project_gid", "factory_gid", "vehicle_model_gid",
+        "maturity", "takt_time", "version_type", "pbom_version_gid", "owner_gid", "data_stage",
+    ):
+        if name in payload:
+            legacy.setdefault(name, payload[name])
+    return {"data": legacy}
 
 
 @router.get("/versions/{gid}")
-def get_version(gid: str, _u=Depends(_READ)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(f"SELECT {_VER_COLS} FROM workmanship_bop_bop_versions WHERE gid=%s", (gid,))
-            row = _row(cur, _VER_KEYS)
-            if not row: _not_found(gid)
-            return {"data": row}
+async def get_version(
+    gid: str,
+    request: Request,
+    _u=Depends(_READ),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    data = await _invoke_factory(
+        request, _u, principal, gateway, "craft.bop.version.get", {"version_gid": gid}
+    )
+    if not data:
+        _not_found(gid)
+    # Preserve the legacy response keys while the provider owns the read.
+    legacy = dict(data)
+    legacy.setdefault("gid", legacy.get("version_gid", gid))
+    legacy.setdefault("version_family_gid", legacy.get("family_gid"))
+    return {"data": legacy}
 
 
 @router.patch("/versions/{gid}")
-def update_version(gid: str, body: UpdateBopVersionBody, _u=Depends(_WRITE)):
+async def update_version(
+    gid: str,
+    body: UpdateBopVersionBody,
+    request: Request,
+    _u=Depends(_WRITE),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
     updates = {k: v for k, v in body.model_dump().items() if v is not None}
     if not updates:
         raise HTTPException(400, "无更新字段")
-    updates['updated_at'] = 'NOW()'
-    set_parts = []
-    vals = []
-    for k, v in updates.items():
-        if v == 'NOW()':
-            set_parts.append(f"{k}=NOW()")
-        else:
-            set_parts.append(f"{k}=%s")
-            vals.append(v)
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                f"UPDATE workmanship_bop_bop_versions SET {', '.join(set_parts)} WHERE gid=%s",
-                vals + [gid]
-            )
-            cur.execute(f"SELECT {_VER_COLS} FROM workmanship_bop_bop_versions WHERE gid=%s", (gid,))
-            row = _row(cur, _VER_KEYS)
-            if not row: _not_found(gid)
-            conn.commit()
-            return {"data": row}
+    supported = {
+        "version_tag", "bop_name", "maturity", "takt_time", "factory_gid",
+        "vehicle_model_gid", "visibility", "data_stage", "pbom_version_gid",
+    }
+    unsupported = sorted(set(updates) - supported)
+    if unsupported:
+        raise HTTPException(400, f"字段不支持通过版本元数据变更：{', '.join(unsupported)}")
+
+    current = await _invoke_factory(
+        request, _u, principal, gateway, capability_id="craft.bop.version.get", payload={"version_gid": gid}
+    )
+    revision = current.get("revision")
+    try:
+        revision = int(revision)
+    except (TypeError, ValueError):
+        raise HTTPException(409, "版本缺少可用 revision")
+    preview = await _invoke_factory(
+        request,
+        _u,
+        principal,
+        gateway,
+        capability_id="craft.bop.draft.change.preview",
+        payload={"version_gid": gid, "expected_revision": revision, "commands": [{"kind": "version.metadata.update", "changes": updates}]},
+    )
+    await _invoke_factory(
+        request,
+        _u,
+        principal,
+        gateway,
+        capability_id="craft.bop.draft.change.apply",
+        payload={"preview_gid": preview["preview_gid"]},
+        write=True,
+    )
+    data = await _invoke_factory(
+        request, _u, principal, gateway, capability_id="craft.bop.version.get", payload={"version_gid": gid}
+    )
+    legacy = dict(data)
+    legacy.setdefault("gid", legacy.get("version_gid", gid))
+    legacy.setdefault("version_family_gid", legacy.get("family_gid"))
+    return {"data": legacy}
 
 
 @router.get("/versions/{gid}/layout-config")
-def get_layout_config(gid: str, _u=Depends(_READ)):
+async def get_layout_config(gid: str, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
     """读取 BOP 版本的共享布局视图配置"""
+    return await _invoke_legacy_version_read(request, _u, principal, gateway, "craft.bop.version.legacy_read", "layout_config", gid)
+
+
+def _legacy_get_layout_config(gid: str, _u=Depends(_READ)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT JSON_EXTRACT(meta,'$.view_config') AS cfg FROM workmanship_bop_bop_versions WHERE gid=%s", (gid,))
@@ -251,7 +359,11 @@ def get_layout_config(gid: str, _u=Depends(_READ)):
 
 
 @router.put("/versions/{gid}/layout-config", status_code=200)
-def put_layout_config(gid: str, body: LayoutConfigBody, _u=Depends(_WRITE)):
+async def put_layout_config(gid: str, body: LayoutConfigBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_version_layout_change(request, _u, principal, gateway, {"version_gid": gid, "config": body.config})
+
+
+def _legacy_put_layout_config(gid: str, body: LayoutConfigBody, _u=Depends(_WRITE)):
     """写入 BOP 版本的共享布局视图配置"""
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -266,8 +378,12 @@ def put_layout_config(gid: str, body: LayoutConfigBody, _u=Depends(_WRITE)):
 
 
 @router.get("/versions/{version_gid}/bop-tree")
-def get_bop_tree(version_gid: str, _u=Depends(_READ)):
+async def get_bop_tree(version_gid: str, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
     """返回 BOP 版本完整层级树 JSON"""
+    return await _invoke_legacy_version_read(request, _u, principal, gateway, "craft.bop.version.legacy_read", "bop_tree", version_gid)
+
+
+def _legacy_get_bop_tree(version_gid: str, _u=Depends(_READ)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("""
@@ -305,8 +421,12 @@ def get_bop_tree(version_gid: str, _u=Depends(_READ)):
 
 
 @router.get("/versions/{version_gid}/station-part-map")
-def get_station_part_map(version_gid: str, _u=Depends(_READ)):
+async def get_station_part_map(version_gid: str, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
     """按工位分组返回零件列表"""
+    return await _invoke_legacy_version_read(request, _u, principal, gateway, "craft.bop.version.legacy_read", "station_part_map", version_gid)
+
+
+def _legacy_get_station_part_map(version_gid: str, _u=Depends(_READ)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("""
@@ -370,7 +490,11 @@ def get_station_part_map(version_gid: str, _u=Depends(_READ)):
 # ── 版本生命周期 ──────────────────────────────────────────────────────────────
 
 @router.post("/versions/{gid}/freeze", status_code=200)
-def freeze_version(gid: str, _u=Depends(_WRITE)):
+async def freeze_version(gid: str, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_version_freeze_change(request, _u, principal, gateway, {"operation": "freeze", "version_gid": gid})
+
+
+def _legacy_freeze_version(gid: str, _u=Depends(_WRITE)):
     """冻结版本：active → baseline，执行快照"""
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -393,7 +517,11 @@ def freeze_version(gid: str, _u=Depends(_WRITE)):
 
 
 @router.post("/versions/{gid}/unfreeze", status_code=200)
-def unfreeze_version(gid: str, _u=Depends(_WRITE)):
+async def unfreeze_version(gid: str, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_version_freeze_change(request, _u, principal, gateway, {"operation": "unfreeze", "version_gid": gid})
+
+
+def _legacy_unfreeze_version(gid: str, _u=Depends(_WRITE)):
     """解冻版本：baseline → active，清除快照"""
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -416,7 +544,11 @@ def unfreeze_version(gid: str, _u=Depends(_WRITE)):
 
 
 @router.post("/versions/{gid}/publish", status_code=200)
-def publish_version(gid: str, _u=Depends(_WRITE)):
+async def publish_version(gid: str, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_version_lifecycle_change(request, _u, principal, gateway, {"operation": "publish", "version_gid": gid})
+
+
+def _legacy_publish_version(gid: str, _u=Depends(_WRITE)):
     """发布版本：baseline → M"""
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -438,7 +570,11 @@ def publish_version(gid: str, _u=Depends(_WRITE)):
 
 
 @router.post("/versions/{gid}/freeze-snapshot", status_code=201)
-def freeze_snapshot(gid: str, body: FreezeSnapshotBody, _u=Depends(_WRITE)):
+async def _freeze_snapshot_endpoint(gid: str, body: FreezeSnapshotBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_version_snapshot_change(request, _u, principal, gateway, {"operation": "freeze_snapshot", "version_gid": gid, **body.model_dump(exclude_unset=True)})
+
+
+def _legacy_freeze_snapshot(gid: str, body: FreezeSnapshotBody, _u=Depends(_WRITE)):
     """
     新版冻结/升版：活动版本原地保持 active，fork 出副本变 baseline/M。
     - 副本携带：当前所有条目/链接快照 + lifecycle_state 快照，保留旧 data_stage
@@ -560,13 +696,26 @@ def freeze_snapshot(gid: str, body: FreezeSnapshotBody, _u=Depends(_WRITE)):
 
 # 别名路由：语义更直观的"升版"入口（行为同 freeze-snapshot）
 @router.post("/versions/{gid}/promote", status_code=201)
-def promote_version(gid: str, body: FreezeSnapshotBody, _u=Depends(_WRITE)):
+async def _promote_version_endpoint(gid: str, body: FreezeSnapshotBody, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_version_snapshot_change(request, _u, principal, gateway, {"operation": "promote", "version_gid": gid, **body.model_dump(exclude_unset=True)})
+
+
+def _legacy_promote_version(gid: str, body: FreezeSnapshotBody, _u=Depends(_WRITE)):
     """升版别名 — 等同于 freeze-snapshot，便于前端语义化调用。"""
-    return freeze_snapshot(gid, body, _u)
+    return _legacy_freeze_snapshot(gid, body, _u)
+
+
+# Keep direct Python callers compatible while FastAPI uses the governed endpoints above.
+freeze_snapshot = _legacy_freeze_snapshot
+promote_version = _legacy_promote_version
 
 
 @router.post("/version-families/{family_gid}/archive", status_code=200)
-def archive_family(family_gid: str, _u=Depends(_WRITE)):
+async def archive_family(family_gid: str, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_version_lifecycle_change(request, _u, principal, gateway, {"operation": "archive_family", "family_gid": family_gid})
+
+
+def _legacy_archive_family(family_gid: str, _u=Depends(_WRITE)):
     """归档版本族"""
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -581,7 +730,11 @@ def archive_family(family_gid: str, _u=Depends(_WRITE)):
 
 
 @router.delete("/version-families/{family_gid}/archive", status_code=200)
-def unarchive_family(family_gid: str, _u=Depends(_WRITE)):
+async def unarchive_family(family_gid: str, request: Request, _u=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_version_lifecycle_change(request, _u, principal, gateway, {"operation": "unarchive_family", "family_gid": family_gid})
+
+
+def _legacy_unarchive_family(family_gid: str, _u=Depends(_WRITE)):
     """解除版本族归档"""
     with get_conn() as conn:
         with conn.cursor() as cur:

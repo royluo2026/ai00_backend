@@ -8,7 +8,7 @@ Create a BOP draft from an empty, version, template or import preview source.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_118d91d38b08fcecd96ddea0005a02b5`
+- Catalog Release：`rel_3010694218f96365eda536567f35d198`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -70,7 +70,35 @@ Create a BOP draft from an empty, version, template or import preview source.
 {
   "additionalProperties": false,
   "properties": {
+    "bop_name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "data_stage": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "factory_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
     "import_preview_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "maturity": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "owner_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "pbom_version_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "project_gid": {
       "minLength": 1,
       "type": "string"
     },
@@ -87,7 +115,14 @@ Create a BOP draft from an empty, version, template or import preview source.
       "minLength": 1,
       "type": "string"
     },
+    "takt_time": {
+      "type": "number"
+    },
     "template_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "vehicle_model_gid": {
       "minLength": 1,
       "type": "string"
     },
@@ -96,6 +131,10 @@ Create a BOP draft from an empty, version, template or import preview source.
       "type": "string"
     },
     "version_tag": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "version_type": {
       "minLength": 1,
       "type": "string"
     }
@@ -113,7 +152,7 @@ Create a BOP draft from an empty, version, template or import preview source.
 ```json
 {
   "capability_id": "craft.bop.version.create",
-  "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
+  "catalog_release": "rel_3010694218f96365eda536567f35d198",
   "major_version": 1,
   "payload": {
     "source": "empty",

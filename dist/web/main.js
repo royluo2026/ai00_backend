@@ -289,6 +289,21 @@ function _hasGrant(grantType, scopeGid = null) {
 
 window._hasGrant = _hasGrant;
 
+// 状态栏显示服务器返回的身份；按钮可见性不能用来推断当前角色。
+function _renderAuthStatus(state = null) {
+  const element = document.getElementById('current-user');
+  if (!element) return;
+  const mode = state?.mode || window._authMode || 'none';
+  const user = state?.user || window._authUser || null;
+  if (window.AuthStateManager?.renderUserStatus) {
+    window.AuthStateManager.renderUserStatus(element, user, mode);
+    return;
+  }
+  element.textContent = user ? (user.name || user.gid || '已登录') : '未登录';
+  element.title = user ? '已通过后端鉴权' : '未登录，尚未完成后端鉴权';
+}
+window._renderAuthStatus = _renderAuthStatus;
+
 function _meetsVisibility(level) {
   const user = window._authUser;
   const role = user?.org_role || user?.system_role || user?.role || 'member';
@@ -491,6 +506,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 立即从 localStorage 读取认证状态，避免状态栏短暂显示"未登录"
   // AuthStateManager.init() 是异步的但基于 localStorage，几乎瞬间完成
   AuthStateManager.init().then(() => {
+    _renderAuthStatus();
     _applyStatusbarFlags();
     NavManager.render();
   }).catch(() => {});
@@ -502,6 +518,7 @@ document.addEventListener('DOMContentLoaded', () => {
   _bindNavSidebar();
   _bindShortcuts();
   _bindStatusbar();
+  _renderAuthStatus();
   _applyStatusbarFlags();   // 用初始默认值先遮住无权限按钮
   // Phase 2：从 PluginRegistry 动态加载 Tab/Nav（补充 manifest 中声明的、硬编码中未包含的条目）
   Promise.all([
@@ -514,6 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window._authMode  = state?.mode  || 'none';
     window._authUser  = state?.user  || null;
     window._authToken = state?.token || '';
+    _renderAuthStatus(state);
     _addCrumb('auth', `登录状态: ${window._authMode}`);
     if (state?.mode === 'feishu') {
       NotifManager.startPolling();
@@ -530,6 +548,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // （工作台有 localStorage 前缀依赖，必须完整重载；其他 Tab 也可能有缓存数据）
     WorkspaceEngine.reloadAllTabs();
   });
+  // auth_state.js 异步补全 /users/me 后更新角色和权限显示。
+  window.addEventListener('ai00-auth-user-updated', () => _renderAuthStatus());
   // 跨窗口主题同步（设置窗口改主题后广播到主窗口）
   window.electronAPI?.onThemeChanged?.((theme) => ThemeManager.applyTheme(theme));
 
@@ -1058,32 +1078,6 @@ window._showCaptureProgress = function(msg) {
   }
 };
 
-function _acceptWebTokenRefresh(refreshedToken, previousToken) {
-  if (!refreshedToken || refreshedToken === previousToken || window.electronAPI?._isElectron !== false) return;
-  localStorage.setItem('ai00_token', refreshedToken);
-  let previousUser = null;
-  try { previousUser = JSON.parse(localStorage.getItem('ai00_user') || 'null'); } catch (_) {}
-  let payload = {};
-  try {
-    const encoded = refreshedToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-    const padded = encoded.padEnd(Math.ceil(encoded.length / 4) * 4, '=');
-    const bytes = Uint8Array.from(atob(padded), ch => ch.charCodeAt(0));
-    payload = JSON.parse(new TextDecoder().decode(bytes));
-  } catch (_) {}
-  const user = {
-    ...(previousUser || {}),
-    gid: payload.sub || previousUser?.gid || '',
-    system_role: payload.system_role || previousUser?.system_role,
-    org_role: payload.org_role || previousUser?.org_role,
-    team_id: payload.team_id || previousUser?.team_id || '',
-    name: payload.name || previousUser?.name || '',
-    email: payload.email || previousUser?.email || '',
-  };
-  localStorage.setItem('ai00_user', JSON.stringify(user));
-  window.dispatchEvent(new CustomEvent('ai00:auth-changed', {
-    detail: { mode: 'feishu', token: refreshedToken, user },
-  }));
-}
 window._cloudFetch = async function(path, opts = {}) {
   const config = (await window.electronAPI?.getConfig?.()) || {};
   const state  = (await window.electronAPI?.authGetState?.()) || {};
@@ -1111,7 +1105,6 @@ window._cloudFetch = async function(path, opts = {}) {
     _netPush({ reqId, method, path, status: 0, ms, ok: false, err: networkErr.message });
     throw networkErr;
   }
-  _acceptWebTokenRefresh(res.headers.get('X-New-Token'), token);
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     const detail = err.detail;

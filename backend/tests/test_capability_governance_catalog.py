@@ -130,5 +130,6 @@ def test_default_test_governance_bootstrap_wires_scan_and_projection_runtime(mon
             {"target_gid": scan["snapshot_gid"], "max_depth": 2, "max_nodes": 500}, object()
         )
         assert any(item.get("binding_type") == "implemented_by" for item in graph["bindings"])
+        assert any(item.get("binding_type") == "tested_by" for item in graph["bindings"])
     finally:
         reset_capability_registry_for_tests()

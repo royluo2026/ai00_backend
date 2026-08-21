@@ -15,6 +15,7 @@ from backend.capability_v2.contracts import (
 from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec
 
 from .contracts import input_schema_for, output_schema_for
+from .reviewed_ids import DEPRECATED_REVIEWED_CAPABILITIES
 
 
 _RESOURCE_FIELDS: dict[str, tuple[tuple[str, str], ...]] = {
@@ -99,8 +100,18 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         for resource_type, payload_path in _RESOURCE_FIELDS.get(spec.id, ())
     )
     updates = {
-        "lifecycle_status": LifecycleStatus.STABLE,
+        "lifecycle_status": (
+            LifecycleStatus.DEPRECATED
+            if spec.id in DEPRECATED_REVIEWED_CAPABILITIES
+            else LifecycleStatus.STABLE
+        ),
+        "deprecation_message": (
+            "Final-wave identity retained for compatibility; no bound Craft "
+            "application outcome is currently registered."
+            if spec.id in DEPRECATED_REVIEWED_CAPABILITIES else None
+        ),
         "exposure": ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True),
+        "exposure_policy_source": "provider_explicit",
         "automation_level": AutomationLevel.A1 if is_write else AutomationLevel.A2,
         "authorization_policy": "craft.v2:" + (",".join(governed.permissions) or "authenticated"),
         "resource_selectors": selectors,

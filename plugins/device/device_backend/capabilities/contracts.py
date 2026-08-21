@@ -28,8 +28,8 @@ INPUT_SCHEMAS = {
     "vismockup.visibility": obj({**DEVICE, "action": {"type": "string", "enum": ["all_on", "all_off", "deselect"]}}, ("device_id", "action")),
     "vismockup.capture": obj(DEVICE, ("device_id",)),
     "local.command.get": obj({"command_id": STRING}, ("command_id",)),
-    "local.device.read": obj({"operation": STRING, "arguments": {}}, ("operation", "arguments")),
-    "local.device.change.apply": obj({"operation": STRING, "arguments": {}}, ("operation", "arguments")),
+    "local.device.read": obj({"operation": {"type": "string", "enum": []}, "arguments": obj({})}, ("operation", "arguments")),
+    "local.device.change.apply": obj({"operation": {"type": "string", "enum": []}, "arguments": obj({})}, ("operation", "arguments")),
 }
 
 QUEUED = obj({
