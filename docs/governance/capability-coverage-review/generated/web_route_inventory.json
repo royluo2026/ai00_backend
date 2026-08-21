@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 384,
-    "capability": 6,
+    "legacy": 375,
+    "capability": 7,
     "allowlisted": 6,
-    "total": 396
+    "total": 388
   },
   "routes": [
     {
@@ -37,7 +37,7 @@
     },
     {
       "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
-      "line": 76,
+      "line": 77,
       "column": 32,
       "route": "/api/flows/capability-manifest",
       "kind": "allowlisted",
@@ -45,7 +45,7 @@
     },
     {
       "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
-      "line": 755,
+      "line": 756,
       "column": 32,
       "route": "/api/flows/test-node",
       "kind": "allowlisted",
@@ -53,7 +53,7 @@
     },
     {
       "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
-      "line": 797,
+      "line": 798,
       "column": 32,
       "route": "/api/flows/gen-script",
       "kind": "allowlisted",
@@ -2645,71 +2645,15 @@
     },
     {
       "source": "web/knowledge_hub/pages/project_info.html",
-      "line": 261,
-      "column": 26,
-      "route": "/api/projects",
-      "kind": "legacy",
+      "line": 233,
+      "column": 29,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
       "method": null
     },
     {
       "source": "web/knowledge_hub/pages/project_info.html",
-      "line": 373,
-      "column": 40,
-      "route": "/api/projects",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "web/knowledge_hub/pages/project_info.html",
-      "line": 374,
-      "column": 45,
-      "route": "/api/projects/${gid}",
-      "kind": "legacy",
-      "method": "PATCH"
-    },
-    {
-      "source": "web/knowledge_hub/pages/project_info.html",
-      "line": 375,
-      "column": 39,
-      "route": "/api/projects/${gid}",
-      "kind": "legacy",
-      "method": "DELETE"
-    },
-    {
-      "source": "web/knowledge_hub/pages/project_info.html",
-      "line": 390,
-      "column": 26,
-      "route": "/api/projects/vehicle_models",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/knowledge_hub/pages/project_info.html",
-      "line": 437,
-      "column": 40,
-      "route": "/api/projects/vehicle_models",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "web/knowledge_hub/pages/project_info.html",
-      "line": 438,
-      "column": 45,
-      "route": "/api/projects/vehicle_models/${gid}",
-      "kind": "legacy",
-      "method": "PATCH"
-    },
-    {
-      "source": "web/knowledge_hub/pages/project_info.html",
-      "line": 439,
-      "column": 39,
-      "route": "/api/projects/vehicle_models/${gid}",
-      "kind": "legacy",
-      "method": "DELETE"
-    },
-    {
-      "source": "web/knowledge_hub/pages/project_info.html",
-      "line": 455,
+      "line": 471,
       "column": 26,
       "route": "/api/bop/factories",
       "kind": "legacy",
@@ -2717,7 +2661,7 @@
     },
     {
       "source": "web/knowledge_hub/pages/project_info.html",
-      "line": 484,
+      "line": 500,
       "column": 40,
       "route": "/api/bop/factories",
       "kind": "legacy",
@@ -2725,7 +2669,7 @@
     },
     {
       "source": "web/knowledge_hub/pages/project_info.html",
-      "line": 485,
+      "line": 501,
       "column": 45,
       "route": "/api/bop/factories/${gid}",
       "kind": "legacy",
@@ -2733,7 +2677,7 @@
     },
     {
       "source": "web/knowledge_hub/pages/project_info.html",
-      "line": 486,
+      "line": 502,
       "column": 39,
       "route": "/api/bop/factories/${gid}",
       "kind": "legacy",
@@ -2741,15 +2685,7 @@
     },
     {
       "source": "web/knowledge_hub/pages/project_info.html",
-      "line": 515,
-      "column": 10,
-      "route": "/api/projects/vehicle_models",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/knowledge_hub/pages/project_info.html",
-      "line": 517,
+      "line": 533,
       "column": 10,
       "route": "/api/bop/factories",
       "kind": "legacy",
