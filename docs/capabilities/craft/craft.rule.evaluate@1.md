@@ -8,7 +8,7 @@ craft.rule.evaluate
 - 不适用：Rules are unreviewed or inputs are mutable.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_3010694218f96365eda536567f35d198`
+- Catalog Release：`rel_2ea663d74c22d76684117ecc24c0d891`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -101,7 +101,7 @@ craft.rule.evaluate
 ```json
 {
   "capability_id": "craft.rule.evaluate",
-  "catalog_release": "rel_3010694218f96365eda536567f35d198",
+  "catalog_release": "rel_2ea663d74c22d76684117ecc24c0d891",
   "major_version": 1,
   "payload": {}
 }

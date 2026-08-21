@@ -8,7 +8,7 @@ Create, update, or delete a Base export template.
 - 不适用：The consumer only needs to list templates.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_3010694218f96365eda536567f35d198`
+- Catalog Release：`rel_2ea663d74c22d76684117ecc24c0d891`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -138,7 +138,7 @@ Create, update, or delete a Base export template.
 ```json
 {
   "capability_id": "base.export_template.change.apply",
-  "catalog_release": "rel_3010694218f96365eda536567f35d198",
+  "catalog_release": "rel_2ea663d74c22d76684117ecc24c0d891",
   "major_version": 1,
   "payload": {
     "operation": "create"

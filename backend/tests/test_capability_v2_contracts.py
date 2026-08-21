@@ -13,6 +13,7 @@ from backend.capability_v2.contracts import (
     ConsumerDescriptor,
     ConsumerIdentity,
     ConsumerType,
+    DomainErrorContract,
     ExecutionBudget,
     ExposurePolicy,
     InvocationEnvelope,
@@ -189,6 +190,49 @@ def test_v1_adapter_is_experimental_and_never_infers_plugin_or_agent_write_acces
     assert descriptor.automation_level is AutomationLevel.A1
     assert descriptor.input_schema["additionalProperties"] is False
     assert descriptor.output_schema["additionalProperties"] is False
+
+
+def test_v21_descriptor_exposes_independent_business_and_error_contract_fields():
+    descriptor = CapabilityDescriptorV2(
+        id="craft.routing.get",
+        major_version=1,
+        owner_domain="craft",
+        title="Get routing",
+        description="Return one routing.",
+        use_when="A caller needs one routing.",
+        do_not_use_when="A caller needs to publish a routing.",
+        business_effect="Returns one routing version.",
+        side_effect_level="read",
+        side_effects="Reads the routing projection without changing domain state.",
+        exposure=ExposurePolicy(web=True, api=True),
+        automation_level=AutomationLevel.A2,
+        authorization_policy="craft.routing.read",
+        capability_version_gid="cv2_craft_routing_get_1",
+        error_schema=({
+            "error_code": "invalid_input",
+            "message_template": "Routing identifier is invalid.",
+            "is_retryable": False,
+            "is_caller_error": True,
+        },),
+        transaction_policy={"mode": "none", "boundary": "provider"},
+        consumer_refs=("web.craft.routing",),
+        provider_ref="craft.provider.routing",
+        api_refs=("gateway.capability.invoke",),
+        test_refs=({"path": "backend/tests/test_craft_capability_contracts.py", "result": "passed"},),
+        input_schema={"type": "object", "properties": {}, "additionalProperties": False},
+        output_schema={"type": "object", "properties": {}, "additionalProperties": False},
+        schema_hash="sha256:" + "0" * 64,
+        domain_errors=(DomainErrorContract(
+            code="invalid_input", meaning="Routing identifier is invalid.", is_caller_error=True,
+        ),),
+        domain_errors_complete=True,
+    )
+
+    assert descriptor.business_effect != descriptor.description
+    assert descriptor.side_effect_level.value == "read"
+    assert descriptor.side_effects.startswith("Reads")
+    assert descriptor.error_schema[0]["is_caller_error"] is True
+    assert descriptor.domain_errors[0].is_caller_error is True
 
 
 def test_v1_adapter_preserves_explicit_execution_budget():

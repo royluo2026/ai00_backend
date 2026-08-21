@@ -8,7 +8,7 @@ Create an immutable artifact-backed Digital Model snapshot.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`digital_model`
-- Catalog Release：`rel_3010694218f96365eda536567f35d198`
+- Catalog Release：`rel_2ea663d74c22d76684117ecc24c0d891`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -177,7 +177,7 @@ Create an immutable artifact-backed Digital Model snapshot.
 ```json
 {
   "capability_id": "digital_model.version.create",
-  "catalog_release": "rel_3010694218f96365eda536567f35d198",
+  "catalog_release": "rel_2ea663d74c22d76684117ecc24c0d891",
   "major_version": 1,
   "payload": {
     "artifact_ref": {

@@ -20,6 +20,7 @@ from backend.capability_v2.catalog_store import InMemoryCatalogStore, SqlCatalog
 from backend.capability_v2.contracts import (
     AutomationLevel,
     CapabilityDescriptorV2,
+    DomainErrorContract,
     ExposurePolicy,
     ExecutionBudget,
     LifecycleStatus,
@@ -65,6 +66,17 @@ def test_catalog_hash_is_order_independent_and_binds_provider_artifacts():
     assert forward.catalog_hash == reverse.catalog_hash
     assert forward.release_id == reverse.release_id
     assert forward.catalog_hash != changed_provider.catalog_hash
+
+
+def test_catalog_hash_normalizes_derived_error_schema_from_domain_errors():
+    descriptor = _descriptor("craft.routing.get").model_copy(update={
+        "domain_errors": (DomainErrorContract(code="invalid_input", meaning="Invalid routing."),),
+        "domain_errors_complete": True,
+    })
+
+    release = build_release([descriptor])
+
+    assert release.descriptors[0].error_schema[0]["error_code"] == "invalid_input"
 
 
 def test_catalog_hash_binds_execution_budget():

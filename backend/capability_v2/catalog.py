@@ -80,6 +80,19 @@ def canonical_catalog_bytes(
 
 def _descriptor_document(item: CapabilityDescriptorV2) -> dict:
     document = item.model_dump(mode="json")
+    # Pydantic re-validation materializes the V2.1 error projection from the
+    # legacy domain_errors tuple. Normalize before hashing so the release hash
+    # is identical before and after CatalogRelease validation.
+    if not document.get("error_schema") and document.get("domain_errors"):
+        document["error_schema"] = [
+            {
+                "error_code": error["code"],
+                "message_template": error["meaning"],
+                "is_retryable": error.get("retryable", False),
+                "is_caller_error": error.get("is_caller_error", False),
+            }
+            for error in document["domain_errors"]
+        ]
     # Preserve hashes of releases created before this additive optional field existed.
     if document.get("agent_output_schema") is None:
         document.pop("agent_output_schema", None)

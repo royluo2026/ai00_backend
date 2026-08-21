@@ -135,6 +135,16 @@ class DomainErrorContract(FrozenModel):
     code: str = Field(pattern=CAPABILITY_ID_PATTERN)
     meaning: str = Field(min_length=1, max_length=2000)
     retryable: bool = False
+    # V2.1 keeps caller-fixability explicit; it must not be inferred from retryable.
+    is_caller_error: bool = False
+
+    def as_error_schema_entry(self) -> dict[str, object]:
+        return {
+            "error_code": self.code,
+            "message_template": self.meaning,
+            "is_retryable": self.retryable,
+            "is_caller_error": self.is_caller_error,
+        }
 
 
 class ActorIdentity(FrozenModel):
@@ -306,7 +316,10 @@ class CapabilityDescriptorV2(FrozenModel):
     description: str = Field(min_length=1, max_length=4000)
     use_when: str = Field(min_length=1, max_length=4000)
     do_not_use_when: str = Field(min_length=1, max_length=4000)
+    # V2.1 names the business outcome separately from the human description.
+    business_effect: str | None = Field(default=None, max_length=4000)
     side_effect_level: SideEffectLevel = SideEffectLevel.READ
+    side_effects: str | None = Field(default=None, max_length=4000)
     execution_mode: ExecutionMode = ExecutionMode.CLOUD_SYNC
     exposure: ExposurePolicy
     # Exposure must come from an explicitly reviewed provider policy. The
@@ -338,6 +351,15 @@ class CapabilityDescriptorV2(FrozenModel):
     deprecation_message: str | None = Field(default=None, max_length=2000)
     domain_errors: tuple[DomainErrorContract, ...] = ()
     domain_errors_complete: bool = False
+    # V2.1 governance projection fields. Legacy adapters may leave these empty;
+    # the Catalog audit requires them before a descriptor can be released stable.
+    capability_version_gid: str | None = Field(default=None, min_length=1, max_length=255)
+    error_schema: tuple[Mapping[str, Any], ...] = ()
+    transaction_policy: Mapping[str, Any] = Field(default_factory=dict)
+    consumer_refs: tuple[str, ...] = ()
+    provider_ref: str | None = Field(default=None, min_length=1, max_length=512)
+    api_refs: tuple[str, ...] = ()
+    test_refs: tuple[Mapping[str, Any], ...] = ()
 
     @model_validator(mode="after")
     def public_schemas_are_closed(self) -> "CapabilityDescriptorV2":
@@ -354,4 +376,10 @@ class CapabilityDescriptorV2(FrozenModel):
         codes = [item.code for item in self.domain_errors]
         if len(codes) != len(set(codes)):
             raise ValueError("duplicate domain error contract")
+        if not self.error_schema and self.domain_errors:
+            object.__setattr__(
+                self,
+                "error_schema",
+                tuple(item.as_error_schema_entry() for item in self.domain_errors),
+            )
         return self

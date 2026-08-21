@@ -46,6 +46,13 @@ def descriptor_from_provider_spec(spec: CapabilitySpec) -> CapabilityDescriptorV
     execution_mode = ExecutionMode.LOCAL if spec.execution is CapabilityExecution.LOCAL else ExecutionMode.CLOUD_SYNC
     description = spec.description.strip() or f"Capability {spec.id}."
     permissions = ",".join(spec.permissions) or "authenticated"
+    capability_version_gid = "cv2_" + hashlib.sha256(
+        f"{spec.id}@{spec.version}".encode("utf-8")
+    ).hexdigest()[:24]
+    side_effects = (
+        "Reads domain state without mutation."
+        if is_read else "Writes domain state through the owning Provider."
+    )
     execution_budget = ExecutionBudget.model_validate(
         spec.execution_budget.model_dump(mode="json") if spec.execution_budget is not None else {}
     )
@@ -54,13 +61,18 @@ def descriptor_from_provider_spec(spec: CapabilitySpec) -> CapabilityDescriptorV
         lifecycle_status="experimental", title=spec.id, description=description,
         use_when=spec.use_when.strip() or description,
         do_not_use_when=spec.do_not_use_when.strip() or "Use the owning domain's governed Capability.",
-        side_effect_level=SideEffectLevel(spec.risk.value), execution_mode=execution_mode,
+        business_effect=description,
+        side_effect_level=SideEffectLevel(spec.risk.value), side_effects=side_effects,
+        execution_mode=execution_mode,
         exposure=ExposurePolicy(web=True, api=True, plugin=bool(is_read and spec.plugin_callable),
             agent=bool(is_read and execution_mode is not ExecutionMode.LOCAL), mcp=bool(is_read and execution_mode is not ExecutionMode.LOCAL)),
         automation_level=AutomationLevel.A2 if is_read and spec.confirmation == "none" else AutomationLevel.A1,
         authorization_policy=f"legacy:{permissions}", input_schema=input_schema, output_schema=output_schema,
         agent_output_schema=output_schema if is_read and execution_mode is not ExecutionMode.LOCAL else None,
         schema_hash=_schema_hash(input_schema, output_schema),
+        capability_version_gid=capability_version_gid,
+        transaction_policy={"mode": "provider", "boundary": "owning_domain"},
+        provider_ref=f"{_OWNER_ALIASES.get(spec.owner, spec.owner)}.provider",
         operation_policy="required" if execution_mode is ExecutionMode.LOCAL else "none",
         execution_budget=execution_budget,
         idempotency_policy="optional" if not is_read and spec.idempotent else "none",
