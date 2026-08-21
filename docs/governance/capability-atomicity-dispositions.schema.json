@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["schema_version", "dispositions"],
+  "properties": {
+    "schema_version": {"const": "1"},
+    "dispositions": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/Disposition"}
+    }
+  },
+  "$defs": {
+    "Disposition": {
+      "type": "object",
+      "required": ["capability_id", "major_version", "disposition", "evidence_refs"],
+      "properties": {
+        "capability_id": {"type": "string", "minLength": 1},
+        "major_version": {"type": "integer", "minimum": 1},
+        "disposition": {"enum": ["split", "justified", "retire"]},
+        "replacement_capabilities": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "evidence_refs": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "approval_reference": {"type": "string", "minLength": 1},
+        "expires_on": {"type": "string", "format": "date"}
+      },
+      "additionalProperties": false
+    }
+  }
+}
