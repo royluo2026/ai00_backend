@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "domain": "Craft",
+  "reviewed_against": "atomic EBOM Capability split implemented on 2026-08-21",
+  "capabilities": {
+    "craft.ebom.part.bulk_create": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.ebom.part.bulk_create": {
+          "resolution": "existing_capability",
+          "source_paths": ["plugins/craft/craft_backend/capabilities/contracts.py", "plugins/craft/craft_backend/capabilities/ebom_part_change.py", "plugins/craft/craft_backend/capabilities/ebom_vpps_stats_change.py"],
+          "owner": "Craft",
+          "evidence": "The frozen Catalog contains a bounded atomic Provider for bulk EBOM part creation.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-21"
+        }
+      }
+    },
+    "craft.ebom.part.create": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.ebom.part.create": {
+          "resolution": "existing_capability",
+          "source_paths": ["plugins/craft/craft_backend/capabilities/contracts.py", "plugins/craft/craft_backend/capabilities/ebom_part_change.py", "plugins/craft/craft_backend/capabilities/ebom_vpps_stats_change.py"],
+          "owner": "Craft",
+          "evidence": "The frozen Catalog contains a bounded atomic Provider for EBOM part creation.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-21"
+        }
+      }
+    },
+    "craft.ebom.part.delete": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.ebom.part.delete": {
+          "resolution": "existing_capability",
+          "source_paths": ["plugins/craft/craft_backend/capabilities/contracts.py", "plugins/craft/craft_backend/capabilities/ebom_part_change.py", "plugins/craft/craft_backend/capabilities/ebom_vpps_stats_change.py"],
+          "owner": "Craft",
+          "evidence": "The frozen Catalog contains a bounded atomic Provider for EBOM part deletion.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-21"
+        }
+      }
+    },
+    "craft.ebom.part.update": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.ebom.part.update": {
+          "resolution": "existing_capability",
+          "source_paths": ["plugins/craft/craft_backend/capabilities/contracts.py", "plugins/craft/craft_backend/capabilities/ebom_part_change.py", "plugins/craft/craft_backend/capabilities/ebom_vpps_stats_change.py"],
+          "owner": "Craft",
+          "evidence": "The frozen Catalog contains a bounded atomic Provider for EBOM part updates.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-21"
+        }
+      }
+    },
+    "craft.ebom.snapshot.delete": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.ebom.snapshot.delete": {
+          "resolution": "existing_capability",
+          "source_paths": ["plugins/craft/craft_backend/capabilities/contracts.py", "plugins/craft/craft_backend/capabilities/ebom_snapshot_change.py"],
+          "owner": "Craft",
+          "evidence": "The frozen Catalog contains a bounded atomic Provider for EBOM snapshot deletion.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-21"
+        }
+      }
+    },
+    "craft.ebom.snapshot.status.update": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.ebom.snapshot.status.update": {
+          "resolution": "existing_capability",
+          "source_paths": ["plugins/craft/craft_backend/capabilities/contracts.py", "plugins/craft/craft_backend/capabilities/ebom_snapshot_status_change.py"],
+          "owner": "Craft",
+          "evidence": "The frozen Catalog contains a bounded atomic Provider for EBOM snapshot status transitions.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-21"
+        }
+      }
+    },
+    "craft.ebom.snapshot.update": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.ebom.snapshot.update": {
+          "resolution": "existing_capability",
+          "source_paths": ["plugins/craft/craft_backend/capabilities/contracts.py", "plugins/craft/craft_backend/capabilities/ebom_snapshot_change.py"],
+          "owner": "Craft",
+          "evidence": "The frozen Catalog contains a bounded atomic Provider for EBOM snapshot updates.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-21"
+        }
+      }
+    },
+    "craft.ebom.snapshot.vpps_stats.update": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.ebom.snapshot.vpps_stats.update": {
+          "resolution": "existing_capability",
+          "source_paths": ["plugins/craft/craft_backend/capabilities/contracts.py", "plugins/craft/craft_backend/capabilities/ebom_vpps_stats_change.py"],
+          "owner": "Craft",
+          "evidence": "The frozen Catalog contains a bounded atomic Provider for EBOM VPPS statistics updates.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-21"
+        }
+      }
+    }
+  }
+}

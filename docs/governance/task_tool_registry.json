@@ -1,0 +1,1 @@
+{"registry_kind":"task_tool","entries":[{"task_id":"task.capability_catalog.audit","capability_id":"system.search","owner_domain":"base","provider_ref":"base.provider","source":"backend/scripts/check_capability_v2_catalog_audit.py","test_refs":["backend/tests/test_capability_v2_catalog_audit.py"]}]}

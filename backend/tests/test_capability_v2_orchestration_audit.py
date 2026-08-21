@@ -1,0 +1,26 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from backend.capability_v2.orchestration_audit import audit_orchestration_registry
+
+
+def test_orchestration_registry_audit_requires_catalog_capability(tmp_path: Path) -> None:
+    registry = tmp_path / "registry.json"
+    registry.write_text(json.dumps({
+        "registry_kind": "task_tool",
+        "entries": [{"task_id": "task-1", "capability_id": "base.missing", "owner_domain": "base"}],
+    }), encoding="utf-8")
+
+    report = audit_orchestration_registry(registry, {"capabilities": [{"id": "base.present"}]})
+
+    assert report.missing_capabilities == ("task-1:base.missing",)
+    assert report.passed is False
+
+
+def test_current_orchestration_registries_are_bound() -> None:
+    import json as _json
+    catalog = _json.loads(Path("docs/capabilities/catalog.v2.json").read_text(encoding="utf-8"))
+    for name in ("task_tool_registry.json", "bff_capability_registry.json", "business_capability_ledger.json"):
+        assert audit_orchestration_registry(Path("docs/governance") / name, catalog).passed

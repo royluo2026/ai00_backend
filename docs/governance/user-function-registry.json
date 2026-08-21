@@ -2950,6 +2950,102 @@
         "plugins/craft/craft_backend/capabilities/ebom_legacy_read.py"
       ]
     },
+    "capability:craft.ebom.part.bulk_create": {
+      "function_id": "capability:craft.ebom.part.bulk_create",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.ebom.part.bulk_create",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/ebom_part_change.py",
+        "plugins/craft/craft_backend/capabilities/ebom_vpps_stats_change.py"
+      ]
+    },
+    "capability:craft.ebom.part.create": {
+      "function_id": "capability:craft.ebom.part.create",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.ebom.part.create",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/ebom_part_change.py",
+        "plugins/craft/craft_backend/capabilities/ebom_vpps_stats_change.py"
+      ]
+    },
+    "capability:craft.ebom.part.delete": {
+      "function_id": "capability:craft.ebom.part.delete",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.ebom.part.delete",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/ebom_part_change.py",
+        "plugins/craft/craft_backend/capabilities/ebom_vpps_stats_change.py"
+      ]
+    },
+    "capability:craft.ebom.part.update": {
+      "function_id": "capability:craft.ebom.part.update",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.ebom.part.update",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/ebom_part_change.py",
+        "plugins/craft/craft_backend/capabilities/ebom_vpps_stats_change.py"
+      ]
+    },
     "capability:craft.ebom.read": {
       "function_id": "capability:craft.ebom.read",
       "domain": "Craft",
@@ -2971,6 +3067,98 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+      ]
+    },
+    "capability:craft.ebom.snapshot.delete": {
+      "function_id": "capability:craft.ebom.snapshot.delete",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.ebom.snapshot.delete",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/ebom_snapshot_change.py"
+      ]
+    },
+    "capability:craft.ebom.snapshot.status.update": {
+      "function_id": "capability:craft.ebom.snapshot.status.update",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.ebom.snapshot.status.update",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/ebom_snapshot_status_change.py"
+      ]
+    },
+    "capability:craft.ebom.snapshot.update": {
+      "function_id": "capability:craft.ebom.snapshot.update",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.ebom.snapshot.update",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/ebom_snapshot_change.py"
+      ]
+    },
+    "capability:craft.ebom.snapshot.vpps_stats.update": {
+      "function_id": "capability:craft.ebom.snapshot.vpps_stats.update",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.ebom.snapshot.vpps_stats.update",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/ebom_vpps_stats_change.py"
       ]
     },
     "capability:craft.ebom.vpps_check.read": {

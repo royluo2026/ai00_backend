@@ -23,6 +23,7 @@ class CatalogAuditReport:
     required_field_missing_counts: dict[str, int] = field(default_factory=dict)
     invalid_error_schema_count: int = 0
     test_evidence_not_run_count: int = 0
+    invalid_test_ref_count: int = 0
 
     @property
     def missing_fields(self) -> dict[str, int]:
@@ -38,6 +39,7 @@ class CatalogAuditReport:
             "required_field_missing_counts": self.missing_fields,
             "invalid_error_schema_count": self.invalid_error_schema_count,
             "test_evidence_not_run_count": self.test_evidence_not_run_count,
+            "invalid_test_ref_count": self.invalid_test_ref_count,
         }
 
 
@@ -68,6 +70,7 @@ def audit_catalog(path: Path) -> CatalogAuditReport:
     }
     invalid_error_schema = 0
     test_evidence_not_run = 0
+    invalid_test_refs = 0
     for entry in stable:
         capability_id = entry.get("id")
         if not isinstance(capability_id, str) or not capability_id:
@@ -111,6 +114,13 @@ def audit_catalog(path: Path) -> CatalogAuditReport:
             for item in test_refs
         ):
             test_evidence_not_run += 1
+        if not isinstance(test_refs, list) or any(
+            not isinstance(item, dict)
+            or not {"test_type", "test_node_id", "code_revision", "result"} <= set(item)
+            or item.get("result") not in {"pass", "fail", "not_run", "skipped"}
+            for item in (test_refs if isinstance(test_refs, list) else [{}])
+        ):
+            invalid_test_refs += 1
     return CatalogAuditReport(
         stable_count=len(stable),
         generic_operation_count=len(generic_ids),
@@ -120,6 +130,7 @@ def audit_catalog(path: Path) -> CatalogAuditReport:
         required_field_missing_counts=dict(sorted(missing_fields.items())),
         invalid_error_schema_count=invalid_error_schema,
         test_evidence_not_run_count=test_evidence_not_run,
+        invalid_test_ref_count=invalid_test_refs,
     )
 
 

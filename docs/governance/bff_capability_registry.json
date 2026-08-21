@@ -1,0 +1,1 @@
+{"registry_kind":"bff_capability","entries":[{"route_id":"bff.capability.invoke","route_path":"/api/v1/capabilities/{capability_id}:invoke","method":"POST","capability_id":"system.search","owner_domain":"base","source":"backend/routers/capabilities.py"}]}

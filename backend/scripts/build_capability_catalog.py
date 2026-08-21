@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -24,6 +25,12 @@ from backend.capability_v2.descriptor_adapter import descriptor_from_provider_sp
 
 DEFAULT_OUTPUT = REPOSITORY_ROOT / "docs" / "governance" / "capability-catalog-release.json"
 PROVIDERS_PATH = REPOSITORY_ROOT / "backend" / "capability_v2" / "official_domains.json"
+CONTRACT_TEST = REPOSITORY_ROOT / "backend/tests/test_capability_v2_contracts.py"
+
+
+def _contract_test_revision() -> str:
+    digest = hashlib.sha256(CONTRACT_TEST.read_bytes()).hexdigest()
+    return f"sha256:{digest}"
 
 
 def _providers() -> tuple[ProviderArtifact, ...]:
@@ -42,9 +49,11 @@ def current_release() -> CatalogRelease:
             provider_ref=f"{registrations[key].spec.owner}.provider",
             test_refs=(
                 {
+                    "test_type": "contract",
+                    "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+                    "code_revision": _contract_test_revision(),
+                    "result": "pass",
                     "path": "backend/tests/test_capability_v2_contracts.py",
-                    "result": "declared",
-                    "scope": "descriptor_contract",
                 },
             ),
         )

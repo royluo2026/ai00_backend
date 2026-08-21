@@ -8,7 +8,7 @@ Execute Project Management operation notifications.mark_read.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_64f64e8b3837de2d02b0a06181881ca7`
+- Catalog Release：`rel_7dd59a4ffa1f9c6a7f0fb85bfedae6af`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -326,7 +326,7 @@ Execute Project Management operation notifications.mark_read.
 ```json
 {
   "capability_id": "project.notification.change.apply.atomic.notifications_mark_read",
-  "catalog_release": "rel_64f64e8b3837de2d02b0a06181881ca7",
+  "catalog_release": "rel_7dd59a4ffa1f9c6a7f0fb85bfedae6af",
   "major_version": 1,
   "payload": {}
 }

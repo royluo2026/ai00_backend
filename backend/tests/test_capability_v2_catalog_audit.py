@@ -84,6 +84,7 @@ def test_audit_catalog_reports_missing_v21_fields_and_unrun_test_evidence(tmp_pa
     assert report.required_field_missing_counts["provider_ref"] == 1
     assert report.required_field_missing_counts["business_effect"] == 1
     assert report.test_evidence_not_run_count == 1
+    assert report.invalid_test_ref_count == 1
 
 
 def test_audit_catalog_fails_closed_for_missing_catalog(tmp_path: Path) -> None:
