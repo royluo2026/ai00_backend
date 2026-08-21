@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 375,
-    "capability": 7,
+    "legacy": 350,
+    "capability": 8,
     "allowlisted": 6,
-    "total": 388
+    "total": 364
   },
   "routes": [
     {
@@ -2445,203 +2445,11 @@
     },
     {
       "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 354,
-      "column": 26,
-      "route": "/api/factory/tools",
-      "kind": "legacy",
+      "line": 324,
+      "column": 29,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
       "method": null
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 393,
-      "column": 40,
-      "route": "/api/factory/tools",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 394,
-      "column": 45,
-      "route": "/api/factory/tools/${gid}",
-      "kind": "legacy",
-      "method": "PATCH"
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 395,
-      "column": 39,
-      "route": "/api/factory/tools/${gid}",
-      "kind": "legacy",
-      "method": "DELETE"
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 402,
-      "column": 43,
-      "route": "/api/factory/tools",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 420,
-      "column": 26,
-      "route": "/api/factory/equipments",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 459,
-      "column": 40,
-      "route": "/api/factory/equipments",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 460,
-      "column": 45,
-      "route": "/api/factory/equipments/${gid}",
-      "kind": "legacy",
-      "method": "PATCH"
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 461,
-      "column": 39,
-      "route": "/api/factory/equipments/${gid}",
-      "kind": "legacy",
-      "method": "DELETE"
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 468,
-      "column": 43,
-      "route": "/api/factory/equipments",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 486,
-      "column": 26,
-      "route": "/api/factory/fixtures",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 525,
-      "column": 40,
-      "route": "/api/factory/fixtures",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 526,
-      "column": 45,
-      "route": "/api/factory/fixtures/${gid}",
-      "kind": "legacy",
-      "method": "PATCH"
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 527,
-      "column": 39,
-      "route": "/api/factory/fixtures/${gid}",
-      "kind": "legacy",
-      "method": "DELETE"
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 534,
-      "column": 43,
-      "route": "/api/factory/fixtures",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 550,
-      "column": 26,
-      "route": "/api/factory/sections",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 601,
-      "column": 40,
-      "route": "/api/factory/sections",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 602,
-      "column": 45,
-      "route": "/api/factory/sections/${gid}",
-      "kind": "legacy",
-      "method": "PATCH"
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 603,
-      "column": 39,
-      "route": "/api/factory/sections/${gid}",
-      "kind": "legacy",
-      "method": "DELETE"
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 615,
-      "column": 43,
-      "route": "/api/factory/sections",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 631,
-      "column": 26,
-      "route": "/api/factory/stations",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 692,
-      "column": 40,
-      "route": "/api/factory/stations",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 693,
-      "column": 45,
-      "route": "/api/factory/stations/${gid}",
-      "kind": "legacy",
-      "method": "PATCH"
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 694,
-      "column": 39,
-      "route": "/api/factory/stations/${gid}",
-      "kind": "legacy",
-      "method": "DELETE"
-    },
-    {
-      "source": "web/knowledge_hub/pages/factory_info.html",
-      "line": 707,
-      "column": 43,
-      "route": "/api/factory/stations",
-      "kind": "legacy",
-      "method": "POST"
     },
     {
       "source": "web/knowledge_hub/pages/project_info.html",
