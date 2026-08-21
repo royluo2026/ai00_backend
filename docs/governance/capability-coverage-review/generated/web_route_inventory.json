@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 350,
-    "capability": 8,
+    "legacy": 343,
+    "capability": 9,
     "allowlisted": 6,
-    "total": 364
+    "total": 358
   },
   "routes": [
     {
@@ -2261,7 +2261,15 @@
     },
     {
       "source": "web/canvas/types/flow_type.js",
-      "line": 115,
+      "line": 112,
+      "column": 33,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "web/canvas/types/flow_type.js",
+      "line": 129,
       "column": 19,
       "route": "/api/flows/capability-manifest",
       "kind": "allowlisted",
@@ -2269,63 +2277,7 @@
     },
     {
       "source": "web/canvas/types/flow_type.js",
-      "line": 117,
-      "column": 19,
-      "route": "/api/flows/${gid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/canvas/types/flow_type.js",
-      "line": 119,
-      "column": 19,
-      "route": "/api/flows",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "web/canvas/types/flow_type.js",
-      "line": 121,
-      "column": 19,
-      "route": "/api/flows/${gid}",
-      "kind": "legacy",
-      "method": "PUT"
-    },
-    {
-      "source": "web/canvas/types/flow_type.js",
-      "line": 123,
-      "column": 19,
-      "route": "/api/flows/${gid}/run",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "web/canvas/types/flow_type.js",
-      "line": 125,
-      "column": 19,
-      "route": "/api/flows/runs/${runGid}/step",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "web/canvas/types/flow_type.js",
-      "line": 127,
-      "column": 19,
-      "route": "/api/flows/runs/${runGid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/canvas/types/flow_type.js",
-      "line": 129,
-      "column": 19,
-      "route": "/api/flows/${gid}/runs",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/canvas/types/flow_type.js",
-      "line": 131,
+      "line": 145,
       "column": 19,
       "route": "/api/flows/test-node",
       "kind": "allowlisted",
@@ -2333,7 +2285,7 @@
     },
     {
       "source": "web/canvas/types/flow_type.js",
-      "line": 768,
+      "line": 782,
       "column": 45,
       "route": "/api/flows/gen-script",
       "kind": "allowlisted",
