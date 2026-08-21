@@ -13,8 +13,8 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 343,
-    "capability": 9,
+    "legacy": 342,
+    "capability": 10,
     "allowlisted": 6,
     "total": 358
   },
@@ -2453,15 +2453,15 @@
     },
     {
       "source": "web/my_files/my_files.js",
-      "line": 118,
-      "column": 11,
-      "route": "/api/bop/versions",
-      "kind": "legacy",
+      "line": 92,
+      "column": 30,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
       "method": null
     },
     {
       "source": "web/my_files/my_files.js",
-      "line": 626,
+      "line": 650,
       "column": 24,
       "route": "/api/projects",
       "kind": "legacy",
@@ -2469,7 +2469,7 @@
     },
     {
       "source": "web/my_files/my_files.js",
-      "line": 628,
+      "line": 652,
       "column": 24,
       "route": "/api/bop/versions",
       "kind": "legacy",
@@ -2477,7 +2477,7 @@
     },
     {
       "source": "web/my_files/my_files.js",
-      "line": 904,
+      "line": 928,
       "column": 29,
       "route": "/api/bop/versions",
       "kind": "legacy",
@@ -2485,7 +2485,7 @@
     },
     {
       "source": "web/my_files/my_files.js",
-      "line": 913,
+      "line": 937,
       "column": 29,
       "route": "/api/bop/versions/${srcGid}/fork",
       "kind": "legacy",
@@ -2493,7 +2493,7 @@
     },
     {
       "source": "web/my_files/my_files.js",
-      "line": 923,
+      "line": 947,
       "column": 29,
       "route": "/api/bop/versions/${srcGid}/smart-fork",
       "kind": "legacy",
