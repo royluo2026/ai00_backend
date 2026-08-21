@@ -99,3 +99,12 @@ def test_atomicity_audit_fails_expired_justification_and_missing_replacement(tmp
     assert report.expired_ids == ("project.change.apply@1",)
     assert report.missing_replacement_ids == ("project.read@1",)
     assert report.passed is False
+
+
+def test_current_catalog_has_a_governed_replacement_for_every_generic_operation() -> None:
+    catalog = json.loads(Path("docs/capabilities/catalog.v2.json").read_text(encoding="utf-8"))
+    report = audit_generic_operations(
+        catalog,
+        load_atomicity_dispositions(Path("docs/governance/capability-atomicity-dispositions.json")),
+    )
+    assert report.passed is True

@@ -214,7 +214,7 @@
         "plugin_id": "official.knowledge",
         "module": "knowledge_backend.capabilities",
         "version": "2.0.0",
-        "artifact_hash": "sha256:9065a80cf151bcb8c344e6879f3392f6bfa43b342a8152659e44e05a9a127475"
+        "artifact_hash": "sha256:204e363149456811aebc9ccb7b82a4ed649b140bdd795628815d7dfd9547e68c"
       },
       "artifact_path": "plugins/knowledge/knowledge_backend",
       "allowed_owners": [
@@ -268,7 +268,7 @@
         "plugin_id": "official.project-management",
         "module": "project_management_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:f544796664ad3c848116c0d34f9b94b870b8f5bb235e3481ae611f935b22c3e2"
+        "artifact_hash": "sha256:100b536536edbe43d22e2d4b914b67f407f90cf568431aee38923dbc96114564"
       },
       "artifact_path": "plugins/project_management/project_management_backend",
       "allowed_owners": [

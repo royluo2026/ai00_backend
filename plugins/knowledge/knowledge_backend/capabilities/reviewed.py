@@ -116,3 +116,28 @@ def register_reviewed_capabilities(registry):
         )
         def handler(payload, context, *, _id=capability_id): return {"data": knowledge_outcomes.invoke(_id, payload, context)}
         register_capability(registry, spec, handler)
+
+    # Publish one fixed-operation capability per reviewed operation.  The
+    # historical envelope remains available only as a compatibility facade;
+    # new consumers cannot choose an arbitrary operation string.
+    for capability_id in CAPABILITY_IDS:
+        schema = SCHEMAS[capability_id]
+        operation_schema = schema["properties"]["operation"]
+        argument_schema = schema["properties"]["arguments"]
+        for operation in operation_schema.get("enum", []):
+            atomic_id = f"{capability_id}.atomic.{operation.replace('.', '_')}"
+            atomic_spec = CapabilitySpec(
+                id=atomic_id, owner="knowledge", description=f"Execute Knowledge operation {operation}.",
+                use_when="A governed consumer needs exactly this Knowledge operation.",
+                do_not_use_when="The request selects another operation or domain.",
+                risk=CapabilityRisk.READ if capability_id.endswith(".read") else CapabilityRisk.WRITE,
+                confirmation="none" if capability_id.endswith(".read") else "user",
+                permissions=("knowledge.read",) if capability_id.endswith(".read") else ("knowledge.write",),
+                input_schema={"type": "object", "properties": argument_schema.get("properties", {}), "additionalProperties": False},
+                output_schema={"type": "object", "required": ["data"], "properties": {"data": {}}},
+                tags=("knowledge", "atomic", operation), plugin_callable=True,
+            )
+            def atomic_handler(payload, context, *, _id=capability_id, _operation=operation):
+                arguments = payload.get("arguments", payload) if isinstance(payload, dict) else {}
+                return {"data": knowledge_outcomes.invoke(_id, {"operation": _operation, "arguments": arguments}, context)}
+            register_capability(registry, atomic_spec, atomic_handler)

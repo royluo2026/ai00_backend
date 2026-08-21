@@ -174,6 +174,42 @@ def register_reviewed_capabilities(registry: Any) -> None:
             _handler(capability_id),
         )
 
+    # Freeze each supported operation as its own Capability.  The historical
+    # operation envelope stays as a compatibility facade for migration only.
+    for capability_id in sorted(PROJECT_CAPABILITY_IDS - DEPRECATED_CAPABILITY_IDS):
+        operations = sorted(SUPPORTED_OPERATIONS.get(capability_id, ()))
+        if not operations:
+            continue
+        for operation in operations:
+            atomic_id = f"{capability_id}.atomic.{operation.replace('.', '_')}"
+            is_write = capability_id.endswith(".change.apply")
+            register_capability(
+                registry,
+                CapabilitySpec(
+                    id=atomic_id, owner="project_management",
+                    description=f"Execute Project Management operation {operation}.",
+                    use_when="A governed consumer needs exactly this Project Management operation.",
+                    do_not_use_when="The request selects another operation or domain.",
+                    risk=CapabilityRisk.WRITE if is_write else CapabilityRisk.READ,
+                    confirmation="user" if is_write else "none",
+                    permissions=("project.manage_any",) if is_write else ("project.view",),
+                    input_schema={
+                        "type": "object", "properties": {
+                            "arguments": {"type": "object", "properties": _ARGUMENT_FIELDS, "additionalProperties": False},
+                        }, "additionalProperties": False,
+                    },
+                    output_schema={"type": "object", "required": ["data"], "properties": {"data": {}}},
+                    tags=("project_management", "atomic", operation),
+                ),
+                lambda payload, context, _id=capability_id, _operation=operation: {
+                    "data": project_outcome_port.invoke(
+                        _id,
+                        {"operation": _operation, "arguments": (payload.get("arguments", payload) if isinstance(payload, dict) else {})},
+                        context,
+                    )
+                },
+            )
+
 
 __all__ = [
     "OPERATION_INPUT_SCHEMA",

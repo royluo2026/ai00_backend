@@ -12,6 +12,17 @@ from backend.capability_v2.contracts import (
     TenantIdentity,
 )
 from backend.capability_v2.web_compatibility import invoke_trusted_web_compatibility
+from ..application.service import SUPPORTED_OPERATIONS
+
+
+def _atomic_web_target(capability_id: str, payload: dict[str, Any]) -> tuple[str, dict[str, Any]]:
+    """Pin compatibility traffic to a fixed operation capability."""
+
+    operation = payload.get("operation")
+    if capability_id not in SUPPORTED_OPERATIONS or not isinstance(operation, str):
+        return capability_id, payload
+    atomic_id = f"{capability_id}.atomic.{operation.replace('.', '_')}"
+    return atomic_id, payload.get("arguments", {}) if isinstance(payload.get("arguments"), dict) else {}
 
 
 def build_web_compatibility_envelope(
@@ -27,6 +38,7 @@ def build_web_compatibility_envelope(
     approval_reference: str | None = None,
 ) -> InvocationEnvelope:
     """Construct trusted identity and tenant fields outside client payloads."""
+    capability_id, payload = _atomic_web_target(capability_id, payload)
     return InvocationEnvelope(
         capability_id=capability_id,
         major_version=1,

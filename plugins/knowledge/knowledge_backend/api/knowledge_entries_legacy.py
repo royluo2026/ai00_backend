@@ -28,6 +28,10 @@ router = APIRouter(tags=["knowledge"])
 
 
 async def _invoke_knowledge(request, current_user, principal, gateway, capability_id, payload, *, write=False):
+    operation = payload.get("operation") if isinstance(payload, dict) else None
+    if isinstance(operation, str):
+        capability_id = f"{capability_id}.atomic.{operation.replace('.', '_')}"
+        payload = payload.get("arguments", {}) if isinstance(payload.get("arguments"), dict) else {}
     request_id = request.headers.get("X-Request-ID") or f"knowledge_legacy_{next_gid()}"
     result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
         gateway,

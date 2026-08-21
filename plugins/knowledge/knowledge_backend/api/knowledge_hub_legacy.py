@@ -15,9 +15,11 @@ router = APIRouter(prefix="/api/knowledge_hub", tags=["knowledge_hub"])
 
 
 async def _invoke(request, current_user, principal, gateway, capability_id, operation, arguments=None, *, write=False):
+    capability_id = f"{capability_id}.atomic.{operation.replace('.', '_')}"
+    atomic_payload = arguments or {}
     request_id = request.headers.get("X-Request-ID") or f"knowledge_hub_legacy_{next_gid()}"
     result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
-        gateway, capability_id=capability_id, payload={"operation": operation, "arguments": arguments or {}},
+        gateway, capability_id=capability_id, payload=atomic_payload,
         current_user=current_user, principal=principal, request_id=request_id,
         trace_id=request.headers.get("X-Trace-ID") or request_id,
         idempotency_key=(request.headers.get("X-Idempotency-Key") or request_id) if write else None,
