@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 392,
-    "capability": 5,
+    "legacy": 384,
+    "capability": 6,
     "allowlisted": 6,
-    "total": 403
+    "total": 396
   },
   "routes": [
     {
@@ -29,7 +29,15 @@
     },
     {
       "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
-      "line": 59,
+      "line": 20,
+      "column": 29,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
+      "line": 76,
       "column": 32,
       "route": "/api/flows/capability-manifest",
       "kind": "allowlisted",
@@ -37,71 +45,7 @@
     },
     {
       "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
-      "line": 501,
-      "column": 32,
-      "route": "/api/flows/${gid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
-      "line": 543,
-      "column": 34,
-      "route": "/api/flows",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
-      "line": 553,
-      "column": 22,
-      "route": "/api/flows/${_flowGid}",
-      "kind": "legacy",
-      "method": "PUT"
-    },
-    {
-      "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
-      "line": 580,
-      "column": 32,
-      "route": "/api/flows/${_flowGid}/run",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
-      "line": 597,
-      "column": 32,
-      "route": "/api/flows/${_flowGid}/run",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
-      "line": 611,
-      "column": 32,
-      "route": "/api/flows/runs/${_runGid}/step",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
-      "line": 630,
-      "column": 32,
-      "route": "/api/flows/runs/${_runGid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
-      "line": 677,
-      "column": 32,
-      "route": "/api/flows/runs",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
-      "line": 738,
+      "line": 755,
       "column": 32,
       "route": "/api/flows/test-node",
       "kind": "allowlisted",
@@ -109,7 +53,7 @@
     },
     {
       "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
-      "line": 780,
+      "line": 797,
       "column": 32,
       "route": "/api/flows/gen-script",
       "kind": "allowlisted",
