@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 62,
+    "legacy": 61,
     "capability": 24,
     "allowlisted": 6,
-    "total": 92
+    "total": 91
   },
   "routes": [
     {
@@ -720,14 +720,6 @@
       "line": 881,
       "column": 25,
       "route": "/api/projects/${_selectedProjectGid}/line-assignment",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/org_mgmt/org_mgmt.js",
-      "line": 886,
-      "column": 34,
-      "route": "/api/projects/${_selectedProjectGid}/members",
       "kind": "legacy",
       "method": null
     },
