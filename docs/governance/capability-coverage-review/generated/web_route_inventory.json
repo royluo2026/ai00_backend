@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 76,
+    "legacy": 71,
     "capability": 24,
     "allowlisted": 6,
-    "total": 106
+    "total": 101
   },
   "routes": [
     {
@@ -413,14 +413,6 @@
     },
     {
       "source": "packages/craft-plugin/web/project/project.js",
-      "line": 344,
-      "column": 18,
-      "route": "/api/projects/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/project/project.js",
       "line": 403,
       "column": 26,
       "route": "/api/projects/${encodeURIComponent",
@@ -496,22 +488,6 @@
       "line": 655,
       "column": 13,
       "route": "/api/bop/versions/${listGid}/entries",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/components/visibility_selector.js",
-      "line": 71,
-      "column": 29,
-      "route": "/api/projects",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/components/visibility_selector.js",
-      "line": 75,
-      "column": 30,
-      "route": "/api/projects",
       "kind": "legacy",
       "method": null
     },
@@ -800,22 +776,6 @@
       "line": 1691,
       "column": 25,
       "route": "/api/ontology/node-type-suggestions",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/org_mgmt/org_mgmt.js",
-      "line": 720,
-      "column": 9,
-      "route": "/api/projects/${projectGid}/bop-lines",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/org_mgmt/org_mgmt.js",
-      "line": 721,
-      "column": 9,
-      "route": "/api/projects/${projectGid}/members",
       "kind": "legacy",
       "method": null
     },
