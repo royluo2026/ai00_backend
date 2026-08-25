@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 196,
-    "capability": 17,
+    "legacy": 184,
+    "capability": 18,
     "allowlisted": 6,
-    "total": 219
+    "total": 208
   },
   "routes": [
     {
@@ -205,7 +205,15 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop/gbop.js",
-      "line": 66,
+      "line": 63,
+      "column": 40,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/gbop/gbop.js",
+      "line": 82,
       "column": 38,
       "route": "/api/gbop/versions/${_currentVersion}/entries",
       "kind": "legacy",
@@ -213,79 +221,7 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop/gbop.js",
-      "line": 123,
-      "column": 31,
-      "route": "/api/gbop/entries/${changedRow.gid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/gbop/gbop.js",
-      "line": 134,
-      "column": 31,
-      "route": "/api/gbop/entries",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/gbop/gbop.js",
-      "line": 163,
-      "column": 38,
-      "route": "/api/gbop/versions",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/gbop/gbop.js",
-      "line": 232,
-      "column": 29,
-      "route": "/api/gbop/version-families/${fgid}/archive",
-      "kind": "legacy",
-      "method": "DELETE"
-    },
-    {
-      "source": "packages/craft-plugin/web/gbop/gbop.js",
-      "line": 234,
-      "column": 29,
-      "route": "/api/gbop/version-families/${fgid}/archive",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "packages/craft-plugin/web/gbop/gbop.js",
-      "line": 307,
-      "column": 25,
-      "route": "/api/gbop/versions/${gid}/freeze",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "packages/craft-plugin/web/gbop/gbop.js",
-      "line": 375,
-      "column": 25,
-      "route": "/api/gbop/entries/${gid}",
-      "kind": "legacy",
-      "method": "DELETE"
-    },
-    {
-      "source": "packages/craft-plugin/web/gbop/gbop.js",
-      "line": 396,
-      "column": 27,
-      "route": "/api/gbop/versions",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/gbop/gbop.js",
-      "line": 417,
-      "column": 27,
-      "route": "/api/gbop/versions/${gid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/gbop/gbop.js",
-      "line": 436,
+      "line": 468,
       "column": 39,
       "route": "/api/gbop/versions/${_currentVersion}/import-vpps-parts",
       "kind": "legacy",
@@ -293,33 +229,9 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop/gbop.js",
-      "line": 461,
+      "line": 493,
       "column": 9,
       "route": "/api/gbop/versions/${_currentVersion}/import-tc-excel",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/gbop/gbop.js",
-      "line": 493,
-      "column": 29,
-      "route": "/api/gbop/entries/${editGid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/gbop/gbop.js",
-      "line": 499,
-      "column": 29,
-      "route": "/api/gbop/entries",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/gbop/gbop.js",
-      "line": 520,
-      "column": 27,
-      "route": "/api/gbop/versions/${sourceGid}/fork",
       "kind": "legacy",
       "method": null
     },
