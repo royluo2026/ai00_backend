@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 89,
+    "legacy": 87,
     "capability": 24,
     "allowlisted": 6,
-    "total": 119
+    "total": 117
   },
   "routes": [
     {
@@ -129,14 +129,6 @@
       "column": 30,
       "route": "/api/v1/capabilities/${id}:invoke",
       "kind": "capability",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/ebom/ebom.js",
-      "line": 286,
-      "column": 25,
-      "route": "/api/projects",
-      "kind": "legacy",
       "method": null
     },
     {
@@ -505,14 +497,6 @@
       "column": 45,
       "route": "/api/flows/gen-script",
       "kind": "allowlisted",
-      "method": null
-    },
-    {
-      "source": "web/components/list_sidebar.js",
-      "line": 890,
-      "column": 34,
-      "route": "/api/projects",
-      "kind": "legacy",
       "method": null
     },
     {
