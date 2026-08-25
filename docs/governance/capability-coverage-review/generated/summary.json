@@ -93,9 +93,9 @@
   },
   "code_extractions": 58,
   "debt_backlog": {},
-  "catalog_descriptors": 451,
-  "current_catalog_capabilities": 435,
-  "proposed_final_catalog_capabilities": 435,
+  "catalog_descriptors": 452,
+  "current_catalog_capabilities": 436,
+  "proposed_final_catalog_capabilities": 436,
   "evidence": {
     "module_dependencies": 0,
     "boundary_violations": 0,

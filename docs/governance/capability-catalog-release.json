@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_f703703fd827bef0ee6f1e7c338e8785",
-  "catalog_hash": "sha256:f703703fd827bef0ee6f1e7c338e8785523170de6b531e30a3b6080daa9b22da",
+  "release_id": "rel_b269c2007be6145b1cdc6da7d97a4456",
+  "catalog_hash": "sha256:b269c2007be6145b1cdc6da7d97a44567c1543f30eff79e6132624d41b2a61ad",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -133186,6 +133186,7 @@
             "type": "string",
             "enum": [
               "members.add",
+              "members.line_assignment.replace",
               "members.remove"
             ],
             "minLength": 1,
@@ -133464,7 +133465,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:01d29f46a2514dd98843a6fa0fa1c0a748ef3365278846575ed8dba032732871",
+      "schema_hash": "sha256:90149c1eae765fef5a041fabe7bfd5894d10443c428cb4118870f8eea28b109b",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -133981,6 +133982,425 @@
       "provider_ref": "project_management.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/project.member.change.apply.atomic.members_add:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
+          "result": "pass",
+          "path": "backend/tests/test_capability_v2_contracts.py"
+        }
+      ]
+    },
+    {
+      "id": "project.member.change.apply.atomic.members_line_assignment_replace",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.member.change.apply.atomic.members_line_assignment_replace",
+      "description": "Execute Project Management operation members.line_assignment.replace.",
+      "use_when": "A governed consumer needs exactly this Project Management operation.",
+      "do_not_use_when": "The request selects another operation or domain.",
+      "business_effect": "Business outcome: Execute Project Management operation members.line_assignment.replace.",
+      "side_effect_level": "write",
+      "side_effects": "Writes project_management domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "project_management.v2:project.manage_any",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "arguments": {
+            "type": "object",
+            "properties": {
+              "assignee_map": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "assignee_role": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "body": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "brand": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "color": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "comment": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "content": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "current_scope": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "data": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "dep_condition": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "dep_group": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "description": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "display_name": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "due_offset_days": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "edge_type": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "entries": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "expires_at": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "factory_gid": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "gid": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "include_archived": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "include_deleted": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "item_gid": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "item_title": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "item_type": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "jph": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "key": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "label": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "list_gid": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "local_gid": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "message": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "model_year": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "name": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "new_list_gid": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "notify_on": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "order_type": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "owner_gid": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "owner_team_gid": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "owner_type": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "owner_user_gid": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "permission": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "platform": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "priority": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "project_code": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "project_gid": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "user_gid": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "member_gid": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "project_role": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "q": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "read_scope": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "recipient_gid": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "reviewer_gid": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "scope": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "section_gid": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "share_scope": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "shared_to": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "sort_order": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "source_gid": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "source_ref": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "start_date": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "status": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "storage_scope": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "suffix": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "target_gid": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "target_scope": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "target_type": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "team_id": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "template_gid": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "title": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "title_pattern": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "title_vars": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "token": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "type": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "unread_only": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "updates": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "vehicle_model_gid": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "vehicle_type": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "visibility": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "want_permission": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "widgets": {
+                "description": "Operation-specific value validated by the Project application layer."
+              },
+              "write_scope": {
+                "description": "Operation-specific value validated by the Project application layer."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5afdbe2204538e51747750cf0532272865fd767814adeb9e157057752026bd60",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_545d45378c515e0d7d658f17",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested project resource is unavailable.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller cannot access the project resource.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The project change requires Base approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The project resource changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "The Project Management provider is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "project_management.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/project.member.change.apply.atomic.members_line_assignment_replace:invoke"
       ],
       "test_refs": [
         {
@@ -174436,7 +174856,7 @@
       "plugin_id": "official.project-management",
       "module": "project_management_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:100b536536edbe43d22e2d4b914b67f407f90cf568431aee38923dbc96114564"
+      "artifact_hash": "sha256:59c656c05500acbb85da5ecd95a0f100c52d9cb71215e37ba0c47aa818a70086"
     },
     {
       "plugin_id": "official.simulation",
@@ -174445,5 +174865,5 @@
       "artifact_hash": "sha256:5c1fccaa2219f6833c24237667039685e322cefcffc7ca6f0287d28cfc0a2b39"
     }
   ],
-  "created_at": "2026-08-25T03:51:52.618068Z"
+  "created_at": "2026-08-25T06:51:24.162469Z"
 }

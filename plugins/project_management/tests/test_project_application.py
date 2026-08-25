@@ -504,6 +504,51 @@ def test_change_log_list_read_rejects_non_owner_but_trusted_super_admin_can_read
     assert len(result) == 2
 
 
+def test_member_line_assignment_replace_is_governed_and_preserves_scope_semantics():
+    application = _application()
+    with pytest.MonkeyPatch.context() as patcher:
+        patcher.setattr(
+            "backend.platform_sdk.project_access.can_manage_project",
+            lambda user_gid, project_gid: user_gid == "user-1" and project_gid == "project-1",
+        )
+        patcher.setattr(
+            "backend.platform_sdk.craft_project_scope.equivalent_line_gids",
+            lambda project_gid, line_gid: [line_gid] if project_gid == "project-1" else [],
+        )
+        manager_calls = []
+        section_calls = []
+        patcher.setattr(
+            "backend.platform_sdk.project_access.replace_project_manager",
+            lambda project_gid, user_gid: manager_calls.append((project_gid, user_gid)),
+        )
+        patcher.setattr(
+            "backend.platform_sdk.project_access.replace_section_leads",
+            lambda project_gid, line_gids, user_gid, actor_gid: section_calls.append(
+                (project_gid, line_gids, user_gid, actor_gid)
+            ),
+        )
+
+        assert application.invoke(
+            "project.member.change.apply",
+            {
+                "operation": "members.line_assignment.replace",
+                "arguments": {"project_gid": "project-1", "line_gid": "line-1", "user_gid": "user-2"},
+            },
+            CONTEXT,
+        ) == {"success": True}
+        assert section_calls == [("project-1", ["line-1"], "user-2", "user-1")]
+
+        assert application.invoke(
+            "project.member.change.apply",
+            {
+                "operation": "members.line_assignment.replace",
+                "arguments": {"project_gid": "project-1", "line_gid": None, "user_gid": None},
+            },
+            CONTEXT,
+        ) == {"success": True}
+        assert manager_calls == [("project-1", None)]
+
+
 def test_collaboration_read_returns_legacy_list_and_detail_shapes():
     application = _application()
     listed = application.invoke(

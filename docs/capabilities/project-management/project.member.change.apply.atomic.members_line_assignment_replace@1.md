@@ -1,6 +1,6 @@
-# project.issue.change.apply.atomic.issues_delete@1
+# project.member.change.apply.atomic.members_line_assignment_replace@1
 
-Execute Project Management operation issues.delete.
+Execute Project Management operation members.line_assignment.replace.
 
 ## 使用判断
 
@@ -325,7 +325,7 @@ Execute Project Management operation issues.delete.
 
 ```json
 {
-  "capability_id": "project.issue.change.apply.atomic.issues_delete",
+  "capability_id": "project.member.change.apply.atomic.members_line_assignment_replace",
   "catalog_release": "rel_b269c2007be6145b1cdc6da7d97a4456",
   "major_version": 1,
   "payload": {}

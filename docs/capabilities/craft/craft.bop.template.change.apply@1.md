@@ -8,7 +8,7 @@ Create a BOP template from a version or refresh a template from a source version
 - 不适用：The request edits a working version directly or publishes a version.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_f703703fd827bef0ee6f1e7c338e8785`
+- Catalog Release：`rel_b269c2007be6145b1cdc6da7d97a4456`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -109,7 +109,7 @@ Create a BOP template from a version or refresh a template from a source version
 ```json
 {
   "capability_id": "craft.bop.template.change.apply",
-  "catalog_release": "rel_f703703fd827bef0ee6f1e7c338e8785",
+  "catalog_release": "rel_b269c2007be6145b1cdc6da7d97a4456",
   "major_version": 1,
   "payload": {
     "operation": "save_as_template"

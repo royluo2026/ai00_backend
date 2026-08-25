@@ -373,6 +373,7 @@
     "project-management/project.list.read.atomic.lists_search@1.md",
     "project-management/project.list.read@1.md",
     "project-management/project.member.change.apply.atomic.members_add@1.md",
+    "project-management/project.member.change.apply.atomic.members_line_assignment_replace@1.md",
     "project-management/project.member.change.apply.atomic.members_remove@1.md",
     "project-management/project.member.change.apply@1.md",
     "project-management/project.member.read.atomic.members_list@1.md",

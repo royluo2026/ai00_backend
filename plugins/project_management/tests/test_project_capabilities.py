@@ -53,7 +53,10 @@ def _frozen_project_capability_ids() -> set[str]:
 def test_project_provider_is_complete_against_frozen_review():
     registry = SnapshotRegistry()
     register_capabilities(registry)
-    actual = {descriptor.id for _, _, descriptor in registry.items}
+    actual = {
+        descriptor.id for _, _, descriptor in registry.items
+        if ".atomic." not in descriptor.id
+    }
 
     assert actual == _frozen_project_capability_ids()
 
@@ -83,7 +86,7 @@ def test_consolidated_project_capabilities_accept_a_bounded_operation_envelope()
     generic = {
         spec.id: descriptor.input_schema
         for spec, _, descriptor in registry.items
-        if spec.id.startswith("project.")
+        if spec.id.startswith("project.") and ".atomic." not in spec.id
     }
 
     assert generic

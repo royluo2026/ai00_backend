@@ -141,7 +141,7 @@ _OPERATIONS = {
     "project.project.read": frozenset({"projects.search", "projects.get", "vehicle_models.list"}),
     "project.project.change.apply": frozenset({"projects.create", "projects.update", "projects.delete", "vehicle_models.create", "vehicle_models.update", "vehicle_models.delete"}),
     "project.member.read": frozenset({"members.list"}),
-    "project.member.change.apply": frozenset({"members.add", "members.remove"}),
+    "project.member.change.apply": frozenset({"members.add", "members.remove", "members.line_assignment.replace"}),
     "project.task_template.read": frozenset({"task_templates.list", "task_templates.get"}),
     "project.task_template.change.apply": frozenset({"task_templates.create", "task_templates.update", "task_templates.delete", "task_templates.items.create", "task_templates.items.update", "task_templates.items.delete", "task_templates.instantiate"}),
     "project.approval.read": frozenset({"approval.orders.search", "approval.orders.get"}),
@@ -359,6 +359,8 @@ class ProjectManagementApplication:
         if operation.startswith("lists."):
             return self._list(operation, arguments, _context)
         if operation.startswith("projects."):
+            return self._project(operation, arguments, _context)
+        if operation.startswith("members."):
             return self._project(operation, arguments, _context)
         if operation.startswith("vehicle_models."):
             return self._vehicle_model(operation, arguments, _context)
@@ -621,11 +623,32 @@ class ProjectManagementApplication:
         if not user_gid:
             raise CapabilityBusinessError("unauthenticated", "user identity is required")
         if operation.startswith("members."):
-            from backend.platform_sdk.project_access import add_project_member, list_all_project_memberships, remove_project_member
+            from backend.platform_sdk.project_access import (
+                add_project_member,
+                can_manage_project,
+                list_all_project_memberships,
+                remove_project_member,
+                replace_project_manager,
+                replace_section_leads,
+            )
+            from backend.platform_sdk.craft_project_scope import equivalent_line_gids
             project_gid = _required_text(arguments, "project_gid")
             if operation == "members.list":
                 rows = [row for row in list_all_project_memberships() if str(row.get("project_gid") or "") == project_gid]
                 return {"success": True, "data": rows}
+            if operation == "members.line_assignment.replace":
+                if "super_admin" not in set(getattr(context, "active_roles", ()) or ()) and not can_manage_project(user_gid, project_gid):
+                    raise CapabilityBusinessError("forbidden", "caller cannot manage project line assignments")
+                line_gid = str(arguments.get("line_gid") or "").strip()
+                target_user_gid = str(arguments.get("user_gid") or "").strip() or None
+                if line_gid:
+                    line_gids = equivalent_line_gids(project_gid, line_gid)
+                    if not line_gids:
+                        raise CapabilityBusinessError("not_found", "line not found")
+                    replace_section_leads(project_gid, line_gids, target_user_gid, user_gid)
+                else:
+                    replace_project_manager(project_gid, target_user_gid)
+                return {"success": True}
             if operation == "members.add":
                 member_gid = add_project_member(project_gid, _required_text(arguments, "user_gid"), str(arguments.get("project_role") or "member"), arguments.get("section_gid"))
                 return {"success": True, "data": {"gid": member_gid}}

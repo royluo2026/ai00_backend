@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 34,
+    "legacy": 31,
     "capability": 24,
     "allowlisted": 6,
-    "total": 64
+    "total": 61
   },
   "routes": [
     {
@@ -201,22 +201,6 @@
       "column": 29,
       "route": "/api/v1/capabilities/${id}:invoke",
       "kind": "capability",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/project/project.js",
-      "line": 403,
-      "column": 26,
-      "route": "/api/projects/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/project/project.js",
-      "line": 413,
-      "column": 22,
-      "route": "/api/projects/${encodeURIComponent",
-      "kind": "legacy",
       "method": null
     },
     {
@@ -504,14 +488,6 @@
       "line": 1666,
       "column": 15,
       "route": "/api/ontology/classes/${gid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/org_mgmt/org_mgmt.js",
-      "line": 881,
-      "column": 25,
-      "route": "/api/projects/${_selectedProjectGid}/line-assignment",
       "kind": "legacy",
       "method": null
     },
