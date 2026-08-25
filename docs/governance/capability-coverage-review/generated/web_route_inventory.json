@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 122,
+    "legacy": 119,
     "capability": 21,
     "allowlisted": 6,
-    "total": 149
+    "total": 146
   },
   "routes": [
     {
@@ -209,30 +209,6 @@
       "column": 40,
       "route": "/api/v1/capabilities/${id}:invoke",
       "kind": "capability",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/gbop/gbop.js",
-      "line": 82,
-      "column": 38,
-      "route": "/api/gbop/versions/${_currentVersion}/entries",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/gbop/gbop.js",
-      "line": 468,
-      "column": 39,
-      "route": "/api/gbop/versions/${_currentVersion}/import-vpps-parts",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/gbop/gbop.js",
-      "line": 493,
-      "column": 9,
-      "route": "/api/gbop/versions/${_currentVersion}/import-tc-excel",
-      "kind": "legacy",
       "method": null
     },
     {
