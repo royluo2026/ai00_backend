@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 84,
+    "legacy": 83,
     "capability": 24,
     "allowlisted": 6,
-    "total": 114
+    "total": 113
   },
   "routes": [
     {
@@ -497,14 +497,6 @@
       "column": 45,
       "route": "/api/flows/gen-script",
       "kind": "allowlisted",
-      "method": null
-    },
-    {
-      "source": "web/components/quick_list.html",
-      "line": 289,
-      "column": 28,
-      "route": "/api/bop/versions",
-      "kind": "legacy",
       "method": null
     },
     {
