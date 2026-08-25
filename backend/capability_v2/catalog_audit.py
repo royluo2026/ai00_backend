@@ -24,6 +24,9 @@ class CatalogAuditReport:
     invalid_error_schema_count: int = 0
     test_evidence_not_run_count: int = 0
     invalid_test_ref_count: int = 0
+    invalid_consumer_ref_count: int = 0
+    invalid_business_effect_count: int = 0
+    invalid_side_effect_count: int = 0
 
     @property
     def missing_fields(self) -> dict[str, int]:
@@ -40,6 +43,9 @@ class CatalogAuditReport:
             "invalid_error_schema_count": self.invalid_error_schema_count,
             "test_evidence_not_run_count": self.test_evidence_not_run_count,
             "invalid_test_ref_count": self.invalid_test_ref_count,
+            "invalid_consumer_ref_count": self.invalid_consumer_ref_count,
+            "invalid_business_effect_count": self.invalid_business_effect_count,
+            "invalid_side_effect_count": self.invalid_side_effect_count,
         }
 
 
@@ -71,6 +77,13 @@ def audit_catalog(path: Path) -> CatalogAuditReport:
     invalid_error_schema = 0
     test_evidence_not_run = 0
     invalid_test_refs = 0
+    invalid_consumer_refs = 0
+    invalid_business_effects = 0
+    invalid_side_effects = 0
+    generic_side_effects = {
+        "Reads domain state without mutation.",
+        "Writes domain state through the owning Provider.",
+    }
     for entry in stable:
         capability_id = entry.get("id")
         if not isinstance(capability_id, str) or not capability_id:
@@ -98,8 +111,29 @@ def audit_catalog(path: Path) -> CatalogAuditReport:
             default_all += 1
         for field in missing_fields:
             value = entry.get(field)
+            if field == "consumer_refs" and value in (None, [], {}) and entry.get("no_consumer_reason"):
+                continue
             if value is None or value == "" or value == [] or value == {}:
                 missing_fields[field] += 1
+        consumers = entry.get("consumer_refs")
+        reason = entry.get("no_consumer_reason")
+        if consumers in (None, [], {}):
+            if not isinstance(reason, str) or not reason.strip():
+                invalid_consumer_refs += 1
+        elif not isinstance(consumers, list) or any(
+            not isinstance(item, dict)
+            or not {"consumer_id", "consumer_type", "version_constraint"} <= set(item)
+            or not all(isinstance(item.get(key), str) and item[key].strip() for key in ("consumer_id", "consumer_type", "version_constraint"))
+            for item in consumers
+        ):
+            invalid_consumer_refs += 1
+        description = entry.get("description")
+        business_effect = entry.get("business_effect")
+        if not isinstance(business_effect, str) or not business_effect.strip() or business_effect.strip() == description:
+            invalid_business_effects += 1
+        side_effects = entry.get("side_effects")
+        if not isinstance(side_effects, str) or not side_effects.strip() or side_effects.strip() in generic_side_effects:
+            invalid_side_effects += 1
         error_schema = entry.get("error_schema")
         if error_schema not in (None, []):
             if not isinstance(error_schema, list) or any(
@@ -131,6 +165,9 @@ def audit_catalog(path: Path) -> CatalogAuditReport:
         invalid_error_schema_count=invalid_error_schema,
         test_evidence_not_run_count=test_evidence_not_run,
         invalid_test_ref_count=invalid_test_refs,
+        invalid_consumer_ref_count=invalid_consumer_refs,
+        invalid_business_effect_count=invalid_business_effects,
+        invalid_side_effect_count=invalid_side_effects,
     )
 
 

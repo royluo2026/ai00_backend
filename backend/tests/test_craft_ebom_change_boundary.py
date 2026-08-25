@@ -17,7 +17,10 @@ def test_ebom_change_routes_share_one_gateway_capability() -> None:
         "_legacy_patch_snapshot_status", "_legacy_add_part", "_legacy_add_parts_batch",
         "_legacy_update_part", "_legacy_delete_part",
     ):
-        assert f"def {legacy}" in source
+        assert f"def {legacy}" not in source
+    assert "def _legacy_diff_snapshots" not in source
+    assert "def _legacy_vpps_check" not in source
+    assert "def _legacy_version" in source
 
 
 def test_ebom_change_rejects_unknown_operation_before_io() -> None:

@@ -120,6 +120,43 @@ def test_audit_catalog_accepts_all_exposure_only_when_provider_explicit(tmp_path
     assert audit_catalog(catalog).default_all_exposure_count == 0
 
 
+def test_audit_catalog_rejects_exposure_placeholder_and_description_fallback(tmp_path: Path) -> None:
+    catalog = tmp_path / "catalog.json"
+    catalog.write_text(json.dumps({"capabilities": [{
+        "id": "craft.read", "lifecycle_status": "stable",
+        "title": "craft.read", "description": "Read craft data",
+        "business_effect": "Read craft data",
+        "side_effects": "Reads domain state without mutation.",
+        "consumer_refs": ["exposure:web"],
+        "exposure": {"web": True},
+    }]}), encoding="utf-8")
+
+    report = audit_catalog(catalog)
+
+    assert report.invalid_consumer_ref_count == 1
+    assert report.invalid_business_effect_count == 1
+    assert report.invalid_side_effect_count == 1
+
+
+def test_audit_catalog_accepts_explicit_no_consumer_reason(tmp_path: Path) -> None:
+    catalog = tmp_path / "catalog.json"
+    catalog.write_text(json.dumps({"capabilities": [{
+        "id": "craft.read", "lifecycle_status": "stable",
+        "title": "craft.read", "description": "Read craft data",
+        "business_effect": "A craft operator can inspect the current craft record.",
+        "side_effects": "Reads workmanship_craft_records and emits no mutation event.",
+        "consumer_refs": [],
+        "no_consumer_reason": "No verified consumer is registered for this provider-only capability.",
+        "exposure": {"web": True},
+    }]}), encoding="utf-8"),
+
+    report = audit_catalog(catalog)
+
+    assert report.invalid_consumer_ref_count == 0
+    assert report.invalid_business_effect_count == 0
+    assert report.invalid_side_effect_count == 0
+
+
 def test_audit_catalog_detects_known_multi_operation_ebom_descriptor_without_arguments_wrapper(tmp_path: Path) -> None:
     catalog = tmp_path / "catalog.json"
     catalog.write_text(json.dumps({"capabilities": [{

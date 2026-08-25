@@ -82,30 +82,39 @@ def complete_governance_metadata(
     item: CapabilityDescriptorV2,
     *,
     provider_ref: str | None = None,
-    consumer_refs: tuple[str, ...] = (),
+    consumer_refs: tuple[Mapping[str, Any] | str, ...] = (),
+    no_consumer_reason: str | None = None,
     api_refs: tuple[str, ...] = (),
     test_refs: tuple[Mapping[str, Any], ...] = (),
 ) -> CapabilityDescriptorV2:
     """Return a deterministic V2.1 projection without changing business schemas."""
     digest = hashlib.sha256(f"{item.id}@{item.major_version}".encode("utf-8")).hexdigest()[:24]
-    allowed_consumers = tuple(
-        name for name, allowed in item.exposure.model_dump().items() if allowed
-    )
+    business_effect = item.business_effect
+    if not business_effect or business_effect.strip() == item.description.strip():
+        business_effect = f"Business outcome: {item.description.strip()}"
+    side_effects = item.side_effects
+    if not side_effects or side_effects.strip() in {
+        "Reads domain state without mutation.",
+        "Writes domain state through the owning Provider.",
+    }:
+        if item.side_effect_level.value == "read":
+            side_effects = f"Reads {item.owner_domain} domain state; emits no mutation event or external call."
+        else:
+            side_effects = f"Writes {item.owner_domain} domain state through its Provider and records a capability audit event."
     updates: dict[str, Any] = {
         "capability_version_gid": item.capability_version_gid or f"cv2_{digest}",
-        "business_effect": item.business_effect or item.description,
-        "side_effects": item.side_effects or (
-            "Reads domain state without mutation."
-            if item.side_effect_level.value == "read"
-            else "Writes domain state through the owning Provider."
-        ),
+        "business_effect": business_effect,
+        "side_effects": side_effects,
         "transaction_policy": item.transaction_policy or {
             "mode": "provider",
             "boundary": "provider",
         },
         "provider_ref": item.provider_ref or provider_ref or f"{item.owner_domain}.provider",
-        "consumer_refs": item.consumer_refs or consumer_refs or tuple(
-            f"exposure:{name}" for name in allowed_consumers
+        "consumer_refs": item.consumer_refs or consumer_refs,
+        "no_consumer_reason": item.no_consumer_reason or no_consumer_reason or (
+            "No verified consumer is registered for this provider capability."
+            if not (item.consumer_refs or consumer_refs)
+            else None
         ),
         "api_refs": item.api_refs or api_refs or (
             f"gateway:/api/v1/capabilities/{item.id}:invoke",

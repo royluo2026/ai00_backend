@@ -28,6 +28,41 @@ PROVIDERS_PATH = REPOSITORY_ROOT / "backend" / "capability_v2" / "official_domai
 CONTRACT_TEST = REPOSITORY_ROOT / "backend/tests/test_capability_v2_contracts.py"
 
 
+def _verified_consumer_refs(capability_id: str) -> tuple[dict[str, str], ...]:
+    """Return only consumers proven by migrated source files in this release."""
+    consumers: list[dict[str, str]] = []
+    if capability_id.startswith("craft.ebom.") or capability_id.startswith("craft.pbom."):
+        consumers.append({
+            "consumer_id": "craft-plugin/ebom.js",
+            "consumer_type": "web",
+            "version_constraint": ">=1",
+        })
+    if capability_id.startswith("factory.asset.") or capability_id.startswith("factory.structure."):
+        consumers.append({
+            "consumer_id": "knowledge-hub/factory_info.html",
+            "consumer_type": "web",
+            "version_constraint": ">=1",
+        })
+    if capability_id.startswith("project.project.") and ".atomic." in capability_id:
+        consumers.append({
+            "consumer_id": "knowledge-hub/project_info.html",
+            "consumer_type": "web",
+            "version_constraint": ">=1",
+        })
+    if capability_id == "craft.bop.version.list":
+        consumers.append({
+            "consumer_id": "web/my_files/my_files.js",
+            "consumer_type": "web",
+            "version_constraint": ">=1",
+        })
+    if capability_id in {"agent.flow.read", "agent.flow.change.apply"}:
+        consumers.extend((
+            {"consumer_id": "agent-plugin/flow_canvas/flow_editor.js", "consumer_type": "web", "version_constraint": ">=1"},
+            {"consumer_id": "web/canvas/types/flow_type.js", "consumer_type": "web", "version_constraint": ">=1"},
+        ))
+    return tuple(consumers)
+
+
 def _contract_test_revision() -> str:
     digest = hashlib.sha256(CONTRACT_TEST.read_bytes()).hexdigest()
     return f"sha256:{digest}"
@@ -47,6 +82,7 @@ def current_release() -> CatalogRelease:
         complete_governance_metadata(
             registrations[key].descriptor or descriptor_from_provider_spec(registrations[key].spec),
             provider_ref=f"{registrations[key].spec.owner}.provider",
+            consumer_refs=_verified_consumer_refs(registrations[key].spec.id),
             test_refs=(
                 {
                     "test_type": "contract",

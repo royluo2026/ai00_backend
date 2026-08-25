@@ -8,7 +8,7 @@ Execute Knowledge operation favorites.list.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_7dd59a4ffa1f9c6a7f0fb85bfedae6af`
+- Catalog Release：`rel_8c2ddb0f627d7b924f28c571202672e1`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -85,7 +85,7 @@ Execute Knowledge operation favorites.list.
 ```json
 {
   "capability_id": "knowledge.personalization.read.atomic.favorites_list",
-  "catalog_release": "rel_7dd59a4ffa1f9c6a7f0fb85bfedae6af",
+  "catalog_release": "rel_8c2ddb0f627d7b924f28c571202672e1",
   "major_version": 1,
   "payload": {}
 }
