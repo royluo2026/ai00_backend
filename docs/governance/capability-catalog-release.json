@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_18e33fb9916963cae3955c617e7538c2",
-  "catalog_hash": "sha256:18e33fb9916963cae3955c617e7538c292492d963bc2032c845f1a21645dbdbd",
+  "release_id": "rel_1b40890bffd2481e1cc55591ae4ffb0c",
+  "catalog_hash": "sha256:1b40890bffd2481e1cc55591ae4ffb0c808dc3dadea4d9b8c134ba1e6e347175",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -19065,7 +19065,8 @@
               "project_bop_lines",
               "line_operations",
               "version_history",
-              "entry_history"
+              "entry_history",
+              "version_entries"
             ]
           },
           "version_gid": {
@@ -19119,6 +19120,10 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 500
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0
           }
         },
         "additionalProperties": false,
@@ -19139,7 +19144,22 @@
             ],
             "additionalProperties": true
           },
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
           "total": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
             "type": "integer"
           }
         },
@@ -19161,7 +19181,22 @@
             ],
             "additionalProperties": true
           },
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
           "total": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
             "type": "integer"
           }
         },
@@ -19170,7 +19205,7 @@
           "data"
         ]
       },
-      "schema_hash": "sha256:1d944788c4c676ffbb0bc9cd047fc22e085a944273b7e6a527f09bb03fc00ece",
+      "schema_hash": "sha256:bc18068ec2e3780fb2c26184193412b5e9420c7770cfff9310f77c30cff99eb3",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -175199,7 +175234,7 @@
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
       "version": "1.2.0",
-      "artifact_hash": "sha256:27ee2f00a385e028ed84616382e078e492eb08df2b205e6a6a1fd718745a98bd"
+      "artifact_hash": "sha256:d2bb5be8e467473891fe310a45bedc8d38297eb6f2cdeaa38c18ad929f5826a2"
     },
     {
       "plugin_id": "official.device",
@@ -175250,5 +175285,5 @@
       "artifact_hash": "sha256:5c1fccaa2219f6833c24237667039685e322cefcffc7ca6f0287d28cfc0a2b39"
     }
   ],
-  "created_at": "2026-08-25T07:10:34.490297Z"
+  "created_at": "2026-08-25T12:12:31.721032Z"
 }

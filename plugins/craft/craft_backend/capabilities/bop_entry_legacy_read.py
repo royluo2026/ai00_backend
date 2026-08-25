@@ -9,12 +9,26 @@ from backend.capability_v2.provider_contracts import CapabilityContext, Capabili
 from backend.platform_sdk.identity import resolve_identity_labels
 
 from ..data.connection import get_craft_conn
-from ..routers._bop._constants import _GID_RESOLVE_MAP, _LINK_TARGET_TABLES, _PART_NODE_TYPES, _PROCESS_ENTITY_MAP
+from ..routers._bop._constants import (
+    _ENTRY_KEYS,
+    _ENTRY_LIST_SQL,
+    _GID_RESOLVE_MAP,
+    _LINK_TARGET_TABLES,
+    _PART_NODE_TYPES,
+    _PROCESS_ENTITY_MAP,
+)
 
 OPERATIONS = (
     "auto_link_preview", "entry_links", "link_summary", "entity_detail", "resolve_gids",
     "pbom_search", "pbom_snapshots", "project_bop_lines", "line_operations", "version_history", "entry_history",
+    "version_entries",
 )
+
+# The legacy REST route returned the entire version.  Keep its rich row shape
+# for the remaining consumers, but make the Gateway projection explicitly
+# bounded and pageable.  The SQL template is shared with the compatibility
+# route so the two read paths cannot drift in fields or link semantics.
+_ENTRY_PAGE_SQL = f"{_ENTRY_LIST_SQL}\nLIMIT %s OFFSET %s"
 
 
 def _jsonable(value: Any) -> Any:
@@ -47,9 +61,46 @@ def read_bop_entry_legacy(payload: dict[str, Any], _context: CapabilityContext) 
     limit = payload.get("limit", 100)
     if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 500:
         raise ValueError("limit must be between 1 and 500")
+    offset = payload.get("offset", 0)
+    if isinstance(offset, bool) or not isinstance(offset, int) or offset < 0:
+        raise ValueError("offset must be a non-negative integer")
+    if operation == "version_entries" and limit > 100:
+        raise ValueError("version_entries limit must be between 1 and 100")
 
     with get_craft_conn() as conn:
         with conn.cursor() as cur:
+            if operation == "version_entries":
+                version_gid = str(payload.get("version_gid") or "").strip()
+                if not version_gid:
+                    raise ValueError("version_gid is required")
+                cur.execute(
+                    "SELECT 1 FROM workmanship_bop_bop_versions WHERE gid=%s LIMIT 1",
+                    (version_gid,),
+                )
+                if not cur.fetchone():
+                    raise LookupError("version_not_found")
+                cur.execute(
+                    "SELECT COUNT(*) AS total FROM workmanship_bop_bop_entries "
+                    "WHERE version_gid=%s AND is_deleted=FALSE",
+                    (version_gid,),
+                )
+                count_row = cur.fetchone()
+                total = int(count_row["total"] if count_row else 0)
+                cur.execute(_ENTRY_PAGE_SQL, (version_gid, version_gid, limit, offset))
+                rows = _rows(cur)
+                # ``_ENTRY_KEYS`` documents the projection contract and keeps
+                # this provider aligned with the legacy route's row shape.
+                for row in rows:
+                    for key in _ENTRY_KEYS:
+                        row.setdefault(key, None)
+                return CapabilityOutput(data={
+                    "data": rows,
+                    "items": rows,
+                    "total": total,
+                    "limit": limit,
+                    "offset": offset,
+                })
+
             if operation == "auto_link_preview":
                 version_gid = str(payload.get("version_gid") or "")
                 if not version_gid:
@@ -231,7 +282,7 @@ def register_bop_entry_legacy_read_capability(registry: Any) -> None:
         use_when="A governed Craft consumer still needs one of the supported legacy BOP entry read projections.",
         do_not_use_when="The request mutates entries, links, entities, imports data, or needs the canonical structure capability.",
         risk="read", permissions=("craft.read",),
-        input_schema={"type": "object", "required": ["operation"], "properties": {"operation": {"type": "string", "enum": list(OPERATIONS)}, "version_gid": {"type": "string"}, "entry_gid": {"type": "string"}, "line_entry_gid": {"type": "string"}, "link_type": {"type": "string"}, "ref_gid": {"type": "string"}, "gids": {"type": "object", "additionalProperties": {"type": "string"}}, "recursive": {"type": "boolean"}, "q": {"type": ["string", "null"]}, "vpps": {"type": ["string", "null"]}, "snapshot_gid": {"type": ["string", "null"]}, "project_gid": {"type": ["string", "null"]}, "limit": {"type": "integer", "minimum": 1, "maximum": 500}}, "additionalProperties": False},
+        input_schema={"type": "object", "required": ["operation"], "properties": {"operation": {"type": "string", "enum": list(OPERATIONS)}, "version_gid": {"type": "string"}, "entry_gid": {"type": "string"}, "line_entry_gid": {"type": "string"}, "link_type": {"type": "string"}, "ref_gid": {"type": "string"}, "gids": {"type": "object", "additionalProperties": {"type": "string"}}, "recursive": {"type": "boolean"}, "q": {"type": ["string", "null"]}, "vpps": {"type": ["string", "null"]}, "snapshot_gid": {"type": ["string", "null"]}, "project_gid": {"type": ["string", "null"]}, "limit": {"type": "integer", "minimum": 1, "maximum": 500}, "offset": {"type": "integer", "minimum": 0}}, "additionalProperties": False},
         output_schema={"type": "object", "required": ["data"], "properties": {"ok": {"type": "boolean"}, "data": {"type": ["array", "object"], "additionalProperties": True}, "total": {"type": "integer"}}, "additionalProperties": False},
         tags=("craft", "bop", "entry", "legacy", "read"),
     ), read_bop_entry_legacy)

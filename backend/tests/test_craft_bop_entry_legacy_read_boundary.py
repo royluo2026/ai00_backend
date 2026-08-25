@@ -5,6 +5,8 @@ import ast
 import inspect
 from pathlib import Path
 
+import pytest
+
 from plugins.craft.craft_backend.routers._bop import entries
 
 
@@ -55,4 +57,19 @@ def test_legacy_entry_read_capability_declared():
         "line_operations",
         "version_history",
         "entry_history",
+        "version_entries",
     }
+
+
+def test_version_entries_rejects_unbounded_pages():
+    from plugins.craft.craft_backend.capabilities.bop_entry_legacy_read import read_bop_entry_legacy
+
+    with pytest.raises(ValueError, match="between 1 and 100"):
+        read_bop_entry_legacy({"operation": "version_entries", "version_gid": "v1", "limit": 101}, None)
+
+
+def test_version_entries_rejects_negative_offset():
+    from plugins.craft.craft_backend.capabilities.bop_entry_legacy_read import read_bop_entry_legacy
+
+    with pytest.raises(ValueError, match="non-negative"):
+        read_bop_entry_legacy({"operation": "version_entries", "version_gid": "v1", "offset": -1}, None)

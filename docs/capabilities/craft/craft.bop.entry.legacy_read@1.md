@@ -8,7 +8,7 @@ Read bounded legacy BOP entry links, PBOM projections, auto-link previews and hi
 - 不适用：The request mutates entries, links, entities, imports data, or needs the canonical structure capability.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_18e33fb9916963cae3955c617e7538c2`
+- Catalog Release：`rel_1b40890bffd2481e1cc55591ae4ffb0c`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -89,6 +89,10 @@ Read bounded legacy BOP entry links, PBOM projections, auto-link previews and hi
     "link_type": {
       "type": "string"
     },
+    "offset": {
+      "minimum": 0,
+      "type": "integer"
+    },
     "operation": {
       "enum": [
         "auto_link_preview",
@@ -101,7 +105,8 @@ Read bounded legacy BOP entry links, PBOM projections, auto-link previews and hi
         "project_bop_lines",
         "line_operations",
         "version_history",
-        "entry_history"
+        "entry_history",
+        "version_entries"
       ],
       "type": "string"
     },
@@ -151,7 +156,7 @@ Read bounded legacy BOP entry links, PBOM projections, auto-link previews and hi
 ```json
 {
   "capability_id": "craft.bop.entry.legacy_read",
-  "catalog_release": "rel_18e33fb9916963cae3955c617e7538c2",
+  "catalog_release": "rel_1b40890bffd2481e1cc55591ae4ffb0c",
   "major_version": 1,
   "payload": {
     "operation": "auto_link_preview"
@@ -173,6 +178,21 @@ Read bounded legacy BOP entry links, PBOM projections, auto-link previews and hi
         "array",
         "object"
       ]
+    },
+    "items": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "maxItems": 100,
+      "type": "array"
+    },
+    "limit": {
+      "type": "integer"
+    },
+    "offset": {
+      "type": "integer"
     },
     "ok": {
       "type": "boolean"
