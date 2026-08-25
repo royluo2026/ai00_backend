@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 71,
+    "legacy": 68,
     "capability": 24,
     "allowlisted": 6,
-    "total": 101
+    "total": 98
   },
   "routes": [
     {
@@ -97,30 +97,6 @@
       "column": 30,
       "route": "/api/v1/capabilities/${id}:invoke",
       "kind": "capability",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/craft_table/table.js",
-      "line": 98,
-      "column": 18,
-      "route": "/api/bop/operations/${opGid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/craft_table/table.js",
-      "line": 118,
-      "column": 30,
-      "route": "/api/bop/operations/${params.op_gid}/drift-check",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/craft_table/table.js",
-      "line": 122,
-      "column": 30,
-      "route": "/api/bop/operations/${params.op_gid}/reset-fields",
-      "kind": "legacy",
       "method": null
     },
     {
