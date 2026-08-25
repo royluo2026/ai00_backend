@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 176,
-    "capability": 20,
+    "legacy": 157,
+    "capability": 21,
     "allowlisted": 6,
-    "total": 202
+    "total": 184
   },
   "routes": [
     {
@@ -445,31 +445,15 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 57,
-      "column": 28,
-      "route": "/api/bop/versions/${versionGid}/linked-parts",
-      "kind": "legacy",
+      "line": 15,
+      "column": 29,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
       "method": null
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 136,
-      "column": 28,
-      "route": "/api/factory/tools",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 153,
-      "column": 30,
-      "route": "/api/gbop/versions",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 165,
+      "line": 193,
       "column": 30,
       "route": "/api/gbop/versions/${filterGid}/entries",
       "kind": "legacy",
@@ -477,15 +461,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 168,
-      "column": 29,
-      "route": "/api/gbop/versions",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 173,
+      "line": 201,
       "column": 33,
       "route": "/api/gbop/versions/${v.gid}/entries",
       "kind": "legacy",
@@ -493,15 +469,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 196,
-      "column": 30,
-      "route": "/api/gbop/versions",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 206,
+      "line": 234,
       "column": 30,
       "route": "/api/gbop/versions/${filterGid}/entries",
       "kind": "legacy",
@@ -509,15 +477,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 209,
-      "column": 29,
-      "route": "/api/gbop/versions",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 214,
+      "line": 242,
       "column": 33,
       "route": "/api/gbop/versions/${v.gid}/entries",
       "kind": "legacy",
@@ -525,113 +485,9 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 232,
-      "column": 30,
-      "route": "/api/gbop/pbom-versions/${versionGid}/gbop-nav-link-summary",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 266,
-      "column": 30,
-      "route": "/api/gbop/pbom-versions/${versionGid}/gbop-nav-link-summary",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 292,
-      "column": 30,
-      "route": "/api/gbop/bop-versions/${versionGid}/station-autolink-preview${override}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 300,
-      "column": 28,
-      "route": "/api/gbop/bop-versions/${versionGid}/station-autolink-preview${override}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 318,
-      "column": 30,
-      "route": "/api/gbop/bop-versions/${versionGid}/station-autolink-preview${override}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 335,
-      "column": 13,
-      "route": "/api/gbop/bop-versions/${versionGid}/station-autolink",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 350,
-      "column": 13,
-      "route": "/api/gbop/bop-versions/${versionGid}/station-autolink-undo",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 363,
-      "column": 13,
-      "route": "/api/gbop/bop-versions/${versionGid}/station-autolink-undo",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 406,
-      "column": 13,
-      "route": "/api/bop/versions/${versionGid}/line-operations",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 414,
-      "column": 24,
-      "route": "/api/bop/entries/${op.bop_entry_gid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 430,
-      "column": 32,
-      "route": "/api/gbop/bop-versions/${versionGid}/station-autolink-preview${override}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 1330,
+      "line": 1387,
       "column": 15,
       "route": "/api/bop/versions/${this._versionGid}/link-summary",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 1421,
-      "column": 9,
-      "route": "/api/bop/versions/${this._versionGid}/line-operations",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 1689,
-      "column": 24,
-      "route": "/api/bop/entry-links",
       "kind": "legacy",
       "method": null
     },
