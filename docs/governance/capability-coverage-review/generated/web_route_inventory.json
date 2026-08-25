@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 31,
+    "legacy": 30,
     "capability": 24,
     "allowlisted": 6,
-    "total": 61
+    "total": 60
   },
   "routes": [
     {
@@ -280,14 +280,6 @@
       "line": 86,
       "column": 11,
       "route": "/api/ontology/graph",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/ext_datasource/ext_ds.js",
-      "line": 103,
-      "column": 28,
-      "route": "/api/ontology/schema/${encodeURIComponent",
       "kind": "legacy",
       "method": null
     },
