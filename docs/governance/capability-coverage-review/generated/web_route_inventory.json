@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 87,
+    "legacy": 84,
     "capability": 24,
     "allowlisted": 6,
-    "total": 117
+    "total": 114
   },
   "routes": [
     {
@@ -497,30 +497,6 @@
       "column": 45,
       "route": "/api/flows/gen-script",
       "kind": "allowlisted",
-      "method": null
-    },
-    {
-      "source": "web/components/list_tree.html",
-      "line": 295,
-      "column": 28,
-      "route": "/api/projects/vehicle_models",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/components/list_tree.html",
-      "line": 304,
-      "column": 28,
-      "route": "/api/projects",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/components/list_tree.html",
-      "line": 330,
-      "column": 28,
-      "route": "/api/bop/versions",
-      "kind": "legacy",
       "method": null
     },
     {
