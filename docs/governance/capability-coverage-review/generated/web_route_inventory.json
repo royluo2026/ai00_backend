@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 83,
+    "legacy": 82,
     "capability": 24,
     "allowlisted": 6,
-    "total": 113
+    "total": 112
   },
   "routes": [
     {
@@ -848,14 +848,6 @@
       "line": 1691,
       "column": 25,
       "route": "/api/ontology/node-type-suggestions",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/org_mgmt/org_mgmt.js",
-      "line": 679,
-      "column": 25,
-      "route": "/api/projects",
       "kind": "legacy",
       "method": null
     },
