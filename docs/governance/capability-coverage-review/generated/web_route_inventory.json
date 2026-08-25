@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 296,
-    "capability": 12,
+    "legacy": 270,
+    "capability": 13,
     "allowlisted": 6,
-    "total": 314
+    "total": 289
   },
   "routes": [
     {
@@ -69,7 +69,15 @@
     },
     {
       "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 121,
+      "line": 93,
+      "column": 40,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/bop/bop.js",
+      "line": 136,
       "column": 38,
       "route": "/api/bop/versions/${_currentVersion}/entries",
       "kind": "legacy",
@@ -77,219 +85,11 @@
     },
     {
       "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 186,
-      "column": 31,
-      "route": "/api/bop/entries/${gid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 196,
-      "column": 31,
-      "route": "/api/bop/entries",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 231,
-      "column": 38,
-      "route": "/api/bop/versions",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 403,
-      "column": 25,
-      "route": "/api/bop/versions/${ver.gid}/freeze",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 412,
-      "column": 25,
-      "route": "/api/bop/version-families/${familyGid}/archive",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 425,
-      "column": 25,
-      "route": "/api/bop/version-families/${familyGid}/archive",
-      "kind": "legacy",
-      "method": "DELETE"
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 439,
-      "column": 39,
-      "route": "/api/projects",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 446,
-      "column": 39,
-      "route": "/api/bop/factories",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 554,
-      "column": 37,
-      "route": "/api/bop/pbom-versions",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 586,
-      "column": 25,
-      "route": "/api/bop/versions",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 633,
+      "line": 652,
       "column": 25,
       "route": "/api/bop/versions/${gid}",
       "kind": "legacy",
       "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 655,
-      "column": 37,
-      "route": "/api/bop/versions/${ver.gid}/purge-entries",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 687,
-      "column": 25,
-      "route": "/api/bop/entries",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 720,
-      "column": 25,
-      "route": "/api/bop/entries",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 755,
-      "column": 25,
-      "route": "/api/bop/entries/${gid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 772,
-      "column": 25,
-      "route": "/api/bop/entries/${gid}",
-      "kind": "legacy",
-      "method": "DELETE"
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 997,
-      "column": 38,
-      "route": "/api/bop/versions/${_currentVersion}/import-tc",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 1144,
-      "column": 38,
-      "route": "/api/bop/versions",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 1168,
-      "column": 38,
-      "route": "/api/bop/fork-presets",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 1217,
-      "column": 38,
-      "route": "/api/bop/fork-presets",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 1232,
-      "column": 25,
-      "route": "/api/bop/fork-presets/${_forkSelectedPresetGid}",
-      "kind": "legacy",
-      "method": "DELETE"
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 1259,
-      "column": 38,
-      "route": "/api/bop/versions/${srcGid}/fork",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 1273,
-      "column": 38,
-      "route": "/api/bop/versions/${_currentVersion}/auto-link-preview",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 1330,
-      "column": 38,
-      "route": "/api/bop/versions/${_currentVersion}/auto-link-preview",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 1341,
-      "column": 38,
-      "route": "/api/bop/versions/${_currentVersion}/auto-link",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 1360,
-      "column": 38,
-      "route": "/api/bop/versions",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 1376,
-      "column": 38,
-      "route": "/api/bop/versions/${_currentVersion}/copy-from-gbop/${srcGid}",
-      "kind": "legacy",
-      "method": "POST"
     },
     {
       "source": "packages/craft-plugin/web/bop_nav/bop_nav.js",
