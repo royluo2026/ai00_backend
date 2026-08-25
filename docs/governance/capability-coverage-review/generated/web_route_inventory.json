@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 35,
+    "legacy": 34,
     "capability": 24,
     "allowlisted": 6,
-    "total": 65
+    "total": 64
   },
   "routes": [
     {
@@ -169,14 +169,6 @@
       "column": 30,
       "route": "/api/v1/capabilities/${id}:invoke",
       "kind": "capability",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 516,
-      "column": 32,
-      "route": "/api/projects/${encodeURIComponent",
-      "kind": "legacy",
       "method": null
     },
     {
