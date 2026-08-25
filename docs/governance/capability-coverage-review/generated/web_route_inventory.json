@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 56,
+    "legacy": 48,
     "capability": 24,
     "allowlisted": 6,
-    "total": 86
+    "total": 78
   },
   "routes": [
     {
@@ -477,35 +477,11 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 614,
-      "column": 30,
-      "route": "/api/ontology/classes/${_selectedGid}/full",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 621,
-      "column": 28,
-      "route": "/api/ontology/schema-diff",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/ontology/ontology.js",
       "line": 710,
       "column": 15,
       "route": "/api/ontology/classes/${_selectedGid}",
       "kind": "legacy",
       "method": "PATCH"
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 791,
-      "column": 27,
-      "route": "/api/ontology/classes/${_selectedGid}/sync-from-table",
-      "kind": "legacy",
-      "method": "POST"
     },
     {
       "source": "web/ontology/ontology.js",
@@ -581,14 +557,6 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 1288,
-      "column": 28,
-      "route": "/api/ontology/classes/${_selectedGid}/individuals",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/ontology/ontology.js",
       "line": 1426,
       "column": 15,
       "route": "/api/ontology/classes",
@@ -610,14 +578,6 @@
       "route": "/api/ontology/classes/${cls.gid}",
       "kind": "legacy",
       "method": "DELETE"
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 1466,
-      "column": 28,
-      "route": "/api/ontology/seed",
-      "kind": "legacy",
-      "method": "POST"
     },
     {
       "source": "web/ontology/ontology.js",
@@ -645,33 +605,9 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 1571,
-      "column": 25,
-      "route": "/api/ontology/db-tables",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 1610,
-      "column": 9,
-      "route": "/api/ontology/unbound-classes",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/ontology/ontology.js",
       "line": 1666,
       "column": 15,
       "route": "/api/ontology/classes/${gid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 1691,
-      "column": 25,
-      "route": "/api/ontology/node-type-suggestions",
       "kind": "legacy",
       "method": null
     },
