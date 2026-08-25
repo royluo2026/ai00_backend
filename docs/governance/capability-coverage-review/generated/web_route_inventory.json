@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 109,
+    "legacy": 108,
     "capability": 21,
     "allowlisted": 6,
-    "total": 136
+    "total": 135
   },
   "routes": [
     {
@@ -205,15 +205,7 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 1068,
-      "column": 31,
-      "route": "/api/gbop/versions/${_versionGid}/linked-parts",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 2354,
+      "line": 2356,
       "column": 38,
       "route": "/api/gbop/versions/${_versionGid}/layout-config",
       "kind": "legacy",
