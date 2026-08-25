@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 249,
-    "capability": 14,
+    "legacy": 210,
+    "capability": 15,
     "allowlisted": 6,
-    "total": 269
+    "total": 231
   },
   "routes": [
     {
@@ -765,439 +765,135 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 803,
-      "column": 22,
-      "route": "/api/bop/entries",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 1025,
-      "column": 24,
-      "route": "/api/bop/entries/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 1042,
-      "column": 20,
-      "route": "/api/bop/entries/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 1254,
-      "column": 20,
-      "route": "/api/bop/entries/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 1326,
-      "column": 41,
-      "route": "/api/ontology/schema/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 1346,
-      "column": 37,
-      "route": "/api/bop/entries/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 1430,
-      "column": 28,
-      "route": "/api/bop/entries/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 1480,
-      "column": 11,
-      "route": "/api/bop/entry-links",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 1543,
-      "column": 41,
-      "route": "/api/ontology/schema/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 1694,
-      "column": 37,
-      "route": "/api/bop/entity-detail",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 1782,
-      "column": 26,
-      "route": "/api/bop/entity-detail",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 1810,
-      "column": 24,
-      "route": "/api/bop/entry-links/${encodeURIComponent",
-      "kind": "legacy",
-      "method": "DELETE"
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 1865,
-      "column": 28,
-      "route": "/api/bop/factory/equipments",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 1865,
-      "column": 109,
-      "route": "/api/bop/factory/equipments",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 1868,
-      "column": 37,
-      "route": "/api/bop/factory/tools",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 1871,
-      "column": 37,
-      "route": "/api/bop/factory/fixtures",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 1874,
-      "column": 37,
-      "route": "/api/bop/entries/search",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 1877,
-      "column": 37,
-      "route": "/api/bop/entries/search",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 1880,
-      "column": 37,
-      "route": "/api/bop/entries/search",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 1895,
-      "column": 37,
-      "route": "/api/gbop/entries",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 2059,
-      "column": 26,
-      "route": "/api/bop/entries",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 2078,
-      "column": 26,
-      "route": "/api/bop/entry-links",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 2096,
-      "column": 26,
-      "route": "/api/bop/entry-links",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 2114,
-      "column": 43,
-      "route": "/api/ontology/schema/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 2118,
-      "column": 26,
-      "route": "/api/bop/entry-links",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 2132,
-      "column": 26,
-      "route": "/api/bop/entry-links",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 2158,
-      "column": 37,
-      "route": "/api/ontology/schema/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 2201,
-      "column": 9,
-      "route": "/api/bop/entry-links",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 2677,
-      "column": 41,
-      "route": "/api/ontology/schema/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 2697,
-      "column": 37,
-      "route": "/api/bop/entries/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 2781,
-      "column": 28,
-      "route": "/api/bop/entries/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 2826,
-      "column": 9,
-      "route": "/api/bop/entry-links",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 2888,
-      "column": 41,
-      "route": "/api/ontology/schema/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 3039,
-      "column": 37,
-      "route": "/api/bop/entity-detail",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 3127,
-      "column": 26,
-      "route": "/api/bop/entity-detail",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 3155,
-      "column": 24,
-      "route": "/api/bop/entry-links/${encodeURIComponent",
-      "kind": "legacy",
-      "method": "DELETE"
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 3210,
-      "column": 28,
-      "route": "/api/bop/factory/equipments",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 3210,
-      "column": 109,
-      "route": "/api/bop/factory/equipments",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 3213,
-      "column": 37,
-      "route": "/api/bop/factory/tools",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 3216,
-      "column": 37,
-      "route": "/api/bop/factory/fixtures",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 3219,
-      "column": 37,
-      "route": "/api/bop/entries/search",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 3222,
-      "column": 37,
-      "route": "/api/bop/entries/search",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 3225,
-      "column": 37,
-      "route": "/api/bop/entries/search",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 3240,
-      "column": 37,
-      "route": "/api/gbop/entries",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 3404,
-      "column": 26,
-      "route": "/api/bop/entries",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 3423,
-      "column": 26,
-      "route": "/api/bop/entry-links",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 3441,
-      "column": 26,
-      "route": "/api/bop/entry-links",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 3459,
-      "column": 43,
-      "route": "/api/ontology/schema/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 3463,
-      "column": 26,
-      "route": "/api/bop/entry-links",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 3477,
-      "column": 26,
-      "route": "/api/bop/entry-links",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 3503,
-      "column": 37,
-      "route": "/api/ontology/schema/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 3546,
-      "column": 9,
-      "route": "/api/bop/entry-links",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 3994,
+      "line": 223,
       "column": 39,
-      "route": "/api/bop/entry-links",
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+      "line": 1261,
+      "column": 20,
+      "route": "/api/bop/entries/${encodeURIComponent",
       "kind": "legacy",
       "method": null
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 4089,
-      "column": 11,
-      "route": "/api/bop/entry-links",
+      "line": 1333,
+      "column": 41,
+      "route": "/api/ontology/schema/${encodeURIComponent",
       "kind": "legacy",
       "method": null
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 4101,
+      "line": 1353,
+      "column": 37,
+      "route": "/api/bop/entries/${encodeURIComponent",
+      "kind": "legacy",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+      "line": 1437,
+      "column": 28,
+      "route": "/api/bop/entries/${encodeURIComponent",
+      "kind": "legacy",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+      "line": 1550,
+      "column": 41,
+      "route": "/api/ontology/schema/${encodeURIComponent",
+      "kind": "legacy",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+      "line": 1912,
+      "column": 37,
+      "route": "/api/gbop/entries",
+      "kind": "legacy",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+      "line": 2117,
+      "column": 43,
+      "route": "/api/ontology/schema/${encodeURIComponent",
+      "kind": "legacy",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+      "line": 2151,
+      "column": 37,
+      "route": "/api/ontology/schema/${encodeURIComponent",
+      "kind": "legacy",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+      "line": 2670,
+      "column": 41,
+      "route": "/api/ontology/schema/${encodeURIComponent",
+      "kind": "legacy",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+      "line": 2690,
+      "column": 37,
+      "route": "/api/bop/entries/${encodeURIComponent",
+      "kind": "legacy",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+      "line": 2774,
+      "column": 28,
+      "route": "/api/bop/entries/${encodeURIComponent",
+      "kind": "legacy",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+      "line": 2881,
+      "column": 41,
+      "route": "/api/ontology/schema/${encodeURIComponent",
+      "kind": "legacy",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+      "line": 3244,
+      "column": 37,
+      "route": "/api/gbop/entries",
+      "kind": "legacy",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+      "line": 3449,
+      "column": 43,
+      "route": "/api/ontology/schema/${encodeURIComponent",
+      "kind": "legacy",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+      "line": 3483,
+      "column": 37,
+      "route": "/api/ontology/schema/${encodeURIComponent",
+      "kind": "legacy",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+      "line": 4083,
       "column": 43,
       "route": "/api/ontology/schema/${encodeURIComponent",
       "kind": "legacy",
