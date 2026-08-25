@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 99,
+    "legacy": 98,
     "capability": 24,
     "allowlisted": 6,
-    "total": 129
+    "total": 128
   },
   "routes": [
     {
@@ -425,14 +425,6 @@
       "column": 29,
       "route": "/api/v1/capabilities/${id}:invoke",
       "kind": "capability",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/project/project.js",
-      "line": 343,
-      "column": 18,
-      "route": "/api/projects/${encodeURIComponent",
-      "kind": "legacy",
       "method": null
     },
     {
