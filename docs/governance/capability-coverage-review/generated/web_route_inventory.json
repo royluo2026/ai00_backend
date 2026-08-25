@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 82,
+    "legacy": 79,
     "capability": 24,
     "allowlisted": 6,
-    "total": 112
+    "total": 109
   },
   "routes": [
     {
@@ -192,14 +192,6 @@
       "line": 80,
       "column": 39,
       "route": "/api/bop/entries/${gid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/issue/issue.js",
-      "line": 103,
-      "column": 37,
-      "route": "/api/bop/entries/search",
       "kind": "legacy",
       "method": null
     },
@@ -520,22 +512,6 @@
       "line": 75,
       "column": 30,
       "route": "/api/projects",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/core/global_search.js",
-      "line": 88,
-      "column": 44,
-      "route": "/api/bop/entries/search",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/core/global_search.js",
-      "line": 198,
-      "column": 28,
-      "route": "/api/bop/entries/search",
       "kind": "legacy",
       "method": null
     },
