@@ -13,8 +13,8 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 100,
-    "capability": 23,
+    "legacy": 99,
+    "capability": 24,
     "allowlisted": 6,
     "total": 129
   },
@@ -965,15 +965,15 @@
     },
     {
       "source": "web/workbench/workbench.js",
-      "line": 192,
+      "line": 1185,
       "column": 31,
-      "route": "/api/bop/versions/${listGid}/entries",
-      "kind": "legacy",
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
       "method": null
     },
     {
       "source": "web/workbench/workbench.js",
-      "line": 1969,
+      "line": 1996,
       "column": 14,
       "route": "/api/bop/versions",
       "kind": "legacy",
@@ -981,7 +981,7 @@
     },
     {
       "source": "web/workbench/workbench.js",
-      "line": 2437,
+      "line": 2464,
       "column": 33,
       "route": "/api/projects",
       "kind": "legacy",
@@ -989,7 +989,7 @@
     },
     {
       "source": "web/workbench/workbench.js",
-      "line": 2439,
+      "line": 2466,
       "column": 33,
       "route": "/api/bop/versions",
       "kind": "legacy",
@@ -997,7 +997,7 @@
     },
     {
       "source": "web/workbench/workbench.js",
-      "line": 2663,
+      "line": 2690,
       "column": 30,
       "route": "/api/bop/versions",
       "kind": "legacy",
@@ -1005,7 +1005,7 @@
     },
     {
       "source": "web/workbench/workbench.js",
-      "line": 2672,
+      "line": 2699,
       "column": 30,
       "route": "/api/bop/versions/${srcGid}/fork",
       "kind": "legacy",
@@ -1013,7 +1013,7 @@
     },
     {
       "source": "web/workbench/workbench.js",
-      "line": 2681,
+      "line": 2708,
       "column": 30,
       "route": "/api/bop/versions/${srcGid}/smart-fork",
       "kind": "legacy",
@@ -1021,7 +1021,7 @@
     },
     {
       "source": "web/workbench/workbench.js",
-      "line": 2929,
+      "line": 2956,
       "column": 12,
       "route": "/api/bop/versions",
       "kind": "legacy",
@@ -1029,7 +1029,7 @@
     },
     {
       "source": "web/workbench/workbench.js",
-      "line": 2932,
+      "line": 2959,
       "column": 12,
       "route": "/api/projects",
       "kind": "legacy",
@@ -1037,7 +1037,7 @@
     },
     {
       "source": "web/workbench/workbench.js",
-      "line": 3341,
+      "line": 3368,
       "column": 22,
       "route": "/api/bop/versions/${item.gid}",
       "kind": "legacy",
@@ -1045,7 +1045,7 @@
     },
     {
       "source": "web/workbench/workbench.js",
-      "line": 3412,
+      "line": 3439,
       "column": 20,
       "route": "/api/projects",
       "kind": "legacy",
