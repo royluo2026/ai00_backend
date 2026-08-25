@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 108,
-    "capability": 21,
+    "legacy": 104,
+    "capability": 22,
     "allowlisted": 6,
-    "total": 135
+    "total": 132
   },
   "routes": [
     {
@@ -485,34 +485,10 @@
     },
     {
       "source": "packages/sim-plugin/web/cad_sim/cad_sim.js",
-      "line": 495,
-      "column": 27,
-      "route": "/api/bop/versions",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/sim-plugin/web/cad_sim/cad_sim.js",
-      "line": 531,
-      "column": 27,
-      "route": "/api/bop/versions/${versionGid}/alt-hier",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/sim-plugin/web/cad_sim/cad_sim.js",
-      "line": 1215,
-      "column": 38,
-      "route": "/api/bop/pics/upload",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/sim-plugin/web/cad_sim/cad_sim.js",
-      "line": 1227,
-      "column": 22,
-      "route": "/api/bop/entries/${op.bop_entry_gid}",
-      "kind": "legacy",
+      "line": 44,
+      "column": 29,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
       "method": null
     },
     {
