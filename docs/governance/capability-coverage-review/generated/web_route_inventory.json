@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 182,
-    "capability": 19,
+    "legacy": 176,
+    "capability": 20,
     "allowlisted": 6,
-    "total": 207
+    "total": 202
   },
   "routes": [
     {
@@ -773,50 +773,10 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/layout_mode.js",
-      "line": 1049,
-      "column": 18,
-      "route": "/api/bop/entries",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_mode.js",
-      "line": 1081,
-      "column": 16,
-      "route": "/api/bop/entries",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_mode.js",
-      "line": 2650,
-      "column": 20,
-      "route": "/api/bop/entry-links",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_mode.js",
-      "line": 3640,
-      "column": 17,
-      "route": "/api/bop/entries/${drag.row.gid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_mode.js",
-      "line": 3684,
-      "column": 19,
-      "route": "/api/bop/entries/${drag.row.gid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_mode.js",
-      "line": 3708,
-      "column": 15,
-      "route": "/api/bop/entries/${p.gid}",
-      "kind": "legacy",
+      "line": 49,
+      "column": 30,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
       "method": null
     },
     {
