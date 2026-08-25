@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 184,
-    "capability": 18,
+    "legacy": 182,
+    "capability": 19,
     "allowlisted": 6,
-    "total": 208
+    "total": 207
   },
   "routes": [
     {
@@ -261,7 +261,15 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 231,
+      "line": 50,
+      "column": 30,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
+      "line": 247,
       "column": 28,
       "route": "/api/gbop/versions/${_versionGid}/entries",
       "kind": "legacy",
@@ -269,23 +277,7 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 252,
-      "column": 28,
-      "route": "/api/gbop/versions",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 384,
-      "column": 28,
-      "route": "/api/gbop/versions",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 419,
+      "line": 439,
       "column": 28,
       "route": "/api/gbop/versions/${versionGid}/entries",
       "kind": "legacy",
@@ -293,7 +285,7 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 1042,
+      "line": 1062,
       "column": 31,
       "route": "/api/gbop/versions/${_versionGid}/linked-parts",
       "kind": "legacy",
@@ -301,7 +293,7 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 1291,
+      "line": 1311,
       "column": 13,
       "route": "/api/gbop/entries/${gid}",
       "kind": "legacy",
@@ -309,7 +301,7 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 1402,
+      "line": 1422,
       "column": 31,
       "route": "/api/gbop/pics/upload",
       "kind": "legacy",
@@ -317,7 +309,7 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 1653,
+      "line": 1673,
       "column": 17,
       "route": "/api/gbop/processes",
       "kind": "legacy",
@@ -325,7 +317,7 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 1678,
+      "line": 1698,
       "column": 17,
       "route": "/api/gbop/operations",
       "kind": "legacy",
@@ -333,7 +325,7 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 1693,
+      "line": 1713,
       "column": 30,
       "route": "/api/gbop/entries",
       "kind": "legacy",
@@ -341,7 +333,7 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 1704,
+      "line": 1724,
       "column": 19,
       "route": "/api/gbop/entries/${newGid}",
       "kind": "legacy",
@@ -349,7 +341,7 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 1729,
+      "line": 1749,
       "column": 15,
       "route": "/api/gbop/entries/${gid}",
       "kind": "legacy",
@@ -357,7 +349,7 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 2000,
+      "line": 2020,
       "column": 21,
       "route": "/api/gbop/entries/${gid}",
       "kind": "legacy",
@@ -365,7 +357,7 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 2040,
+      "line": 2060,
       "column": 19,
       "route": "/api/gbop/entries/${gid}",
       "kind": "legacy",
@@ -373,7 +365,7 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 2062,
+      "line": 2082,
       "column": 9,
       "route": "/api/gbop/processes/${primaryLink.ref_gid}",
       "kind": "legacy",
@@ -381,7 +373,7 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 2063,
+      "line": 2083,
       "column": 9,
       "route": "/api/gbop/operations/${primaryLink.ref_gid}",
       "kind": "legacy",
@@ -389,7 +381,7 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 2067,
+      "line": 2087,
       "column": 9,
       "route": "/api/gbop/versions/${_versionGid}/processes",
       "kind": "legacy",
@@ -397,7 +389,7 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 2068,
+      "line": 2088,
       "column": 9,
       "route": "/api/gbop/versions/${_versionGid}/operations",
       "kind": "legacy",
@@ -405,7 +397,7 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 2104,
+      "line": 2124,
       "column": 33,
       "route": "/api/gbop/processes/${entityGid}",
       "kind": "legacy",
@@ -413,7 +405,7 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 2104,
+      "line": 2124,
       "column": 70,
       "route": "/api/gbop/operations/${entityGid}",
       "kind": "legacy",
@@ -421,7 +413,7 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 2331,
+      "line": 2351,
       "column": 38,
       "route": "/api/gbop/versions/${_versionGid}/layout-config",
       "kind": "legacy",
@@ -429,7 +421,7 @@
     },
     {
       "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 2441,
+      "line": 2461,
       "column": 30,
       "route": "/api/gbop/versions/${vGid}/entries",
       "kind": "legacy",
