@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 331,
+    "legacy": 329,
     "capability": 11,
     "allowlisted": 6,
-    "total": 348
+    "total": 346
   },
   "routes": [
     {
@@ -2373,14 +2373,6 @@
     },
     {
       "source": "web/knowledge_hub/pages/project_info.html",
-      "line": 471,
-      "column": 26,
-      "route": "/api/bop/factories",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/knowledge_hub/pages/project_info.html",
       "line": 500,
       "column": 40,
       "route": "/api/bop/factories",
@@ -2402,14 +2394,6 @@
       "route": "/api/bop/factories/${gid}",
       "kind": "legacy",
       "method": "DELETE"
-    },
-    {
-      "source": "web/knowledge_hub/pages/project_info.html",
-      "line": 533,
-      "column": 10,
-      "route": "/api/bop/factories",
-      "kind": "legacy",
-      "method": null
     },
     {
       "source": "web/my_files/my_files.js",
