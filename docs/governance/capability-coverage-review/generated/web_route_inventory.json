@@ -13,20 +13,12 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 29,
+    "legacy": 28,
     "capability": 24,
     "allowlisted": 6,
-    "total": 59
+    "total": 58
   },
   "routes": [
-    {
-      "source": "packages/agent-plugin/web/automation_hub/skill_lib.js",
-      "line": 253,
-      "column": 38,
-      "route": "/api/flows",
-      "kind": "legacy",
-      "method": null
-    },
     {
       "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
       "line": 20,
