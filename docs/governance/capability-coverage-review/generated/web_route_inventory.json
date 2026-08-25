@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 39,
+    "legacy": 37,
     "capability": 24,
     "allowlisted": 6,
-    "total": 69
+    "total": 67
   },
   "routes": [
     {
@@ -124,14 +124,6 @@
       "method": null
     },
     {
-      "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
-      "line": 2356,
-      "column": 38,
-      "route": "/api/gbop/versions/${_versionGid}/layout-config",
-      "kind": "legacy",
-      "method": null
-    },
-    {
       "source": "packages/craft-plugin/web/issue/issue.js",
       "line": 80,
       "column": 39,
@@ -184,14 +176,6 @@
       "line": 516,
       "column": 32,
       "route": "/api/projects/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 3776,
-      "column": 38,
-      "route": "/api/bop/versions/${_versionGid}/layout-config",
       "kind": "legacy",
       "method": null
     },
