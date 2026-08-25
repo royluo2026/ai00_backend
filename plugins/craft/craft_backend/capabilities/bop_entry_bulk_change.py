@@ -30,8 +30,8 @@ def apply_bop_entry_bulk_change(payload: dict[str, Any], context: CapabilityCont
         version_gid = str(payload.get("version_gid") or payload.get("bop_version_gid") or "").strip()
         if not version_gid:
             raise ValueError("version_gid is required")
-        body = legacy.CreateEntryBody(**{k: v for k, v in payload.items() if k not in {"operation"}})
         from ..routers._bop import entries as legacy
+        body = legacy.CreateEntryBody(**{k: v for k, v in payload.items() if k not in {"operation"}})
         return {"data": legacy._legacy_create_entry(body, _actor(context))}
     if operation == "purge":
         version_gid = _required(payload, "version_gid")
