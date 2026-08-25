@@ -8,7 +8,7 @@ Update or soft-delete an active BOP main-tree entry with linked-entity and audit
 - 不适用：The request creates/copies/imports entries, changes links only, or operates on staging.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_25d12e3dbf9c09d95ad82d09c7802cef`
+- Catalog Release：`rel_f703703fd827bef0ee6f1e7c338e8785`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -100,7 +100,7 @@ Update or soft-delete an active BOP main-tree entry with linked-entity and audit
 ```json
 {
   "capability_id": "craft.bop.entry.change.apply",
-  "catalog_release": "rel_25d12e3dbf9c09d95ad82d09c7802cef",
+  "catalog_release": "rel_f703703fd827bef0ee6f1e7c338e8785",
   "major_version": 1,
   "payload": {
     "entry_gid": "example",

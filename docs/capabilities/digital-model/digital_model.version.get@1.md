@@ -8,7 +8,7 @@ Read an immutable Digital Model Version.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`digital_model`
-- Catalog Release：`rel_25d12e3dbf9c09d95ad82d09c7802cef`
+- Catalog Release：`rel_f703703fd827bef0ee6f1e7c338e8785`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -91,7 +91,7 @@ Read an immutable Digital Model Version.
 ```json
 {
   "capability_id": "digital_model.version.get",
-  "catalog_release": "rel_25d12e3dbf9c09d95ad82d09c7802cef",
+  "catalog_release": "rel_f703703fd827bef0ee6f1e7c338e8785",
   "major_version": 1,
   "payload": {
     "model_id": "example",

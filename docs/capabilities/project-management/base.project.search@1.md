@@ -8,7 +8,7 @@ Search visible Project Management refs by name or code.
 - 不适用：A project reference is already known or project rows are requested.
 - 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_25d12e3dbf9c09d95ad82d09c7802cef`
+- Catalog Release：`rel_f703703fd827bef0ee6f1e7c338e8785`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -93,7 +93,7 @@ Search visible Project Management refs by name or code.
 ```json
 {
   "capability_id": "base.project.search",
-  "catalog_release": "rel_25d12e3dbf9c09d95ad82d09c7802cef",
+  "catalog_release": "rel_f703703fd827bef0ee6f1e7c338e8785",
   "major_version": 1,
   "payload": {
     "query": "example"
