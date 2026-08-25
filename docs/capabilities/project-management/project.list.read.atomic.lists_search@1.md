@@ -8,7 +8,7 @@ Execute Project Management operation lists.search.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_8c2ddb0f627d7b924f28c571202672e1`
+- Catalog Release：`rel_25d12e3dbf9c09d95ad82d09c7802cef`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -326,7 +326,7 @@ Execute Project Management operation lists.search.
 ```json
 {
   "capability_id": "project.list.read.atomic.lists_search",
-  "catalog_release": "rel_8c2ddb0f627d7b924f28c571202672e1",
+  "catalog_release": "rel_25d12e3dbf9c09d95ad82d09c7802cef",
   "major_version": 1,
   "payload": {}
 }

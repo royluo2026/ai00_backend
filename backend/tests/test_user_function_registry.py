@@ -456,6 +456,21 @@ def test_strict_cli_accepts_registry_after_reviewed_candidates_are_published():
     assert "User Function Registry strict check passed" in result.stdout
 
 
+def test_coverage_reviews_ignore_supplemental_atomic_review_file(tmp_path: Path):
+    builder = _builder_module()
+    (tmp_path / "manifest.json").write_text("{}", encoding="utf-8")
+    (tmp_path / "craft-ebom-atomic.json").write_text(
+        json.dumps({"domain": "Craft", "capabilities": {}}), encoding="utf-8"
+    )
+    (tmp_path / "craft.json").write_text(
+        json.dumps({"domain": "Craft", "capabilities": {}}), encoding="utf-8"
+    )
+
+    reviews = builder.load_coverage_reviews(tmp_path)
+
+    assert [review["domain"] for review in reviews] == ["Craft"]
+
+
 def test_review_linkage_rejects_registry_row_missing_from_domain_review():
     builder = _builder_module()
     row = {

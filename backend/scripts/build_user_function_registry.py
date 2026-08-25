@@ -621,7 +621,7 @@ def load_coverage_reviews(path: Path = REVIEW_PATH) -> list[dict]:
     reviews = [
         json.loads(review_path.read_text(encoding="utf-8"))
         for review_path in sorted(path.glob("*.json"))
-        if review_path.name != "manifest.json"
+        if review_path.name not in {"manifest.json", "craft-ebom-atomic.json"}
     ]
     for review in reviews:
         _promote_device_review_fields(review)

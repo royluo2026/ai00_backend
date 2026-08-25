@@ -3,9 +3,9 @@
   "domain": "Craft",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:f8d765156a25c374d7e807820ab8603bacafc1687bdbc5dd37e24c1c597d035e",
-    "catalog_release": "rel_3010694218f96365eda536567f35d198",
-    "catalog_sha256": "sha256:1fa8c7b227193cfa27eb9c94d40ddb882899132ee6132351a60b54312ef1f280"
+    "registry_sha256": "sha256:3a1f42998087f2b5be49b54834412e89d12b81fc44ac9b1a391501c65a26fe74",
+    "catalog_release": "rel_25d12e3dbf9c09d95ad82d09c7802cef",
+    "catalog_sha256": "sha256:a8562bf685a10d721a4fe6e56bfeb1d9d17d0e71e5dac298fd261204a46cdb9d"
   },
   "unreviewed_functions": {},
   "excluded_functions": {
@@ -4138,6 +4138,206 @@
         }
       }
     },
+    "craft.ebom.part.bulk_create": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.ebom.part.bulk_create": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/ebom_part_change.py",
+            "plugins/craft/craft_backend/capabilities/ebom_vpps_stats_change.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.ebom.part.create": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.ebom.part.create": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/ebom_part_change.py",
+            "plugins/craft/craft_backend/capabilities/ebom_vpps_stats_change.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.ebom.part.delete": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.ebom.part.delete": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/ebom_part_change.py",
+            "plugins/craft/craft_backend/capabilities/ebom_vpps_stats_change.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.ebom.part.update": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.ebom.part.update": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/ebom_part_change.py",
+            "plugins/craft/craft_backend/capabilities/ebom_vpps_stats_change.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
     "craft.ebom.read": {
       "kind": "existing",
       "function_dispositions": {
@@ -4214,6 +4414,202 @@
           "enabled": false,
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "craft.ebom.read"
+        }
+      }
+    },
+    "craft.ebom.snapshot.delete": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.ebom.snapshot.delete": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/ebom_snapshot_change.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.ebom.snapshot.status.update": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.ebom.snapshot.status.update": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/ebom_snapshot_status_change.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.ebom.snapshot.update": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.ebom.snapshot.update": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/ebom_snapshot_change.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "craft.ebom.snapshot.vpps_stats.update": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:craft.ebom.snapshot.vpps_stats.update": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/ebom_vpps_stats_change.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
       }
     },

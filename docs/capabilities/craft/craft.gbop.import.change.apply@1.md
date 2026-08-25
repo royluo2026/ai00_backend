@@ -8,7 +8,7 @@ Import bounded VPPS parts or parsed entries into a GBOP version.
 - 不适用：The request imports Teamcenter Excel binary content or mutates individual GBOP entities.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_8c2ddb0f627d7b924f28c571202672e1`
+- Catalog Release：`rel_25d12e3dbf9c09d95ad82d09c7802cef`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -111,7 +111,7 @@ Import bounded VPPS parts or parsed entries into a GBOP version.
 ```json
 {
   "capability_id": "craft.gbop.import.change.apply",
-  "catalog_release": "rel_8c2ddb0f627d7b924f28c571202672e1",
+  "catalog_release": "rel_25d12e3dbf9c09d95ad82d09c7802cef",
   "major_version": 1,
   "payload": {
     "operation": "import_vpps_parts",

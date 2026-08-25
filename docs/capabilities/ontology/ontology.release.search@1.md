@@ -8,7 +8,7 @@ Search immutable release metadata.
 - 不适用：A release identity is known.
 - 生命周期：`stable`
 - 所属领域：`ontology`
-- Catalog Release：`rel_8c2ddb0f627d7b924f28c571202672e1`
+- Catalog Release：`rel_25d12e3dbf9c09d95ad82d09c7802cef`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -79,7 +79,7 @@ Search immutable release metadata.
 ```json
 {
   "capability_id": "ontology.release.search",
-  "catalog_release": "rel_8c2ddb0f627d7b924f28c571202672e1",
+  "catalog_release": "rel_25d12e3dbf9c09d95ad82d09c7802cef",
   "major_version": 1,
   "payload": {}
 }

@@ -113,7 +113,15 @@
 | Craft | `craft.data_exchange.lark.write` | none |
 | Craft | `craft.ebom.change.apply` | rest |
 | Craft | `craft.ebom.legacy_read` | web, rest |
+| Craft | `craft.ebom.part.bulk_create` | none |
+| Craft | `craft.ebom.part.create` | none |
+| Craft | `craft.ebom.part.delete` | none |
+| Craft | `craft.ebom.part.update` | none |
 | Craft | `craft.ebom.read` | rest |
+| Craft | `craft.ebom.snapshot.delete` | none |
+| Craft | `craft.ebom.snapshot.status.update` | none |
+| Craft | `craft.ebom.snapshot.update` | none |
+| Craft | `craft.ebom.snapshot.vpps_stats.update` | none |
 | Craft | `craft.ebom.vpps_check.read` | web, rest |
 | Craft | `craft.gbop.catalog.read` | web, rest |
 | Craft | `craft.gbop.change.apply` | rest |

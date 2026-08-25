@@ -5,10 +5,10 @@
     "maximum_catalog_capabilities": 170,
     "maximum_domain_additions": 40
   },
-  "catalog_descriptors": 333,
-  "current_catalog_capabilities": 317,
+  "catalog_descriptors": 451,
+  "current_catalog_capabilities": 435,
   "candidate_capabilities": 0,
-  "proposed_final_catalog_capabilities": 317,
+  "proposed_final_catalog_capabilities": 435,
   "candidate_additions_by_domain": {
     "Base Platform": 0,
     "Project Management": 0,
@@ -24,9 +24,9 @@
   },
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:f8d765156a25c374d7e807820ab8603bacafc1687bdbc5dd37e24c1c597d035e",
-    "catalog_release": "rel_3010694218f96365eda536567f35d198",
-    "catalog_sha256": "sha256:1fa8c7b227193cfa27eb9c94d40ddb882899132ee6132351a60b54312ef1f280"
+    "registry_sha256": "sha256:3a1f42998087f2b5be49b54834412e89d12b81fc44ac9b1a391501c65a26fe74",
+    "catalog_release": "rel_25d12e3dbf9c09d95ad82d09c7802cef",
+    "catalog_sha256": "sha256:a8562bf685a10d721a4fe6e56bfeb1d9d17d0e71e5dac298fd261204a46cdb9d"
   },
   "ownership_sha256": "sha256:eca651991b073cc0e75d3aa0e4f97b3402d36fd9df825bbf76da2d3f9ed4cdb5",
   "table_inventory_sha256": "sha256:db67c535f4be4790b88387809c12f45b0f0b3c284543f8c8f20e0fe522cc12a3",

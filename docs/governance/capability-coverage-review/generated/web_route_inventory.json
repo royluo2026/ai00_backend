@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 342,
-    "capability": 10,
+    "legacy": 336,
+    "capability": 11,
     "allowlisted": 6,
-    "total": 358
+    "total": 353
   },
   "routes": [
     {
@@ -2133,55 +2133,15 @@
     },
     {
       "source": "packages/craft-plugin/web/project/project.js",
-      "line": 173,
-      "column": 15,
-      "route": "/api/projects/${_editingGid}",
-      "kind": "legacy",
+      "line": 17,
+      "column": 29,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
       "method": null
     },
     {
       "source": "packages/craft-plugin/web/project/project.js",
-      "line": 178,
-      "column": 15,
-      "route": "/api/projects",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/project/project.js",
-      "line": 216,
-      "column": 25,
-      "route": "/api/projects",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/project/project.js",
-      "line": 222,
-      "column": 25,
-      "route": "/api/projects/vehicle_models",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/project/project.js",
-      "line": 234,
-      "column": 25,
-      "route": "/api/bop/factories",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/project/project.js",
-      "line": 283,
-      "column": 13,
-      "route": "/api/projects/${_selectedProject.gid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/project/project.js",
-      "line": 333,
+      "line": 343,
       "column": 18,
       "route": "/api/projects/${encodeURIComponent",
       "kind": "legacy",
@@ -2189,16 +2149,8 @@
     },
     {
       "source": "packages/craft-plugin/web/project/project.js",
-      "line": 334,
+      "line": 344,
       "column": 18,
-      "route": "/api/projects/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/project/project.js",
-      "line": 393,
-      "column": 26,
       "route": "/api/projects/${encodeURIComponent",
       "kind": "legacy",
       "method": null
@@ -2206,6 +2158,14 @@
     {
       "source": "packages/craft-plugin/web/project/project.js",
       "line": 403,
+      "column": 26,
+      "route": "/api/projects/${encodeURIComponent",
+      "kind": "legacy",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/project/project.js",
+      "line": 413,
       "column": 22,
       "route": "/api/projects/${encodeURIComponent",
       "kind": "legacy",
