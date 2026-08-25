@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 199,
+    "legacy": 196,
     "capability": 17,
     "allowlisted": 6,
-    "total": 222
+    "total": 219
   },
   "routes": [
     {
@@ -933,15 +933,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 332,
-      "column": 27,
-      "route": "/api/projects",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 513,
+      "line": 516,
       "column": 32,
       "route": "/api/projects/${encodeURIComponent",
       "kind": "legacy",
@@ -949,23 +941,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 799,
-      "column": 28,
-      "route": "/api/bop/versions",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 952,
-      "column": 27,
-      "route": "/api/bop/versions",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 2281,
+      "line": 2292,
       "column": 13,
       "route": "/api/bop/entries/${gid}",
       "kind": "legacy",
@@ -973,7 +949,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 2621,
+      "line": 2632,
       "column": 31,
       "route": "/api/bop/pics/upload",
       "kind": "legacy",
@@ -981,7 +957,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 2961,
+      "line": 2972,
       "column": 28,
       "route": "/api/bop/entries",
       "kind": "legacy",
@@ -989,7 +965,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 2972,
+      "line": 2983,
       "column": 17,
       "route": "/api/bop/entries/${newGid}",
       "kind": "legacy",
@@ -997,7 +973,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 3000,
+      "line": 3011,
       "column": 15,
       "route": "/api/bop/entries/${gid}",
       "kind": "legacy",
@@ -1005,7 +981,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 3165,
+      "line": 3176,
       "column": 27,
       "route": "/api/bop/entity-detail",
       "kind": "legacy",
@@ -1013,7 +989,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 3245,
+      "line": 3256,
       "column": 19,
       "route": "/api/bop/entity-detail",
       "kind": "legacy",
@@ -1021,7 +997,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 3264,
+      "line": 3275,
       "column": 19,
       "route": "/api/bop/entry-links/${linkGid}",
       "kind": "legacy",
@@ -1029,7 +1005,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 3282,
+      "line": 3293,
       "column": 21,
       "route": "/api/bop/entity-detail",
       "kind": "legacy",
@@ -1037,7 +1013,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 3440,
+      "line": 3451,
       "column": 21,
       "route": "/api/bop/entries/${gid}",
       "kind": "legacy",
@@ -1045,7 +1021,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 3480,
+      "line": 3491,
       "column": 19,
       "route": "/api/bop/entries/${gid}",
       "kind": "legacy",
@@ -1053,7 +1029,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 3574,
+      "line": 3585,
       "column": 17,
       "route": "/api/bop/staging/${item.gid}",
       "kind": "legacy",
@@ -1061,7 +1037,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 3756,
+      "line": 3767,
       "column": 38,
       "route": "/api/bop/versions/${_versionGid}/layout-config",
       "kind": "legacy",
@@ -1069,7 +1045,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 4019,
+      "line": 4030,
       "column": 27,
       "route": "/api/bop/versions/${_versionGid}/auto-link",
       "kind": "legacy",
@@ -1077,7 +1053,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 4072,
+      "line": 4083,
       "column": 15,
       "route": "/api/bop/entries",
       "kind": "legacy",
@@ -1085,7 +1061,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 4451,
+      "line": 4462,
       "column": 19,
       "route": "/api/bop/entry-links",
       "kind": "legacy",
@@ -1093,7 +1069,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 4497,
+      "line": 4508,
       "column": 15,
       "route": "/api/bop/entries/${savedGid}",
       "kind": "legacy",
