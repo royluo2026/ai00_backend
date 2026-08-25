@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 79,
+    "legacy": 76,
     "capability": 24,
     "allowlisted": 6,
-    "total": 109
+    "total": 106
   },
   "routes": [
     {
@@ -554,30 +554,6 @@
       "route": "/api/v1/capabilities/${id}:invoke",
       "kind": "capability",
       "method": null
-    },
-    {
-      "source": "web/knowledge_hub/pages/project_info.html",
-      "line": 500,
-      "column": 40,
-      "route": "/api/bop/factories",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "web/knowledge_hub/pages/project_info.html",
-      "line": 501,
-      "column": 45,
-      "route": "/api/bop/factories/${gid}",
-      "kind": "legacy",
-      "method": "PATCH"
-    },
-    {
-      "source": "web/knowledge_hub/pages/project_info.html",
-      "line": 502,
-      "column": 39,
-      "route": "/api/bop/factories/${gid}",
-      "kind": "legacy",
-      "method": "DELETE"
     },
     {
       "source": "web/my_files/my_files.js",
