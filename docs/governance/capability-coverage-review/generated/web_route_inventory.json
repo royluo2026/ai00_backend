@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 210,
-    "capability": 15,
+    "legacy": 204,
+    "capability": 16,
     "allowlisted": 6,
-    "total": 231
+    "total": 226
   },
   "routes": [
     {
@@ -1157,50 +1157,10 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/staging_panel.js",
-      "line": 44,
-      "column": 34,
-      "route": "/api/bop/versions/${this._versionGid}/staging",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/staging_panel.js",
-      "line": 205,
-      "column": 20,
-      "route": "/api/bop/versions/${this._versionGid}/staging",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/staging_panel.js",
-      "line": 222,
-      "column": 20,
-      "route": "/api/bop/entries/${entryGid}/demote",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/staging_panel.js",
-      "line": 234,
-      "column": 32,
-      "route": "/api/bop/staging/${stagingGid}/promote",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/staging_panel.js",
-      "line": 251,
-      "column": 22,
-      "route": "/api/bop/staging/${stagingGid}",
-      "kind": "legacy",
-      "method": "DELETE"
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/staging_panel.js",
-      "line": 261,
-      "column": 20,
-      "route": "/api/bop/versions/${this._versionGid}/staging",
-      "kind": "legacy",
+      "line": 42,
+      "column": 37,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
       "method": null
     },
     {
