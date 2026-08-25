@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 103,
-    "capability": 22,
+    "legacy": 100,
+    "capability": 23,
     "allowlisted": 6,
-    "total": 131
+    "total": 129
   },
   "routes": [
     {
@@ -141,26 +141,10 @@
     },
     {
       "source": "packages/craft-plugin/web/factory_resource/factory_resource.js",
-      "line": 16,
-      "column": 25,
-      "route": "/api/factory/tools",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/factory_resource/factory_resource.js",
-      "line": 17,
-      "column": 25,
-      "route": "/api/factory/equipments",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/factory_resource/factory_resource.js",
-      "line": 18,
-      "column": 25,
-      "route": "/api/factory/fixtures",
-      "kind": "legacy",
+      "line": 29,
+      "column": 40,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
       "method": null
     },
     {
@@ -413,7 +397,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage_version_mgr.js",
-      "line": 487,
+      "line": 491,
       "column": 24,
       "route": "/api/bop/versions/${ver.gid}",
       "kind": "legacy",
