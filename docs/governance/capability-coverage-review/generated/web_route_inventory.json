@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 61,
+    "legacy": 56,
     "capability": 24,
     "allowlisted": 6,
-    "total": 91
+    "total": 86
   },
   "routes": [
     {
@@ -157,33 +157,9 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 1261,
-      "column": 20,
-      "route": "/api/bop/entries/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
       "line": 1333,
       "column": 41,
       "route": "/api/ontology/schema/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 1353,
-      "column": 37,
-      "route": "/api/bop/entries/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 1437,
-      "column": 28,
-      "route": "/api/bop/entries/${encodeURIComponent",
       "kind": "legacy",
       "method": null
     },
@@ -216,22 +192,6 @@
       "line": 2674,
       "column": 41,
       "route": "/api/ontology/schema/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 2694,
-      "column": 37,
-      "route": "/api/bop/entries/${encodeURIComponent",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 2778,
-      "column": 28,
-      "route": "/api/bop/entries/${encodeURIComponent",
       "kind": "legacy",
       "method": null
     },
