@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 119,
+    "legacy": 114,
     "capability": 21,
     "allowlisted": 6,
-    "total": 146
+    "total": 141
   },
   "routes": [
     {
@@ -97,46 +97,6 @@
       "column": 30,
       "route": "/api/v1/capabilities/${id}:invoke",
       "kind": "capability",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop_nav/bop_nav.js",
-      "line": 985,
-      "column": 15,
-      "route": "/api/bop/pbom-versions/${_currentGid}/gbop-match-confirm",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop_nav/bop_nav.js",
-      "line": 1001,
-      "column": 19,
-      "route": "/api/bop/versions/${_bopVersionGid}/vehicle-ops-stats",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop_nav/bop_nav.js",
-      "line": 1230,
-      "column": 27,
-      "route": "/api/gbop/pbom-versions/${pbomGid}/vpps-auto-link-status",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop_nav/bop_nav.js",
-      "line": 1241,
-      "column": 29,
-      "route": "/api/gbop/pbom-versions/${_currentGid}/vpps-auto-link",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop_nav/bop_nav.js",
-      "line": 1269,
-      "column": 29,
-      "route": "/api/gbop/pbom-versions/${_currentGid}/vpps-auto-link-confirm",
-      "kind": "legacy",
       "method": null
     },
     {
