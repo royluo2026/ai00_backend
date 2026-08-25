@@ -6729,6 +6729,30 @@
         "plugins/ontology/ontology_backend/capabilities/reviewed.py"
       ]
     },
+    "capability:ontology.object.list": {
+      "function_id": "capability:ontology.object.list",
+      "domain": "Ontology",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "ontology.object.list",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "ontology"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Ontology",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "backend/capabilities/ontology_concepts_next.py",
+        "plugins/ontology/ontology_backend/capabilities/ontology_concepts_next.py"
+      ]
+    },
     "capability:ontology.release.activate": {
       "function_id": "capability:ontology.release.activate",
       "domain": "Ontology",

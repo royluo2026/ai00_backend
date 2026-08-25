@@ -33,6 +33,13 @@ class Repository:
     def get_object(self, release_gid, kind, stable_gid):
         return next((item for item in self.objects if item["kind"] == kind and item["stable_gid"] == stable_gid), None)
 
+    def list_objects_page(self, release_gid, *, kinds=None, limit=100, offset=0, query=None):
+        items = self.list_objects(release_gid, kinds=kinds)
+        if query:
+            needle = query.casefold()
+            items = [item for item in items if needle in str(item.get("name", "")).casefold()]
+        return items[offset:offset + limit], len(items)
+
 
 def _repository():
     return patch("backend.capabilities.ontology_concepts_next.OntologyReleaseRepository", return_value=Repository())
@@ -74,6 +81,36 @@ def test_get_schema_is_version_pinned_and_does_not_return_arbitrary_graph():
     assert result.data["release_gid"] == "rel1"
     assert result.data["concept"]["value_type"] == "number"
     assert result.data["ontology_version_ref"]["release_gid"] == "rel1"
+
+
+def test_list_objects_is_bounded_and_version_pinned():
+    from backend.capabilities.ontology_concepts_next import list_objects
+
+    with _repository():
+        result = list_objects({"release_gid": "rel1", "kinds": ["concept"], "limit": 1, "offset": 1}, CONTEXT)
+    assert result.data["total"] == 2
+    assert result.data["offset"] == 1
+    assert len(result.data["items"]) == 1
+    assert result.data["items"][0]["stable_gid"] == "c-station-b"
+    assert result.data["items"][0]["concept_ref"]["ontology_version"]["release_gid"] == "rel1"
+
+
+def test_list_objects_rejects_unbounded_or_unknown_kinds():
+    from backend.capabilities.ontology_concepts_next import list_objects
+
+    with _repository():
+        try:
+            list_objects({"limit": 101}, CONTEXT)
+        except ValueError as exc:
+            assert "between 1 and 100" in str(exc)
+        else:
+            raise AssertionError("limit above 100 must be rejected")
+        try:
+            list_objects({"kinds": ["table"]}, CONTEXT)
+        except ValueError as exc:
+            assert "unsupported" in str(exc)
+        else:
+            raise AssertionError("unknown kinds must be rejected")
 
 
 def test_mapping_assess_never_claims_semantic_truth_from_names_only():
@@ -126,7 +163,7 @@ def test_plugin_and_agent_contracts_declare_stable_ontology_refs():
     registry = CapabilityRegistry()
     register_ontology_concept_capabilities(registry)
 
-    for capability_id in ("ontology.concept.resolve", "ontology.concept.get"):
+    for capability_id in ("ontology.concept.resolve", "ontology.concept.get", "ontology.object.list"):
         descriptor = adapt_v1_spec(registry.get(capability_id).spec)
         assert descriptor.exposure.plugin is True
         assert descriptor.exposure.agent is True

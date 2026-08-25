@@ -242,7 +242,7 @@
         "plugin_id": "official.ontology",
         "module": "ontology_backend.capabilities",
         "version": "2.0.0",
-        "artifact_hash": "sha256:be2cb24632b718d53e028d893618f55cad4b257170932e5b20775e1bd55c5948"
+        "artifact_hash": "sha256:d459104c099a808590ddbd6e341d5b0cb28ca649ba9c8cbf36cb4ea50b144a23"
       },
       "artifact_path": "plugins/ontology/ontology_backend",
       "allowed_owners": [

@@ -8,7 +8,10 @@ from plugins.ontology.ontology_backend.mappings import assess_objects
 from plugins.ontology.ontology_backend.repository import OntologyReleaseRepository
 from backend.domain_ports.ontology import ConceptRef, OntologyVersionRef
 
-from backend.capability_v2.provider_contracts import CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
+from backend.capability_v2.provider_contracts import (
+    CapabilityCollectionPolicy, CapabilityContext, CapabilityExecutionBudget,
+    CapabilityMemoryClass, CapabilityOutput, CapabilitySpec, EvidenceRef,
+)
 
 
 ONTOLOGY_VERSION_REF_SCHEMA = {
@@ -74,6 +77,20 @@ MAPPING_ASSESSMENT_SCHEMA = {
         },
         "reasons": {"type": "array", "items": {"type": "string"}},
         "checks": {},
+    },
+}
+
+OBJECT_LIST_SCHEMA = {
+    "type": "object",
+    "required": ["items", "total", "offset", "limit", "release_gid", "release_sha256", "ontology_version_ref"],
+    "properties": {
+        "items": {"type": "array", "items": {"type": "object"}},
+        "total": {"type": "integer", "minimum": 0},
+        "offset": {"type": "integer", "minimum": 0},
+        "limit": {"type": "integer", "minimum": 1, "maximum": 100},
+        "release_gid": {"type": "string"},
+        "release_sha256": {"type": "string", "pattern": r"^[0-9a-f]{64}$"},
+        "ontology_version_ref": ONTOLOGY_VERSION_REF_SCHEMA,
     },
 }
 
@@ -148,6 +165,45 @@ def get_concept(payload: dict[str, Any], _context: CapabilityContext) -> Capabil
     )
 
 
+def list_objects(payload: dict[str, Any], _context: CapabilityContext) -> CapabilityOutput:
+    raw_kinds = payload.get("kinds")
+    if raw_kinds is None:
+        kinds = {"concept", "property", "relation", "mapping", "constraint"}
+    elif isinstance(raw_kinds, list) and all(isinstance(kind, str) for kind in raw_kinds):
+        kinds = {kind.strip() for kind in raw_kinds if kind.strip()}
+        if not kinds:
+            raise ValueError("kinds must not be empty")
+    else:
+        raise ValueError("kinds must be a string array")
+    allowed = {"concept", "property", "relation", "mapping", "constraint"}
+    if not kinds.issubset(allowed):
+        raise ValueError("kinds contains an unsupported ontology object kind")
+    limit = int(payload.get("limit") or 100)
+    offset = int(payload.get("offset") or 0)
+    if not 1 <= limit <= 100:
+        raise ValueError("limit must be between 1 and 100")
+    if offset < 0:
+        raise ValueError("offset must be non-negative")
+    query = str(payload.get("query") or "").strip()
+    if len(query) > 100:
+        raise ValueError("query must be at most 100 characters")
+    repository = OntologyReleaseRepository()
+    release = repository.resolve_release(str(payload.get("release_gid") or "").strip() or None)
+    version = _version_ref(release)
+    items, total = repository.list_objects_page(
+        release["release_gid"], kinds=kinds, limit=limit, offset=offset, query=query or None,
+    )
+    return CapabilityOutput(
+        data={
+            "items": [_project_with_ref(item, "schema", version) for item in items],
+            "total": total, "offset": offset, "limit": limit,
+            "release_gid": release["release_gid"], "release_sha256": release["content_sha256"],
+            "ontology_version_ref": version.model_dump(mode="json"),
+        },
+        evidence=(_release_evidence(release),),
+    )
+
+
 def assess_mapping(payload: dict[str, Any], _context: CapabilityContext) -> CapabilityOutput:
     source = payload.get("source")
     target = payload.get("target")
@@ -182,6 +238,20 @@ def register_ontology_concept_capabilities(registry: Any) -> None:
         use_when="A stable ontology identity is known.", do_not_use_when="The caller only has an ambiguous term.",
         effects=("read:ontology.object",), output_schema=CONCEPT_RESULT_SCHEMA,
         input_schema={"type": "object", "required": ["stable_gid"], "properties": {"stable_gid": {"type": "string"}, "kind": object_ref["properties"]["kind"], "release_gid": {"type": "string"}, "view": {"type": "string", "enum": ["summary", "schema"]}}}), get_concept)
+    registry.register(CapabilitySpec(
+        **common, id="ontology.object.list", description="Read a bounded page of immutable ontology objects.",
+        use_when="A consumer needs a list or graph projection of ontology objects.",
+        do_not_use_when="A stable object identity is already known or an unbounded export is requested.",
+        effects=("read:ontology.object",), output_schema=OBJECT_LIST_SCHEMA,
+        execution_budget=CapabilityExecutionBudget(
+            memory_class=CapabilityMemoryClass.MEDIUM, collection_policy=CapabilityCollectionPolicy.PAGED,
+            max_page_size=100, max_output_bytes=2 * 1024 * 1024,
+        ),
+        input_schema={"type": "object", "properties": {
+            "release_gid": {"type": "string"}, "kinds": {"type": "array", "maxItems": 5, "items": object_ref["properties"]["kind"]},
+            "limit": {"type": "integer", "minimum": 1, "maximum": 100}, "offset": {"type": "integer", "minimum": 0},
+            "query": {"type": "string", "maxLength": 100},
+        }}), list_objects)
     registry.register(CapabilitySpec(
         **common, id="ontology.mapping.assess", description="Assess deterministic mapping compatibility without persisting a mapping.",
         use_when="Two typed ontology objects may correspond.", do_not_use_when="Only names are available and an automatic decision is expected.",

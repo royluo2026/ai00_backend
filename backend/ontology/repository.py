@@ -194,6 +194,52 @@ class OntologyReleaseRepository:
             result.append(item)
         return result
 
+    def list_objects_page(
+        self,
+        release_gid: str,
+        *,
+        kinds: set[str] | None = None,
+        limit: int = 100,
+        offset: int = 0,
+        query: str | None = None,
+    ) -> tuple[list[dict[str, Any]], int]:
+        """Read a deterministic, bounded page from an immutable release."""
+        limit = max(1, min(int(limit), 100))
+        offset = max(0, int(offset))
+        params: list[Any] = [release_gid]
+        where = ["release_gid=%s"]
+        if kinds:
+            ordered = sorted(kinds)
+            where.append("object_kind IN (" + ",".join(["%s"] * len(ordered)) + ")")
+            params.extend(ordered)
+        if query:
+            where.append("LOWER(object_json) LIKE %s")
+            params.append(f"%{query.strip().lower()}%")
+        clause = " AND ".join(where)
+        with _open_connection(self._connection_factory) as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    f"SELECT COUNT(*) AS total FROM workmanship_base_ontology_release_objects WHERE {clause}",
+                    tuple(params),
+                )
+                total_row = cursor.fetchone() or {"total": 0}
+                cursor.execute(
+                    "SELECT object_kind,stable_object_gid,object_sha256,object_json "
+                    f"FROM workmanship_base_ontology_release_objects WHERE {clause} "
+                    "ORDER BY object_kind,stable_object_gid LIMIT %s OFFSET %s",
+                    tuple(params + [limit, offset]),
+                )
+                rows = cursor.fetchall()
+        result = []
+        for row in rows:
+            raw = row["object_json"]
+            item = json.loads(raw) if isinstance(raw, str) else dict(raw)
+            item.setdefault("kind", row["object_kind"])
+            item.setdefault("stable_gid", row["stable_object_gid"])
+            item["object_sha256"] = row["object_sha256"]
+            result.append(item)
+        return result, int(total_row.get("total") or 0)
+
     def get_object(self, release_gid: str, kind: str, stable_gid: str) -> dict[str, Any] | None:
         with _open_connection(self._connection_factory) as conn:
             with conn.cursor() as cursor:

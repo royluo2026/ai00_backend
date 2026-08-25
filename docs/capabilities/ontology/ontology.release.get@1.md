@@ -8,7 +8,7 @@ Read one immutable or active release.
 - 不适用：Comparing two releases.
 - 生命周期：`stable`
 - 所属领域：`ontology`
-- Catalog Release：`rel_b269c2007be6145b1cdc6da7d97a4456`
+- Catalog Release：`rel_18e33fb9916963cae3955c617e7538c2`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -79,7 +79,7 @@ Read one immutable or active release.
 ```json
 {
   "capability_id": "ontology.release.get",
-  "catalog_release": "rel_b269c2007be6145b1cdc6da7d97a4456",
+  "catalog_release": "rel_18e33fb9916963cae3955c617e7538c2",
   "major_version": 1,
   "payload": {}
 }

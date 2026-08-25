@@ -2448,6 +2448,15 @@
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[ontology.mapping.change.apply@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[ontology.mapping.change.apply@1]"
     },
+    "ontology.object.list@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[ontology.object.list@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[ontology.object.list@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[ontology.object.list@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[ontology.object.list@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[ontology.object.list@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[ontology.object.list@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[ontology.object.list@1]"
+    },
     "ontology.release.activate@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[ontology.release.activate@1]",
       "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[ontology.release.activate@1]",
@@ -3925,7 +3934,7 @@
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[vismockup.visibility@1]"
     }
   },
-  "catalog_release": "rel_b269c2007be6145b1cdc6da7d97a4456",
+  "catalog_release": "rel_18e33fb9916963cae3955c617e7538c2",
   "mandatory_cases": [
     "success",
     "invalid_input",

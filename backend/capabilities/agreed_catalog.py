@@ -93,7 +93,7 @@ APPROVED_CAPABILITY_IDS = frozenset({
     "knowledge.space.search", "local.command.get", "ontology.change.proposal.create",
     "ontology.change.proposal.get", "ontology.change.proposal.review.submit",
     "ontology.change.proposal.search", "ontology.concept.get", "ontology.concept.resolve",
-    "ontology.mapping.assess", "ontology.release.activate", "ontology.release.diff",
+    "ontology.mapping.assess", "ontology.object.list", "ontology.release.activate", "ontology.release.diff",
     "ontology.release.get", "ontology.release.publish", "ontology.release.search",
     "plugin.disable", "plugin.enable", "plugin.install", "plugin.revoke", "plugin.rollback",
     "plugin.storage.delete", "plugin.storage.get", "plugin.storage.list", "plugin.storage.put",

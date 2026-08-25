@@ -743,6 +743,7 @@
 | Ontology | `rest:GET:/api/ontology/schema/{node_type}` | existing_capability | `ontology.concept.resolve` |
 | Ontology | `capability:ontology.mapping.assess` | existing_capability | `ontology.mapping.assess` |
 | Ontology | `capability:ontology.mapping.change.apply` | existing_capability | `ontology.mapping.change.apply` |
+| Ontology | `capability:ontology.object.list` | existing_capability | `ontology.object.list` |
 | Ontology | `capability:ontology.release.activate` | existing_capability | `ontology.release.activate` |
 | Ontology | `capability:ontology.release.diff` | existing_capability | `ontology.release.diff` |
 | Ontology | `capability:ontology.release.get` | existing_capability | `ontology.release.get` |

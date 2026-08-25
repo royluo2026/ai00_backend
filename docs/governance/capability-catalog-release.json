@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_b269c2007be6145b1cdc6da7d97a4456",
-  "catalog_hash": "sha256:b269c2007be6145b1cdc6da7d97a44567c1543f30eff79e6132624d41b2a61ad",
+  "release_id": "rel_18e33fb9916963cae3955c617e7538c2",
+  "catalog_hash": "sha256:18e33fb9916963cae3955c617e7538c292492d963bc2032c845f1a21645dbdbd",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -108035,6 +108035,391 @@
       ]
     },
     {
+      "id": "ontology.object.list",
+      "major_version": 1,
+      "owner_domain": "ontology",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "ontology.object.list",
+      "description": "Read a bounded page of immutable ontology objects.",
+      "use_when": "A consumer needs a list or graph projection of ontology objects.",
+      "do_not_use_when": "A stable object identity is already known or an unbounded export is requested.",
+      "business_effect": "Business outcome: Read a bounded page of immutable ontology objects.",
+      "side_effect_level": "read",
+      "side_effects": "Reads ontology domain state; emits no mutation event or external call.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "ontology.v2:authenticated",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "release_gid": {
+            "type": "string"
+          },
+          "kinds": {
+            "type": "array",
+            "maxItems": 5,
+            "items": {
+              "type": "string",
+              "enum": [
+                "concept",
+                "property",
+                "relation",
+                "mapping",
+                "constraint"
+              ]
+            }
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "query": {
+            "type": "string",
+            "maxLength": 100
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "offset",
+          "limit",
+          "release_gid",
+          "release_sha256",
+          "ontology_version_ref"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "release_gid": {
+            "type": "string"
+          },
+          "release_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "offset",
+          "limit",
+          "release_gid",
+          "release_sha256",
+          "ontology_version_ref"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "release_gid": {
+            "type": "string"
+          },
+          "release_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:f13ed600d7bf25dd21f6ec172324619f62b27075fe19610e744cbdf94954d87b",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "medium",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 2097152,
+        "collection_policy": "paged",
+        "max_page_size": 100,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "Ontology release or object was not found.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "Activation requires an approved release.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "Ontology active release changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "Ontology provider is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_843a7d9437fdc3a4f84aa56c",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "Ontology release or object was not found.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "Activation requires an approved release.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "Ontology active release changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "Ontology provider is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "ontology.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/ontology.object.list:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
+          "result": "pass",
+          "path": "backend/tests/test_capability_v2_contracts.py"
+        }
+      ]
+    },
+    {
       "id": "ontology.release.activate",
       "major_version": 1,
       "owner_domain": "ontology",
@@ -174850,7 +175235,7 @@
       "plugin_id": "official.ontology",
       "module": "ontology_backend.capabilities",
       "version": "2.0.0",
-      "artifact_hash": "sha256:be2cb24632b718d53e028d893618f55cad4b257170932e5b20775e1bd55c5948"
+      "artifact_hash": "sha256:d459104c099a808590ddbd6e341d5b0cb28ca649ba9c8cbf36cb4ea50b144a23"
     },
     {
       "plugin_id": "official.project-management",
@@ -174865,5 +175250,5 @@
       "artifact_hash": "sha256:5c1fccaa2219f6833c24237667039685e322cefcffc7ca6f0287d28cfc0a2b39"
     }
   ],
-  "created_at": "2026-08-25T06:51:24.162469Z"
+  "created_at": "2026-08-25T07:10:34.490297Z"
 }

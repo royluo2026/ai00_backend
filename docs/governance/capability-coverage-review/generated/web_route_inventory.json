@@ -13,12 +13,20 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 28,
-    "capability": 24,
+    "legacy": 25,
+    "capability": 35,
     "allowlisted": 6,
-    "total": 58
+    "total": 66
   },
   "routes": [
+    {
+      "source": "packages/agent-plugin/web/automation_hub/skill_lib.js",
+      "line": 55,
+      "column": 31,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
     {
       "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
       "line": 20,
@@ -111,6 +119,14 @@
       "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
       "line": 50,
       "column": 30,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/issue/issue.js",
+      "line": 46,
+      "column": 40,
       "route": "/api/v1/capabilities/${id}:invoke",
       "kind": "capability",
       "method": null
@@ -244,27 +260,67 @@
       "method": null
     },
     {
+      "source": "web/components/list_sidebar.js",
+      "line": 110,
+      "column": 37,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "web/components/list_tree.html",
+      "line": 277,
+      "column": 31,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
       "source": "web/components/quick_list.html",
-      "line": 655,
+      "line": 289,
+      "column": 28,
+      "route": "/api/bop/versions",
+      "kind": "legacy",
+      "method": null
+    },
+    {
+      "source": "web/components/quick_list.html",
+      "line": 313,
+      "column": 29,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "web/components/quick_list.html",
+      "line": 678,
       "column": 13,
       "route": "/api/bop/versions/${listGid}/entries",
       "kind": "legacy",
       "method": null
     },
     {
-      "source": "web/ext_datasource/ext_ds.js",
-      "line": 85,
-      "column": 11,
-      "route": "/api/ontology/classes",
-      "kind": "legacy",
+      "source": "web/components/visibility_selector.js",
+      "line": 52,
+      "column": 31,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "web/core/global_search.js",
+      "line": 34,
+      "column": 47,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
       "method": null
     },
     {
       "source": "web/ext_datasource/ext_ds.js",
-      "line": 86,
-      "column": 11,
-      "route": "/api/ontology/graph",
-      "kind": "legacy",
+      "line": 13,
+      "column": 30,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
       "method": null
     },
     {
@@ -293,23 +349,15 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 229,
-      "column": 28,
-      "route": "/api/ontology/classes",
-      "kind": "legacy",
+      "line": 25,
+      "column": 30,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
       "method": null
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 244,
-      "column": 28,
-      "route": "/api/ontology/graph",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 350,
+      "line": 378,
       "column": 19,
       "route": "/api/ontology/${api}/${gid}",
       "kind": "legacy",
@@ -317,7 +365,7 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 494,
+      "line": 522,
       "column": 26,
       "route": "/api/ontology/classes/${gid}",
       "kind": "legacy",
@@ -325,7 +373,7 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 582,
+      "line": 610,
       "column": 30,
       "route": "/api/ontology/classes/${_selectedGid}/full",
       "kind": "legacy",
@@ -333,7 +381,15 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 710,
+      "line": 642,
+      "column": 30,
+      "route": "/api/ontology/classes/${_selectedGid}/full",
+      "kind": "legacy",
+      "method": null
+    },
+    {
+      "source": "web/ontology/ontology.js",
+      "line": 732,
       "column": 15,
       "route": "/api/ontology/classes/${_selectedGid}",
       "kind": "legacy",
@@ -341,7 +397,7 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 809,
+      "line": 824,
       "column": 14,
       "route": "/api/ontology/properties/${gid}",
       "kind": "legacy",
@@ -349,7 +405,7 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 938,
+      "line": 953,
       "column": 17,
       "route": "/api/ontology/properties",
       "kind": "legacy",
@@ -357,7 +413,7 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 1076,
+      "line": 1091,
       "column": 17,
       "route": "/api/ontology/properties/${prop.gid}/promote",
       "kind": "legacy",
@@ -365,7 +421,7 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 1102,
+      "line": 1117,
       "column": 17,
       "route": "/api/ontology/properties/${prop.gid}",
       "kind": "legacy",
@@ -373,7 +429,7 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 1124,
+      "line": 1139,
       "column": 15,
       "route": "/api/ontology/properties/${propGid}",
       "kind": "legacy",
@@ -381,7 +437,7 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 1164,
+      "line": 1179,
       "column": 17,
       "route": "/api/ontology/relations/${btn.dataset.gid}",
       "kind": "legacy",
@@ -389,7 +445,7 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 1173,
+      "line": 1188,
       "column": 14,
       "route": "/api/ontology/relations/${gid}",
       "kind": "legacy",
@@ -397,7 +453,7 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 1261,
+      "line": 1276,
       "column": 19,
       "route": "/api/ontology/relations/${editRel.gid}",
       "kind": "legacy",
@@ -405,7 +461,7 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 1263,
+      "line": 1278,
       "column": 17,
       "route": "/api/ontology/relations",
       "kind": "legacy",
@@ -413,7 +469,7 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 1426,
+      "line": 1418,
       "column": 15,
       "route": "/api/ontology/classes",
       "kind": "legacy",
@@ -421,7 +477,7 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 1441,
+      "line": 1433,
       "column": 15,
       "route": "/api/ontology/classes/${cls.gid}",
       "kind": "legacy",
@@ -429,7 +485,7 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 1451,
+      "line": 1443,
       "column": 15,
       "route": "/api/ontology/classes/${cls.gid}",
       "kind": "legacy",
@@ -437,7 +493,7 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 1484,
+      "line": 1472,
       "column": 27,
       "route": "/api/ontology/classes/${classGid}/axioms",
       "kind": "legacy",
@@ -445,7 +501,7 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 1513,
+      "line": 1501,
       "column": 19,
       "route": "/api/ontology/axioms/${btn.dataset.gid}",
       "kind": "legacy",
@@ -453,7 +509,7 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 1556,
+      "line": 1544,
       "column": 17,
       "route": "/api/ontology/axioms",
       "kind": "legacy",
@@ -461,18 +517,26 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 1666,
+      "line": 1650,
       "column": 15,
       "route": "/api/ontology/classes/${gid}",
       "kind": "legacy",
       "method": null
     },
     {
+      "source": "web/org_mgmt/org_mgmt.js",
+      "line": 30,
+      "column": 29,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
       "source": "web/rule_mgmt/rule_mgmt.js",
-      "line": 50,
+      "line": 52,
       "column": 38,
-      "route": "/api/ontology/classes",
-      "kind": "legacy",
+      "route": "/api/v1/capabilities/ontology.object.list:invoke",
+      "kind": "capability",
       "method": null
     },
     {
@@ -482,6 +546,6 @@
       "route": "/api/v1/capabilities/${id}:invoke",
       "kind": "capability",
       "method": null
-    },
+    }
   ]
 }

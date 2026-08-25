@@ -279,6 +279,7 @@
 | Ontology | `ontology.concept.resolve` | rest, agent |
 | Ontology | `ontology.mapping.assess` | rest |
 | Ontology | `ontology.mapping.change.apply` | rest |
+| Ontology | `ontology.object.list` | none |
 | Ontology | `ontology.release.activate` | none |
 | Ontology | `ontology.release.diff` | rest |
 | Ontology | `ontology.release.get` | none |
