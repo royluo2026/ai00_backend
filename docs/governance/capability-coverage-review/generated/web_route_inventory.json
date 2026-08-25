@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 68,
+    "legacy": 62,
     "capability": 24,
     "allowlisted": 6,
-    "total": 98
+    "total": 92
   },
   "routes": [
     {
@@ -84,14 +84,6 @@
       "method": null
     },
     {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 652,
-      "column": 25,
-      "route": "/api/bop/versions/${gid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
       "source": "packages/craft-plugin/web/bop_nav/bop_nav.js",
       "line": 22,
       "column": 30,
@@ -121,30 +113,6 @@
       "column": 40,
       "route": "/api/v1/capabilities/${id}:invoke",
       "kind": "capability",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/gbop_lineage/layout_mode.js",
-      "line": 1812,
-      "column": 17,
-      "route": "/api/bop/entries/${drag.row.gid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/gbop_lineage/layout_mode.js",
-      "line": 1837,
-      "column": 19,
-      "route": "/api/bop/entries/${drag.row.gid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/gbop_lineage/layout_mode.js",
-      "line": 1861,
-      "column": 15,
-      "route": "/api/bop/entries/${p.gid}",
-      "kind": "legacy",
       "method": null
     },
     {
@@ -353,14 +321,6 @@
       "column": 37,
       "route": "/api/v1/capabilities/${id}:invoke",
       "kind": "capability",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/lineage_version_mgr.js",
-      "line": 491,
-      "column": 24,
-      "route": "/api/bop/versions/${ver.gid}",
-      "kind": "legacy",
       "method": null
     },
     {
@@ -795,13 +755,5 @@
       "kind": "capability",
       "method": null
     },
-    {
-      "source": "web/workbench/workbench.js",
-      "line": 3382,
-      "column": 22,
-      "route": "/api/bop/versions/${item.gid}",
-      "kind": "legacy",
-      "method": "PATCH"
-    }
   ]
 }
