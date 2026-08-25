@@ -957,7 +957,7 @@
     },
     {
       "source": "web/workbench/workbench.js",
-      "line": 1185,
+      "line": 1183,
       "column": 31,
       "route": "/api/v1/capabilities/${id}:invoke",
       "kind": "capability",
@@ -965,7 +965,7 @@
     },
     {
       "source": "web/workbench/workbench.js",
-      "line": 2464,
+      "line": 2474,
       "column": 33,
       "route": "/api/projects",
       "kind": "legacy",
@@ -973,7 +973,7 @@
     },
     {
       "source": "web/workbench/workbench.js",
-      "line": 2963,
+      "line": 2973,
       "column": 12,
       "route": "/api/projects",
       "kind": "legacy",
@@ -981,7 +981,7 @@
     },
     {
       "source": "web/workbench/workbench.js",
-      "line": 3372,
+      "line": 3382,
       "column": 22,
       "route": "/api/bop/versions/${item.gid}",
       "kind": "legacy",
@@ -989,7 +989,7 @@
     },
     {
       "source": "web/workbench/workbench.js",
-      "line": 3443,
+      "line": 3453,
       "column": 20,
       "route": "/api/projects",
       "kind": "legacy",
