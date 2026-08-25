@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 114,
+    "legacy": 109,
     "capability": 21,
     "allowlisted": 6,
-    "total": 141
+    "total": 136
   },
   "routes": [
     {
@@ -241,46 +241,6 @@
       "column": 29,
       "route": "/api/v1/capabilities/${id}:invoke",
       "kind": "capability",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 193,
-      "column": 30,
-      "route": "/api/gbop/versions/${filterGid}/entries",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 201,
-      "column": 33,
-      "route": "/api/gbop/versions/${v.gid}/entries",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 234,
-      "column": 30,
-      "route": "/api/gbop/versions/${filterGid}/entries",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 242,
-      "column": 33,
-      "route": "/api/gbop/versions/${v.gid}/entries",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
-      "line": 1387,
-      "column": 15,
-      "route": "/api/bop/versions/${this._versionGid}/link-summary",
-      "kind": "legacy",
       "method": null
     },
     {
