@@ -63,13 +63,13 @@
     },
     {
       "source": "web/components/list_shell.js",
-      "line": 1158,
+      "line": 1182,
       "column": 37,
       "reason": "JSDoc usage example is documentation, not executable code."
     },
     {
       "source": "web/components/list_sidebar.js",
-      "line": 898,
+      "line": 902,
       "column": 14,
       "reason": "Comment describes the adjacent project selector; it is not executable."
     },
@@ -87,7 +87,7 @@
     },
     {
       "source": "web/core/web_compat.js",
-      "line": 335,
+      "line": 331,
       "column": 47,
       "reason": "Comment names the upload route owned by another component; it is not executable."
     },
@@ -105,13 +105,13 @@
     },
     {
       "source": "web/main.js",
-      "line": 1063,
+      "line": 1068,
       "column": 33,
       "reason": "Commented usage example is documentation, not executable code."
     },
     {
       "source": "web/workbench/workbench.js",
-      "line": 4963,
+      "line": 4956,
       "column": 18,
       "reason": "Comment describes the adjacent panel loader; it is not executable."
     }
