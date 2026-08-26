@@ -11,6 +11,7 @@ from backend.capability_v2.completion import (
     CompletionConfigurationError,
     evaluate_completion,
 )
+from backend.capability_v2.consumer_routes import scan_web_api_routes
 from backend.tests.capability_completion_support import FrozenCoverageReview
 
 
@@ -412,6 +413,94 @@ def test_web_route_inventory_drift_fails_closed(tmp_path: Path) -> None:
 
     assert report.complete is False
     assert "web_route_inventory_drift:1" in report.failed
+
+
+def _configure_complete_web_evidence(
+    root: Path, source: str
+) -> tuple[Path, Path]:
+    web = root / "frontend"
+    web.mkdir()
+    (web / "app.js").write_text(source, encoding="utf-8")
+    configuration_path = root / "backend/governance/capability_v2_completion.json"
+    configuration = json.loads(configuration_path.read_text(encoding="utf-8"))
+    configuration.update(
+        {
+            "web_route_inventory_artifact": "docs/web-routes.json",
+            "legacy_route_inventory_artifact": "docs/legacy-routes.json",
+            "bff_route_inventory_artifact": "docs/bff-routes.json",
+            "web_operations_exclusions_artifact": "docs/operations.json",
+        }
+    )
+    _write_json(root, "backend/governance/capability_v2_completion.json", configuration)
+    _write_json(root, "docs/legacy-routes.json", {"inventory_kind": "legacy_rest", "entries": []})
+    _write_json(root, "docs/bff-routes.json", {"inventory_kind": "bff", "entries": []})
+    _write_json(root, "docs/operations.json", {"schema_version": 1, "entries": []})
+    report = scan_web_api_routes(
+        [web],
+        legacy_index=set(),
+        bff_index=set(),
+        exclusions=(),
+        frontend_revision="unversioned",
+    )
+    artifact = root / "docs/web-routes.json"
+    artifact.write_text(report.json(), encoding="utf-8", newline="\n")
+    return web, artifact
+
+
+def test_completion_distinguishes_missing_stored_web_occurrence(tmp_path: Path) -> None:
+    root = _complete_repository(tmp_path)
+    web, artifact = _configure_complete_web_evidence(
+        root,
+        "fetch('/api/v1/capabilities/test.capability_1:invoke', { method: 'POST' });\n",
+    )
+    document = json.loads(artifact.read_text(encoding="utf-8"))
+    document["routes"] = []
+    document["counts"]["capability"] = 0
+    _write_json(root, "docs/web-routes.json", document)
+
+    report = evaluate_completion(root, mode="strict", web_root=web)
+
+    assert "web_route_inventory_occurrence_drift:1" in report.failed
+    assert "web_route_inventory_revision_drift:1" not in report.failed
+
+
+def test_completion_distinguishes_frontend_revision_drift(tmp_path: Path) -> None:
+    root = _complete_repository(tmp_path)
+    web, artifact = _configure_complete_web_evidence(
+        root,
+        "fetch('/api/v1/capabilities/test.capability_1:invoke', { method: 'POST' });\n",
+    )
+    document = json.loads(artifact.read_text(encoding="utf-8"))
+    document["frontend_revision"] = "f" * 40
+    _write_json(root, "docs/web-routes.json", document)
+
+    report = evaluate_completion(root, mode="strict", web_root=web)
+
+    assert "web_route_inventory_revision_drift:1" in report.failed
+    assert "web_route_inventory_occurrence_drift:1" not in report.failed
+
+
+def test_completion_blocks_stored_unresolved_web_occurrence(tmp_path: Path) -> None:
+    root = _complete_repository(tmp_path)
+    web, _artifact = _configure_complete_web_evidence(
+        root, "fetch('/api/tasks');\n"
+    )
+
+    report = evaluate_completion(root, mode="strict", web_root=web)
+
+    assert "web_route_inventory_unresolved:1" in report.failed
+
+
+def test_completion_accepts_byte_identical_canonical_web_evidence(tmp_path: Path) -> None:
+    root = _complete_repository(tmp_path)
+    web, _artifact = _configure_complete_web_evidence(
+        root,
+        "fetch('/api/v1/capabilities/test.capability_1:invoke', { method: 'POST' });\n",
+    )
+
+    report = evaluate_completion(root, mode="strict", web_root=web)
+
+    assert not any(reason.startswith("web_route_inventory_") for reason in report.failed)
 
 
 def test_completion_checks_optional_legacy_route_inventory_deadlines(tmp_path: Path) -> None:

@@ -1,0 +1,142 @@
+{
+  "$schema": "web-api-operations-exclusions.schema.json",
+  "schema_version": 1,
+  "entries": [
+    {
+      "route_method": "GET",
+      "normalized_route": "/api/ai/admin-config",
+      "owner": "agent",
+      "reason": "Reads administrator connectivity configuration without executing an Agent business outcome.",
+      "approval_reference": "capability-governance-evidence-closure/task-3",
+      "expires_at": "2026-11-21T23:59:59+08:00"
+    },
+    {
+      "route_method": "GET",
+      "normalized_route": "/api/ai/tools",
+      "owner": "agent",
+      "reason": "Lists the Agent runtime tool catalog for administrator introspection.",
+      "approval_reference": "capability-governance-evidence-closure/task-3",
+      "expires_at": "2026-11-21T23:59:59+08:00"
+    },
+    {
+      "route_method": "GET",
+      "normalized_route": "/api/flows/capability-manifest",
+      "owner": "agent",
+      "reason": "Reads the generated flow capability manifest used by the editor runtime.",
+      "approval_reference": "capability-governance-evidence-closure/task-3",
+      "expires_at": "2026-11-21T23:59:59+08:00"
+    },
+    {
+      "route_method": "POST",
+      "normalized_route": "/api/ai/admin-config",
+      "owner": "agent",
+      "reason": "Updates administrator connectivity configuration without executing an Agent business outcome.",
+      "approval_reference": "capability-governance-evidence-closure/task-3",
+      "expires_at": "2026-11-21T23:59:59+08:00"
+    },
+    {
+      "route_method": "POST",
+      "normalized_route": "/api/ai/test-connection",
+      "owner": "agent",
+      "reason": "Tests administrator connectivity to the configured Agent model provider.",
+      "approval_reference": "capability-governance-evidence-closure/task-3",
+      "expires_at": "2026-11-21T23:59:59+08:00"
+    },
+    {
+      "route_method": "POST",
+      "normalized_route": "/api/bop/pics/upload",
+      "owner": "craft",
+      "reason": "Transfers binary picture content for a later Craft reference without applying domain business rules.",
+      "approval_reference": "capability-governance-evidence-closure/task-3",
+      "expires_at": "2026-11-21T23:59:59+08:00"
+    },
+    {
+      "route_method": "POST",
+      "normalized_route": "/api/file-store/config",
+      "owner": "platform-runtime",
+      "reason": "Configures the deployment file-transfer adapter; it does not execute a business capability.",
+      "approval_reference": "capability-governance-evidence-closure/task-3",
+      "expires_at": "2026-11-21T23:59:59+08:00"
+    },
+    {
+      "route_method": "POST",
+      "normalized_route": "/api/file-store/ois-config",
+      "owner": "platform-runtime",
+      "reason": "Configures the deployment OIS file-transfer adapter; it does not execute a business capability.",
+      "approval_reference": "capability-governance-evidence-closure/task-3",
+      "expires_at": "2026-11-21T23:59:59+08:00"
+    },
+    {
+      "route_method": "POST",
+      "normalized_route": "/api/file-store/ois-test",
+      "owner": "platform-runtime",
+      "reason": "Tests connectivity to the deployment OIS file-transfer adapter.",
+      "approval_reference": "capability-governance-evidence-closure/task-3",
+      "expires_at": "2026-11-21T23:59:59+08:00"
+    },
+    {
+      "route_method": "POST",
+      "normalized_route": "/api/file-store/test",
+      "owner": "platform-runtime",
+      "reason": "Tests connectivity to the deployment file-transfer adapter.",
+      "approval_reference": "capability-governance-evidence-closure/task-3",
+      "expires_at": "2026-11-21T23:59:59+08:00"
+    },
+    {
+      "route_method": "POST",
+      "normalized_route": "/api/import-export/lark-bitable/read",
+      "owner": "craft",
+      "reason": "Reads raw Lark Bitable transport data without applying Craft business rules.",
+      "approval_reference": "capability-governance-evidence-closure/task-3",
+      "expires_at": "2026-11-21T23:59:59+08:00"
+    },
+    {
+      "route_method": "POST",
+      "normalized_route": "/api/import-export/lark-bitable/write",
+      "owner": "craft",
+      "reason": "Writes raw Lark Bitable transport data without applying Craft business rules.",
+      "approval_reference": "capability-governance-evidence-closure/task-3",
+      "expires_at": "2026-11-21T23:59:59+08:00"
+    },
+    {
+      "route_method": "POST",
+      "normalized_route": "/api/import-export/lark-sheets/read",
+      "owner": "craft",
+      "reason": "Reads raw Lark Sheets transport data without applying Craft business rules.",
+      "approval_reference": "capability-governance-evidence-closure/task-3",
+      "expires_at": "2026-11-21T23:59:59+08:00"
+    },
+    {
+      "route_method": "POST",
+      "normalized_route": "/api/import-export/lark-sheets/write",
+      "owner": "craft",
+      "reason": "Writes raw Lark Sheets transport data without applying Craft business rules.",
+      "approval_reference": "capability-governance-evidence-closure/task-3",
+      "expires_at": "2026-11-21T23:59:59+08:00"
+    },
+    {
+      "route_method": "POST",
+      "normalized_route": "/api/uploads",
+      "owner": "platform-runtime",
+      "reason": "Creates a transport upload session without applying domain business rules.",
+      "approval_reference": "capability-governance-evidence-closure/task-3",
+      "expires_at": "2026-11-21T23:59:59+08:00"
+    },
+    {
+      "route_method": "POST",
+      "normalized_route": "/api/uploads/ois/resolve",
+      "owner": "platform-runtime",
+      "reason": "Resolves an OIS file-transfer reference without applying domain business rules.",
+      "approval_reference": "capability-governance-evidence-closure/task-3",
+      "expires_at": "2026-11-21T23:59:59+08:00"
+    },
+    {
+      "route_method": "PUT",
+      "normalized_route": "/api/uploads/{dynamic}",
+      "owner": "platform-runtime",
+      "reason": "Transfers upload bytes into an existing transport session without applying domain business rules.",
+      "approval_reference": "capability-governance-evidence-closure/task-3",
+      "expires_at": "2026-11-21T23:59:59+08:00"
+    }
+  ]
+}

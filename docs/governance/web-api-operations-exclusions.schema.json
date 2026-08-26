@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["schema_version", "entries"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "entries": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/Exclusion"}
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "Exclusion": {
+      "type": "object",
+      "required": [
+        "route_method",
+        "normalized_route",
+        "owner",
+        "reason",
+        "approval_reference",
+        "expires_at"
+      ],
+      "properties": {
+        "route_method": {"enum": ["DELETE", "GET", "PATCH", "POST", "PUT"]},
+        "normalized_route": {"type": "string", "pattern": "^(?!.*\\*)/api/"},
+        "owner": {"type": "string", "minLength": 1},
+        "reason": {"type": "string", "minLength": 1},
+        "approval_reference": {"type": "string", "minLength": 1},
+        "expires_at": {"type": "string", "format": "date-time"}
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -3,11 +3,12 @@ from __future__ import annotations
 
 import ast
 import json
+import subprocess
 from dataclasses import asdict, dataclass
 from pathlib import Path, PurePosixPath
 from typing import Literal
 
-from .consumer_routes import scan_web_routes
+from .consumer_routes import load_operations_exclusions, scan_web_api_routes
 from .atomicity import load_atomicity_dispositions
 from .catalog_targets import CatalogTargetIndex
 from .route_inventory import audit_route_inventory, load_route_inventory
@@ -252,21 +253,92 @@ def _catalog_capability_count(root: Path) -> int:
     return len(capability_ids)
 
 
-def _web_route_inventory_drift(
+def _web_route_inventory_failures(
     root: Path,
     configuration: dict,
     report: dict,
-) -> bool:
-    """Return whether checked-in Web route evidence differs from a fresh scan."""
+) -> list[str]:
+    """Return precise blockers when stored Web evidence differs from a fresh scan."""
     relative = configuration.get("web_route_inventory_artifact")
     if relative is None:
-        return False
+        unresolved = report.get("counts", {}).get("unresolved", 0)
+        return [f"web_route_inventory_unresolved:{unresolved}"] if unresolved else []
     if not isinstance(relative, str) or not relative:
         raise CompletionConfigurationError(
             "web_route_inventory_artifact must be a repository-relative path"
         )
     expected = _load_json(_relative_path(root, relative, field="web_route_inventory_artifact"))
-    return expected != report
+    failures: list[str] = []
+    if expected.get("frontend_revision") != report.get("frontend_revision"):
+        failures.append("web_route_inventory_revision_drift:1")
+    if expected.get("content_hash") != report.get("content_hash"):
+        failures.append("web_route_inventory_content_drift:1")
+    expected_routes = expected.get("routes")
+    actual_routes = report.get("routes")
+    if not isinstance(expected_routes, list) or not isinstance(actual_routes, list):
+        failures.append("web_route_inventory_occurrence_drift:1")
+    else:
+        expected_by_id = {
+            item.get("occurrence_id"): item
+            for item in expected_routes
+            if isinstance(item, dict) and isinstance(item.get("occurrence_id"), str)
+        }
+        actual_by_id = {
+            item.get("occurrence_id"): item
+            for item in actual_routes
+            if isinstance(item, dict) and isinstance(item.get("occurrence_id"), str)
+        }
+        changed = set(expected_by_id) ^ set(actual_by_id)
+        changed.update(
+            identity
+            for identity in set(expected_by_id) & set(actual_by_id)
+            if expected_by_id[identity] != actual_by_id[identity]
+        )
+        malformed = (
+            len(expected_by_id) != len(expected_routes)
+            or len(actual_by_id) != len(actual_routes)
+        )
+        if changed or malformed:
+            failures.append(
+                f"web_route_inventory_occurrence_drift:{max(1, len(changed))}"
+            )
+    for field in ("scan_roots", "excluded_roots"):
+        if expected.get(field) != report.get(field):
+            failures.append(f"web_route_inventory_{field}_drift:1")
+    unresolved = report.get("counts", {}).get("unresolved", 0)
+    if not isinstance(unresolved, int) or unresolved < 0:
+        raise CompletionConfigurationError("Web route unresolved count is invalid")
+    if unresolved:
+        failures.append(f"web_route_inventory_unresolved:{unresolved}")
+    if expected != report:
+        failures.append("web_route_inventory_drift:1")
+    return failures
+
+
+def _web_frontend_revision(web_root: Path) -> str:
+    result = subprocess.run(
+        ["git", "-C", str(web_root), "rev-parse", "HEAD"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    revision = result.stdout.strip()
+    return revision if result.returncode == 0 and len(revision) == 40 else "unversioned"
+
+
+def _web_scan_roots(web_root: Path) -> tuple[Path, ...]:
+    roots = tuple(path for path in (web_root / "web", web_root / "packages") if path.is_dir())
+    return roots or (web_root,)
+
+
+def _web_route_index(root: Path, configuration: dict, field: str) -> set[tuple[str, str]]:
+    relative = configuration.get(field)
+    if relative is None:
+        return set()
+    if not isinstance(relative, str) or not relative:
+        raise CompletionConfigurationError(f"{field} must be a repository-relative path")
+    inventory = load_route_inventory(_relative_path(root, relative, field=field))
+    return {(entry.method, entry.route_path) for entry in inventory.entries}
 
 
 def _route_inventory_failures(root: Path, configuration: dict) -> list[str]:
@@ -373,6 +445,7 @@ def evaluate_completion(
     consumer_bypasses = _consumer_bypasses(root, configuration)
     web_consumer_bypasses = 0
     if web_root is not None:
+        web_root = Path(web_root).resolve()
         web_prefixes = configuration.get(
             "web_legacy_route_prefixes",
             [
@@ -382,20 +455,36 @@ def evaluate_completion(
         )
         if not isinstance(web_prefixes, list):
             raise CompletionConfigurationError("web_legacy_route_prefixes must be an array")
-        allowlisted_routes = configuration.get("web_allowlisted_legacy_routes", [])
-        if not isinstance(allowlisted_routes, list) or not all(
-            isinstance(value, str) and value for value in allowlisted_routes
-        ):
-            raise CompletionConfigurationError(
-                "web_allowlisted_legacy_routes must be an array of routes"
+        exclusions_relative = configuration.get("web_operations_exclusions_artifact")
+        exclusions = ()
+        if exclusions_relative is not None:
+            if not isinstance(exclusions_relative, str) or not exclusions_relative:
+                raise CompletionConfigurationError(
+                    "web_operations_exclusions_artifact must be a repository-relative path"
+                )
+            exclusions = load_operations_exclusions(
+                _relative_path(
+                    root,
+                    exclusions_relative,
+                    field="web_operations_exclusions_artifact",
+                )
             )
-        web_scan = scan_web_routes(
-            Path(web_root), roots=(".",), legacy_prefixes=tuple(web_prefixes),
-            allowlisted_legacy_routes=tuple(allowlisted_routes),
+        web_scan = scan_web_api_routes(
+            _web_scan_roots(web_root),
+            legacy_index=_web_route_index(
+                root, configuration, "legacy_route_inventory_artifact"
+            ),
+            bff_index=_web_route_index(
+                root, configuration, "bff_route_inventory_artifact"
+            ),
+            exclusions=exclusions,
+            frontend_revision=_web_frontend_revision(web_root),
+            classification_prefixes=tuple(web_prefixes),
         )
-        web_consumer_bypasses = web_scan.legacy_count
-        if _web_route_inventory_drift(root, configuration, web_scan.serialized()):
-            failures.append("web_route_inventory_drift:1")
+        web_consumer_bypasses = web_scan.unresolved_count
+        failures.extend(
+            _web_route_inventory_failures(root, configuration, web_scan.serialized())
+        )
     catalog_capabilities = _catalog_capability_count(root)
     production_paths = _load_json(
         root / "backend/governance/capability_v2_production_paths.json",

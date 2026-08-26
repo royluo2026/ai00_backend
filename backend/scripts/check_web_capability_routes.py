@@ -1,7 +1,8 @@
-"""Emit fail-closed evidence for browser-side Capability route adoption."""
+"""Generate or verify complete browser ``/api/`` route evidence."""
 from __future__ import annotations
 
 import argparse
+import subprocess
 from pathlib import Path
 import sys
 
@@ -9,43 +10,114 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 if str(REPOSITORY_ROOT) not in sys.path:
     sys.path.insert(0, str(REPOSITORY_ROOT))
 
-from backend.capability_v2.consumer_routes import scan_web_routes
+from backend.capability_v2.consumer_routes import (
+    RouteScanConfigurationError,
+    load_operations_exclusions,
+    scan_web_api_routes,
+)
+from backend.capability_v2.route_inventory import (
+    RouteInventoryConfigurationError,
+    load_route_inventory,
+)
 
 
 DEFAULT_LEGACY_PREFIXES = (
     "/api/bop",
+    "/api/device",
+    "/api/factory",
+    "/api/flows",
     "/api/gbop",
     "/api/ontology",
     "/api/projects",
-    "/api/flows",
-    "/api/factory",
     "/api/simulation",
-    "/api/device",
+)
+DEFAULT_REPORT = (
+    REPOSITORY_ROOT
+    / "docs/governance/capability-coverage-review/generated/web_route_inventory.json"
+)
+LEGACY_INVENTORY = REPOSITORY_ROOT / "docs/governance/legacy_route_inventory.json"
+BFF_INVENTORY = REPOSITORY_ROOT / "docs/governance/bff_route_inventory.json"
+OPERATIONS_EXCLUSIONS = (
+    REPOSITORY_ROOT / "docs/governance/web-api-operations-exclusions.json"
 )
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--web-root", type=Path, required=True)
-    parser.add_argument("--fail-on-legacy", action="store_true")
-    parser.add_argument("--legacy-prefix", action="append", dest="legacy_prefixes")
-    parser.add_argument("--allowlisted-legacy-route", action="append", default=[])
-    parser.add_argument("--report", type=Path)
-    args = parser.parse_args()
-    prefixes = tuple(args.legacy_prefixes or DEFAULT_LEGACY_PREFIXES)
-    report = scan_web_routes(
-        args.web_root,
-        roots=(".",),
-        legacy_prefixes=prefixes,
-        allowlisted_legacy_routes=tuple(args.allowlisted_legacy_route),
+def _frontend_revision(web_root: Path) -> str:
+    result = subprocess.run(
+        ["git", "-C", str(web_root), "rev-parse", "HEAD"],
+        capture_output=True,
+        text=True,
+        check=False,
     )
+    revision = result.stdout.strip()
+    if result.returncode or len(revision) != 40:
+        raise RouteScanConfigurationError("frontend full Git revision is unavailable")
+    return revision
+
+
+def _inventory_index(path: Path) -> set[tuple[str, str]]:
+    inventory = load_route_inventory(path)
+    return {(entry.method, entry.route_path) for entry in inventory.entries}
+
+
+def build_report(web_root: Path, prefixes: tuple[str, ...] = DEFAULT_LEGACY_PREFIXES):
+    web_root = web_root.resolve()
+    return scan_web_api_routes(
+        [web_root / "web", web_root / "packages"],
+        legacy_index=_inventory_index(LEGACY_INVENTORY),
+        bff_index=_inventory_index(BFF_INVENTORY),
+        exclusions=load_operations_exclusions(OPERATIONS_EXCLUSIONS),
+        frontend_revision=_frontend_revision(web_root),
+        classification_prefixes=prefixes,
+    )
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--web-root", type=Path, required=True)
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--write", action="store_true")
+    mode.add_argument("--check", action="store_true")
+    parser.add_argument("--fail-on-unresolved", action="store_true")
+    parser.add_argument("--legacy-prefix", action="append", dest="legacy_prefixes")
+    parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
+    args = parser.parse_args(argv)
+    try:
+        report = build_report(
+            args.web_root,
+            tuple(args.legacy_prefixes or DEFAULT_LEGACY_PREFIXES),
+        )
+    except (RouteScanConfigurationError, RouteInventoryConfigurationError) as exc:
+        print(f"web-route-scan failed: {exc}", file=sys.stderr)
+        return 1
     rendered = report.json()
-    if args.report:
+    if args.write:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(rendered, encoding="utf-8", newline="\n")
-    print(rendered, end="")
-    return 1 if args.fail_on_legacy and report.legacy_count else 0
+    if args.check:
+        try:
+            stored = args.report.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as exc:
+            print(f"web-route-inventory unreadable: {exc}", file=sys.stderr)
+            return 1
+        if stored != rendered:
+            print("web-route-inventory drift: fresh canonical JSON differs", file=sys.stderr)
+            return 1
+    counts = " ".join(f"{key}={value}" for key, value in report.counts.items())
+    print(
+        f"frontend_revision={report.frontend_revision} "
+        f"content_hash={report.content_hash} {counts} total={report.total_count}"
+    )
+    if not args.write and not args.check:
+        print(rendered, end="")
+    if args.fail_on_unresolved and report.unresolved_count:
+        print(f"web-route-inventory unresolved={report.unresolved_count}", file=sys.stderr)
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())
+
+
+__all__ = ["build_report", "main"]
