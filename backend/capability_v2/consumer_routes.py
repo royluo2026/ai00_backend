@@ -924,6 +924,10 @@ def load_wrapper_contracts(path: Path) -> tuple[WrapperContract, ...]:
         if not isinstance(expected_definition, str) or not expected_definition:
             raise RouteScanConfigurationError("wrapper expected definition is required")
         definition = _source_anchor(raw["definition"], "definition")
+        if definition.source_path != source:
+            raise RouteScanConfigurationError(
+                "wrapper contract definition source is ambiguous"
+            )
         binding = _wrapper_binding(raw["binding"])
         call_sites_raw = raw["call_sites"]
         if not isinstance(call_sites_raw, list) or not call_sites_raw:
@@ -1036,6 +1040,35 @@ def _binding_parameter_contract(
     return _declared_parameters(anchored.group(1))
 
 
+def _callee_binding_positions(contract: WrapperContract, source: str) -> set[int]:
+    masked = _mask_comments(source)
+    callee = contract.callee
+    escaped = re.escape(callee)
+    if "." in callee:
+        return {
+            match.start("binding")
+            for match in re.finditer(
+                rf"(?<![\w$.])(?P<binding>{escaped})\s*=(?!=)",
+                masked,
+            )
+        }
+
+    identifier = re.escape(callee)
+    positions: set[int] = set()
+    patterns = (
+        rf"\bfunction\s+(?P<binding>{identifier})\s*\(",
+        rf"\b(?:const|let|var|class)\s+(?P<binding>{identifier})\b",
+        rf"(?<![\w$.])(?P<binding>{identifier})\s*=(?!=)",
+        rf"\bcatch\s*\(\s*(?P<binding>{identifier})\b",
+        rf"(?<![\w$])(?P<binding>{identifier})\s*=>",
+    )
+    for pattern in patterns:
+        positions.update(
+            match.start("binding") for match in re.finditer(pattern, masked)
+        )
+    return positions
+
+
 def _validate_call_sites(
     contract: WrapperContract,
     sources: Mapping[str, str],
@@ -1118,10 +1151,18 @@ def _validate_wrapper_contracts(
                 f"wrapper contract source hash is stale: {contract.source}"
             )
         anchor = contract.definition
+        if anchor.source_path != contract.source:
+            raise RouteScanConfigurationError(
+                "wrapper contract definition source is ambiguous"
+            )
         definition = _anchored_source_text(anchor, sources, "definition")
         if contract.expected_definition not in definition:
             raise RouteScanConfigurationError(
                 f"wrapper contract definition is ambiguous: {anchor.source_path}"
+            )
+        if len(_callee_binding_positions(contract, source)) != 1:
+            raise RouteScanConfigurationError(
+                f"wrapper contract definition binding is ambiguous: {anchor.source_path}"
             )
         declared_parameters = _binding_parameter_contract(contract, definition)
         if declared_parameters != contract.binding.parameters:

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -108,6 +109,7 @@ def _exact_wrapper_contracts(
     call_routes: list[str],
     contract_source_sha256: str | None = None,
     call_source_sha256: str | None = None,
+    definition_source_path: str = "web/app.js",
 ):
     lines = source.splitlines(keepends=True)
     definition = lines[0]
@@ -143,7 +145,7 @@ def _exact_wrapper_contracts(
                     "default_method": "GET",
                 },
                 "definition": {
-                    "source_path": "web/app.js",
+                    "source_path": definition_source_path,
                     "start_line": 1,
                     "end_line": 1,
                     "sha256": hashlib.sha256(definition.encode("utf-8")).hexdigest(),
@@ -556,10 +558,7 @@ def test_wrapper_contract_applies_only_to_anchored_call_scope(tmp_path: Path) ->
     source = (
         "function request(route, options = {}) { return fetch(route, options); }\n"
         "function first() { return request('/api/tasks'); }\n"
-        "function second() {\n"
-        "  function request(route) { return fetch(route, { method: 'POST' }); }\n"
-        "  return request('/api/issues');\n"
-        "}\n"
+        "function second() { return request('/api/issues'); }\n"
     )
     contracts = _wrapper_contracts(
         tmp_path,
@@ -592,7 +591,7 @@ def test_wrapper_contract_applies_only_to_anchored_call_scope(tmp_path: Path) ->
     ]
 
 
-def test_exact_wrapper_anchor_does_not_cover_same_line_shadowed_call(
+def test_exact_wrapper_contract_rejects_same_line_shadowed_binding(
     tmp_path: Path,
 ) -> None:
     source = (
@@ -606,18 +605,100 @@ def test_exact_wrapper_anchor_does_not_cover_same_line_shadowed_call(
         call_routes=["/api/tasks"],
     )
 
-    report = _scan(
-        source,
+    with pytest.raises(
+        RouteScanConfigurationError,
+        match="definition binding is ambiguous",
+    ):
+        _scan(source, tmp_path, wrapper_contracts=contracts)
+
+
+def test_exact_wrapper_contract_rejects_anchored_shadowed_binding(
+    tmp_path: Path,
+) -> None:
+    source = (
+        "function request(route, options = {}) { return fetch(route, options); }\n"
+        "function shadowed() {\n"
+        "  function request(route) { return fetch(route, { method: 'POST' }); }\n"
+        "  return request('/api/issues');\n"
+        "}\n"
+        "request('/api/tasks');\n"
+    )
+    contracts = _exact_wrapper_contracts(
         tmp_path,
-        wrapper_contracts=contracts,
-        legacy_index={
-            ("GET", "/api/tasks"),
-            ("GET", "/api/issues"),
-            ("POST", "/api/issues"),
-        },
+        source,
+        call_routes=["/api/issues", "/api/tasks"],
     )
 
-    assert [route.method for route in report.routes] == [None, "GET"]
+    with pytest.raises(
+        RouteScanConfigurationError,
+        match="definition binding is ambiguous",
+    ):
+        _scan(source, tmp_path, wrapper_contracts=contracts)
+
+
+def test_wrapper_contract_rejects_cross_source_definition(
+    tmp_path: Path,
+) -> None:
+    source = (
+        "function request(route, options = {}) { return fetch(route, options); }\n"
+        "request('/api/tasks');\n"
+    )
+
+    with pytest.raises(
+        RouteScanConfigurationError,
+        match="definition source is ambiguous",
+    ):
+        _exact_wrapper_contracts(
+            tmp_path,
+            source,
+            call_routes=["/api/tasks"],
+            definition_source_path="web/request.js",
+        )
+
+
+def test_scanner_rejects_cross_source_definition_if_loader_is_bypassed(
+    tmp_path: Path,
+) -> None:
+    source = (
+        "function request(route, options = {}) { return fetch(route, options); }\n"
+        "request('/api/tasks');\n"
+    )
+    contract = _exact_wrapper_contracts(
+        tmp_path,
+        source,
+        call_routes=["/api/tasks"],
+    )[0]
+    contract = replace(
+        contract,
+        definition=replace(contract.definition, source_path="web/request.js"),
+    )
+
+    with pytest.raises(
+        RouteScanConfigurationError,
+        match="definition source is ambiguous",
+    ):
+        _scan(source, tmp_path, wrapper_contracts=[contract])
+
+
+def test_wrapper_contract_rejects_additional_callee_assignment(
+    tmp_path: Path,
+) -> None:
+    source = (
+        "function request(route, options = {}) { return fetch(route, options); }\n"
+        "request = function(route) { return fetch(route, { method: 'POST' }); };\n"
+        "request('/api/tasks');\n"
+    )
+    contracts = _exact_wrapper_contracts(
+        tmp_path,
+        source,
+        call_routes=["/api/tasks"],
+    )
+
+    with pytest.raises(
+        RouteScanConfigurationError,
+        match="definition binding is ambiguous",
+    ):
+        _scan(source, tmp_path, wrapper_contracts=contracts)
 
 
 def test_exact_wrapper_anchor_rejects_moved_column(tmp_path: Path) -> None:
