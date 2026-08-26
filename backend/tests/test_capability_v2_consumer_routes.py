@@ -104,7 +104,7 @@ def test_scanner_preserves_method_after_markup_and_optional_chaining(
 ) -> None:
     report = _scan(
         "const markup = `<div class=\"item\">x</div>`;\n"
-        "window._cloudFetch?.(`/api/tasks/${encodeURIComponent(gid)}`, {\n"
+        "_cloudFetch?.(`/api/tasks/${encodeURIComponent(gid)}`, {\n"
         "  method: 'PATCH',\n"
         "});\n",
         tmp_path,
@@ -129,6 +129,23 @@ def test_scanner_reads_explicit_method_argument_before_route(tmp_path: Path) -> 
 
 def test_unknown_method_first_call_contract_stays_unresolved(tmp_path: Path) -> None:
     report = _scan("dispatch('POST', '/api/tasks')\n", tmp_path)
+
+    assert report.routes[0].method is None
+    assert report.routes[0].disposition == "unresolved"
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "client.fetch('/api/tasks', { method: 'POST' });\n",
+        "client._cf('POST', '/api/tasks');\n",
+        "client._cloudFetch('/api/tasks', { method: 'POST' });\n",
+    ],
+)
+def test_qualified_callee_does_not_inherit_direct_http_contract(
+    tmp_path: Path, source: str
+) -> None:
+    report = _scan(source, tmp_path)
 
     assert report.routes[0].method is None
     assert report.routes[0].disposition == "unresolved"

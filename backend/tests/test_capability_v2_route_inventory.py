@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import ast
+import hashlib
 import json
 from datetime import date, timedelta
 from pathlib import Path
@@ -124,8 +126,18 @@ def test_task3_legacy_addition_review_is_complete_and_traceable() -> None:
     )
     inventory = load_route_inventory(root / "docs/governance/legacy_route_inventory.json")
     targets = {
-        (entry.method, entry.route_path): entry.migration_target_capability
+        (entry.method, entry.route_path): (
+            entry.migration_target_capability,
+            entry.migration_target_major_version,
+        )
         for entry in inventory.entries
+    }
+    catalog = json.loads(
+        (root / "docs/capabilities/catalog.v2.json").read_text(encoding="utf-8")
+    )
+    catalog_targets = {
+        (entry["id"], entry["major_version"]): entry["lifecycle_status"]
+        for entry in catalog["capabilities"]
     }
     original = [entry for entry in review["entries"] if entry["scope"] == "original_109"]
     retained = [entry for entry in original if entry["disposition"] == "retained"]
@@ -133,16 +145,59 @@ def test_task3_legacy_addition_review_is_complete_and_traceable() -> None:
 
     assert review["baseline_revision"] == "565b00a0"
     assert len(original) == 109
-    assert len(retained) == 90
-    assert len(removed) == 19
-    assert len(review["entries"]) == 113
+    assert review["original_retained_count"] == len(retained)
+    assert review["original_removed_count"] == len(removed)
+    assert review["retained_count"] == len(
+        [entry for entry in review["entries"] if entry["disposition"] == "retained"]
+    )
+    assert review["removed_count"] == len(
+        [entry for entry in review["entries"] if entry["disposition"] == "removed"]
+    )
     for entry in review["entries"]:
         key = (entry["method"], entry["route_path"])
         assert entry["reason"]
-        assert entry["evidence_refs"]
-        for reference in entry["evidence_refs"]:
-            assert (root / reference.split("#", 1)[0]).is_file(), reference
         if entry["disposition"] == "retained":
-            assert targets[key] == entry["target_capability"]
+            target = entry["target_capability"]
+            major = entry["target_major_version"]
+            assert targets[key] == (target, major)
+            assert catalog_targets[(target, major)] == "stable"
+            evidence = entry["evidence"]
+            assert evidence["kind"] in {"capability_invocation", "exact_delegation"}
+
+            def anchored_text(anchor: dict) -> str:
+                assert set(anchor) == {
+                    "source_path", "start_line", "end_line", "sha256"
+                }
+                source_path = root / anchor["source_path"]
+                assert source_path.is_file(), source_path
+                lines = source_path.read_text(encoding="utf-8").splitlines(keepends=True)
+                assert 1 <= anchor["start_line"] <= anchor["end_line"] <= len(lines)
+                text = "".join(lines[anchor["start_line"] - 1:anchor["end_line"]])
+                assert hashlib.sha256(text.encode("utf-8")).hexdigest() == anchor["sha256"]
+                return text
+
+            handler = anchored_text(evidence["handler"])
+
+            def exact_calls(source: str) -> set[str]:
+                tree = ast.parse(source)
+                return {
+                    ast.get_source_segment(source, node)
+                    for node in ast.walk(tree)
+                    if isinstance(node, ast.Call)
+                }
+
+            if evidence["kind"] == "capability_invocation":
+                invocation = evidence["expected_target_invocation"]
+                assert target in invocation
+                assert invocation in exact_calls(handler)
+            else:
+                symbol = evidence["delegation_symbol"]
+                delegation = evidence["expected_delegation"]
+                binding = anchored_text(evidence["binding"])
+                target_binding = evidence["expected_target_binding"]
+                assert symbol in delegation and delegation in exact_calls(handler)
+                assert f"def {symbol}" in binding
+                assert target in target_binding
+                assert target_binding in exact_calls(binding)
         else:
             assert key not in targets

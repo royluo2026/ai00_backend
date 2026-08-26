@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess
 import sys
@@ -89,6 +90,34 @@ def _complete_repository(tmp_path: Path) -> Path:
                 "catalog_descriptors": 102,
                 "proposed_final_catalog_capabilities": 173,
             },
+            "web_route_inventory_artifact": "docs/web-routes.json",
+        },
+    )
+    _write_json(
+        tmp_path,
+        "docs/web-routes.json",
+        {
+            "frontend_revision": "0" * 40,
+            "content_hash": "0" * 64,
+            "scan_roots": [],
+            "excluded_roots": [],
+            "counts": {
+                "capability": 0,
+                "legacy_registered": 0,
+                "bff_registered": 0,
+                "operations_excluded": 0,
+                "unresolved": 0,
+            },
+            "lexical_audit": {
+                "token_count": 0,
+                "token_hash": hashlib.sha256(b"").hexdigest(),
+                "mapped_count": 0,
+                "reviewed_non_route_count": 0,
+                "reviewed_non_route_tokens": [],
+                "unmatched_count": 0,
+                "unmatched_tokens": [],
+            },
+            "routes": [],
         },
     )
     _write_json(
@@ -530,6 +559,64 @@ def test_strict_completion_blocks_stored_unresolved_without_frontend_root(
     assert report.web_consumer_bypasses == 1
     assert "web_route_inventory_unresolved:1" in report.failed
     assert "web_consumer_bypasses:1" in report.failed
+
+
+def test_strict_completion_requires_stored_web_artifact_configuration(
+    tmp_path: Path,
+) -> None:
+    root = _complete_repository(tmp_path)
+    configuration_path = root / "backend/governance/capability_v2_completion.json"
+    configuration = json.loads(configuration_path.read_text(encoding="utf-8"))
+    configuration.pop("web_route_inventory_artifact")
+    _write_json(root, "backend/governance/capability_v2_completion.json", configuration)
+
+    report = evaluate_completion(root, mode="strict")
+
+    assert "web_route_inventory_artifact_unconfigured:1" in report.failed
+
+
+def test_strict_completion_requires_stored_web_artifact_file(tmp_path: Path) -> None:
+    root = _complete_repository(tmp_path)
+    configuration_path = root / "backend/governance/capability_v2_completion.json"
+    configuration = json.loads(configuration_path.read_text(encoding="utf-8"))
+    configuration["web_route_inventory_artifact"] = "docs/missing-web-routes.json"
+    _write_json(root, "backend/governance/capability_v2_completion.json", configuration)
+
+    report = evaluate_completion(root, mode="strict")
+
+    assert "web_route_inventory_artifact_missing:1" in report.failed
+
+
+def test_strict_completion_recomputes_unresolved_from_stored_routes(
+    tmp_path: Path,
+) -> None:
+    root = _complete_repository(tmp_path)
+    _web, artifact = _configure_complete_web_evidence(
+        root, "fetch('/api/tasks');\n"
+    )
+    document = json.loads(artifact.read_text(encoding="utf-8"))
+    document["counts"]["unresolved"] = 0
+    _write_json(root, "docs/web-routes.json", document)
+
+    report = evaluate_completion(root, mode="strict")
+
+    assert report.web_consumer_bypasses == 1
+    assert "web_route_inventory_counts_mismatch:1" in report.failed
+    assert "web_route_inventory_unresolved:1" in report.failed
+
+
+def test_strict_completion_rejects_noncanonical_stored_route(tmp_path: Path) -> None:
+    root = _complete_repository(tmp_path)
+    _web, artifact = _configure_complete_web_evidence(
+        root, "fetch('/api/tasks');\n"
+    )
+    document = json.loads(artifact.read_text(encoding="utf-8"))
+    document["routes"][0]["occurrence_id"] = "forged"
+    _write_json(root, "docs/web-routes.json", document)
+
+    report = evaluate_completion(root, mode="strict")
+
+    assert "web_route_inventory_routes_invalid:1" in report.failed
 
 
 def test_fresh_web_verification_rejects_missing_frontend_root(tmp_path: Path) -> None:

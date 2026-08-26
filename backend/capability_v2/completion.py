@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import ast
+from collections import Counter
 import json
 import re
 import subprocess
@@ -17,6 +18,16 @@ from .consumer_routes import (
 from .atomicity import load_atomicity_dispositions
 from .catalog_targets import CatalogTargetIndex
 from .route_inventory import audit_route_inventory, load_route_inventory
+
+
+_WEB_DISPOSITIONS = {
+    "capability",
+    "legacy_registered",
+    "bff_registered",
+    "operations_excluded",
+    "unresolved",
+}
+_WEB_METHODS = {"DELETE", "GET", "PATCH", "POST", "PUT"}
 
 
 class CompletionConfigurationError(ValueError):
@@ -320,19 +331,89 @@ def _stored_web_route_failures(
 ) -> tuple[int, list[str]]:
     relative = configuration.get("web_route_inventory_artifact")
     if relative is None:
-        return 0, []
+        return 0, ["web_route_inventory_artifact_unconfigured:1"]
     if not isinstance(relative, str) or not relative:
         raise CompletionConfigurationError(
             "web_route_inventory_artifact must be a repository-relative path"
         )
-    report = _load_json(_relative_path(root, relative, field="web_route_inventory_artifact"))
+    artifact = _relative_path(root, relative, field="web_route_inventory_artifact")
+    if not artifact.is_file():
+        return 0, ["web_route_inventory_artifact_missing:1"]
+    report = _load_json(artifact)
+    failures: list[str] = []
+    routes = report.get("routes")
+    computed = Counter({disposition: 0 for disposition in _WEB_DISPOSITIONS})
+    identities: set[str] = set()
+    routes_valid = isinstance(routes, list)
+    if isinstance(routes, list):
+        allowed_keys = {
+            "source", "line", "column", "raw_route", "normalized_route",
+            "method", "disposition", "occurrence_id", "classification_prefix",
+        }
+        required_keys = allowed_keys - {"classification_prefix"}
+        for route in routes:
+            if not isinstance(route, dict):
+                routes_valid = False
+                continue
+            source = route.get("source")
+            line = route.get("line")
+            column = route.get("column")
+            raw_route = route.get("raw_route")
+            normalized = route.get("normalized_route")
+            method = route.get("method")
+            disposition = route.get("disposition")
+            identity = route.get("occurrence_id")
+            prefix = route.get("classification_prefix")
+            expected_identity = (
+                f"{source}:{line}:{column}:{method or 'UNKNOWN'}:{normalized}"
+            )
+            valid = (
+                required_keys <= set(route) <= allowed_keys
+                and isinstance(source, str)
+                and bool(source)
+                and "\\" not in source
+                and not source.startswith("/")
+                and isinstance(line, int)
+                and not isinstance(line, bool)
+                and line > 0
+                and isinstance(column, int)
+                and not isinstance(column, bool)
+                and column > 0
+                and isinstance(raw_route, str)
+                and "/api/" in raw_route
+                and isinstance(normalized, str)
+                and normalized.startswith("/api/")
+                and (method is None or (
+                    isinstance(method, str) and method in _WEB_METHODS
+                ))
+                and isinstance(disposition, str)
+                and disposition in _WEB_DISPOSITIONS
+                and isinstance(identity, str)
+                and identity == expected_identity
+                and identity not in identities
+                and (prefix is None or isinstance(prefix, str))
+            )
+            if not valid:
+                routes_valid = False
+                continue
+            identities.add(identity)
+            computed[disposition] += 1
+    if not routes_valid:
+        failures.append("web_route_inventory_routes_invalid:1")
     counts = report.get("counts")
-    unresolved = counts.get("unresolved") if isinstance(counts, dict) else None
-    if not isinstance(unresolved, int) or unresolved < 0:
-        return 0, ["web_route_inventory_stored_invalid:1"]
-    failures = (
-        [f"web_route_inventory_unresolved:{unresolved}"] if unresolved else []
+    counts_valid = (
+        isinstance(counts, dict)
+        and set(counts) == _WEB_DISPOSITIONS
+        and all(
+            isinstance(value, int) and not isinstance(value, bool) and value >= 0
+            for value in counts.values()
+        )
     )
+    if not counts_valid or any(counts[key] != computed[key] for key in _WEB_DISPOSITIONS):
+        failures.append("web_route_inventory_counts_mismatch:1")
+    unresolved = computed["unresolved"]
+    if unresolved:
+        failures.append(f"web_route_inventory_unresolved:{unresolved}")
     lexical = report.get("lexical_audit")
     if not isinstance(lexical, dict):
         failures.append("web_route_inventory_lexical_evidence_missing:1")
@@ -344,7 +425,6 @@ def _stored_web_route_failures(
     reviewed_tokens = lexical.get("reviewed_non_route_tokens")
     unmatched = lexical.get("unmatched_count")
     unmatched_tokens = lexical.get("unmatched_tokens")
-    routes = report.get("routes")
     valid = (
         isinstance(token_count, int)
         and token_count >= 0

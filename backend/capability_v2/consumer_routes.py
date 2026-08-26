@@ -417,18 +417,17 @@ def _method_for_occurrence(
         return None
     callee, open_paren = call
     method_argument = _METHOD_ARGUMENT.match(source[open_paren + 1:literal_start])
-    final_name = callee.rsplit(".", 1)[-1]
-    if method_argument and final_name in _METHOD_FIRST_CALLS:
+    if method_argument and callee in _METHOD_FIRST_CALLS:
         return method_argument.group(1).upper()
     call_end = _matching_paren(source, open_paren)
     explicit = (
         _direct_options_method(source, literal_end, call_end)
-        if final_name in _OPTIONS_METHOD_CALLS
+        if callee in _OPTIONS_METHOD_CALLS
         else None
     )
     if explicit:
         return explicit
-    if final_name in _DEFAULT_GET_CALLS:
+    if callee in _DEFAULT_GET_CALLS:
         return "GET"
     return None
 

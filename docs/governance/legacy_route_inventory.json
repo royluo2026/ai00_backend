@@ -2798,64 +2798,12 @@
         "migration_target_major_version": 1
       },
       {
-        "route_path": "/api/follows/{gid}",
-        "method": "DELETE",
-        "owner": "project_management",
-        "migration_target_capability": "project.follow.change.apply.atomic.follows_delete",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/follows.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/shares/lists/{list_gid}/{gid}",
-        "method": "DELETE",
-        "owner": "project_management",
-        "migration_target_capability": "project.sharing.change.apply.atomic.shares_list_delete",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/shares.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
         "route_path": "/api/skills/{gid}",
         "method": "DELETE",
         "owner": "agent",
         "migration_target_capability": "agent.skill.change.apply",
         "migration_deadline": "2026-11-21",
         "source": "plugins/agent/agent_backend/routers/skills_v2.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/task-dependencies/{gid}",
-        "method": "DELETE",
-        "owner": "project_management",
-        "migration_target_capability": "project.task.change.apply.atomic.task_dependencies_delete",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/promotion.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/tasks/{gid}",
-        "method": "DELETE",
-        "owner": "project_management",
-        "migration_target_capability": "project.task.change.apply.atomic.tasks_delete",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/promotion.py",
         "allowed_consumers": [
           "web",
           "rest"
@@ -2889,45 +2837,6 @@
         "migration_target_major_version": 1
       },
       {
-        "route_path": "/api/annotations/{key}",
-        "method": "GET",
-        "owner": "project_management",
-        "migration_target_capability": "project.workbench.read.atomic.annotations_get",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/annotations.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/approval/orders",
-        "method": "GET",
-        "owner": "project_management",
-        "migration_target_capability": "project.approval.read.atomic.approval_orders_search",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/approval.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/approval/orders/{gid}",
-        "method": "GET",
-        "owner": "project_management",
-        "migration_target_capability": "project.approval.read.atomic.approval_orders_get",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/approval.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
         "route_path": "/api/canvases",
         "method": "GET",
         "owner": "craft",
@@ -2954,116 +2863,12 @@
         "migration_target_major_version": 1
       },
       {
-        "route_path": "/api/change-logs",
-        "method": "GET",
-        "owner": "project_management",
-        "migration_target_capability": "project.change_log.read.atomic.change_logs_search",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/change_logs.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/follows",
-        "method": "GET",
-        "owner": "project_management",
-        "migration_target_capability": "project.follow.read.atomic.follows_list",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/follows.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/item-entries/{item_type}/{item_gid}",
-        "method": "GET",
-        "owner": "project_management",
-        "migration_target_capability": "project.list.read.atomic.item_entries_get",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/item_entries.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/shares/lists/{list_gid}",
-        "method": "GET",
-        "owner": "project_management",
-        "migration_target_capability": "project.sharing.read.atomic.shares_list_list",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/shares.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
         "route_path": "/api/skills",
         "method": "GET",
         "owner": "agent",
         "migration_target_capability": "agent.skill.read",
         "migration_deadline": "2026-11-21",
         "source": "plugins/agent/agent_backend/routers/skills_v2.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/task-dependencies",
-        "method": "GET",
-        "owner": "project_management",
-        "migration_target_capability": "project.task.read.atomic.task_dependencies_list",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/promotion.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/task-templates",
-        "method": "GET",
-        "owner": "project_management",
-        "migration_target_capability": "project.task_template.read.atomic.task_templates_list",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/task_templates.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/task-templates/{gid}",
-        "method": "GET",
-        "owner": "project_management",
-        "migration_target_capability": "project.task_template.read.atomic.task_templates_get",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/task_templates.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/tasks",
-        "method": "GET",
-        "owner": "project_management",
-        "migration_target_capability": "project.task.read.atomic.tasks_search",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/promotion.py",
         "allowed_consumers": [
           "web",
           "rest"
@@ -3103,58 +2908,6 @@
         "migration_target_capability": "craft.ebom.snapshot.update",
         "migration_deadline": "2026-11-21",
         "source": "plugins/craft/craft_backend/routers/ebom.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/follows/{gid}",
-        "method": "PATCH",
-        "owner": "project_management",
-        "migration_target_capability": "project.follow.change.apply.atomic.follows_update",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/follows.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/lists/{gid}",
-        "method": "PATCH",
-        "owner": "project_management",
-        "migration_target_capability": "project.list.change.apply.atomic.lists_update",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/lists.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/notifications/read_all",
-        "method": "PATCH",
-        "owner": "project_management",
-        "migration_target_capability": "project.notification.change.apply.atomic.notifications_mark_all_read",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/notifications.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/notifications/{gid}/read",
-        "method": "PATCH",
-        "owner": "project_management",
-        "migration_target_capability": "project.notification.change.apply.atomic.notifications_mark_read",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/notifications.py",
         "allowed_consumers": [
           "web",
           "rest"
@@ -3214,58 +2967,6 @@
         "migration_target_major_version": 1
       },
       {
-        "route_path": "/api/approval/orders/scope_upgrade",
-        "method": "POST",
-        "owner": "project_management",
-        "migration_target_capability": "project.approval.change.apply.atomic.approval_scope_upgrade_create",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/approval.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/approval/orders/{gid}/approve",
-        "method": "POST",
-        "owner": "project_management",
-        "migration_target_capability": "project.approval.change.apply.atomic.approval_orders_approve",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/approval.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/approval/orders/{gid}/start",
-        "method": "POST",
-        "owner": "project_management",
-        "migration_target_capability": "project.approval.change.apply.atomic.approval_orders_start",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/approval.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/approval/orders/{gid}/withdraw",
-        "method": "POST",
-        "owner": "project_management",
-        "migration_target_capability": "project.approval.change.apply.atomic.approval_orders_withdraw",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/approval.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
         "route_path": "/api/canvases",
         "method": "POST",
         "owner": "craft",
@@ -3292,64 +2993,12 @@
         "migration_target_major_version": 1
       },
       {
-        "route_path": "/api/follows",
-        "method": "POST",
-        "owner": "project_management",
-        "migration_target_capability": "project.follow.change.apply.atomic.follows_create",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/follows.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
         "route_path": "/api/import-export/import/parse-excel",
         "method": "POST",
         "owner": "craft",
         "migration_target_capability": "craft.bop.import.preview",
         "migration_deadline": "2026-11-21",
         "source": "plugins/craft/craft_backend/routers/import_export.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/issues",
-        "method": "POST",
-        "owner": "project_management",
-        "migration_target_capability": "project.issue.change.apply.atomic.issues_create",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/promotion.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/lists",
-        "method": "POST",
-        "owner": "project_management",
-        "migration_target_capability": "project.list.change.apply.atomic.lists_create",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/lists.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/permission-requests",
-        "method": "POST",
-        "owner": "project_management",
-        "migration_target_capability": "project.permission_request.change.apply.atomic.permission_requests_create",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/permission_requests.py",
         "allowed_consumers": [
           "web",
           "rest"
@@ -3370,64 +3019,12 @@
         "migration_target_major_version": 1
       },
       {
-        "route_path": "/api/shares/lists/{list_gid}",
-        "method": "POST",
-        "owner": "project_management",
-        "migration_target_capability": "project.sharing.change.apply.atomic.shares_list_create",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/shares.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
         "route_path": "/api/skills",
         "method": "POST",
         "owner": "agent",
         "migration_target_capability": "agent.skill.change.apply",
         "migration_deadline": "2026-11-21",
         "source": "plugins/agent/agent_backend/routers/skills_v2.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/task-dependencies",
-        "method": "POST",
-        "owner": "project_management",
-        "migration_target_capability": "project.task.change.apply.atomic.task_dependencies_create",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/promotion.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/task-templates/{gid}/instantiate",
-        "method": "POST",
-        "owner": "project_management",
-        "migration_target_capability": "project.task_template.change.apply.atomic.task_templates_instantiate",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/task_templates.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/tasks",
-        "method": "POST",
-        "owner": "project_management",
-        "migration_target_capability": "project.task.change.apply.atomic.tasks_create",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/promotion.py",
         "allowed_consumers": [
           "web",
           "rest"
@@ -3461,45 +3058,6 @@
         "migration_target_major_version": 1
       },
       {
-        "route_path": "/api/annotations/{key}",
-        "method": "PUT",
-        "owner": "project_management",
-        "migration_target_capability": "project.workbench.change.apply.atomic.annotations_put",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/annotations.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/issues/{gid}",
-        "method": "PUT",
-        "owner": "project_management",
-        "migration_target_capability": "project.issue.change.apply.atomic.issues_update",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/promotion.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/item-entries/{item_type}/{item_gid}",
-        "method": "PUT",
-        "owner": "project_management",
-        "migration_target_capability": "project.list.change.apply.atomic.item_entries_replace",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/item_entries.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
         "route_path": "/api/skills/{gid}",
         "method": "PUT",
         "owner": "agent",
@@ -3513,32 +3071,6 @@
         "migration_target_major_version": 1
       },
       {
-        "route_path": "/api/task-dependencies/{gid}",
-        "method": "PUT",
-        "owner": "project_management",
-        "migration_target_capability": "project.task.change.apply.atomic.task_dependencies_update",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/promotion.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/tasks/{gid}",
-        "method": "PUT",
-        "owner": "project_management",
-        "migration_target_capability": "project.task.change.apply.atomic.tasks_update",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/promotion.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-    },
-      {
         "route_path": "/api/craft_lib/equipments",
         "method": "GET",
         "owner": "craft",
@@ -3554,19 +3086,6 @@
       {
         "route_path": "/api/craft_lib/equipments",
         "method": "POST",
-        "owner": "craft",
-        "migration_target_capability": "craft.library.change.apply",
-        "source": "plugins/craft/craft_backend/routers/craft_library.py",
-        "migration_deadline": "2026-11-21",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/craft_lib/equipments/{gid}",
-        "method": "DELETE",
         "owner": "craft",
         "migration_target_capability": "craft.library.change.apply",
         "source": "plugins/craft/craft_backend/routers/craft_library.py",
@@ -3658,19 +3177,6 @@
       {
         "route_path": "/api/craft_lib/fixtures",
         "method": "POST",
-        "owner": "craft",
-        "migration_target_capability": "craft.library.change.apply",
-        "source": "plugins/craft/craft_backend/routers/craft_library.py",
-        "migration_deadline": "2026-11-21",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/craft_lib/fixtures/{gid}",
-        "method": "DELETE",
         "owner": "craft",
         "migration_target_capability": "craft.library.change.apply",
         "source": "plugins/craft/craft_backend/routers/craft_library.py",

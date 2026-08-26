@@ -23,10 +23,10 @@
   ],
   "counts": {
     "capability": 37,
-    "legacy_registered": 24,
+    "legacy_registered": 7,
     "bff_registered": 0,
     "operations_excluded": 9,
-    "unresolved": 391
+    "unresolved": 408
   },
   "lexical_audit": {
     "token_count": 480,
@@ -377,9 +377,9 @@
       "column": 45,
       "raw_route": "/api/skills",
       "normalized_route": "/api/skills",
-      "method": "POST",
-      "disposition": "legacy_registered",
-      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:751:45:POST:/api/skills"
+      "method": null,
+      "disposition": "unresolved",
+      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:751:45:UNKNOWN:/api/skills"
     },
     {
       "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
@@ -387,9 +387,9 @@
       "column": 45,
       "raw_route": "/api/skills/${_fixedSkill.gid}",
       "normalized_route": "/api/skills/{dynamic}",
-      "method": "PUT",
-      "disposition": "legacy_registered",
-      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:782:45:PUT:/api/skills/{dynamic}"
+      "method": null,
+      "disposition": "unresolved",
+      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:782:45:UNKNOWN:/api/skills/{dynamic}"
     },
     {
       "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
@@ -407,9 +407,9 @@
       "column": 42,
       "raw_route": "/api/skills/canvas-options",
       "normalized_route": "/api/skills/canvas-options",
-      "method": "POST",
+      "method": null,
       "disposition": "unresolved",
-      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1596:42:POST:/api/skills/canvas-options"
+      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1596:42:UNKNOWN:/api/skills/canvas-options"
     },
     {
       "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
@@ -417,9 +417,9 @@
       "column": 47,
       "raw_route": "/api/skills/resume-canvas",
       "normalized_route": "/api/skills/resume-canvas",
-      "method": "POST",
+      "method": null,
       "disposition": "unresolved",
-      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1611:47:POST:/api/skills/resume-canvas"
+      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1611:47:UNKNOWN:/api/skills/resume-canvas"
     },
     {
       "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
@@ -427,9 +427,9 @@
       "column": 47,
       "raw_route": "/api/v1/capabilities/craft.bop.entry.legacy_read:invoke",
       "normalized_route": "/api/v1/capabilities/craft.bop.entry.legacy_read:invoke",
-      "method": "POST",
+      "method": null,
       "disposition": "capability",
-      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1705:47:POST:/api/v1/capabilities/craft.bop.entry.legacy_read:invoke"
+      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1705:47:UNKNOWN:/api/v1/capabilities/craft.bop.entry.legacy_read:invoke"
     },
     {
       "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
@@ -437,9 +437,9 @@
       "column": 31,
       "raw_route": "/api/ai/abort",
       "normalized_route": "/api/ai/abort",
-      "method": "POST",
-      "disposition": "legacy_registered",
-      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1947:31:POST:/api/ai/abort"
+      "method": null,
+      "disposition": "unresolved",
+      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1947:31:UNKNOWN:/api/ai/abort"
     },
     {
       "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
@@ -467,9 +467,9 @@
       "column": 47,
       "raw_route": "/api/skills/${_fixedSkill.gid}",
       "normalized_route": "/api/skills/{dynamic}",
-      "method": "PUT",
-      "disposition": "legacy_registered",
-      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2217:47:PUT:/api/skills/{dynamic}"
+      "method": null,
+      "disposition": "unresolved",
+      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2217:47:UNKNOWN:/api/skills/{dynamic}"
     },
     {
       "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
@@ -477,9 +477,9 @@
       "column": 47,
       "raw_route": "/api/skills/execute-canvas",
       "normalized_route": "/api/skills/execute-canvas",
-      "method": "POST",
+      "method": null,
       "disposition": "unresolved",
-      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2254:47:POST:/api/skills/execute-canvas"
+      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2254:47:UNKNOWN:/api/skills/execute-canvas"
     },
     {
       "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
@@ -487,9 +487,9 @@
       "column": 31,
       "raw_route": "/api/ai/abort",
       "normalized_route": "/api/ai/abort",
-      "method": "POST",
-      "disposition": "legacy_registered",
-      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2559:31:POST:/api/ai/abort"
+      "method": null,
+      "disposition": "unresolved",
+      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2559:31:UNKNOWN:/api/ai/abort"
     },
     {
       "source": "packages/craft-plugin/web/approval/approval.js",
@@ -1227,9 +1227,9 @@
       "column": 45,
       "raw_route": "/api/craft_lib/part_names/batch_add_from_pbom",
       "normalized_route": "/api/craft_lib/part_names/batch_add_from_pbom",
-      "method": "POST",
-      "disposition": "legacy_registered",
-      "occurrence_id": "packages/craft-plugin/web/pbom_check/pbom_check.js:320:45:POST:/api/craft_lib/part_names/batch_add_from_pbom"
+      "method": null,
+      "disposition": "unresolved",
+      "occurrence_id": "packages/craft-plugin/web/pbom_check/pbom_check.js:320:45:UNKNOWN:/api/craft_lib/part_names/batch_add_from_pbom"
     },
     {
       "source": "packages/craft-plugin/web/pbom_check/pbom_check.js",
@@ -1247,9 +1247,9 @@
       "column": 45,
       "raw_route": "/api/craft_lib/part_names/batch_accept_alias",
       "normalized_route": "/api/craft_lib/part_names/batch_accept_alias",
-      "method": "POST",
-      "disposition": "legacy_registered",
-      "occurrence_id": "packages/craft-plugin/web/pbom_check/pbom_check.js:359:45:POST:/api/craft_lib/part_names/batch_accept_alias"
+      "method": null,
+      "disposition": "unresolved",
+      "occurrence_id": "packages/craft-plugin/web/pbom_check/pbom_check.js:359:45:UNKNOWN:/api/craft_lib/part_names/batch_accept_alias"
     },
     {
       "source": "packages/craft-plugin/web/pbom_check/pbom_check.js",
@@ -1257,9 +1257,9 @@
       "column": 31,
       "raw_route": "/api/vpps-operations/rule4-bulk-ignore",
       "normalized_route": "/api/vpps-operations/rule4-bulk-ignore",
-      "method": "POST",
-      "disposition": "legacy_registered",
-      "occurrence_id": "packages/craft-plugin/web/pbom_check/pbom_check.js:555:31:POST:/api/vpps-operations/rule4-bulk-ignore"
+      "method": null,
+      "disposition": "unresolved",
+      "occurrence_id": "packages/craft-plugin/web/pbom_check/pbom_check.js:555:31:UNKNOWN:/api/vpps-operations/rule4-bulk-ignore"
     },
     {
       "source": "packages/craft-plugin/web/pbom_check/pbom_check.js",
@@ -1267,9 +1267,9 @@
       "column": 37,
       "raw_route": "/api/vpps-operations/${op.gid}/revert",
       "normalized_route": "/api/vpps-operations/{dynamic}/revert",
-      "method": "POST",
-      "disposition": "legacy_registered",
-      "occurrence_id": "packages/craft-plugin/web/pbom_check/pbom_check.js:572:37:POST:/api/vpps-operations/{dynamic}/revert"
+      "method": null,
+      "disposition": "unresolved",
+      "occurrence_id": "packages/craft-plugin/web/pbom_check/pbom_check.js:572:37:UNKNOWN:/api/vpps-operations/{dynamic}/revert"
     },
     {
       "source": "packages/craft-plugin/web/pbom_check/pbom_check.js",
@@ -1277,9 +1277,9 @@
       "column": 35,
       "raw_route": "/api/vpps-operations/rule4-bulk-ignore",
       "normalized_route": "/api/vpps-operations/rule4-bulk-ignore",
-      "method": "POST",
-      "disposition": "legacy_registered",
-      "occurrence_id": "packages/craft-plugin/web/pbom_check/pbom_check.js:744:35:POST:/api/vpps-operations/rule4-bulk-ignore"
+      "method": null,
+      "disposition": "unresolved",
+      "occurrence_id": "packages/craft-plugin/web/pbom_check/pbom_check.js:744:35:UNKNOWN:/api/vpps-operations/rule4-bulk-ignore"
     },
     {
       "source": "packages/craft-plugin/web/pbom_check/pbom_check.js",
@@ -1297,9 +1297,9 @@
       "column": 35,
       "raw_route": "/api/vpps-operations/${ops[0].gid}/revert",
       "normalized_route": "/api/vpps-operations/{dynamic}/revert",
-      "method": "POST",
-      "disposition": "legacy_registered",
-      "occurrence_id": "packages/craft-plugin/web/pbom_check/pbom_check.js:767:35:POST:/api/vpps-operations/{dynamic}/revert"
+      "method": null,
+      "disposition": "unresolved",
+      "occurrence_id": "packages/craft-plugin/web/pbom_check/pbom_check.js:767:35:UNKNOWN:/api/vpps-operations/{dynamic}/revert"
     },
     {
       "source": "packages/craft-plugin/web/project/project.js",
@@ -1527,9 +1527,9 @@
       "column": 36,
       "raw_route": "/api/my-plugin/items",
       "normalized_route": "/api/my-plugin/items",
-      "method": "GET",
+      "method": null,
       "disposition": "unresolved",
-      "occurrence_id": "packages/plugin-sdk/template/web/app.js:32:36:GET:/api/my-plugin/items"
+      "occurrence_id": "packages/plugin-sdk/template/web/app.js:32:36:UNKNOWN:/api/my-plugin/items"
     },
     {
       "source": "packages/plugin-sdk/template/web/app.js",
@@ -1537,9 +1537,9 @@
       "column": 23,
       "raw_route": "/api/my-plugin/items",
       "normalized_route": "/api/my-plugin/items",
-      "method": "POST",
+      "method": null,
       "disposition": "unresolved",
-      "occurrence_id": "packages/plugin-sdk/template/web/app.js:71:23:POST:/api/my-plugin/items"
+      "occurrence_id": "packages/plugin-sdk/template/web/app.js:71:23:UNKNOWN:/api/my-plugin/items"
     },
     {
       "source": "packages/sim-plugin/web/cad_sim/cad_sim.js",
@@ -1739,9 +1739,9 @@
       "column": 46,
       "raw_route": "/api/flows/gen-script",
       "normalized_route": "/api/flows/gen-script",
-      "method": "POST",
-      "disposition": "legacy_registered",
-      "occurrence_id": "web/canvas/types/flow_type.js:782:46:POST:/api/flows/gen-script",
+      "method": null,
+      "disposition": "unresolved",
+      "occurrence_id": "web/canvas/types/flow_type.js:782:46:UNKNOWN:/api/flows/gen-script",
       "classification_prefix": "/api/flows"
     },
     {
@@ -1780,9 +1780,9 @@
       "column": 33,
       "raw_route": "/api/bitable-sync/rows/push",
       "normalized_route": "/api/bitable-sync/rows/push",
-      "method": "POST",
+      "method": null,
       "disposition": "unresolved",
-      "occurrence_id": "web/components/bitable_sync_manager.js:79:33:POST:/api/bitable-sync/rows/push"
+      "occurrence_id": "web/components/bitable_sync_manager.js:79:33:UNKNOWN:/api/bitable-sync/rows/push"
     },
     {
       "source": "web/components/bitable_sync_manager.js",
@@ -1790,9 +1790,9 @@
       "column": 33,
       "raw_route": "/api/bitable-sync/bindings/${this._listGid}/push",
       "normalized_route": "/api/bitable-sync/bindings/{dynamic}/push",
-      "method": "POST",
+      "method": null,
       "disposition": "unresolved",
-      "occurrence_id": "web/components/bitable_sync_manager.js:94:33:POST:/api/bitable-sync/bindings/{dynamic}/push"
+      "occurrence_id": "web/components/bitable_sync_manager.js:94:33:UNKNOWN:/api/bitable-sync/bindings/{dynamic}/push"
     },
     {
       "source": "web/components/bitable_sync_manager.js",
@@ -1800,9 +1800,9 @@
       "column": 33,
       "raw_route": "/api/bitable-sync/bindings/${this._listGid}/pull",
       "normalized_route": "/api/bitable-sync/bindings/{dynamic}/pull",
-      "method": "POST",
+      "method": null,
       "disposition": "unresolved",
-      "occurrence_id": "web/components/bitable_sync_manager.js:109:33:POST:/api/bitable-sync/bindings/{dynamic}/pull"
+      "occurrence_id": "web/components/bitable_sync_manager.js:109:33:UNKNOWN:/api/bitable-sync/bindings/{dynamic}/pull"
     },
     {
       "source": "web/components/bitable_sync_manager.js",
@@ -1820,9 +1820,9 @@
       "column": 35,
       "raw_route": "/api/bitable-sync/bindings/${this._listGid}",
       "normalized_route": "/api/bitable-sync/bindings/{dynamic}",
-      "method": "POST",
+      "method": null,
       "disposition": "unresolved",
-      "occurrence_id": "web/components/bitable_sync_manager.js:246:35:POST:/api/bitable-sync/bindings/{dynamic}"
+      "occurrence_id": "web/components/bitable_sync_manager.js:246:35:UNKNOWN:/api/bitable-sync/bindings/{dynamic}"
     },
     {
       "source": "web/components/bitable_sync_manager.js",
@@ -1840,9 +1840,9 @@
       "column": 31,
       "raw_route": "/api/bitable-sync/bindings/${this._listGid}",
       "normalized_route": "/api/bitable-sync/bindings/{dynamic}",
-      "method": "DELETE",
+      "method": null,
       "disposition": "unresolved",
-      "occurrence_id": "web/components/bitable_sync_manager.js:271:31:DELETE:/api/bitable-sync/bindings/{dynamic}"
+      "occurrence_id": "web/components/bitable_sync_manager.js:271:31:UNKNOWN:/api/bitable-sync/bindings/{dynamic}"
     },
     {
       "source": "web/components/diff_manager.js",
@@ -2221,7 +2221,7 @@
       "raw_route": "/api/change-logs?item_type=${encodeURIComponent(itemType)}&item_gid=${encodeURIComponent(itemGid)}&limit=50",
       "normalized_route": "/api/change-logs",
       "method": "GET",
-      "disposition": "legacy_registered",
+      "disposition": "unresolved",
       "occurrence_id": "web/components/overlay_edit_modal.js:564:12:GET:/api/change-logs"
     },
     {
@@ -2720,9 +2720,9 @@
       "column": 48,
       "raw_route": "/api/v1/capabilities/${id}:invoke",
       "normalized_route": "/api/v1/capabilities/{dynamic}:invoke",
-      "method": "POST",
+      "method": null,
       "disposition": "capability",
-      "occurrence_id": "web/core/global_search.js:34:48:POST:/api/v1/capabilities/{dynamic}:invoke"
+      "occurrence_id": "web/core/global_search.js:34:48:UNKNOWN:/api/v1/capabilities/{dynamic}:invoke"
     },
     {
       "source": "web/core/global_search.js",
@@ -2841,7 +2841,7 @@
       "raw_route": "/api/notifications/${gid}/read",
       "normalized_route": "/api/notifications/{dynamic}/read",
       "method": "PATCH",
-      "disposition": "legacy_registered",
+      "disposition": "unresolved",
       "occurrence_id": "web/core/notification_manager.js:66:30:PATCH:/api/notifications/{dynamic}/read"
     },
     {
@@ -2851,7 +2851,7 @@
       "raw_route": "/api/notifications/read_all",
       "normalized_route": "/api/notifications/read_all",
       "method": "PATCH",
-      "disposition": "legacy_registered",
+      "disposition": "unresolved",
       "occurrence_id": "web/core/notification_manager.js:80:24:PATCH:/api/notifications/read_all"
     },
     {
@@ -3760,9 +3760,9 @@
       "column": 33,
       "raw_route": "/api/permission-requests",
       "normalized_route": "/api/permission-requests",
-      "method": "POST",
-      "disposition": "legacy_registered",
-      "occurrence_id": "web/main.js:696:33:POST:/api/permission-requests"
+      "method": null,
+      "disposition": "unresolved",
+      "occurrence_id": "web/main.js:696:33:UNKNOWN:/api/permission-requests"
     },
     {
       "source": "web/main.js",
@@ -3780,9 +3780,9 @@
       "column": 33,
       "raw_route": "/api/tasks/${gid}",
       "normalized_route": "/api/tasks/{dynamic}",
-      "method": "PUT",
-      "disposition": "legacy_registered",
-      "occurrence_id": "web/main.js:1477:33:PUT:/api/tasks/{dynamic}"
+      "method": null,
+      "disposition": "unresolved",
+      "occurrence_id": "web/main.js:1477:33:UNKNOWN:/api/tasks/{dynamic}"
     },
     {
       "source": "web/main.js",
@@ -3800,9 +3800,9 @@
       "column": 39,
       "raw_route": "/api/tasks/${task.gid}/entries",
       "normalized_route": "/api/tasks/{dynamic}/entries",
-      "method": "PUT",
+      "method": null,
       "disposition": "unresolved",
-      "occurrence_id": "web/main.js:1520:39:PUT:/api/tasks/{dynamic}/entries"
+      "occurrence_id": "web/main.js:1520:39:UNKNOWN:/api/tasks/{dynamic}/entries"
     },
     {
       "source": "web/my_files/my_files.js",
