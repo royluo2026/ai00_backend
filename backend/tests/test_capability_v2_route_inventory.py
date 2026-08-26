@@ -13,6 +13,23 @@ from backend.capability_v2.route_inventory import (
     load_legacy_route_baseline,
     load_route_inventory,
 )
+from backend.capability_v2.route_root_cause_ledger import (
+    audit_route_root_cause_ledger,
+    load_route_root_cause_ledger,
+)
+
+
+def test_task3b3a_root_cause_ledger_covers_pinned_unresolved_evidence() -> None:
+    root = Path(__file__).resolve().parents[2]
+    ledger = load_route_root_cause_ledger(
+        root / "docs/governance/web-route-root-cause-ledger.json"
+    )
+
+    assert ledger.baseline_unresolved_count == 148
+    assert ledger.baseline_group_count == 93
+    assert sum(entry.occurrence_count for entry in ledger.entries) == 148
+    assert len(ledger.entries) == 93
+    assert audit_route_root_cause_ledger(root, ledger) == ()
 
 
 def test_route_scan_excludes_named_generated_dist_outputs(tmp_path: Path) -> None:
@@ -363,4 +380,4 @@ def test_current_legacy_proofs_biject_exactly_to_immutable_baseline_difference()
     }
 
     assert current_keys - baseline.key_set == active_proof_keys
-    assert len(active_proof_keys) == 132
+    assert len(active_proof_keys) == review["retained_count"] == 137

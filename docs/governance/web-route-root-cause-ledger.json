@@ -1,0 +1,3719 @@
+{
+  "schema_version": 1,
+  "artifact_id": "web-route-root-cause-ledger",
+  "review_authority": "capability-governance-evidence-closure/task-3b3a",
+  "baseline_frontend_revision": "7848e30803ada6cc687c9e8b3b14ce4020254886",
+  "baseline_content_hash": "227927b5c91ae24747115ccea4ab72097b951be0dd4d96c8f954455984a71b38",
+  "baseline_unresolved_count": 148,
+  "baseline_group_count": 93,
+  "baseline_source_hashes": {
+    "packages/agent-plugin/web/automation_hub/ai_assistant.js": "d38eefada66db195d037f8601f40680ed71d52809f32b8c3d562b739f74f5340",
+    "packages/agent-plugin/web/flow_canvas/flow_editor.js": "9bb1fe5371a15087509924b6de1304199977757f1038a76177e78e490deca049",
+    "packages/agent-plugin/web/wfc_window/wfc_window.js": "c6f654458ff966e9bb4c2f023dd877c682243a6ff70c71ef0646f4acf9c041a7",
+    "packages/craft-plugin/web/approval/approval.js": "04495deeced75c275da108fc797af937d194541b597c6186d52faa6d82cf7539",
+    "packages/craft-plugin/web/bop/bop.js": "c06ab7a41a49a6cbf233155d04eefb14b3d793a908f0e7262ba6d88e78c10819",
+    "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js": "d425d6294546dfb7134b4f41c1fc200af8ddde31b87a8cfb2ed9ef3b2ff1b851",
+    "packages/craft-plugin/web/craft_table/table.js": "e13514904349a299e1466f781df25dd96f742ac4e58cca912e6bb59f41a4486b",
+    "packages/craft-plugin/web/ebom/ebom.js": "ed22202d2c34d2a0b320a2bbed1f804a1db2e8b72ac8d4d67a984142cce65321",
+    "packages/craft-plugin/web/issue/issue.js": "89c320fb34eb0b058b72b794c2101812d9f8e3bb84d51fb4eb16330fa4cb65e7",
+    "packages/craft-plugin/web/lineage_view/assoc_panel.js": "1df0649aea1c9836f3de9ffb2e8e47765fa9f3011e6a303d32acc72de2c5d8d5",
+    "packages/craft-plugin/web/lineage_view/layout_detail_panel.js": "36bb20338757c77fcfe80f4d0f84449f2928df7183989efeb2798adbc9abc00a",
+    "packages/craft-plugin/web/lineage_view/lineage.js": "4eded0f1dca13981e7bff65526389f43f71b47cae211dbc00469e6c3f3466d65",
+    "packages/craft-plugin/web/project/project.js": "9a0085d95c82fc8d98789c3e9d71f53467b6372152acc448b4643e86239fef03",
+    "packages/craft-plugin/web/std_op_lib/std_op_lib.js": "bef8bd9e3271a8108a3dd65539a644491481c998eda76b80a11f9ed01b5e957f",
+    "packages/craft-plugin/web/task/task.js": "b8ff99fe7b3e81670be8e0b3100b3f9d685eaa6409475eeba3dd3a7d7eec75f8",
+    "packages/plugin-sdk/template/web/app.js": "a3af9b0cc348a1f3a2465fce980652c1100e6cdb5172e163e65f5e252904383a",
+    "web/admin/ai_audit.html": "666af866eb3f7560e990b0b338bd2421fa29dba9b8c4ee0bab5da3d7630b2179",
+    "web/admin/task_planning.html": "9458faf6cb26c55b84344d405084358da501c59cae64b8725f18b559fd6b29e7",
+    "web/canvas/types/flow_type.js": "591904dbc5db76114ccc02ac981ab675147876890bd297d814a2d9024928212f",
+    "web/components/bitable_sync_manager.js": "2708374dc47c6e22f56c9fc923b4acb550756a83905d59a7ffe92344f5d3af08",
+    "web/components/list_nav.html": "c73c06958138f87ee70a4b6a8f9dad8e487adf663e14568924daa188533d2443",
+    "web/components/list_shell.js": "214115280f84f0a9874691e8fc9cf0028de16b4c4c3975e3d9094d9dd45bbfff",
+    "web/components/list_sidebar.js": "21407987333e16b153d0cbf88d0872dc01c6b11b76cd9d26247d6eb63c06f49e",
+    "web/components/list_tree.html": "bfa8fe3d79f58aae2179e97d056fed8249738b7006985cefa33b2f454010ce71",
+    "web/components/quick_list.html": "1b8fbbbfe8f09a87f882fc92c589e24c1a105fc352701770eb881e49e97b8f2e",
+    "web/components/scope_badge.js": "a3b470164443fd82287a2ccf09a4485ff1fece92ac046bf7b44d506bdcb627f8",
+    "web/components/self_annotation_panel.js": "55c294a99365af52084ce49b89432bf3dee012cfdbad32ec9993b1467b871301",
+    "web/components/view_manager.js": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6",
+    "web/components/visibility_selector.js": "5d7d05f49f03ece4b75139ebfcf857deda38f3e52cdb453d47ca018f8313b98e",
+    "web/container_card/modes/container_item_detail.js": "e3e1b83d5e5596cb267449f447bd5c78594e12f477581b0a36c2adaf8e8b55f4",
+    "web/container_card/modes/mode_field_detail.js": "9e0bbd6e14368e83adcd96eb0756f0ceab11cabbd932e55b5db2c874c16f2d20",
+    "web/container_card/modes/mode_text_image.js": "cddd814d614f8bd14fff88ce6cf8a16662691e9e338156fe5d6460895cacb0ad",
+    "web/core/global_search.js": "818504d9c4c7277789c3bb5a066910b92427c267558494a90764a2e5f856abbd",
+    "web/core/web_compat.js": "ec21b526867d051eb968d8e1b451c535dbbf819251463d42a9f5d82ea870b02c",
+    "web/ext_datasource/ext_ds.js": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01",
+    "web/feishu/feishu.js": "e7f04bce5b078b9544baf908669a40b7db01978f8cf64514f7278c94bc038d94",
+    "web/knowledge_hub/knowledge_hub.js": "1f247f6133368b61baa10648243b7fc6659b33b8c342459a9d138afde102d465",
+    "web/knowledge_hub/pages/gbop_vpps.html": "db5265ec700318095f663c2571b1e5c734b37d8a51b200bf33aeea3b7c20e2f8",
+    "web/main.js": "d6365ef216f87200281ef17284ffccc977a8ed8430e36f3448bdaa5aff4f0bd5",
+    "web/org_mgmt/org_mgmt.js": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f",
+    "web/rule_mgmt/rule_mgmt.js": "83b06c82671c9c398d44e7b0692ab24dbc0ef33b707278e86973978c84693cb3",
+    "web/settings/settings.js": "7315fba56b7f88f38265b933ae6615bbfaf2e8f826540f6315d60aa85e0e4a82",
+    "web/share/issues.html": "4b1b3187589cd3204ec2b7c9f1942ad57822da8f745d8fcb301debf3c0e9d41a",
+    "web/team_space/team_space.js": "a3d1a2a00447e04711fb077b3c9822003fc5755f88829d71463d0fa88cb77bc5",
+    "web/workbench/workbench.js": "b204bf23ef35d7c214b9bd9a07cf230f6c1c7a537cd9ddde436845914e2275d4",
+    "web/workspace/nav_manager.js": "e229fb407361c139cfc265cd438f929a944cd1919c321c4b6a1cf5bf57cfcd7d"
+  },
+  "final_evidence": {
+    "frontend_revision": "b6d154dd75acf6eb0555a365591e20bb41c70c54",
+    "content_hash": "1bce0e94067b98dfa159dc5ccc74262ea7da3c18b59f29e5c9bdfb1701de00fb",
+    "unresolved_count": 109,
+    "unresolved_group_count": 64
+  },
+  "final_unresolved_groups": [
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/craft_lib/equipments/{dynamic}",
+      "occurrence_count": 1
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/craft_lib/fixtures/{dynamic}",
+      "occurrence_count": 1
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/grants/{dynamic}",
+      "occurrence_count": 1
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/knowledges/{dynamic}",
+      "occurrence_count": 1
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/lists/{dynamic}",
+      "occurrence_count": 2
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/plugin/uninstall/{dynamic}",
+      "occurrence_count": 1
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/views/{dynamic}",
+      "occurrence_count": 1
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/ext-datasources",
+      "occurrence_count": 1
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/ext-datasources/{dynamic}/tables",
+      "occurrence_count": 1
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/ext-field-mappings",
+      "occurrence_count": 1
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/ext-mappings",
+      "occurrence_count": 1
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/ext-mappings/{dynamic}/columns",
+      "occurrence_count": 1
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/ext-mappings/{dynamic}/preview",
+      "occurrence_count": 1
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/file-store/config",
+      "occurrence_count": 1
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/grants",
+      "occurrence_count": 1
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/knowledge/entries",
+      "occurrence_count": 1
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/knowledges/{dynamic}",
+      "occurrence_count": 3
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/lists",
+      "occurrence_count": 12
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/notifications/prefs",
+      "occurrence_count": 1
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/org/teams",
+      "occurrence_count": 3
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/plugin/list",
+      "occurrence_count": 1
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/rule-engine/check-entry",
+      "occurrence_count": 2
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/self_ann/batch",
+      "occurrence_count": 5
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/self_ann/list",
+      "occurrence_count": 3
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/self_ann/{dynamic}",
+      "occurrence_count": 1
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/tasks/{dynamic}/entries",
+      "occurrence_count": 1
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/teams",
+      "occurrence_count": 1
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/users",
+      "occurrence_count": 6
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/users/me",
+      "occurrence_count": 1
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/users/search",
+      "occurrence_count": 3
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/views",
+      "occurrence_count": 2
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/workbench/home",
+      "occurrence_count": 1
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/workbench/panel1",
+      "occurrence_count": 1
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/ext-datasources/{dynamic}",
+      "occurrence_count": 1
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/knowledges/{dynamic}",
+      "occurrence_count": 1
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/lists/{dynamic}",
+      "occurrence_count": 6
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/notifications/prefs",
+      "occurrence_count": 1
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/users/{dynamic}/role",
+      "occurrence_count": 2
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/views/{dynamic}",
+      "occurrence_count": 2
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/approval/orders/{dynamic}/reject",
+      "occurrence_count": 1
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/ext-datasources",
+      "occurrence_count": 1
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/ext-datasources/{dynamic}/test",
+      "occurrence_count": 1
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/ext-mappings",
+      "occurrence_count": 1
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/ext-mappings/{dynamic}/import",
+      "occurrence_count": 1
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/flows/test-node",
+      "occurrence_count": 2
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/grants",
+      "occurrence_count": 2
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/knowledges",
+      "occurrence_count": 1
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/org/sync-from-feishu",
+      "occurrence_count": 1
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/plugin/install",
+      "occurrence_count": 1
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/rules/{dynamic}/deviations",
+      "occurrence_count": 1
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/rules/{dynamic}/{dynamic}",
+      "occurrence_count": 1
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/skills/canvas-options",
+      "occurrence_count": 1
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/skills/execute-canvas",
+      "occurrence_count": 1
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/skills/resume-canvas",
+      "occurrence_count": 1
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/views",
+      "occurrence_count": 2
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/views/{dynamic}/copy",
+      "occurrence_count": 1
+    },
+    {
+      "method": "PUT",
+      "normalized_route": "/api/ext-field-mappings/batch",
+      "occurrence_count": 1
+    },
+    {
+      "method": "PUT",
+      "normalized_route": "/api/issues",
+      "occurrence_count": 2
+    },
+    {
+      "method": "PUT",
+      "normalized_route": "/api/knowledge/entries",
+      "occurrence_count": 1
+    },
+    {
+      "method": "PUT",
+      "normalized_route": "/api/knowledges/{dynamic}",
+      "occurrence_count": 2
+    },
+    {
+      "method": "PUT",
+      "normalized_route": "/api/rules/{dynamic}",
+      "occurrence_count": 2
+    },
+    {
+      "method": "PUT",
+      "normalized_route": "/api/self_ann/{dynamic}",
+      "occurrence_count": 1
+    },
+    {
+      "method": "PUT",
+      "normalized_route": "/api/tasks",
+      "occurrence_count": 2
+    },
+    {
+      "method": "PUT",
+      "normalized_route": "/api/tasks/{dynamic}/entries",
+      "occurrence_count": 1
+    }
+  ],
+  "entries": [
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/bitable-sync/bindings/{dynamic}",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/bitable_sync_manager.js:279:24:DELETE:/api/bitable-sync/bindings/{dynamic}",
+          "source": "web/components/bitable_sync_manager.js",
+          "line": 279,
+          "column": 24,
+          "raw_route": "/api/bitable-sync/bindings/${this._listGid}",
+          "source_sha256": "2708374dc47c6e22f56c9fc923b4acb550756a83905d59a7ffe92344f5d3af08"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The frontend call is dead, explicitly retired, or template/sample-only and was removed without replacement.",
+      "disposition": "frontend_retire",
+      "disposition_details": {
+        "removed_in_frontend_revision": "b6d154dd75acf6eb0555a365591e20bb41c70c54",
+        "retirement_basis": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted."
+      }
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/craft_lib/equipments/{dynamic}",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:771:58:DELETE:/api/craft_lib/equipments/{dynamic}",
+          "source": "web/knowledge_hub/pages/gbop_vpps.html",
+          "line": 771,
+          "column": 58,
+          "raw_route": "/api/craft_lib/equipments/${gid}",
+          "source_sha256": "db5265ec700318095f663c2571b1e5c734b37d8a51b200bf33aeea3b7c20e2f8"
+        }
+      ],
+      "owner_domain": "craft",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "No exact stable provider outcome exists for this method and normalized route.",
+      "disposition": "new_atomic_capability_required",
+      "disposition_details": {
+        "proposed_owner_domain": "craft",
+        "atomic_outcome": "Execute the bounded DELETE /api/craft_lib/equipments/{dynamic} outcome without dynamic action or collection ambiguity.",
+        "provider_or_handler": "plugins/craft/craft_backend/routers/craft_library.py",
+        "bounded_input": "Authenticated principal, finite route identifiers, and one closed request object with bounded strings/collections.",
+        "bounded_output": "One closed result object or a paginated bounded collection with explicit domain errors.",
+        "no_stable_target_reason": "Catalog and provider review found no exact provider-equivalent stable target; similar names were rejected."
+      }
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/craft_lib/fixtures/{dynamic}",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:714:58:DELETE:/api/craft_lib/fixtures/{dynamic}",
+          "source": "web/knowledge_hub/pages/gbop_vpps.html",
+          "line": 714,
+          "column": 58,
+          "raw_route": "/api/craft_lib/fixtures/${gid}",
+          "source_sha256": "db5265ec700318095f663c2571b1e5c734b37d8a51b200bf33aeea3b7c20e2f8"
+        }
+      ],
+      "owner_domain": "craft",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "No exact stable provider outcome exists for this method and normalized route.",
+      "disposition": "new_atomic_capability_required",
+      "disposition_details": {
+        "proposed_owner_domain": "craft",
+        "atomic_outcome": "Execute the bounded DELETE /api/craft_lib/fixtures/{dynamic} outcome without dynamic action or collection ambiguity.",
+        "provider_or_handler": "plugins/craft/craft_backend/routers/craft_library.py",
+        "bounded_input": "Authenticated principal, finite route identifiers, and one closed request object with bounded strings/collections.",
+        "bounded_output": "One closed result object or a paginated bounded collection with explicit domain errors.",
+        "no_stable_target_reason": "Catalog and provider review found no exact provider-equivalent stable target; similar names were rejected."
+      }
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/grants/{dynamic}",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/team_space/team_space.js:404:28:DELETE:/api/grants/{dynamic}",
+          "source": "web/team_space/team_space.js",
+          "line": 404,
+          "column": 28,
+          "raw_route": "/api/grants/${encodeURIComponent(ownGrant.gid)}",
+          "source_sha256": "a3d1a2a00447e04711fb077b3c9822003fc5755f88829d71463d0fa88cb77bc5"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/grants.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "base.authorization.grant.change.apply@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/lists/{dynamic}",
+      "occurrence_count": 2,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/bop/bop.js:703:26:DELETE:/api/lists/{dynamic}",
+          "source": "packages/craft-plugin/web/bop/bop.js",
+          "line": 703,
+          "column": 26,
+          "raw_route": "/api/lists/${ver.gid}",
+          "source_sha256": "c06ab7a41a49a6cbf233155d04eefb14b3d793a908f0e7262ba6d88e78c10819"
+        },
+        {
+          "occurrence_id": "web/components/list_sidebar.js:1105:28:DELETE:/api/lists/{dynamic}",
+          "source": "web/components/list_sidebar.js",
+          "line": 1105,
+          "column": 28,
+          "raw_route": "/api/lists/${gid}",
+          "source_sha256": "21407987333e16b153d0cbf88d0872dc01c6b11b76cd9d26247d6eb63c06f49e"
+        }
+      ],
+      "owner_domain": "project_management",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/lists.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "project.list.change.apply.atomic.lists_delete@1",
+          "craft.bop.version.archive@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/plugin/uninstall/{dynamic}",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/core/web_compat.js:294:29:DELETE:/api/plugin/uninstall/{dynamic}",
+          "source": "web/core/web_compat.js",
+          "line": 294,
+          "column": 29,
+          "raw_route": "/api/plugin/uninstall/${pluginId}",
+          "source_sha256": "ec21b526867d051eb968d8e1b451c535dbbf819251463d42a9f5d82ea870b02c"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "plugin.uninstall@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/views/{dynamic}",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/view_manager.js:1002:28:DELETE:/api/views/{dynamic}",
+          "source": "web/components/view_manager.js",
+          "line": 1002,
+          "column": 28,
+          "raw_route": "/api/views/${gid}",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/views.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "base.saved_view.change.apply@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/{dynamic}/{dynamic}",
+      "occurrence_count": 2,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/list_shell.js:582:28:DELETE:/api/{dynamic}/{dynamic}",
+          "source": "web/components/list_shell.js",
+          "line": 582,
+          "column": 28,
+          "raw_route": "/api/${type}s/${row.gid}",
+          "source_sha256": "214115280f84f0a9874691e8fc9cf0028de16b4c4c3975e3d9094d9dd45bbfff"
+        },
+        {
+          "occurrence_id": "web/components/list_shell.js:591:28:DELETE:/api/{dynamic}/{dynamic}",
+          "source": "web/components/list_shell.js",
+          "line": 591,
+          "column": 28,
+          "raw_route": "/api/${type}s/${row.gid}",
+          "source_sha256": "214115280f84f0a9874691e8fc9cf0028de16b4c4c3975e3d9094d9dd45bbfff"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The scanner ambiguity came from a malformed template or finite item-type interpolation.",
+      "disposition": "frontend_route_normalize",
+      "disposition_details": {
+        "finite_routes": [
+          "DELETE /api/tasks/{dynamic}",
+          "DELETE /api/issues/{dynamic}",
+          "DELETE /api/knowledges/{dynamic}",
+          "DELETE /api/rules/{dynamic}"
+        ],
+        "runtime_target_preserved": true,
+        "normalization_basis": "Only source expression shape changed; concrete runtime paths and HTTP methods are unchanged.",
+        "residual_unresolved_routes": [
+          "DELETE /api/knowledges/{dynamic}"
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/ai/audit-logs",
+      "occurrence_count": 2,
+      "occurrences": [
+        {
+          "occurrence_id": "web/admin/ai_audit.html:125:39:GET:/api/ai/audit-logs",
+          "source": "web/admin/ai_audit.html",
+          "line": 125,
+          "column": 39,
+          "raw_route": "/api/ai/audit-logs?${params}",
+          "source_sha256": "666af866eb3f7560e990b0b338bd2421fa29dba9b8c4ee0bab5da3d7630b2179"
+        },
+        {
+          "occurrence_id": "web/admin/ai_audit.html:132:41:GET:/api/ai/audit-logs",
+          "source": "web/admin/ai_audit.html",
+          "line": 132,
+          "column": 41,
+          "raw_route": "/api/ai/audit-logs?${params}",
+          "source_sha256": "666af866eb3f7560e990b0b338bd2421fa29dba9b8c4ee0bab5da3d7630b2179"
+        }
+      ],
+      "owner_domain": "agent",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "plugins/agent/agent_backend/routers/ai_audit.py",
+        "finding": "The exact handler invocation/delegation is anchored below.",
+        "anchors": [
+          {
+            "source_path": "plugins/agent/agent_backend/routers/ai_audit.py",
+            "start_line": 38,
+            "end_line": 38,
+            "sha256": "4ead0aa463aee7fc62caefe91f9d4975aff5173e372387d7631fea742f82bbc2"
+          }
+        ]
+      },
+      "lifecycle_conclusion": "Exact registered handler reaches the stable target through the anchored call.",
+      "disposition": "existing_stable_capability",
+      "disposition_details": {
+        "target_capability": "agent.audit.read@1",
+        "proof_reference": "web-api-legacy-addition-review/task_3b3a:GET:/api/ai/audit-logs"
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/ai/balance",
+      "occurrence_count": 2,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/agent-plugin/web/automation_hub/ai_assistant.js:982:37:GET:/api/ai/balance",
+          "source": "packages/agent-plugin/web/automation_hub/ai_assistant.js",
+          "line": 982,
+          "column": 37,
+          "raw_route": "/api/ai/balance",
+          "source_sha256": "d38eefada66db195d037f8601f40680ed71d52809f32b8c3d562b739f74f5340"
+        },
+        {
+          "occurrence_id": "web/workspace/nav_manager.js:367:40:GET:/api/ai/balance",
+          "source": "web/workspace/nav_manager.js",
+          "line": 367,
+          "column": 40,
+          "raw_route": "/api/ai/balance?user_gid=${userGid}",
+          "source_sha256": "e229fb407361c139cfc265cd438f929a944cd1919c321c4b6a1cf5bf57cfcd7d"
+        }
+      ],
+      "owner_domain": "agent",
+      "backend_evidence": {
+        "openapi_status": "retired_410",
+        "source_path": "plugins/agent/agent_backend/routers/ai_audit.py",
+        "finding": "The registered handler returns HTTP 410 and the polling UI had no supported result.",
+        "anchors": [
+          {
+            "source_path": "plugins/agent/agent_backend/routers/ai_audit.py",
+            "start_line": 18,
+            "end_line": 18,
+            "sha256": "39956488e4218fcc900bacdc36e710f6ec1521d6e1552a0960bf1faf2a540d09"
+          }
+        ]
+      },
+      "lifecycle_conclusion": "The frontend call is dead, explicitly retired, or template/sample-only and was removed without replacement.",
+      "disposition": "frontend_retire",
+      "disposition_details": {
+        "removed_in_frontend_revision": "b6d154dd75acf6eb0555a365591e20bb41c70c54",
+        "retirement_basis": "The registered handler returns HTTP 410 and the polling UI had no supported result."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bitable-sync/bindings/{dynamic}",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/bitable_sync_manager.js:269:38:GET:/api/bitable-sync/bindings/{dynamic}",
+          "source": "web/components/bitable_sync_manager.js",
+          "line": 269,
+          "column": 38,
+          "raw_route": "/api/bitable-sync/bindings/${this._listGid}",
+          "source_sha256": "2708374dc47c6e22f56c9fc923b4acb550756a83905d59a7ffe92344f5d3af08"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The frontend call is dead, explicitly retired, or template/sample-only and was removed without replacement.",
+      "disposition": "frontend_retire",
+      "disposition_details": {
+        "removed_in_frontend_revision": "b6d154dd75acf6eb0555a365591e20bb41c70c54",
+        "retirement_basis": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bitable-sync/bindings/{dynamic}/schema-by-token",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/bitable_sync_manager.js:169:12:GET:/api/bitable-sync/bindings/{dynamic}/schema-by-token",
+          "source": "web/components/bitable_sync_manager.js",
+          "line": 169,
+          "column": 12,
+          "raw_route": "/api/bitable-sync/bindings/${this._listGid}/schema-by-token?app_token=${encodeURIComponent(appToken)}&table_id=${encodeURIComponent(tableId)}",
+          "source_sha256": "2708374dc47c6e22f56c9fc923b4acb550756a83905d59a7ffe92344f5d3af08"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The frontend call is dead, explicitly retired, or template/sample-only and was removed without replacement.",
+      "disposition": "frontend_retire",
+      "disposition_details": {
+        "removed_in_frontend_revision": "b6d154dd75acf6eb0555a365591e20bb41c70c54",
+        "retirement_basis": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bitable-sync/bindings/{dynamic}/status",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/bitable_sync_manager.js:51:38:GET:/api/bitable-sync/bindings/{dynamic}/status",
+          "source": "web/components/bitable_sync_manager.js",
+          "line": 51,
+          "column": 38,
+          "raw_route": "/api/bitable-sync/bindings/${this._listGid}/status",
+          "source_sha256": "2708374dc47c6e22f56c9fc923b4acb550756a83905d59a7ffe92344f5d3af08"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The frontend call is dead, explicitly retired, or template/sample-only and was removed without replacement.",
+      "disposition": "frontend_retire",
+      "disposition_details": {
+        "removed_in_frontend_revision": "b6d154dd75acf6eb0555a365591e20bb41c70c54",
+        "retirement_basis": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/craft/sections/{dynamic}/operations",
+      "occurrence_count": 2,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/craft_table/table.js:529:42:GET:/api/craft/sections/{dynamic}/operations",
+          "source": "packages/craft-plugin/web/craft_table/table.js",
+          "line": 529,
+          "column": 42,
+          "raw_route": "/api/craft/sections/${gid}/operations",
+          "source_sha256": "e13514904349a299e1466f781df25dd96f742ac4e58cca912e6bb59f41a4486b"
+        },
+        {
+          "occurrence_id": "packages/craft-plugin/web/craft_table/table.js:88:42:GET:/api/craft/sections/{dynamic}/operations",
+          "source": "packages/craft-plugin/web/craft_table/table.js",
+          "line": 88,
+          "column": 42,
+          "raw_route": "/api/craft/sections/${secGid}/operations",
+          "source_sha256": "e13514904349a299e1466f781df25dd96f742ac4e58cca912e6bb59f41a4486b"
+        }
+      ],
+      "owner_domain": "craft",
+      "backend_evidence": {
+        "openapi_status": "removed_v1_router",
+        "source_path": "backend/routers/craft.py",
+        "finding": "The V1 craft table router is an explicit tombstone with no routes.",
+        "anchors": [
+          {
+            "source_path": "backend/routers/craft.py",
+            "start_line": 6,
+            "end_line": 6,
+            "sha256": "0be54cd5689fd7b233a94b4c80776d935011a999c950eff6d8885900f42539ee"
+          }
+        ]
+      },
+      "lifecycle_conclusion": "The frontend call is dead, explicitly retired, or template/sample-only and was removed without replacement.",
+      "disposition": "frontend_retire",
+      "disposition_details": {
+        "removed_in_frontend_revision": "b6d154dd75acf6eb0555a365591e20bb41c70c54",
+        "retirement_basis": "The V1 craft table router is an explicit tombstone with no routes."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/craft/work_plans",
+      "occurrence_count": 2,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/craft_table/table.js:516:47:GET:/api/craft/work_plans",
+          "source": "packages/craft-plugin/web/craft_table/table.js",
+          "line": 516,
+          "column": 47,
+          "raw_route": "/api/craft/work_plans",
+          "source_sha256": "e13514904349a299e1466f781df25dd96f742ac4e58cca912e6bb59f41a4486b"
+        },
+        {
+          "occurrence_id": "packages/craft-plugin/web/craft_table/table.js:78:40:GET:/api/craft/work_plans",
+          "source": "packages/craft-plugin/web/craft_table/table.js",
+          "line": 78,
+          "column": 40,
+          "raw_route": "/api/craft/work_plans",
+          "source_sha256": "e13514904349a299e1466f781df25dd96f742ac4e58cca912e6bb59f41a4486b"
+        }
+      ],
+      "owner_domain": "craft",
+      "backend_evidence": {
+        "openapi_status": "removed_v1_router",
+        "source_path": "backend/routers/craft.py",
+        "finding": "The V1 craft table router is an explicit tombstone with no routes.",
+        "anchors": [
+          {
+            "source_path": "backend/routers/craft.py",
+            "start_line": 6,
+            "end_line": 6,
+            "sha256": "0be54cd5689fd7b233a94b4c80776d935011a999c950eff6d8885900f42539ee"
+          }
+        ]
+      },
+      "lifecycle_conclusion": "The frontend call is dead, explicitly retired, or template/sample-only and was removed without replacement.",
+      "disposition": "frontend_retire",
+      "disposition_details": {
+        "removed_in_frontend_revision": "b6d154dd75acf6eb0555a365591e20bb41c70c54",
+        "retirement_basis": "The V1 craft table router is an explicit tombstone with no routes."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/craft/work_plans/{dynamic}/sections",
+      "occurrence_count": 2,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/craft_table/table.js:520:47:GET:/api/craft/work_plans/{dynamic}/sections",
+          "source": "packages/craft-plugin/web/craft_table/table.js",
+          "line": 520,
+          "column": 47,
+          "raw_route": "/api/craft/work_plans/${p.gid}/sections",
+          "source_sha256": "e13514904349a299e1466f781df25dd96f742ac4e58cca912e6bb59f41a4486b"
+        },
+        {
+          "occurrence_id": "packages/craft-plugin/web/craft_table/table.js:82:40:GET:/api/craft/work_plans/{dynamic}/sections",
+          "source": "packages/craft-plugin/web/craft_table/table.js",
+          "line": 82,
+          "column": 40,
+          "raw_route": "/api/craft/work_plans/${params.work_plan_gid}/sections",
+          "source_sha256": "e13514904349a299e1466f781df25dd96f742ac4e58cca912e6bb59f41a4486b"
+        }
+      ],
+      "owner_domain": "craft",
+      "backend_evidence": {
+        "openapi_status": "removed_v1_router",
+        "source_path": "backend/routers/craft.py",
+        "finding": "The V1 craft table router is an explicit tombstone with no routes.",
+        "anchors": [
+          {
+            "source_path": "backend/routers/craft.py",
+            "start_line": 6,
+            "end_line": 6,
+            "sha256": "0be54cd5689fd7b233a94b4c80776d935011a999c950eff6d8885900f42539ee"
+          }
+        ]
+      },
+      "lifecycle_conclusion": "The frontend call is dead, explicitly retired, or template/sample-only and was removed without replacement.",
+      "disposition": "frontend_retire",
+      "disposition_details": {
+        "removed_in_frontend_revision": "b6d154dd75acf6eb0555a365591e20bb41c70c54",
+        "retirement_basis": "The V1 craft table router is an explicit tombstone with no routes."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/craft_lib/equipments${listGid ",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:44:34:GET:/api/craft_lib/equipments${listGid ",
+          "source": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
+          "line": 44,
+          "column": 34,
+          "raw_route": "/api/craft_lib/equipments${listGid ? ",
+          "source_sha256": "d425d6294546dfb7134b4f41c1fc200af8ddde31b87a8cfb2ed9ef3b2ff1b851"
+        }
+      ],
+      "owner_domain": "craft",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The scanner ambiguity came from a malformed template or finite item-type interpolation.",
+      "disposition": "frontend_route_normalize",
+      "disposition_details": {
+        "finite_routes": [
+          "GET /api/craft_lib/equipments"
+        ],
+        "runtime_target_preserved": true,
+        "normalization_basis": "Only source expression shape changed; concrete runtime paths and HTTP methods are unchanged.",
+        "residual_unresolved_routes": []
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/craft_lib/fasteners${listGid ",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:56:34:GET:/api/craft_lib/fasteners${listGid ",
+          "source": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
+          "line": 56,
+          "column": 34,
+          "raw_route": "/api/craft_lib/fasteners${listGid ? ",
+          "source_sha256": "d425d6294546dfb7134b4f41c1fc200af8ddde31b87a8cfb2ed9ef3b2ff1b851"
+        }
+      ],
+      "owner_domain": "craft",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The scanner ambiguity came from a malformed template or finite item-type interpolation.",
+      "disposition": "frontend_route_normalize",
+      "disposition_details": {
+        "finite_routes": [
+          "GET /api/craft_lib/fasteners"
+        ],
+        "runtime_target_preserved": true,
+        "normalization_basis": "Only source expression shape changed; concrete runtime paths and HTTP methods are unchanged.",
+        "residual_unresolved_routes": []
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/craft_lib/fixtures${listGid ",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:50:34:GET:/api/craft_lib/fixtures${listGid ",
+          "source": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
+          "line": 50,
+          "column": 34,
+          "raw_route": "/api/craft_lib/fixtures${listGid ? ",
+          "source_sha256": "d425d6294546dfb7134b4f41c1fc200af8ddde31b87a8cfb2ed9ef3b2ff1b851"
+        }
+      ],
+      "owner_domain": "craft",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The scanner ambiguity came from a malformed template or finite item-type interpolation.",
+      "disposition": "frontend_route_normalize",
+      "disposition_details": {
+        "finite_routes": [
+          "GET /api/craft_lib/fixtures"
+        ],
+        "runtime_target_preserved": true,
+        "normalization_basis": "Only source expression shape changed; concrete runtime paths and HTTP methods are unchanged.",
+        "residual_unresolved_routes": []
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/craft_lib/part_names${listGid ",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:62:34:GET:/api/craft_lib/part_names${listGid ",
+          "source": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
+          "line": 62,
+          "column": 34,
+          "raw_route": "/api/craft_lib/part_names${listGid ? ",
+          "source_sha256": "d425d6294546dfb7134b4f41c1fc200af8ddde31b87a8cfb2ed9ef3b2ff1b851"
+        }
+      ],
+      "owner_domain": "craft",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The scanner ambiguity came from a malformed template or finite item-type interpolation.",
+      "disposition": "frontend_route_normalize",
+      "disposition_details": {
+        "finite_routes": [
+          "GET /api/craft_lib/part_names"
+        ],
+        "runtime_target_preserved": true,
+        "normalization_basis": "Only source expression shape changed; concrete runtime paths and HTTP methods are unchanged.",
+        "residual_unresolved_routes": []
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/craft_lib/tools${listGid ",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:38:34:GET:/api/craft_lib/tools${listGid ",
+          "source": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
+          "line": 38,
+          "column": 34,
+          "raw_route": "/api/craft_lib/tools${listGid ? ",
+          "source_sha256": "d425d6294546dfb7134b4f41c1fc200af8ddde31b87a8cfb2ed9ef3b2ff1b851"
+        }
+      ],
+      "owner_domain": "craft",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The scanner ambiguity came from a malformed template or finite item-type interpolation.",
+      "disposition": "frontend_route_normalize",
+      "disposition_details": {
+        "finite_routes": [
+          "GET /api/craft_lib/tools"
+        ],
+        "runtime_target_preserved": true,
+        "normalization_basis": "Only source expression shape changed; concrete runtime paths and HTTP methods are unchanged.",
+        "residual_unresolved_routes": []
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/ext-datasources",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/ext_datasource/ext_ds.js:148:36:GET:/api/ext-datasources",
+          "source": "web/ext_datasource/ext_ds.js",
+          "line": 148,
+          "column": 36,
+          "raw_route": "/api/ext-datasources",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "owner_domain": "integration",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "integration.connector.search@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/ext-datasources/{dynamic}/tables",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/ext_datasource/ext_ds.js:640:36:GET:/api/ext-datasources/{dynamic}/tables",
+          "source": "web/ext_datasource/ext_ds.js",
+          "line": 640,
+          "column": 36,
+          "raw_route": "/api/ext-datasources/${_selectedDs.gid}/tables",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "owner_domain": "integration",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "integration.connector.schema.discover@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/ext-field-mappings",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/ext_datasource/ext_ds.js:349:36:GET:/api/ext-field-mappings",
+          "source": "web/ext_datasource/ext_ds.js",
+          "line": 349,
+          "column": 36,
+          "raw_route": "/api/ext-field-mappings?mapping_gid=${_selectedMap.gid}",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "owner_domain": "integration",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "integration.mapping.get@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/ext-mappings",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/ext_datasource/ext_ds.js:187:36:GET:/api/ext-mappings",
+          "source": "web/ext_datasource/ext_ds.js",
+          "line": 187,
+          "column": 36,
+          "raw_route": "/api/ext-mappings?datasource_gid=${_selectedDs.gid}",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "owner_domain": "integration",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "integration.mapping.search@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/ext-mappings/{dynamic}/columns",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/ext_datasource/ext_ds.js:341:36:GET:/api/ext-mappings/{dynamic}/columns",
+          "source": "web/ext_datasource/ext_ds.js",
+          "line": 341,
+          "column": 36,
+          "raw_route": "/api/ext-mappings/${_selectedMap.gid}/columns",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "owner_domain": "integration",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "integration.connector.schema.discover@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/ext-mappings/{dynamic}/preview",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/ext_datasource/ext_ds.js:496:36:GET:/api/ext-mappings/{dynamic}/preview",
+          "source": "web/ext_datasource/ext_ds.js",
+          "line": 496,
+          "column": 36,
+          "raw_route": "/api/ext-mappings/${_selectedMap.gid}/preview?limit=5",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "owner_domain": "integration",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "integration.mapping.preview@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/feishu/config",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/feishu/feishu.js:23:40:GET:/api/feishu/config",
+          "source": "web/feishu/feishu.js",
+          "line": 23,
+          "column": 40,
+          "raw_route": "/api/feishu/config",
+          "source_sha256": "e7f04bce5b078b9544baf908669a40b7db01978f8cf64514f7278c94bc038d94"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The frontend call is dead, explicitly retired, or template/sample-only and was removed without replacement.",
+      "disposition": "frontend_retire",
+      "disposition_details": {
+        "removed_in_frontend_revision": "b6d154dd75acf6eb0555a365591e20bb41c70c54",
+        "retirement_basis": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/file-store/config",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/settings/settings.js:386:31:GET:/api/file-store/config",
+          "source": "web/settings/settings.js",
+          "line": 386,
+          "column": 31,
+          "raw_route": "/api/file-store/config",
+          "source_sha256": "7315fba56b7f88f38265b933ae6615bbfaf2e8f826540f6315d60aa85e0e4a82"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The route is technical/diagnostic, but this task grants no operations exclusion.",
+      "disposition": "operations_candidate",
+      "disposition_details": {
+        "approval_status": "not_approved",
+        "operation_kind": "technical configuration or test execution",
+        "reason": "Non-business operation candidate retained unresolved until separately approved."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/grants",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/project/project.js:348:20:GET:/api/grants",
+          "source": "packages/craft-plugin/web/project/project.js",
+          "line": 348,
+          "column": 20,
+          "raw_route": "/api/grants",
+          "source_sha256": "9a0085d95c82fc8d98789c3e9d71f53467b6372152acc448b4643e86239fef03"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/grants.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "base.authorization.grant.read@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/issues${listGid ",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/quick_list.html:293:50:GET:/api/issues${listGid ",
+          "source": "web/components/quick_list.html",
+          "line": 293,
+          "column": 50,
+          "raw_route": "/api/issues${listGid ? ",
+          "source_sha256": "1b8fbbbfe8f09a87f882fc92c589e24c1a105fc352701770eb881e49e97b8f2e"
+        }
+      ],
+      "owner_domain": "project_management",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The scanner ambiguity came from a malformed template or finite item-type interpolation.",
+      "disposition": "frontend_route_normalize",
+      "disposition_details": {
+        "finite_routes": [
+          "GET /api/issues"
+        ],
+        "runtime_target_preserved": true,
+        "normalization_basis": "Only source expression shape changed; concrete runtime paths and HTTP methods are unchanged.",
+        "residual_unresolved_routes": []
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/knowledge/entries${listGid ",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/quick_list.html:298:50:GET:/api/knowledge/entries${listGid ",
+          "source": "web/components/quick_list.html",
+          "line": 298,
+          "column": 50,
+          "raw_route": "/api/knowledge/entries${listGid ? ",
+          "source_sha256": "1b8fbbbfe8f09a87f882fc92c589e24c1a105fc352701770eb881e49e97b8f2e"
+        }
+      ],
+      "owner_domain": "knowledge",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The scanner ambiguity came from a malformed template or finite item-type interpolation.",
+      "disposition": "frontend_route_normalize",
+      "disposition_details": {
+        "finite_routes": [
+          "GET /api/knowledge/entries"
+        ],
+        "runtime_target_preserved": true,
+        "normalization_basis": "Only source expression shape changed; concrete runtime paths and HTTP methods are unchanged.",
+        "residual_unresolved_routes": [
+          "GET /api/knowledge/entries"
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/lists",
+      "occurrence_count": 12,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/lineage_view/assoc_panel.js:836:42:GET:/api/lists",
+          "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
+          "line": 836,
+          "column": 42,
+          "raw_route": "/api/lists?item_type=${filterCfg.itemType}",
+          "source_sha256": "1df0649aea1c9836f3de9ffb2e8e47765fa9f3011e6a303d32acc72de2c5d8d5"
+        },
+        {
+          "occurrence_id": "web/admin/task_planning.html:1012:26:GET:/api/lists",
+          "source": "web/admin/task_planning.html",
+          "line": 1012,
+          "column": 26,
+          "raw_route": "/api/lists?item_type=task",
+          "source_sha256": "9458faf6cb26c55b84344d405084358da501c59cae64b8725f18b559fd6b29e7"
+        },
+        {
+          "occurrence_id": "web/components/list_nav.html:130:38:GET:/api/lists",
+          "source": "web/components/list_nav.html",
+          "line": 130,
+          "column": 38,
+          "raw_route": "/api/lists?item_type=${_itemType}",
+          "source_sha256": "c73c06958138f87ee70a4b6a8f9dad8e487adf663e14568924daa188533d2443"
+        },
+        {
+          "occurrence_id": "web/components/list_sidebar.js:131:37:GET:/api/lists",
+          "source": "web/components/list_sidebar.js",
+          "line": 131,
+          "column": 37,
+          "raw_route": "/api/lists?item_type=${this._itemType}",
+          "source_sha256": "21407987333e16b153d0cbf88d0872dc01c6b11b76cd9d26247d6eb63c06f49e"
+        },
+        {
+          "occurrence_id": "web/components/list_tree.html:295:38:GET:/api/lists",
+          "source": "web/components/list_tree.html",
+          "line": 295,
+          "column": 38,
+          "raw_route": "/api/lists",
+          "source_sha256": "bfa8fe3d79f58aae2179e97d056fed8249738b7006985cefa33b2f454010ce71"
+        },
+        {
+          "occurrence_id": "web/components/quick_list.html:287:44:GET:/api/lists",
+          "source": "web/components/quick_list.html",
+          "line": 287,
+          "column": 44,
+          "raw_route": "/api/lists?item_type=${t}",
+          "source_sha256": "1b8fbbbfe8f09a87f882fc92c589e24c1a105fc352701770eb881e49e97b8f2e"
+        },
+        {
+          "occurrence_id": "web/components/quick_list.html:292:44:GET:/api/lists",
+          "source": "web/components/quick_list.html",
+          "line": 292,
+          "column": 44,
+          "raw_route": "/api/lists?item_type=${t}",
+          "source_sha256": "1b8fbbbfe8f09a87f882fc92c589e24c1a105fc352701770eb881e49e97b8f2e"
+        },
+        {
+          "occurrence_id": "web/components/quick_list.html:297:44:GET:/api/lists",
+          "source": "web/components/quick_list.html",
+          "line": 297,
+          "column": 44,
+          "raw_route": "/api/lists?item_type=${t}",
+          "source_sha256": "1b8fbbbfe8f09a87f882fc92c589e24c1a105fc352701770eb881e49e97b8f2e"
+        },
+        {
+          "occurrence_id": "web/core/global_search.js:211:22:GET:/api/lists",
+          "source": "web/core/global_search.js",
+          "line": 211,
+          "column": 22,
+          "raw_route": "/api/lists?q=${enc}",
+          "source_sha256": "818504d9c4c7277789c3bb5a066910b92427c267558494a90764a2e5f856abbd"
+        },
+        {
+          "occurrence_id": "web/team_space/team_space.js:210:36:GET:/api/lists",
+          "source": "web/team_space/team_space.js",
+          "line": 210,
+          "column": 36,
+          "raw_route": "/api/lists?owner_team_gid=${encodeURIComponent(teamGid)}&read_scope=team",
+          "source_sha256": "a3d1a2a00447e04711fb077b3c9822003fc5755f88829d71463d0fa88cb77bc5"
+        },
+        {
+          "occurrence_id": "web/workbench/workbench.js:2039:38:GET:/api/lists",
+          "source": "web/workbench/workbench.js",
+          "line": 2039,
+          "column": 38,
+          "raw_route": "/api/lists?item_type=${domain}",
+          "source_sha256": "b204bf23ef35d7c214b9bd9a07cf230f6c1c7a537cd9ddde436845914e2275d4"
+        },
+        {
+          "occurrence_id": "web/workbench/workbench.js:2967:22:GET:/api/lists",
+          "source": "web/workbench/workbench.js",
+          "line": 2967,
+          "column": 22,
+          "raw_route": "/api/lists",
+          "source_sha256": "b204bf23ef35d7c214b9bd9a07cf230f6c1c7a537cd9ddde436845914e2275d4"
+        }
+      ],
+      "owner_domain": "project_management",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/lists.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "project.list.read.atomic.lists_search@1",
+          "craft.bop.version.list@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/my-plugin/items",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/plugin-sdk/template/web/app.js:33:37:GET:/api/my-plugin/items",
+          "source": "packages/plugin-sdk/template/web/app.js",
+          "line": 33,
+          "column": 37,
+          "raw_route": "/api/my-plugin/items",
+          "source_sha256": "a3af9b0cc348a1f3a2465fce980652c1100e6cdb5172e163e65f5e252904383a"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The frontend call is dead, explicitly retired, or template/sample-only and was removed without replacement.",
+      "disposition": "frontend_retire",
+      "disposition_details": {
+        "removed_in_frontend_revision": "b6d154dd75acf6eb0555a365591e20bb41c70c54",
+        "retirement_basis": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/notifications/prefs",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/settings/settings.js:1436:35:GET:/api/notifications/prefs",
+          "source": "web/settings/settings.js",
+          "line": 1436,
+          "column": 35,
+          "raw_route": "/api/notifications/prefs",
+          "source_sha256": "7315fba56b7f88f38265b933ae6615bbfaf2e8f826540f6315d60aa85e0e4a82"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/notifications.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "base.notification.preference.get@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/org/teams",
+      "occurrence_count": 3,
+      "occurrences": [
+        {
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:688:19:GET:/api/org/teams",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "line": 688,
+          "column": 19,
+          "raw_route": "/api/org/teams",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        },
+        {
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:728:19:GET:/api/org/teams",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "line": 728,
+          "column": 19,
+          "raw_route": "/api/org/teams",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        },
+        {
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:92:17:GET:/api/org/teams",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "line": 92,
+          "column": 17,
+          "raw_route": "/api/org/teams",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/org.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "base.team.read@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/plugin/list",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/core/web_compat.js:281:26:GET:/api/plugin/list",
+          "source": "web/core/web_compat.js",
+          "line": 281,
+          "column": 26,
+          "raw_route": "/api/plugin/list",
+          "source_sha256": "ec21b526867d051eb968d8e1b451c535dbbf819251463d42a9f5d82ea870b02c"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "No exact stable provider outcome exists for this method and normalized route.",
+      "disposition": "new_atomic_capability_required",
+      "disposition_details": {
+        "proposed_owner_domain": "base",
+        "atomic_outcome": "Execute the bounded GET /api/plugin/list outcome without dynamic action or collection ambiguity.",
+        "provider_or_handler": "backend/governance/legacy_route_registry.json",
+        "bounded_input": "Authenticated principal, finite route identifiers, and one closed request object with bounded strings/collections.",
+        "bounded_output": "One closed result object or a paginated bounded collection with explicit domain errors.",
+        "no_stable_target_reason": "Catalog and provider review found no exact provider-equivalent stable target; similar names were rejected."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/rule-engine/check-entry",
+      "occurrence_count": 2,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:2192:40:GET:/api/rule-engine/check-entry",
+          "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+          "line": 2192,
+          "column": 40,
+          "raw_route": "/api/rule-engine/check-entry?entry_gid=${encodeURIComponent(gid)}",
+          "source_sha256": "36bb20338757c77fcfe80f4d0f84449f2928df7183989efeb2798adbc9abc00a"
+        },
+        {
+          "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:3524:40:GET:/api/rule-engine/check-entry",
+          "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+          "line": 3524,
+          "column": 40,
+          "raw_route": "/api/rule-engine/check-entry?entry_gid=${encodeURIComponent(gid)}",
+          "source_sha256": "36bb20338757c77fcfe80f4d0f84449f2928df7183989efeb2798adbc9abc00a"
+        }
+      ],
+      "owner_domain": "craft",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "plugins/craft/craft_backend/routers/rule_engine.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "craft.rule.engine.evaluate@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/self_ann/batch",
+      "occurrence_count": 5,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:125:35:GET:/api/self_ann/batch",
+          "source": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
+          "line": 125,
+          "column": 35,
+          "raw_route": "/api/self_ann/batch?gids=${chunk.join(',')}",
+          "source_sha256": "d425d6294546dfb7134b4f41c1fc200af8ddde31b87a8cfb2ed9ef3b2ff1b851"
+        },
+        {
+          "occurrence_id": "packages/craft-plugin/web/ebom/ebom.js:394:35:GET:/api/self_ann/batch",
+          "source": "packages/craft-plugin/web/ebom/ebom.js",
+          "line": 394,
+          "column": 35,
+          "raw_route": "/api/self_ann/batch?gids=${chunk.join(',')}",
+          "source_sha256": "ed22202d2c34d2a0b320a2bbed1f804a1db2e8b72ac8d4d67a984142cce65321"
+        },
+        {
+          "occurrence_id": "packages/craft-plugin/web/issue/issue.js:262:35:GET:/api/self_ann/batch",
+          "source": "packages/craft-plugin/web/issue/issue.js",
+          "line": 262,
+          "column": 35,
+          "raw_route": "/api/self_ann/batch?gids=${chunk.join(',')}",
+          "source_sha256": "89c320fb34eb0b058b72b794c2101812d9f8e3bb84d51fb4eb16330fa4cb65e7"
+        },
+        {
+          "occurrence_id": "packages/craft-plugin/web/task/task.js:164:35:GET:/api/self_ann/batch",
+          "source": "packages/craft-plugin/web/task/task.js",
+          "line": 164,
+          "column": 35,
+          "raw_route": "/api/self_ann/batch?gids=${chunk.join(',')}",
+          "source_sha256": "b8ff99fe7b3e81670be8e0b3100b3f9d685eaa6409475eeba3dd3a7d7eec75f8"
+        },
+        {
+          "occurrence_id": "web/knowledge_hub/knowledge_hub.js:614:36:GET:/api/self_ann/batch",
+          "source": "web/knowledge_hub/knowledge_hub.js",
+          "line": 614,
+          "column": 36,
+          "raw_route": "/api/self_ann/batch?gids=${chunk.join(',')}",
+          "source_sha256": "1f247f6133368b61baa10648243b7fc6659b33b8c342459a9d138afde102d465"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/self_annotations.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "base.annotation.read@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/self_ann/list",
+      "occurrence_count": 3,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/self_annotation_panel.js:292:27:GET:/api/self_ann/list",
+          "source": "web/components/self_annotation_panel.js",
+          "line": 292,
+          "column": 27,
+          "raw_route": "/api/self_ann/list?module=${encodeURIComponent(_module)}",
+          "source_sha256": "55c294a99365af52084ce49b89432bf3dee012cfdbad32ec9993b1467b871301"
+        },
+        {
+          "occurrence_id": "web/components/self_annotation_panel.js:293:27:GET:/api/self_ann/list",
+          "source": "web/components/self_annotation_panel.js",
+          "line": 293,
+          "column": 27,
+          "raw_route": "/api/self_ann/list",
+          "source_sha256": "55c294a99365af52084ce49b89432bf3dee012cfdbad32ec9993b1467b871301"
+        },
+        {
+          "occurrence_id": "web/knowledge_hub/knowledge_hub.js:499:42:GET:/api/self_ann/list",
+          "source": "web/knowledge_hub/knowledge_hub.js",
+          "line": 499,
+          "column": 42,
+          "raw_route": "/api/self_ann/list?module=knowledge_hub",
+          "source_sha256": "1f247f6133368b61baa10648243b7fc6659b33b8c342459a9d138afde102d465"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/self_annotations.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "base.annotation.read@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/self_ann/{dynamic}",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/self_annotation_panel.js:146:36:GET:/api/self_ann/{dynamic}",
+          "source": "web/components/self_annotation_panel.js",
+          "line": 146,
+          "column": 36,
+          "raw_route": "/api/self_ann/${gid}",
+          "source_sha256": "55c294a99365af52084ce49b89432bf3dee012cfdbad32ec9993b1467b871301"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/self_annotations.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "base.annotation.read@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/tasks${listGid ",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/quick_list.html:288:50:GET:/api/tasks${listGid ",
+          "source": "web/components/quick_list.html",
+          "line": 288,
+          "column": 50,
+          "raw_route": "/api/tasks${listGid ? ",
+          "source_sha256": "1b8fbbbfe8f09a87f882fc92c589e24c1a105fc352701770eb881e49e97b8f2e"
+        }
+      ],
+      "owner_domain": "project_management",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The scanner ambiguity came from a malformed template or finite item-type interpolation.",
+      "disposition": "frontend_route_normalize",
+      "disposition_details": {
+        "finite_routes": [
+          "GET /api/tasks"
+        ],
+        "runtime_target_preserved": true,
+        "normalization_basis": "Only source expression shape changed; concrete runtime paths and HTTP methods are unchanged.",
+        "residual_unresolved_routes": []
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/tasks/{dynamic}/entries",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/main.js:1495:36:GET:/api/tasks/{dynamic}/entries",
+          "source": "web/main.js",
+          "line": 1495,
+          "column": 36,
+          "raw_route": "/api/tasks/${task.gid}/entries",
+          "source_sha256": "d6365ef216f87200281ef17284ffccc977a8ed8430e36f3448bdaa5aff4f0bd5"
+        }
+      ],
+      "owner_domain": "project_management",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "project.list.read.atomic.item_entries_get@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/teams",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/visibility_selector.js:76:39:GET:/api/teams",
+          "source": "web/components/visibility_selector.js",
+          "line": 76,
+          "column": 39,
+          "raw_route": "/api/teams",
+          "source_sha256": "5d7d05f49f03ece4b75139ebfcf857deda38f3e52cdb453d47ca018f8313b98e"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "base.team.read@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/users",
+      "occurrence_count": 6,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/task/task.js:396:38:GET:/api/users",
+          "source": "packages/craft-plugin/web/task/task.js",
+          "line": 396,
+          "column": 38,
+          "raw_route": "/api/users",
+          "source_sha256": "b8ff99fe7b3e81670be8e0b3100b3f9d685eaa6409475eeba3dd3a7d7eec75f8"
+        },
+        {
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:342:44:GET:/api/users",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "line": 342,
+          "column": 44,
+          "raw_route": "/api/users/",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        },
+        {
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:376:40:GET:/api/users",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "line": 376,
+          "column": 40,
+          "raw_route": "/api/users/",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        },
+        {
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:689:19:GET:/api/users",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "line": 689,
+          "column": 19,
+          "raw_route": "/api/users/",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        },
+        {
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:729:19:GET:/api/users",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "line": 729,
+          "column": 19,
+          "raw_route": "/api/users/",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        },
+        {
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:93:75:GET:/api/users",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "line": 93,
+          "column": 75,
+          "raw_route": "/api/users/",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/users.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "identity.principal.search@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/users/me",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/lineage_view/lineage.js:511:34:GET:/api/users/me",
+          "source": "packages/craft-plugin/web/lineage_view/lineage.js",
+          "line": 511,
+          "column": 34,
+          "raw_route": "/api/users/me",
+          "source_sha256": "4eded0f1dca13981e7bff65526389f43f71b47cae211dbc00469e6c3f3466d65"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/users.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "base.identity.session.get@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/users/search",
+      "occurrence_count": 3,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/list_sidebar.js:1010:37:GET:/api/users/search",
+          "source": "web/components/list_sidebar.js",
+          "line": 1010,
+          "column": 37,
+          "raw_route": "/api/users/search?q=&limit=20",
+          "source_sha256": "21407987333e16b153d0cbf88d0872dc01c6b11b76cd9d26247d6eb63c06f49e"
+        },
+        {
+          "occurrence_id": "web/components/list_sidebar.js:998:41:GET:/api/users/search",
+          "source": "web/components/list_sidebar.js",
+          "line": 998,
+          "column": 41,
+          "raw_route": "/api/users/search?q=${encodeURIComponent(q)}&limit=10",
+          "source_sha256": "21407987333e16b153d0cbf88d0872dc01c6b11b76cd9d26247d6eb63c06f49e"
+        },
+        {
+          "occurrence_id": "web/components/scope_badge.js:247:43:GET:/api/users/search",
+          "source": "web/components/scope_badge.js",
+          "line": 247,
+          "column": 43,
+          "raw_route": "/api/users/search?q=${encodeURIComponent(q)}&limit=8",
+          "source_sha256": "a3b470164443fd82287a2ccf09a4485ff1fece92ac046bf7b44d506bdcb627f8"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/users.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "identity.principal.search@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/views",
+      "occurrence_count": 2,
+      "occurrences": [
+        {
+          "occurrence_id": "web/admin/task_planning.html:1068:26:GET:/api/views",
+          "source": "web/admin/task_planning.html",
+          "line": 1068,
+          "column": 26,
+          "raw_route": "/api/views?module=task&list_gid=${listGid}",
+          "source_sha256": "9458faf6cb26c55b84344d405084358da501c59cae64b8725f18b559fd6b29e7"
+        },
+        {
+          "occurrence_id": "web/components/view_manager.js:541:40:GET:/api/views",
+          "source": "web/components/view_manager.js",
+          "line": 541,
+          "column": 40,
+          "raw_route": "/api/views?module=${this.moduleId}${listQuery}",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/views.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "base.saved_view.read@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/workbench/home",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/workbench/workbench.js:5007:39:GET:/api/workbench/home",
+          "source": "web/workbench/workbench.js",
+          "line": 5007,
+          "column": 39,
+          "raw_route": "/api/workbench/home",
+          "source_sha256": "b204bf23ef35d7c214b9bd9a07cf230f6c1c7a537cd9ddde436845914e2275d4"
+        }
+      ],
+      "owner_domain": "project_management",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/routers/workbench.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "project.project.read.atomic.projects_search@1",
+          "project.follow.read.atomic.follows_list@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/workbench/panel1",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/workbench/workbench.js:4982:39:GET:/api/workbench/panel1",
+          "source": "web/workbench/workbench.js",
+          "line": 4982,
+          "column": 39,
+          "raw_route": "/api/workbench/panel1?${params}",
+          "source_sha256": "b204bf23ef35d7c214b9bd9a07cf230f6c1c7a537cd9ddde436845914e2275d4"
+        }
+      ],
+      "owner_domain": "project_management",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/routers/workbench.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "project.task.read.atomic.tasks_search@1",
+          "project.issue.read.atomic.issues_search@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/{dynamic}",
+      "occurrence_count": 3,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/issue/issue.js:228:35:GET:/api/{dynamic}",
+          "source": "packages/craft-plugin/web/issue/issue.js",
+          "line": 228,
+          "column": 35,
+          "raw_route": "/api/issues${qs}",
+          "source_sha256": "89c320fb34eb0b058b72b794c2101812d9f8e3bb84d51fb4eb16330fa4cb65e7"
+        },
+        {
+          "occurrence_id": "packages/craft-plugin/web/task/task.js:133:35:GET:/api/{dynamic}",
+          "source": "packages/craft-plugin/web/task/task.js",
+          "line": 133,
+          "column": 35,
+          "raw_route": "/api/tasks${qs}",
+          "source_sha256": "b8ff99fe7b3e81670be8e0b3100b3f9d685eaa6409475eeba3dd3a7d7eec75f8"
+        },
+        {
+          "occurrence_id": "web/share/issues.html:178:40:GET:/api/{dynamic}",
+          "source": "web/share/issues.html",
+          "line": 178,
+          "column": 40,
+          "raw_route": "/api/issues${qs}",
+          "source_sha256": "4b1b3187589cd3204ec2b7c9f1942ad57822da8f745d8fcb301debf3c0e9d41a"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The scanner ambiguity came from a malformed template or finite item-type interpolation.",
+      "disposition": "frontend_route_normalize",
+      "disposition_details": {
+        "finite_routes": [
+          "GET /api/tasks",
+          "GET /api/issues"
+        ],
+        "runtime_target_preserved": true,
+        "normalization_basis": "Only source expression shape changed; concrete runtime paths and HTTP methods are unchanged.",
+        "residual_unresolved_routes": []
+      }
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/{dynamic}/{dynamic}",
+      "occurrence_count": 3,
+      "occurrences": [
+        {
+          "occurrence_id": "web/container_card/modes/container_item_detail.js:107:28:GET:/api/{dynamic}/{dynamic}",
+          "source": "web/container_card/modes/container_item_detail.js",
+          "line": 107,
+          "column": 28,
+          "raw_route": "/api/${itemType}s/${gid}",
+          "source_sha256": "e3e1b83d5e5596cb267449f447bd5c78594e12f477581b0a36c2adaf8e8b55f4"
+        },
+        {
+          "occurrence_id": "web/container_card/modes/mode_field_detail.js:31:37:GET:/api/{dynamic}/{dynamic}",
+          "source": "web/container_card/modes/mode_field_detail.js",
+          "line": 31,
+          "column": 37,
+          "raw_route": "/api/${itemType}s/${gid}",
+          "source_sha256": "9e0bbd6e14368e83adcd96eb0756f0ceab11cabbd932e55b5db2c874c16f2d20"
+        },
+        {
+          "occurrence_id": "web/container_card/modes/mode_text_image.js:25:36:GET:/api/{dynamic}/{dynamic}",
+          "source": "web/container_card/modes/mode_text_image.js",
+          "line": 25,
+          "column": 36,
+          "raw_route": "/api/${itemType}s/${gid}",
+          "source_sha256": "cddd814d614f8bd14fff88ce6cf8a16662691e9e338156fe5d6460895cacb0ad"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The scanner ambiguity came from a malformed template or finite item-type interpolation.",
+      "disposition": "frontend_route_normalize",
+      "disposition_details": {
+        "finite_routes": [
+          "GET /api/tasks/{dynamic}",
+          "GET /api/issues/{dynamic}",
+          "GET /api/knowledges/{dynamic}",
+          "GET /api/rules/{dynamic}"
+        ],
+        "runtime_target_preserved": true,
+        "normalization_basis": "Only source expression shape changed; concrete runtime paths and HTTP methods are unchanged.",
+        "residual_unresolved_routes": [
+          "GET /api/knowledges/{dynamic}"
+        ]
+      }
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/ext-datasources/{dynamic}",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/ext_datasource/ext_ds.js:623:29:PATCH:/api/ext-datasources/{dynamic}",
+          "source": "web/ext_datasource/ext_ds.js",
+          "line": 623,
+          "column": 29,
+          "raw_route": "/api/ext-datasources/${ds.gid}",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "owner_domain": "integration",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "integration.connector.update@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/lists/{dynamic}",
+      "occurrence_count": 6,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/list_sidebar.js:1088:27:PATCH:/api/lists/{dynamic}",
+          "source": "web/components/list_sidebar.js",
+          "line": 1088,
+          "column": 27,
+          "raw_route": "/api/lists/${gid}",
+          "source_sha256": "21407987333e16b153d0cbf88d0872dc01c6b11b76cd9d26247d6eb63c06f49e"
+        },
+        {
+          "occurrence_id": "web/components/list_tree.html:630:26:PATCH:/api/lists/{dynamic}",
+          "source": "web/components/list_tree.html",
+          "line": 630,
+          "column": 26,
+          "raw_route": "/api/lists/${list.gid}",
+          "source_sha256": "bfa8fe3d79f58aae2179e97d056fed8249738b7006985cefa33b2f454010ce71"
+        },
+        {
+          "occurrence_id": "web/workbench/workbench.js:3373:32:PATCH:/api/lists/{dynamic}",
+          "source": "web/workbench/workbench.js",
+          "line": 3373,
+          "column": 32,
+          "raw_route": "/api/lists/${item.gid}",
+          "source_sha256": "b204bf23ef35d7c214b9bd9a07cf230f6c1c7a537cd9ddde436845914e2275d4"
+        },
+        {
+          "occurrence_id": "web/workbench/workbench.js:3401:30:PATCH:/api/lists/{dynamic}",
+          "source": "web/workbench/workbench.js",
+          "line": 3401,
+          "column": 30,
+          "raw_route": "/api/lists/${list.gid}",
+          "source_sha256": "b204bf23ef35d7c214b9bd9a07cf230f6c1c7a537cd9ddde436845914e2275d4"
+        },
+        {
+          "occurrence_id": "web/workbench/workbench.js:3437:28:PATCH:/api/lists/{dynamic}",
+          "source": "web/workbench/workbench.js",
+          "line": 3437,
+          "column": 28,
+          "raw_route": "/api/lists/${list.gid}",
+          "source_sha256": "b204bf23ef35d7c214b9bd9a07cf230f6c1c7a537cd9ddde436845914e2275d4"
+        },
+        {
+          "occurrence_id": "web/workbench/workbench.js:3471:28:PATCH:/api/lists/{dynamic}",
+          "source": "web/workbench/workbench.js",
+          "line": 3471,
+          "column": 28,
+          "raw_route": "/api/lists/${list.gid}",
+          "source_sha256": "b204bf23ef35d7c214b9bd9a07cf230f6c1c7a537cd9ddde436845914e2275d4"
+        }
+      ],
+      "owner_domain": "project_management",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/lists.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "project.list.change.apply.atomic.lists_update@1",
+          "project.list.change.apply.atomic.lists_delete@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/notifications/prefs",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/settings/settings.js:1447:37:PATCH:/api/notifications/prefs",
+          "source": "web/settings/settings.js",
+          "line": 1447,
+          "column": 37,
+          "raw_route": "/api/notifications/prefs",
+          "source_sha256": "7315fba56b7f88f38265b933ae6615bbfaf2e8f826540f6315d60aa85e0e4a82"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/notifications.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "base.notification.preference.update@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/std_op/operations/{dynamic}",
+      "occurrence_count": 2,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/std_op_lib/std_op_lib.js:122:67:PATCH:/api/std_op/operations/{dynamic}",
+          "source": "packages/craft-plugin/web/std_op_lib/std_op_lib.js",
+          "line": 122,
+          "column": 67,
+          "raw_route": "/api/std_op/operations/${row.gid}",
+          "source_sha256": "bef8bd9e3271a8108a3dd65539a644491481c998eda76b80a11f9ed01b5e957f"
+        },
+        {
+          "occurrence_id": "packages/craft-plugin/web/std_op_lib/std_op_lib.js:94:50:PATCH:/api/std_op/operations/{dynamic}",
+          "source": "packages/craft-plugin/web/std_op_lib/std_op_lib.js",
+          "line": 94,
+          "column": 50,
+          "raw_route": "/api/std_op/operations/${gid}",
+          "source_sha256": "bef8bd9e3271a8108a3dd65539a644491481c998eda76b80a11f9ed01b5e957f"
+        }
+      ],
+      "owner_domain": "craft",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "plugins/craft/craft_backend/routers/std_op.py",
+        "finding": "The exact handler invocation/delegation is anchored below.",
+        "anchors": [
+          {
+            "source_path": "plugins/craft/craft_backend/routers/std_op.py",
+            "start_line": 95,
+            "end_line": 95,
+            "sha256": "76b64130adb6f24822b557dd614c37df255d5a7419bda80555ae983395c90787"
+          }
+        ]
+      },
+      "lifecycle_conclusion": "Exact registered handler reaches the stable target through the anchored call.",
+      "disposition": "existing_stable_capability",
+      "disposition_details": {
+        "target_capability": "craft.standard_operation.change.apply@1",
+        "proof_reference": "web-api-legacy-addition-review/task_3b3a:PATCH:/api/std_op/operations/{dynamic}"
+      }
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/users/{dynamic}/role",
+      "occurrence_count": 2,
+      "occurrences": [
+        {
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:491:35:PATCH:/api/users/{dynamic}/role",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "line": 491,
+          "column": 35,
+          "raw_route": "/api/users/${_editingUserId}/role",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        },
+        {
+          "occurrence_id": "web/settings/settings.js:1637:35:PATCH:/api/users/{dynamic}/role",
+          "source": "web/settings/settings.js",
+          "line": 1637,
+          "column": 35,
+          "raw_route": "/api/users/${userGid}/role",
+          "source_sha256": "7315fba56b7f88f38265b933ae6615bbfaf2e8f826540f6315d60aa85e0e4a82"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/users.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "base.identity.role.assign@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/views/{dynamic}",
+      "occurrence_count": 2,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/view_manager.js:1011:28:PATCH:/api/views/{dynamic}",
+          "source": "web/components/view_manager.js",
+          "line": 1011,
+          "column": 28,
+          "raw_route": "/api/views/${gid}",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
+        },
+        {
+          "occurrence_id": "web/components/view_manager.js:651:30:PATCH:/api/views/{dynamic}",
+          "source": "web/components/view_manager.js",
+          "line": 651,
+          "column": 30,
+          "raw_route": "/api/views/${this._activeViewGid}",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/views.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "base.saved_view.change.apply@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/{dynamic}/{dynamic}",
+      "occurrence_count": 3,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/list_shell.js:1154:32:PATCH:/api/{dynamic}/{dynamic}",
+          "source": "web/components/list_shell.js",
+          "line": 1154,
+          "column": 32,
+          "raw_route": "/api/${shell._itemType}s/${gid}",
+          "source_sha256": "214115280f84f0a9874691e8fc9cf0028de16b4c4c3975e3d9094d9dd45bbfff"
+        },
+        {
+          "occurrence_id": "web/components/list_shell.js:643:61:PATCH:/api/{dynamic}/{dynamic}",
+          "source": "web/components/list_shell.js",
+          "line": 643,
+          "column": 61,
+          "raw_route": "/api/${type}s/${row.gid}",
+          "source_sha256": "214115280f84f0a9874691e8fc9cf0028de16b4c4c3975e3d9094d9dd45bbfff"
+        },
+        {
+          "occurrence_id": "web/components/list_shell.js:709:30:PATCH:/api/{dynamic}/{dynamic}",
+          "source": "web/components/list_shell.js",
+          "line": 709,
+          "column": 30,
+          "raw_route": "/api/${this._itemType}s/${fields.gid}",
+          "source_sha256": "214115280f84f0a9874691e8fc9cf0028de16b4c4c3975e3d9094d9dd45bbfff"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The scanner ambiguity came from a malformed template or finite item-type interpolation.",
+      "disposition": "frontend_route_normalize",
+      "disposition_details": {
+        "finite_routes": [
+          "PATCH /api/tasks/{dynamic}",
+          "PATCH /api/issues/{dynamic}",
+          "PATCH /api/knowledges/{dynamic}",
+          "PATCH /api/rules/{dynamic}"
+        ],
+        "runtime_target_preserved": true,
+        "normalization_basis": "Only source expression shape changed; concrete runtime paths and HTTP methods are unchanged.",
+        "residual_unresolved_routes": [
+          "PATCH /api/knowledges/{dynamic}"
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/approval/orders/{dynamic}/reject",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/approval/approval.js:153:26:POST:/api/approval/orders/{dynamic}/reject",
+          "source": "packages/craft-plugin/web/approval/approval.js",
+          "line": 153,
+          "column": 26,
+          "raw_route": "/api/approval/orders/${_selected.gid}/reject",
+          "source_sha256": "04495deeced75c275da108fc797af937d194541b597c6186d52faa6d82cf7539"
+        }
+      ],
+      "owner_domain": "project_management",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "plugins/craft/craft_backend/routers/approval.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "project.approval.change.apply.atomic.approval_orders_reject@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bitable-sync/bindings/{dynamic}",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/bitable_sync_manager.js:252:28:POST:/api/bitable-sync/bindings/{dynamic}",
+          "source": "web/components/bitable_sync_manager.js",
+          "line": 252,
+          "column": 28,
+          "raw_route": "/api/bitable-sync/bindings/${this._listGid}",
+          "source_sha256": "2708374dc47c6e22f56c9fc923b4acb550756a83905d59a7ffe92344f5d3af08"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The frontend call is dead, explicitly retired, or template/sample-only and was removed without replacement.",
+      "disposition": "frontend_retire",
+      "disposition_details": {
+        "removed_in_frontend_revision": "b6d154dd75acf6eb0555a365591e20bb41c70c54",
+        "retirement_basis": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bitable-sync/bindings/{dynamic}/pull",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/bitable_sync_manager.js:113:26:POST:/api/bitable-sync/bindings/{dynamic}/pull",
+          "source": "web/components/bitable_sync_manager.js",
+          "line": 113,
+          "column": 26,
+          "raw_route": "/api/bitable-sync/bindings/${this._listGid}/pull",
+          "source_sha256": "2708374dc47c6e22f56c9fc923b4acb550756a83905d59a7ffe92344f5d3af08"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The frontend call is dead, explicitly retired, or template/sample-only and was removed without replacement.",
+      "disposition": "frontend_retire",
+      "disposition_details": {
+        "removed_in_frontend_revision": "b6d154dd75acf6eb0555a365591e20bb41c70c54",
+        "retirement_basis": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bitable-sync/bindings/{dynamic}/push",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/bitable_sync_manager.js:97:26:POST:/api/bitable-sync/bindings/{dynamic}/push",
+          "source": "web/components/bitable_sync_manager.js",
+          "line": 97,
+          "column": 26,
+          "raw_route": "/api/bitable-sync/bindings/${this._listGid}/push",
+          "source_sha256": "2708374dc47c6e22f56c9fc923b4acb550756a83905d59a7ffe92344f5d3af08"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The frontend call is dead, explicitly retired, or template/sample-only and was removed without replacement.",
+      "disposition": "frontend_retire",
+      "disposition_details": {
+        "removed_in_frontend_revision": "b6d154dd75acf6eb0555a365591e20bb41c70c54",
+        "retirement_basis": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bitable-sync/rows/push",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/bitable_sync_manager.js:81:26:POST:/api/bitable-sync/rows/push",
+          "source": "web/components/bitable_sync_manager.js",
+          "line": 81,
+          "column": 26,
+          "raw_route": "/api/bitable-sync/rows/push",
+          "source_sha256": "2708374dc47c6e22f56c9fc923b4acb550756a83905d59a7ffe92344f5d3af08"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The frontend call is dead, explicitly retired, or template/sample-only and was removed without replacement.",
+      "disposition": "frontend_retire",
+      "disposition_details": {
+        "removed_in_frontend_revision": "b6d154dd75acf6eb0555a365591e20bb41c70c54",
+        "retirement_basis": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/craft/sections/{dynamic}/operations",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/craft_table/table.js:492:28:POST:/api/craft/sections/{dynamic}/operations",
+          "source": "packages/craft-plugin/web/craft_table/table.js",
+          "line": 492,
+          "column": 28,
+          "raw_route": "/api/craft/sections/${state.sectionGid}/operations",
+          "source_sha256": "e13514904349a299e1466f781df25dd96f742ac4e58cca912e6bb59f41a4486b"
+        }
+      ],
+      "owner_domain": "craft",
+      "backend_evidence": {
+        "openapi_status": "removed_v1_router",
+        "source_path": "backend/routers/craft.py",
+        "finding": "The V1 craft table router is an explicit tombstone with no routes.",
+        "anchors": [
+          {
+            "source_path": "backend/routers/craft.py",
+            "start_line": 6,
+            "end_line": 6,
+            "sha256": "0be54cd5689fd7b233a94b4c80776d935011a999c950eff6d8885900f42539ee"
+          }
+        ]
+      },
+      "lifecycle_conclusion": "The frontend call is dead, explicitly retired, or template/sample-only and was removed without replacement.",
+      "disposition": "frontend_retire",
+      "disposition_details": {
+        "removed_in_frontend_revision": "b6d154dd75acf6eb0555a365591e20bb41c70c54",
+        "retirement_basis": "The V1 craft table router is an explicit tombstone with no routes."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/craft_lib/equipments/{dynamic}/obsolete",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:48:35:POST:/api/craft_lib/equipments/{dynamic}/obsolete",
+          "source": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
+          "line": 48,
+          "column": 35,
+          "raw_route": "/api/craft_lib/equipments/${gid}/obsolete",
+          "source_sha256": "d425d6294546dfb7134b4f41c1fc200af8ddde31b87a8cfb2ed9ef3b2ff1b851"
+        }
+      ],
+      "owner_domain": "craft",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
+        "finding": "The exact handler invocation/delegation is anchored below.",
+        "anchors": [
+          {
+            "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
+            "start_line": 314,
+            "end_line": 314,
+            "sha256": "fd5527bbd2c5df22364723443e1c58c5f84a7c2517d2678e44f0f11ee679e499"
+          }
+        ]
+      },
+      "lifecycle_conclusion": "Exact registered handler reaches the stable target through the anchored call.",
+      "disposition": "existing_stable_capability",
+      "disposition_details": {
+        "target_capability": "craft.library.change.apply@1",
+        "proof_reference": "web-api-legacy-addition-review/task_3b3a:POST:/api/craft_lib/equipments/{dynamic}/obsolete"
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/craft_lib/fixtures/{dynamic}/obsolete",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:54:35:POST:/api/craft_lib/fixtures/{dynamic}/obsolete",
+          "source": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
+          "line": 54,
+          "column": 35,
+          "raw_route": "/api/craft_lib/fixtures/${gid}/obsolete",
+          "source_sha256": "d425d6294546dfb7134b4f41c1fc200af8ddde31b87a8cfb2ed9ef3b2ff1b851"
+        }
+      ],
+      "owner_domain": "craft",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
+        "finding": "The exact handler invocation/delegation is anchored below.",
+        "anchors": [
+          {
+            "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
+            "start_line": 339,
+            "end_line": 339,
+            "sha256": "30c2eb4d56785d1202183ff45a4bda99e9a3ba87d60957f88ce47c29bfc3ed35"
+          }
+        ]
+      },
+      "lifecycle_conclusion": "Exact registered handler reaches the stable target through the anchored call.",
+      "disposition": "existing_stable_capability",
+      "disposition_details": {
+        "target_capability": "craft.library.change.apply@1",
+        "proof_reference": "web-api-legacy-addition-review/task_3b3a:POST:/api/craft_lib/fixtures/{dynamic}/obsolete"
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/craft_lib/tools/{dynamic}/obsolete",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:42:35:POST:/api/craft_lib/tools/{dynamic}/obsolete",
+          "source": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
+          "line": 42,
+          "column": 35,
+          "raw_route": "/api/craft_lib/tools/${gid}/obsolete",
+          "source_sha256": "d425d6294546dfb7134b4f41c1fc200af8ddde31b87a8cfb2ed9ef3b2ff1b851"
+        }
+      ],
+      "owner_domain": "craft",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
+        "finding": "The exact handler invocation/delegation is anchored below.",
+        "anchors": [
+          {
+            "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
+            "start_line": 295,
+            "end_line": 295,
+            "sha256": "ddefc91bce9220d0ccc8fddf9d969f4582762ea939e6433595cd99d7be52c584"
+          }
+        ]
+      },
+      "lifecycle_conclusion": "Exact registered handler reaches the stable target through the anchored call.",
+      "disposition": "existing_stable_capability",
+      "disposition_details": {
+        "target_capability": "craft.library.change.apply@1",
+        "proof_reference": "web-api-legacy-addition-review/task_3b3a:POST:/api/craft_lib/tools/{dynamic}/obsolete"
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/ext-datasources",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/ext_datasource/ext_ds.js:625:28:POST:/api/ext-datasources",
+          "source": "web/ext_datasource/ext_ds.js",
+          "line": 625,
+          "column": 28,
+          "raw_route": "/api/ext-datasources",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "owner_domain": "integration",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "integration.connector.create@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/ext-datasources/{dynamic}/test",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/ext_datasource/ext_ds.js:605:34:POST:/api/ext-datasources/{dynamic}/test",
+          "source": "web/ext_datasource/ext_ds.js",
+          "line": 605,
+          "column": 34,
+          "raw_route": "/api/ext-datasources/${ds.gid}/test",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "owner_domain": "integration",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "integration.connector.connection.test@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/ext-mappings",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/ext_datasource/ext_ds.js:677:26:POST:/api/ext-mappings",
+          "source": "web/ext_datasource/ext_ds.js",
+          "line": 677,
+          "column": 26,
+          "raw_route": "/api/ext-mappings",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "owner_domain": "integration",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "integration.mapping.create@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/ext-mappings/{dynamic}/import",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/ext_datasource/ext_ds.js:549:37:POST:/api/ext-mappings/{dynamic}/import",
+          "source": "web/ext_datasource/ext_ds.js",
+          "line": 549,
+          "column": 37,
+          "raw_route": "/api/ext-mappings/${_selectedMap.gid}/import",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "owner_domain": "integration",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "integration.sync.start@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/flows/test-node",
+      "occurrence_count": 2,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/agent-plugin/web/flow_canvas/flow_editor.js:754:36:POST:/api/flows/test-node",
+          "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
+          "line": 754,
+          "column": 36,
+          "raw_route": "/api/flows/test-node",
+          "source_sha256": "9bb1fe5371a15087509924b6de1304199977757f1038a76177e78e490deca049"
+        },
+        {
+          "occurrence_id": "web/canvas/types/flow_type.js:145:29:POST:/api/flows/test-node",
+          "source": "web/canvas/types/flow_type.js",
+          "line": 145,
+          "column": 29,
+          "raw_route": "/api/flows/test-node",
+          "source_sha256": "591904dbc5db76114ccc02ac981ab675147876890bd297d814a2d9024928212f"
+        }
+      ],
+      "owner_domain": "agent",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The route is technical/diagnostic, but this task grants no operations exclusion.",
+      "disposition": "operations_candidate",
+      "disposition_details": {
+        "approval_status": "not_approved",
+        "operation_kind": "technical configuration or test execution",
+        "reason": "Non-business operation candidate retained unresolved until separately approved."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/grants",
+      "occurrence_count": 2,
+      "occurrences": [
+        {
+          "occurrence_id": "web/team_space/team_space.js:256:24:POST:/api/grants",
+          "source": "web/team_space/team_space.js",
+          "line": 256,
+          "column": 24,
+          "raw_route": "/api/grants",
+          "source_sha256": "a3d1a2a00447e04711fb077b3c9822003fc5755f88829d71463d0fa88cb77bc5"
+        },
+        {
+          "occurrence_id": "web/team_space/team_space.js:398:24:POST:/api/grants",
+          "source": "web/team_space/team_space.js",
+          "line": 398,
+          "column": 24,
+          "raw_route": "/api/grants",
+          "source_sha256": "a3d1a2a00447e04711fb077b3c9822003fc5755f88829d71463d0fa88cb77bc5"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/grants.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "base.authorization.grant.change.apply@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/my-plugin/items",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/plugin-sdk/template/web/app.js:73:24:POST:/api/my-plugin/items",
+          "source": "packages/plugin-sdk/template/web/app.js",
+          "line": 73,
+          "column": 24,
+          "raw_route": "/api/my-plugin/items",
+          "source_sha256": "a3af9b0cc348a1f3a2465fce980652c1100e6cdb5172e163e65f5e252904383a"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The frontend call is dead, explicitly retired, or template/sample-only and was removed without replacement.",
+      "disposition": "frontend_retire",
+      "disposition_details": {
+        "removed_in_frontend_revision": "b6d154dd75acf6eb0555a365591e20bb41c70c54",
+        "retirement_basis": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/org/sync-from-feishu",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:331:36:POST:/api/org/sync-from-feishu",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "line": 331,
+          "column": 36,
+          "raw_route": "/api/org/sync-from-feishu",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/org.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "base.identity.directory.sync@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/plugin/install",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/core/web_compat.js:287:27:POST:/api/plugin/install",
+          "source": "web/core/web_compat.js",
+          "line": 287,
+          "column": 27,
+          "raw_route": "/api/plugin/install",
+          "source_sha256": "ec21b526867d051eb968d8e1b451c535dbbf819251463d42a9f5d82ea870b02c"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "plugin.install@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/rules/{dynamic}/deviations",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/rule_mgmt/rule_mgmt.js:214:36:POST:/api/rules/{dynamic}/deviations",
+          "source": "web/rule_mgmt/rule_mgmt.js",
+          "line": 214,
+          "column": 36,
+          "raw_route": "/api/rules/${_devRuleGid}/deviations",
+          "source_sha256": "83b06c82671c9c398d44e7b0692ab24dbc0ef33b707278e86973978c84693cb3"
+        }
+      ],
+      "owner_domain": "craft",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "plugins/craft/craft_backend/routers/rule_engine.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "craft.rule.waiver.create@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/rules/{dynamic}/{dynamic}",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/rule_mgmt/rule_mgmt.js:172:24:POST:/api/rules/{dynamic}/{dynamic}",
+          "source": "web/rule_mgmt/rule_mgmt.js",
+          "line": 172,
+          "column": 24,
+          "raw_route": "/api/rules/${gid}/${action}",
+          "source_sha256": "83b06c82671c9c398d44e7b0692ab24dbc0ef33b707278e86973978c84693cb3"
+        }
+      ],
+      "owner_domain": "craft",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "plugins/craft/craft_backend/routers/rule_engine.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "No exact stable provider outcome exists for this method and normalized route.",
+      "disposition": "new_atomic_capability_required",
+      "disposition_details": {
+        "proposed_owner_domain": "craft",
+        "atomic_outcome": "Execute the bounded POST /api/rules/{dynamic}/{dynamic} outcome without dynamic action or collection ambiguity.",
+        "provider_or_handler": "plugins/craft/craft_backend/routers/rule_engine.py",
+        "bounded_input": "Authenticated principal, finite route identifiers, and one closed request object with bounded strings/collections.",
+        "bounded_output": "One closed result object or a paginated bounded collection with explicit domain errors.",
+        "no_stable_target_reason": "Catalog and provider review found no exact provider-equivalent stable target; similar names were rejected."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/skills/canvas-options",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1599:35:POST:/api/skills/canvas-options",
+          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+          "line": 1599,
+          "column": 35,
+          "raw_route": "/api/skills/canvas-options",
+          "source_sha256": "c6f654458ff966e9bb4c2f023dd877c682243a6ff70c71ef0646f4acf9c041a7"
+        }
+      ],
+      "owner_domain": "agent",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "agent.skill.read@1",
+          "agent.tool_catalog.read@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/skills/execute-canvas",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2264:40:POST:/api/skills/execute-canvas",
+          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+          "line": 2264,
+          "column": 40,
+          "raw_route": "/api/skills/execute-canvas",
+          "source_sha256": "c6f654458ff966e9bb4c2f023dd877c682243a6ff70c71ef0646f4acf9c041a7"
+        }
+      ],
+      "owner_domain": "agent",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "agent.run.change.apply@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/skills/resume-canvas",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1615:40:POST:/api/skills/resume-canvas",
+          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+          "line": 1615,
+          "column": 40,
+          "raw_route": "/api/skills/resume-canvas",
+          "source_sha256": "c6f654458ff966e9bb4c2f023dd877c682243a6ff70c71ef0646f4acf9c041a7"
+        }
+      ],
+      "owner_domain": "agent",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "agent.run.change.apply@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/std_op/operations/{dynamic}/clone-to-post",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "packages/craft-plugin/web/craft_table/table.js:100:40:POST:/api/std_op/operations/{dynamic}/clone-to-post",
+          "source": "packages/craft-plugin/web/craft_table/table.js",
+          "line": 100,
+          "column": 40,
+          "raw_route": "/api/std_op/operations/${params.std_op_gid}/clone-to-post",
+          "source_sha256": "e13514904349a299e1466f781df25dd96f742ac4e58cca912e6bb59f41a4486b"
+        }
+      ],
+      "owner_domain": "craft",
+      "backend_evidence": {
+        "openapi_status": "retired_410",
+        "source_path": "plugins/craft/craft_backend/routers/std_op.py",
+        "finding": "The registered compatibility handler returns HTTP 410.",
+        "anchors": [
+          {
+            "source_path": "plugins/craft/craft_backend/routers/std_op.py",
+            "start_line": 115,
+            "end_line": 115,
+            "sha256": "8ccb073369daff5463d1f94de558ae58b1b853a0cd4176a502e9d87b61d44936"
+          }
+        ]
+      },
+      "lifecycle_conclusion": "The frontend call is dead, explicitly retired, or template/sample-only and was removed without replacement.",
+      "disposition": "frontend_retire",
+      "disposition_details": {
+        "removed_in_frontend_revision": "b6d154dd75acf6eb0555a365591e20bb41c70c54",
+        "retirement_basis": "The registered compatibility handler returns HTTP 410."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/views",
+      "occurrence_count": 2,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/view_manager.js:657:42:POST:/api/views",
+          "source": "web/components/view_manager.js",
+          "line": 657,
+          "column": 42,
+          "raw_route": "/api/views",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
+        },
+        {
+          "occurrence_id": "web/components/view_manager.js:713:40:POST:/api/views",
+          "source": "web/components/view_manager.js",
+          "line": 713,
+          "column": 40,
+          "raw_route": "/api/views",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/views.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "base.saved_view.change.apply@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/views/{dynamic}/copy",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/view_manager.js:978:42:POST:/api/views/{dynamic}/copy",
+          "source": "web/components/view_manager.js",
+          "line": 978,
+          "column": 42,
+          "raw_route": "/api/views/${gid}/copy",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/views.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "base.saved_view.change.apply@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/{dynamic}",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/container_card/modes/container_item_detail.js:148:28:POST:/api/{dynamic}",
+          "source": "web/container_card/modes/container_item_detail.js",
+          "line": 148,
+          "column": 28,
+          "raw_route": "/api/${itemType}s",
+          "source_sha256": "e3e1b83d5e5596cb267449f447bd5c78594e12f477581b0a36c2adaf8e8b55f4"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The scanner ambiguity came from a malformed template or finite item-type interpolation.",
+      "disposition": "frontend_route_normalize",
+      "disposition_details": {
+        "finite_routes": [
+          "POST /api/tasks",
+          "POST /api/issues",
+          "POST /api/knowledges",
+          "POST /api/rules"
+        ],
+        "runtime_target_preserved": true,
+        "normalization_basis": "Only source expression shape changed; concrete runtime paths and HTTP methods are unchanged.",
+        "residual_unresolved_routes": [
+          "POST /api/knowledges"
+        ]
+      }
+    },
+    {
+      "method": "PUT",
+      "normalized_route": "/api/ext-field-mappings/batch",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/ext_datasource/ext_ds.js:457:23:PUT:/api/ext-field-mappings/batch",
+          "source": "web/ext_datasource/ext_ds.js",
+          "line": 457,
+          "column": 23,
+          "raw_route": "/api/ext-field-mappings/batch?mapping_gid=${_selectedMap.gid}",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "owner_domain": "integration",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "integration.mapping.update@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "PUT",
+      "normalized_route": "/api/issues",
+      "occurrence_count": 2,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/quick_list.html:294:50:PUT:/api/issues",
+          "source": "web/components/quick_list.html",
+          "line": 294,
+          "column": 50,
+          "raw_route": "/api/issues",
+          "source_sha256": "1b8fbbbfe8f09a87f882fc92c589e24c1a105fc352701770eb881e49e97b8f2e"
+        },
+        {
+          "occurrence_id": "web/components/quick_list.html:769:28:PUT:/api/issues",
+          "source": "web/components/quick_list.html",
+          "line": 769,
+          "column": 28,
+          "raw_route": "/api/issues",
+          "source_sha256": "1b8fbbbfe8f09a87f882fc92c589e24c1a105fc352701770eb881e49e97b8f2e"
+        }
+      ],
+      "owner_domain": "project_management",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "project.issue.change.apply.atomic.issues_update@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "PUT",
+      "normalized_route": "/api/knowledge/entries",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/quick_list.html:299:50:PUT:/api/knowledge/entries",
+          "source": "web/components/quick_list.html",
+          "line": 299,
+          "column": 50,
+          "raw_route": "/api/knowledge/entries",
+          "source_sha256": "1b8fbbbfe8f09a87f882fc92c589e24c1a105fc352701770eb881e49e97b8f2e"
+        }
+      ],
+      "owner_domain": "knowledge",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "knowledge.entry.change.apply.atomic.entries_update@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "PUT",
+      "normalized_route": "/api/self_ann/{dynamic}",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/self_annotation_panel.js:175:35:PUT:/api/self_ann/{dynamic}",
+          "source": "web/components/self_annotation_panel.js",
+          "line": 175,
+          "column": 35,
+          "raw_route": "/api/self_ann/${_currentGid}",
+          "source_sha256": "55c294a99365af52084ce49b89432bf3dee012cfdbad32ec9993b1467b871301"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "registered",
+        "source_path": "backend/routers/self_annotations.py",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "base.annotation.change.apply@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "PUT",
+      "normalized_route": "/api/tasks",
+      "occurrence_count": 2,
+      "occurrences": [
+        {
+          "occurrence_id": "web/components/quick_list.html:289:50:PUT:/api/tasks",
+          "source": "web/components/quick_list.html",
+          "line": 289,
+          "column": 50,
+          "raw_route": "/api/tasks",
+          "source_sha256": "1b8fbbbfe8f09a87f882fc92c589e24c1a105fc352701770eb881e49e97b8f2e"
+        },
+        {
+          "occurrence_id": "web/components/quick_list.html:753:28:PUT:/api/tasks",
+          "source": "web/components/quick_list.html",
+          "line": 753,
+          "column": 28,
+          "raw_route": "/api/tasks",
+          "source_sha256": "1b8fbbbfe8f09a87f882fc92c589e24c1a105fc352701770eb881e49e97b8f2e"
+        }
+      ],
+      "owner_domain": "project_management",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "project.task.change.apply.atomic.tasks_update@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "PUT",
+      "normalized_route": "/api/tasks/{dynamic}/entries",
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "occurrence_id": "web/main.js:1528:32:PUT:/api/tasks/{dynamic}/entries",
+          "source": "web/main.js",
+          "line": 1528,
+          "column": 32,
+          "raw_route": "/api/tasks/${task.gid}/entries",
+          "source_sha256": "d6365ef216f87200281ef17284ffccc977a8ed8430e36f3448bdaa5aff4f0bd5"
+        }
+      ],
+      "owner_domain": "project_management",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "Stable constituents exist, but the current route has no provider-equivalent invocation proof.",
+      "disposition": "truthful_bff_required",
+      "disposition_details": {
+        "constituent_capabilities": [
+          "project.list.change.apply.atomic.item_entries_replace@1"
+        ],
+        "aggregation_evidence": "The current REST shape performs transport adaptation, conditional dispatch, or direct service/SQL access; it must be rebuilt as a truthful facade over these exact stable outcomes before Legacy registration."
+      }
+    },
+    {
+      "method": "PUT",
+      "normalized_route": "/api/{dynamic}/{dynamic}",
+      "occurrence_count": 2,
+      "occurrences": [
+        {
+          "occurrence_id": "web/container_card/modes/container_item_detail.js:129:16:PUT:/api/{dynamic}/{dynamic}",
+          "source": "web/container_card/modes/container_item_detail.js",
+          "line": 129,
+          "column": 16,
+          "raw_route": "/api/${itemType}s/${gid}",
+          "source_sha256": "e3e1b83d5e5596cb267449f447bd5c78594e12f477581b0a36c2adaf8e8b55f4"
+        },
+        {
+          "occurrence_id": "web/container_card/modes/mode_field_detail.js:39:25:PUT:/api/{dynamic}/{dynamic}",
+          "source": "web/container_card/modes/mode_field_detail.js",
+          "line": 39,
+          "column": 25,
+          "raw_route": "/api/${itemType}s/${gid}",
+          "source_sha256": "9e0bbd6e14368e83adcd96eb0756f0ceab11cabbd932e55b5db2c874c16f2d20"
+        }
+      ],
+      "owner_domain": "base",
+      "backend_evidence": {
+        "openapi_status": "absent",
+        "source_path": "backend/governance/legacy_route_registry.json",
+        "finding": "Reviewed against the backend OpenAPI and implementation at 800ec6ba; same-name inference is not accepted.",
+        "anchors": []
+      },
+      "lifecycle_conclusion": "The scanner ambiguity came from a malformed template or finite item-type interpolation.",
+      "disposition": "frontend_route_normalize",
+      "disposition_details": {
+        "finite_routes": [
+          "PUT /api/tasks/{dynamic}",
+          "PUT /api/issues/{dynamic}",
+          "PUT /api/knowledges/{dynamic}",
+          "PUT /api/rules/{dynamic}"
+        ],
+        "runtime_target_preserved": true,
+        "normalization_basis": "Only source expression shape changed; concrete runtime paths and HTTP methods are unchanged.",
+        "residual_unresolved_routes": [
+          "PUT /api/knowledges/{dynamic}",
+          "PUT /api/rules/{dynamic}"
+        ]
+      }
+    }
+  ]
+}

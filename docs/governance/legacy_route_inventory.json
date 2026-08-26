@@ -4618,6 +4618,76 @@
       ],
       "migration_target_major_version": 1,
       "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
+    },
+    {
+      "route_path": "/api/ai/audit-logs",
+      "method": "GET",
+      "owner": "agent",
+      "migration_target_capability": "agent.audit.read",
+      "source": "plugins/agent/agent_backend/routers/ai_audit.py",
+      "migration_deadline": "2026-11-21",
+      "allowed_consumers": [
+        "web",
+        "rest"
+      ],
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/task_3b3a"
+    },
+    {
+      "route_path": "/api/craft_lib/tools/{gid}/obsolete",
+      "method": "POST",
+      "owner": "craft",
+      "migration_target_capability": "craft.library.change.apply",
+      "source": "plugins/craft/craft_backend/routers/craft_library.py",
+      "migration_deadline": "2026-11-21",
+      "allowed_consumers": [
+        "web",
+        "rest"
+      ],
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/task_3b3a"
+    },
+    {
+      "route_path": "/api/craft_lib/equipments/{gid}/obsolete",
+      "method": "POST",
+      "owner": "craft",
+      "migration_target_capability": "craft.library.change.apply",
+      "source": "plugins/craft/craft_backend/routers/craft_library.py",
+      "migration_deadline": "2026-11-21",
+      "allowed_consumers": [
+        "web",
+        "rest"
+      ],
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/task_3b3a"
+    },
+    {
+      "route_path": "/api/craft_lib/fixtures/{gid}/obsolete",
+      "method": "POST",
+      "owner": "craft",
+      "migration_target_capability": "craft.library.change.apply",
+      "source": "plugins/craft/craft_backend/routers/craft_library.py",
+      "migration_deadline": "2026-11-21",
+      "allowed_consumers": [
+        "web",
+        "rest"
+      ],
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/task_3b3a"
+    },
+    {
+      "route_path": "/api/std_op/operations/{gid}",
+      "method": "PATCH",
+      "owner": "craft",
+      "migration_target_capability": "craft.standard_operation.change.apply",
+      "source": "plugins/craft/craft_backend/routers/std_op.py",
+      "migration_deadline": "2026-11-21",
+      "allowed_consumers": [
+        "web",
+        "rest"
+      ],
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/task_3b3a"
     }
   ]
 }

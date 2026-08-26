@@ -22,6 +22,11 @@ from backend.capability_v2.route_inventory import (
     RouteInventoryConfigurationError,
     load_route_inventory,
 )
+from backend.capability_v2.route_root_cause_ledger import (
+    RouteRootCauseLedgerConfigurationError,
+    audit_route_root_cause_ledger,
+    load_route_root_cause_ledger,
+)
 
 
 DEFAULT_LEGACY_PREFIXES = (
@@ -48,6 +53,9 @@ LEXICAL_NON_ROUTES = (
 )
 WRAPPER_CONTRACTS = (
     REPOSITORY_ROOT / "docs/governance/web-api-wrapper-contracts.json"
+)
+ROOT_CAUSE_LEDGER = (
+    REPOSITORY_ROOT / "docs/governance/web-route-root-cause-ledger.json"
 )
 
 
@@ -129,6 +137,18 @@ def main(argv: list[str] | None = None) -> int:
         if stored != rendered:
             print("web-route-inventory drift: fresh canonical JSON differs", file=sys.stderr)
             return 1
+    try:
+        ledger = load_route_root_cause_ledger(ROOT_CAUSE_LEDGER)
+        ledger_issues = audit_route_root_cause_ledger(REPOSITORY_ROOT, ledger)
+    except RouteRootCauseLedgerConfigurationError as exc:
+        print(f"web-route-root-cause-ledger invalid: {exc}", file=sys.stderr)
+        return 1
+    if ledger_issues:
+        print(
+            "web-route-root-cause-ledger audit failed: " + ", ".join(ledger_issues),
+            file=sys.stderr,
+        )
+        return 1
     counts = " ".join(f"{key}={value}" for key, value in report.counts.items())
     print(
         f"frontend_revision={report.frontend_revision} "

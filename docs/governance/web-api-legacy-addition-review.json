@@ -3689,11 +3689,130 @@
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"agent.interaction.chat.change.apply\", payload=payload,\n        current_user=user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n    )"
       },
       "round_4_change": "new"
+    },
+    {
+      "scope": "task_3b3a",
+      "method": "GET",
+      "route_path": "/api/ai/audit-logs",
+      "disposition": "retained",
+      "target_capability": "agent.audit.read",
+      "reason": "Handler invokes agent.audit.read through the anchored call.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "capability_invocation",
+        "handler": {
+          "source_path": "plugins/agent/agent_backend/routers/ai_audit.py",
+          "start_line": 27,
+          "end_line": 49,
+          "sha256": "d93fd51ca18e1e8f9d31046559f292226f35a099cfccd32f0c6cb826113ddfba"
+        },
+        "expected_target_invocation": "invoke_agent_capability(\n        \"agent.audit.read\",\n        {\n            \"session_gid\": session_gid,\n            \"user_gid\": user_gid,\n            \"tool_name\": tool_name,\n            \"is_write\": is_write,\n            \"limit\": limit,\n            \"offset\": offset,\n        },\n        _user,\n    )"
+      }
+    },
+    {
+      "scope": "task_3b3a",
+      "method": "POST",
+      "route_path": "/api/craft_lib/tools/{gid}/obsolete",
+      "disposition": "retained",
+      "target_capability": "craft.library.change.apply",
+      "reason": "Handler delegates to _invoke_change, whose anchored binding invokes craft.library.change.apply.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "exact_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
+          "start_line": 293,
+          "end_line": 295,
+          "sha256": "d8b6667721961c337b9df469e5163026b78801be81e6b6da726a13c2d99c5344"
+        },
+        "delegation_symbol": "_invoke_change",
+        "expected_delegation": "_invoke_change(request, current_user, principal, gateway, \"tools.obsolete\", gid=gid)",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
+          "start_line": 57,
+          "end_line": 78,
+          "sha256": "cdfa9103ae30aa401dec3e5627b3bd248abe8b49e2729e4f5be562765454433b"
+        },
+        "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.change.apply\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
+      }
+    },
+    {
+      "scope": "task_3b3a",
+      "method": "POST",
+      "route_path": "/api/craft_lib/equipments/{gid}/obsolete",
+      "disposition": "retained",
+      "target_capability": "craft.library.change.apply",
+      "reason": "Handler delegates to _invoke_change, whose anchored binding invokes craft.library.change.apply.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "exact_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
+          "start_line": 312,
+          "end_line": 314,
+          "sha256": "f06d1077c7b291d09248019a85bda4f3a8d1d11c26756bfca76db058d65fe3bc"
+        },
+        "delegation_symbol": "_invoke_change",
+        "expected_delegation": "_invoke_change(request, current_user, principal, gateway, \"equipments.obsolete\", gid=gid)",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
+          "start_line": 57,
+          "end_line": 78,
+          "sha256": "cdfa9103ae30aa401dec3e5627b3bd248abe8b49e2729e4f5be562765454433b"
+        },
+        "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.change.apply\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
+      }
+    },
+    {
+      "scope": "task_3b3a",
+      "method": "POST",
+      "route_path": "/api/craft_lib/fixtures/{gid}/obsolete",
+      "disposition": "retained",
+      "target_capability": "craft.library.change.apply",
+      "reason": "Handler delegates to _invoke_change, whose anchored binding invokes craft.library.change.apply.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "exact_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
+          "start_line": 337,
+          "end_line": 339,
+          "sha256": "d161067fce57e5ba2dc47acbc44f953eb732c728f2a73796fb25fafa7a1a051a"
+        },
+        "delegation_symbol": "_invoke_change",
+        "expected_delegation": "_invoke_change(request, current_user, principal, gateway, \"fixtures.obsolete\", gid=gid)",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
+          "start_line": 57,
+          "end_line": 78,
+          "sha256": "cdfa9103ae30aa401dec3e5627b3bd248abe8b49e2729e4f5be562765454433b"
+        },
+        "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.change.apply\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
+      }
+    },
+    {
+      "scope": "task_3b3a",
+      "method": "PATCH",
+      "route_path": "/api/std_op/operations/{gid}",
+      "disposition": "retained",
+      "target_capability": "craft.standard_operation.change.apply",
+      "reason": "Handler invokes craft.standard_operation.change.apply through the anchored call.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "capability_invocation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/std_op.py",
+          "start_line": 93,
+          "end_line": 95,
+          "sha256": "4e7ead5b3063532e250feda631e7374bb6ed2bc2f7bd2fa0907a70d852008fa7"
+        },
+        "expected_target_invocation": "_invoke_standard_operation(request, current_user, principal, gateway, \"craft.standard_operation.change.apply\", \"update\", gid=gid, record=body.model_dump(exclude_none=True))"
+      }
     }
   ],
   "original_retained_count": 87,
   "original_removed_count": 22,
-  "retained_count": 132,
+  "retained_count": 137,
   "removed_count": 22,
   "round_4_re_retained_count": 35,
   "round_4_new_count": 41,

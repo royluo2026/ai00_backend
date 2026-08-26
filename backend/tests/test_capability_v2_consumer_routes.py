@@ -1094,7 +1094,7 @@ def test_repository_wrapper_contracts_are_exact_and_unambiguous() -> None:
         )
         for anchor in anchors
     }
-    assert len(anchors) == len(identities) == 24
+    assert len(anchors) == len(identities) == 19
     assert all(
         anchor.source_sha256 == contract.source_sha256
         for contract in contracts

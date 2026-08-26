@@ -1,7 +1,7 @@
 {
-  "frontend_revision": "7848e30803ada6cc687c9e8b3b14ce4020254886",
-  "content_hash": "227927b5c91ae24747115ccea4ab72097b951be0dd4d96c8f954455984a71b38",
-  "wrapper_contracts_hash": "32d10dab46359a55ca2a0c9c48648c4f313b27cee7f0371d14bd4f08162ff68a",
+  "frontend_revision": "b6d154dd75acf6eb0555a365591e20bb41c70c54",
+  "content_hash": "1bce0e94067b98dfa159dc5ccc74262ea7da3c18b59f29e5c9bdfb1701de00fb",
+  "wrapper_contracts_hash": "7467489f3d7eed7d9c0dc4fe53f13103ed137fcb7da89da01062a5d84a1f6e4b",
   "scan_roots": [
     "web",
     "packages"
@@ -24,14 +24,14 @@
   ],
   "counts": {
     "capability": 37,
-    "legacy_registered": 272,
+    "legacy_registered": 311,
     "bff_registered": 0,
     "operations_excluded": 19,
-    "unresolved": 148
+    "unresolved": 109
   },
   "lexical_audit": {
     "token_count": 495,
-    "token_hash": "470ca1c5e8e3bb8a7a0f20d80369fe8c26fa2cb05889269103abdf7a6157058d",
+    "token_hash": "eb93bed926cba63c0f1d63610d7297c7e09d7e0a3ef334e270befec8c736089a",
     "mapped_count": 476,
     "reviewed_non_route_count": 19,
     "reviewed_non_route_tokens": [
@@ -45,7 +45,7 @@
       "packages/plugin-sdk/frontend/plugin-sdk.js:43:42:/api/",
       "packages/plugin-sdk/frontend/plugin-sdk.js:8:20:/api/",
       "web/components/attachments_widget.js:119:21:/api/",
-      "web/components/list_shell.js:1182:37:/api/",
+      "web/components/list_shell.js:1192:37:/api/",
       "web/components/list_sidebar.js:902:14:/api/",
       "web/components/list_tree.html:625:18:/api/",
       "web/container_card/modes/mode_spreadsheet.js:53:19:/api/",
@@ -131,23 +131,13 @@
     },
     {
       "source": "packages/agent-plugin/web/automation_hub/ai_assistant.js",
-      "line": 982,
-      "column": 37,
-      "raw_route": "/api/ai/balance",
-      "normalized_route": "/api/ai/balance",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/agent-plugin/web/automation_hub/ai_assistant.js:982:37:GET:/api/ai/balance"
-    },
-    {
-      "source": "packages/agent-plugin/web/automation_hub/ai_assistant.js",
-      "line": 1247,
+      "line": 1230,
       "column": 42,
       "raw_route": "/api/skills?scope_filter=all",
       "normalized_route": "/api/skills",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "packages/agent-plugin/web/automation_hub/ai_assistant.js:1247:42:GET:/api/skills"
+      "occurrence_id": "packages/agent-plugin/web/automation_hub/ai_assistant.js:1230:42:GET:/api/skills"
     },
     {
       "source": "packages/agent-plugin/web/automation_hub/ai_settings.html",
@@ -596,11 +586,11 @@
       "source": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
       "line": 38,
       "column": 34,
-      "raw_route": "/api/craft_lib/tools${listGid ? ",
-      "normalized_route": "/api/craft_lib/tools${listGid ",
+      "raw_route": "/api/craft_lib/tools",
+      "normalized_route": "/api/craft_lib/tools",
       "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:38:34:GET:/api/craft_lib/tools${listGid "
+      "disposition": "legacy_registered",
+      "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:38:34:GET:/api/craft_lib/tools"
     },
     {
       "source": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
@@ -639,18 +629,18 @@
       "raw_route": "/api/craft_lib/tools/${gid}/obsolete",
       "normalized_route": "/api/craft_lib/tools/{dynamic}/obsolete",
       "method": "POST",
-      "disposition": "unresolved",
+      "disposition": "legacy_registered",
       "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:42:35:POST:/api/craft_lib/tools/{dynamic}/obsolete"
     },
     {
       "source": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
       "line": 44,
       "column": 34,
-      "raw_route": "/api/craft_lib/equipments${listGid ? ",
-      "normalized_route": "/api/craft_lib/equipments${listGid ",
+      "raw_route": "/api/craft_lib/equipments",
+      "normalized_route": "/api/craft_lib/equipments",
       "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:44:34:GET:/api/craft_lib/equipments${listGid "
+      "disposition": "legacy_registered",
+      "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:44:34:GET:/api/craft_lib/equipments"
     },
     {
       "source": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
@@ -689,18 +679,18 @@
       "raw_route": "/api/craft_lib/equipments/${gid}/obsolete",
       "normalized_route": "/api/craft_lib/equipments/{dynamic}/obsolete",
       "method": "POST",
-      "disposition": "unresolved",
+      "disposition": "legacy_registered",
       "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:48:35:POST:/api/craft_lib/equipments/{dynamic}/obsolete"
     },
     {
       "source": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
       "line": 50,
       "column": 34,
-      "raw_route": "/api/craft_lib/fixtures${listGid ? ",
-      "normalized_route": "/api/craft_lib/fixtures${listGid ",
+      "raw_route": "/api/craft_lib/fixtures",
+      "normalized_route": "/api/craft_lib/fixtures",
       "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:50:34:GET:/api/craft_lib/fixtures${listGid "
+      "disposition": "legacy_registered",
+      "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:50:34:GET:/api/craft_lib/fixtures"
     },
     {
       "source": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
@@ -739,18 +729,18 @@
       "raw_route": "/api/craft_lib/fixtures/${gid}/obsolete",
       "normalized_route": "/api/craft_lib/fixtures/{dynamic}/obsolete",
       "method": "POST",
-      "disposition": "unresolved",
+      "disposition": "legacy_registered",
       "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:54:35:POST:/api/craft_lib/fixtures/{dynamic}/obsolete"
     },
     {
       "source": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
       "line": 56,
       "column": 34,
-      "raw_route": "/api/craft_lib/fasteners${listGid ? ",
-      "normalized_route": "/api/craft_lib/fasteners${listGid ",
+      "raw_route": "/api/craft_lib/fasteners",
+      "normalized_route": "/api/craft_lib/fasteners",
       "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:56:34:GET:/api/craft_lib/fasteners${listGid "
+      "disposition": "legacy_registered",
+      "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:56:34:GET:/api/craft_lib/fasteners"
     },
     {
       "source": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
@@ -786,11 +776,11 @@
       "source": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
       "line": 62,
       "column": 34,
-      "raw_route": "/api/craft_lib/part_names${listGid ? ",
-      "normalized_route": "/api/craft_lib/part_names${listGid ",
+      "raw_route": "/api/craft_lib/part_names",
+      "normalized_route": "/api/craft_lib/part_names",
       "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:62:34:GET:/api/craft_lib/part_names${listGid "
+      "disposition": "legacy_registered",
+      "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:62:34:GET:/api/craft_lib/part_names"
     },
     {
       "source": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
@@ -834,93 +824,13 @@
     },
     {
       "source": "packages/craft-plugin/web/craft_table/table.js",
-      "line": 78,
-      "column": 40,
-      "raw_route": "/api/craft/work_plans",
-      "normalized_route": "/api/craft/work_plans",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/craft-plugin/web/craft_table/table.js:78:40:GET:/api/craft/work_plans"
-    },
-    {
-      "source": "packages/craft-plugin/web/craft_table/table.js",
       "line": 82,
-      "column": 40,
-      "raw_route": "/api/craft/work_plans/${params.work_plan_gid}/sections",
-      "normalized_route": "/api/craft/work_plans/{dynamic}/sections",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/craft-plugin/web/craft_table/table.js:82:40:GET:/api/craft/work_plans/{dynamic}/sections"
-    },
-    {
-      "source": "packages/craft-plugin/web/craft_table/table.js",
-      "line": 88,
-      "column": 42,
-      "raw_route": "/api/craft/sections/${secGid}/operations",
-      "normalized_route": "/api/craft/sections/{dynamic}/operations",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/craft-plugin/web/craft_table/table.js:88:42:GET:/api/craft/sections/{dynamic}/operations"
-    },
-    {
-      "source": "packages/craft-plugin/web/craft_table/table.js",
-      "line": 96,
       "column": 40,
       "raw_route": "/api/std_op/operations?status=active",
       "normalized_route": "/api/std_op/operations",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "packages/craft-plugin/web/craft_table/table.js:96:40:GET:/api/std_op/operations"
-    },
-    {
-      "source": "packages/craft-plugin/web/craft_table/table.js",
-      "line": 100,
-      "column": 40,
-      "raw_route": "/api/std_op/operations/${params.std_op_gid}/clone-to-post",
-      "normalized_route": "/api/std_op/operations/{dynamic}/clone-to-post",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/craft-plugin/web/craft_table/table.js:100:40:POST:/api/std_op/operations/{dynamic}/clone-to-post"
-    },
-    {
-      "source": "packages/craft-plugin/web/craft_table/table.js",
-      "line": 492,
-      "column": 28,
-      "raw_route": "/api/craft/sections/${state.sectionGid}/operations",
-      "normalized_route": "/api/craft/sections/{dynamic}/operations",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/craft-plugin/web/craft_table/table.js:492:28:POST:/api/craft/sections/{dynamic}/operations"
-    },
-    {
-      "source": "packages/craft-plugin/web/craft_table/table.js",
-      "line": 516,
-      "column": 47,
-      "raw_route": "/api/craft/work_plans",
-      "normalized_route": "/api/craft/work_plans",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/craft-plugin/web/craft_table/table.js:516:47:GET:/api/craft/work_plans"
-    },
-    {
-      "source": "packages/craft-plugin/web/craft_table/table.js",
-      "line": 520,
-      "column": 47,
-      "raw_route": "/api/craft/work_plans/${p.gid}/sections",
-      "normalized_route": "/api/craft/work_plans/{dynamic}/sections",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/craft-plugin/web/craft_table/table.js:520:47:GET:/api/craft/work_plans/{dynamic}/sections"
-    },
-    {
-      "source": "packages/craft-plugin/web/craft_table/table.js",
-      "line": 529,
-      "column": 42,
-      "raw_route": "/api/craft/sections/${gid}/operations",
-      "normalized_route": "/api/craft/sections/{dynamic}/operations",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/craft-plugin/web/craft_table/table.js:529:42:GET:/api/craft/sections/{dynamic}/operations"
+      "occurrence_id": "packages/craft-plugin/web/craft_table/table.js:82:40:GET:/api/std_op/operations"
     },
     {
       "source": "packages/craft-plugin/web/ebom/ebom.js",
@@ -1156,11 +1066,11 @@
       "source": "packages/craft-plugin/web/issue/issue.js",
       "line": 228,
       "column": 35,
-      "raw_route": "/api/issues${qs}",
-      "normalized_route": "/api/{dynamic}",
+      "raw_route": "/api/issues",
+      "normalized_route": "/api/issues",
       "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/craft-plugin/web/issue/issue.js:228:35:GET:/api/{dynamic}"
+      "disposition": "legacy_registered",
+      "occurrence_id": "packages/craft-plugin/web/issue/issue.js:228:35:GET:/api/issues"
     },
     {
       "source": "packages/craft-plugin/web/issue/issue.js",
@@ -1509,7 +1419,7 @@
       "raw_route": "/api/std_op/operations/${gid}",
       "normalized_route": "/api/std_op/operations/{dynamic}",
       "method": "PATCH",
-      "disposition": "unresolved",
+      "disposition": "legacy_registered",
       "occurrence_id": "packages/craft-plugin/web/std_op_lib/std_op_lib.js:94:50:PATCH:/api/std_op/operations/{dynamic}"
     },
     {
@@ -1529,7 +1439,7 @@
       "raw_route": "/api/std_op/operations/${row.gid}",
       "normalized_route": "/api/std_op/operations/{dynamic}",
       "method": "PATCH",
-      "disposition": "unresolved",
+      "disposition": "legacy_registered",
       "occurrence_id": "packages/craft-plugin/web/std_op_lib/std_op_lib.js:122:67:PATCH:/api/std_op/operations/{dynamic}"
     },
     {
@@ -1576,11 +1486,11 @@
       "source": "packages/craft-plugin/web/task/task.js",
       "line": 133,
       "column": 35,
-      "raw_route": "/api/tasks${qs}",
-      "normalized_route": "/api/{dynamic}",
+      "raw_route": "/api/tasks",
+      "normalized_route": "/api/tasks",
       "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/craft-plugin/web/task/task.js:133:35:GET:/api/{dynamic}"
+      "disposition": "legacy_registered",
+      "occurrence_id": "packages/craft-plugin/web/task/task.js:133:35:GET:/api/tasks"
     },
     {
       "source": "packages/craft-plugin/web/task/task.js",
@@ -1673,26 +1583,6 @@
       "occurrence_id": "packages/craft-plugin/web/task/task.js:494:38:POST:/api/task-templates/{dynamic}/instantiate"
     },
     {
-      "source": "packages/plugin-sdk/template/web/app.js",
-      "line": 33,
-      "column": 37,
-      "raw_route": "/api/my-plugin/items",
-      "normalized_route": "/api/my-plugin/items",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/plugin-sdk/template/web/app.js:33:37:GET:/api/my-plugin/items"
-    },
-    {
-      "source": "packages/plugin-sdk/template/web/app.js",
-      "line": 73,
-      "column": 24,
-      "raw_route": "/api/my-plugin/items",
-      "normalized_route": "/api/my-plugin/items",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/plugin-sdk/template/web/app.js:73:24:POST:/api/my-plugin/items"
-    },
-    {
       "source": "packages/sim-plugin/web/cad_sim/cad_sim.js",
       "line": 44,
       "column": 39,
@@ -1709,7 +1599,7 @@
       "raw_route": "/api/ai/audit-logs?${params}",
       "normalized_route": "/api/ai/audit-logs",
       "method": "GET",
-      "disposition": "unresolved",
+      "disposition": "legacy_registered",
       "occurrence_id": "web/admin/ai_audit.html:125:39:GET:/api/ai/audit-logs"
     },
     {
@@ -1719,7 +1609,7 @@
       "raw_route": "/api/ai/audit-logs?${params}",
       "normalized_route": "/api/ai/audit-logs",
       "method": "GET",
-      "disposition": "unresolved",
+      "disposition": "legacy_registered",
       "occurrence_id": "web/admin/ai_audit.html:132:41:GET:/api/ai/audit-logs"
     },
     {
@@ -1926,86 +1816,6 @@
       "occurrence_id": "web/components/attachments_widget.js:171:51:POST:/api/uploads/ois/resolve"
     },
     {
-      "source": "web/components/bitable_sync_manager.js",
-      "line": 51,
-      "column": 38,
-      "raw_route": "/api/bitable-sync/bindings/${this._listGid}/status",
-      "normalized_route": "/api/bitable-sync/bindings/{dynamic}/status",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/bitable_sync_manager.js:51:38:GET:/api/bitable-sync/bindings/{dynamic}/status"
-    },
-    {
-      "source": "web/components/bitable_sync_manager.js",
-      "line": 81,
-      "column": 26,
-      "raw_route": "/api/bitable-sync/rows/push",
-      "normalized_route": "/api/bitable-sync/rows/push",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/bitable_sync_manager.js:81:26:POST:/api/bitable-sync/rows/push"
-    },
-    {
-      "source": "web/components/bitable_sync_manager.js",
-      "line": 97,
-      "column": 26,
-      "raw_route": "/api/bitable-sync/bindings/${this._listGid}/push",
-      "normalized_route": "/api/bitable-sync/bindings/{dynamic}/push",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/bitable_sync_manager.js:97:26:POST:/api/bitable-sync/bindings/{dynamic}/push"
-    },
-    {
-      "source": "web/components/bitable_sync_manager.js",
-      "line": 113,
-      "column": 26,
-      "raw_route": "/api/bitable-sync/bindings/${this._listGid}/pull",
-      "normalized_route": "/api/bitable-sync/bindings/{dynamic}/pull",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/bitable_sync_manager.js:113:26:POST:/api/bitable-sync/bindings/{dynamic}/pull"
-    },
-    {
-      "source": "web/components/bitable_sync_manager.js",
-      "line": 169,
-      "column": 12,
-      "raw_route": "/api/bitable-sync/bindings/${this._listGid}/schema-by-token?app_token=${encodeURIComponent(appToken)}&table_id=${encodeURIComponent(tableId)}",
-      "normalized_route": "/api/bitable-sync/bindings/{dynamic}/schema-by-token",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/bitable_sync_manager.js:169:12:GET:/api/bitable-sync/bindings/{dynamic}/schema-by-token"
-    },
-    {
-      "source": "web/components/bitable_sync_manager.js",
-      "line": 252,
-      "column": 28,
-      "raw_route": "/api/bitable-sync/bindings/${this._listGid}",
-      "normalized_route": "/api/bitable-sync/bindings/{dynamic}",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/bitable_sync_manager.js:252:28:POST:/api/bitable-sync/bindings/{dynamic}"
-    },
-    {
-      "source": "web/components/bitable_sync_manager.js",
-      "line": 269,
-      "column": 38,
-      "raw_route": "/api/bitable-sync/bindings/${this._listGid}",
-      "normalized_route": "/api/bitable-sync/bindings/{dynamic}",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/bitable_sync_manager.js:269:38:GET:/api/bitable-sync/bindings/{dynamic}"
-    },
-    {
-      "source": "web/components/bitable_sync_manager.js",
-      "line": 279,
-      "column": 24,
-      "raw_route": "/api/bitable-sync/bindings/${this._listGid}",
-      "normalized_route": "/api/bitable-sync/bindings/{dynamic}",
-      "method": "DELETE",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/bitable_sync_manager.js:279:24:DELETE:/api/bitable-sync/bindings/{dynamic}"
-    },
-    {
       "source": "web/components/diff_manager.js",
       "line": 590,
       "column": 39,
@@ -2147,113 +1957,143 @@
     },
     {
       "source": "web/components/list_shell.js",
-      "line": 582,
-      "column": 28,
-      "raw_route": "/api/${type}s/${row.gid}",
-      "normalized_route": "/api/{dynamic}/{dynamic}",
+      "line": 565,
+      "column": 46,
+      "raw_route": "/api/tasks/${gid}",
+      "normalized_route": "/api/tasks/{dynamic}",
       "method": "DELETE",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/list_shell.js:582:28:DELETE:/api/{dynamic}/{dynamic}"
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/components/list_shell.js:565:46:DELETE:/api/tasks/{dynamic}"
     },
     {
       "source": "web/components/list_shell.js",
-      "line": 591,
-      "column": 28,
-      "raw_route": "/api/${type}s/${row.gid}",
-      "normalized_route": "/api/{dynamic}/{dynamic}",
+      "line": 566,
+      "column": 47,
+      "raw_route": "/api/issues/${gid}",
+      "normalized_route": "/api/issues/{dynamic}",
       "method": "DELETE",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/list_shell.js:591:28:DELETE:/api/{dynamic}/{dynamic}"
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/components/list_shell.js:566:47:DELETE:/api/issues/{dynamic}"
     },
     {
       "source": "web/components/list_shell.js",
-      "line": 638,
+      "line": 567,
+      "column": 51,
+      "raw_route": "/api/knowledges/${gid}",
+      "normalized_route": "/api/knowledges/{dynamic}",
+      "method": "DELETE",
+      "disposition": "unresolved",
+      "occurrence_id": "web/components/list_shell.js:567:51:DELETE:/api/knowledges/{dynamic}"
+    },
+    {
+      "source": "web/components/list_shell.js",
+      "line": 568,
+      "column": 46,
+      "raw_route": "/api/rules/${gid}",
+      "normalized_route": "/api/rules/{dynamic}",
+      "method": "DELETE",
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/components/list_shell.js:568:46:DELETE:/api/rules/{dynamic}"
+    },
+    {
+      "source": "web/components/list_shell.js",
+      "line": 573,
+      "column": 46,
+      "raw_route": "/api/tasks/${gid}",
+      "normalized_route": "/api/tasks/{dynamic}",
+      "method": "PATCH",
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/components/list_shell.js:573:46:PATCH:/api/tasks/{dynamic}"
+    },
+    {
+      "source": "web/components/list_shell.js",
+      "line": 574,
+      "column": 47,
+      "raw_route": "/api/issues/${gid}",
+      "normalized_route": "/api/issues/{dynamic}",
+      "method": "PATCH",
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/components/list_shell.js:574:47:PATCH:/api/issues/{dynamic}"
+    },
+    {
+      "source": "web/components/list_shell.js",
+      "line": 575,
+      "column": 51,
+      "raw_route": "/api/knowledges/${gid}",
+      "normalized_route": "/api/knowledges/{dynamic}",
+      "method": "PATCH",
+      "disposition": "unresolved",
+      "occurrence_id": "web/components/list_shell.js:575:51:PATCH:/api/knowledges/{dynamic}"
+    },
+    {
+      "source": "web/components/list_shell.js",
+      "line": 576,
+      "column": 46,
+      "raw_route": "/api/rules/${gid}",
+      "normalized_route": "/api/rules/{dynamic}",
+      "method": "PATCH",
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/components/list_shell.js:576:46:PATCH:/api/rules/{dynamic}"
+    },
+    {
+      "source": "web/components/list_shell.js",
+      "line": 654,
       "column": 41,
       "raw_route": "/api/tasks/${row.gid}",
       "normalized_route": "/api/tasks/{dynamic}",
       "method": "PUT",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/components/list_shell.js:638:41:PUT:/api/tasks/{dynamic}"
+      "occurrence_id": "web/components/list_shell.js:654:41:PUT:/api/tasks/{dynamic}"
     },
     {
       "source": "web/components/list_shell.js",
-      "line": 639,
+      "line": 655,
       "column": 41,
       "raw_route": "/api/issues/${row.gid}",
       "normalized_route": "/api/issues/{dynamic}",
       "method": "PUT",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/components/list_shell.js:639:41:PUT:/api/issues/{dynamic}"
+      "occurrence_id": "web/components/list_shell.js:655:41:PUT:/api/issues/{dynamic}"
     },
     {
       "source": "web/components/list_shell.js",
-      "line": 640,
+      "line": 656,
       "column": 41,
       "raw_route": "/api/rules/${row.gid}",
       "normalized_route": "/api/rules/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/components/list_shell.js:640:41:PATCH:/api/rules/{dynamic}"
+      "occurrence_id": "web/components/list_shell.js:656:41:PATCH:/api/rules/{dynamic}"
     },
     {
       "source": "web/components/list_shell.js",
-      "line": 641,
+      "line": 657,
       "column": 41,
       "raw_route": "/api/knowledge_entries/${row.gid}",
       "normalized_route": "/api/knowledge_entries/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/components/list_shell.js:641:41:PATCH:/api/knowledge_entries/{dynamic}"
+      "occurrence_id": "web/components/list_shell.js:657:41:PATCH:/api/knowledge_entries/{dynamic}"
     },
     {
       "source": "web/components/list_shell.js",
-      "line": 643,
-      "column": 61,
-      "raw_route": "/api/${type}s/${row.gid}",
-      "normalized_route": "/api/{dynamic}/{dynamic}",
-      "method": "PATCH",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/list_shell.js:643:61:PATCH:/api/{dynamic}/{dynamic}"
-    },
-    {
-      "source": "web/components/list_shell.js",
-      "line": 658,
+      "line": 676,
       "column": 39,
       "raw_route": "/api/item-entries/${this._itemType}/${gid}",
       "normalized_route": "/api/item-entries/{dynamic}/{dynamic}",
       "method": "PUT",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/components/list_shell.js:658:39:PUT:/api/item-entries/{dynamic}/{dynamic}"
+      "occurrence_id": "web/components/list_shell.js:676:39:PUT:/api/item-entries/{dynamic}/{dynamic}"
     },
     {
       "source": "web/components/list_shell.js",
-      "line": 709,
-      "column": 30,
-      "raw_route": "/api/${this._itemType}s/${fields.gid}",
-      "normalized_route": "/api/{dynamic}/{dynamic}",
-      "method": "PATCH",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/list_shell.js:709:30:PATCH:/api/{dynamic}/{dynamic}"
-    },
-    {
-      "source": "web/components/list_shell.js",
-      "line": 1051,
+      "line": 1065,
       "column": 41,
       "raw_route": "/api/item-entries/${this._itemType}/${row.gid}",
       "normalized_route": "/api/item-entries/{dynamic}/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/components/list_shell.js:1051:41:GET:/api/item-entries/{dynamic}/{dynamic}"
-    },
-    {
-      "source": "web/components/list_shell.js",
-      "line": 1154,
-      "column": 32,
-      "raw_route": "/api/${shell._itemType}s/${gid}",
-      "normalized_route": "/api/{dynamic}/{dynamic}",
-      "method": "PATCH",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/list_shell.js:1154:32:PATCH:/api/{dynamic}/{dynamic}"
+      "occurrence_id": "web/components/list_shell.js:1065:41:GET:/api/item-entries/{dynamic}/{dynamic}"
     },
     {
       "source": "web/components/list_sidebar.js",
@@ -2389,11 +2229,11 @@
       "source": "web/components/quick_list.html",
       "line": 288,
       "column": 50,
-      "raw_route": "/api/tasks${listGid ? ",
-      "normalized_route": "/api/tasks${listGid ",
+      "raw_route": "/api/tasks",
+      "normalized_route": "/api/tasks",
       "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/quick_list.html:288:50:GET:/api/tasks${listGid "
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/components/quick_list.html:288:50:GET:/api/tasks"
     },
     {
       "source": "web/components/quick_list.html",
@@ -2419,11 +2259,11 @@
       "source": "web/components/quick_list.html",
       "line": 293,
       "column": 50,
-      "raw_route": "/api/issues${listGid ? ",
-      "normalized_route": "/api/issues${listGid ",
+      "raw_route": "/api/issues",
+      "normalized_route": "/api/issues",
       "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/quick_list.html:293:50:GET:/api/issues${listGid "
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/components/quick_list.html:293:50:GET:/api/issues"
     },
     {
       "source": "web/components/quick_list.html",
@@ -2449,11 +2289,11 @@
       "source": "web/components/quick_list.html",
       "line": 298,
       "column": 50,
-      "raw_route": "/api/knowledge/entries${listGid ? ",
-      "normalized_route": "/api/knowledge/entries${listGid ",
+      "raw_route": "/api/knowledge/entries",
+      "normalized_route": "/api/knowledge/entries",
       "method": "GET",
       "disposition": "unresolved",
-      "occurrence_id": "web/components/quick_list.html:298:50:GET:/api/knowledge/entries${listGid "
+      "occurrence_id": "web/components/quick_list.html:298:50:GET:/api/knowledge/entries"
     },
     {
       "source": "web/components/quick_list.html",
@@ -2747,73 +2587,223 @@
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 107,
-      "column": 28,
-      "raw_route": "/api/${itemType}s/${gid}",
-      "normalized_route": "/api/{dynamic}/{dynamic}",
+      "line": 109,
+      "column": 54,
+      "raw_route": "/api/tasks/${gid}",
+      "normalized_route": "/api/tasks/{dynamic}",
       "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:107:28:GET:/api/{dynamic}/{dynamic}"
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:109:54:GET:/api/tasks/{dynamic}"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 116,
-      "column": 29,
+      "line": 110,
+      "column": 60,
+      "raw_route": "/api/issues/${gid}",
+      "normalized_route": "/api/issues/{dynamic}",
+      "method": "GET",
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:110:60:GET:/api/issues/{dynamic}"
+    },
+    {
+      "source": "web/container_card/modes/container_item_detail.js",
+      "line": 111,
+      "column": 64,
+      "raw_route": "/api/knowledges/${gid}",
+      "normalized_route": "/api/knowledges/{dynamic}",
+      "method": "GET",
+      "disposition": "unresolved",
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:111:64:GET:/api/knowledges/{dynamic}"
+    },
+    {
+      "source": "web/container_card/modes/container_item_detail.js",
+      "line": 112,
+      "column": 59,
+      "raw_route": "/api/rules/${gid}",
+      "normalized_route": "/api/rules/{dynamic}",
+      "method": "GET",
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:112:59:GET:/api/rules/{dynamic}"
+    },
+    {
+      "source": "web/container_card/modes/container_item_detail.js",
+      "line": 122,
+      "column": 36,
       "raw_route": "/api/item-entries/${itemType}/${gid}",
       "normalized_route": "/api/item-entries/{dynamic}/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:116:29:GET:/api/item-entries/{dynamic}/{dynamic}"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:122:36:GET:/api/item-entries/{dynamic}/{dynamic}"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 121,
-      "column": 16,
+      "line": 127,
+      "column": 23,
       "raw_route": "/api/item-entries/${itemType}/${gid}",
       "normalized_route": "/api/item-entries/{dynamic}/{dynamic}",
       "method": "PUT",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:121:16:PUT:/api/item-entries/{dynamic}/{dynamic}"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:127:23:PUT:/api/item-entries/{dynamic}/{dynamic}"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 129,
-      "column": 16,
-      "raw_route": "/api/${itemType}s/${gid}",
-      "normalized_route": "/api/{dynamic}/{dynamic}",
+      "line": 134,
+      "column": 48,
+      "raw_route": "/api/tasks/${gid}",
+      "normalized_route": "/api/tasks/{dynamic}",
+      "method": "PUT",
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:134:48:PUT:/api/tasks/{dynamic}"
+    },
+    {
+      "source": "web/container_card/modes/container_item_detail.js",
+      "line": 135,
+      "column": 54,
+      "raw_route": "/api/issues/${gid}",
+      "normalized_route": "/api/issues/{dynamic}",
+      "method": "PUT",
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:135:54:PUT:/api/issues/{dynamic}"
+    },
+    {
+      "source": "web/container_card/modes/container_item_detail.js",
+      "line": 136,
+      "column": 58,
+      "raw_route": "/api/knowledges/${gid}",
+      "normalized_route": "/api/knowledges/{dynamic}",
       "method": "PUT",
       "disposition": "unresolved",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:129:16:PUT:/api/{dynamic}/{dynamic}"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:136:58:PUT:/api/knowledges/{dynamic}"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 148,
-      "column": 28,
-      "raw_route": "/api/${itemType}s",
-      "normalized_route": "/api/{dynamic}",
+      "line": 137,
+      "column": 53,
+      "raw_route": "/api/rules/${gid}",
+      "normalized_route": "/api/rules/{dynamic}",
+      "method": "PUT",
+      "disposition": "unresolved",
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:137:53:PUT:/api/rules/{dynamic}"
+    },
+    {
+      "source": "web/container_card/modes/container_item_detail.js",
+      "line": 154,
+      "column": 55,
+      "raw_route": "/api/tasks",
+      "normalized_route": "/api/tasks",
+      "method": "POST",
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:154:55:POST:/api/tasks"
+    },
+    {
+      "source": "web/container_card/modes/container_item_detail.js",
+      "line": 155,
+      "column": 61,
+      "raw_route": "/api/issues",
+      "normalized_route": "/api/issues",
+      "method": "POST",
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:155:61:POST:/api/issues"
+    },
+    {
+      "source": "web/container_card/modes/container_item_detail.js",
+      "line": 156,
+      "column": 65,
+      "raw_route": "/api/knowledges",
+      "normalized_route": "/api/knowledges",
       "method": "POST",
       "disposition": "unresolved",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:148:28:POST:/api/{dynamic}"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:156:65:POST:/api/knowledges"
+    },
+    {
+      "source": "web/container_card/modes/container_item_detail.js",
+      "line": 157,
+      "column": 60,
+      "raw_route": "/api/rules",
+      "normalized_route": "/api/rules",
+      "method": "POST",
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:157:60:POST:/api/rules"
     },
     {
       "source": "web/container_card/modes/mode_field_detail.js",
-      "line": 31,
-      "column": 37,
-      "raw_route": "/api/${itemType}s/${gid}",
-      "normalized_route": "/api/{dynamic}/{dynamic}",
+      "line": 32,
+      "column": 56,
+      "raw_route": "/api/tasks/${gid}",
+      "normalized_route": "/api/tasks/{dynamic}",
+      "method": "GET",
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/container_card/modes/mode_field_detail.js:32:56:GET:/api/tasks/{dynamic}"
+    },
+    {
+      "source": "web/container_card/modes/mode_field_detail.js",
+      "line": 33,
+      "column": 62,
+      "raw_route": "/api/issues/${gid}",
+      "normalized_route": "/api/issues/{dynamic}",
+      "method": "GET",
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/container_card/modes/mode_field_detail.js:33:62:GET:/api/issues/{dynamic}"
+    },
+    {
+      "source": "web/container_card/modes/mode_field_detail.js",
+      "line": 34,
+      "column": 66,
+      "raw_route": "/api/knowledges/${gid}",
+      "normalized_route": "/api/knowledges/{dynamic}",
       "method": "GET",
       "disposition": "unresolved",
-      "occurrence_id": "web/container_card/modes/mode_field_detail.js:31:37:GET:/api/{dynamic}/{dynamic}"
+      "occurrence_id": "web/container_card/modes/mode_field_detail.js:34:66:GET:/api/knowledges/{dynamic}"
     },
     {
       "source": "web/container_card/modes/mode_field_detail.js",
-      "line": 39,
-      "column": 25,
-      "raw_route": "/api/${itemType}s/${gid}",
-      "normalized_route": "/api/{dynamic}/{dynamic}",
+      "line": 35,
+      "column": 61,
+      "raw_route": "/api/rules/${gid}",
+      "normalized_route": "/api/rules/{dynamic}",
+      "method": "GET",
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/container_card/modes/mode_field_detail.js:35:61:GET:/api/rules/{dynamic}"
+    },
+    {
+      "source": "web/container_card/modes/mode_field_detail.js",
+      "line": 44,
+      "column": 50,
+      "raw_route": "/api/tasks/${gid}",
+      "normalized_route": "/api/tasks/{dynamic}",
+      "method": "PUT",
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/container_card/modes/mode_field_detail.js:44:50:PUT:/api/tasks/{dynamic}"
+    },
+    {
+      "source": "web/container_card/modes/mode_field_detail.js",
+      "line": 45,
+      "column": 51,
+      "raw_route": "/api/issues/${gid}",
+      "normalized_route": "/api/issues/{dynamic}",
+      "method": "PUT",
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/container_card/modes/mode_field_detail.js:45:51:PUT:/api/issues/{dynamic}"
+    },
+    {
+      "source": "web/container_card/modes/mode_field_detail.js",
+      "line": 46,
+      "column": 55,
+      "raw_route": "/api/knowledges/${gid}",
+      "normalized_route": "/api/knowledges/{dynamic}",
       "method": "PUT",
       "disposition": "unresolved",
-      "occurrence_id": "web/container_card/modes/mode_field_detail.js:39:25:PUT:/api/{dynamic}/{dynamic}"
+      "occurrence_id": "web/container_card/modes/mode_field_detail.js:46:55:PUT:/api/knowledges/{dynamic}"
+    },
+    {
+      "source": "web/container_card/modes/mode_field_detail.js",
+      "line": 47,
+      "column": 50,
+      "raw_route": "/api/rules/${gid}",
+      "normalized_route": "/api/rules/{dynamic}",
+      "method": "PUT",
+      "disposition": "unresolved",
+      "occurrence_id": "web/container_card/modes/mode_field_detail.js:47:50:PUT:/api/rules/{dynamic}"
     },
     {
       "source": "web/container_card/modes/mode_image_gallery.js",
@@ -2877,13 +2867,43 @@
     },
     {
       "source": "web/container_card/modes/mode_text_image.js",
-      "line": 25,
-      "column": 36,
-      "raw_route": "/api/${itemType}s/${gid}",
-      "normalized_route": "/api/{dynamic}/{dynamic}",
+      "line": 26,
+      "column": 55,
+      "raw_route": "/api/tasks/${gid}",
+      "normalized_route": "/api/tasks/{dynamic}",
+      "method": "GET",
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/container_card/modes/mode_text_image.js:26:55:GET:/api/tasks/{dynamic}"
+    },
+    {
+      "source": "web/container_card/modes/mode_text_image.js",
+      "line": 27,
+      "column": 61,
+      "raw_route": "/api/issues/${gid}",
+      "normalized_route": "/api/issues/{dynamic}",
+      "method": "GET",
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/container_card/modes/mode_text_image.js:27:61:GET:/api/issues/{dynamic}"
+    },
+    {
+      "source": "web/container_card/modes/mode_text_image.js",
+      "line": 28,
+      "column": 65,
+      "raw_route": "/api/knowledges/${gid}",
+      "normalized_route": "/api/knowledges/{dynamic}",
       "method": "GET",
       "disposition": "unresolved",
-      "occurrence_id": "web/container_card/modes/mode_text_image.js:25:36:GET:/api/{dynamic}/{dynamic}"
+      "occurrence_id": "web/container_card/modes/mode_text_image.js:28:65:GET:/api/knowledges/{dynamic}"
+    },
+    {
+      "source": "web/container_card/modes/mode_text_image.js",
+      "line": 29,
+      "column": 60,
+      "raw_route": "/api/rules/${gid}",
+      "normalized_route": "/api/rules/{dynamic}",
+      "method": "GET",
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/container_card/modes/mode_text_image.js:29:60:GET:/api/rules/{dynamic}"
     },
     {
       "source": "web/core/global_search.js",
@@ -3184,16 +3204,6 @@
       "method": "POST",
       "disposition": "unresolved",
       "occurrence_id": "web/ext_datasource/ext_ds.js:677:26:POST:/api/ext-mappings"
-    },
-    {
-      "source": "web/feishu/feishu.js",
-      "line": 23,
-      "column": 40,
-      "raw_route": "/api/feishu/config",
-      "normalized_route": "/api/feishu/config",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/feishu/feishu.js:23:40:GET:/api/feishu/config"
     },
     {
       "source": "web/knowledge/knowledge.js",
@@ -4369,11 +4379,11 @@
       "source": "web/share/issues.html",
       "line": 178,
       "column": 40,
-      "raw_route": "/api/issues${qs}",
-      "normalized_route": "/api/{dynamic}",
+      "raw_route": "/api/issues",
+      "normalized_route": "/api/issues",
       "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/share/issues.html:178:40:GET:/api/{dynamic}"
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/share/issues.html:178:40:GET:/api/issues"
     },
     {
       "source": "web/team_space/team_space.js",
@@ -4814,16 +4824,6 @@
       "method": "POST",
       "disposition": "legacy_registered",
       "occurrence_id": "web/workbench/workbench.js:5664:42:POST:/api/ai/chat/stream"
-    },
-    {
-      "source": "web/workspace/nav_manager.js",
-      "line": 367,
-      "column": 40,
-      "raw_route": "/api/ai/balance?user_gid=${userGid}",
-      "normalized_route": "/api/ai/balance",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/workspace/nav_manager.js:367:40:GET:/api/ai/balance"
     }
   ]
 }

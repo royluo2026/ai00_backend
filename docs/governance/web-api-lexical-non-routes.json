@@ -63,7 +63,7 @@
     },
     {
       "source": "web/components/list_shell.js",
-      "line": 1182,
+      "line": 1192,
       "column": 37,
       "reason": "JSDoc usage example is documentation, not executable code."
     },
