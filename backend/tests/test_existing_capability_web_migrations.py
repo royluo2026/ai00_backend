@@ -4,17 +4,59 @@ from collections import Counter
 from dataclasses import replace
 import json
 from pathlib import Path
+import subprocess
 
 from backend.capability_v2.existing_capability_migrations import (
     audit_existing_capability_migrations,
     load_existing_capability_migrations,
 )
+from backend.capabilities.validation_next import validate_payload
 
 
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / "docs/governance/existing-capability-web-migrations.json"
 LEDGER = ROOT / "docs/governance/web-route-root-cause-ledger.json"
 WEB_ROOT = Path(r"E:\Projects\ai00_v3\.worktrees\workmanship-web-capability-governance")
+CATALOG = ROOT / "docs/capabilities/catalog.v2.json"
+
+
+def _frontend_payloads() -> dict[str, dict[str, object]]:
+    cases = {
+        "knowledge.search": {"listGid": "list-1"},
+        "knowledge.get": {"gid": "knowledge-1"},
+        "knowledge.create": {"record": {"title": "New"}},
+        "knowledge.update": {"gid": "knowledge-1", "updates": {"title": "Changed"}},
+        "knowledge.delete": {"gid": "knowledge-1"},
+        "project.task.update": {"gid": "task-1", "updates": {"status": "completed"}},
+        "project.issue.update": {"gid": "issue-1", "updates": {"status": "closed"}},
+        "project.itemEntries.get": {"itemGid": "task-1"},
+        "project.itemEntries.replace": {"itemGid": "task-1", "entries": [{"gid": "entry-2"}]},
+    }
+    script = r"""
+const fs = require('fs');
+const { createExistingCapabilityClient } = require(process.argv[1]);
+const cases = JSON.parse(fs.readFileSync(0, 'utf8'));
+(async () => {
+  const output = {};
+  for (const [operation, args] of Object.entries(cases)) {
+    let firstInvoke;
+    const client = createExistingCapabilityClient(async (path, options) => {
+      if (path.endsWith(':invoke') && !firstInvoke) {
+        firstInvoke = { path, body: JSON.parse(options.body) };
+      }
+      return { success: true, data: { ok: true, data: {} } };
+    });
+    await client.call(operation, args);
+    output[operation] = firstInvoke;
+  }
+  process.stdout.write(JSON.stringify(output));
+})().catch(error => { console.error(error); process.exitCode = 1; });
+"""
+    result = subprocess.run(
+        ["node", "-e", script, str(WEB_ROOT / "web/core/existing_capability_client.js")],
+        input=json.dumps(cases), text=True, capture_output=True, check=True,
+    )
+    return json.loads(result.stdout)
 
 
 def _replace_group(manifest, replacement):
@@ -33,12 +75,36 @@ def test_manifest_accounts_for_all_53_groups_and_80_occurrences() -> None:
     assert len(manifest.groups) == 53
     assert sum(group.occurrence_count for group in manifest.groups) == 80
     assert Counter(group.decision for group in manifest.groups) == {
-        "migrate": 12,
-        "reclassify": 41,
+        "migrate": 11,
+        "reclassify": 42,
     }
     assert sum(
         group.occurrence_count for group in manifest.groups if group.decision == "migrate"
-    ) == 18
+    ) == 16
+
+
+def test_all_migrated_frontend_operation_payloads_pass_production_catalog_validation() -> None:
+    payloads = _frontend_payloads()
+    catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
+    descriptors = {
+        item["id"]: item
+        for item in catalog["capabilities"]
+        if item["major_version"] == 1
+    }
+    failures = {}
+    for operation, request in payloads.items():
+        capability_id = request["path"].removeprefix("/api/v1/capabilities/").removesuffix(":invoke")
+        try:
+            validate_payload(descriptors[capability_id]["input_schema"], request["body"]["payload"])
+        except ValueError as exc:
+            failures[operation] = str(exc)
+
+    assert set(payloads) == {
+        "knowledge.search", "knowledge.get", "knowledge.create", "knowledge.update",
+        "knowledge.delete", "project.task.update", "project.issue.update",
+        "project.itemEntries.get", "project.itemEntries.replace",
+    }
+    assert failures == {}
 
 
 def test_manifest_targets_are_stable_owned_and_decisions_have_evidence() -> None:
@@ -71,7 +137,6 @@ def test_migrated_groups_are_only_the_provider_equivalent_families() -> None:
         ("PUT", "/api/tasks/{dynamic}/entries"),
         ("PUT", "/api/tasks"),
         ("PUT", "/api/issues"),
-        ("PUT", "/api/rules/{dynamic}"),
     }
 
 
@@ -82,7 +147,7 @@ def test_manifest_independently_binds_pinned_baseline_frontend_and_ledger() -> N
     assert manifest.frontend_revision
     migrated = [group for group in manifest.groups if group.decision == "migrate"]
     assert all(group.frontend_operation and group.frontend_call_sites for group in migrated)
-    assert sum(len(group.frontend_call_sites) for group in migrated) == 18
+    assert sum(len(group.frontend_call_sites) for group in migrated) == 16
     reclassified = [group for group in manifest.groups if group.decision == "reclassify"]
     assert all(group.reclassification["legacy_contract"] for group in reclassified)
     assert all(group.reclassification["candidate_contracts"] for group in reclassified)

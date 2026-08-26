@@ -1,6 +1,6 @@
 {
-  "frontend_revision": "4980eb7264fbca95f00e38ee2322783f21c987db",
-  "content_hash": "f6e4c27bb14a489854518422fb862446c4869b468b6bc6014cb039e6bc41ebbb",
+  "frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
+  "content_hash": "c960574d6b4156a9535c20300efad032c5333426c9642232acc45ef8f59abb62",
   "wrapper_contracts_hash": "7467489f3d7eed7d9c0dc4fe53f13103ed137fcb7da89da01062a5d84a1f6e4b",
   "scan_roots": [
     "web",
@@ -27,12 +27,12 @@
     "legacy_registered": 311,
     "bff_registered": 0,
     "operations_excluded": 19,
-    "unresolved": 92
+    "unresolved": 94
   },
   "lexical_audit": {
-    "token_count": 479,
-    "token_hash": "0fbba58b4282c05d46004da39ffb7df8b9aca3b54d89cef1fe580a7ee0f6ab71",
-    "mapped_count": 460,
+    "token_count": 481,
+    "token_hash": "a562cca19dd31b836d77236a80b67938ee46fe9879895d78b249932584e09a36",
+    "mapped_count": 462,
     "reviewed_non_route_count": 19,
     "reviewed_non_route_tokens": [
       "packages/craft-plugin/web/bop_nav/bop_nav.js:12:13:/api/",
@@ -2577,6 +2577,16 @@
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
+      "line": 137,
+      "column": 53,
+      "raw_route": "/api/rules/${gid}",
+      "normalized_route": "/api/rules/{dynamic}",
+      "method": "PUT",
+      "disposition": "unresolved",
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:137:53:PUT:/api/rules/{dynamic}"
+    },
+    {
+      "source": "web/container_card/modes/container_item_detail.js",
       "line": 154,
       "column": 55,
       "raw_route": "/api/tasks",
@@ -2654,6 +2664,16 @@
       "method": "PUT",
       "disposition": "legacy_registered",
       "occurrence_id": "web/container_card/modes/mode_field_detail.js:45:51:PUT:/api/issues/{dynamic}"
+    },
+    {
+      "source": "web/container_card/modes/mode_field_detail.js",
+      "line": 47,
+      "column": 50,
+      "raw_route": "/api/rules/${gid}",
+      "normalized_route": "/api/rules/{dynamic}",
+      "method": "PUT",
+      "disposition": "unresolved",
+      "occurrence_id": "web/container_card/modes/mode_field_detail.js:47:50:PUT:/api/rules/{dynamic}"
     },
     {
       "source": "web/container_card/modes/mode_image_gallery.js",
@@ -2747,13 +2767,13 @@
     },
     {
       "source": "web/core/existing_capability_client.js",
-      "line": 116,
+      "line": 109,
       "column": 27,
       "raw_route": "/api/v1/capabilities/${capabilityId}:${action}",
       "normalized_route": "/api/v1/capabilities/{dynamic}:{dynamic}",
       "method": "POST",
       "disposition": "capability",
-      "occurrence_id": "web/core/existing_capability_client.js:116:27:POST:/api/v1/capabilities/{dynamic}:{dynamic}"
+      "occurrence_id": "web/core/existing_capability_client.js:109:27:POST:/api/v1/capabilities/{dynamic}:{dynamic}"
     },
     {
       "source": "web/core/global_search.js",

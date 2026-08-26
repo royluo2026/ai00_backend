@@ -3,7 +3,7 @@
   "artifact_id": "existing-capability-web-migrations",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "baseline_revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-  "frontend_revision": "4980eb7264fbca95f00e38ee2322783f21c987db",
+  "frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
   "groups": [
     {
       "method": "DELETE",
@@ -827,14 +827,14 @@
           "line": 111,
           "column": 140,
           "operation": "knowledge.get",
-          "source_sha256": "cc45ad6151d455fef4cc5a0c28e3642094ebeab79706de91ca72963e8488b716"
+          "source_sha256": "2707d0dfb871b339c28c587d03adabf464882b2095c62a364b32e77682e6dad9"
         },
         {
           "source_path": "web/container_card/modes/mode_field_detail.js",
           "line": 34,
           "column": 141,
           "operation": "knowledge.get",
-          "source_sha256": "4227ddc414c4e515c2b22e502e3c782e1af2de57de6d38eeb6cc91d05fa041cd"
+          "source_sha256": "f8656483caefc979f5f23be6e2c6ad84c0c053a4c3f0acb7821ffc9516fb790d"
         },
         {
           "source_path": "web/container_card/modes/mode_text_image.js",
@@ -1407,7 +1407,7 @@
         "anchors": []
       },
       "decision": "migrate",
-      "request_transform": "task gid -> {item_type:'task',item_gid}",
+      "request_transform": "task gid -> {arguments:{item_type:'task',item_gid}}",
       "response_transform": "provider entries -> legacy data array",
       "frontend_operation": "project.itemEntries.get",
       "frontend_call_sites": [
@@ -1422,12 +1422,12 @@
       "equivalence_evidence": {
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
-          "source_path": "plugins/project_management/project_management_backend/api/compatibility.py",
-          "source_sha256": "dada959af7b2398472e9315673e322ab2df0e5dde35de6ba3e4ba091951cba87",
-          "start_line": 25,
-          "end_line": 25,
-          "sha256": "c0bc2ba56adf837821b17a8c49f61d281678cd953df7335cb8ede8e1bc13a64a",
-          "needle": "payload.get(\"arguments\""
+          "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
+          "source_sha256": "499025e424e149ca3c5bc4e00b221b9fa90e390958516931ac85a6ba2ddd9c3c",
+          "start_line": 207,
+          "end_line": 207,
+          "sha256": "4b7b8840eb19e82fbe9f1530b1cc5d8d77f475d6f79c9c5eaa3d3cd12a68d2f4",
+          "needle": "payload.get(\"arguments\", payload)"
         }
       },
       "reclassification": null
@@ -2660,7 +2660,7 @@
           "line": 156,
           "column": 140,
           "operation": "knowledge.create",
-          "source_sha256": "cc45ad6151d455fef4cc5a0c28e3642094ebeab79706de91ca72963e8488b716"
+          "source_sha256": "2707d0dfb871b339c28c587d03adabf464882b2095c62a364b32e77682e6dad9"
         }
       ],
       "equivalence_evidence": {
@@ -3320,7 +3320,7 @@
         "anchors": []
       },
       "decision": "migrate",
-      "request_transform": "body gid plus fields -> direct {gid,updates}",
+      "request_transform": "body gid plus fields -> {arguments:{gid,updates}}",
       "response_transform": "provider update projection -> legacy data",
       "frontend_operation": "project.issue.update",
       "frontend_call_sites": [
@@ -3342,12 +3342,12 @@
       "equivalence_evidence": {
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
-          "source_path": "plugins/project_management/project_management_backend/api/compatibility.py",
-          "source_sha256": "dada959af7b2398472e9315673e322ab2df0e5dde35de6ba3e4ba091951cba87",
-          "start_line": 25,
-          "end_line": 25,
-          "sha256": "c0bc2ba56adf837821b17a8c49f61d281678cd953df7335cb8ede8e1bc13a64a",
-          "needle": "payload.get(\"arguments\""
+          "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
+          "source_sha256": "499025e424e149ca3c5bc4e00b221b9fa90e390958516931ac85a6ba2ddd9c3c",
+          "start_line": 207,
+          "end_line": 207,
+          "sha256": "4b7b8840eb19e82fbe9f1530b1cc5d8d77f475d6f79c9c5eaa3d3cd12a68d2f4",
+          "needle": "payload.get(\"arguments\", payload)"
         }
       },
       "reclassification": null
@@ -3453,14 +3453,14 @@
           "line": 136,
           "column": 134,
           "operation": "knowledge.update",
-          "source_sha256": "cc45ad6151d455fef4cc5a0c28e3642094ebeab79706de91ca72963e8488b716"
+          "source_sha256": "2707d0dfb871b339c28c587d03adabf464882b2095c62a364b32e77682e6dad9"
         },
         {
           "source_path": "web/container_card/modes/mode_field_detail.js",
           "line": 46,
           "column": 130,
           "operation": "knowledge.update",
-          "source_sha256": "4227ddc414c4e515c2b22e502e3c782e1af2de57de6d38eeb6cc91d05fa041cd"
+          "source_sha256": "f8656483caefc979f5f23be6e2c6ad84c0c053a4c3f0acb7821ffc9516fb790d"
         }
       ],
       "equivalence_evidence": {
@@ -3514,38 +3514,41 @@
         "route_definition": null,
         "anchors": []
       },
-      "decision": "migrate",
-      "request_transform": "gid plus fields -> {operation:'update',gid,record}",
-      "response_transform": "provider rule projection -> legacy data",
-      "frontend_operation": "craft.rule.update",
-      "frontend_call_sites": [
-        {
-          "source_path": "web/container_card/modes/container_item_detail.js",
-          "line": 137,
-          "column": 129,
-          "operation": "craft.rule.update",
-          "source_sha256": "cc45ad6151d455fef4cc5a0c28e3642094ebeab79706de91ca72963e8488b716"
-        },
-        {
-          "source_path": "web/container_card/modes/mode_field_detail.js",
-          "line": 47,
-          "column": 125,
-          "operation": "craft.rule.update",
-          "source_sha256": "4227ddc414c4e515c2b22e502e3c782e1af2de57de6d38eeb6cc91d05fa041cd"
-        }
-      ],
-      "equivalence_evidence": {
-        "proof_kind": "provider_equivalent_adapter",
-        "provider_contract": {
+      "decision": "reclassify",
+      "request_transform": "not applied: /api/rules/{dynamic}: REST accepts a non-empty update record; the published stable candidate closes record with no allowed properties.",
+      "response_transform": "not applied: /api/rules/{dynamic}: REST returns the updated rule projection; the candidate cannot be invoked with any meaningful update record.",
+      "frontend_operation": null,
+      "frontend_call_sites": [],
+      "equivalence_evidence": null,
+      "reclassification": {
+        "reason_code": "contract_shape_mismatch",
+        "followup": "atomic_capability_review",
+        "finding": "/api/rules/{dynamic}: REST accepts a non-empty update record; the published stable candidate closes record with no allowed properties. | /api/rules/{dynamic}: REST returns the updated rule projection; the candidate cannot be invoked with any meaningful update record. | /api/rules/{dynamic}: REST reaches the rule provider with one of its ten supported fields; the Gateway rejects that same non-empty record before provider execution.",
+        "legacy_contract": {
+          "kind": "reviewed_handler_absence",
           "source_path": "plugins/craft/craft_backend/routers/rules.py",
           "source_sha256": "fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
-          "start_line": 62,
-          "end_line": 62,
-          "sha256": "d1ad2925df4b75dbb5c3a5ba5d6a045f21f6eafa71bc2d8e0b81b30d99dca881",
-          "needle": "\"update\""
+          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
+          "method": "PUT",
+          "normalized_route": "/api/rules/{dynamic}",
+          "finding": "No exact registered route/method definition exists in this reviewed handler family."
+        },
+        "candidate_contracts": [
+          {
+            "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
+            "source_sha256": "da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+            "start_line": 562,
+            "end_line": 562,
+            "sha256": "87996e6eb263b446ffb01e10d1cdbd92be0299705262028f64b237aa97d299d9",
+            "needle": "INPUT_SCHEMAS[(\"craft.rule.library.change.apply\", 1)]"
+          }
+        ],
+        "contract_mismatch": {
+          "input": "/api/rules/{dynamic}: REST accepts a non-empty update record; the published stable candidate closes record with no allowed properties.",
+          "output": "/api/rules/{dynamic}: REST returns the updated rule projection; the candidate cannot be invoked with any meaningful update record.",
+          "side_effects": "/api/rules/{dynamic}: REST reaches the rule provider with one of its ten supported fields; the Gateway rejects that same non-empty record before provider execution."
         }
-      },
-      "reclassification": null
+      }
     },
     {
       "method": "PUT",
@@ -3658,7 +3661,7 @@
         "anchors": []
       },
       "decision": "migrate",
-      "request_transform": "body gid plus fields -> direct {gid,updates}",
+      "request_transform": "body gid plus fields -> {arguments:{gid,updates}}",
       "response_transform": "provider update projection -> legacy data",
       "frontend_operation": "project.task.update",
       "frontend_call_sites": [
@@ -3680,12 +3683,12 @@
       "equivalence_evidence": {
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
-          "source_path": "plugins/project_management/project_management_backend/api/compatibility.py",
-          "source_sha256": "dada959af7b2398472e9315673e322ab2df0e5dde35de6ba3e4ba091951cba87",
-          "start_line": 25,
-          "end_line": 25,
-          "sha256": "c0bc2ba56adf837821b17a8c49f61d281678cd953df7335cb8ede8e1bc13a64a",
-          "needle": "payload.get(\"arguments\""
+          "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
+          "source_sha256": "499025e424e149ca3c5bc4e00b221b9fa90e390958516931ac85a6ba2ddd9c3c",
+          "start_line": 207,
+          "end_line": 207,
+          "sha256": "4b7b8840eb19e82fbe9f1530b1cc5d8d77f475d6f79c9c5eaa3d3cd12a68d2f4",
+          "needle": "payload.get(\"arguments\", payload)"
         }
       },
       "reclassification": null
@@ -3718,7 +3721,7 @@
         "anchors": []
       },
       "decision": "migrate",
-      "request_transform": "task gid and entries -> direct atomic arguments",
+      "request_transform": "task gid and entries -> {arguments:{item_type,item_gid,entries}}",
       "response_transform": "provider replace projection -> legacy data",
       "frontend_operation": "project.itemEntries.replace",
       "frontend_call_sites": [
@@ -3733,12 +3736,12 @@
       "equivalence_evidence": {
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
-          "source_path": "plugins/project_management/project_management_backend/api/compatibility.py",
-          "source_sha256": "dada959af7b2398472e9315673e322ab2df0e5dde35de6ba3e4ba091951cba87",
-          "start_line": 25,
-          "end_line": 25,
-          "sha256": "c0bc2ba56adf837821b17a8c49f61d281678cd953df7335cb8ede8e1bc13a64a",
-          "needle": "payload.get(\"arguments\""
+          "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
+          "source_sha256": "499025e424e149ca3c5bc4e00b221b9fa90e390958516931ac85a6ba2ddd9c3c",
+          "start_line": 207,
+          "end_line": 207,
+          "sha256": "4b7b8840eb19e82fbe9f1530b1cc5d8d77f475d6f79c9c5eaa3d3cd12a68d2f4",
+          "needle": "payload.get(\"arguments\", payload)"
         }
       },
       "reclassification": null

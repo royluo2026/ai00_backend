@@ -58,10 +58,10 @@
     "web/workspace/nav_manager.js": "e229fb407361c139cfc265cd438f929a944cd1919c321c4b6a1cf5bf57cfcd7d"
   },
   "final_evidence": {
-    "frontend_revision": "4980eb7264fbca95f00e38ee2322783f21c987db",
-    "content_hash": "f6e4c27bb14a489854518422fb862446c4869b468b6bc6014cb039e6bc41ebbb",
-    "unresolved_count": 92,
-    "unresolved_group_count": 53
+    "frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
+    "content_hash": "c960574d6b4156a9535c20300efad032c5333426c9642232acc45ef8f59abb62",
+    "unresolved_count": 94,
+    "unresolved_group_count": 54
   },
   "final_unresolved_groups": [
     {
@@ -378,6 +378,12 @@
     },
     {
       "method": "PUT",
+      "normalized_route": "/api/rules/{dynamic}",
+      "occurrence_count": 2,
+      "disposition": "existing_capability_reclassified"
+    },
+    {
+      "method": "PUT",
       "normalized_route": "/api/self_ann/{dynamic}",
       "occurrence_count": 1,
       "disposition": "existing_capability_reclassified"
@@ -421,7 +427,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "4980eb7264fbca95f00e38ee2322783f21c987db",
+        "removed_in_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -1000,7 +1006,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "4980eb7264fbca95f00e38ee2322783f21c987db",
+        "removed_in_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
         "retirement_proof": {
           "kind": "http_410",
           "rationale": "The registered AI balance compatibility endpoint is permanently gone and returns HTTP 410, so polling it cannot yield a supported outcome.",
@@ -1069,7 +1075,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "4980eb7264fbca95f00e38ee2322783f21c987db",
+        "removed_in_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -1131,7 +1137,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "4980eb7264fbca95f00e38ee2322783f21c987db",
+        "removed_in_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -1193,7 +1199,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "4980eb7264fbca95f00e38ee2322783f21c987db",
+        "removed_in_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -1266,7 +1272,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "4980eb7264fbca95f00e38ee2322783f21c987db",
+        "removed_in_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -1340,7 +1346,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "4980eb7264fbca95f00e38ee2322783f21c987db",
+        "removed_in_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -1413,7 +1419,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "4980eb7264fbca95f00e38ee2322783f21c987db",
+        "removed_in_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -2010,7 +2016,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "4980eb7264fbca95f00e38ee2322783f21c987db",
+        "removed_in_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
         "retirement_proof": {
           "kind": "backend_route_absent",
           "rationale": "The standalone Feishu UI had no matching API-prefixed configuration handler; it now uses a bounded local default configuration.",
@@ -2277,7 +2283,7 @@
           "method": "GET",
           "disposition": "unresolved",
           "occurrence_id": "web/container_card/modes/container_item_detail.js:111:64:GET:/api/knowledges/{dynamic}",
-          "source_sha256": "de7b856440c81cc34bdf158e98386d085638543ab2375a2a520360833c4f2e13"
+          "source_sha256": "80d6527fda0872ecb118a8a06cb11066956feed460b190f257e6b6a3016d530a"
         },
         {
           "source": "web/container_card/modes/mode_field_detail.js",
@@ -2288,7 +2294,7 @@
           "method": "GET",
           "disposition": "unresolved",
           "occurrence_id": "web/container_card/modes/mode_field_detail.js:34:66:GET:/api/knowledges/{dynamic}",
-          "source_sha256": "9071abd133c291ef105d11964e5e5287021b12078b8544434ded2228d135f9cc"
+          "source_sha256": "1751d2f01f071191219fd19cdb59b477f96abd93725905398d9d8a6ddfcc3c99"
         },
         {
           "source": "web/container_card/modes/mode_text_image.js",
@@ -2552,7 +2558,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "4980eb7264fbca95f00e38ee2322783f21c987db",
+        "removed_in_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
         "retirement_proof": {
           "kind": "sample_template_only",
           "rationale": "The only caller lived in the distributable plugin SDK template and represented placeholder sample data rather than a shipped product route.",
@@ -3186,17 +3192,17 @@
       "disposition_details": {
         "target_capability": "project.list.read.atomic.item_entries_get@1",
         "provider_equivalence": "proven",
-        "request_transform": "task gid -> {item_type:'task',item_gid}",
+        "request_transform": "task gid -> {arguments:{item_type:'task',item_gid}}",
         "response_transform": "provider entries -> legacy data array",
         "equivalence_evidence": {
           "proof_kind": "provider_equivalent_adapter",
           "provider_contract": {
-            "source_path": "plugins/project_management/project_management_backend/api/compatibility.py",
-            "source_sha256": "dada959af7b2398472e9315673e322ab2df0e5dde35de6ba3e4ba091951cba87",
-            "start_line": 25,
-            "end_line": 25,
-            "sha256": "c0bc2ba56adf837821b17a8c49f61d281678cd953df7335cb8ede8e1bc13a64a",
-            "needle": "payload.get(\"arguments\""
+            "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
+            "source_sha256": "499025e424e149ca3c5bc4e00b221b9fa90e390958516931ac85a6ba2ddd9c3c",
+            "start_line": 207,
+            "end_line": 207,
+            "sha256": "4b7b8840eb19e82fbe9f1530b1cc5d8d77f475d6f79c9c5eaa3d3cd12a68d2f4",
+            "needle": "payload.get(\"arguments\", payload)"
           }
         }
       }
@@ -4538,7 +4544,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "4980eb7264fbca95f00e38ee2322783f21c987db",
+        "removed_in_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4600,7 +4606,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "4980eb7264fbca95f00e38ee2322783f21c987db",
+        "removed_in_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4662,7 +4668,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "4980eb7264fbca95f00e38ee2322783f21c987db",
+        "removed_in_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4724,7 +4730,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "4980eb7264fbca95f00e38ee2322783f21c987db",
+        "removed_in_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4786,7 +4792,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "4980eb7264fbca95f00e38ee2322783f21c987db",
+        "removed_in_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -5335,7 +5341,7 @@
           "method": "POST",
           "disposition": "unresolved",
           "occurrence_id": "web/container_card/modes/container_item_detail.js:156:65:POST:/api/knowledges",
-          "source_sha256": "de7b856440c81cc34bdf158e98386d085638543ab2375a2a520360833c4f2e13"
+          "source_sha256": "80d6527fda0872ecb118a8a06cb11066956feed460b190f257e6b6a3016d530a"
         }
       ],
       "owner_domain": "knowledge",
@@ -5403,7 +5409,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "4980eb7264fbca95f00e38ee2322783f21c987db",
+        "removed_in_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
         "retirement_proof": {
           "kind": "sample_template_only",
           "rationale": "The only caller lived in the distributable plugin SDK template and represented placeholder sample data rather than a shipped product route.",
@@ -5946,7 +5952,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "4980eb7264fbca95f00e38ee2322783f21c987db",
+        "removed_in_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
         "retirement_proof": {
           "kind": "http_410",
           "rationale": "The registered V1 standard-operation clone compatibility endpoint raises HTTP 410 and instructs callers to use the current BOP entry surface.",
@@ -6258,17 +6264,17 @@
       "disposition_details": {
         "target_capability": "project.issue.change.apply.atomic.issues_update@1",
         "provider_equivalence": "proven",
-        "request_transform": "body gid plus fields -> direct {gid,updates}",
+        "request_transform": "body gid plus fields -> {arguments:{gid,updates}}",
         "response_transform": "provider update projection -> legacy data",
         "equivalence_evidence": {
           "proof_kind": "provider_equivalent_adapter",
           "provider_contract": {
-            "source_path": "plugins/project_management/project_management_backend/api/compatibility.py",
-            "source_sha256": "dada959af7b2398472e9315673e322ab2df0e5dde35de6ba3e4ba091951cba87",
-            "start_line": 25,
-            "end_line": 25,
-            "sha256": "c0bc2ba56adf837821b17a8c49f61d281678cd953df7335cb8ede8e1bc13a64a",
-            "needle": "payload.get(\"arguments\""
+            "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
+            "source_sha256": "499025e424e149ca3c5bc4e00b221b9fa90e390958516931ac85a6ba2ddd9c3c",
+            "start_line": 207,
+            "end_line": 207,
+            "sha256": "4b7b8840eb19e82fbe9f1530b1cc5d8d77f475d6f79c9c5eaa3d3cd12a68d2f4",
+            "needle": "payload.get(\"arguments\", payload)"
           }
         }
       }
@@ -6334,7 +6340,7 @@
           "method": "PUT",
           "disposition": "unresolved",
           "occurrence_id": "web/container_card/modes/container_item_detail.js:136:58:PUT:/api/knowledges/{dynamic}",
-          "source_sha256": "de7b856440c81cc34bdf158e98386d085638543ab2375a2a520360833c4f2e13"
+          "source_sha256": "80d6527fda0872ecb118a8a06cb11066956feed460b190f257e6b6a3016d530a"
         },
         {
           "source": "web/container_card/modes/mode_field_detail.js",
@@ -6345,7 +6351,7 @@
           "method": "PUT",
           "disposition": "unresolved",
           "occurrence_id": "web/container_card/modes/mode_field_detail.js:46:55:PUT:/api/knowledges/{dynamic}",
-          "source_sha256": "9071abd133c291ef105d11964e5e5287021b12078b8544434ded2228d135f9cc"
+          "source_sha256": "1751d2f01f071191219fd19cdb59b477f96abd93725905398d9d8a6ddfcc3c99"
         }
       ],
       "owner_domain": "knowledge",
@@ -6391,7 +6397,7 @@
           "method": "PUT",
           "disposition": "unresolved",
           "occurrence_id": "web/container_card/modes/container_item_detail.js:137:53:PUT:/api/rules/{dynamic}",
-          "source_sha256": "de7b856440c81cc34bdf158e98386d085638543ab2375a2a520360833c4f2e13"
+          "source_sha256": "80d6527fda0872ecb118a8a06cb11066956feed460b190f257e6b6a3016d530a"
         },
         {
           "source": "web/container_card/modes/mode_field_detail.js",
@@ -6402,7 +6408,7 @@
           "method": "PUT",
           "disposition": "unresolved",
           "occurrence_id": "web/container_card/modes/mode_field_detail.js:47:50:PUT:/api/rules/{dynamic}",
-          "source_sha256": "9071abd133c291ef105d11964e5e5287021b12078b8544434ded2228d135f9cc"
+          "source_sha256": "1751d2f01f071191219fd19cdb59b477f96abd93725905398d9d8a6ddfcc3c99"
         }
       ],
       "owner_domain": "craft",
@@ -6413,23 +6419,36 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "The frontend now invokes the exact stable target through the shared Gateway adapter using provider-equivalent request and response transformations.",
-      "disposition": "existing_capability_migrated",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "craft.rule.library.change.apply@1",
-        "provider_equivalence": "proven",
-        "request_transform": "gid plus fields -> {operation:'update',gid,record}",
-        "response_transform": "provider rule projection -> legacy data",
-        "equivalence_evidence": {
-          "proof_kind": "provider_equivalent_adapter",
-          "provider_contract": {
-            "source_path": "plugins/craft/craft_backend/routers/rules.py",
-            "source_sha256": "fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
-            "start_line": 62,
-            "end_line": 62,
-            "sha256": "d1ad2925df4b75dbb5c3a5ba5d6a045f21f6eafa71bc2d8e0b81b30d99dca881",
-            "needle": "\"update\""
+        "candidate_target_capability": "craft.rule.library.change.apply@1",
+        "reason_code": "contract_shape_mismatch",
+        "followup": "atomic_capability_review",
+        "finding": "/api/rules/{dynamic}: REST accepts a non-empty update record; the published stable candidate closes record with no allowed properties. | /api/rules/{dynamic}: REST returns the updated rule projection; the candidate cannot be invoked with any meaningful update record. | /api/rules/{dynamic}: REST reaches the rule provider with one of its ten supported fields; the Gateway rejects that same non-empty record before provider execution.",
+        "legacy_contract": {
+          "kind": "reviewed_handler_absence",
+          "source_path": "plugins/craft/craft_backend/routers/rules.py",
+          "source_sha256": "fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
+          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
+          "method": "PUT",
+          "normalized_route": "/api/rules/{dynamic}",
+          "finding": "No exact registered route/method definition exists in this reviewed handler family."
+        },
+        "candidate_contracts": [
+          {
+            "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
+            "source_sha256": "da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+            "start_line": 562,
+            "end_line": 562,
+            "sha256": "87996e6eb263b446ffb01e10d1cdbd92be0299705262028f64b237aa97d299d9",
+            "needle": "INPUT_SCHEMAS[(\"craft.rule.library.change.apply\", 1)]"
           }
+        ],
+        "contract_mismatch": {
+          "input": "/api/rules/{dynamic}: REST accepts a non-empty update record; the published stable candidate closes record with no allowed properties.",
+          "output": "/api/rules/{dynamic}: REST returns the updated rule projection; the candidate cannot be invoked with any meaningful update record.",
+          "side_effects": "/api/rules/{dynamic}: REST reaches the rule provider with one of its ten supported fields; the Gateway rejects that same non-empty record before provider execution."
         }
       }
     },
@@ -6543,17 +6562,17 @@
       "disposition_details": {
         "target_capability": "project.task.change.apply.atomic.tasks_update@1",
         "provider_equivalence": "proven",
-        "request_transform": "body gid plus fields -> direct {gid,updates}",
+        "request_transform": "body gid plus fields -> {arguments:{gid,updates}}",
         "response_transform": "provider update projection -> legacy data",
         "equivalence_evidence": {
           "proof_kind": "provider_equivalent_adapter",
           "provider_contract": {
-            "source_path": "plugins/project_management/project_management_backend/api/compatibility.py",
-            "source_sha256": "dada959af7b2398472e9315673e322ab2df0e5dde35de6ba3e4ba091951cba87",
-            "start_line": 25,
-            "end_line": 25,
-            "sha256": "c0bc2ba56adf837821b17a8c49f61d281678cd953df7335cb8ede8e1bc13a64a",
-            "needle": "payload.get(\"arguments\""
+            "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
+            "source_sha256": "499025e424e149ca3c5bc4e00b221b9fa90e390958516931ac85a6ba2ddd9c3c",
+            "start_line": 207,
+            "end_line": 207,
+            "sha256": "4b7b8840eb19e82fbe9f1530b1cc5d8d77f475d6f79c9c5eaa3d3cd12a68d2f4",
+            "needle": "payload.get(\"arguments\", payload)"
           }
         }
       }
@@ -6589,17 +6608,17 @@
       "disposition_details": {
         "target_capability": "project.list.change.apply.atomic.item_entries_replace@1",
         "provider_equivalence": "proven",
-        "request_transform": "task gid and entries -> direct atomic arguments",
+        "request_transform": "task gid and entries -> {arguments:{item_type,item_gid,entries}}",
         "response_transform": "provider replace projection -> legacy data",
         "equivalence_evidence": {
           "proof_kind": "provider_equivalent_adapter",
           "provider_contract": {
-            "source_path": "plugins/project_management/project_management_backend/api/compatibility.py",
-            "source_sha256": "dada959af7b2398472e9315673e322ab2df0e5dde35de6ba3e4ba091951cba87",
-            "start_line": 25,
-            "end_line": 25,
-            "sha256": "c0bc2ba56adf837821b17a8c49f61d281678cd953df7335cb8ede8e1bc13a64a",
-            "needle": "payload.get(\"arguments\""
+            "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
+            "source_sha256": "499025e424e149ca3c5bc4e00b221b9fa90e390958516931ac85a6ba2ddd9c3c",
+            "start_line": 207,
+            "end_line": 207,
+            "sha256": "4b7b8840eb19e82fbe9f1530b1cc5d8d77f475d6f79c9c5eaa3d3cd12a68d2f4",
+            "needle": "payload.get(\"arguments\", payload)"
           }
         }
       }
