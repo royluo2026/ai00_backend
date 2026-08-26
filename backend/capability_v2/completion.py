@@ -24,9 +24,12 @@ from .consumer_routes import (
 from .atomicity import load_atomicity_dispositions
 from .catalog_targets import CatalogTargetIndex
 from .route_inventory import (
+    LegacyRouteBaselineConfigurationError,
     LegacyRouteProofConfigurationError,
+    audit_legacy_route_baseline,
     audit_legacy_route_proofs,
     audit_route_inventory,
+    load_legacy_route_baseline,
     load_route_inventory,
 )
 
@@ -632,6 +635,29 @@ def _route_inventory_failures(root: Path, configuration: dict) -> list[str]:
             f"{field}:{issue}" for issue in audit_route_inventory(inventory, catalog_index=catalog_index)
         )
     if legacy_inventory is not None:
+        baseline = None
+        baseline_relative = configuration.get("legacy_route_baseline_artifact")
+        if baseline_relative is None:
+            failures.append("legacy_route_baseline_artifact_unconfigured:1")
+        elif not isinstance(baseline_relative, str) or not baseline_relative:
+            raise CompletionConfigurationError(
+                "legacy_route_baseline_artifact must be a repository-relative path"
+            )
+        else:
+            baseline_path = _relative_path(
+                root, baseline_relative, field="legacy_route_baseline_artifact"
+            )
+            if not baseline_path.is_file():
+                failures.append("legacy_route_baseline_artifact_missing:1")
+            else:
+                try:
+                    baseline = load_legacy_route_baseline(baseline_path)
+                    baseline_issues = audit_legacy_route_baseline(baseline)
+                    failures.extend(baseline_issues)
+                    if baseline_issues:
+                        baseline = None
+                except LegacyRouteBaselineConfigurationError:
+                    failures.append("legacy_route_baseline_artifact_invalid:1")
         proof_relative = configuration.get("web_legacy_route_proof_artifact")
         if proof_relative is None:
             failures.append("legacy_route_proof_artifact_unconfigured:1")
@@ -645,12 +671,13 @@ def _route_inventory_failures(root: Path, configuration: dict) -> list[str]:
             )
             if not proof_path.is_file():
                 failures.append("legacy_route_proof_artifact_missing:1")
-            else:
+            elif baseline is not None:
                 try:
                     failures.extend(
                         audit_legacy_route_proofs(
                             root,
                             legacy_inventory,
+                            baseline,
                             proof_path,
                             catalog_index=catalog_index,
                             replacements=replacement_sets,

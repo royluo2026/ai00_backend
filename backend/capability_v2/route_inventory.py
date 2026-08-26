@@ -11,6 +11,15 @@ from pathlib import Path, PurePosixPath
 from typing import Any, Mapping
 
 from .catalog_targets import CatalogTargetIndex, TargetResolution
+from .consumer_routes import normalize_route
+
+
+LEGACY_ROUTE_BASELINE_COMMIT = "565b00a0fdd13ea7d163d6b0ec0e9cb9bf05d924"
+LEGACY_ROUTE_BASELINE_SOURCE = "docs/governance/legacy_route_inventory.json"
+LEGACY_ROUTE_BASELINE_KEY_COUNT = 223
+LEGACY_ROUTE_BASELINE_KEYS_SHA256 = (
+    "5fb96dafb709888877589ae8e54e68415d87fca837d55cf1a3ea0e2a28f92b04"
+)
 
 
 class RouteInventoryConfigurationError(ValueError):
@@ -19,6 +28,23 @@ class RouteInventoryConfigurationError(ValueError):
 
 class LegacyRouteProofConfigurationError(ValueError):
     """Raised when the governed Legacy proof artifact is malformed."""
+
+
+class LegacyRouteBaselineConfigurationError(ValueError):
+    """Raised when the immutable Legacy baseline artifact is malformed."""
+
+
+@dataclass(frozen=True)
+class LegacyRouteBaseline:
+    source_commit: str
+    source_artifact: str
+    key_count: int
+    keys_sha256: str
+    keys: tuple[tuple[str, str], ...]
+
+    @property
+    def key_set(self) -> frozenset[tuple[str, str]]:
+        return frozenset(self.keys)
 
 
 @dataclass(frozen=True)
@@ -75,6 +101,147 @@ def _load(path: Path) -> Mapping[str, Any]:
     if not isinstance(document, dict) or not isinstance(document.get("entries"), list):
         raise RouteInventoryConfigurationError("route inventory entries must be an array")
     return document
+
+
+def _baseline_keys_sha256(keys: tuple[tuple[str, str], ...]) -> str:
+    payload = json.dumps(
+        [
+            {"method": method, "normalized_route": route}
+            for method, route in keys
+        ],
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ) + "\n"
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def build_legacy_route_baseline(document: Mapping[str, Any]) -> dict[str, Any]:
+    """Build canonical keys from the immutable inventory loaded by the caller."""
+
+    entries = document.get("entries")
+    if not isinstance(entries, list):
+        raise LegacyRouteBaselineConfigurationError(
+            "immutable Legacy inventory entries must be an array"
+        )
+    keys: set[tuple[str, str]] = set()
+    for raw in entries:
+        if not isinstance(raw, Mapping):
+            raise LegacyRouteBaselineConfigurationError(
+                "immutable Legacy inventory entry must be an object"
+            )
+        method = raw.get("method")
+        route = raw.get("route_path")
+        if (
+            not isinstance(method, str)
+            or not method
+            or not isinstance(route, str)
+            or not route.startswith("/api/")
+        ):
+            raise LegacyRouteBaselineConfigurationError(
+                "immutable Legacy inventory route key is invalid"
+            )
+        keys.add((method.upper(), normalize_route(route)))
+    ordered = tuple(sorted(keys))
+    return {
+        "schema_version": 1,
+        "source_commit": LEGACY_ROUTE_BASELINE_COMMIT,
+        "source_artifact": LEGACY_ROUTE_BASELINE_SOURCE,
+        "key_count": len(ordered),
+        "keys_sha256": _baseline_keys_sha256(ordered),
+        "keys": [
+            {"method": method, "normalized_route": route}
+            for method, route in ordered
+        ],
+    }
+
+
+def load_legacy_route_baseline(path: Path) -> LegacyRouteBaseline:
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise LegacyRouteBaselineConfigurationError(
+            f"invalid immutable Legacy baseline: {path}"
+        ) from exc
+    required = {
+        "schema_version",
+        "source_commit",
+        "source_artifact",
+        "key_count",
+        "keys_sha256",
+        "keys",
+    }
+    if not isinstance(document, dict) or set(document) != required:
+        raise LegacyRouteBaselineConfigurationError(
+            "invalid immutable Legacy baseline fields"
+        )
+    raw_keys = document.get("keys")
+    if document.get("schema_version") != 1 or not isinstance(raw_keys, list):
+        raise LegacyRouteBaselineConfigurationError(
+            "invalid immutable Legacy baseline schema"
+        )
+    keys: list[tuple[str, str]] = []
+    for raw in raw_keys:
+        if not isinstance(raw, dict) or set(raw) != {"method", "normalized_route"}:
+            raise LegacyRouteBaselineConfigurationError(
+                "invalid immutable Legacy baseline key"
+            )
+        method = raw.get("method")
+        route = raw.get("normalized_route")
+        if (
+            not isinstance(method, str)
+            or method != method.upper()
+            or not isinstance(route, str)
+            or not route.startswith("/api/")
+            or normalize_route(route) != route
+        ):
+            raise LegacyRouteBaselineConfigurationError(
+                "invalid immutable Legacy baseline key"
+            )
+        keys.append((method, route))
+    source_commit = document.get("source_commit")
+    source_artifact = document.get("source_artifact")
+    key_count = document.get("key_count")
+    keys_sha256 = document.get("keys_sha256")
+    if (
+        not isinstance(source_commit, str)
+        or not isinstance(source_artifact, str)
+        or not isinstance(key_count, int)
+        or isinstance(key_count, bool)
+        or not isinstance(keys_sha256, str)
+    ):
+        raise LegacyRouteBaselineConfigurationError(
+            "invalid immutable Legacy baseline metadata"
+        )
+    return LegacyRouteBaseline(
+        source_commit=source_commit,
+        source_artifact=source_artifact,
+        key_count=key_count,
+        keys_sha256=keys_sha256,
+        keys=tuple(keys),
+    )
+
+
+def audit_legacy_route_baseline(baseline: LegacyRouteBaseline) -> tuple[str, ...]:
+    issues: list[str] = []
+    if baseline.source_commit != LEGACY_ROUTE_BASELINE_COMMIT:
+        issues.append("legacy_route_baseline_commit_mismatch:1")
+    if baseline.source_artifact != LEGACY_ROUTE_BASELINE_SOURCE:
+        issues.append("legacy_route_baseline_source_mismatch:1")
+    canonical = tuple(sorted(set(baseline.keys)))
+    if canonical != baseline.keys:
+        issues.append("legacy_route_baseline_keys_noncanonical:1")
+    if (
+        baseline.key_count != len(baseline.keys)
+        or len(canonical) != LEGACY_ROUTE_BASELINE_KEY_COUNT
+    ):
+        issues.append("legacy_route_baseline_key_count_mismatch:1")
+    if (
+        baseline.keys_sha256 != _baseline_keys_sha256(canonical)
+        or baseline.keys_sha256 != LEGACY_ROUTE_BASELINE_KEYS_SHA256
+    ):
+        issues.append("legacy_route_baseline_hash_mismatch:1")
+    return tuple(sorted(issues))
 
 
 def load_route_inventory(path: Path) -> RouteInventory:
@@ -344,6 +511,7 @@ def _valid_retained_proof_evidence(
 def audit_legacy_route_proofs(
     root: Path,
     inventory: RouteInventory,
+    baseline: LegacyRouteBaseline,
     proof_path: Path,
     *,
     catalog_index: CatalogTargetIndex,
@@ -409,7 +577,7 @@ def audit_legacy_route_proofs(
             if scope == "original_109":
                 original_removed += 1
             continue
-        key = method, route
+        key = method, normalize_route(route)
         active.setdefault(key, []).append(raw)
         if scope == "original_109":
             original_retained += 1
@@ -442,15 +610,21 @@ def audit_legacy_route_proofs(
     if duplicates:
         issues.append(f"legacy_route_proof_duplicate:{duplicates}")
     active_once = {key: values[0] for key, values in active.items() if len(values) == 1}
-    provenance_prefix = f"{artifact_id}/"
-    marked = {
-        (entry.method, entry.route_path): entry
-        for entry in inventory.entries
-        if isinstance(entry.evidence_provenance, str)
-        and entry.evidence_provenance.startswith(provenance_prefix)
-    }
-    missing = set(marked) - set(active_once)
-    orphaned = set(active_once) - set(marked)
+    current: dict[tuple[str, str], RouteInventoryEntry] = {}
+    inventory_duplicates = 0
+    for inventory_entry in inventory.entries:
+        key = (inventory_entry.method, normalize_route(inventory_entry.route_path))
+        if key in current:
+            inventory_duplicates += 1
+        else:
+            current[key] = inventory_entry
+    if inventory_duplicates:
+        issues.append(
+            f"legacy_route_proof_inventory_duplicate:{inventory_duplicates}"
+        )
+    proof_scope = set(current) - baseline.key_set
+    missing = proof_scope - set(active_once)
+    orphaned = set(active_once) - proof_scope
     if missing:
         issues.append(f"legacy_route_proof_missing:{len(missing)}")
     if orphaned:
@@ -459,8 +633,8 @@ def audit_legacy_route_proofs(
     anchor_invalid = 0
     target_mismatch = 0
     lifecycle_failures: Counter[str] = Counter()
-    for key in sorted(set(marked) & set(active_once)):
-        inventory_entry = marked[key]
+    for key in sorted(proof_scope & set(active_once)):
+        inventory_entry = current[key]
         proof = active_once[key]
         expected_provenance = f"{artifact_id}/{proof['scope']}"
         if (
@@ -492,12 +666,21 @@ def audit_legacy_route_proofs(
 
 
 __all__ = [
+    "LEGACY_ROUTE_BASELINE_COMMIT",
+    "LEGACY_ROUTE_BASELINE_KEY_COUNT",
+    "LEGACY_ROUTE_BASELINE_KEYS_SHA256",
+    "LEGACY_ROUTE_BASELINE_SOURCE",
+    "LegacyRouteBaseline",
+    "LegacyRouteBaselineConfigurationError",
     "LegacyRouteProofConfigurationError",
     "RouteInventory",
     "RouteInventoryConfigurationError",
     "RouteInventoryEntry",
     "RouteInventoryTargetFailure",
+    "audit_legacy_route_baseline",
     "audit_route_inventory",
     "audit_legacy_route_proofs",
+    "build_legacy_route_baseline",
+    "load_legacy_route_baseline",
     "load_route_inventory",
 ]

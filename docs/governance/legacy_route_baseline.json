@@ -1,0 +1,901 @@
+{
+  "schema_version": 1,
+  "source_commit": "565b00a0fdd13ea7d163d6b0ec0e9cb9bf05d924",
+  "source_artifact": "docs/governance/legacy_route_inventory.json",
+  "key_count": 223,
+  "keys_sha256": "5fb96dafb709888877589ae8e54e68415d87fca837d55cf1a3ea0e2a28f92b04",
+  "keys": [
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/bop/entries/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/bop/entry-links/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/bop/factories/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/bop/factory_sections/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/bop/factory_stations/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/bop/fork-presets/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/bop/layout_templates/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/bop/operations/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/bop/posts/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/bop/resources/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/bop/staging/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/bop/steps/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/bop/version-families/{dynamic}/archive"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/factory/equipments/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/factory/fixtures/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/factory/sections/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/factory/stations/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/factory/tools/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/flows/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/gbop/entries/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/gbop/entry-links/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/gbop/operations/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/gbop/processes/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/gbop/version-families/{dynamic}/archive"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/ontology/axioms/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/ontology/classes/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/ontology/properties/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/ontology/relations/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/projects/vehicle_models/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/projects/{dynamic}"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/projects/{dynamic}/members/{dynamic}"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/entity-detail"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/entries/search"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/entries/{dynamic}"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/entries/{dynamic}/history"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/entry-links"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/factories"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/factories/{dynamic}"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/factories/{dynamic}/layout_templates"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/factories/{dynamic}/sections"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/factory_sections/{dynamic}/stations"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/fork-presets"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/fork-presets/{dynamic}"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/layout_templates/{dynamic}"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/operations/{dynamic}/drift-check"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/operations/{dynamic}/resources"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/pbom-snapshots"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/pbom-versions"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/pbom-versions/{dynamic}/gbop-match-preview"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/pbom/search"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}/alt-hier"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}/auto-link-preview"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}/bop-tree"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}/canvas"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}/entries"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}/history"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}/layout-config"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}/lifecycle"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}/lifecycle/history"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}/lifecycle/lines/{dynamic}/checkpoints"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}/lifecycle/lines/{dynamic}/history"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}/lifecycle/lines/{dynamic}/operation-log"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}/line-op-catia-parts"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}/line-operations"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}/link-summary"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}/linked-parts"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}/pbom"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}/pbom-change-point"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}/pbom-diff-queue"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}/pbom-link-stats"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}/staging"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/bop/versions/{dynamic}/station-part-map"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/factory/equipments"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/factory/fixtures"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/factory/sections"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/factory/stations"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/factory/tools"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/flows"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/flows/runs"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/flows/runs/{dynamic}"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/flows/{dynamic}"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/gbop/bop-versions/{dynamic}/station-autolink-preview"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/gbop/entries/{dynamic}/links"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/gbop/pbom-versions/{dynamic}/gbop-nav-link-summary"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/gbop/pbom-versions/{dynamic}/process-hierarchy"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/gbop/pbom-versions/{dynamic}/vpps-auto-link-status"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/gbop/versions"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/gbop/versions/{dynamic}/entries"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/gbop/versions/{dynamic}/operations"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/gbop/versions/{dynamic}/processes"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/ontology/classes"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/ontology/classes/{dynamic}/axioms"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/ontology/classes/{dynamic}/full"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/ontology/graph"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/ontology/schema/{dynamic}"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/projects/vehicle_models"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/projects/{dynamic}"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/projects/{dynamic}/bop-lines"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/projects/{dynamic}/members"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/simulation/environments"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/simulation/environments/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/bop/entity-detail"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/bop/entries/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/bop/factories/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/bop/factory_sections/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/bop/factory_stations/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/bop/fork-presets/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/bop/layout_templates/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/bop/operations/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/bop/pbom-diff-queue/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/bop/posts/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/bop/staging/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/bop/steps/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/bop/versions/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/bop/versions/{dynamic}/lifecycle/init-state"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/bop/versions/{dynamic}/pbom-match"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/bop/versions/{dynamic}/vehicle-ops-stats"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/factory/equipments/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/factory/fixtures/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/factory/sections/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/factory/stations/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/factory/tools/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/gbop/entries/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/gbop/operations/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/gbop/processes/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/gbop/versions/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/ontology/classes/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/ontology/properties/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/ontology/relations/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/projects/vehicle_models/{dynamic}"
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/projects/{dynamic}"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/entries"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/entries/{dynamic}/demote"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/entries/{dynamic}/history/{dynamic}/rollback"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/entry-links"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/factories"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/factories/{dynamic}/layout_templates"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/factories/{dynamic}/sections"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/factory_sections/{dynamic}/stations"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/fork-presets"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/layout_templates/{dynamic}/apply"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/operations/{dynamic}/reset-fields"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/operations/{dynamic}/resources"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/operations/{dynamic}/steps"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/pbom-versions/{dynamic}/gbop-match-confirm"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/posts/{dynamic}/operations"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/resolve-gids"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/staging/{dynamic}/promote"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/version-families/{dynamic}/archive"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/auto-link"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/copy-from-gbop/{dynamic}"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/copy-from/{dynamic}"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/fork"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/freeze"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/freeze-snapshot"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/gbop-auto-link"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/import-tc"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/lifecycle/confirm-phase"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/lifecycle/lines/{dynamic}/checkpoints"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/lifecycle/lines/{dynamic}/redo"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/lifecycle/lines/{dynamic}/rollback/{dynamic}"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/lifecycle/lines/{dynamic}/undo"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/lifecycle/refresh-stats"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/lifecycle/undo-step"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/pbom-diff-queue"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/posts"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/promote"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/publish"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/purge-entries"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/save-as-template"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/smart-fork"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/stage-advance"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/staging"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/unfreeze"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/bop/versions/{dynamic}/update-from/{dynamic}"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/factory/equipments"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/factory/equipments/{dynamic}/maintenance"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/factory/equipments/{dynamic}/return"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/factory/equipments/{dynamic}/scrap"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/factory/fixtures"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/factory/fixtures/{dynamic}/maintenance"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/factory/fixtures/{dynamic}/return"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/factory/fixtures/{dynamic}/scrap"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/factory/sections"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/factory/stations"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/factory/tools"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/factory/tools/{dynamic}/maintenance"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/factory/tools/{dynamic}/return"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/factory/tools/{dynamic}/scrap"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/flows"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/flows/gen-script"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/flows/runs/{dynamic}/step"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/flows/{dynamic}/run"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/gbop/bop-versions/{dynamic}/station-autolink"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/gbop/bop-versions/{dynamic}/station-autolink-undo"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/gbop/entries"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/gbop/entry-links"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/gbop/operations"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/gbop/pbom-versions/{dynamic}/vpps-auto-link"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/gbop/pbom-versions/{dynamic}/vpps-auto-link-confirm"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/gbop/processes"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/gbop/version-families/{dynamic}/archive"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/gbop/versions"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/gbop/versions/{dynamic}/fork"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/gbop/versions/{dynamic}/freeze"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/gbop/versions/{dynamic}/import-entries"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/gbop/versions/{dynamic}/import-tc-excel"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/gbop/versions/{dynamic}/import-vpps-parts"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/ontology/axioms"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/ontology/classes"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/ontology/properties"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/ontology/relations"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/projects"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/projects/vehicle_models"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/projects/{dynamic}/members"
+    },
+    {
+      "method": "POST",
+      "normalized_route": "/api/simulation/environments"
+    },
+    {
+      "method": "PUT",
+      "normalized_route": "/api/bop/versions/{dynamic}/layout-config"
+    },
+    {
+      "method": "PUT",
+      "normalized_route": "/api/flows/{dynamic}"
+    },
+    {
+      "method": "PUT",
+      "normalized_route": "/api/projects/{dynamic}/line-assignment"
+    }
+  ]
+}

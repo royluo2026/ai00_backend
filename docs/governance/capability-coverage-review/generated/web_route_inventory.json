@@ -1,7 +1,7 @@
 {
   "frontend_revision": "dd67726d4881ec56eb8bb1df88b3c6e938166fa9",
   "content_hash": "4ff63012ef42c69f1bfde891ba0dfa096a0708cf7c332a5844f3a554d517794c",
-  "wrapper_contracts_hash": "92683f26e54d6eb1f6d8de0f71a33aba1f765595fd1cbfe02e83e8a015f39a60",
+  "wrapper_contracts_hash": "8c2a0bfec9e2cc3034054951425db869464e32d7ef10199eb421178eb674ac1d",
   "scan_roots": [
     "web",
     "packages"

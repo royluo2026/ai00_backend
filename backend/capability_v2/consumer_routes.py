@@ -26,6 +26,16 @@ class SourceAnchor:
 
 
 @dataclass(frozen=True)
+class RouteOccurrenceAnchor:
+    source_path: str
+    line: int
+    column: int
+    raw_route: str
+    normalized_route: str
+    source_sha256: str
+
+
+@dataclass(frozen=True)
 class WrapperSignature:
     route_argument: int
     method_source: str
@@ -49,7 +59,7 @@ class WrapperContract:
     definition: SourceAnchor
     expected_definition: str
     binding: WrapperBinding
-    call_sites: tuple[SourceAnchor, ...]
+    call_sites: tuple[RouteOccurrenceAnchor, ...]
 
 
 @dataclass(frozen=True)
@@ -766,6 +776,48 @@ def _source_anchor(raw: object, context: str) -> SourceAnchor:
     return SourceAnchor(source_path, start_line, end_line, sha256)
 
 
+def _route_occurrence_anchor(raw: object) -> RouteOccurrenceAnchor:
+    required = {
+        "source_path",
+        "line",
+        "column",
+        "raw_route",
+        "normalized_route",
+        "source_sha256",
+    }
+    if not isinstance(raw, dict) or set(raw) != required:
+        raise RouteScanConfigurationError("wrapper call site occurrence is invalid")
+    source_path = _exact_source_path(raw["source_path"], "call site source")
+    line = raw["line"]
+    column = raw["column"]
+    raw_route = raw["raw_route"]
+    normalized_route = raw["normalized_route"]
+    source_sha256 = raw["source_sha256"]
+    if (
+        not isinstance(line, int)
+        or isinstance(line, bool)
+        or line < 1
+        or not isinstance(column, int)
+        or isinstance(column, bool)
+        or column < 1
+        or not isinstance(raw_route, str)
+        or not raw_route.startswith("/api/")
+        or not isinstance(normalized_route, str)
+        or normalize_route(raw_route) != normalized_route
+        or not isinstance(source_sha256, str)
+        or _SHA256.fullmatch(source_sha256) is None
+    ):
+        raise RouteScanConfigurationError("wrapper call site occurrence is invalid")
+    return RouteOccurrenceAnchor(
+        source_path,
+        line,
+        column,
+        raw_route,
+        normalized_route,
+        source_sha256,
+    )
+
+
 def _wrapper_binding(raw: object) -> WrapperBinding:
     if not isinstance(raw, dict) or set(raw) != {"kind", "parameters"}:
         raise RouteScanConfigurationError("wrapper binding is invalid")
@@ -841,7 +893,7 @@ def load_wrapper_contracts(path: Path) -> tuple[WrapperContract, ...]:
         document = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise RouteScanConfigurationError(f"invalid wrapper contracts: {path}") from exc
-    if not isinstance(document, dict) or document.get("schema_version") != 2:
+    if not isinstance(document, dict) or document.get("schema_version") != 3:
         raise RouteScanConfigurationError("unsupported wrapper contracts schema version")
     entries = document.get("entries")
     if not isinstance(entries, list):
@@ -877,8 +929,16 @@ def load_wrapper_contracts(path: Path) -> tuple[WrapperContract, ...]:
         if not isinstance(call_sites_raw, list) or not call_sites_raw:
             raise RouteScanConfigurationError("wrapper call sites are required")
         call_sites = tuple(
-            _source_anchor(item, "call site") for item in call_sites_raw
+            _route_occurrence_anchor(item) for item in call_sites_raw
         )
+        if any(item.source_path != source for item in call_sites):
+            raise RouteScanConfigurationError(
+                "wrapper contract call site source is ambiguous"
+            )
+        if any(item.source_sha256 != source_sha256 for item in call_sites):
+            raise RouteScanConfigurationError(
+                "wrapper contract call site source hash is stale"
+            )
         key = source, callee
         if key in seen:
             raise RouteScanConfigurationError(
@@ -980,30 +1040,58 @@ def _validate_call_sites(
     contract: WrapperContract,
     sources: Mapping[str, str],
 ) -> None:
-    ranges: list[tuple[int, int]] = []
+    identities: set[tuple[str, int, int, str, str, str]] = set()
     for anchor in contract.call_sites:
         if anchor.source_path != contract.source:
             raise RouteScanConfigurationError(
                 f"wrapper contract call site source is ambiguous: {anchor.source_path}"
             )
-        if any(
-            anchor.start_line <= end and start <= anchor.end_line
-            for start, end in ranges
-        ):
+        identity = (
+            anchor.source_path,
+            anchor.line,
+            anchor.column,
+            anchor.raw_route,
+            anchor.normalized_route,
+            anchor.source_sha256,
+        )
+        if identity in identities:
             raise RouteScanConfigurationError(
-                f"wrapper contract call sites overlap: {contract.source}:{contract.callee}"
+                f"wrapper contract call site occurrence is duplicate: "
+                f"{contract.source}:{contract.callee}"
             )
-        ranges.append((anchor.start_line, anchor.end_line))
-        text = _anchored_source_text(anchor, sources, "call site")
-        masked = _mask_comments(text)
-        callees = []
-        for match in _ROUTE_LITERAL.finditer(masked):
-            call = _find_call(masked, match.start())
-            if call is not None:
-                callees.append(call[0])
-        if contract.callee not in callees:
+        identities.add(identity)
+        source = sources.get(anchor.source_path)
+        if source is None:
             raise RouteScanConfigurationError(
-                f"wrapper contract call site is ambiguous: {contract.source}:{contract.callee}"
+                f"wrapper contract call site source is stale: {anchor.source_path}"
+            )
+        if hashlib.sha256(source.encode("utf-8")).hexdigest() != anchor.source_sha256:
+            raise RouteScanConfigurationError(
+                f"wrapper contract call site source hash is stale: {anchor.source_path}"
+            )
+        masked = _mask_comments(source)
+        matches = 0
+        for match in _ROUTE_LITERAL.finditer(masked):
+            raw_fragment = source[match.start("route"):match.end("route")]
+            raw_route = _raw_route(source, match.end(), raw_fragment)
+            route_offset = match.start("route")
+            line = source.count("\n", 0, route_offset) + 1
+            line_start = source.rfind("\n", 0, route_offset) + 1
+            column = route_offset - line_start + 1
+            call = _find_call(masked, match.start())
+            if (
+                call is not None
+                and call[0] == contract.callee
+                and line == anchor.line
+                and column == anchor.column
+                and raw_route == anchor.raw_route
+                and normalize_route(raw_route) == anchor.normalized_route
+            ):
+                matches += 1
+        if matches != 1:
+            raise RouteScanConfigurationError(
+                f"wrapper contract call site occurrence is stale: "
+                f"{contract.source}:{contract.callee}"
             )
 
 
@@ -1081,9 +1169,11 @@ def wrapper_contracts_hash(contracts: Sequence[WrapperContract]) -> str:
             "call_sites": [
                 {
                     "source_path": anchor.source_path,
-                    "start_line": anchor.start_line,
-                    "end_line": anchor.end_line,
-                    "sha256": anchor.sha256,
+                    "line": anchor.line,
+                    "column": anchor.column,
+                    "raw_route": anchor.raw_route,
+                    "normalized_route": anchor.normalized_route,
+                    "source_sha256": anchor.source_sha256,
                 }
                 for anchor in contract.call_sites
             ],
@@ -1157,6 +1247,7 @@ def scan_web_api_routes(
     for path in sources:
         relative = path.relative_to(common_base).as_posix()
         source = source_documents[relative]
+        source_sha256 = hashlib.sha256(source.encode("utf-8")).hexdigest()
         digest.update(relative.encode("utf-8"))
         digest.update(b"\0")
         digest.update(source.encode("utf-8"))
@@ -1185,7 +1276,12 @@ def scan_web_api_routes(
                 candidate
                 if candidate is not None
                 and any(
-                    anchor.start_line <= line <= anchor.end_line
+                    anchor.source_path == relative
+                    and anchor.line == line
+                    and anchor.column == column
+                    and anchor.raw_route == raw_route
+                    and anchor.normalized_route == normalized
+                    and anchor.source_sha256 == source_sha256
                     for anchor in candidate.call_sites
                 )
                 else None
@@ -1320,6 +1416,7 @@ def scan_web_routes(
 
 __all__ = [
     "SourceAnchor",
+    "RouteOccurrenceAnchor",
     "WrapperBinding",
     "WrapperContract",
     "WrapperSignature",

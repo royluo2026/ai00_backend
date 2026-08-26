@@ -6,9 +6,13 @@ import json
 from datetime import date, timedelta
 from pathlib import Path
 
-from backend.capability_v2.consumer_routes import scan_web_routes
+from backend.capability_v2.consumer_routes import normalize_route, scan_web_routes
 from backend.capability_v2.catalog_targets import CatalogTargetIndex
-from backend.capability_v2.route_inventory import audit_route_inventory, load_route_inventory
+from backend.capability_v2.route_inventory import (
+    audit_route_inventory,
+    load_legacy_route_baseline,
+    load_route_inventory,
+)
 
 
 def test_route_scan_excludes_named_generated_dist_outputs(tmp_path: Path) -> None:
@@ -333,3 +337,30 @@ def test_task3_legacy_addition_review_is_complete_and_traceable() -> None:
                     assert facade_binding in exact_calls(binding)
         else:
             assert key not in targets
+
+
+def test_current_legacy_proofs_biject_exactly_to_immutable_baseline_difference() -> None:
+    root = Path(__file__).resolve().parents[2]
+    baseline = load_legacy_route_baseline(
+        root / "docs/governance/legacy_route_baseline.json"
+    )
+    inventory = load_route_inventory(
+        root / "docs/governance/legacy_route_inventory.json"
+    )
+    review = json.loads(
+        (root / "docs/governance/web-api-legacy-addition-review.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    current_keys = {
+        (entry.method, normalize_route(entry.route_path))
+        for entry in inventory.entries
+    }
+    active_proof_keys = {
+        (entry["method"], normalize_route(entry["route_path"]))
+        for entry in review["entries"]
+        if entry["disposition"] == "retained"
+    }
+
+    assert current_keys - baseline.key_set == active_proof_keys
+    assert len(active_proof_keys) == 132

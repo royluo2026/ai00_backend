@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import subprocess
 import sys
+from functools import lru_cache
 from pathlib import Path
 
 import pytest
@@ -29,6 +31,48 @@ DOMAIN_IDS = (
     "project_management",
     "simulation",
 )
+
+LEGACY_BASELINE_COMMIT = "565b00a0fdd13ea7d163d6b0ec0e9cb9bf05d924"
+LEGACY_BASELINE_KEYS_SHA256 = (
+    "5fb96dafb709888877589ae8e54e68415d87fca837d55cf1a3ea0e2a28f92b04"
+)
+
+
+@lru_cache(maxsize=1)
+def _legacy_baseline_document() -> dict[str, object]:
+    repository = Path(__file__).resolve().parents[2]
+    result = subprocess.run(
+        [
+            "git",
+            "-C",
+            str(repository),
+            "show",
+            f"{LEGACY_BASELINE_COMMIT}:docs/governance/legacy_route_inventory.json",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    inventory = json.loads(result.stdout)
+    keys = sorted({
+        (
+            entry["method"].upper(),
+            re.sub(r"\{[^/{}]+\}", "{dynamic}", entry["route_path"]).rstrip("/"),
+        )
+        for entry in inventory["entries"]
+    })
+    assert len(keys) == 223
+    return {
+        "schema_version": 1,
+        "source_commit": LEGACY_BASELINE_COMMIT,
+        "source_artifact": "docs/governance/legacy_route_inventory.json",
+        "key_count": len(keys),
+        "keys_sha256": LEGACY_BASELINE_KEYS_SHA256,
+        "keys": [
+            {"method": method, "normalized_route": route}
+            for method, route in keys
+        ],
+    }
 
 
 def _write_json(root: Path, relative: str, document: object) -> None:
@@ -93,6 +137,7 @@ def _complete_repository(tmp_path: Path) -> Path:
             "web_route_inventory_artifact": "docs/web-routes.json",
             "web_wrapper_contracts_artifact": "docs/web-wrapper-contracts.json",
             "legacy_route_inventory_artifact": "docs/legacy-routes.json",
+            "legacy_route_baseline_artifact": "docs/legacy-route-baseline.json",
             "bff_route_inventory_artifact": "docs/bff-routes.json",
             "web_legacy_route_proof_artifact": "docs/legacy-route-proofs.json",
         },
@@ -100,7 +145,12 @@ def _complete_repository(tmp_path: Path) -> Path:
     _write_json(
         tmp_path,
         "docs/web-wrapper-contracts.json",
-        {"schema_version": 2, "entries": []},
+        {"schema_version": 3, "entries": []},
+    )
+    _write_json(
+        tmp_path,
+        "docs/legacy-route-baseline.json",
+        _legacy_baseline_document(),
     )
     _write_json(
         tmp_path,
@@ -647,6 +697,70 @@ def test_strict_completion_rejects_inventory_entry_without_active_proof(
     assert "legacy_route_proof_missing:1" in report.failed
 
 
+def test_strict_completion_cannot_bypass_proof_scope_by_removing_provenance(
+    tmp_path: Path,
+) -> None:
+    root = _complete_repository(tmp_path)
+    inventory_path, proof_path, _catalog_path = _configure_complete_legacy_proof(root)
+    inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+    inventory["entries"][0].pop("evidence_provenance")
+    _write_json(root, "docs/legacy-routes.json", inventory)
+    proof = json.loads(proof_path.read_text(encoding="utf-8"))
+    proof["entries"] = []
+    proof["retained_count"] = 0
+    _write_json(root, "docs/legacy-route-proofs.json", proof)
+
+    report = evaluate_completion(root, mode="strict")
+
+    assert "legacy_route_proof_missing:1" in report.failed
+
+
+def test_strict_completion_rejects_removed_descriptive_provenance(
+    tmp_path: Path,
+) -> None:
+    root = _complete_repository(tmp_path)
+    inventory_path, _proof_path, _catalog_path = _configure_complete_legacy_proof(root)
+    inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+    inventory["entries"][0].pop("evidence_provenance")
+    _write_json(root, "docs/legacy-routes.json", inventory)
+
+    report = evaluate_completion(root, mode="strict")
+
+    assert "legacy_route_proof_target_mismatch:1" in report.failed
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "reason_code"),
+    [
+        (
+            "source_commit",
+            "0" * 40,
+            "legacy_route_baseline_commit_mismatch:1",
+        ),
+        (
+            "keys_sha256",
+            "0" * 64,
+            "legacy_route_baseline_hash_mismatch:1",
+        ),
+    ],
+)
+def test_strict_completion_rejects_immutable_legacy_baseline_mismatch(
+    tmp_path: Path,
+    field: str,
+    value: object,
+    reason_code: str,
+) -> None:
+    root = _complete_repository(tmp_path)
+    baseline_path = root / "docs/legacy-route-baseline.json"
+    baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
+    baseline[field] = value
+    _write_json(root, "docs/legacy-route-baseline.json", baseline)
+
+    report = evaluate_completion(root, mode="strict")
+
+    assert reason_code in report.failed
+
+
 def test_strict_completion_rejects_active_proof_without_inventory_entry(
     tmp_path: Path,
 ) -> None:
@@ -674,6 +788,22 @@ def test_strict_completion_rejects_duplicate_active_legacy_proof(
     report = evaluate_completion(root, mode="strict")
 
     assert "legacy_route_proof_duplicate:1" in report.failed
+
+
+def test_strict_completion_rejects_duplicate_normalized_inventory_key(
+    tmp_path: Path,
+) -> None:
+    root = _complete_repository(tmp_path)
+    inventory_path, _proof_path, _catalog_path = _configure_complete_legacy_proof(root)
+    inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+    duplicate = dict(inventory["entries"][0])
+    duplicate["route_path"] = "/api/tasks/"
+    inventory["entries"].append(duplicate)
+    _write_json(root, "docs/legacy-routes.json", inventory)
+
+    report = evaluate_completion(root, mode="strict")
+
+    assert "legacy_route_proof_inventory_duplicate:1" in report.failed
 
 
 def test_strict_completion_rejects_stale_legacy_proof_source_hash(
