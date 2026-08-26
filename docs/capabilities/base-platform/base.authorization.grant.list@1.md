@@ -8,7 +8,7 @@ Execute exact Base outcome base.authorization.grant.list.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_b6846f0f3faea2788a65130a4a59a5fe`
+- Catalog Release：`rel_5915db601d7c6ce939a106d76a78b90a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -28,7 +28,7 @@ Execute exact Base outcome base.authorization.grant.list.
 
 ## 授权与数据边界
 
-- 授权策略：`base.v2:base.read`
+- 授权策略：`base.v2:system.user.manage`
 - 自动化等级：`A2`
 - 数据分类：`confidential`
 - Delegation：`scoped`
@@ -87,7 +87,7 @@ Execute exact Base outcome base.authorization.grant.list.
 ```json
 {
   "capability_id": "base.authorization.grant.list",
-  "catalog_release": "rel_b6846f0f3faea2788a65130a4a59a5fe",
+  "catalog_release": "rel_5915db601d7c6ce939a106d76a78b90a",
   "major_version": 1,
   "payload": {}
 }
@@ -101,13 +101,81 @@ Execute exact Base outcome base.authorization.grant.list.
 {
   "additionalProperties": false,
   "properties": {
-    "result_json": {
-      "maxLength": 4000000,
-      "type": "string"
+    "grants": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "expires_at": {
+            "maxLength": 512,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "gid": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "grant_type": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "granted_at": {
+            "maxLength": 512,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "granted_by": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "grantee_gid": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "grantee_name": {
+            "maxLength": 512,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "note": {
+            "maxLength": 2000,
+            "type": "string"
+          },
+          "scope_gid": {
+            "maxLength": 512,
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "gid",
+          "grantee_gid",
+          "grant_type",
+          "scope_gid",
+          "granted_by",
+          "expires_at",
+          "note",
+          "granted_at"
+        ],
+        "type": "object"
+      },
+      "maxItems": 500,
+      "type": "array"
     }
   },
   "required": [
-    "result_json"
+    "grants"
   ],
   "type": "object"
 }

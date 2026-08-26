@@ -8,7 +8,7 @@ Read bounded Craft manufacturing resource library collections.
 - 不适用：The caller needs to mutate library records or read BOP-linked resources.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_b6846f0f3faea2788a65130a4a59a5fe`
+- Catalog Release：`rel_5915db601d7c6ce939a106d76a78b90a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -97,7 +97,7 @@ Read bounded Craft manufacturing resource library collections.
 ```json
 {
   "capability_id": "craft.library.read",
-  "catalog_release": "rel_b6846f0f3faea2788a65130a4a59a5fe",
+  "catalog_release": "rel_5915db601d7c6ce939a106d76a78b90a",
   "major_version": 1,
   "payload": {
     "operation": "tools.list"

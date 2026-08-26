@@ -8,7 +8,7 @@ Execute exact Base outcome base.notification.preference.atomic.update.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_b6846f0f3faea2788a65130a4a59a5fe`
+- Catalog Release：`rel_5915db601d7c6ce939a106d76a78b90a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -28,7 +28,7 @@ Execute exact Base outcome base.notification.preference.atomic.update.
 
 ## 授权与数据边界
 
-- 授权策略：`base.v2:base.write`
+- 授权策略：`base.v2:authenticated`
 - 自动化等级：`A1`
 - 数据分类：`confidential`
 - Delegation：`scoped`
@@ -101,7 +101,7 @@ Execute exact Base outcome base.notification.preference.atomic.update.
 ```json
 {
   "capability_id": "base.notification.preference.atomic.update",
-  "catalog_release": "rel_b6846f0f3faea2788a65130a4a59a5fe",
+  "catalog_release": "rel_5915db601d7c6ce939a106d76a78b90a",
   "major_version": 1,
   "payload": {
     "preferences": {}
@@ -117,13 +117,37 @@ Execute exact Base outcome base.notification.preference.atomic.update.
 {
   "additionalProperties": false,
   "properties": {
-    "result_json": {
-      "maxLength": 4000000,
-      "type": "string"
+    "data": {
+      "additionalProperties": false,
+      "properties": {
+        "item_status": {
+          "type": "boolean"
+        },
+        "new_follower": {
+          "type": "boolean"
+        },
+        "scope_approved": {
+          "type": "boolean"
+        },
+        "scope_rejected": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "scope_approved",
+        "scope_rejected",
+        "item_status",
+        "new_follower"
+      ],
+      "type": "object"
+    },
+    "success": {
+      "type": "boolean"
     }
   },
   "required": [
-    "result_json"
+    "success",
+    "data"
   ],
   "type": "object"
 }

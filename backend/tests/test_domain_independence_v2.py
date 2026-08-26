@@ -223,6 +223,41 @@ def test_dependency_checker_allows_shared_domain_ports(tmp_path, monkeypatch):
     assert violations == []
 
 
+def test_dependency_checker_rejects_platform_sdk_import_of_private_router(tmp_path, monkeypatch):
+    source = tmp_path / "backend" / "platform_sdk" / "leak.py"
+    target = tmp_path / "backend" / "routers" / "grants.py"
+    source.parent.mkdir(parents=True)
+    target.parent.mkdir(parents=True)
+    source.write_text("from backend.routers.grants import list_grants\n", encoding="utf-8")
+    target.write_text("def list_grants(): pass\n", encoding="utf-8")
+    ownership = {
+        "shared_import_prefixes": [
+            "backend.capability_v2",
+            "backend.contracts",
+            "backend.domain_ports",
+            "backend.platform_sdk",
+        ],
+        "domains": {
+            "Base": {
+                "module_prefixes": ["backend.base"],
+                "code_paths": ["backend/base/**", "backend/routers/**"],
+            }
+        },
+    }
+    monkeypatch.setattr(dependency_checker, "REPOSITORY_ROOT", tmp_path)
+
+    violations, errors = dependency_checker.discover_violations(ownership)
+
+    assert errors == []
+    assert violations == [{
+        "source": "backend/platform_sdk/leak.py",
+        "imported_module": "backend.routers.grants",
+        "source_domain": "Shared Platform SDK",
+        "target_domain": "Base",
+        "reason": "Platform SDK imports private router implementation.",
+    }]
+
+
 def test_codeowners_names_every_domain_maintainer_group():
     document = _ownership()
     rules = {

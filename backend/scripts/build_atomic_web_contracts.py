@@ -13,8 +13,10 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from backend.capability_v2.atomic_web_contracts import (
-    EXAMPLES, OUTPUT_SCHEMA, ROUTE_CAPABILITIES, UNSAFE_REASONS,
+    EXAMPLES, EXAMPLE_OUTPUTS, ROUTE_CAPABILITIES, UNSAFE_REASONS,
 )
+from backend.capabilities.registry_next import CapabilityRegistry
+from backend.base.web_atomic import register_atomic_web_capabilities
 
 
 LEDGER = ROOT / "docs/governance/web-route-root-cause-ledger.json"
@@ -35,6 +37,8 @@ def build_manifest() -> dict[str, Any]:
     ).stdout
     ledger = json.loads(ledger_blob.decode("utf-8"))
     scoped = [entry for entry in ledger["entries"] if entry["disposition"] in SCOPE]
+    registry = CapabilityRegistry()
+    register_atomic_web_capabilities(registry)
     entries = []
     for source in scoped:
         key = (source["method"], source["normalized_route"])
@@ -43,29 +47,20 @@ def build_manifest() -> dict[str, Any]:
         if (reviewed is None) == (unsafe_reason is None):
             raise ValueError(f"scope key must have exactly one reviewed conclusion: {key}")
         owner = source["owner_domain"]
-        is_write = source["method"] not in {"GET", "HEAD"}
         capability_id = reviewed["id"] if reviewed else None
+        provider = registry.get(capability_id) if reviewed else None
+        descriptor = provider.descriptor if provider else None
         provider_anchor = (
             "plugins/project_management/project_management_backend/capabilities/reviewed.py:def register_reviewed_capabilities"
             if reviewed and owner == "project_management"
             else (
                 "backend/base/web_atomic.py:HANDLERS: dict" if reviewed and owner == "base"
-                else "plugins/craft/craft_backend/capabilities/web_atomic.py:HANDLERS: dict"
-                if reviewed and owner == "craft"
                 else source["backend_evidence"]["source_path"]
             )
         )
         provider_source_path = provider_anchor.partition(":")[0]
         provider_blob = (ROOT / provider_source_path).read_bytes()
-        authorization_policy = (
-            "craft.rule.write" if reviewed and owner == "craft"
-            else "project.manage_any" if reviewed and owner == "project_management"
-            else f"{owner}.read" if not is_write else f"{owner}.write"
-        )
-        output_schema = (
-            {"type": "object", "required": ["data"], "properties": {"data": {"type": "object", "properties": {}, "additionalProperties": False}}, "additionalProperties": False}
-            if reviewed and owner == "project_management" else OUTPUT_SCHEMA
-        )
+        is_write = bool(descriptor and descriptor.side_effect_level.value != "read")
         entry = {
             "method": source["method"],
             "normalized_route": source["normalized_route"],
@@ -78,17 +73,21 @@ def build_manifest() -> dict[str, Any]:
             "handler_evidence": source["backend_evidence"],
             "capability_id": capability_id,
             "major_version": 1 if reviewed else None,
-            "input_schema": reviewed["schema"] if reviewed else {"type": "object", "properties": {}, "additionalProperties": False},
-            "output_schema": output_schema if reviewed else {"type": "object", "properties": {}, "additionalProperties": False},
+            "input_schema": dict(provider.spec.input_schema) if provider else {"type": "object", "properties": {}, "additionalProperties": False},
+            "output_schema": dict(provider.spec.output_schema) if provider else {"type": "object", "properties": {}, "additionalProperties": False},
             "example_input": EXAMPLES[capability_id] if reviewed else {},
-            "example_output": ({"data": {}} if owner == "project_management" else {"result_json": "{}"}) if reviewed else {},
-            "side_effects": ["read"] if not is_write else [f"{owner}:write"],
-            "atomicity_class": "read" if not is_write else "single_transaction",
-            "authorization_policy": authorization_policy,
-            "confirmation_policy": "none" if not is_write else ("admin" if key in {
-                ("POST", "/api/org/sync-from-feishu"), ("PATCH", "/api/users/{dynamic}/role")
-            } else "user"),
-            "idempotency_policy": "none" if not is_write else "required",
+            "example_output": EXAMPLE_OUTPUTS[capability_id] if reviewed else {},
+            "side_effects": [descriptor.side_effects] if descriptor else [],
+            "atomicity_class": (
+                "read" if not is_write else
+                "single_transaction" if descriptor.consistency_policy == "strong" and getattr(provider.handler, "__capability_transactional__", False)
+                else "external"
+            ),
+            "consistency_policy": descriptor.consistency_policy if descriptor else None,
+            "authorization_policy": descriptor.authorization_policy if descriptor else None,
+            "required_permissions": list(provider.spec.permissions) if provider else [],
+            "confirmation_policy": descriptor.confirmation_policy if descriptor else None,
+            "idempotency_policy": descriptor.idempotency_policy if descriptor else None,
             "final_disposition": "migrated" if reviewed else "domain_design_required",
             "reclassification_reason": None if reviewed else unsafe_reason,
             "review_reference": "task-3b3c:exact-provider-review",

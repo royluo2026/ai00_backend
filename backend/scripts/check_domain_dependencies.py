@@ -24,6 +24,9 @@ APPROVED_SHARED_PREFIXES = frozenset(
 PRIVATE_MODULE_SEGMENTS = frozenset(
     {"domain", "application", "infrastructure", "repositories", "api", "routers"}
 )
+PLATFORM_SDK_PRIVATE_ROUTER_BASELINE = frozenset({
+    ("backend/platform_sdk/auth.py", "backend.routers.deps"),
+})
 
 
 def _load(path: Path) -> dict:
@@ -97,8 +100,14 @@ def discover_violations(ownership: dict) -> tuple[list[dict], list[str]]:
                 candidate_paths.update(prefix_path.rglob("*.py"))
             else:
                 candidate_paths.update(path for path in REPOSITORY_ROOT.glob(pattern) if path.suffix == ".py")
+    sdk_root = REPOSITORY_ROOT / "backend" / "platform_sdk"
+    if sdk_root.is_dir():
+        candidate_paths.update(sdk_root.rglob("*.py"))
     for path in sorted(candidate_paths):
         relative = path.relative_to(REPOSITORY_ROOT).as_posix()
+        if relative.startswith("backend/platform_sdk/"):
+            sources[relative] = (path, "Shared Platform SDK")
+            continue
         owner, tied = owner_for_path(relative, ownership)
         if owner is None:
             errors.append(f"ambiguous code owner for {relative}: {tied}")
@@ -109,6 +118,25 @@ def discover_violations(ownership: dict) -> tuple[list[dict], list[str]]:
     violations: list[dict] = []
     for relative, (path, source_domain) in sorted(sources.items()):
         for imported_module in sorted(_imports(path)):
+            if source_domain == "Shared Platform SDK" and (
+                imported_module == "backend.routers"
+                or imported_module.startswith("backend.routers.")
+                or ".routers." in imported_module
+            ):
+                target_path = _module_path(imported_module)
+                target_relative = target_path.relative_to(REPOSITORY_ROOT).as_posix() if target_path else ""
+                target_domain, _ = owner_for_path(target_relative, ownership) if target_relative else (None, [])
+                if (relative, imported_module) not in PLATFORM_SDK_PRIVATE_ROUTER_BASELINE:
+                    violations.append({
+                        "source": relative,
+                        "imported_module": imported_module,
+                        "source_domain": source_domain,
+                        "target_domain": target_domain or "Unowned Internal",
+                        "reason": "Platform SDK imports private router implementation.",
+                    })
+                continue
+            if source_domain == "Shared Platform SDK":
+                continue
             if any(
                 imported_module == prefix or imported_module.startswith(prefix + ".")
                 for prefix in shared

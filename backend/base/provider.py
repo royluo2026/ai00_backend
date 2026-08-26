@@ -18,6 +18,16 @@ _LIFECYCLE = {
 }
 _STORAGE_WRITES = {"plugin.storage.delete", "plugin.storage.put"}
 _WRITES = _LIFECYCLE | _STORAGE_WRITES | {"system.job.cancel"}
+_ATOMIC_WEB_EFFECTS = {
+    "base.authorization.grant.list": "Reads active authorization grants from the Base grant store without mutation.",
+    "base.authorization.grant.create": "Creates or replaces one scoped authorization grant in the Base grant store.",
+    "base.authorization.grant.revoke": "Deletes one existing scoped authorization grant from the Base grant store.",
+    "base.notification.preference.atomic.get": "Reads the caller's notification preferences without mutation.",
+    "base.notification.preference.atomic.update": "Updates the caller's notification preferences in the Base store.",
+    "base.identity.directory.feishu.sync": "Reads the Feishu directory and applies team and user changes to the Base store.",
+    "base.plugin.installed.list": "Reads the bounded installed-plugin inventory without mutation.",
+    "base.identity.user.search": "Reads and projects matching Base directory users without mutation.",
+}
 _RESOURCE_FIELDS = {
     **{capability_id: ("plugin-installation", "plugin_id") for capability_id in _LIFECYCLE},
     **{capability_id: ("plugin-storage-key", "key") for capability_id in {
@@ -72,6 +82,13 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         "domain_errors": _DOMAIN_ERRORS,
         "domain_errors_complete": True,
     }
+    if capability_id in _ATOMIC_WEB_EFFECTS:
+        updates["business_effect"] = _ATOMIC_WEB_EFFECTS[capability_id]
+        updates["side_effects"] = _ATOMIC_WEB_EFFECTS[capability_id]
+        updates["transaction_policy"] = {
+            "mode": "external" if capability_id == "base.identity.directory.feishu.sync" else "provider",
+            "boundary": "owning_domain",
+        }
     return CapabilityDescriptorV2.model_validate({**descriptor.model_dump(), **updates})
 
 

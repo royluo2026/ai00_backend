@@ -8,7 +8,7 @@ Create a tenant Knowledge Workspace space.
 - 不适用：A suitable space already exists.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_b6846f0f3faea2788a65130a4a59a5fe`
+- Catalog Release：`rel_5915db601d7c6ce939a106d76a78b90a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -94,7 +94,7 @@ Create a tenant Knowledge Workspace space.
 ```json
 {
   "capability_id": "knowledge.space.create",
-  "catalog_release": "rel_b6846f0f3faea2788a65130a4a59a5fe",
+  "catalog_release": "rel_5915db601d7c6ce939a106d76a78b90a",
   "major_version": 1,
   "payload": {
     "name": "example"

@@ -3,7 +3,7 @@
   "artifact_id": "existing-capability-web-migrations",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "baseline_revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-  "frontend_revision": "078951be722a48b4e151ee8cd4d6b3091cf207be",
+  "frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
   "groups": [
     {
       "method": "DELETE",
@@ -827,14 +827,14 @@
           "line": 111,
           "column": 140,
           "operation": "knowledge.get",
-          "source_sha256": "0945dc3fd35dda24d841c5884c9713ef8a3afe5a2048d5370aa51e2af46f6f2d"
+          "source_sha256": "2707d0dfb871b339c28c587d03adabf464882b2095c62a364b32e77682e6dad9"
         },
         {
           "source_path": "web/container_card/modes/mode_field_detail.js",
           "line": 34,
           "column": 141,
           "operation": "knowledge.get",
-          "source_sha256": "e8b9a670a2704db124bf31adcbcee2318954d70012164e608a778d479d5cb90e"
+          "source_sha256": "f8656483caefc979f5f23be6e2c6ad84c0c053a4c3f0acb7821ffc9516fb790d"
         },
         {
           "source_path": "web/container_card/modes/mode_text_image.js",
@@ -2660,7 +2660,7 @@
           "line": 156,
           "column": 140,
           "operation": "knowledge.create",
-          "source_sha256": "0945dc3fd35dda24d841c5884c9713ef8a3afe5a2048d5370aa51e2af46f6f2d"
+          "source_sha256": "2707d0dfb871b339c28c587d03adabf464882b2095c62a364b32e77682e6dad9"
         }
       ],
       "equivalence_evidence": {
@@ -3453,14 +3453,14 @@
           "line": 136,
           "column": 134,
           "operation": "knowledge.update",
-          "source_sha256": "0945dc3fd35dda24d841c5884c9713ef8a3afe5a2048d5370aa51e2af46f6f2d"
+          "source_sha256": "2707d0dfb871b339c28c587d03adabf464882b2095c62a364b32e77682e6dad9"
         },
         {
           "source_path": "web/container_card/modes/mode_field_detail.js",
           "line": 46,
           "column": 130,
           "operation": "knowledge.update",
-          "source_sha256": "e8b9a670a2704db124bf31adcbcee2318954d70012164e608a778d479d5cb90e"
+          "source_sha256": "f8656483caefc979f5f23be6e2c6ad84c0c053a4c3f0acb7821ffc9516fb790d"
         }
       ],
       "equivalence_evidence": {

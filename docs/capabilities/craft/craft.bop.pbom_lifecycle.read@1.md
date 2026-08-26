@@ -8,7 +8,7 @@ Read bounded PBOM link statistics and diff queue projections for a BOP version.
 - 不适用：The request changes PBOM matching metadata or diff queue state.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_b6846f0f3faea2788a65130a4a59a5fe`
+- Catalog Release：`rel_5915db601d7c6ce939a106d76a78b90a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -97,7 +97,7 @@ Read bounded PBOM link statistics and diff queue projections for a BOP version.
 ```json
 {
   "capability_id": "craft.bop.pbom_lifecycle.read",
-  "catalog_release": "rel_b6846f0f3faea2788a65130a4a59a5fe",
+  "catalog_release": "rel_5915db601d7c6ce939a106d76a78b90a",
   "major_version": 1,
   "payload": {
     "gid": "example",

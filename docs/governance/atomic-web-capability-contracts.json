@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3c-atomic-web-contracts",
   "baseline_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
-  "content_sha256": "sha256:0d86179ef68e9b5d3f63e1575cafa32c6c0267c8448592fb169516bba22a80bc",
+  "content_sha256": "sha256:96659c615a353da4149f09d1dea8ddd7b2f997770aa927e4022a516efacd2073",
   "counts_by_owner": {
     "agent": {
       "groups": 4,
@@ -26,11 +26,12 @@
   },
   "entries": [
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "agent.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "new_atomic_capability_required",
       "capability_id": null,
-      "confirmation_policy": "user",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -41,7 +42,7 @@
         "route_definition": null,
         "source_path": "plugins/agent/agent_backend/routers/flows.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -86,17 +87,17 @@
       "provider_anchor": "plugins/agent/agent_backend/routers/flows.py",
       "provider_source_sha256": "sha256:b7451e4b3a5537ec078bad85d9c1131b6ce4e20d608d07b8cde116e159b48ad8",
       "reclassification_reason": "No node-test handler or runtime service exists in the Agent provider.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "agent:write"
-      ]
+      "side_effects": []
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "agent.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "new_atomic_capability_required",
       "capability_id": null,
-      "confirmation_policy": "user",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -107,7 +108,7 @@
         "route_definition": null,
         "source_path": "plugins/agent/agent_backend/routers/skills_v2.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -139,17 +140,17 @@
       "provider_anchor": "plugins/agent/agent_backend/routers/skills_v2.py",
       "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
       "reclassification_reason": "No bounded canvas-option resolver exists in the Agent provider.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "agent:write"
-      ]
+      "side_effects": []
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "agent.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": null,
-      "confirmation_policy": "user",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -160,7 +161,7 @@
         "route_definition": null,
         "source_path": "plugins/agent/agent_backend/routers/skills_v2.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -192,17 +193,17 @@
       "provider_anchor": "plugins/agent/agent_backend/routers/skills_v2.py",
       "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
       "reclassification_reason": "No canvas execution provider exists; generic run mutation is not provider-equivalent.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "agent:write"
-      ]
+      "side_effects": []
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "agent.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": null,
-      "confirmation_policy": "user",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -213,7 +214,7 @@
         "route_definition": null,
         "source_path": "plugins/agent/agent_backend/routers/skills_v2.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -245,22 +246,22 @@
       "provider_anchor": "plugins/agent/agent_backend/routers/skills_v2.py",
       "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
       "reclassification_reason": "No pause-token resume provider exists; generic run mutation is not provider-equivalent.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "agent:write"
-      ]
+      "side_effects": []
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": "base.read",
+      "authorization_policy": "base.v2:system.user.manage",
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": "base.authorization.grant.list",
       "confirmation_policy": "none",
+      "consistency_policy": "strong",
       "example_input": {
         "user_gid": null
       },
       "example_output": {
-        "result_json": "{}"
+        "grants": []
       },
       "final_disposition": "migrated",
       "handler_evidence": {
@@ -310,32 +311,104 @@
       "output_schema": {
         "additionalProperties": false,
         "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
+          "grants": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "expires_at": {
+                  "maxLength": 512,
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "gid": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "grant_type": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "granted_at": {
+                  "maxLength": 512,
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "granted_by": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "grantee_gid": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "grantee_name": {
+                  "maxLength": 512,
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "note": {
+                  "maxLength": 2000,
+                  "type": "string"
+                },
+                "scope_gid": {
+                  "maxLength": 512,
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "gid",
+                "grantee_gid",
+                "grant_type",
+                "scope_gid",
+                "granted_by",
+                "expires_at",
+                "note",
+                "granted_at"
+              ],
+              "type": "object"
+            },
+            "maxItems": 500,
+            "type": "array"
           }
         },
         "required": [
-          "result_json"
+          "grants"
         ],
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
       "reclassification_reason": null,
+      "required_permissions": [
+        "system.user.manage"
+      ],
       "review_reference": "task-3b3c:exact-provider-review",
       "side_effects": [
-        "read"
+        "Reads active authorization grants from the Base grant store without mutation."
       ]
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "base.write",
+      "atomicity_class": "external",
+      "authorization_policy": "base.v2:system.user.manage",
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": "base.authorization.grant.create",
       "confirmation_policy": "user",
+      "consistency_policy": "external",
       "example_input": {
         "expires_at": null,
         "grant_type": "team_admin",
@@ -344,7 +417,16 @@
         "scope_gid": "team_1"
       },
       "example_output": {
-        "result_json": "{}"
+        "grant": {
+          "expires_at": null,
+          "gid": "grant_1",
+          "grant_type": "team_admin",
+          "granted_at": null,
+          "granted_by": "usr_1",
+          "grantee_gid": "usr_2",
+          "note": "",
+          "scope_gid": "team_1"
+        }
       },
       "final_disposition": "migrated",
       "handler_evidence": {
@@ -430,37 +512,105 @@
       "output_schema": {
         "additionalProperties": false,
         "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
+          "grant": {
+            "additionalProperties": false,
+            "properties": {
+              "expires_at": {
+                "maxLength": 512,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "gid": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "grant_type": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "granted_at": {
+                "maxLength": 512,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "granted_by": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "grantee_gid": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "grantee_name": {
+                "maxLength": 512,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note": {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              "scope_gid": {
+                "maxLength": 512,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "gid",
+              "grantee_gid",
+              "grant_type",
+              "scope_gid",
+              "granted_by",
+              "expires_at",
+              "note",
+              "granted_at"
+            ],
+            "type": "object"
           }
         },
         "required": [
-          "result_json"
+          "grant"
         ],
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
       "reclassification_reason": null,
+      "required_permissions": [
+        "system.user.manage"
+      ],
       "review_reference": "task-3b3c:exact-provider-review",
       "side_effects": [
-        "base:write"
+        "Creates or replaces one scoped authorization grant in the Base grant store."
       ]
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "base.write",
+      "atomicity_class": "external",
+      "authorization_policy": "base.v2:system.user.manage",
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": "base.authorization.grant.revoke",
       "confirmation_policy": "user",
+      "consistency_policy": "external",
       "example_input": {
         "gid": "grant_1"
       },
       "example_output": {
-        "result_json": "{}"
+        "ok": true
       },
       "final_disposition": "migrated",
       "handler_evidence": {
@@ -511,35 +661,44 @@
       "output_schema": {
         "additionalProperties": false,
         "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
+          "ok": {
+            "type": "boolean"
           }
         },
         "required": [
-          "result_json"
+          "ok"
         ],
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
       "reclassification_reason": null,
+      "required_permissions": [
+        "system.user.manage"
+      ],
       "review_reference": "task-3b3c:exact-provider-review",
       "side_effects": [
-        "base:write"
+        "Deletes one existing scoped authorization grant from the Base grant store."
       ]
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": "base.read",
+      "authorization_policy": "base.v2:authenticated",
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": "base.notification.preference.atomic.get",
       "confirmation_policy": "none",
+      "consistency_policy": "strong",
       "example_input": {},
       "example_output": {
-        "result_json": "{}"
+        "data": {
+          "item_status": true,
+          "new_follower": true,
+          "scope_approved": true,
+          "scope_rejected": true
+        },
+        "success": true
       },
       "final_disposition": "migrated",
       "handler_evidence": {
@@ -581,39 +740,71 @@
       "output_schema": {
         "additionalProperties": false,
         "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
+          "data": {
+            "additionalProperties": false,
+            "properties": {
+              "item_status": {
+                "type": "boolean"
+              },
+              "new_follower": {
+                "type": "boolean"
+              },
+              "scope_approved": {
+                "type": "boolean"
+              },
+              "scope_rejected": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "scope_approved",
+              "scope_rejected",
+              "item_status",
+              "new_follower"
+            ],
+            "type": "object"
+          },
+          "success": {
+            "type": "boolean"
           }
         },
         "required": [
-          "result_json"
+          "success",
+          "data"
         ],
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
       "reclassification_reason": null,
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
       "side_effects": [
-        "read"
+        "Reads the caller's notification preferences without mutation."
       ]
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "base.write",
+      "atomicity_class": "external",
+      "authorization_policy": "base.v2:authenticated",
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": "base.notification.preference.atomic.update",
       "confirmation_policy": "user",
+      "consistency_policy": "external",
       "example_input": {
         "preferences": {
           "item_status": true
         }
       },
       "example_output": {
-        "result_json": "{}"
+        "data": {
+          "item_status": true,
+          "new_follower": true,
+          "scope_approved": true,
+          "scope_rejected": true
+        },
+        "success": true
       },
       "final_disposition": "migrated",
       "handler_evidence": {
@@ -677,37 +868,68 @@
       "output_schema": {
         "additionalProperties": false,
         "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
+          "data": {
+            "additionalProperties": false,
+            "properties": {
+              "item_status": {
+                "type": "boolean"
+              },
+              "new_follower": {
+                "type": "boolean"
+              },
+              "scope_approved": {
+                "type": "boolean"
+              },
+              "scope_rejected": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "scope_approved",
+              "scope_rejected",
+              "item_status",
+              "new_follower"
+            ],
+            "type": "object"
+          },
+          "success": {
+            "type": "boolean"
           }
         },
         "required": [
-          "result_json"
+          "success",
+          "data"
         ],
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
       "reclassification_reason": null,
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
       "side_effects": [
-        "base:write"
+        "Updates the caller's notification preferences in the Base store."
       ]
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "base.write",
+      "atomicity_class": "external",
+      "authorization_policy": "base.v2:system.tech_config",
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": "base.identity.directory.feishu.sync",
       "confirmation_policy": "admin",
+      "consistency_policy": "external",
       "example_input": {
         "department_id": null
       },
       "example_output": {
-        "result_json": "{}"
+        "created": 0,
+        "departments": 0,
+        "dept_synced": 0,
+        "manual_teams_preserved": true,
+        "ok": true,
+        "updated": 0
       },
       "final_disposition": "migrated",
       "handler_evidence": {
@@ -757,37 +979,62 @@
       "output_schema": {
         "additionalProperties": false,
         "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
+          "created": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "departments": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "dept_synced": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "manual_teams_preserved": {
+            "type": "boolean"
+          },
+          "ok": {
+            "type": "boolean"
+          },
+          "updated": {
+            "minimum": 0,
+            "type": "integer"
           }
         },
         "required": [
-          "result_json"
+          "ok",
+          "created",
+          "updated",
+          "dept_synced",
+          "departments",
+          "manual_teams_preserved"
         ],
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
       "reclassification_reason": null,
+      "required_permissions": [
+        "system.tech_config"
+      ],
       "review_reference": "task-3b3c:exact-provider-review",
       "side_effects": [
-        "base:write"
+        "Reads the Feishu directory and applies team and user changes to the Base store."
       ]
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": "base.read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": "base.team.directory.list",
-      "confirmation_policy": "none",
+      "capability_id": null,
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
-      "example_output": {
-        "result_json": "{}"
-      },
-      "final_disposition": "migrated",
+      "example_output": {},
+      "final_disposition": "domain_design_required",
       "handler_evidence": {
         "anchors": [],
         "finding": "Exact registered route definition is anchored and machine-checked.",
@@ -802,13 +1049,13 @@
         },
         "source_path": "backend/routers/org.py"
       },
-      "idempotency_policy": "none",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
         "type": "object"
       },
-      "major_version": 1,
+      "major_version": null,
       "method": "GET",
       "normalized_route": "/api/org/teams",
       "occurrences": [
@@ -848,33 +1095,25 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
-          }
-        },
-        "required": [
-          "result_json"
-        ],
+        "properties": {},
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
-      "reclassification_reason": null,
+      "provider_anchor": "backend/routers/org.py",
+      "provider_source_sha256": "sha256:3dd9133921d1a0a2d49568350b150aef133b19ccc868ff88e20d61740214b36e",
+      "reclassification_reason": "The response contains unbounded team config that cannot be published as a closed exact schema.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "read"
-      ]
+      "side_effects": []
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "base.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": null,
-      "confirmation_policy": "user",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -885,7 +1124,7 @@
         "route_definition": null,
         "source_path": "backend/routers/plugins.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -915,22 +1154,23 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/routers/plugins.py",
-      "provider_source_sha256": "sha256:cf0ab10ba195dc67cc42718478fc00a7e133a1fee6fb991eedbf295f19a86395",
+      "provider_source_sha256": "sha256:bab080093bc16f582378f81ae82d6264d3cd724c2e55d842fad259507c11b2f2",
       "reclassification_reason": "The arbitrary-URL installer route has no production handler and is not equivalent to signed marketplace installation.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "base:write"
-      ]
+      "side_effects": []
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": "base.read",
+      "authorization_policy": "base.v2:authenticated",
       "baseline_disposition": "new_atomic_capability_required",
       "capability_id": "base.plugin.installed.list",
       "confirmation_policy": "none",
+      "consistency_policy": "strong",
       "example_input": {},
       "example_output": {
-        "result_json": "{}"
+        "data": [],
+        "success": true
       },
       "final_disposition": "migrated",
       "handler_evidence": {
@@ -972,32 +1212,74 @@
       "output_schema": {
         "additionalProperties": false,
         "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
+          "data": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "builtin": {
+                  "type": "boolean"
+                },
+                "category": {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                "enabled": {
+                  "type": "boolean"
+                },
+                "name": {
+                  "maxLength": 512,
+                  "type": "string"
+                },
+                "plugin_id": {
+                  "maxLength": 256,
+                  "type": "string"
+                },
+                "version": {
+                  "maxLength": 128,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "plugin_id",
+                "name",
+                "version",
+                "category",
+                "enabled",
+                "builtin"
+              ],
+              "type": "object"
+            },
+            "maxItems": 500,
+            "type": "array"
+          },
+          "success": {
+            "type": "boolean"
           }
         },
         "required": [
-          "result_json"
+          "success",
+          "data"
         ],
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
       "reclassification_reason": null,
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
       "side_effects": [
-        "read"
+        "Reads the bounded installed-plugin inventory without mutation."
       ]
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "base.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": null,
-      "confirmation_policy": "user",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -1008,7 +1290,7 @@
         "route_definition": null,
         "source_path": "backend/routers/plugins.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -1038,28 +1320,22 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/routers/plugins.py",
-      "provider_source_sha256": "sha256:cf0ab10ba195dc67cc42718478fc00a7e133a1fee6fb991eedbf295f19a86395",
+      "provider_source_sha256": "sha256:bab080093bc16f582378f81ae82d6264d3cd724c2e55d842fad259507c11b2f2",
       "reclassification_reason": "The unrestricted legacy uninstall route has no production handler and cannot bypass marketplace lifecycle controls.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "base:write"
-      ]
+      "side_effects": []
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": "base.read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": "base.annotation.batch.get",
-      "confirmation_policy": "none",
-      "example_input": {
-        "item_gids": [
-          "item_1"
-        ]
-      },
-      "example_output": {
-        "result_json": "{}"
-      },
-      "final_disposition": "migrated",
+      "capability_id": null,
+      "confirmation_policy": null,
+      "consistency_policy": null,
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
       "handler_evidence": {
         "anchors": [],
         "finding": "Exact registered route definition is anchored and machine-checked.",
@@ -1074,26 +1350,13 @@
         },
         "source_path": "backend/routers/self_annotations.py"
       },
-      "idempotency_policy": "none",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
-        "properties": {
-          "item_gids": {
-            "items": {
-              "maxLength": 512,
-              "minLength": 1,
-              "type": "string"
-            },
-            "maxItems": 500,
-            "type": "array"
-          }
-        },
-        "required": [
-          "item_gids"
-        ],
+        "properties": {},
         "type": "object"
       },
-      "major_version": 1,
+      "major_version": null,
       "method": "GET",
       "normalized_route": "/api/self_ann/batch",
       "occurrences": [
@@ -1155,40 +1418,28 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
-          }
-        },
-        "required": [
-          "result_json"
-        ],
+        "properties": {},
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
-      "reclassification_reason": null,
+      "provider_anchor": "backend/routers/self_annotations.py",
+      "provider_source_sha256": "sha256:4a75270d28bb12c80ced69f16583041f1b9ac3b47b4688622f1461f8addf8e0a",
+      "reclassification_reason": "The dynamic item-gid keyed result cannot be represented by the closed production schema validator.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "read"
-      ]
+      "side_effects": []
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": "base.read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": "base.annotation.list",
-      "confirmation_policy": "none",
-      "example_input": {
-        "module": "task"
-      },
-      "example_output": {
-        "result_json": "{}"
-      },
-      "final_disposition": "migrated",
+      "capability_id": null,
+      "confirmation_policy": null,
+      "consistency_policy": null,
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
       "handler_evidence": {
         "anchors": [],
         "finding": "Exact registered route definition is anchored and machine-checked.",
@@ -1203,18 +1454,13 @@
         },
         "source_path": "backend/routers/self_annotations.py"
       },
-      "idempotency_policy": "none",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
-        "properties": {
-          "module": {
-            "maxLength": 128,
-            "type": "string"
-          }
-        },
+        "properties": {},
         "type": "object"
       },
-      "major_version": 1,
+      "major_version": null,
       "method": "GET",
       "normalized_route": "/api/self_ann/list",
       "occurrences": [
@@ -1254,40 +1500,28 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
-          }
-        },
-        "required": [
-          "result_json"
-        ],
+        "properties": {},
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
-      "reclassification_reason": null,
+      "provider_anchor": "backend/routers/self_annotations.py",
+      "provider_source_sha256": "sha256:4a75270d28bb12c80ced69f16583041f1b9ac3b47b4688622f1461f8addf8e0a",
+      "reclassification_reason": "The response contains attachment records without a governed nested attachment contract.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "read"
-      ]
+      "side_effects": []
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": "base.read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": "base.annotation.get",
-      "confirmation_policy": "none",
-      "example_input": {
-        "item_gid": "item_1"
-      },
-      "example_output": {
-        "result_json": "{}"
-      },
-      "final_disposition": "migrated",
+      "capability_id": null,
+      "confirmation_policy": null,
+      "consistency_policy": null,
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
       "handler_evidence": {
         "anchors": [],
         "finding": "Exact registered route definition is anchored and machine-checked.",
@@ -1302,22 +1536,13 @@
         },
         "source_path": "backend/routers/self_annotations.py"
       },
-      "idempotency_policy": "none",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
-        "properties": {
-          "item_gid": {
-            "maxLength": 512,
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "required": [
-          "item_gid"
-        ],
+        "properties": {},
         "type": "object"
       },
-      "major_version": 1,
+      "major_version": null,
       "method": "GET",
       "normalized_route": "/api/self_ann/{dynamic}",
       "occurrences": [
@@ -1335,48 +1560,28 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
-          }
-        },
-        "required": [
-          "result_json"
-        ],
+        "properties": {},
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
-      "reclassification_reason": null,
+      "provider_anchor": "backend/routers/self_annotations.py",
+      "provider_source_sha256": "sha256:4a75270d28bb12c80ced69f16583041f1b9ac3b47b4688622f1461f8addf8e0a",
+      "reclassification_reason": "The response contains attachment records without a governed nested attachment contract.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "read"
-      ]
+      "side_effects": []
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "base.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": "base.annotation.upsert",
-      "confirmation_policy": "user",
-      "example_input": {
-        "annotation": {
-          "item_title": "T",
-          "module": "task",
-          "self_attachments_json": "[]",
-          "self_note": "",
-          "self_schedule": "",
-          "self_status": "todo"
-        },
-        "item_gid": "item_1"
-      },
-      "example_output": {
-        "result_json": "{}"
-      },
-      "final_disposition": "migrated",
+      "capability_id": null,
+      "confirmation_policy": null,
+      "consistency_policy": null,
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
       "handler_evidence": {
         "anchors": [],
         "finding": "Exact registered route definition is anchored and machine-checked.",
@@ -1391,53 +1596,13 @@
         },
         "source_path": "backend/routers/self_annotations.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
-        "properties": {
-          "annotation": {
-            "additionalProperties": false,
-            "properties": {
-              "item_title": {
-                "maxLength": 512,
-                "type": "string"
-              },
-              "module": {
-                "maxLength": 128,
-                "type": "string"
-              },
-              "self_attachments_json": {
-                "maxLength": 1000000,
-                "type": "string"
-              },
-              "self_note": {
-                "maxLength": 20000,
-                "type": "string"
-              },
-              "self_schedule": {
-                "maxLength": 128,
-                "type": "string"
-              },
-              "self_status": {
-                "maxLength": 64,
-                "type": "string"
-              }
-            },
-            "type": "object"
-          },
-          "item_gid": {
-            "maxLength": 512,
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "required": [
-          "item_gid",
-          "annotation"
-        ],
+        "properties": {},
         "type": "object"
       },
-      "major_version": 1,
+      "major_version": null,
       "method": "PUT",
       "normalized_route": "/api/self_ann/{dynamic}",
       "occurrences": [
@@ -1455,38 +1620,28 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
-          }
-        },
-        "required": [
-          "result_json"
-        ],
+        "properties": {},
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
-      "reclassification_reason": null,
+      "provider_anchor": "backend/routers/self_annotations.py",
+      "provider_source_sha256": "sha256:4a75270d28bb12c80ced69f16583041f1b9ac3b47b4688622f1461f8addf8e0a",
+      "reclassification_reason": "The request contains attachment records without a governed nested attachment contract.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "base:write"
-      ]
+      "side_effects": []
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": "base.read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": "base.team.list",
-      "confirmation_policy": "none",
+      "capability_id": null,
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
-      "example_output": {
-        "result_json": "{}"
-      },
-      "final_disposition": "migrated",
+      "example_output": {},
+      "final_disposition": "domain_design_required",
       "handler_evidence": {
         "anchors": [],
         "finding": "No exact registered route/method definition exists in this reviewed handler family.",
@@ -1494,13 +1649,13 @@
         "route_definition": null,
         "source_path": "backend/routers/teams.py"
       },
-      "idempotency_policy": "none",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
         "type": "object"
       },
-      "major_version": 1,
+      "major_version": null,
       "method": "GET",
       "normalized_route": "/api/teams",
       "occurrences": [
@@ -1518,38 +1673,28 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
-          }
-        },
-        "required": [
-          "result_json"
-        ],
+        "properties": {},
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
-      "reclassification_reason": null,
+      "provider_anchor": "backend/routers/teams.py",
+      "provider_source_sha256": "sha256:4e36ea16c386ae5f207cdda5fa747fb857e520acdad66d25f886b208f404b36f",
+      "reclassification_reason": "The response contains unbounded team config that cannot be published as a closed exact schema.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "read"
-      ]
+      "side_effects": []
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": "base.read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": "base.identity.user.list",
-      "confirmation_policy": "none",
+      "capability_id": null,
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
-      "example_output": {
-        "result_json": "{}"
-      },
-      "final_disposition": "migrated",
+      "example_output": {},
+      "final_disposition": "domain_design_required",
       "handler_evidence": {
         "anchors": [],
         "finding": "Exact registered route definition is anchored and machine-checked.",
@@ -1564,13 +1709,13 @@
         },
         "source_path": "backend/routers/users.py"
       },
-      "idempotency_policy": "none",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
         "type": "object"
       },
-      "major_version": 1,
+      "major_version": null,
       "method": "GET",
       "normalized_route": "/api/users",
       "occurrences": [
@@ -1643,38 +1788,28 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
-          }
-        },
-        "required": [
-          "result_json"
-        ],
+        "properties": {},
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
-      "reclassification_reason": null,
+      "provider_anchor": "backend/routers/users.py",
+      "provider_source_sha256": "sha256:1447c4ff79a3f9e2382ea6865a9a61f8b3ac595e13e463bf9fb0294a89b8780c",
+      "reclassification_reason": "The legacy service returns unprojected user records including non-public fields; no exact safe output exists.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "read"
-      ]
+      "side_effects": []
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": "base.read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": "base.identity.session.get.atomic",
-      "confirmation_policy": "none",
+      "capability_id": null,
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
-      "example_output": {
-        "result_json": "{}"
-      },
-      "final_disposition": "migrated",
+      "example_output": {},
+      "final_disposition": "domain_design_required",
       "handler_evidence": {
         "anchors": [],
         "finding": "Exact registered route definition is anchored and machine-checked.",
@@ -1689,13 +1824,13 @@
         },
         "source_path": "backend/routers/users.py"
       },
-      "idempotency_policy": "none",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
         "type": "object"
       },
-      "major_version": 1,
+      "major_version": null,
       "method": "GET",
       "normalized_route": "/api/users/me",
       "occurrences": [
@@ -1713,39 +1848,32 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
-          }
-        },
-        "required": [
-          "result_json"
-        ],
+        "properties": {},
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
-      "reclassification_reason": null,
+      "provider_anchor": "backend/routers/users.py",
+      "provider_source_sha256": "sha256:1447c4ff79a3f9e2382ea6865a9a61f8b3ac595e13e463bf9fb0294a89b8780c",
+      "reclassification_reason": "The profile contains dynamic grants and permissions without a closed exact output contract.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "read"
-      ]
+      "side_effects": []
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": "base.read",
+      "authorization_policy": "base.v2:authenticated",
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": "base.identity.user.search",
       "confirmation_policy": "none",
+      "consistency_policy": "strong",
       "example_input": {
         "limit": 10,
         "query": ""
       },
       "example_output": {
-        "result_json": "{}"
+        "data": [],
+        "success": true
       },
       "final_disposition": "migrated",
       "handler_evidence": {
@@ -1823,41 +1951,70 @@
       "output_schema": {
         "additionalProperties": false,
         "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
+          "data": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "avatar_url": {
+                  "maxLength": 2048,
+                  "type": "string"
+                },
+                "email": {
+                  "maxLength": 512,
+                  "type": "string"
+                },
+                "gid": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "name": {
+                  "maxLength": 512,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "gid",
+                "name",
+                "email",
+                "avatar_url"
+              ],
+              "type": "object"
+            },
+            "maxItems": 50,
+            "type": "array"
+          },
+          "success": {
+            "type": "boolean"
           }
         },
         "required": [
-          "result_json"
+          "success",
+          "data"
         ],
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
       "reclassification_reason": null,
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
       "side_effects": [
-        "read"
+        "Reads and projects matching Base directory users without mutation."
       ]
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "base.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": "base.identity.user.role.assign",
-      "confirmation_policy": "admin",
-      "example_input": {
-        "external_subtype": null,
-        "new_role": "member",
-        "user_gid": "usr_2"
-      },
-      "example_output": {
-        "result_json": "{}"
-      },
-      "final_disposition": "migrated",
+      "capability_id": null,
+      "confirmation_policy": null,
+      "consistency_policy": null,
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
       "handler_evidence": {
         "anchors": [],
         "finding": "Exact registered route definition is anchored and machine-checked.",
@@ -1872,35 +2029,13 @@
         },
         "source_path": "backend/routers/users.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
-        "properties": {
-          "external_subtype": {
-            "maxLength": 512,
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "new_role": {
-            "maxLength": 512,
-            "minLength": 1,
-            "type": "string"
-          },
-          "user_gid": {
-            "maxLength": 512,
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "required": [
-          "user_gid",
-          "new_role"
-        ],
+        "properties": {},
         "type": "object"
       },
-      "major_version": 1,
+      "major_version": null,
       "method": "PATCH",
       "normalized_route": "/api/users/{dynamic}/role",
       "occurrences": [
@@ -1929,41 +2064,28 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
-          }
-        },
-        "required": [
-          "result_json"
-        ],
+        "properties": {},
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
-      "reclassification_reason": null,
+      "provider_anchor": "backend/routers/users.py",
+      "provider_source_sha256": "sha256:1447c4ff79a3f9e2382ea6865a9a61f8b3ac595e13e463bf9fb0294a89b8780c",
+      "reclassification_reason": "The legacy service returns an unprojected user record; no exact safe output exists without changing REST semantics.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "base:write"
-      ]
+      "side_effects": []
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": "base.read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": "base.saved_view.list",
-      "confirmation_policy": "none",
-      "example_input": {
-        "list_gid": null,
-        "module": "task"
-      },
-      "example_output": {
-        "result_json": "{}"
-      },
-      "final_disposition": "migrated",
+      "capability_id": null,
+      "confirmation_policy": null,
+      "consistency_policy": null,
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
       "handler_evidence": {
         "anchors": [],
         "finding": "Exact registered route definition is anchored and machine-checked.",
@@ -1978,25 +2100,13 @@
         },
         "source_path": "backend/routers/views.py"
       },
-      "idempotency_policy": "none",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
-        "properties": {
-          "list_gid": {
-            "maxLength": 512,
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "module": {
-            "maxLength": 128,
-            "type": "string"
-          }
-        },
+        "properties": {},
         "type": "object"
       },
-      "major_version": 1,
+      "major_version": null,
       "method": "GET",
       "normalized_route": "/api/views",
       "occurrences": [
@@ -2025,44 +2135,28 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
-          }
-        },
-        "required": [
-          "result_json"
-        ],
+        "properties": {},
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
-      "reclassification_reason": null,
+      "provider_anchor": "backend/routers/views.py",
+      "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
+      "reclassification_reason": "Saved-view config is intentionally dynamic and has no governed closed nested contract.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "read"
-      ]
+      "side_effects": []
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "base.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": "base.saved_view.create",
-      "confirmation_policy": "user",
-      "example_input": {
-        "config_json": "{}",
-        "is_shared": false,
-        "list_gid": null,
-        "module": "task",
-        "name": "View"
-      },
-      "example_output": {
-        "result_json": "{}"
-      },
-      "final_disposition": "migrated",
+      "capability_id": null,
+      "confirmation_policy": null,
+      "consistency_policy": null,
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
       "handler_evidence": {
         "anchors": [],
         "finding": "Exact registered route definition is anchored and machine-checked.",
@@ -2077,41 +2171,13 @@
         },
         "source_path": "backend/routers/views.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
-        "properties": {
-          "config_json": {
-            "maxLength": 1000000,
-            "type": "string"
-          },
-          "is_shared": {
-            "type": "boolean"
-          },
-          "list_gid": {
-            "maxLength": 512,
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "module": {
-            "maxLength": 512,
-            "minLength": 1,
-            "type": "string"
-          },
-          "name": {
-            "maxLength": 512,
-            "type": "string"
-          }
-        },
-        "required": [
-          "module",
-          "config_json"
-        ],
+        "properties": {},
         "type": "object"
       },
-      "major_version": 1,
+      "major_version": null,
       "method": "POST",
       "normalized_route": "/api/views",
       "occurrences": [
@@ -2140,40 +2206,28 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
-          }
-        },
-        "required": [
-          "result_json"
-        ],
+        "properties": {},
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
-      "reclassification_reason": null,
+      "provider_anchor": "backend/routers/views.py",
+      "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
+      "reclassification_reason": "Saved-view config is intentionally dynamic and has no governed closed nested contract.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "base:write"
-      ]
+      "side_effects": []
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "base.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": "base.saved_view.delete",
-      "confirmation_policy": "user",
-      "example_input": {
-        "gid": "view_1"
-      },
-      "example_output": {
-        "result_json": "{}"
-      },
-      "final_disposition": "migrated",
+      "capability_id": null,
+      "confirmation_policy": null,
+      "consistency_policy": null,
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
       "handler_evidence": {
         "anchors": [],
         "finding": "Exact registered route definition is anchored and machine-checked.",
@@ -2188,22 +2242,13 @@
         },
         "source_path": "backend/routers/views.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
-        "properties": {
-          "gid": {
-            "maxLength": 512,
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "required": [
-          "gid"
-        ],
+        "properties": {},
         "type": "object"
       },
-      "major_version": 1,
+      "major_version": null,
       "method": "DELETE",
       "normalized_route": "/api/views/{dynamic}",
       "occurrences": [
@@ -2221,43 +2266,28 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
-          }
-        },
-        "required": [
-          "result_json"
-        ],
+        "properties": {},
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
-      "reclassification_reason": null,
+      "provider_anchor": "backend/routers/views.py",
+      "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
+      "reclassification_reason": "The object-ownership check has no public owner-service boundary independent of dynamic saved-view config.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "base:write"
-      ]
+      "side_effects": []
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "base.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": "base.saved_view.update",
-      "confirmation_policy": "user",
-      "example_input": {
-        "changes": {
-          "name": "View 2"
-        },
-        "gid": "view_1"
-      },
-      "example_output": {
-        "result_json": "{}"
-      },
-      "final_disposition": "migrated",
+      "capability_id": null,
+      "confirmation_policy": null,
+      "consistency_policy": null,
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
       "handler_evidence": {
         "anchors": [],
         "finding": "Exact registered route definition is anchored and machine-checked.",
@@ -2272,47 +2302,13 @@
         },
         "source_path": "backend/routers/views.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
-        "properties": {
-          "changes": {
-            "additionalProperties": false,
-            "properties": {
-              "config_json": {
-                "maxLength": 1000000,
-                "type": "string"
-              },
-              "is_shared": {
-                "type": "boolean"
-              },
-              "list_gid": {
-                "maxLength": 512,
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "name": {
-                "maxLength": 512,
-                "type": "string"
-              }
-            },
-            "type": "object"
-          },
-          "gid": {
-            "maxLength": 512,
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "required": [
-          "gid",
-          "changes"
-        ],
+        "properties": {},
         "type": "object"
       },
-      "major_version": 1,
+      "major_version": null,
       "method": "PATCH",
       "normalized_route": "/api/views/{dynamic}",
       "occurrences": [
@@ -2341,40 +2337,28 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
-          }
-        },
-        "required": [
-          "result_json"
-        ],
+        "properties": {},
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
-      "reclassification_reason": null,
+      "provider_anchor": "backend/routers/views.py",
+      "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
+      "reclassification_reason": "Saved-view config is intentionally dynamic and has no governed closed nested contract.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "base:write"
-      ]
+      "side_effects": []
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "base.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": "base.saved_view.copy",
-      "confirmation_policy": "user",
-      "example_input": {
-        "gid": "view_1"
-      },
-      "example_output": {
-        "result_json": "{}"
-      },
-      "final_disposition": "migrated",
+      "capability_id": null,
+      "confirmation_policy": null,
+      "consistency_policy": null,
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
       "handler_evidence": {
         "anchors": [],
         "finding": "Exact registered route definition is anchored and machine-checked.",
@@ -2389,22 +2373,13 @@
         },
         "source_path": "backend/routers/views.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
-        "properties": {
-          "gid": {
-            "maxLength": 512,
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "required": [
-          "gid"
-        ],
+        "properties": {},
         "type": "object"
       },
-      "major_version": 1,
+      "major_version": null,
       "method": "POST",
       "normalized_route": "/api/views/{dynamic}/copy",
       "occurrences": [
@@ -2422,33 +2397,25 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
-          }
-        },
-        "required": [
-          "result_json"
-        ],
+        "properties": {},
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
-      "reclassification_reason": null,
+      "provider_anchor": "backend/routers/views.py",
+      "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
+      "reclassification_reason": "The copied result depends on dynamic saved-view config without a governed closed nested contract.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "base:write"
-      ]
+      "side_effects": []
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "craft.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "new_atomic_capability_required",
       "capability_id": null,
-      "confirmation_policy": "user",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -2459,7 +2426,7 @@
         "route_definition": null,
         "source_path": "plugins/craft/craft_backend/routers/craft_library.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -2491,17 +2458,17 @@
       "provider_anchor": "plugins/craft/craft_backend/routers/craft_library.py",
       "provider_source_sha256": "sha256:30c275048c808550f27bbdcf2da96871936a4b6a53f7eda3aefa0ee3d522eed3",
       "reclassification_reason": "No delete provider exists; the available obsolete transition is a different lifecycle outcome.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "craft:write"
-      ]
+      "side_effects": []
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "craft.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "new_atomic_capability_required",
       "capability_id": null,
-      "confirmation_policy": "user",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -2512,7 +2479,7 @@
         "route_definition": null,
         "source_path": "plugins/craft/craft_backend/routers/craft_library.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -2544,17 +2511,17 @@
       "provider_anchor": "plugins/craft/craft_backend/routers/craft_library.py",
       "provider_source_sha256": "sha256:30c275048c808550f27bbdcf2da96871936a4b6a53f7eda3aefa0ee3d522eed3",
       "reclassification_reason": "No delete provider exists; the available obsolete transition is a different lifecycle outcome.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "craft:write"
-      ]
+      "side_effects": []
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": "craft.read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": null,
-      "confirmation_policy": "none",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -2565,7 +2532,7 @@
         "route_definition": null,
         "source_path": "plugins/craft/craft_backend/routers/rule_engine.py"
       },
-      "idempotency_policy": "none",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -2608,25 +2575,20 @@
       "provider_anchor": "plugins/craft/craft_backend/routers/rule_engine.py",
       "provider_source_sha256": "sha256:ac258d5ffc6531a5da259750f8b637fea6e467c0a50d4f64a379069aa660f86a",
       "reclassification_reason": "No entry-check provider exists; CEL evaluation and BOP audit are different outcomes.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "read"
-      ]
+      "side_effects": []
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "craft.rule.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": "craft.rule.definition.update",
-      "confirmation_policy": "user",
-      "example_input": {
-        "changes_json": "{\"name\":\"Rule\"}",
-        "gid": "rule_1"
-      },
-      "example_output": {
-        "result_json": "{}"
-      },
-      "final_disposition": "migrated",
+      "capability_id": null,
+      "confirmation_policy": null,
+      "consistency_policy": null,
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
       "handler_evidence": {
         "anchors": [],
         "finding": "No exact registered route/method definition exists in this reviewed handler family.",
@@ -2634,27 +2596,13 @@
         "route_definition": null,
         "source_path": "plugins/craft/craft_backend/routers/rules.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
-        "properties": {
-          "changes_json": {
-            "maxLength": 1000000,
-            "type": "string"
-          },
-          "gid": {
-            "maxLength": 512,
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "required": [
-          "gid",
-          "changes_json"
-        ],
+        "properties": {},
         "type": "object"
       },
-      "major_version": 1,
+      "major_version": null,
       "method": "PUT",
       "normalized_route": "/api/rules/{dynamic}",
       "occurrences": [
@@ -2683,33 +2631,25 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {
-          "result_json": {
-            "maxLength": 4000000,
-            "type": "string"
-          }
-        },
-        "required": [
-          "result_json"
-        ],
+        "properties": {},
         "type": "object"
       },
       "owner_domain": "craft",
       "owner_prefix": "craft",
-      "provider_anchor": "plugins/craft/craft_backend/capabilities/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:6b9feaac14abf395b5c165d9745b3597125623784aa98c2fda371b656d4e37a1",
-      "reclassification_reason": null,
+      "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
+      "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
+      "reclassification_reason": "Rule definition changes contain dynamic rule_definition data without a governed closed nested contract.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "craft:write"
-      ]
+      "side_effects": []
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "craft.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": null,
-      "confirmation_policy": "user",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -2720,7 +2660,7 @@
         "route_definition": null,
         "source_path": "plugins/craft/craft_backend/routers/rules.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -2751,18 +2691,18 @@
       "owner_prefix": "craft",
       "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
       "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
-      "reclassification_reason": "No mutable-rule activation provider exists; immutable release activation is a different lifecycle.",
+      "reclassification_reason": "No mutable-rule activation provider exists; immutable release activation is a different lifecycle outcome.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "craft:write"
-      ]
+      "side_effects": []
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "craft.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": null,
-      "confirmation_policy": "user",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -2773,7 +2713,7 @@
         "route_definition": null,
         "source_path": "plugins/craft/craft_backend/routers/rules.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -2805,17 +2745,17 @@
       "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
       "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
       "reclassification_reason": "No legacy deviation provider exists; governed release waiver creation has a different evidence contract.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "craft:write"
-      ]
+      "side_effects": []
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "craft.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "new_atomic_capability_required",
       "capability_id": null,
-      "confirmation_policy": "user",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -2826,7 +2766,7 @@
         "route_definition": null,
         "source_path": "plugins/craft/craft_backend/routers/rules.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -2858,17 +2798,17 @@
       "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
       "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
       "reclassification_reason": "No mutable-rule suspension handler or domain service exists.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "craft:write"
-      ]
+      "side_effects": []
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": "integration.read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": null,
-      "confirmation_policy": "none",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -2879,7 +2819,7 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": "none",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -2910,18 +2850,18 @@
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
       "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "read"
-      ]
+      "side_effects": []
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "integration.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": null,
-      "confirmation_policy": "user",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -2932,7 +2872,7 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -2963,18 +2903,18 @@
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
       "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "integration:write"
-      ]
+      "side_effects": []
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "integration.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": null,
-      "confirmation_policy": "user",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -2985,7 +2925,7 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -3016,18 +2956,18 @@
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
       "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "integration:write"
-      ]
+      "side_effects": []
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": "integration.read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": null,
-      "confirmation_policy": "none",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -3038,7 +2978,7 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": "none",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -3069,18 +3009,18 @@
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
       "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "read"
-      ]
+      "side_effects": []
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "integration.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": null,
-      "confirmation_policy": "user",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -3091,7 +3031,7 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -3122,18 +3062,18 @@
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
       "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "integration:write"
-      ]
+      "side_effects": []
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": "integration.read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": null,
-      "confirmation_policy": "none",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -3144,7 +3084,7 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": "none",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -3175,18 +3115,18 @@
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
       "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "read"
-      ]
+      "side_effects": []
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "integration.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": null,
-      "confirmation_policy": "user",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -3197,7 +3137,7 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -3228,18 +3168,18 @@
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
       "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "integration:write"
-      ]
+      "side_effects": []
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": "integration.read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": null,
-      "confirmation_policy": "none",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -3250,7 +3190,7 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": "none",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -3281,18 +3221,18 @@
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
       "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "read"
-      ]
+      "side_effects": []
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "integration.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": null,
-      "confirmation_policy": "user",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -3303,7 +3243,7 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -3334,18 +3274,18 @@
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
       "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "integration:write"
-      ]
+      "side_effects": []
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": "integration.read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": null,
-      "confirmation_policy": "none",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -3356,7 +3296,7 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": "none",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -3387,18 +3327,18 @@
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
       "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "read"
-      ]
+      "side_effects": []
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "integration.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": null,
-      "confirmation_policy": "user",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -3409,7 +3349,7 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -3440,18 +3380,18 @@
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
       "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "integration:write"
-      ]
+      "side_effects": []
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": "integration.read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": null,
-      "confirmation_policy": "none",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -3462,7 +3402,7 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": "none",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -3493,18 +3433,18 @@
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
       "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "read"
-      ]
+      "side_effects": []
     },
     {
-      "atomicity_class": "single_transaction",
-      "authorization_policy": "project_management.write",
+      "atomicity_class": "read",
+      "authorization_policy": null,
       "baseline_disposition": "existing_capability_reclassified",
       "capability_id": null,
-      "confirmation_policy": "user",
+      "confirmation_policy": null,
+      "consistency_policy": null,
       "example_input": {},
       "example_output": {},
       "final_disposition": "domain_design_required",
@@ -3515,7 +3455,7 @@
         "route_definition": null,
         "source_path": "plugins/craft/craft_backend/routers/approval.py"
       },
-      "idempotency_policy": "required",
+      "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -3546,11 +3486,10 @@
       "owner_prefix": "project",
       "provider_anchor": "plugins/craft/craft_backend/routers/approval.py",
       "provider_source_sha256": "sha256:1b6d618b9562ad4509f81a848234af9c02f75e17392fe26ed9ca203bf1c7569a",
-      "reclassification_reason": "The Project outcome returns a notification side effect that the legacy adapter must publish; a direct atomic invocation would silently omit it and requires BFF or provider redesign.",
+      "reclassification_reason": "The Project outcome omits the legacy notification publication side effect.",
+      "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": [
-        "project_management:write"
-      ]
+      "side_effects": []
     }
   ],
   "schema_version": "1.0.0",

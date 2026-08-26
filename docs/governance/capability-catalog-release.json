@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_b6846f0f3faea2788a65130a4a59a5fe",
-  "catalog_hash": "sha256:b6846f0f3faea2788a65130a4a59a5fef9a22bdd1cd0a85412246be47873e0f9",
+  "release_id": "rel_5915db601d7c6ce939a106d76a78b90a",
+  "catalog_hash": "sha256:5915db601d7c6ce939a106d76a78b90a98ee54a65d779951dd124558baf64f4f",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -8325,225 +8325,6 @@
       ]
     },
     {
-      "id": "base.annotation.batch.get",
-      "major_version": 1,
-      "owner_domain": "base",
-      "lifecycle_status": "stable",
-      "catalog_release": null,
-      "title": "base.annotation.batch.get",
-      "description": "Execute exact Base outcome base.annotation.batch.get.",
-      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
-      "do_not_use_when": "The request selects another operation or domain.",
-      "business_effect": "Business outcome: Execute exact Base outcome base.annotation.batch.get.",
-      "side_effect_level": "read",
-      "side_effects": "Reads base domain state; emits no mutation event or external call.",
-      "execution_mode": "cloud_sync",
-      "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
-        "worker": false,
-        "local_runtime": false
-      },
-      "exposure_policy_source": "provider_explicit",
-      "automation_level": "A2",
-      "authorization_policy": "base.v2:base.read",
-      "resource_selectors": [],
-      "data_classification": "confidential",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "scoped",
-      "input_schema": {
-        "type": "object",
-        "properties": {
-          "item_gids": {
-            "type": "array",
-            "maxItems": 500,
-            "items": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 512
-            }
-          }
-        },
-        "additionalProperties": false,
-        "required": [
-          "item_gids"
-        ]
-      },
-      "output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "agent_output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "schema_hash": "sha256:570e9c5e55ad8c8348f9f494aa7d12f4a5357f5cd6f89321bc9e4d7ebadc9bca",
-      "artifact_policy": "none",
-      "operation_policy": "none",
-      "concurrency_policy": "none",
-      "expected_version_payload_path": null,
-      "idempotency_policy": "none",
-      "consistency_policy": "strong",
-      "timeout_seconds": 30,
-      "rate_limit_cost": 1,
-      "execution_budget": {
-        "memory_class": "small",
-        "max_input_bytes": 1048576,
-        "max_output_bytes": 4194304,
-        "collection_policy": "bounded",
-        "max_page_size": null,
-        "max_parallel_per_consumer": 4,
-        "max_parallel_per_tenant": 32,
-        "overload_policy": "reject"
-      },
-      "confirmation_policy": "none",
-      "evidence_policy": "optional",
-      "audit_policy": "standard",
-      "deprecation_message": null,
-      "domain_errors": [
-        {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "domain_errors_complete": true,
-      "capability_version_gid": "cv2_3a5870d8c90c2cba10a29e74",
-      "error_schema": [
-        {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
-          "is_retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "transaction_policy": {
-        "mode": "provider",
-        "boundary": "owning_domain"
-      },
-      "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
-      "provider_ref": "base.provider",
-      "api_refs": [
-        "gateway:/api/v1/capabilities/base.annotation.batch.get:invoke"
-      ],
-      "test_refs": [
-        {
-          "test_type": "contract",
-          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
-          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
-          "result": "pass",
-          "path": "backend/tests/test_capability_v2_contracts.py"
-        }
-      ]
-    },
-    {
       "id": "base.annotation.change.apply",
       "major_version": 1,
       "owner_domain": "base",
@@ -8782,432 +8563,6 @@
       ]
     },
     {
-      "id": "base.annotation.get",
-      "major_version": 1,
-      "owner_domain": "base",
-      "lifecycle_status": "stable",
-      "catalog_release": null,
-      "title": "base.annotation.get",
-      "description": "Execute exact Base outcome base.annotation.get.",
-      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
-      "do_not_use_when": "The request selects another operation or domain.",
-      "business_effect": "Business outcome: Execute exact Base outcome base.annotation.get.",
-      "side_effect_level": "read",
-      "side_effects": "Reads base domain state; emits no mutation event or external call.",
-      "execution_mode": "cloud_sync",
-      "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
-        "worker": false,
-        "local_runtime": false
-      },
-      "exposure_policy_source": "provider_explicit",
-      "automation_level": "A2",
-      "authorization_policy": "base.v2:base.read",
-      "resource_selectors": [],
-      "data_classification": "confidential",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "scoped",
-      "input_schema": {
-        "type": "object",
-        "properties": {
-          "item_gid": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 512
-          }
-        },
-        "additionalProperties": false,
-        "required": [
-          "item_gid"
-        ]
-      },
-      "output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "agent_output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "schema_hash": "sha256:08a1eb8cce46b1a81bfafc6afd77a909fccc196ce045fdf478ca797d2d25100d",
-      "artifact_policy": "none",
-      "operation_policy": "none",
-      "concurrency_policy": "none",
-      "expected_version_payload_path": null,
-      "idempotency_policy": "none",
-      "consistency_policy": "strong",
-      "timeout_seconds": 30,
-      "rate_limit_cost": 1,
-      "execution_budget": {
-        "memory_class": "small",
-        "max_input_bytes": 1048576,
-        "max_output_bytes": 4194304,
-        "collection_policy": "bounded",
-        "max_page_size": null,
-        "max_parallel_per_consumer": 4,
-        "max_parallel_per_tenant": 32,
-        "overload_policy": "reject"
-      },
-      "confirmation_policy": "none",
-      "evidence_policy": "optional",
-      "audit_policy": "standard",
-      "deprecation_message": null,
-      "domain_errors": [
-        {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "domain_errors_complete": true,
-      "capability_version_gid": "cv2_bc9b150fbf1f129f0a89f7d4",
-      "error_schema": [
-        {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
-          "is_retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "transaction_policy": {
-        "mode": "provider",
-        "boundary": "owning_domain"
-      },
-      "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
-      "provider_ref": "base.provider",
-      "api_refs": [
-        "gateway:/api/v1/capabilities/base.annotation.get:invoke"
-      ],
-      "test_refs": [
-        {
-          "test_type": "contract",
-          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
-          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
-          "result": "pass",
-          "path": "backend/tests/test_capability_v2_contracts.py"
-        }
-      ]
-    },
-    {
-      "id": "base.annotation.list",
-      "major_version": 1,
-      "owner_domain": "base",
-      "lifecycle_status": "stable",
-      "catalog_release": null,
-      "title": "base.annotation.list",
-      "description": "Execute exact Base outcome base.annotation.list.",
-      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
-      "do_not_use_when": "The request selects another operation or domain.",
-      "business_effect": "Business outcome: Execute exact Base outcome base.annotation.list.",
-      "side_effect_level": "read",
-      "side_effects": "Reads base domain state; emits no mutation event or external call.",
-      "execution_mode": "cloud_sync",
-      "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
-        "worker": false,
-        "local_runtime": false
-      },
-      "exposure_policy_source": "provider_explicit",
-      "automation_level": "A2",
-      "authorization_policy": "base.v2:base.read",
-      "resource_selectors": [],
-      "data_classification": "confidential",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "scoped",
-      "input_schema": {
-        "type": "object",
-        "properties": {
-          "module": {
-            "type": "string",
-            "maxLength": 128
-          }
-        },
-        "additionalProperties": false
-      },
-      "output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "agent_output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "schema_hash": "sha256:ab5df6fa846681389d98f7a170f12c573001b1b07760cb665a5300a956ce3b63",
-      "artifact_policy": "none",
-      "operation_policy": "none",
-      "concurrency_policy": "none",
-      "expected_version_payload_path": null,
-      "idempotency_policy": "none",
-      "consistency_policy": "strong",
-      "timeout_seconds": 30,
-      "rate_limit_cost": 1,
-      "execution_budget": {
-        "memory_class": "small",
-        "max_input_bytes": 1048576,
-        "max_output_bytes": 4194304,
-        "collection_policy": "bounded",
-        "max_page_size": null,
-        "max_parallel_per_consumer": 4,
-        "max_parallel_per_tenant": 32,
-        "overload_policy": "reject"
-      },
-      "confirmation_policy": "none",
-      "evidence_policy": "optional",
-      "audit_policy": "standard",
-      "deprecation_message": null,
-      "domain_errors": [
-        {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "domain_errors_complete": true,
-      "capability_version_gid": "cv2_a07b5868e6bfc7f90b1695a0",
-      "error_schema": [
-        {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
-          "is_retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "transaction_policy": {
-        "mode": "provider",
-        "boundary": "owning_domain"
-      },
-      "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
-      "provider_ref": "base.provider",
-      "api_refs": [
-        "gateway:/api/v1/capabilities/base.annotation.list:invoke"
-      ],
-      "test_refs": [
-        {
-          "test_type": "contract",
-          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
-          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
-          "result": "pass",
-          "path": "backend/tests/test_capability_v2_contracts.py"
-        }
-      ]
-    },
-    {
       "id": "base.annotation.read",
       "major_version": 1,
       "owner_domain": "base",
@@ -9434,252 +8789,6 @@
       "provider_ref": "base.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/base.annotation.read:invoke"
-      ],
-      "test_refs": [
-        {
-          "test_type": "contract",
-          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
-          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
-          "result": "pass",
-          "path": "backend/tests/test_capability_v2_contracts.py"
-        }
-      ]
-    },
-    {
-      "id": "base.annotation.upsert",
-      "major_version": 1,
-      "owner_domain": "base",
-      "lifecycle_status": "stable",
-      "catalog_release": null,
-      "title": "base.annotation.upsert",
-      "description": "Execute exact Base outcome base.annotation.upsert.",
-      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
-      "do_not_use_when": "The request selects another operation or domain.",
-      "business_effect": "Business outcome: Execute exact Base outcome base.annotation.upsert.",
-      "side_effect_level": "write",
-      "side_effects": "Writes base domain state through its Provider and records a capability audit event.",
-      "execution_mode": "cloud_sync",
-      "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
-        "worker": false,
-        "local_runtime": false
-      },
-      "exposure_policy_source": "provider_explicit",
-      "automation_level": "A1",
-      "authorization_policy": "base.v2:base.write",
-      "resource_selectors": [],
-      "data_classification": "confidential",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "scoped",
-      "input_schema": {
-        "type": "object",
-        "properties": {
-          "item_gid": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 512
-          },
-          "annotation": {
-            "type": "object",
-            "properties": {
-              "module": {
-                "type": "string",
-                "maxLength": 128
-              },
-              "item_title": {
-                "type": "string",
-                "maxLength": 512
-              },
-              "self_status": {
-                "type": "string",
-                "maxLength": 64
-              },
-              "self_schedule": {
-                "type": "string",
-                "maxLength": 128
-              },
-              "self_note": {
-                "type": "string",
-                "maxLength": 20000
-              },
-              "self_attachments_json": {
-                "type": "string",
-                "maxLength": 1000000
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "additionalProperties": false,
-        "required": [
-          "item_gid",
-          "annotation"
-        ]
-      },
-      "output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "agent_output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "schema_hash": "sha256:f802f8272b917cea4e9b073b6d56975f31085cba5550866b4cd171ad814a971a",
-      "artifact_policy": "none",
-      "operation_policy": "optional",
-      "concurrency_policy": "none",
-      "expected_version_payload_path": null,
-      "idempotency_policy": "required",
-      "consistency_policy": "external",
-      "timeout_seconds": 30,
-      "rate_limit_cost": 1,
-      "execution_budget": {
-        "memory_class": "small",
-        "max_input_bytes": 1048576,
-        "max_output_bytes": 4194304,
-        "collection_policy": "bounded",
-        "max_page_size": null,
-        "max_parallel_per_consumer": 4,
-        "max_parallel_per_tenant": 32,
-        "overload_policy": "reject"
-      },
-      "confirmation_policy": "user",
-      "evidence_policy": "optional",
-      "audit_policy": "standard",
-      "deprecation_message": null,
-      "domain_errors": [
-        {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "domain_errors_complete": true,
-      "capability_version_gid": "cv2_be12e7ff03fb19e26d3f039b",
-      "error_schema": [
-        {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
-          "is_retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "transaction_policy": {
-        "mode": "provider",
-        "boundary": "owning_domain"
-      },
-      "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
-      "provider_ref": "base.provider",
-      "api_refs": [
-        "gateway:/api/v1/capabilities/base.annotation.upsert:invoke"
       ],
       "test_refs": [
         {
@@ -11707,9 +10816,9 @@
       "description": "Execute exact Base outcome base.authorization.grant.create.",
       "use_when": "A browser consumer needs exactly this Base-owned outcome.",
       "do_not_use_when": "The request selects another operation or domain.",
-      "business_effect": "Business outcome: Execute exact Base outcome base.authorization.grant.create.",
+      "business_effect": "Creates or replaces one scoped authorization grant in the Base grant store.",
       "side_effect_level": "write",
-      "side_effects": "Writes base domain state through its Provider and records a capability audit event.",
+      "side_effects": "Creates or replaces one scoped authorization grant in the Base grant store.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -11722,7 +10831,7 @@
       },
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A1",
-      "authorization_policy": "base.v2:base.write",
+      "authorization_policy": "base.v2:system.user.manage",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -11767,31 +10876,159 @@
       },
       "output_schema": {
         "type": "object",
-        "required": [
-          "result_json"
-        ],
         "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
+          "grant": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "grantee_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "grant_type": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "scope_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "granted_by": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "expires_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "note": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "granted_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "grantee_name": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid",
+              "grantee_gid",
+              "grant_type",
+              "scope_gid",
+              "granted_by",
+              "expires_at",
+              "note",
+              "granted_at"
+            ]
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "grant"
+        ]
       },
       "agent_output_schema": {
         "type": "object",
-        "required": [
-          "result_json"
-        ],
         "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
+          "grant": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "grantee_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "grant_type": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "scope_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "granted_by": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "expires_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "note": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "granted_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "grantee_name": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid",
+              "grantee_gid",
+              "grant_type",
+              "scope_gid",
+              "granted_by",
+              "expires_at",
+              "note",
+              "granted_at"
+            ]
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "grant"
+        ]
       },
-      "schema_hash": "sha256:aa7d8a263d47e1195a10effd8277dea14cb77199d0f79c4106a157ba20970e3c",
+      "schema_hash": "sha256:e6671ebcce11931e408f65223a1b0b1511bee92a37c304aa91433c8178edaa51",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -11946,9 +11183,9 @@
       "description": "Execute exact Base outcome base.authorization.grant.list.",
       "use_when": "A browser consumer needs exactly this Base-owned outcome.",
       "do_not_use_when": "The request selects another operation or domain.",
-      "business_effect": "Business outcome: Execute exact Base outcome base.authorization.grant.list.",
+      "business_effect": "Reads active authorization grants from the Base grant store without mutation.",
       "side_effect_level": "read",
-      "side_effects": "Reads base domain state; emits no mutation event or external call.",
+      "side_effects": "Reads active authorization grants from the Base grant store without mutation.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -11961,7 +11198,7 @@
       },
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A2",
-      "authorization_policy": "base.v2:base.read",
+      "authorization_policy": "base.v2:system.user.manage",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -11981,31 +11218,167 @@
       },
       "output_schema": {
         "type": "object",
-        "required": [
-          "result_json"
-        ],
         "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
+          "grants": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "grantee_gid": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "grant_type": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "scope_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "granted_by": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "expires_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "note": {
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "granted_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "grantee_name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "gid",
+                "grantee_gid",
+                "grant_type",
+                "scope_gid",
+                "granted_by",
+                "expires_at",
+                "note",
+                "granted_at"
+              ]
+            }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "grants"
+        ]
       },
       "agent_output_schema": {
         "type": "object",
-        "required": [
-          "result_json"
-        ],
         "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
+          "grants": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "grantee_gid": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "grant_type": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "scope_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "granted_by": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "expires_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "note": {
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "granted_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "grantee_name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "gid",
+                "grantee_gid",
+                "grant_type",
+                "scope_gid",
+                "granted_by",
+                "expires_at",
+                "note",
+                "granted_at"
+              ]
+            }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "grants"
+        ]
       },
-      "schema_hash": "sha256:e20590907b94729c78f466f60f607e6ffc2637d785b5f3d6b053f98d89db49e1",
+      "schema_hash": "sha256:9406040ddbffec59b3f1f41e17af1eeee3b04a5e1f67969a28b43f9e41af15d2",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -12398,9 +11771,9 @@
       "description": "Execute exact Base outcome base.authorization.grant.revoke.",
       "use_when": "A browser consumer needs exactly this Base-owned outcome.",
       "do_not_use_when": "The request selects another operation or domain.",
-      "business_effect": "Business outcome: Execute exact Base outcome base.authorization.grant.revoke.",
+      "business_effect": "Deletes one existing scoped authorization grant from the Base grant store.",
       "side_effect_level": "write",
-      "side_effects": "Writes base domain state through its Provider and records a capability audit event.",
+      "side_effects": "Deletes one existing scoped authorization grant from the Base grant store.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -12413,7 +11786,7 @@
       },
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A1",
-      "authorization_policy": "base.v2:base.write",
+      "authorization_policy": "base.v2:system.user.manage",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -12434,31 +11807,29 @@
       },
       "output_schema": {
         "type": "object",
-        "required": [
-          "result_json"
-        ],
         "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
+          "ok": {
+            "type": "boolean"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "ok"
+        ]
       },
       "agent_output_schema": {
         "type": "object",
-        "required": [
-          "result_json"
-        ],
         "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
+          "ok": {
+            "type": "boolean"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "ok"
+        ]
       },
-      "schema_hash": "sha256:a5e415a0508b28de4279e5e9c02df3ff86729f4b8363c0b9da251996c370d691",
+      "schema_hash": "sha256:a2bb3055b25fbe0a58fb7324f0cb8d26ea0065e3fd704c89b5bcfa2b3a3d6372",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -13128,9 +12499,9 @@
       "description": "Execute exact Base outcome base.identity.directory.feishu.sync.",
       "use_when": "A browser consumer needs exactly this Base-owned outcome.",
       "do_not_use_when": "The request selects another operation or domain.",
-      "business_effect": "Business outcome: Execute exact Base outcome base.identity.directory.feishu.sync.",
+      "business_effect": "Reads the Feishu directory and applies team and user changes to the Base store.",
       "side_effect_level": "write",
-      "side_effects": "Writes base domain state through its Provider and records a capability audit event.",
+      "side_effects": "Reads the Feishu directory and applies team and user changes to the Base store.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -13143,7 +12514,7 @@
       },
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A1",
-      "authorization_policy": "base.v2:base.write",
+      "authorization_policy": "base.v2:system.tech_config",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -13163,31 +12534,77 @@
       },
       "output_schema": {
         "type": "object",
-        "required": [
-          "result_json"
-        ],
         "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
+          "ok": {
+            "type": "boolean"
+          },
+          "created": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "updated": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "dept_synced": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "departments": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "manual_teams_preserved": {
+            "type": "boolean"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "ok",
+          "created",
+          "updated",
+          "dept_synced",
+          "departments",
+          "manual_teams_preserved"
+        ]
       },
       "agent_output_schema": {
         "type": "object",
-        "required": [
-          "result_json"
-        ],
         "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
+          "ok": {
+            "type": "boolean"
+          },
+          "created": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "updated": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "dept_synced": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "departments": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "manual_teams_preserved": {
+            "type": "boolean"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "ok",
+          "created",
+          "updated",
+          "dept_synced",
+          "departments",
+          "manual_teams_preserved"
+        ]
       },
-      "schema_hash": "sha256:4383632714637315cf7af446faf7eab2be2b5a2ccb5365a64aa723382f55adec",
+      "schema_hash": "sha256:fd6f20ef08b3c5c5fedfffdc3b978f216579dc37390c98e82910272eb212ad09",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -13313,7 +12730,7 @@
         }
       ],
       "transaction_policy": {
-        "mode": "provider",
+        "mode": "external",
         "boundary": "owning_domain"
       },
       "consumer_refs": [],
@@ -14047,646 +13464,6 @@
       ]
     },
     {
-      "id": "base.identity.session.get.atomic",
-      "major_version": 1,
-      "owner_domain": "base",
-      "lifecycle_status": "stable",
-      "catalog_release": null,
-      "title": "base.identity.session.get.atomic",
-      "description": "Execute exact Base outcome base.identity.session.get.atomic.",
-      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
-      "do_not_use_when": "The request selects another operation or domain.",
-      "business_effect": "Business outcome: Execute exact Base outcome base.identity.session.get.atomic.",
-      "side_effect_level": "read",
-      "side_effects": "Reads base domain state; emits no mutation event or external call.",
-      "execution_mode": "cloud_sync",
-      "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
-        "worker": false,
-        "local_runtime": false
-      },
-      "exposure_policy_source": "provider_explicit",
-      "automation_level": "A2",
-      "authorization_policy": "base.v2:base.read",
-      "resource_selectors": [],
-      "data_classification": "confidential",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "scoped",
-      "input_schema": {
-        "type": "object",
-        "properties": {},
-        "additionalProperties": false
-      },
-      "output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "agent_output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "schema_hash": "sha256:3465b1c678f3c089ecc4c08226d7241811a81ed4819a7324c3a73e43906cf203",
-      "artifact_policy": "none",
-      "operation_policy": "none",
-      "concurrency_policy": "none",
-      "expected_version_payload_path": null,
-      "idempotency_policy": "none",
-      "consistency_policy": "strong",
-      "timeout_seconds": 30,
-      "rate_limit_cost": 1,
-      "execution_budget": {
-        "memory_class": "small",
-        "max_input_bytes": 1048576,
-        "max_output_bytes": 4194304,
-        "collection_policy": "bounded",
-        "max_page_size": null,
-        "max_parallel_per_consumer": 4,
-        "max_parallel_per_tenant": 32,
-        "overload_policy": "reject"
-      },
-      "confirmation_policy": "none",
-      "evidence_policy": "optional",
-      "audit_policy": "standard",
-      "deprecation_message": null,
-      "domain_errors": [
-        {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "domain_errors_complete": true,
-      "capability_version_gid": "cv2_baf7e59ef9cff4b03fbdfd72",
-      "error_schema": [
-        {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
-          "is_retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "transaction_policy": {
-        "mode": "provider",
-        "boundary": "owning_domain"
-      },
-      "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
-      "provider_ref": "base.provider",
-      "api_refs": [
-        "gateway:/api/v1/capabilities/base.identity.session.get.atomic:invoke"
-      ],
-      "test_refs": [
-        {
-          "test_type": "contract",
-          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
-          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
-          "result": "pass",
-          "path": "backend/tests/test_capability_v2_contracts.py"
-        }
-      ]
-    },
-    {
-      "id": "base.identity.user.list",
-      "major_version": 1,
-      "owner_domain": "base",
-      "lifecycle_status": "stable",
-      "catalog_release": null,
-      "title": "base.identity.user.list",
-      "description": "Execute exact Base outcome base.identity.user.list.",
-      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
-      "do_not_use_when": "The request selects another operation or domain.",
-      "business_effect": "Business outcome: Execute exact Base outcome base.identity.user.list.",
-      "side_effect_level": "read",
-      "side_effects": "Reads base domain state; emits no mutation event or external call.",
-      "execution_mode": "cloud_sync",
-      "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
-        "worker": false,
-        "local_runtime": false
-      },
-      "exposure_policy_source": "provider_explicit",
-      "automation_level": "A2",
-      "authorization_policy": "base.v2:base.read",
-      "resource_selectors": [],
-      "data_classification": "confidential",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "scoped",
-      "input_schema": {
-        "type": "object",
-        "properties": {},
-        "additionalProperties": false
-      },
-      "output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "agent_output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "schema_hash": "sha256:3465b1c678f3c089ecc4c08226d7241811a81ed4819a7324c3a73e43906cf203",
-      "artifact_policy": "none",
-      "operation_policy": "none",
-      "concurrency_policy": "none",
-      "expected_version_payload_path": null,
-      "idempotency_policy": "none",
-      "consistency_policy": "strong",
-      "timeout_seconds": 30,
-      "rate_limit_cost": 1,
-      "execution_budget": {
-        "memory_class": "small",
-        "max_input_bytes": 1048576,
-        "max_output_bytes": 4194304,
-        "collection_policy": "bounded",
-        "max_page_size": null,
-        "max_parallel_per_consumer": 4,
-        "max_parallel_per_tenant": 32,
-        "overload_policy": "reject"
-      },
-      "confirmation_policy": "none",
-      "evidence_policy": "optional",
-      "audit_policy": "standard",
-      "deprecation_message": null,
-      "domain_errors": [
-        {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "domain_errors_complete": true,
-      "capability_version_gid": "cv2_1a53e0a1c7cc458cab65f2d3",
-      "error_schema": [
-        {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
-          "is_retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "transaction_policy": {
-        "mode": "provider",
-        "boundary": "owning_domain"
-      },
-      "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
-      "provider_ref": "base.provider",
-      "api_refs": [
-        "gateway:/api/v1/capabilities/base.identity.user.list:invoke"
-      ],
-      "test_refs": [
-        {
-          "test_type": "contract",
-          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
-          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
-          "result": "pass",
-          "path": "backend/tests/test_capability_v2_contracts.py"
-        }
-      ]
-    },
-    {
-      "id": "base.identity.user.role.assign",
-      "major_version": 1,
-      "owner_domain": "base",
-      "lifecycle_status": "stable",
-      "catalog_release": null,
-      "title": "base.identity.user.role.assign",
-      "description": "Execute exact Base outcome base.identity.user.role.assign.",
-      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
-      "do_not_use_when": "The request selects another operation or domain.",
-      "business_effect": "Business outcome: Execute exact Base outcome base.identity.user.role.assign.",
-      "side_effect_level": "write",
-      "side_effects": "Writes base domain state through its Provider and records a capability audit event.",
-      "execution_mode": "cloud_sync",
-      "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
-        "worker": false,
-        "local_runtime": false
-      },
-      "exposure_policy_source": "provider_explicit",
-      "automation_level": "A1",
-      "authorization_policy": "base.v2:base.write",
-      "resource_selectors": [],
-      "data_classification": "confidential",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "scoped",
-      "input_schema": {
-        "type": "object",
-        "properties": {
-          "user_gid": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 512
-          },
-          "new_role": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 512
-          },
-          "external_subtype": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "maxLength": 512
-          }
-        },
-        "additionalProperties": false,
-        "required": [
-          "user_gid",
-          "new_role"
-        ]
-      },
-      "output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "agent_output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "schema_hash": "sha256:79e068ed82da865ddece276ed3534e793384ecfb5ef2b84a32672438ade0c9d3",
-      "artifact_policy": "none",
-      "operation_policy": "optional",
-      "concurrency_policy": "none",
-      "expected_version_payload_path": null,
-      "idempotency_policy": "required",
-      "consistency_policy": "external",
-      "timeout_seconds": 30,
-      "rate_limit_cost": 1,
-      "execution_budget": {
-        "memory_class": "small",
-        "max_input_bytes": 1048576,
-        "max_output_bytes": 4194304,
-        "collection_policy": "bounded",
-        "max_page_size": null,
-        "max_parallel_per_consumer": 4,
-        "max_parallel_per_tenant": 32,
-        "overload_policy": "reject"
-      },
-      "confirmation_policy": "admin",
-      "evidence_policy": "optional",
-      "audit_policy": "standard",
-      "deprecation_message": null,
-      "domain_errors": [
-        {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "domain_errors_complete": true,
-      "capability_version_gid": "cv2_c14a9ecb9b27c074f2e35788",
-      "error_schema": [
-        {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
-          "is_retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "transaction_policy": {
-        "mode": "provider",
-        "boundary": "owning_domain"
-      },
-      "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
-      "provider_ref": "base.provider",
-      "api_refs": [
-        "gateway:/api/v1/capabilities/base.identity.user.role.assign:invoke"
-      ],
-      "test_refs": [
-        {
-          "test_type": "contract",
-          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
-          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
-          "result": "pass",
-          "path": "backend/tests/test_capability_v2_contracts.py"
-        }
-      ]
-    },
-    {
       "id": "base.identity.user.search",
       "major_version": 1,
       "owner_domain": "base",
@@ -14696,9 +13473,9 @@
       "description": "Execute exact Base outcome base.identity.user.search.",
       "use_when": "A browser consumer needs exactly this Base-owned outcome.",
       "do_not_use_when": "The request selects another operation or domain.",
-      "business_effect": "Business outcome: Execute exact Base outcome base.identity.user.search.",
+      "business_effect": "Reads and projects matching Base directory users without mutation.",
       "side_effect_level": "read",
-      "side_effects": "Reads base domain state; emits no mutation event or external call.",
+      "side_effects": "Reads and projects matching Base directory users without mutation.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -14711,7 +13488,7 @@
       },
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A2",
-      "authorization_policy": "base.v2:base.read",
+      "authorization_policy": "base.v2:authenticated",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -14737,31 +13514,97 @@
       },
       "output_schema": {
         "type": "object",
-        "required": [
-          "result_json"
-        ],
         "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "name": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "email": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "avatar_url": {
+                  "type": "string",
+                  "maxLength": 2048
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "gid",
+                "name",
+                "email",
+                "avatar_url"
+              ]
+            }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
       },
       "agent_output_schema": {
         "type": "object",
-        "required": [
-          "result_json"
-        ],
         "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "name": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "email": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "avatar_url": {
+                  "type": "string",
+                  "maxLength": 2048
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "gid",
+                "name",
+                "email",
+                "avatar_url"
+              ]
+            }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
       },
-      "schema_hash": "sha256:968970fa44c911ff906a675c735b0414731fc8ba3e87a33767044b66bc03da99",
+      "schema_hash": "sha256:bfc720a382c433887d6a752ba2dbc9e2d56f2d9848d948fab6a36627945c285d",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -14916,9 +13759,9 @@
       "description": "Execute exact Base outcome base.notification.preference.atomic.get.",
       "use_when": "A browser consumer needs exactly this Base-owned outcome.",
       "do_not_use_when": "The request selects another operation or domain.",
-      "business_effect": "Business outcome: Execute exact Base outcome base.notification.preference.atomic.get.",
+      "business_effect": "Reads the caller's notification preferences without mutation.",
       "side_effect_level": "read",
-      "side_effects": "Reads base domain state; emits no mutation event or external call.",
+      "side_effects": "Reads the caller's notification preferences without mutation.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -14931,7 +13774,7 @@
       },
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A2",
-      "authorization_policy": "base.v2:base.read",
+      "authorization_policy": "base.v2:authenticated",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -14943,31 +13786,79 @@
       },
       "output_schema": {
         "type": "object",
-        "required": [
-          "result_json"
-        ],
         "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "scope_approved": {
+                "type": "boolean"
+              },
+              "scope_rejected": {
+                "type": "boolean"
+              },
+              "item_status": {
+                "type": "boolean"
+              },
+              "new_follower": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "scope_approved",
+              "scope_rejected",
+              "item_status",
+              "new_follower"
+            ]
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
       },
       "agent_output_schema": {
         "type": "object",
-        "required": [
-          "result_json"
-        ],
         "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "scope_approved": {
+                "type": "boolean"
+              },
+              "scope_rejected": {
+                "type": "boolean"
+              },
+              "item_status": {
+                "type": "boolean"
+              },
+              "new_follower": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "scope_approved",
+              "scope_rejected",
+              "item_status",
+              "new_follower"
+            ]
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
       },
-      "schema_hash": "sha256:3465b1c678f3c089ecc4c08226d7241811a81ed4819a7324c3a73e43906cf203",
+      "schema_hash": "sha256:ea3ad5aa3e0839ea98ff505260e169da70ca4cda8efdbbcee553f51d41ec2fcc",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -15122,9 +14013,9 @@
       "description": "Execute exact Base outcome base.notification.preference.atomic.update.",
       "use_when": "A browser consumer needs exactly this Base-owned outcome.",
       "do_not_use_when": "The request selects another operation or domain.",
-      "business_effect": "Business outcome: Execute exact Base outcome base.notification.preference.atomic.update.",
+      "business_effect": "Updates the caller's notification preferences in the Base store.",
       "side_effect_level": "write",
-      "side_effects": "Writes base domain state through its Provider and records a capability audit event.",
+      "side_effects": "Updates the caller's notification preferences in the Base store.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -15137,7 +14028,7 @@
       },
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A1",
-      "authorization_policy": "base.v2:base.write",
+      "authorization_policy": "base.v2:authenticated",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -15171,31 +14062,79 @@
       },
       "output_schema": {
         "type": "object",
-        "required": [
-          "result_json"
-        ],
         "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "scope_approved": {
+                "type": "boolean"
+              },
+              "scope_rejected": {
+                "type": "boolean"
+              },
+              "item_status": {
+                "type": "boolean"
+              },
+              "new_follower": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "scope_approved",
+              "scope_rejected",
+              "item_status",
+              "new_follower"
+            ]
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
       },
       "agent_output_schema": {
         "type": "object",
-        "required": [
-          "result_json"
-        ],
         "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "scope_approved": {
+                "type": "boolean"
+              },
+              "scope_rejected": {
+                "type": "boolean"
+              },
+              "item_status": {
+                "type": "boolean"
+              },
+              "new_follower": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "scope_approved",
+              "scope_rejected",
+              "item_status",
+              "new_follower"
+            ]
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
       },
-      "schema_hash": "sha256:a5de8f680a368b38a0176884a67015fdd7f7c18b73ed4857759690eddd4eb9e5",
+      "schema_hash": "sha256:9cb35baf7d7882ce015719f796b30ef3ccc62c9786ab9e6bda652d80b08463fb",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -16383,9 +15322,9 @@
       "description": "Execute exact Base outcome base.plugin.installed.list.",
       "use_when": "A browser consumer needs exactly this Base-owned outcome.",
       "do_not_use_when": "The request selects another operation or domain.",
-      "business_effect": "Business outcome: Execute exact Base outcome base.plugin.installed.list.",
+      "business_effect": "Reads the bounded installed-plugin inventory without mutation.",
       "side_effect_level": "read",
-      "side_effects": "Reads base domain state; emits no mutation event or external call.",
+      "side_effects": "Reads the bounded installed-plugin inventory without mutation.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -16398,7 +15337,7 @@
       },
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A2",
-      "authorization_policy": "base.v2:base.read",
+      "authorization_policy": "base.v2:authenticated",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -16410,31 +15349,111 @@
       },
       "output_schema": {
         "type": "object",
-        "required": [
-          "result_json"
-        ],
         "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "properties": {
+                "plugin_id": {
+                  "type": "string",
+                  "maxLength": 256
+                },
+                "name": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "version": {
+                  "type": "string",
+                  "maxLength": 128
+                },
+                "category": {
+                  "type": "string",
+                  "maxLength": 128
+                },
+                "enabled": {
+                  "type": "boolean"
+                },
+                "builtin": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "plugin_id",
+                "name",
+                "version",
+                "category",
+                "enabled",
+                "builtin"
+              ]
+            }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
       },
       "agent_output_schema": {
         "type": "object",
-        "required": [
-          "result_json"
-        ],
         "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "properties": {
+                "plugin_id": {
+                  "type": "string",
+                  "maxLength": 256
+                },
+                "name": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "version": {
+                  "type": "string",
+                  "maxLength": 128
+                },
+                "category": {
+                  "type": "string",
+                  "maxLength": 128
+                },
+                "enabled": {
+                  "type": "boolean"
+                },
+                "builtin": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "plugin_id",
+                "name",
+                "version",
+                "category",
+                "enabled",
+                "builtin"
+              ]
+            }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
       },
-      "schema_hash": "sha256:3465b1c678f3c089ecc4c08226d7241811a81ed4819a7324c3a73e43906cf203",
+      "schema_hash": "sha256:cd88ebafa6cf641676f2905bef713fa893b9eb0353c8dbef84466b402e9b92ba",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -18450,888 +17469,6 @@
       ]
     },
     {
-      "id": "base.saved_view.copy",
-      "major_version": 1,
-      "owner_domain": "base",
-      "lifecycle_status": "stable",
-      "catalog_release": null,
-      "title": "base.saved_view.copy",
-      "description": "Execute exact Base outcome base.saved_view.copy.",
-      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
-      "do_not_use_when": "The request selects another operation or domain.",
-      "business_effect": "Business outcome: Execute exact Base outcome base.saved_view.copy.",
-      "side_effect_level": "write",
-      "side_effects": "Writes base domain state through its Provider and records a capability audit event.",
-      "execution_mode": "cloud_sync",
-      "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
-        "worker": false,
-        "local_runtime": false
-      },
-      "exposure_policy_source": "provider_explicit",
-      "automation_level": "A1",
-      "authorization_policy": "base.v2:base.write",
-      "resource_selectors": [],
-      "data_classification": "confidential",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "scoped",
-      "input_schema": {
-        "type": "object",
-        "properties": {
-          "gid": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 512
-          }
-        },
-        "additionalProperties": false,
-        "required": [
-          "gid"
-        ]
-      },
-      "output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "agent_output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "schema_hash": "sha256:a5e415a0508b28de4279e5e9c02df3ff86729f4b8363c0b9da251996c370d691",
-      "artifact_policy": "none",
-      "operation_policy": "optional",
-      "concurrency_policy": "none",
-      "expected_version_payload_path": null,
-      "idempotency_policy": "required",
-      "consistency_policy": "external",
-      "timeout_seconds": 30,
-      "rate_limit_cost": 1,
-      "execution_budget": {
-        "memory_class": "small",
-        "max_input_bytes": 1048576,
-        "max_output_bytes": 4194304,
-        "collection_policy": "bounded",
-        "max_page_size": null,
-        "max_parallel_per_consumer": 4,
-        "max_parallel_per_tenant": 32,
-        "overload_policy": "reject"
-      },
-      "confirmation_policy": "user",
-      "evidence_policy": "optional",
-      "audit_policy": "standard",
-      "deprecation_message": null,
-      "domain_errors": [
-        {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "domain_errors_complete": true,
-      "capability_version_gid": "cv2_78a34f79d69453add8bf8b6a",
-      "error_schema": [
-        {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
-          "is_retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "transaction_policy": {
-        "mode": "provider",
-        "boundary": "owning_domain"
-      },
-      "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
-      "provider_ref": "base.provider",
-      "api_refs": [
-        "gateway:/api/v1/capabilities/base.saved_view.copy:invoke"
-      ],
-      "test_refs": [
-        {
-          "test_type": "contract",
-          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
-          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
-          "result": "pass",
-          "path": "backend/tests/test_capability_v2_contracts.py"
-        }
-      ]
-    },
-    {
-      "id": "base.saved_view.create",
-      "major_version": 1,
-      "owner_domain": "base",
-      "lifecycle_status": "stable",
-      "catalog_release": null,
-      "title": "base.saved_view.create",
-      "description": "Execute exact Base outcome base.saved_view.create.",
-      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
-      "do_not_use_when": "The request selects another operation or domain.",
-      "business_effect": "Business outcome: Execute exact Base outcome base.saved_view.create.",
-      "side_effect_level": "write",
-      "side_effects": "Writes base domain state through its Provider and records a capability audit event.",
-      "execution_mode": "cloud_sync",
-      "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
-        "worker": false,
-        "local_runtime": false
-      },
-      "exposure_policy_source": "provider_explicit",
-      "automation_level": "A1",
-      "authorization_policy": "base.v2:base.write",
-      "resource_selectors": [],
-      "data_classification": "confidential",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "scoped",
-      "input_schema": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "maxLength": 512
-          },
-          "module": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 512
-          },
-          "list_gid": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "maxLength": 512
-          },
-          "config_json": {
-            "type": "string",
-            "maxLength": 1000000
-          },
-          "is_shared": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false,
-        "required": [
-          "module",
-          "config_json"
-        ]
-      },
-      "output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "agent_output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "schema_hash": "sha256:2dcea5491a75b2d51b3410f4f8d04a3eecd8d54972ca1a3efc624b333c551e44",
-      "artifact_policy": "none",
-      "operation_policy": "optional",
-      "concurrency_policy": "none",
-      "expected_version_payload_path": null,
-      "idempotency_policy": "required",
-      "consistency_policy": "external",
-      "timeout_seconds": 30,
-      "rate_limit_cost": 1,
-      "execution_budget": {
-        "memory_class": "small",
-        "max_input_bytes": 1048576,
-        "max_output_bytes": 4194304,
-        "collection_policy": "bounded",
-        "max_page_size": null,
-        "max_parallel_per_consumer": 4,
-        "max_parallel_per_tenant": 32,
-        "overload_policy": "reject"
-      },
-      "confirmation_policy": "user",
-      "evidence_policy": "optional",
-      "audit_policy": "standard",
-      "deprecation_message": null,
-      "domain_errors": [
-        {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "domain_errors_complete": true,
-      "capability_version_gid": "cv2_c11e958a8729c753c2b6ee41",
-      "error_schema": [
-        {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
-          "is_retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "transaction_policy": {
-        "mode": "provider",
-        "boundary": "owning_domain"
-      },
-      "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
-      "provider_ref": "base.provider",
-      "api_refs": [
-        "gateway:/api/v1/capabilities/base.saved_view.create:invoke"
-      ],
-      "test_refs": [
-        {
-          "test_type": "contract",
-          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
-          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
-          "result": "pass",
-          "path": "backend/tests/test_capability_v2_contracts.py"
-        }
-      ]
-    },
-    {
-      "id": "base.saved_view.delete",
-      "major_version": 1,
-      "owner_domain": "base",
-      "lifecycle_status": "stable",
-      "catalog_release": null,
-      "title": "base.saved_view.delete",
-      "description": "Execute exact Base outcome base.saved_view.delete.",
-      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
-      "do_not_use_when": "The request selects another operation or domain.",
-      "business_effect": "Business outcome: Execute exact Base outcome base.saved_view.delete.",
-      "side_effect_level": "write",
-      "side_effects": "Writes base domain state through its Provider and records a capability audit event.",
-      "execution_mode": "cloud_sync",
-      "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
-        "worker": false,
-        "local_runtime": false
-      },
-      "exposure_policy_source": "provider_explicit",
-      "automation_level": "A1",
-      "authorization_policy": "base.v2:base.write",
-      "resource_selectors": [],
-      "data_classification": "confidential",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "scoped",
-      "input_schema": {
-        "type": "object",
-        "properties": {
-          "gid": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 512
-          }
-        },
-        "additionalProperties": false,
-        "required": [
-          "gid"
-        ]
-      },
-      "output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "agent_output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "schema_hash": "sha256:a5e415a0508b28de4279e5e9c02df3ff86729f4b8363c0b9da251996c370d691",
-      "artifact_policy": "none",
-      "operation_policy": "optional",
-      "concurrency_policy": "none",
-      "expected_version_payload_path": null,
-      "idempotency_policy": "required",
-      "consistency_policy": "external",
-      "timeout_seconds": 30,
-      "rate_limit_cost": 1,
-      "execution_budget": {
-        "memory_class": "small",
-        "max_input_bytes": 1048576,
-        "max_output_bytes": 4194304,
-        "collection_policy": "bounded",
-        "max_page_size": null,
-        "max_parallel_per_consumer": 4,
-        "max_parallel_per_tenant": 32,
-        "overload_policy": "reject"
-      },
-      "confirmation_policy": "user",
-      "evidence_policy": "optional",
-      "audit_policy": "standard",
-      "deprecation_message": null,
-      "domain_errors": [
-        {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "domain_errors_complete": true,
-      "capability_version_gid": "cv2_ab46575ba75993dacd95597d",
-      "error_schema": [
-        {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
-          "is_retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "transaction_policy": {
-        "mode": "provider",
-        "boundary": "owning_domain"
-      },
-      "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
-      "provider_ref": "base.provider",
-      "api_refs": [
-        "gateway:/api/v1/capabilities/base.saved_view.delete:invoke"
-      ],
-      "test_refs": [
-        {
-          "test_type": "contract",
-          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
-          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
-          "result": "pass",
-          "path": "backend/tests/test_capability_v2_contracts.py"
-        }
-      ]
-    },
-    {
-      "id": "base.saved_view.list",
-      "major_version": 1,
-      "owner_domain": "base",
-      "lifecycle_status": "stable",
-      "catalog_release": null,
-      "title": "base.saved_view.list",
-      "description": "Execute exact Base outcome base.saved_view.list.",
-      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
-      "do_not_use_when": "The request selects another operation or domain.",
-      "business_effect": "Business outcome: Execute exact Base outcome base.saved_view.list.",
-      "side_effect_level": "read",
-      "side_effects": "Reads base domain state; emits no mutation event or external call.",
-      "execution_mode": "cloud_sync",
-      "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
-        "worker": false,
-        "local_runtime": false
-      },
-      "exposure_policy_source": "provider_explicit",
-      "automation_level": "A2",
-      "authorization_policy": "base.v2:base.read",
-      "resource_selectors": [],
-      "data_classification": "confidential",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "scoped",
-      "input_schema": {
-        "type": "object",
-        "properties": {
-          "module": {
-            "type": "string",
-            "maxLength": 128
-          },
-          "list_gid": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "maxLength": 512
-          }
-        },
-        "additionalProperties": false
-      },
-      "output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "agent_output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "schema_hash": "sha256:3e475a12cc124869d058e8a8c9bbccf7834bc360be8d2b6e7a273e5a82c59a06",
-      "artifact_policy": "none",
-      "operation_policy": "none",
-      "concurrency_policy": "none",
-      "expected_version_payload_path": null,
-      "idempotency_policy": "none",
-      "consistency_policy": "strong",
-      "timeout_seconds": 30,
-      "rate_limit_cost": 1,
-      "execution_budget": {
-        "memory_class": "small",
-        "max_input_bytes": 1048576,
-        "max_output_bytes": 4194304,
-        "collection_policy": "bounded",
-        "max_page_size": null,
-        "max_parallel_per_consumer": 4,
-        "max_parallel_per_tenant": 32,
-        "overload_policy": "reject"
-      },
-      "confirmation_policy": "none",
-      "evidence_policy": "optional",
-      "audit_policy": "standard",
-      "deprecation_message": null,
-      "domain_errors": [
-        {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "domain_errors_complete": true,
-      "capability_version_gid": "cv2_5f0997923eca938b71ff4abf",
-      "error_schema": [
-        {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
-          "is_retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "transaction_policy": {
-        "mode": "provider",
-        "boundary": "owning_domain"
-      },
-      "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
-      "provider_ref": "base.provider",
-      "api_refs": [
-        "gateway:/api/v1/capabilities/base.saved_view.list:invoke"
-      ],
-      "test_refs": [
-        {
-          "test_type": "contract",
-          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
-          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
-          "result": "pass",
-          "path": "backend/tests/test_capability_v2_contracts.py"
-        }
-      ]
-    },
-    {
       "id": "base.saved_view.read",
       "major_version": 1,
       "owner_domain": "base",
@@ -19570,246 +17707,6 @@
       ]
     },
     {
-      "id": "base.saved_view.update",
-      "major_version": 1,
-      "owner_domain": "base",
-      "lifecycle_status": "stable",
-      "catalog_release": null,
-      "title": "base.saved_view.update",
-      "description": "Execute exact Base outcome base.saved_view.update.",
-      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
-      "do_not_use_when": "The request selects another operation or domain.",
-      "business_effect": "Business outcome: Execute exact Base outcome base.saved_view.update.",
-      "side_effect_level": "write",
-      "side_effects": "Writes base domain state through its Provider and records a capability audit event.",
-      "execution_mode": "cloud_sync",
-      "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
-        "worker": false,
-        "local_runtime": false
-      },
-      "exposure_policy_source": "provider_explicit",
-      "automation_level": "A1",
-      "authorization_policy": "base.v2:base.write",
-      "resource_selectors": [],
-      "data_classification": "confidential",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "scoped",
-      "input_schema": {
-        "type": "object",
-        "properties": {
-          "gid": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 512
-          },
-          "changes": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "string",
-                "maxLength": 512
-              },
-              "config_json": {
-                "type": "string",
-                "maxLength": 1000000
-              },
-              "is_shared": {
-                "type": "boolean"
-              },
-              "list_gid": {
-                "type": [
-                  "string",
-                  "null"
-                ],
-                "maxLength": 512
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "additionalProperties": false,
-        "required": [
-          "gid",
-          "changes"
-        ]
-      },
-      "output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "agent_output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "schema_hash": "sha256:62c38d99afdeca18ce1f6360ed278afd4b62af4041d64517a0047e50161735a7",
-      "artifact_policy": "none",
-      "operation_policy": "optional",
-      "concurrency_policy": "none",
-      "expected_version_payload_path": null,
-      "idempotency_policy": "required",
-      "consistency_policy": "external",
-      "timeout_seconds": 30,
-      "rate_limit_cost": 1,
-      "execution_budget": {
-        "memory_class": "small",
-        "max_input_bytes": 1048576,
-        "max_output_bytes": 4194304,
-        "collection_policy": "bounded",
-        "max_page_size": null,
-        "max_parallel_per_consumer": 4,
-        "max_parallel_per_tenant": 32,
-        "overload_policy": "reject"
-      },
-      "confirmation_policy": "user",
-      "evidence_policy": "optional",
-      "audit_policy": "standard",
-      "deprecation_message": null,
-      "domain_errors": [
-        {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "domain_errors_complete": true,
-      "capability_version_gid": "cv2_5d76ef62893804d33ac52f3a",
-      "error_schema": [
-        {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
-          "is_retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "transaction_policy": {
-        "mode": "provider",
-        "boundary": "owning_domain"
-      },
-      "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
-      "provider_ref": "base.provider",
-      "api_refs": [
-        "gateway:/api/v1/capabilities/base.saved_view.update:invoke"
-      ],
-      "test_refs": [
-        {
-          "test_type": "contract",
-          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
-          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
-          "result": "pass",
-          "path": "backend/tests/test_capability_v2_contracts.py"
-        }
-      ]
-    },
-    {
       "id": "base.team.change.apply",
       "major_version": 1,
       "owner_domain": "base",
@@ -20036,418 +17933,6 @@
       "provider_ref": "base.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/base.team.change.apply:invoke"
-      ],
-      "test_refs": [
-        {
-          "test_type": "contract",
-          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
-          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
-          "result": "pass",
-          "path": "backend/tests/test_capability_v2_contracts.py"
-        }
-      ]
-    },
-    {
-      "id": "base.team.directory.list",
-      "major_version": 1,
-      "owner_domain": "base",
-      "lifecycle_status": "stable",
-      "catalog_release": null,
-      "title": "base.team.directory.list",
-      "description": "Execute exact Base outcome base.team.directory.list.",
-      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
-      "do_not_use_when": "The request selects another operation or domain.",
-      "business_effect": "Business outcome: Execute exact Base outcome base.team.directory.list.",
-      "side_effect_level": "read",
-      "side_effects": "Reads base domain state; emits no mutation event or external call.",
-      "execution_mode": "cloud_sync",
-      "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
-        "worker": false,
-        "local_runtime": false
-      },
-      "exposure_policy_source": "provider_explicit",
-      "automation_level": "A2",
-      "authorization_policy": "base.v2:base.read",
-      "resource_selectors": [],
-      "data_classification": "confidential",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "scoped",
-      "input_schema": {
-        "type": "object",
-        "properties": {},
-        "additionalProperties": false
-      },
-      "output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "agent_output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "schema_hash": "sha256:3465b1c678f3c089ecc4c08226d7241811a81ed4819a7324c3a73e43906cf203",
-      "artifact_policy": "none",
-      "operation_policy": "none",
-      "concurrency_policy": "none",
-      "expected_version_payload_path": null,
-      "idempotency_policy": "none",
-      "consistency_policy": "strong",
-      "timeout_seconds": 30,
-      "rate_limit_cost": 1,
-      "execution_budget": {
-        "memory_class": "small",
-        "max_input_bytes": 1048576,
-        "max_output_bytes": 4194304,
-        "collection_policy": "bounded",
-        "max_page_size": null,
-        "max_parallel_per_consumer": 4,
-        "max_parallel_per_tenant": 32,
-        "overload_policy": "reject"
-      },
-      "confirmation_policy": "none",
-      "evidence_policy": "optional",
-      "audit_policy": "standard",
-      "deprecation_message": null,
-      "domain_errors": [
-        {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "domain_errors_complete": true,
-      "capability_version_gid": "cv2_a9d86933aa63177b679179a7",
-      "error_schema": [
-        {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
-          "is_retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "transaction_policy": {
-        "mode": "provider",
-        "boundary": "owning_domain"
-      },
-      "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
-      "provider_ref": "base.provider",
-      "api_refs": [
-        "gateway:/api/v1/capabilities/base.team.directory.list:invoke"
-      ],
-      "test_refs": [
-        {
-          "test_type": "contract",
-          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
-          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
-          "result": "pass",
-          "path": "backend/tests/test_capability_v2_contracts.py"
-        }
-      ]
-    },
-    {
-      "id": "base.team.list",
-      "major_version": 1,
-      "owner_domain": "base",
-      "lifecycle_status": "stable",
-      "catalog_release": null,
-      "title": "base.team.list",
-      "description": "Execute exact Base outcome base.team.list.",
-      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
-      "do_not_use_when": "The request selects another operation or domain.",
-      "business_effect": "Business outcome: Execute exact Base outcome base.team.list.",
-      "side_effect_level": "read",
-      "side_effects": "Reads base domain state; emits no mutation event or external call.",
-      "execution_mode": "cloud_sync",
-      "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
-        "worker": false,
-        "local_runtime": false
-      },
-      "exposure_policy_source": "provider_explicit",
-      "automation_level": "A2",
-      "authorization_policy": "base.v2:base.read",
-      "resource_selectors": [],
-      "data_classification": "confidential",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "scoped",
-      "input_schema": {
-        "type": "object",
-        "properties": {},
-        "additionalProperties": false
-      },
-      "output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "agent_output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "schema_hash": "sha256:3465b1c678f3c089ecc4c08226d7241811a81ed4819a7324c3a73e43906cf203",
-      "artifact_policy": "none",
-      "operation_policy": "none",
-      "concurrency_policy": "none",
-      "expected_version_payload_path": null,
-      "idempotency_policy": "none",
-      "consistency_policy": "strong",
-      "timeout_seconds": 30,
-      "rate_limit_cost": 1,
-      "execution_budget": {
-        "memory_class": "small",
-        "max_input_bytes": 1048576,
-        "max_output_bytes": 4194304,
-        "collection_policy": "bounded",
-        "max_page_size": null,
-        "max_parallel_per_consumer": 4,
-        "max_parallel_per_tenant": 32,
-        "overload_policy": "reject"
-      },
-      "confirmation_policy": "none",
-      "evidence_policy": "optional",
-      "audit_policy": "standard",
-      "deprecation_message": null,
-      "domain_errors": [
-        {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "domain_errors_complete": true,
-      "capability_version_gid": "cv2_4e8307d1396723f49afd76cc",
-      "error_schema": [
-        {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
-          "is_retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "transaction_policy": {
-        "mode": "provider",
-        "boundary": "owning_domain"
-      },
-      "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
-      "provider_ref": "base.provider",
-      "api_refs": [
-        "gateway:/api/v1/capabilities/base.team.list:invoke"
       ],
       "test_refs": [
         {
@@ -72523,418 +70008,6 @@
       "provider_ref": "craft.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/craft.rule.change.apply:invoke"
-      ],
-      "test_refs": [
-        {
-          "test_type": "contract",
-          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
-          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
-          "result": "pass",
-          "path": "backend/tests/test_capability_v2_contracts.py"
-        }
-      ]
-    },
-    {
-      "id": "craft.rule.definition.update",
-      "major_version": 1,
-      "owner_domain": "craft",
-      "lifecycle_status": "stable",
-      "catalog_release": null,
-      "title": "craft.rule.definition.update",
-      "description": "Update one mutable Craft rule definition.",
-      "use_when": "A browser consumer changes bounded fields on one mutable rule definition.",
-      "do_not_use_when": "The request changes an immutable rule release or waiver.",
-      "business_effect": "Business outcome: Update one mutable Craft rule definition.",
-      "side_effect_level": "write",
-      "side_effects": "Writes craft domain state through its Provider and records a capability audit event.",
-      "execution_mode": "cloud_sync",
-      "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
-        "worker": false,
-        "local_runtime": false
-      },
-      "exposure_policy_source": "provider_explicit",
-      "automation_level": "A1",
-      "authorization_policy": "craft.v2:craft.rule.write",
-      "resource_selectors": [],
-      "data_classification": "confidential",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "scoped",
-      "input_schema": {
-        "type": "object",
-        "properties": {
-          "gid": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 512
-          },
-          "changes_json": {
-            "type": "string",
-            "maxLength": 1000000
-          }
-        },
-        "additionalProperties": false,
-        "required": [
-          "gid",
-          "changes_json"
-        ]
-      },
-      "output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "agent_output_schema": {
-        "type": "object",
-        "required": [
-          "result_json"
-        ],
-        "properties": {
-          "result_json": {
-            "type": "string",
-            "maxLength": 4000000
-          }
-        },
-        "additionalProperties": false
-      },
-      "schema_hash": "sha256:6ac847858e736b99fd90f5b8f1bb580b3177dff6ab089109f112610cc3adc71a",
-      "artifact_policy": "none",
-      "operation_policy": "optional",
-      "concurrency_policy": "none",
-      "expected_version_payload_path": null,
-      "idempotency_policy": "required",
-      "consistency_policy": "external",
-      "timeout_seconds": 30,
-      "rate_limit_cost": 1,
-      "execution_budget": {
-        "memory_class": "small",
-        "max_input_bytes": 1048576,
-        "max_output_bytes": 4194304,
-        "collection_policy": "bounded",
-        "max_page_size": null,
-        "max_parallel_per_consumer": 4,
-        "max_parallel_per_tenant": 32,
-        "overload_policy": "reject"
-      },
-      "confirmation_policy": "user",
-      "evidence_policy": "optional",
-      "audit_policy": "standard",
-      "deprecation_message": null,
-      "domain_errors": [
-        {
-          "code": "bop_version_not_found",
-          "meaning": "The scoped BOP version does not exist.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "bop_revision_unavailable",
-          "meaning": "The BOP has no authoritative revision.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "revision_conflict",
-          "meaning": "The current BOP revision differs from the expected revision.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "bop_entry_not_found",
-          "meaning": "A referenced BOP entry does not exist.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "bop_link_not_found",
-          "meaning": "A referenced BOP link does not exist.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "bop_project_unassigned",
-          "meaning": "The BOP is not assigned to a project.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "version_not_published",
-          "meaning": "An official execution structure requires a published BOP.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "preview_not_found",
-          "meaning": "The requested BOP change preview does not exist.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "preview_expired",
-          "meaning": "The requested BOP change preview has expired.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "preview_already_applied",
-          "meaning": "The requested BOP change preview was already committed.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is already bound to another Craft payload.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "source_not_found",
-          "meaning": "The requested version creation source does not exist.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "archive_forbidden",
-          "meaning": "The BOP lifecycle forbids archiving this version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "pbom_snapshot_not_found",
-          "meaning": "The scoped PBOM snapshot does not exist.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "active_gbop_not_found",
-          "meaning": "No active GBOP release exists.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "multiple_active_gbop_releases",
-          "meaning": "More than one active GBOP release exists.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "active_gbop_item_not_found",
-          "meaning": "The GBOP item is not in the active release.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "The Craft application provider is unavailable.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "invalid_cursor",
-          "meaning": "The pagination cursor is invalid.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "invalid_page_size",
-          "meaning": "The requested page size is outside the capability limit.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "invalid_scope_kind",
-          "meaning": "The requested BOP scope kind is invalid.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "scope_not_found",
-          "meaning": "The requested BOP scope does not exist in the version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "entry_not_found",
-          "meaning": "The requested BOP entry does not exist in the version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "entry_detail_too_large",
-          "meaning": "The BOP entry has too many links for bounded detail output.",
-          "retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "domain_errors_complete": true,
-      "capability_version_gid": "cv2_0657c3479026bbbf70691e91",
-      "error_schema": [
-        {
-          "error_code": "bop_version_not_found",
-          "message_template": "The scoped BOP version does not exist.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "bop_revision_unavailable",
-          "message_template": "The BOP has no authoritative revision.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "revision_conflict",
-          "message_template": "The current BOP revision differs from the expected revision.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "bop_entry_not_found",
-          "message_template": "A referenced BOP entry does not exist.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "bop_link_not_found",
-          "message_template": "A referenced BOP link does not exist.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "bop_project_unassigned",
-          "message_template": "The BOP is not assigned to a project.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "version_not_published",
-          "message_template": "An official execution structure requires a published BOP.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "preview_not_found",
-          "message_template": "The requested BOP change preview does not exist.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "preview_expired",
-          "message_template": "The requested BOP change preview has expired.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "preview_already_applied",
-          "message_template": "The requested BOP change preview was already committed.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is already bound to another Craft payload.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "source_not_found",
-          "message_template": "The requested version creation source does not exist.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "archive_forbidden",
-          "message_template": "The BOP lifecycle forbids archiving this version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "pbom_snapshot_not_found",
-          "message_template": "The scoped PBOM snapshot does not exist.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "active_gbop_not_found",
-          "message_template": "No active GBOP release exists.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "multiple_active_gbop_releases",
-          "message_template": "More than one active GBOP release exists.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "active_gbop_item_not_found",
-          "message_template": "The GBOP item is not in the active release.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "The Craft application provider is unavailable.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "invalid_cursor",
-          "message_template": "The pagination cursor is invalid.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "invalid_page_size",
-          "message_template": "The requested page size is outside the capability limit.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "invalid_scope_kind",
-          "message_template": "The requested BOP scope kind is invalid.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "scope_not_found",
-          "message_template": "The requested BOP scope does not exist in the version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "entry_not_found",
-          "message_template": "The requested BOP entry does not exist in the version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "entry_detail_too_large",
-          "message_template": "The BOP entry has too many links for bounded detail output.",
-          "is_retryable": false,
-          "is_caller_error": false
-        }
-      ],
-      "transaction_policy": {
-        "mode": "provider",
-        "boundary": "owning_domain"
-      },
-      "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
-      "provider_ref": "craft.provider",
-      "api_refs": [
-        "gateway:/api/v1/capabilities/craft.rule.definition.update:invoke"
       ],
       "test_refs": [
         {
@@ -181174,13 +178247,13 @@
       "plugin_id": "official.base",
       "module": "backend.base.official_provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:e1fc3800ddeee80f9b5daff427224cb131ecc31d08ef5279c12bb63bb3499307"
+      "artifact_hash": "sha256:e4ab9a0be9e0b466e5837a13b6463040848ce40e1655feaabad78b066dbe25c6"
     },
     {
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
       "version": "1.2.0",
-      "artifact_hash": "sha256:0f5d1960ed73e8597889d33c927d00c66d1702eff077152863a9a7f95cc2003a"
+      "artifact_hash": "sha256:5d47893b7deb7c3d620b12e78d78ecb30252c958ed3f5b15c3dbed66c05e346a"
     },
     {
       "plugin_id": "official.device",
@@ -181204,7 +178277,7 @@
       "plugin_id": "official.integration",
       "module": "integration_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:a2f23a1f927aaa1540957cf067861396753f4a7118002d88c423796ea4ee17cf"
+      "artifact_hash": "sha256:715c89842662fbdd4941613d58c02076cb62c20f1ba35d8d24cdf2d1d8cce713"
     },
     {
       "plugin_id": "official.knowledge",
@@ -181231,5 +178304,5 @@
       "artifact_hash": "sha256:5c1fccaa2219f6833c24237667039685e322cefcffc7ca6f0287d28cfc0a2b39"
     }
   ],
-  "created_at": "2026-08-26T21:49:55.036871Z"
+  "created_at": "2026-08-26T23:35:11.321076Z"
 }

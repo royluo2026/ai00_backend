@@ -8,7 +8,7 @@ Update PBOM snapshot metadata.
 - 不适用：The request changes snapshot status, statistics, or a part.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_b6846f0f3faea2788a65130a4a59a5fe`
+- Catalog Release：`rel_5915db601d7c6ce939a106d76a78b90a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -93,7 +93,7 @@ Update PBOM snapshot metadata.
 ```json
 {
   "capability_id": "craft.ebom.snapshot.update",
-  "catalog_release": "rel_b6846f0f3faea2788a65130a4a59a5fe",
+  "catalog_release": "rel_5915db601d7c6ce939a106d76a78b90a",
   "major_version": 1,
   "payload": {
     "changes": {},

@@ -8,7 +8,7 @@ Execute exact Base outcome base.plugin.installed.list.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_b6846f0f3faea2788a65130a4a59a5fe`
+- Catalog Release：`rel_5915db601d7c6ce939a106d76a78b90a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -28,7 +28,7 @@ Execute exact Base outcome base.plugin.installed.list.
 
 ## 授权与数据边界
 
-- 授权策略：`base.v2:base.read`
+- 授权策略：`base.v2:authenticated`
 - 自动化等级：`A2`
 - 数据分类：`confidential`
 - Delegation：`scoped`
@@ -79,7 +79,7 @@ Execute exact Base outcome base.plugin.installed.list.
 ```json
 {
   "capability_id": "base.plugin.installed.list",
-  "catalog_release": "rel_b6846f0f3faea2788a65130a4a59a5fe",
+  "catalog_release": "rel_5915db601d7c6ce939a106d76a78b90a",
   "major_version": 1,
   "payload": {}
 }
@@ -93,13 +93,53 @@ Execute exact Base outcome base.plugin.installed.list.
 {
   "additionalProperties": false,
   "properties": {
-    "result_json": {
-      "maxLength": 4000000,
-      "type": "string"
+    "data": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "builtin": {
+            "type": "boolean"
+          },
+          "category": {
+            "maxLength": 128,
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "name": {
+            "maxLength": 512,
+            "type": "string"
+          },
+          "plugin_id": {
+            "maxLength": 256,
+            "type": "string"
+          },
+          "version": {
+            "maxLength": 128,
+            "type": "string"
+          }
+        },
+        "required": [
+          "plugin_id",
+          "name",
+          "version",
+          "category",
+          "enabled",
+          "builtin"
+        ],
+        "type": "object"
+      },
+      "maxItems": 500,
+      "type": "array"
+    },
+    "success": {
+      "type": "boolean"
     }
   },
   "required": [
-    "result_json"
+    "success",
+    "data"
   ],
   "type": "object"
 }

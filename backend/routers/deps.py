@@ -314,6 +314,11 @@ def build_profile(user: dict) -> dict:
     # 外包权限同 member
     if role == "external" and ext == "outsource":
         base_perms = set(_ROLE_PERMISSIONS["member"])
+    # The three-level org role stores legacy team administrators as members.
+    # Preserve only the coarse permission already enforced by the legacy
+    # users/grants Depends boundary; owner services still enforce scope.
+    if role == "team_admin":
+        base_perms.add("system.user.manage")
 
     # 叠加 grants
     grants = _get_user_grants(user["gid"])

@@ -8,7 +8,7 @@ Execute exact Base outcome base.authorization.grant.revoke.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_b6846f0f3faea2788a65130a4a59a5fe`
+- Catalog Release：`rel_5915db601d7c6ce939a106d76a78b90a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -28,7 +28,7 @@ Execute exact Base outcome base.authorization.grant.revoke.
 
 ## 授权与数据边界
 
-- 授权策略：`base.v2:base.write`
+- 授权策略：`base.v2:system.user.manage`
 - 自动化等级：`A1`
 - 数据分类：`confidential`
 - Delegation：`scoped`
@@ -88,7 +88,7 @@ Execute exact Base outcome base.authorization.grant.revoke.
 ```json
 {
   "capability_id": "base.authorization.grant.revoke",
-  "catalog_release": "rel_b6846f0f3faea2788a65130a4a59a5fe",
+  "catalog_release": "rel_5915db601d7c6ce939a106d76a78b90a",
   "major_version": 1,
   "payload": {
     "gid": "example"
@@ -104,13 +104,12 @@ Execute exact Base outcome base.authorization.grant.revoke.
 {
   "additionalProperties": false,
   "properties": {
-    "result_json": {
-      "maxLength": 4000000,
-      "type": "string"
+    "ok": {
+      "type": "boolean"
     }
   },
   "required": [
-    "result_json"
+    "ok"
   ],
   "type": "object"
 }

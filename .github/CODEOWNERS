@@ -2,6 +2,9 @@
 
 # Base Platform
 /backend/base/** @ai00/base-maintainers
+/backend/services/feishu_service.py @ai00/base-maintainers
+/backend/services/org_sync_service.py @ai00/base-maintainers
+/backend/services/user_service.py @ai00/base-maintainers
 /backend/system_capabilities/** @ai00/base-maintainers
 /backend/plugin_platform/** @ai00/base-maintainers
 /backend/capabilities/system_shared_next.py @ai00/base-maintainers

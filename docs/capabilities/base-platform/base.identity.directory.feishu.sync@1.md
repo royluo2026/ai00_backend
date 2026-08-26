@@ -8,7 +8,7 @@ Execute exact Base outcome base.identity.directory.feishu.sync.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_b6846f0f3faea2788a65130a4a59a5fe`
+- Catalog Release：`rel_5915db601d7c6ce939a106d76a78b90a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -28,7 +28,7 @@ Execute exact Base outcome base.identity.directory.feishu.sync.
 
 ## 授权与数据边界
 
-- 授权策略：`base.v2:base.write`
+- 授权策略：`base.v2:system.tech_config`
 - 自动化等级：`A1`
 - 数据分类：`confidential`
 - Delegation：`scoped`
@@ -87,7 +87,7 @@ Execute exact Base outcome base.identity.directory.feishu.sync.
 ```json
 {
   "capability_id": "base.identity.directory.feishu.sync",
-  "catalog_release": "rel_b6846f0f3faea2788a65130a4a59a5fe",
+  "catalog_release": "rel_5915db601d7c6ce939a106d76a78b90a",
   "major_version": 1,
   "payload": {}
 }
@@ -101,13 +101,36 @@ Execute exact Base outcome base.identity.directory.feishu.sync.
 {
   "additionalProperties": false,
   "properties": {
-    "result_json": {
-      "maxLength": 4000000,
-      "type": "string"
+    "created": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "departments": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "dept_synced": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "manual_teams_preserved": {
+      "type": "boolean"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "updated": {
+      "minimum": 0,
+      "type": "integer"
     }
   },
   "required": [
-    "result_json"
+    "ok",
+    "created",
+    "updated",
+    "dept_synced",
+    "departments",
+    "manual_teams_preserved"
   ],
   "type": "object"
 }

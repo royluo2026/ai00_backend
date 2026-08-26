@@ -212,6 +212,8 @@ from backend.plugin_loader import PluginLoader as _PluginLoader
 
 _plugin_loader = _PluginLoader()
 _plugin_loader.discover()
+from backend.base.plugin_inventory import configure_plugin_inventory as _configure_plugin_inventory
+_configure_plugin_inventory(_plugin_loader)
 from backend.capability_v2.bootstrap import get_capability_registry as _get_capability_registry
 _capability_registry = _get_capability_registry()
 from backend.capability_v2.gateway import configure_default_gateway as _configure_capability_gateway

@@ -13,6 +13,16 @@ from backend.capabilities.validation_next import validate_payload
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / "docs/governance/atomic-web-capability-contracts.json"
 CATALOG = ROOT / "docs/capabilities/catalog.v2.json"
+SAFE_CAPABILITIES = {
+    "base.authorization.grant.list",
+    "base.authorization.grant.create",
+    "base.authorization.grant.revoke",
+    "base.notification.preference.atomic.get",
+    "base.notification.preference.atomic.update",
+    "base.identity.directory.feishu.sync",
+    "base.plugin.installed.list",
+    "base.identity.user.search",
+}
 
 
 def _manifest() -> dict:
@@ -52,15 +62,23 @@ def test_every_implemented_contract_is_closed_bounded_and_policy_complete():
             assert schema["additionalProperties"] is False
 
 
+def test_only_service_backed_contracts_remain_migrated_with_typed_outputs():
+    implemented = [entry for entry in _manifest()["entries"] if entry["final_disposition"] == "migrated"]
+    assert {entry["capability_id"] for entry in implemented} == SAFE_CAPABILITIES
+    for entry in implemented:
+        schema = entry["output_schema"]
+        assert "result_json" not in schema["properties"]
+        assert schema["properties"]
+        validate_payload(schema, entry["example_output"], label="output")
+        with pytest.raises(ValueError):
+            validate_payload(schema, {"unexpected": True}, label="output")
+
+
 def test_all_migrated_specs_register_and_use_production_validation():
     from backend.base.web_atomic import register_atomic_web_capabilities as register_base
-    from plugins.craft.craft_backend.capabilities.web_atomic import register_atomic_web_capabilities as register_craft
-    from plugins.integration.integration_backend.capabilities.web_atomic import register_atomic_web_capabilities as register_integration
 
     registry = CapabilityRegistry()
     register_base(registry)
-    register_integration(registry)
-    register_craft(registry)
     entries = [entry for entry in _manifest()["entries"] if entry["final_disposition"] == "migrated"]
     for entry in entries:
         if entry["owner_domain"] == "project_management":
