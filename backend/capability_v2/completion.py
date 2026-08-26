@@ -3,12 +3,17 @@ from __future__ import annotations
 
 import ast
 import json
+import re
 import subprocess
 from dataclasses import asdict, dataclass
 from pathlib import Path, PurePosixPath
 from typing import Literal
 
-from .consumer_routes import load_operations_exclusions, scan_web_api_routes
+from .consumer_routes import (
+    load_lexical_non_routes,
+    load_operations_exclusions,
+    scan_web_api_routes,
+)
 from .atomicity import load_atomicity_dispositions
 from .catalog_targets import CatalogTargetIndex
 from .route_inventory import audit_route_inventory, load_route_inventory
@@ -305,17 +310,81 @@ def _web_route_inventory_failures(
     for field in ("scan_roots", "excluded_roots"):
         if expected.get(field) != report.get(field):
             failures.append(f"web_route_inventory_{field}_drift:1")
-    unresolved = report.get("counts", {}).get("unresolved", 0)
-    if not isinstance(unresolved, int) or unresolved < 0:
-        raise CompletionConfigurationError("Web route unresolved count is invalid")
-    if unresolved:
-        failures.append(f"web_route_inventory_unresolved:{unresolved}")
     if expected != report:
         failures.append("web_route_inventory_drift:1")
     return failures
 
 
+def _stored_web_route_failures(
+    root: Path, configuration: dict
+) -> tuple[int, list[str]]:
+    relative = configuration.get("web_route_inventory_artifact")
+    if relative is None:
+        return 0, []
+    if not isinstance(relative, str) or not relative:
+        raise CompletionConfigurationError(
+            "web_route_inventory_artifact must be a repository-relative path"
+        )
+    report = _load_json(_relative_path(root, relative, field="web_route_inventory_artifact"))
+    counts = report.get("counts")
+    unresolved = counts.get("unresolved") if isinstance(counts, dict) else None
+    if not isinstance(unresolved, int) or unresolved < 0:
+        return 0, ["web_route_inventory_stored_invalid:1"]
+    failures = (
+        [f"web_route_inventory_unresolved:{unresolved}"] if unresolved else []
+    )
+    lexical = report.get("lexical_audit")
+    if not isinstance(lexical, dict):
+        failures.append("web_route_inventory_lexical_evidence_missing:1")
+        return unresolved, failures
+    token_count = lexical.get("token_count")
+    token_hash = lexical.get("token_hash")
+    mapped = lexical.get("mapped_count")
+    reviewed = lexical.get("reviewed_non_route_count")
+    reviewed_tokens = lexical.get("reviewed_non_route_tokens")
+    unmatched = lexical.get("unmatched_count")
+    unmatched_tokens = lexical.get("unmatched_tokens")
+    routes = report.get("routes")
+    valid = (
+        isinstance(token_count, int)
+        and token_count >= 0
+        and isinstance(token_hash, str)
+        and re.fullmatch(r"[0-9a-f]{64}", token_hash) is not None
+        and isinstance(mapped, int)
+        and mapped >= 0
+        and isinstance(reviewed, int)
+        and reviewed >= 0
+        and isinstance(reviewed_tokens, list)
+        and len(reviewed_tokens) == reviewed
+        and all(isinstance(item, str) and item for item in reviewed_tokens)
+        and len(set(reviewed_tokens)) == reviewed
+        and isinstance(unmatched, int)
+        and unmatched >= 0
+        and isinstance(unmatched_tokens, list)
+        and len(unmatched_tokens) == unmatched
+        and all(isinstance(item, str) and item for item in unmatched_tokens)
+        and len(set(unmatched_tokens)) == unmatched
+        and isinstance(routes, list)
+        and mapped == len(routes)
+        and token_count == mapped + reviewed + unmatched
+    )
+    if not valid:
+        failures.append("web_route_inventory_lexical_invalid:1")
+        return unresolved, failures
+    if unmatched:
+        failures.append(f"web_route_inventory_lexical_unmatched:{unmatched}")
+    return unresolved, failures
+
+
 def _web_frontend_revision(web_root: Path) -> str:
+    if not web_root.is_dir():
+        raise CompletionConfigurationError(f"frontend Git root is missing: {web_root}")
+    top_level = subprocess.run(
+        ["git", "-C", str(web_root), "rev-parse", "--show-toplevel"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
     result = subprocess.run(
         ["git", "-C", str(web_root), "rev-parse", "HEAD"],
         capture_output=True,
@@ -323,7 +392,20 @@ def _web_frontend_revision(web_root: Path) -> str:
         check=False,
     )
     revision = result.stdout.strip()
-    return revision if result.returncode == 0 and len(revision) == 40 else "unversioned"
+    try:
+        resolved_top_level = Path(top_level.stdout.strip()).resolve()
+    except (OSError, RuntimeError):
+        resolved_top_level = Path()
+    if (
+        top_level.returncode
+        or resolved_top_level != web_root
+        or result.returncode
+        or re.fullmatch(r"[0-9a-f]{40}", revision) is None
+    ):
+        raise CompletionConfigurationError(
+            f"frontend Git revision is unavailable for exact root: {web_root}"
+        )
+    return revision
 
 
 def _web_scan_roots(web_root: Path) -> tuple[Path, ...]:
@@ -444,6 +526,11 @@ def evaluate_completion(
     cross_domain_sql, internal_imports = _boundary_counts(boundary)
     consumer_bypasses = _consumer_bypasses(root, configuration)
     web_consumer_bypasses = 0
+    if mode == "strict" or web_root is not None:
+        web_consumer_bypasses, stored_web_failures = _stored_web_route_failures(
+            root, configuration
+        )
+        failures.extend(stored_web_failures)
     if web_root is not None:
         web_root = Path(web_root).resolve()
         web_prefixes = configuration.get(
@@ -469,6 +556,25 @@ def evaluate_completion(
                     field="web_operations_exclusions_artifact",
                 )
             )
+        lexical_non_routes_relative = configuration.get(
+            "web_lexical_non_routes_artifact"
+        )
+        lexical_non_routes = ()
+        if lexical_non_routes_relative is not None:
+            if (
+                not isinstance(lexical_non_routes_relative, str)
+                or not lexical_non_routes_relative
+            ):
+                raise CompletionConfigurationError(
+                    "web_lexical_non_routes_artifact must be a repository-relative path"
+                )
+            lexical_non_routes = load_lexical_non_routes(
+                _relative_path(
+                    root,
+                    lexical_non_routes_relative,
+                    field="web_lexical_non_routes_artifact",
+                )
+            )
         web_scan = scan_web_api_routes(
             _web_scan_roots(web_root),
             legacy_index=_web_route_index(
@@ -480,8 +586,14 @@ def evaluate_completion(
             exclusions=exclusions,
             frontend_revision=_web_frontend_revision(web_root),
             classification_prefixes=tuple(web_prefixes),
+            lexical_non_routes=lexical_non_routes,
         )
         web_consumer_bypasses = web_scan.unresolved_count
+        lexical_unmatched = len(web_scan.lexical_audit.unmatched_tokens)
+        if lexical_unmatched:
+            failures.append(
+                f"web_route_inventory_lexical_unmatched:{lexical_unmatched}"
+            )
         failures.extend(
             _web_route_inventory_failures(root, configuration, web_scan.serialized())
         )
@@ -515,7 +627,7 @@ def evaluate_completion(
         internal_imports=internal_imports,
         consumer_bypasses=consumer_bypasses,
         catalog_capabilities=catalog_capabilities,
-        failed=tuple(sorted(failures)),
+        failed=tuple(sorted(set(failures))),
         web_consumer_bypasses=web_consumer_bypasses,
     )
 

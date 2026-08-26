@@ -40,6 +40,65 @@ def test_ambiguous_method_is_unresolved(tmp_path: Path) -> None:
     assert report.routes[0].disposition == "unresolved"
 
 
+@pytest.mark.parametrize("callee", ["api", "cf", "fn"])
+def test_generic_call_names_do_not_imply_get(
+    tmp_path: Path, callee: str
+) -> None:
+    report = _scan(f"{callee}('/api/tasks')\n", tmp_path)
+
+    assert report.routes[0].method is None
+    assert report.routes[0].disposition == "unresolved"
+
+
+def test_arbitrary_object_method_name_does_not_imply_http_method(
+    tmp_path: Path,
+) -> None:
+    report = _scan("routes.get('/api/tasks')\n", tmp_path)
+
+    assert report.routes[0].method is None
+
+
+def test_nested_payload_method_does_not_override_fetch_default_get(
+    tmp_path: Path,
+) -> None:
+    report = _scan(
+        "fetch('/api/tasks', { body: JSON.stringify({ method: 'POST' }) });\n",
+        tmp_path,
+        legacy_index={("GET", "/api/tasks")},
+    )
+
+    assert report.routes[0].method == "GET"
+    assert report.routes[0].disposition == "legacy_registered"
+
+
+def test_arbitrary_options_call_does_not_imply_http_method(tmp_path: Path) -> None:
+    report = _scan("dispatch('/api/tasks', { method: 'POST' });\n", tmp_path)
+
+    assert report.routes[0].method is None
+
+
+def test_direct_fetch_accepts_quoted_top_level_method_key(tmp_path: Path) -> None:
+    report = _scan(
+        "fetch('/api/tasks', { 'method': 'POST' });\n",
+        tmp_path,
+        legacy_index={("POST", "/api/tasks")},
+    )
+
+    assert report.routes[0].method == "POST"
+    assert report.routes[0].disposition == "legacy_registered"
+
+
+def test_commented_fetch_method_does_not_override_default_get(tmp_path: Path) -> None:
+    report = _scan(
+        "fetch('/api/tasks', { // method: 'POST'\n});\n",
+        tmp_path,
+        legacy_index={("GET", "/api/tasks")},
+    )
+
+    assert report.routes[0].method == "GET"
+    assert report.routes[0].disposition == "legacy_registered"
+
+
 def test_scanner_preserves_method_after_markup_and_optional_chaining(
     tmp_path: Path,
 ) -> None:
@@ -66,6 +125,13 @@ def test_scanner_reads_explicit_method_argument_before_route(tmp_path: Path) -> 
 
     assert report.routes[0].method == "POST"
     assert report.routes[0].disposition == "legacy_registered"
+
+
+def test_unknown_method_first_call_contract_stays_unresolved(tmp_path: Path) -> None:
+    report = _scan("dispatch('POST', '/api/tasks')\n", tmp_path)
+
+    assert report.routes[0].method is None
+    assert report.routes[0].disposition == "unresolved"
 
 
 def test_scanner_assigns_exactly_one_governed_disposition_per_occurrence(
@@ -121,6 +187,19 @@ def test_report_records_frontend_revision_content_hash_roots_and_exclusions(
     assert serialized["routes"][0]["occurrence_id"].endswith(
         ":GET:/api/tasks"
     )
+
+
+def test_lexical_audit_catches_api_token_missed_by_primary_extractor(
+    tmp_path: Path,
+) -> None:
+    report = _scan("fetch('https://example.test/api/tasks')\n", tmp_path)
+
+    audit = report.serialized()["lexical_audit"]
+    assert audit["token_count"] == 1
+    assert audit["mapped_count"] == 0
+    assert audit["reviewed_non_route_count"] == 0
+    assert audit["unmatched_count"] == 1
+    assert audit["unmatched_tokens"] == ["web/app.js:1:28:/api/"]
 
 
 def test_report_keeps_sibling_scan_roots_repository_relative(tmp_path: Path) -> None:

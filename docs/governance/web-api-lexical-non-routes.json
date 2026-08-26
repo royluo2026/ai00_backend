@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "source": "packages/craft-plugin/web/bop_nav/bop_nav.js",
+      "line": 12,
+      "column": 13,
+      "reason": "JSDoc documents the route used by runtime code; it is not an executable route literal."
+    },
+    {
+      "source": "packages/craft-plugin/web/craft_table/table.js",
+      "line": 8,
+      "column": 9,
+      "reason": "Comment documents a retired HTTP 410 route; it is not executable."
+    },
+    {
+      "source": "packages/craft-plugin/web/gbop_lineage/layout_mode.js",
+      "line": 48,
+      "column": 32,
+      "reason": "Comment documents a removed legacy entry point; it is not executable."
+    },
+    {
+      "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
+      "line": 6,
+      "column": 13,
+      "reason": "JSDoc describes a data source; it is not an executable route literal."
+    },
+    {
+      "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
+      "line": 1417,
+      "column": 10,
+      "reason": "JSDoc describes the adjacent upload helper; it is not executable."
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/lineage.js",
+      "line": 2617,
+      "column": 10,
+      "reason": "JSDoc describes the adjacent upload helper; it is not executable."
+    },
+    {
+      "source": "packages/craft-plugin/web/pbom_check/pbom_check.js",
+      "line": 6,
+      "column": 23,
+      "reason": "JSDoc describes a server-side rule check; it is not executable."
+    },
+    {
+      "source": "packages/plugin-sdk/frontend/plugin-sdk.js",
+      "line": 8,
+      "column": 20,
+      "reason": "JSDoc usage example is documentation, not executable code."
+    },
+    {
+      "source": "packages/plugin-sdk/frontend/plugin-sdk.js",
+      "line": 43,
+      "column": 42,
+      "reason": "JSDoc parameter example is documentation, not executable code."
+    },
+    {
+      "source": "web/components/attachments_widget.js",
+      "line": 119,
+      "column": 21,
+      "reason": "Section comment names the adjacent upload route; it is not executable."
+    },
+    {
+      "source": "web/components/list_shell.js",
+      "line": 1158,
+      "column": 37,
+      "reason": "JSDoc usage example is documentation, not executable code."
+    },
+    {
+      "source": "web/components/list_sidebar.js",
+      "line": 898,
+      "column": 14,
+      "reason": "Comment describes the adjacent project selector; it is not executable."
+    },
+    {
+      "source": "web/components/list_tree.html",
+      "line": 625,
+      "column": 18,
+      "reason": "Comment labels the adjacent list binding behavior; it is not executable."
+    },
+    {
+      "source": "web/container_card/modes/mode_spreadsheet.js",
+      "line": 53,
+      "column": 19,
+      "reason": "Comment explains upload transport choice; it is not executable."
+    },
+    {
+      "source": "web/core/web_compat.js",
+      "line": 335,
+      "column": 47,
+      "reason": "Comment names the upload route owned by another component; it is not executable."
+    },
+    {
+      "source": "web/handbook/index.html",
+      "line": 477,
+      "column": 58,
+      "reason": "Rendered handbook prose documents an API call; it is not an executable route literal."
+    },
+    {
+      "source": "web/handbook/index.html",
+      "line": 777,
+      "column": 16,
+      "reason": "Rendered handbook code example is documentation, not executable code."
+    },
+    {
+      "source": "web/main.js",
+      "line": 1063,
+      "column": 33,
+      "reason": "Commented usage example is documentation, not executable code."
+    },
+    {
+      "source": "web/workbench/workbench.js",
+      "line": 4963,
+      "column": 18,
+      "reason": "Comment describes the adjacent panel loader; it is not executable."
+    }
+  ]
+}

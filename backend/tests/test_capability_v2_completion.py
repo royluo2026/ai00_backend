@@ -42,6 +42,29 @@ def _write_text(root: Path, relative: str, text: str = "") -> None:
     path.write_text(text, encoding="utf-8")
 
 
+def _commit_frontend(frontend: Path) -> str:
+    commands = (
+        ("init", "-q"),
+        ("config", "user.email", "capability-tests@example.invalid"),
+        ("config", "user.name", "Capability Tests"),
+        ("add", "."),
+        ("commit", "-q", "-m", "test frontend"),
+    )
+    for arguments in commands:
+        subprocess.run(
+            ["git", "-C", str(frontend), *arguments],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    return subprocess.run(
+        ["git", "-C", str(frontend), "rev-parse", "HEAD"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+
+
 def _complete_repository(tmp_path: Path) -> Path:
     _write_json(
         tmp_path,
@@ -387,6 +410,7 @@ def test_web_consumer_bypass_is_evaluated_when_web_root_is_supplied(tmp_path: Pa
     (web / "app.js").write_text(
         "fetch('/api/bop/entries', { method: 'POST' });\n", encoding="utf-8"
     )
+    _commit_frontend(web)
 
     report = evaluate_completion(root, mode="strict", web_root=web)
 
@@ -403,6 +427,7 @@ def test_web_route_inventory_drift_fails_closed(tmp_path: Path) -> None:
         "fetch('/api/capabilities/project.task.read', { method: 'POST' });\n",
         encoding="utf-8",
     )
+    _commit_frontend(web)
     configuration_path = root / "backend/governance/capability_v2_completion.json"
     configuration = json.loads(configuration_path.read_text(encoding="utf-8"))
     configuration["web_route_inventory_artifact"] = "docs/route-inventory.json"
@@ -435,12 +460,13 @@ def _configure_complete_web_evidence(
     _write_json(root, "docs/legacy-routes.json", {"inventory_kind": "legacy_rest", "entries": []})
     _write_json(root, "docs/bff-routes.json", {"inventory_kind": "bff", "entries": []})
     _write_json(root, "docs/operations.json", {"schema_version": 1, "entries": []})
+    revision = _commit_frontend(web)
     report = scan_web_api_routes(
         [web],
         legacy_index=set(),
         bff_index=set(),
         exclusions=(),
-        frontend_revision="unversioned",
+        frontend_revision=revision,
     )
     artifact = root / "docs/web-routes.json"
     artifact.write_text(report.json(), encoding="utf-8", newline="\n")
@@ -489,6 +515,66 @@ def test_completion_blocks_stored_unresolved_web_occurrence(tmp_path: Path) -> N
     report = evaluate_completion(root, mode="strict", web_root=web)
 
     assert "web_route_inventory_unresolved:1" in report.failed
+
+
+def test_strict_completion_blocks_stored_unresolved_without_frontend_root(
+    tmp_path: Path,
+) -> None:
+    root = _complete_repository(tmp_path)
+    _web, _artifact = _configure_complete_web_evidence(
+        root, "fetch('/api/tasks');\n"
+    )
+
+    report = evaluate_completion(root, mode="strict")
+
+    assert report.web_consumer_bypasses == 1
+    assert "web_route_inventory_unresolved:1" in report.failed
+    assert "web_consumer_bypasses:1" in report.failed
+
+
+def test_fresh_web_verification_rejects_missing_frontend_root(tmp_path: Path) -> None:
+    root = _complete_repository(tmp_path)
+
+    with pytest.raises(CompletionConfigurationError, match="frontend Git root is missing"):
+        evaluate_completion(root, mode="strict", web_root=root / "missing-frontend")
+
+
+def test_fresh_web_verification_rejects_non_git_frontend_root(tmp_path: Path) -> None:
+    root = _complete_repository(tmp_path)
+    frontend = root / "frontend"
+    frontend.mkdir()
+    (frontend / "app.js").write_text("fetch('/api/tasks');\n", encoding="utf-8")
+
+    with pytest.raises(CompletionConfigurationError, match="frontend Git revision"):
+        evaluate_completion(root, mode="strict", web_root=frontend)
+
+
+def test_completion_blocks_unmatched_lexical_api_token(tmp_path: Path) -> None:
+    root = _complete_repository(tmp_path)
+    web, _artifact = _configure_complete_web_evidence(
+        root, "fetch('https://example.test/api/tasks');\n"
+    )
+
+    report = evaluate_completion(root, mode="strict", web_root=web)
+
+    assert "web_route_inventory_lexical_unmatched:1" in report.failed
+
+
+def test_strict_completion_rejects_internally_inconsistent_lexical_audit(
+    tmp_path: Path,
+) -> None:
+    root = _complete_repository(tmp_path)
+    _web, artifact = _configure_complete_web_evidence(
+        root,
+        "fetch('/api/v1/capabilities/test.capability_1:invoke', { method: 'POST' });\n",
+    )
+    document = json.loads(artifact.read_text(encoding="utf-8"))
+    document["lexical_audit"]["token_count"] += 1
+    _write_json(root, "docs/web-routes.json", document)
+
+    report = evaluate_completion(root, mode="strict")
+
+    assert "web_route_inventory_lexical_invalid:1" in report.failed
 
 
 def test_completion_accepts_byte_identical_canonical_web_evidence(tmp_path: Path) -> None:
@@ -563,8 +649,12 @@ def test_completion_cli_reports_complete_in_progress_and_strict_modes() -> None:
 
     assert progress.returncode == 0
     assert json.loads(progress.stdout)["complete"] is True
-    assert strict.returncode == 0
-    assert json.loads(strict.stdout)["complete"] is True
+    assert strict.returncode == 1
+    assert json.loads(strict.stdout)["complete"] is False
+    assert any(
+        reason.startswith("web_route_inventory_unresolved:")
+        for reason in json.loads(strict.stdout)["failed"]
+    )
     assert json.loads(strict.stdout)["cross_domain_sql"] == 0
 
 
@@ -580,5 +670,9 @@ def test_completion_cli_static_only_alias_runs_the_strict_static_gate() -> None:
         check=False,
     )
 
-    assert result.returncode == 0, result.stderr
-    assert json.loads(result.stdout)["complete"] is True
+    assert result.returncode == 1, result.stderr
+    assert json.loads(result.stdout)["complete"] is False
+    assert any(
+        reason.startswith("web_route_inventory_unresolved:")
+        for reason in json.loads(result.stdout)["failed"]
+    )

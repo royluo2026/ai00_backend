@@ -32,6 +32,38 @@ class OperationsExclusion:
 
 
 @dataclass(frozen=True)
+class LexicalNonRoute:
+    source: str
+    line: int
+    column: int
+    reason: str
+
+    @property
+    def token_id(self) -> str:
+        return f"{self.source}:{self.line}:{self.column}:/api/"
+
+
+@dataclass(frozen=True)
+class LexicalAudit:
+    token_count: int
+    token_hash: str
+    mapped_count: int
+    reviewed_non_route_tokens: tuple[str, ...]
+    unmatched_tokens: tuple[str, ...]
+
+    def serialized(self) -> dict[str, object]:
+        return {
+            "token_count": self.token_count,
+            "token_hash": self.token_hash,
+            "mapped_count": self.mapped_count,
+            "reviewed_non_route_count": len(self.reviewed_non_route_tokens),
+            "reviewed_non_route_tokens": list(self.reviewed_non_route_tokens),
+            "unmatched_count": len(self.unmatched_tokens),
+            "unmatched_tokens": list(self.unmatched_tokens),
+        }
+
+
+@dataclass(frozen=True)
 class RouteUse:
     source: str
     line: int
@@ -80,6 +112,7 @@ class RouteScanReport:
     scan_roots: tuple[str, ...]
     excluded_roots: tuple[str, ...]
     routes: tuple[RouteUse, ...]
+    lexical_audit: LexicalAudit
     legacy_prefixes: tuple[str, ...] = ()
 
     @property
@@ -120,6 +153,7 @@ class RouteScanReport:
             "scan_roots": list(self.scan_roots),
             "excluded_roots": list(self.excluded_roots),
             "counts": self.counts,
+            "lexical_audit": self.lexical_audit.serialized(),
             "routes": [route.serialized() for route in self.routes],
         }
 
@@ -159,19 +193,16 @@ _ROUTE_LITERAL = re.compile(
 )
 _TEMPLATE_EXPRESSION = re.compile(r"\$\{[^}]+\}")
 _ROUTE_PARAMETER = re.compile(r"\{[^/{}]+\}")
-_EXPLICIT_METHOD = re.compile(r"\bmethod\s*:\s*['\"]([A-Za-z]+)['\"]")
+_DIRECT_METHOD = re.compile(
+    r"(?:\bmethod\b|['\"]method['\"])\s*:\s*['\"]([A-Za-z]+)['\"]"
+)
 _METHOD_ARGUMENT = re.compile(
     r"^\s*['\"](DELETE|GET|PATCH|POST|PUT)['\"]\s*,\s*$", re.IGNORECASE
 )
 _CALLEE = re.compile(r"([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)\s*$")
-_DEFAULT_GET_CALLS = {"_cf", "api", "apiFetch", "cf", "fetch", "fn", "getJSON"}
-_HTTP_METHOD_CALLS = {
-    "delete": "DELETE",
-    "get": "GET",
-    "patch": "PATCH",
-    "post": "POST",
-    "put": "PUT",
-}
+_DEFAULT_GET_CALLS = {"fetch"}
+_METHOD_FIRST_CALLS = {"_cf"}
+_OPTIONS_METHOD_CALLS = {"fetch", "_cloudFetch"}
 
 
 def _is_skipped_directory(part: str) -> bool:
@@ -335,21 +366,68 @@ def _matching_paren(source: str, open_paren: int) -> int:
     return min(len(source), open_paren + 2000)
 
 
-def _method_for_occurrence(source: str, literal_start: int) -> str | None:
+def _direct_options_method(source: str, literal_end: int, call_end: int) -> str | None:
+    index = literal_end
+    while index < call_end and source[index].isspace():
+        index += 1
+    if index >= call_end or source[index] != ",":
+        return None
+    index += 1
+    while index < call_end and source[index].isspace():
+        index += 1
+    if index >= call_end or source[index] != "{":
+        return None
+    depth = 0
+    quote: str | None = None
+    escaped = False
+    while index < call_end:
+        char = source[index]
+        if quote:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == quote:
+                quote = None
+            index += 1
+            continue
+        if depth == 1:
+            match = _DIRECT_METHOD.match(source, index)
+            if match:
+                return match.group(1).upper()
+        if char in {"'", '"', "`"}:
+            quote = char
+            index += 1
+            continue
+        if char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+            if depth == 0:
+                return None
+        index += 1
+    return None
+
+
+def _method_for_occurrence(
+    source: str, literal_start: int, literal_end: int
+) -> str | None:
     call = _find_call(source, literal_start)
     if call is None:
         return None
     callee, open_paren = call
     method_argument = _METHOD_ARGUMENT.match(source[open_paren + 1:literal_start])
-    if method_argument:
-        return method_argument.group(1).upper()
-    call_text = source[open_paren:_matching_paren(source, open_paren) + 1]
-    explicit = _EXPLICIT_METHOD.search(call_text)
-    if explicit:
-        return explicit.group(1).upper()
     final_name = callee.rsplit(".", 1)[-1]
-    if final_name in _HTTP_METHOD_CALLS:
-        return _HTTP_METHOD_CALLS[final_name]
+    if method_argument and final_name in _METHOD_FIRST_CALLS:
+        return method_argument.group(1).upper()
+    call_end = _matching_paren(source, open_paren)
+    explicit = (
+        _direct_options_method(source, literal_end, call_end)
+        if final_name in _OPTIONS_METHOD_CALLS
+        else None
+    )
+    if explicit:
+        return explicit
     if final_name in _DEFAULT_GET_CALLS:
         return "GET"
     return None
@@ -453,6 +531,42 @@ def load_operations_exclusions(path: Path) -> tuple[OperationsExclusion, ...]:
     return _validate_exclusions(parsed)
 
 
+def load_lexical_non_routes(path: Path) -> tuple[LexicalNonRoute, ...]:
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise RouteScanConfigurationError(f"invalid lexical non-route exclusions: {path}") from exc
+    if not isinstance(document, dict) or document.get("schema_version") != 1:
+        raise RouteScanConfigurationError("unsupported lexical non-route schema version")
+    entries = document.get("entries")
+    if not isinstance(entries, list):
+        raise RouteScanConfigurationError("lexical non-route entries must be an array")
+    parsed: list[LexicalNonRoute] = []
+    seen: set[str] = set()
+    for raw in entries:
+        if (
+            not isinstance(raw, dict)
+            or set(raw) != {"source", "line", "column", "reason"}
+            or not isinstance(raw.get("source"), str)
+            or not raw["source"]
+            or not isinstance(raw.get("line"), int)
+            or raw["line"] < 1
+            or not isinstance(raw.get("column"), int)
+            or raw["column"] < 1
+            or not isinstance(raw.get("reason"), str)
+            or not raw["reason"].strip()
+        ):
+            raise RouteScanConfigurationError("lexical non-route entry has invalid fields")
+        item = LexicalNonRoute(**raw)
+        if item.token_id in seen:
+            raise RouteScanConfigurationError(
+                f"duplicate lexical non-route exclusion: {item.token_id}"
+            )
+        seen.add(item.token_id)
+        parsed.append(item)
+    return tuple(parsed)
+
+
 def _disposition(
     method: str | None,
     route: str,
@@ -489,6 +603,7 @@ def scan_web_api_routes(
     frontend_revision: str,
     *,
     classification_prefixes: Sequence[str] = (),
+    lexical_non_routes: Sequence[LexicalNonRoute] = (),
 ) -> RouteScanReport:
     """Discover every source ``/api/`` occurrence and assign one disposition."""
 
@@ -501,6 +616,8 @@ def scan_web_api_routes(
     operations_keys = {item.key for item in operations}
     prefixes = tuple(sorted(set(classification_prefixes)))
     routes: list[RouteUse] = []
+    lexical_tokens: list[str] = []
+    route_token_ids: set[str] = set()
     digest = hashlib.sha256()
     for path in sources:
         relative = path.relative_to(common_base).as_posix()
@@ -510,6 +627,13 @@ def scan_web_api_routes(
         digest.update(b"\0")
         digest.update(source.encode("utf-8"))
         digest.update(b"\0")
+        for token in re.finditer(r"/api/", source):
+            token_line = source.count("\n", 0, token.start()) + 1
+            token_line_start = source.rfind("\n", 0, token.start()) + 1
+            token_column = token.start() - token_line_start + 1
+            lexical_tokens.append(
+                f"{relative}:{token_line}:{token_column}:/api/"
+            )
         scan_source = _mask_comments(source)
         for match in _ROUTE_LITERAL.finditer(scan_source):
             literal_start = match.start()
@@ -521,7 +645,7 @@ def scan_web_api_routes(
             line = source.count("\n", 0, route_offset) + 1
             line_start = source.rfind("\n", 0, route_offset) + 1
             column = route_offset - line_start + 1
-            method = _method_for_occurrence(source, literal_start)
+            method = _method_for_occurrence(scan_source, literal_start, literal_end)
             disposition = _disposition(
                 method, normalized, legacy_keys, bff_keys, operations_keys
             )
@@ -534,6 +658,7 @@ def scan_web_api_routes(
                 None,
             )
             occurrence_id = f"{relative}:{line}:{column}:{method or 'UNKNOWN'}:{normalized}"
+            route_token_ids.add(f"{relative}:{line}:{column}:/api/")
             routes.append(
                 RouteUse(
                     source=relative,
@@ -559,6 +684,27 @@ def scan_web_api_routes(
     identities = [route.occurrence_id for route in routes]
     if len(identities) != len(set(identities)):
         raise RouteScanConfigurationError("duplicate canonical occurrence identity")
+    lexical_token_set = set(lexical_tokens)
+    if len(lexical_token_set) != len(lexical_tokens):
+        raise RouteScanConfigurationError("duplicate lexical token identity")
+    reviewed_non_routes = {item.token_id for item in lexical_non_routes}
+    stale_non_routes = reviewed_non_routes - lexical_token_set
+    if stale_non_routes:
+        raise RouteScanConfigurationError(
+            f"stale lexical non-route exclusion: {min(stale_non_routes)}"
+        )
+    overlapping_non_routes = reviewed_non_routes & route_token_ids
+    if overlapping_non_routes:
+        raise RouteScanConfigurationError(
+            f"lexical non-route exclusion hides route: {min(overlapping_non_routes)}"
+        )
+    unmatched_tokens = tuple(
+        sorted(lexical_token_set - route_token_ids - reviewed_non_routes)
+    )
+    lexical_hash = hashlib.sha256()
+    for token_id in sorted(lexical_token_set):
+        lexical_hash.update(token_id.encode("utf-8"))
+        lexical_hash.update(b"\0")
     scan_roots = tuple(
         Path(path).resolve().relative_to(common_base).as_posix() for path in roots
     )
@@ -568,6 +714,13 @@ def scan_web_api_routes(
         scan_roots=scan_roots,
         excluded_roots=_EXCLUDED_ROOTS,
         routes=tuple(routes),
+        lexical_audit=LexicalAudit(
+            token_count=len(lexical_token_set),
+            token_hash=lexical_hash.hexdigest(),
+            mapped_count=len(route_token_ids),
+            reviewed_non_route_tokens=tuple(sorted(reviewed_non_routes)),
+            unmatched_tokens=unmatched_tokens,
+        ),
         legacy_prefixes=prefixes,
     )
 
@@ -619,10 +772,13 @@ def scan_web_routes(
 
 __all__ = [
     "OperationsExclusion",
+    "LexicalAudit",
+    "LexicalNonRoute",
     "RouteScanConfigurationError",
     "RouteScanReport",
     "RouteUse",
     "load_operations_exclusions",
+    "load_lexical_non_routes",
     "normalize_route",
     "scan_web_api_routes",
     "scan_web_routes",

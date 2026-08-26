@@ -1,0 +1,1377 @@
+{
+  "schema_version": 1,
+  "review_authority": "capability-governance-evidence-closure/task-3-fix-round-1",
+  "baseline_revision": "565b00a0",
+  "original_additions": 109,
+  "entries": [
+    {
+      "scope": "original_109",
+      "method": "DELETE",
+      "route_path": "/api/ai/sessions/{gid}",
+      "disposition": "retained",
+      "target_capability": "agent.session.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/agent/agent_backend/routers/ai_chat.py#route:DELETE /api/ai/sessions/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:agent.session.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "PATCH",
+      "route_path": "/api/craft_lib/equipments/{gid}",
+      "disposition": "retained",
+      "target_capability": "craft.library.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:PATCH /api/craft_lib/equipments/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "DELETE",
+      "route_path": "/api/craft_lib/equipments/{gid}",
+      "disposition": "retained",
+      "target_capability": "craft.library.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:DELETE /api/craft_lib/equipments/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/craft_lib/equipments",
+      "disposition": "retained",
+      "target_capability": "craft.library.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:POST /api/craft_lib/equipments",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/craft_lib/equipments",
+      "disposition": "retained",
+      "target_capability": "craft.library.read",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:GET /api/craft_lib/equipments",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.read"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "PUT",
+      "route_path": "/api/tasks/{gid}",
+      "disposition": "retained",
+      "target_capability": "project.task.change.apply.atomic.tasks_update",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/promotion.py#route:PUT /api/tasks/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:project.task.change.apply.atomic.tasks_update",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:PUT /api/tasks/{gid}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "PUT",
+      "route_path": "/api/task-dependencies/{gid}",
+      "disposition": "retained",
+      "target_capability": "project.task.change.apply.atomic.task_dependencies_update",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/promotion.py#route:PUT /api/task-dependencies/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:project.task.change.apply.atomic.task_dependencies_update",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:PUT /api/task-dependencies/{gid}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "PUT",
+      "route_path": "/api/skills/{gid}",
+      "disposition": "retained",
+      "target_capability": "agent.skill.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/agent/agent_backend/routers/skills_v2.py#route:PUT /api/skills/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:agent.skill.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "PUT",
+      "route_path": "/api/self_ann/{item_gid}",
+      "disposition": "removed",
+      "target_capability": null,
+      "reason": "Handler performs direct service or SQL work; equivalence to the proposed capability target is not proven.",
+      "evidence_refs": [
+        "backend/routers/self_annotations.py#route:PUT /api/self_ann/{item_gid}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "PUT",
+      "route_path": "/api/item-entries/{item_type}/{item_gid}",
+      "disposition": "retained",
+      "target_capability": "project.list.change.apply.atomic.item_entries_replace",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/item_entries.py#route:PUT /api/item-entries/{item_type}/{item_gid}",
+        "docs/capabilities/catalog.v2.json#capability:project.list.change.apply.atomic.item_entries_replace",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:PUT /api/item-entries/{item_type}/{item_gid}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "PUT",
+      "route_path": "/api/issues/{gid}",
+      "disposition": "retained",
+      "target_capability": "project.issue.change.apply.atomic.issues_update",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/promotion.py#route:PUT /api/issues/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:project.issue.change.apply.atomic.issues_update",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:PUT /api/issues/{gid}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "PUT",
+      "route_path": "/api/annotations/{key}",
+      "disposition": "retained",
+      "target_capability": "project.workbench.change.apply.atomic.annotations_put",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "backend/routers/annotations.py#route:PUT /api/annotations/{key}",
+        "docs/capabilities/catalog.v2.json#capability:project.workbench.change.apply.atomic.annotations_put",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:PUT /api/annotations/{key}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/craft_lib/fasteners",
+      "disposition": "retained",
+      "target_capability": "craft.library.read",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:GET /api/craft_lib/fasteners",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.read"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/vpps-operations/{gid}/revert",
+      "disposition": "retained",
+      "target_capability": "craft.vpps_audit.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/vpps_audit.py#route:POST /api/vpps-operations/{gid}/revert",
+        "docs/capabilities/catalog.v2.json#capability:craft.vpps_audit.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/views/{gid}/copy",
+      "disposition": "removed",
+      "target_capability": null,
+      "reason": "Handler performs direct service or SQL work; equivalence to the proposed capability target is not proven.",
+      "evidence_refs": [
+        "backend/routers/views.py#route:POST /api/views/{gid}/copy"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/views",
+      "disposition": "removed",
+      "target_capability": null,
+      "reason": "Handler performs direct service or SQL work; equivalence to the proposed capability target is not proven.",
+      "evidence_refs": [
+        "backend/routers/views.py#route:POST /api/views"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/tasks",
+      "disposition": "retained",
+      "target_capability": "project.task.change.apply.atomic.tasks_create",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/promotion.py#route:POST /api/tasks",
+        "docs/capabilities/catalog.v2.json#capability:project.task.change.apply.atomic.tasks_create",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:POST /api/tasks"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/task-templates/{gid}/instantiate",
+      "disposition": "retained",
+      "target_capability": "project.task_template.change.apply.atomic.task_templates_instantiate",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/task_templates.py#route:POST /api/task-templates/{gid}/instantiate",
+        "docs/capabilities/catalog.v2.json#capability:project.task_template.change.apply.atomic.task_templates_instantiate",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:POST /api/task-templates/{gid}/instantiate"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/task-dependencies",
+      "disposition": "retained",
+      "target_capability": "project.task.change.apply.atomic.task_dependencies_create",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/promotion.py#route:POST /api/task-dependencies",
+        "docs/capabilities/catalog.v2.json#capability:project.task.change.apply.atomic.task_dependencies_create",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:POST /api/task-dependencies"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/skills",
+      "disposition": "retained",
+      "target_capability": "agent.skill.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/agent/agent_backend/routers/skills_v2.py#route:POST /api/skills",
+        "docs/capabilities/catalog.v2.json#capability:agent.skill.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/shares/lists/{list_gid}",
+      "disposition": "retained",
+      "target_capability": "project.sharing.change.apply.atomic.shares_list_create",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/shares.py#route:POST /api/shares/lists/{list_gid}",
+        "docs/capabilities/catalog.v2.json#capability:project.sharing.change.apply.atomic.shares_list_create",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:POST /api/shares/lists/{list_gid}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/rule-engine/check",
+      "disposition": "retained",
+      "target_capability": "craft.rule.engine.evaluate",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/rule_engine.py#route:POST /api/rule-engine/check",
+        "docs/capabilities/catalog.v2.json#capability:craft.rule.engine.evaluate"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/permission-requests",
+      "disposition": "retained",
+      "target_capability": "project.permission_request.change.apply.atomic.permission_requests_create",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/permission_requests.py#route:POST /api/permission-requests",
+        "docs/capabilities/catalog.v2.json#capability:project.permission_request.change.apply.atomic.permission_requests_create",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:POST /api/permission-requests"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/org/sync-from-feishu",
+      "disposition": "removed",
+      "target_capability": null,
+      "reason": "Handler performs direct service or SQL work; equivalence to the proposed capability target is not proven.",
+      "evidence_refs": [
+        "backend/routers/org.py#route:POST /api/org/sync-from-feishu"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/lists",
+      "disposition": "retained",
+      "target_capability": "project.list.change.apply.atomic.lists_create",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/lists.py#route:POST /api/lists",
+        "docs/capabilities/catalog.v2.json#capability:project.list.change.apply.atomic.lists_create",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:POST /api/lists"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/vpps-operations/rule4-bulk-ignore",
+      "disposition": "retained",
+      "target_capability": "craft.vpps_audit.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/vpps_audit.py#route:POST /api/vpps-operations/rule4-bulk-ignore",
+        "docs/capabilities/catalog.v2.json#capability:craft.vpps_audit.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/craft_lib/fasteners",
+      "disposition": "retained",
+      "target_capability": "craft.library.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:POST /api/craft_lib/fasteners",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "DELETE",
+      "route_path": "/api/craft_lib/fasteners/{gid}",
+      "disposition": "retained",
+      "target_capability": "craft.library.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:DELETE /api/craft_lib/fasteners/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "PATCH",
+      "route_path": "/api/craft_lib/fasteners/{gid}",
+      "disposition": "retained",
+      "target_capability": "craft.library.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:PATCH /api/craft_lib/fasteners/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.change.apply"
+      ]
+    },
+    {
+      "scope": "fix_round_1",
+      "method": "POST",
+      "route_path": "/api/import-export/lark-sheets/write",
+      "disposition": "retained",
+      "target_capability": "craft.data_exchange.lark.write",
+      "reason": "Handler directly invokes the stable Lark data-exchange business capability.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/import_export.py#route:POST /api/import-export/lark-sheets/write docs/capabilities/catalog.v2.json#capability:craft.data_exchange.lark.write"
+      ]
+    },
+    {
+      "scope": "fix_round_1",
+      "method": "POST",
+      "route_path": "/api/import-export/lark-sheets/read",
+      "disposition": "retained",
+      "target_capability": "craft.data_exchange.lark.read",
+      "reason": "Handler directly invokes the stable Lark data-exchange business capability.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/import_export.py#route:POST /api/import-export/lark-sheets/read docs/capabilities/catalog.v2.json#capability:craft.data_exchange.lark.read"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/std_op/operations/{gid}/publish",
+      "disposition": "retained",
+      "target_capability": "craft.standard_operation.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/std_op.py#route:POST /api/std_op/operations/{gid}/publish",
+        "docs/capabilities/catalog.v2.json#capability:craft.standard_operation.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/std_op/operations/{gid}/deprecate",
+      "disposition": "retained",
+      "target_capability": "craft.standard_operation.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/std_op.py#route:POST /api/std_op/operations/{gid}/deprecate",
+        "docs/capabilities/catalog.v2.json#capability:craft.standard_operation.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/std_op/operations",
+      "disposition": "retained",
+      "target_capability": "craft.standard_operation.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/std_op.py#route:POST /api/std_op/operations",
+        "docs/capabilities/catalog.v2.json#capability:craft.standard_operation.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/std_op/operations",
+      "disposition": "retained",
+      "target_capability": "craft.standard_operation.read",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/std_op.py#route:GET /api/std_op/operations",
+        "docs/capabilities/catalog.v2.json#capability:craft.standard_operation.read"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "PATCH",
+      "route_path": "/api/rules/{gid}",
+      "disposition": "retained",
+      "target_capability": "craft.rule.library.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/rules.py#route:PATCH /api/rules/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:craft.rule.library.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/rules",
+      "disposition": "retained",
+      "target_capability": "craft.rule.library.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/rules.py#route:POST /api/rules",
+        "docs/capabilities/catalog.v2.json#capability:craft.rule.library.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/ebom/snapshots/{gid}/parts",
+      "disposition": "retained",
+      "target_capability": "craft.pbom.part.search",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/ebom.py#route:GET /api/ebom/snapshots/{gid}/parts",
+        "docs/capabilities/catalog.v2.json#capability:craft.pbom.part.search"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/ebom/snapshots",
+      "disposition": "retained",
+      "target_capability": "craft.pbom.version.search",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/ebom.py#route:GET /api/ebom/snapshots",
+        "docs/capabilities/catalog.v2.json#capability:craft.pbom.version.search"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "PATCH",
+      "route_path": "/api/craft_lib/tools/{gid}",
+      "disposition": "retained",
+      "target_capability": "craft.library.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:PATCH /api/craft_lib/tools/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "DELETE",
+      "route_path": "/api/craft_lib/tools/{gid}",
+      "disposition": "retained",
+      "target_capability": "craft.library.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:DELETE /api/craft_lib/tools/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/craft_lib/tools",
+      "disposition": "retained",
+      "target_capability": "craft.library.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:POST /api/craft_lib/tools",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/craft_lib/tools",
+      "disposition": "retained",
+      "target_capability": "craft.library.read",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:GET /api/craft_lib/tools",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.read"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/craft_lib/part_names/batch_add_from_pbom",
+      "disposition": "retained",
+      "target_capability": "craft.library.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:POST /api/craft_lib/part_names/batch_add_from_pbom",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/craft_lib/part_names/batch_accept_alias",
+      "disposition": "retained",
+      "target_capability": "craft.library.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:POST /api/craft_lib/part_names/batch_accept_alias",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/craft_lib/part_names/{gid}/accept_alias",
+      "disposition": "retained",
+      "target_capability": "craft.library.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:POST /api/craft_lib/part_names/{gid}/accept_alias",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "PATCH",
+      "route_path": "/api/craft_lib/part_names/{gid}",
+      "disposition": "retained",
+      "target_capability": "craft.library.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:PATCH /api/craft_lib/part_names/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "DELETE",
+      "route_path": "/api/craft_lib/part_names/{gid}",
+      "disposition": "retained",
+      "target_capability": "craft.library.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:DELETE /api/craft_lib/part_names/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/craft_lib/part_names",
+      "disposition": "retained",
+      "target_capability": "craft.library.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:POST /api/craft_lib/part_names",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/craft_lib/part_names",
+      "disposition": "retained",
+      "target_capability": "craft.library.read",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:GET /api/craft_lib/part_names",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.read"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "PATCH",
+      "route_path": "/api/craft_lib/fixtures/{gid}",
+      "disposition": "retained",
+      "target_capability": "craft.library.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:PATCH /api/craft_lib/fixtures/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "DELETE",
+      "route_path": "/api/craft_lib/fixtures/{gid}",
+      "disposition": "retained",
+      "target_capability": "craft.library.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:DELETE /api/craft_lib/fixtures/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/craft_lib/fixtures",
+      "disposition": "retained",
+      "target_capability": "craft.library.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:POST /api/craft_lib/fixtures",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/craft_lib/fixtures",
+      "disposition": "retained",
+      "target_capability": "craft.library.read",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/craft_library.py#route:GET /api/craft_lib/fixtures",
+        "docs/capabilities/catalog.v2.json#capability:craft.library.read"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/issues",
+      "disposition": "retained",
+      "target_capability": "project.issue.change.apply.atomic.issues_create",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/promotion.py#route:POST /api/issues",
+        "docs/capabilities/catalog.v2.json#capability:project.issue.change.apply.atomic.issues_create",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:POST /api/issues"
+      ]
+    },
+    {
+      "scope": "fix_round_1",
+      "method": "POST",
+      "route_path": "/api/import-export/lark-bitable/read",
+      "disposition": "retained",
+      "target_capability": "craft.data_exchange.lark.read",
+      "reason": "Handler directly invokes the stable Lark data-exchange business capability.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/import_export.py#route:POST /api/import-export/lark-bitable/read docs/capabilities/catalog.v2.json#capability:craft.data_exchange.lark.read"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/import-export/import/parse-excel",
+      "disposition": "retained",
+      "target_capability": "craft.bop.import.preview",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/import_export.py#route:POST /api/import-export/import/parse-excel",
+        "docs/capabilities/catalog.v2.json#capability:craft.bop.import.preview"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/follows",
+      "disposition": "retained",
+      "target_capability": "project.follow.change.apply.atomic.follows_create",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "backend/routers/follows.py#route:POST /api/follows",
+        "docs/capabilities/catalog.v2.json#capability:project.follow.change.apply.atomic.follows_create",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:POST /api/follows"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/self_ann/{item_gid}",
+      "disposition": "removed",
+      "target_capability": null,
+      "reason": "Handler performs direct service or SQL work; equivalence to the proposed capability target is not proven.",
+      "evidence_refs": [
+        "backend/routers/self_annotations.py#route:GET /api/self_ann/{item_gid}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/self_ann/list",
+      "disposition": "removed",
+      "target_capability": null,
+      "reason": "Handler performs direct service or SQL work; equivalence to the proposed capability target is not proven.",
+      "evidence_refs": [
+        "backend/routers/self_annotations.py#route:GET /api/self_ann/list"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/self_ann/batch",
+      "disposition": "removed",
+      "target_capability": null,
+      "reason": "Handler performs direct service or SQL work; equivalence to the proposed capability target is not proven.",
+      "evidence_refs": [
+        "backend/routers/self_annotations.py#route:GET /api/self_ann/batch"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/lists",
+      "disposition": "removed",
+      "target_capability": null,
+      "reason": "Handler contains a direct SQL branch, so one exact governed outcome is not proven for the route.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/lists.py#route:GET /api/lists"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/item-entries/{item_type}/{item_gid}",
+      "disposition": "retained",
+      "target_capability": "project.list.read.atomic.item_entries_get",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/item_entries.py#route:GET /api/item-entries/{item_type}/{item_gid}",
+        "docs/capabilities/catalog.v2.json#capability:project.list.read.atomic.item_entries_get",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:GET /api/item-entries/{item_type}/{item_gid}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/follows",
+      "disposition": "retained",
+      "target_capability": "project.follow.read.atomic.follows_list",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "backend/routers/follows.py#route:GET /api/follows",
+        "docs/capabilities/catalog.v2.json#capability:project.follow.read.atomic.follows_list",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:GET /api/follows"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/change-logs",
+      "disposition": "retained",
+      "target_capability": "project.change_log.read.atomic.change_logs_search",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/change_logs.py#route:GET /api/change-logs",
+        "docs/capabilities/catalog.v2.json#capability:project.change_log.read.atomic.change_logs_search",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:GET /api/change-logs"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/canvases/{gid}",
+      "disposition": "retained",
+      "target_capability": "craft.canvas.read",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/canvases.py#route:GET /api/canvases/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:craft.canvas.read"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/canvases",
+      "disposition": "retained",
+      "target_capability": "craft.canvas.read",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/canvases.py#route:GET /api/canvases",
+        "docs/capabilities/catalog.v2.json#capability:craft.canvas.read"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/approval/orders/{gid}",
+      "disposition": "retained",
+      "target_capability": "project.approval.read.atomic.approval_orders_get",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/approval.py#route:GET /api/approval/orders/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:project.approval.read.atomic.approval_orders_get",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:GET /api/approval/orders/{gid}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/approval/orders",
+      "disposition": "retained",
+      "target_capability": "project.approval.read.atomic.approval_orders_search",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/approval.py#route:GET /api/approval/orders",
+        "docs/capabilities/catalog.v2.json#capability:project.approval.read.atomic.approval_orders_search",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:GET /api/approval/orders"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/shares/lists/{list_gid}",
+      "disposition": "retained",
+      "target_capability": "project.sharing.read.atomic.shares_list_list",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/shares.py#route:GET /api/shares/lists/{list_gid}",
+        "docs/capabilities/catalog.v2.json#capability:project.sharing.read.atomic.shares_list_list",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:GET /api/shares/lists/{list_gid}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/annotations/{key}",
+      "disposition": "retained",
+      "target_capability": "project.workbench.read.atomic.annotations_get",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "backend/routers/annotations.py#route:GET /api/annotations/{key}",
+        "docs/capabilities/catalog.v2.json#capability:project.workbench.read.atomic.annotations_get",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:GET /api/annotations/{key}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/ai/sessions",
+      "disposition": "retained",
+      "target_capability": "agent.session.read",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/agent/agent_backend/routers/ai_chat.py#route:GET /api/ai/sessions",
+        "docs/capabilities/catalog.v2.json#capability:agent.session.read"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/ai/balance",
+      "disposition": "removed",
+      "target_capability": null,
+      "reason": "Handler is an explicit HTTP 410 endpoint and invokes no business capability.",
+      "evidence_refs": [
+        "plugins/agent/agent_backend/routers/ai_audit.py#route:GET /api/ai/balance"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "DELETE",
+      "route_path": "/api/views/{gid}",
+      "disposition": "removed",
+      "target_capability": null,
+      "reason": "Handler performs direct service or SQL work; equivalence to the proposed capability target is not proven.",
+      "evidence_refs": [
+        "backend/routers/views.py#route:DELETE /api/views/{gid}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "DELETE",
+      "route_path": "/api/tasks/{gid}",
+      "disposition": "retained",
+      "target_capability": "project.task.change.apply.atomic.tasks_delete",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/promotion.py#route:DELETE /api/tasks/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:project.task.change.apply.atomic.tasks_delete",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:DELETE /api/tasks/{gid}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "DELETE",
+      "route_path": "/api/task-dependencies/{gid}",
+      "disposition": "retained",
+      "target_capability": "project.task.change.apply.atomic.task_dependencies_delete",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/promotion.py#route:DELETE /api/task-dependencies/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:project.task.change.apply.atomic.task_dependencies_delete",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:DELETE /api/task-dependencies/{gid}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "DELETE",
+      "route_path": "/api/skills/{gid}",
+      "disposition": "retained",
+      "target_capability": "agent.skill.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/agent/agent_backend/routers/skills_v2.py#route:DELETE /api/skills/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:agent.skill.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "DELETE",
+      "route_path": "/api/shares/lists/{list_gid}/{gid}",
+      "disposition": "retained",
+      "target_capability": "project.sharing.change.apply.atomic.shares_list_delete",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/shares.py#route:DELETE /api/shares/lists/{list_gid}/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:project.sharing.change.apply.atomic.shares_list_delete",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:DELETE /api/shares/lists/{list_gid}/{gid}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "DELETE",
+      "route_path": "/api/lists/{gid}",
+      "disposition": "removed",
+      "target_capability": null,
+      "reason": "Handler contains a direct SQL branch, so one exact governed outcome is not proven for the route.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/lists.py#route:DELETE /api/lists/{gid}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "DELETE",
+      "route_path": "/api/grants/{gid}",
+      "disposition": "removed",
+      "target_capability": null,
+      "reason": "Handler performs direct service or SQL work; equivalence to the proposed capability target is not proven.",
+      "evidence_refs": [
+        "backend/routers/grants.py#route:DELETE /api/grants/{gid}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "DELETE",
+      "route_path": "/api/follows/{gid}",
+      "disposition": "retained",
+      "target_capability": "project.follow.change.apply.atomic.follows_delete",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "backend/routers/follows.py#route:DELETE /api/follows/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:project.follow.change.apply.atomic.follows_delete",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:DELETE /api/follows/{gid}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "DELETE",
+      "route_path": "/api/canvases/{gid}",
+      "disposition": "retained",
+      "target_capability": "craft.canvas.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/canvases.py#route:DELETE /api/canvases/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:craft.canvas.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/ai/sessions/{gid}",
+      "disposition": "retained",
+      "target_capability": "agent.session.read",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/agent/agent_backend/routers/ai_chat.py#route:GET /api/ai/sessions/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:agent.session.read"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/skills",
+      "disposition": "retained",
+      "target_capability": "agent.skill.read",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/agent/agent_backend/routers/skills_v2.py#route:GET /api/skills",
+        "docs/capabilities/catalog.v2.json#capability:agent.skill.read"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/task-dependencies",
+      "disposition": "retained",
+      "target_capability": "project.task.read.atomic.task_dependencies_list",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/promotion.py#route:GET /api/task-dependencies",
+        "docs/capabilities/catalog.v2.json#capability:project.task.read.atomic.task_dependencies_list",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:GET /api/task-dependencies"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/task-templates",
+      "disposition": "retained",
+      "target_capability": "project.task_template.read.atomic.task_templates_list",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/task_templates.py#route:GET /api/task-templates",
+        "docs/capabilities/catalog.v2.json#capability:project.task_template.read.atomic.task_templates_list",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:GET /api/task-templates"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/ebom/snapshots",
+      "disposition": "retained",
+      "target_capability": "craft.pbom.version.create",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/ebom.py#route:POST /api/ebom/snapshots",
+        "docs/capabilities/catalog.v2.json#capability:craft.pbom.version.create"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/canvases",
+      "disposition": "retained",
+      "target_capability": "craft.canvas.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/canvases.py#route:POST /api/canvases",
+        "docs/capabilities/catalog.v2.json#capability:craft.canvas.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/approval/orders/{gid}/withdraw",
+      "disposition": "retained",
+      "target_capability": "project.approval.change.apply.atomic.approval_orders_withdraw",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/approval.py#route:POST /api/approval/orders/{gid}/withdraw",
+        "docs/capabilities/catalog.v2.json#capability:project.approval.change.apply.atomic.approval_orders_withdraw",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:POST /api/approval/orders/{gid}/withdraw"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/approval/orders/{gid}/start",
+      "disposition": "retained",
+      "target_capability": "project.approval.change.apply.atomic.approval_orders_start",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/approval.py#route:POST /api/approval/orders/{gid}/start",
+        "docs/capabilities/catalog.v2.json#capability:project.approval.change.apply.atomic.approval_orders_start",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:POST /api/approval/orders/{gid}/start"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/approval/orders/{gid}/approve",
+      "disposition": "retained",
+      "target_capability": "project.approval.change.apply.atomic.approval_orders_approve",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/approval.py#route:POST /api/approval/orders/{gid}/approve",
+        "docs/capabilities/catalog.v2.json#capability:project.approval.change.apply.atomic.approval_orders_approve",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:POST /api/approval/orders/{gid}/approve"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/approval/orders/scope_upgrade",
+      "disposition": "retained",
+      "target_capability": "project.approval.change.apply.atomic.approval_scope_upgrade_create",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/approval.py#route:POST /api/approval/orders/scope_upgrade",
+        "docs/capabilities/catalog.v2.json#capability:project.approval.change.apply.atomic.approval_scope_upgrade_create",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:POST /api/approval/orders/scope_upgrade"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/ai/confirm/sync",
+      "disposition": "retained",
+      "target_capability": "agent.interaction.chat.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/agent/agent_backend/routers/ai_chat.py#route:POST /api/ai/confirm/sync",
+        "docs/capabilities/catalog.v2.json#capability:agent.interaction.chat.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/ai/chat/stream",
+      "disposition": "retained",
+      "target_capability": "agent.interaction.chat.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/agent/agent_backend/routers/ai_chat.py#route:POST /api/ai/chat/stream",
+        "docs/capabilities/catalog.v2.json#capability:agent.interaction.chat.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/ai/chat",
+      "disposition": "retained",
+      "target_capability": "agent.interaction.chat.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/agent/agent_backend/routers/ai_chat.py#route:POST /api/ai/chat",
+        "docs/capabilities/catalog.v2.json#capability:agent.interaction.chat.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/ai/abort",
+      "disposition": "retained",
+      "target_capability": "agent.interaction.cancel",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/agent/agent_backend/routers/ai_chat.py#route:POST /api/ai/abort",
+        "docs/capabilities/catalog.v2.json#capability:agent.interaction.cancel"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "PATCH",
+      "route_path": "/api/views/{gid}",
+      "disposition": "removed",
+      "target_capability": null,
+      "reason": "Handler performs direct service or SQL work; equivalence to the proposed capability target is not proven.",
+      "evidence_refs": [
+        "backend/routers/views.py#route:PATCH /api/views/{gid}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "PATCH",
+      "route_path": "/api/users/{user_gid}/role",
+      "disposition": "removed",
+      "target_capability": null,
+      "reason": "Handler performs direct service or SQL work; equivalence to the proposed capability target is not proven.",
+      "evidence_refs": [
+        "backend/routers/users.py#route:PATCH /api/users/{user_gid}/role"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "PATCH",
+      "route_path": "/api/notifications/{gid}/read",
+      "disposition": "retained",
+      "target_capability": "project.notification.change.apply.atomic.notifications_mark_read",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "backend/routers/notifications.py#route:PATCH /api/notifications/{gid}/read",
+        "docs/capabilities/catalog.v2.json#capability:project.notification.change.apply.atomic.notifications_mark_read",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:PATCH /api/notifications/{gid}/read"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "PATCH",
+      "route_path": "/api/notifications/read_all",
+      "disposition": "retained",
+      "target_capability": "project.notification.change.apply.atomic.notifications_mark_all_read",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "backend/routers/notifications.py#route:PATCH /api/notifications/read_all",
+        "docs/capabilities/catalog.v2.json#capability:project.notification.change.apply.atomic.notifications_mark_all_read",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:PATCH /api/notifications/read_all"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "PATCH",
+      "route_path": "/api/lists/{gid}",
+      "disposition": "retained",
+      "target_capability": "project.list.change.apply.atomic.lists_update",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/lists.py#route:PATCH /api/lists/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:project.list.change.apply.atomic.lists_update",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:PATCH /api/lists/{gid}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "PATCH",
+      "route_path": "/api/follows/{gid}",
+      "disposition": "retained",
+      "target_capability": "project.follow.change.apply.atomic.follows_update",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "backend/routers/follows.py#route:PATCH /api/follows/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:project.follow.change.apply.atomic.follows_update",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:PATCH /api/follows/{gid}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "PATCH",
+      "route_path": "/api/ebom/snapshots/{gid}",
+      "disposition": "retained",
+      "target_capability": "craft.ebom.snapshot.update",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/ebom.py#route:PATCH /api/ebom/snapshots/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:craft.ebom.snapshot.update"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "PATCH",
+      "route_path": "/api/canvases/{gid}/shared",
+      "disposition": "retained",
+      "target_capability": "craft.canvas.change.apply",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/canvases.py#route:PATCH /api/canvases/{gid}/shared",
+        "docs/capabilities/catalog.v2.json#capability:craft.canvas.change.apply"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/vpps-operations/rule4-ignores",
+      "disposition": "retained",
+      "target_capability": "craft.vpps_audit.read",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/vpps_audit.py#route:GET /api/vpps-operations/rule4-ignores",
+        "docs/capabilities/catalog.v2.json#capability:craft.vpps_audit.read"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/views",
+      "disposition": "removed",
+      "target_capability": null,
+      "reason": "Handler performs direct service or SQL work; equivalence to the proposed capability target is not proven.",
+      "evidence_refs": [
+        "backend/routers/views.py#route:GET /api/views"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/users/search",
+      "disposition": "removed",
+      "target_capability": null,
+      "reason": "Handler performs direct service or SQL work; equivalence to the proposed capability target is not proven.",
+      "evidence_refs": [
+        "backend/routers/users.py#route:GET /api/users/search"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/users/me",
+      "disposition": "removed",
+      "target_capability": null,
+      "reason": "Handler performs direct service or SQL work; equivalence to the proposed capability target is not proven.",
+      "evidence_refs": [
+        "backend/routers/users.py#route:GET /api/users/me"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/users/",
+      "disposition": "removed",
+      "target_capability": null,
+      "reason": "Handler performs direct service or SQL work; equivalence to the proposed capability target is not proven.",
+      "evidence_refs": [
+        "backend/routers/users.py#route:GET /api/users/"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/tasks",
+      "disposition": "retained",
+      "target_capability": "project.task.read.atomic.tasks_search",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/promotion.py#route:GET /api/tasks",
+        "docs/capabilities/catalog.v2.json#capability:project.task.read.atomic.tasks_search",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:GET /api/tasks"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "GET",
+      "route_path": "/api/task-templates/{gid}",
+      "disposition": "retained",
+      "target_capability": "project.task_template.read.atomic.task_templates_get",
+      "reason": "Handler and provider evidence prove the exact stable target for this route outcome.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/task_templates.py#route:GET /api/task-templates/{gid}",
+        "docs/capabilities/catalog.v2.json#capability:project.task_template.read.atomic.task_templates_get",
+        "plugins/project_management/project_management_backend/application/service.py#route-outcome:GET /api/task-templates/{gid}"
+      ]
+    },
+    {
+      "scope": "original_109",
+      "method": "POST",
+      "route_path": "/api/grants",
+      "disposition": "removed",
+      "target_capability": null,
+      "reason": "Handler performs direct service or SQL work; equivalence to the proposed capability target is not proven.",
+      "evidence_refs": [
+        "backend/routers/grants.py#route:POST /api/grants"
+      ]
+    },
+    {
+      "scope": "fix_round_1",
+      "method": "POST",
+      "route_path": "/api/import-export/lark-bitable/write",
+      "disposition": "retained",
+      "target_capability": "craft.data_exchange.lark.write",
+      "reason": "Handler directly invokes the stable Lark data-exchange business capability.",
+      "evidence_refs": [
+        "plugins/craft/craft_backend/routers/import_export.py#route:POST /api/import-export/lark-bitable/write docs/capabilities/catalog.v2.json#capability:craft.data_exchange.lark.write"
+      ]
+    }
+  ]
+}

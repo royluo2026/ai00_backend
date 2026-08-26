@@ -2811,32 +2811,6 @@
         "migration_target_major_version": 1
       },
       {
-        "route_path": "/api/grants/{gid}",
-        "method": "DELETE",
-        "owner": "base",
-        "migration_target_capability": "base.authorization.grant.change.apply",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/grants.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/lists/{gid}",
-        "method": "DELETE",
-        "owner": "project_management",
-        "migration_target_capability": "project.list.change.apply.atomic.lists_delete",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/lists.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
         "route_path": "/api/shares/lists/{list_gid}/{gid}",
         "method": "DELETE",
         "owner": "project_management",
@@ -2889,32 +2863,6 @@
         "migration_target_major_version": 1
       },
       {
-        "route_path": "/api/views/{gid}",
-        "method": "DELETE",
-        "owner": "base",
-        "migration_target_capability": "base.saved_view.change.apply",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/views.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/ai/balance",
-        "method": "GET",
-        "owner": "agent",
-        "migration_target_capability": "agent.audit.read",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/agent/agent_backend/routers/ai_audit.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
         "route_path": "/api/ai/sessions",
         "method": "GET",
         "owner": "agent",
@@ -2943,8 +2891,8 @@
       {
         "route_path": "/api/annotations/{key}",
         "method": "GET",
-        "owner": "base",
-        "migration_target_capability": "base.annotation.read",
+        "owner": "project_management",
+        "migration_target_capability": "project.workbench.read.atomic.annotations_get",
         "migration_deadline": "2026-11-21",
         "source": "backend/routers/annotations.py",
         "allowed_consumers": [
@@ -3045,58 +2993,6 @@
         "migration_target_major_version": 1
       },
       {
-        "route_path": "/api/lists",
-        "method": "GET",
-        "owner": "project_management",
-        "migration_target_capability": "project.list.read.atomic.lists_search",
-        "migration_deadline": "2026-11-21",
-        "source": "plugins/craft/craft_backend/routers/lists.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/self_ann/batch",
-        "method": "GET",
-        "owner": "base",
-        "migration_target_capability": "base.annotation.read",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/self_annotations.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/self_ann/list",
-        "method": "GET",
-        "owner": "base",
-        "migration_target_capability": "base.annotation.read",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/self_annotations.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/self_ann/{item_gid}",
-        "method": "GET",
-        "owner": "base",
-        "migration_target_capability": "base.annotation.read",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/self_annotations.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
         "route_path": "/api/shares/lists/{list_gid}",
         "method": "GET",
         "owner": "project_management",
@@ -3175,62 +3071,10 @@
         "migration_target_major_version": 1
       },
       {
-        "route_path": "/api/users/",
-        "method": "GET",
-        "owner": "base",
-        "migration_target_capability": "identity.principal.search",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/users.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/users/me",
-        "method": "GET",
-        "owner": "base",
-        "migration_target_capability": "base.identity.session.get",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/users.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/users/search",
-        "method": "GET",
-        "owner": "base",
-        "migration_target_capability": "identity.principal.search",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/users.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/views",
-        "method": "GET",
-        "owner": "base",
-        "migration_target_capability": "base.saved_view.read",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/views.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
         "route_path": "/api/vpps-operations/rule4-ignores",
         "method": "GET",
         "owner": "craft",
-        "migration_target_capability": "craft.bop.draft.change.preview",
+        "migration_target_capability": "craft.vpps_audit.read",
         "migration_deadline": "2026-11-21",
         "source": "plugins/craft/craft_backend/routers/vpps_audit.py",
         "allowed_consumers": [
@@ -3318,36 +3162,10 @@
         "migration_target_major_version": 1
       },
       {
-        "route_path": "/api/users/{user_gid}/role",
-        "method": "PATCH",
-        "owner": "base",
-        "migration_target_capability": "base.identity.role.assign",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/users.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/views/{gid}",
-        "method": "PATCH",
-        "owner": "base",
-        "migration_target_capability": "base.saved_view.change.apply",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/views.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
         "route_path": "/api/ai/abort",
         "method": "POST",
         "owner": "agent",
-        "migration_target_capability": "agent.run.change.apply",
+        "migration_target_capability": "agent.interaction.cancel",
         "migration_deadline": "2026-11-21",
         "source": "plugins/agent/agent_backend/routers/ai_chat.py",
         "allowed_consumers": [
@@ -3360,7 +3178,7 @@
         "route_path": "/api/ai/chat",
         "method": "POST",
         "owner": "agent",
-        "migration_target_capability": "agent.run.change.apply",
+        "migration_target_capability": "agent.interaction.chat.change.apply",
         "migration_deadline": "2026-11-21",
         "source": "plugins/agent/agent_backend/routers/ai_chat.py",
         "allowed_consumers": [
@@ -3373,7 +3191,7 @@
         "route_path": "/api/ai/chat/stream",
         "method": "POST",
         "owner": "agent",
-        "migration_target_capability": "agent.run.change.apply",
+        "migration_target_capability": "agent.interaction.chat.change.apply",
         "migration_deadline": "2026-11-21",
         "source": "plugins/agent/agent_backend/routers/ai_chat.py",
         "allowed_consumers": [
@@ -3386,7 +3204,7 @@
         "route_path": "/api/ai/confirm/sync",
         "method": "POST",
         "owner": "agent",
-        "migration_target_capability": "agent.run.change.apply",
+        "migration_target_capability": "agent.interaction.chat.change.apply",
         "migration_deadline": "2026-11-21",
         "source": "plugins/agent/agent_backend/routers/ai_chat.py",
         "allowed_consumers": [
@@ -3487,19 +3305,6 @@
         "migration_target_major_version": 1
       },
       {
-        "route_path": "/api/grants",
-        "method": "POST",
-        "owner": "base",
-        "migration_target_capability": "base.authorization.grant.change.apply",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/grants.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
         "route_path": "/api/import-export/import/parse-excel",
         "method": "POST",
         "owner": "craft",
@@ -3539,19 +3344,6 @@
         "migration_target_major_version": 1
       },
       {
-        "route_path": "/api/org/sync-from-feishu",
-        "method": "POST",
-        "owner": "base",
-        "migration_target_capability": "base.identity.directory.sync",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/org.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
         "route_path": "/api/permission-requests",
         "method": "POST",
         "owner": "project_management",
@@ -3568,7 +3360,7 @@
         "route_path": "/api/rule-engine/check",
         "method": "POST",
         "owner": "craft",
-        "migration_target_capability": "craft.bop.draft.change.preview",
+        "migration_target_capability": "craft.rule.engine.evaluate",
         "migration_deadline": "2026-11-21",
         "source": "plugins/craft/craft_backend/routers/rule_engine.py",
         "allowed_consumers": [
@@ -3643,36 +3435,10 @@
         "migration_target_major_version": 1
       },
       {
-        "route_path": "/api/views",
-        "method": "POST",
-        "owner": "base",
-        "migration_target_capability": "base.saved_view.change.apply",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/views.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/views/{gid}/copy",
-        "method": "POST",
-        "owner": "base",
-        "migration_target_capability": "base.saved_view.change.apply",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/views.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
         "route_path": "/api/vpps-operations/rule4-bulk-ignore",
         "method": "POST",
         "owner": "craft",
-        "migration_target_capability": "craft.bop.draft.change.apply",
+        "migration_target_capability": "craft.vpps_audit.change.apply",
         "migration_deadline": "2026-11-21",
         "source": "plugins/craft/craft_backend/routers/vpps_audit.py",
         "allowed_consumers": [
@@ -3685,7 +3451,7 @@
         "route_path": "/api/vpps-operations/{gid}/revert",
         "method": "POST",
         "owner": "craft",
-        "migration_target_capability": "craft.bop.draft.change.apply",
+        "migration_target_capability": "craft.vpps_audit.change.apply",
         "migration_deadline": "2026-11-21",
         "source": "plugins/craft/craft_backend/routers/vpps_audit.py",
         "allowed_consumers": [
@@ -3697,8 +3463,8 @@
       {
         "route_path": "/api/annotations/{key}",
         "method": "PUT",
-        "owner": "base",
-        "migration_target_capability": "base.annotation.change.apply",
+        "owner": "project_management",
+        "migration_target_capability": "project.workbench.change.apply.atomic.annotations_put",
         "migration_deadline": "2026-11-21",
         "source": "backend/routers/annotations.py",
         "allowed_consumers": [
@@ -3727,19 +3493,6 @@
         "migration_target_capability": "project.list.change.apply.atomic.item_entries_replace",
         "migration_deadline": "2026-11-21",
         "source": "plugins/craft/craft_backend/routers/item_entries.py",
-        "allowed_consumers": [
-          "web",
-          "rest"
-        ],
-        "migration_target_major_version": 1
-      },
-      {
-        "route_path": "/api/self_ann/{item_gid}",
-        "method": "PUT",
-        "owner": "base",
-        "migration_target_capability": "base.annotation.change.apply",
-        "migration_deadline": "2026-11-21",
-        "source": "backend/routers/self_annotations.py",
         "allowed_consumers": [
           "web",
           "rest"
@@ -4181,6 +3934,58 @@
         "owner": "craft",
         "migration_target_capability": "craft.standard_operation.change.apply",
         "source": "plugins/craft/craft_backend/routers/std_op.py",
+        "migration_deadline": "2026-11-21",
+        "allowed_consumers": [
+          "web",
+          "rest"
+        ],
+        "migration_target_major_version": 1
+      },
+      {
+        "route_path": "/api/import-export/lark-bitable/read",
+        "method": "POST",
+        "owner": "craft",
+        "migration_target_capability": "craft.data_exchange.lark.read",
+        "source": "plugins/craft/craft_backend/routers/import_export.py",
+        "migration_deadline": "2026-11-21",
+        "allowed_consumers": [
+          "web",
+          "rest"
+        ],
+        "migration_target_major_version": 1
+      },
+      {
+        "route_path": "/api/import-export/lark-sheets/read",
+        "method": "POST",
+        "owner": "craft",
+        "migration_target_capability": "craft.data_exchange.lark.read",
+        "source": "plugins/craft/craft_backend/routers/import_export.py",
+        "migration_deadline": "2026-11-21",
+        "allowed_consumers": [
+          "web",
+          "rest"
+        ],
+        "migration_target_major_version": 1
+      },
+      {
+        "route_path": "/api/import-export/lark-sheets/write",
+        "method": "POST",
+        "owner": "craft",
+        "migration_target_capability": "craft.data_exchange.lark.write",
+        "source": "plugins/craft/craft_backend/routers/import_export.py",
+        "migration_deadline": "2026-11-21",
+        "allowed_consumers": [
+          "web",
+          "rest"
+        ],
+        "migration_target_major_version": 1
+      },
+      {
+        "route_path": "/api/import-export/lark-bitable/write",
+        "method": "POST",
+        "owner": "craft",
+        "migration_target_capability": "craft.data_exchange.lark.write",
+        "source": "plugins/craft/craft_backend/routers/import_export.py",
         "migration_deadline": "2026-11-21",
         "allowed_consumers": [
           "web",

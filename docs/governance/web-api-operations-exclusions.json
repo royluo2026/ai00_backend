@@ -84,38 +84,6 @@
     },
     {
       "route_method": "POST",
-      "normalized_route": "/api/import-export/lark-bitable/read",
-      "owner": "craft",
-      "reason": "Reads raw Lark Bitable transport data without applying Craft business rules.",
-      "approval_reference": "capability-governance-evidence-closure/task-3",
-      "expires_at": "2026-11-21T23:59:59+08:00"
-    },
-    {
-      "route_method": "POST",
-      "normalized_route": "/api/import-export/lark-bitable/write",
-      "owner": "craft",
-      "reason": "Writes raw Lark Bitable transport data without applying Craft business rules.",
-      "approval_reference": "capability-governance-evidence-closure/task-3",
-      "expires_at": "2026-11-21T23:59:59+08:00"
-    },
-    {
-      "route_method": "POST",
-      "normalized_route": "/api/import-export/lark-sheets/read",
-      "owner": "craft",
-      "reason": "Reads raw Lark Sheets transport data without applying Craft business rules.",
-      "approval_reference": "capability-governance-evidence-closure/task-3",
-      "expires_at": "2026-11-21T23:59:59+08:00"
-    },
-    {
-      "route_method": "POST",
-      "normalized_route": "/api/import-export/lark-sheets/write",
-      "owner": "craft",
-      "reason": "Writes raw Lark Sheets transport data without applying Craft business rules.",
-      "approval_reference": "capability-governance-evidence-closure/task-3",
-      "expires_at": "2026-11-21T23:59:59+08:00"
-    },
-    {
-      "route_method": "POST",
       "normalized_route": "/api/uploads",
       "owner": "platform-runtime",
       "reason": "Creates a transport upload session without applying domain business rules.",

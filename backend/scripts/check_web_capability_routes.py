@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 import subprocess
 from pathlib import Path
 import sys
@@ -12,6 +13,7 @@ if str(REPOSITORY_ROOT) not in sys.path:
 
 from backend.capability_v2.consumer_routes import (
     RouteScanConfigurationError,
+    load_lexical_non_routes,
     load_operations_exclusions,
     scan_web_api_routes,
 )
@@ -40,9 +42,20 @@ BFF_INVENTORY = REPOSITORY_ROOT / "docs/governance/bff_route_inventory.json"
 OPERATIONS_EXCLUSIONS = (
     REPOSITORY_ROOT / "docs/governance/web-api-operations-exclusions.json"
 )
+LEXICAL_NON_ROUTES = (
+    REPOSITORY_ROOT / "docs/governance/web-api-lexical-non-routes.json"
+)
 
 
 def _frontend_revision(web_root: Path) -> str:
+    if not web_root.is_dir():
+        raise RouteScanConfigurationError(f"frontend Git root is missing: {web_root}")
+    top_level = subprocess.run(
+        ["git", "-C", str(web_root), "rev-parse", "--show-toplevel"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
     result = subprocess.run(
         ["git", "-C", str(web_root), "rev-parse", "HEAD"],
         capture_output=True,
@@ -50,8 +63,15 @@ def _frontend_revision(web_root: Path) -> str:
         check=False,
     )
     revision = result.stdout.strip()
-    if result.returncode or len(revision) != 40:
-        raise RouteScanConfigurationError("frontend full Git revision is unavailable")
+    if (
+        top_level.returncode
+        or Path(top_level.stdout.strip()).resolve() != web_root
+        or result.returncode
+        or re.fullmatch(r"[0-9a-f]{40}", revision) is None
+    ):
+        raise RouteScanConfigurationError(
+            "frontend full Git revision is unavailable for exact root"
+        )
     return revision
 
 
@@ -69,6 +89,7 @@ def build_report(web_root: Path, prefixes: tuple[str, ...] = DEFAULT_LEGACY_PREF
         exclusions=load_operations_exclusions(OPERATIONS_EXCLUSIONS),
         frontend_revision=_frontend_revision(web_root),
         classification_prefixes=prefixes,
+        lexical_non_routes=load_lexical_non_routes(LEXICAL_NON_ROUTES),
     )
 
 
