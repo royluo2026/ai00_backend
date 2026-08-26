@@ -1,13 +1,17 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from pathlib import Path
 
 import pytest
 
+from backend.capability_v2 import consumer_routes
 from backend.capability_v2.consumer_routes import (
     OperationsExclusion,
     RouteScanConfigurationError,
     load_operations_exclusions,
+    load_wrapper_contracts,
     scan_web_api_routes,
     scan_web_routes,
 )
@@ -15,7 +19,7 @@ from backend.capability_v2.consumer_routes import (
 
 def _scan(source: str, tmp_path: Path, **kwargs):
     web = tmp_path / "web"
-    web.mkdir()
+    web.mkdir(exist_ok=True)
     (web / "app.js").write_text(source, encoding="utf-8")
     return scan_web_api_routes(
         [web],
@@ -23,7 +27,40 @@ def _scan(source: str, tmp_path: Path, **kwargs):
         bff_index=kwargs.get("bff_index", set()),
         exclusions=kwargs.get("exclusions", ()),
         frontend_revision="abc123",
+        wrapper_contracts=kwargs.get("wrapper_contracts", ()),
     )
+
+
+def _wrapper_contracts(
+    tmp_path: Path,
+    source: str,
+    entries: list[dict[str, object]],
+):
+    lines = source.splitlines(keepends=True)
+    source_sha256 = hashlib.sha256(source.encode("utf-8")).hexdigest()
+    for entry in entries:
+        start_line = int(entry.pop("definition_start_line", 1))
+        end_line = int(entry.pop("definition_end_line", start_line))
+        definition = "".join(lines[start_line - 1:end_line])
+        entry.update(
+            {
+                "source": "web/app.js",
+                "source_sha256": source_sha256,
+                "definition": {
+                    "source_path": "web/app.js",
+                    "start_line": start_line,
+                    "end_line": end_line,
+                    "sha256": hashlib.sha256(definition.encode("utf-8")).hexdigest(),
+                },
+                "expected_definition": definition.strip(),
+            }
+        )
+    path = tmp_path / "wrapper-contracts.json"
+    path.write_text(
+        json.dumps({"schema_version": 1, "entries": entries}),
+        encoding="utf-8",
+    )
+    return consumer_routes.load_wrapper_contracts(path)
 
 
 def test_scanner_discovers_api_outside_configured_prefixes(tmp_path: Path) -> None:
@@ -149,6 +186,161 @@ def test_qualified_callee_does_not_inherit_direct_http_contract(
 
     assert report.routes[0].method is None
     assert report.routes[0].disposition == "unresolved"
+
+
+def test_source_anchored_wrapper_contract_resolves_group_through_shared_classifier(
+    tmp_path: Path,
+) -> None:
+    source = (
+        "function request(route, options = {}) { return fetch(route, options); }\n"
+        "client.request('/api/tasks');\n"
+        "client.request('/api/tasks', { method: 'POST' });\n"
+    )
+    contracts = _wrapper_contracts(
+        tmp_path,
+        source,
+        [
+            {
+                "callee": "client.request",
+                "signature": {
+                    "route_argument": 0,
+                    "method_source": "options_argument",
+                    "method_argument": 1,
+                    "default_method": "GET",
+                },
+            }
+        ],
+    )
+
+    report = _scan(
+        source,
+        tmp_path,
+        wrapper_contracts=contracts,
+        legacy_index={("GET", "/api/tasks"), ("POST", "/api/tasks")},
+    )
+
+    assert [route.method for route in report.routes] == ["GET", "POST"]
+    assert {route.disposition for route in report.routes} == {"legacy_registered"}
+
+
+def test_wrapper_contract_modes_use_exact_signature_positions(tmp_path: Path) -> None:
+    source = (
+        "function create(route, body) { return fetch(route, { method: 'POST', body }); }\n"
+        "function request(method, route) { return fetch(route, { method }); }\n"
+        "create('/api/tasks', {});\n"
+        "request('GET', '/api/tasks');\n"
+    )
+    contracts = _wrapper_contracts(
+        tmp_path,
+        source,
+        [
+            {
+                "callee": "create",
+                "signature": {
+                    "route_argument": 0,
+                    "method_source": "constant",
+                    "method": "POST",
+                },
+                "definition_start_line": 1,
+            },
+            {
+                "callee": "request",
+                "signature": {
+                    "route_argument": 1,
+                    "method_source": "method_argument",
+                    "method_argument": 0,
+                },
+                "definition_start_line": 2,
+            },
+        ],
+    )
+
+    report = _scan(
+        source,
+        tmp_path,
+        wrapper_contracts=contracts,
+        legacy_index={("GET", "/api/tasks"), ("POST", "/api/tasks")},
+    )
+
+    assert [route.method for route in report.routes] == ["POST", "GET"]
+    assert {route.disposition for route in report.routes} == {"legacy_registered"}
+
+
+def test_wrapper_contract_rejects_stale_source_and_definition_anchors(
+    tmp_path: Path,
+) -> None:
+    source = (
+        "function request(route) { return fetch(route); }\n"
+        "client.request('/api/tasks');\n"
+    )
+    contracts = _wrapper_contracts(
+        tmp_path,
+        source,
+        [
+            {
+                "callee": "client.request",
+                "signature": {
+                    "route_argument": 0,
+                    "method_source": "constant",
+                    "method": "GET",
+                },
+            }
+        ],
+    )
+
+    with pytest.raises(RouteScanConfigurationError, match="source hash is stale"):
+        _scan(source.replace("fetch(route)", "fetch(route, {})"), tmp_path, wrapper_contracts=contracts)
+
+    stale_anchor = contracts[0].definition
+    contracts = (
+        consumer_routes.WrapperContract(
+            source=contracts[0].source,
+            source_sha256=hashlib.sha256(source.encode("utf-8")).hexdigest(),
+            callee=contracts[0].callee,
+            signature=contracts[0].signature,
+            definition=consumer_routes.SourceAnchor(
+                source_path=stale_anchor.source_path,
+                start_line=stale_anchor.start_line,
+                end_line=stale_anchor.end_line,
+                sha256="0" * 64,
+            ),
+            expected_definition=contracts[0].expected_definition,
+        ),
+    )
+    with pytest.raises(RouteScanConfigurationError, match="definition hash is stale"):
+        _scan(source, tmp_path, wrapper_contracts=contracts)
+
+
+def test_wrapper_contract_rejects_ambiguous_and_wildcard_contracts(
+    tmp_path: Path,
+) -> None:
+    source = "client.request('/api/tasks');\n"
+    entry = {
+        "callee": "client.request",
+        "signature": {
+            "route_argument": 0,
+            "method_source": "constant",
+            "method": "GET",
+        },
+    }
+    with pytest.raises(RouteScanConfigurationError, match="ambiguous wrapper contract"):
+        _wrapper_contracts(tmp_path, source, [entry, dict(entry)])
+
+    with pytest.raises(RouteScanConfigurationError, match="wildcard"):
+        _wrapper_contracts(
+            tmp_path,
+            source,
+            [
+                {
+                    "callee": "client.*",
+                    "signature": {
+                        "route_argument": 0,
+                        "method_source": "constant",
+                        "method": "GET",
+                    },
+                }
+            ],
+        )
 
 
 def test_scanner_assigns_exactly_one_governed_disposition_per_occurrence(
@@ -314,6 +506,18 @@ def test_repository_operations_exclusions_are_current_and_exact() -> None:
     assert exclusions
     assert all("*" not in item.normalized_route for item in exclusions)
     assert len({item.key for item in exclusions}) == len(exclusions)
+
+
+def test_repository_wrapper_contracts_are_exact_and_unambiguous() -> None:
+    root = Path(__file__).resolve().parents[2]
+
+    contracts = load_wrapper_contracts(
+        root / "docs/governance/web-api-wrapper-contracts.json"
+    )
+
+    assert contracts
+    assert len({(item.source, item.callee) for item in contracts}) == len(contracts)
+    assert all("*" not in item.source and "*" not in item.callee for item in contracts)
 
 
 def test_scan_web_routes_reports_legacy_and_capability_calls_but_skips_dist_and_tests(

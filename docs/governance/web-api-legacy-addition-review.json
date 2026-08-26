@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "review_authority": "capability-governance-evidence-closure/task-3-fix-round-2",
+  "review_authority": "capability-governance-evidence-closure/task-3-fix-round-4",
   "baseline_revision": "565b00a0",
   "original_additions": 109,
   "entries": [
@@ -116,17 +116,59 @@
       "scope": "original_109",
       "method": "PUT",
       "route_path": "/api/tasks/{gid}",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.task.change.apply.atomic.tasks_update",
+      "reason": "Handler delegates operation tasks.update to _task_call, whose anchored project.task.change.apply facade binding has exact stable replacement project.task.change.apply.atomic.tasks_update.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 148,
+          "end_line": 148,
+          "sha256": "af6c328a406976b68a6f263a87fde5b341c802ca45c46e0c01c61c6fffa51694"
+        },
+        "delegation_symbol": "_task_call",
+        "expected_delegation": "_task_call(request, current_user, principal, gateway, \"tasks.update\", {\"gid\": gid, \"updates\": body}, True)",
+        "operation": "tasks.update",
+        "facade_capability": "project.task.change.apply",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 121,
+          "end_line": 121,
+          "sha256": "dca2bfda3f8ac98bec5ef0d065f429c09104fb355d90134d2e72ec1a4ae3e1c4"
+        },
+        "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.task.change.apply\" if write else \"project.task.read\", operation, args, write=write)"
+      }
     },
     {
       "scope": "original_109",
       "method": "PUT",
       "route_path": "/api/task-dependencies/{gid}",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.task.change.apply.atomic.task_dependencies_update",
+      "reason": "Handler delegates operation task_dependencies.update to _task_call, whose anchored project.task.change.apply facade binding has exact stable replacement project.task.change.apply.atomic.task_dependencies_update.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 194,
+          "end_line": 194,
+          "sha256": "ce8babb7a65fec081d824d09773677fb4946551c27aa7ea3a6dc208716c5bb70"
+        },
+        "delegation_symbol": "_task_call",
+        "expected_delegation": "_task_call(request, current_user, principal, gateway, \"task_dependencies.update\", {\"gid\": gid, \"updates\": body}, True)",
+        "operation": "task_dependencies.update",
+        "facade_capability": "project.task.change.apply",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 121,
+          "end_line": 121,
+          "sha256": "dca2bfda3f8ac98bec5ef0d065f429c09104fb355d90134d2e72ec1a4ae3e1c4"
+        },
+        "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.task.change.apply\" if write else \"project.task.read\", operation, args, write=write)"
+      }
     },
     {
       "scope": "original_109",
@@ -162,25 +204,80 @@
       "scope": "original_109",
       "method": "PUT",
       "route_path": "/api/item-entries/{item_type}/{item_gid}",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.list.change.apply.atomic.item_entries_replace",
+      "reason": "Handler invokes the reviewed project.list.change.apply facade operation item_entries.replace, whose exact stable replacement is project.list.change.apply.atomic.item_entries_replace.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_invocation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/item_entries.py",
+          "start_line": 82,
+          "end_line": 100,
+          "sha256": "4ee4eeaa9ee16bd477d16c306e439cb8f0d0a97fab46a2042dd3e4b2769293f5"
+        },
+        "facade_capability": "project.list.change.apply",
+        "operation": "item_entries.replace",
+        "expected_facade_invocation": "_invoke_project(\n        request, current_user, principal, gateway,\n        capability_id=\"project.list.change.apply\",\n        operation=\"item_entries.replace\",\n        arguments={\n            \"item_type\": item_type,\n            \"item_gid\": item_gid,\n            \"entries\": body.entries or [],\n        },\n    )"
+      }
     },
     {
       "scope": "original_109",
       "method": "PUT",
       "route_path": "/api/issues/{gid}",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.issue.change.apply.atomic.issues_update",
+      "reason": "Handler delegates operation issues.update to _issue_call, whose anchored project.issue.change.apply facade binding has exact stable replacement project.issue.change.apply.atomic.issues_update.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 178,
+          "end_line": 178,
+          "sha256": "86900df98a892cdca260eadc743ecd4fe14dbb34551e1eac73c9ccd83f678048"
+        },
+        "delegation_symbol": "_issue_call",
+        "expected_delegation": "_issue_call(request, current_user, principal, gateway, \"issues.update\", {\"gid\": gid, \"updates\": body}, True)",
+        "operation": "issues.update",
+        "facade_capability": "project.issue.change.apply",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 122,
+          "end_line": 122,
+          "sha256": "27c14620f0d6168ed25c15cbb27522e886c85bad2145013ffe06ce38238334d5"
+        },
+        "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.issue.change.apply\" if write else \"project.issue.read\", operation, args, write=write)"
+      }
     },
     {
       "scope": "original_109",
       "method": "PUT",
       "route_path": "/api/annotations/{key}",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.workbench.change.apply.atomic.annotations_put",
+      "reason": "Handler delegates operation annotations.put to _invoke, whose anchored project.workbench.change.apply facade binding has exact stable replacement project.workbench.change.apply.atomic.annotations_put.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "backend/routers/annotations.py",
+          "start_line": 30,
+          "end_line": 31,
+          "sha256": "585dbd5569d698f8ec941ef5a5e77b2f65aa9b8b5388676df1319878d0787945"
+        },
+        "delegation_symbol": "_invoke",
+        "expected_delegation": "_invoke(request, current_user, principal, gateway, \"annotations.put\", {\"key\": key, \"data\": body.data}, True)",
+        "operation": "annotations.put",
+        "facade_capability": "project.workbench.change.apply",
+        "binding": {
+          "source_path": "backend/routers/annotations.py",
+          "start_line": 17,
+          "end_line": 21,
+          "sha256": "223d6d33db03341ac13f4ba257ce7ab8392b52a8afca1caa475ec95c0445edeb"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(gateway, capability_id=\"project.workbench.change.apply\" if write else \"project.workbench.read\", payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal, request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id, idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None, approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None)"
+      }
     },
     {
       "scope": "original_109",
@@ -254,25 +351,88 @@
       "scope": "original_109",
       "method": "POST",
       "route_path": "/api/tasks",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.task.change.apply.atomic.tasks_create",
+      "reason": "Handler delegates operation tasks.create to _task_call, whose anchored project.task.change.apply facade binding has exact stable replacement project.task.change.apply.atomic.tasks_create.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 131,
+          "end_line": 131,
+          "sha256": "4e6240c88e8e2e8ffe3bd2f4cd62c6e5304c2bbd9f2dae313c7f1655ed9d8964"
+        },
+        "delegation_symbol": "_task_call",
+        "expected_delegation": "_task_call(request, current_user, principal, gateway, \"tasks.create\", body.model_dump(), True)",
+        "operation": "tasks.create",
+        "facade_capability": "project.task.change.apply",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 121,
+          "end_line": 121,
+          "sha256": "dca2bfda3f8ac98bec5ef0d065f429c09104fb355d90134d2e72ec1a4ae3e1c4"
+        },
+        "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.task.change.apply\" if write else \"project.task.read\", operation, args, write=write)"
+      }
     },
     {
       "scope": "original_109",
       "method": "POST",
       "route_path": "/api/task-templates/{gid}/instantiate",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.task_template.change.apply.atomic.task_templates_instantiate",
+      "reason": "Handler delegates operation task_templates.instantiate to _invoke, whose anchored project.task_template.change.apply facade binding has exact stable replacement project.task_template.change.apply.atomic.task_templates_instantiate.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/task_templates.py",
+          "start_line": 116,
+          "end_line": 117,
+          "sha256": "ea7d42c88b502331a4b4c8e40b78f041898c9b53ef7d44c6e7612091f1b0fc76"
+        },
+        "delegation_symbol": "_invoke",
+        "expected_delegation": "_invoke(request, current_user, principal, gateway, \"task_templates.instantiate\", {\"gid\": gid, **body.model_dump()}, write=True)",
+        "operation": "task_templates.instantiate",
+        "facade_capability": "project.task_template.change.apply",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/task_templates.py",
+          "start_line": 60,
+          "end_line": 72,
+          "sha256": "4e23438e7e7b01a87c4be0616d1b8a06a0f1c9c8fa634a1ea93ead426c4b40a0"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.task_template.change.apply\" if write else \"project.task_template.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
+      }
     },
     {
       "scope": "original_109",
       "method": "POST",
       "route_path": "/api/task-dependencies",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.task.change.apply.atomic.task_dependencies_create",
+      "reason": "Handler delegates operation task_dependencies.create to _task_call, whose anchored project.task.change.apply facade binding has exact stable replacement project.task.change.apply.atomic.task_dependencies_create.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 190,
+          "end_line": 190,
+          "sha256": "e859be29f7d6241233c4418eb2a9453159830fe2397027cd165c510767320c61"
+        },
+        "delegation_symbol": "_task_call",
+        "expected_delegation": "_task_call(request, current_user, principal, gateway, \"task_dependencies.create\", body.model_dump(), True)",
+        "operation": "task_dependencies.create",
+        "facade_capability": "project.task.change.apply",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 121,
+          "end_line": 121,
+          "sha256": "dca2bfda3f8ac98bec5ef0d065f429c09104fb355d90134d2e72ec1a4ae3e1c4"
+        },
+        "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.task.change.apply\" if write else \"project.task.read\", operation, args, write=write)"
+      }
     },
     {
       "scope": "original_109",
@@ -297,9 +457,30 @@
       "scope": "original_109",
       "method": "POST",
       "route_path": "/api/shares/lists/{list_gid}",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.sharing.change.apply.atomic.shares_list_create",
+      "reason": "Handler delegates operation shares.list.create to _call, whose anchored project.sharing.change.apply facade binding has exact stable replacement project.sharing.change.apply.atomic.shares_list_create.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/shares.py",
+          "start_line": 25,
+          "end_line": 25,
+          "sha256": "b002c5c384218a94af4673595233b394e595d3549fd002bfbe53ac9d7de15a7d"
+        },
+        "delegation_symbol": "_call",
+        "expected_delegation": "_call(request,user,principal,gateway,\"shares.list.create\",{\"list_gid\":list_gid,**body.model_dump()})",
+        "operation": "shares.list.create",
+        "facade_capability": "project.sharing.change.apply",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/shares.py",
+          "start_line": 12,
+          "end_line": 17,
+          "sha256": "242cea424c28e6aa30088950ccdd1edeeb550b7e7caa2dc70af88686dbd25088"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(gateway,capability_id=\"project.sharing.change.apply\" if write else \"project.sharing.read\",payload={\"operation\":operation,\"arguments\":args},current_user=user,principal=principal,request_id=rid,trace_id=request.headers.get(\"X-Trace-ID\") or rid,idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None)"
+      }
     },
     {
       "scope": "original_109",
@@ -332,9 +513,22 @@
       "scope": "original_109",
       "method": "POST",
       "route_path": "/api/permission-requests",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.permission_request.change.apply.atomic.permission_requests_create",
+      "reason": "Handler invokes the reviewed project.permission_request.change.apply facade operation permission_requests.create, whose exact stable replacement is project.permission_request.change.apply.atomic.permission_requests_create.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_invocation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/permission_requests.py",
+          "start_line": 36,
+          "end_line": 37,
+          "sha256": "fbbb82259b51cd4bc111b54a69e027d8d0be6e662a5ef3ad5ca6fee890086cfc"
+        },
+        "facade_capability": "project.permission_request.change.apply",
+        "operation": "permission_requests.create",
+        "expected_facade_invocation": "_invoke(request, user, principal, gateway, \"project.permission_request.change.apply\", \"permission_requests.create\", body.model_dump())"
+      }
     },
     {
       "scope": "original_109",
@@ -351,9 +545,30 @@
       "scope": "original_109",
       "method": "POST",
       "route_path": "/api/lists",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.list.change.apply.atomic.lists_create",
+      "reason": "Handler delegates operation lists.create to _invoke_project, whose anchored project.list.change.apply facade binding has exact stable replacement project.list.change.apply.atomic.lists_create.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/lists.py",
+          "start_line": 139,
+          "end_line": 140,
+          "sha256": "ff48a22be581fdae101e6369c8dcc3b83ec8f91a796c0ff3de9160e969bed274"
+        },
+        "delegation_symbol": "_invoke_project",
+        "expected_delegation": "_invoke_project(request, current_user, principal, gateway, \"lists.create\", body.model_dump(), write=True)",
+        "operation": "lists.create",
+        "facade_capability": "project.list.change.apply",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/lists.py",
+          "start_line": 59,
+          "end_line": 73,
+          "sha256": "f7fef265701c240e46f0d650b14cf205e83de56de0f960cbbcd4ea841d8b8fc9"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.list.change.apply\" if write else \"project.list.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user,\n        principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
+      }
     },
     {
       "scope": "original_109",
@@ -597,9 +812,9 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/rules.py",
-          "start_line": 60,
+          "start_line": 61,
           "end_line": 62,
-          "sha256": "9efebc1c991f572a04f53aab70a302aeb708395da9aad54b9e63375ba53432c6"
+          "sha256": "e762c2c8a75053d7bd237eebea22be007992d0d625eb6e3c9c85a037b55f2f3f"
         },
         "expected_target_invocation": "_invoke_rule_library(request, current_user, principal, gateway, \"craft.rule.library.change.apply\", \"update\", gid=gid, record=body)"
       }
@@ -616,9 +831,9 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/rules.py",
-          "start_line": 50,
+          "start_line": 51,
           "end_line": 52,
-          "sha256": "e4870bbafe6212228991d0e8fb1658799a82a5516d089990f3c65508ff2344ba"
+          "sha256": "b3fee182182b695cefa1b923349bb4d73c92ec27a9170f4579fc0b79f34f26b5"
         },
         "expected_target_invocation": "_invoke_rule_library(request, current_user, principal, gateway, \"craft.rule.library.change.apply\", \"create\", record=body.model_dump())"
       }
@@ -1051,9 +1266,30 @@
       "scope": "original_109",
       "method": "POST",
       "route_path": "/api/issues",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.issue.change.apply.atomic.issues_create",
+      "reason": "Handler delegates operation issues.create to _issue_call, whose anchored project.issue.change.apply facade binding has exact stable replacement project.issue.change.apply.atomic.issues_create.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 161,
+          "end_line": 161,
+          "sha256": "46f1ad82ff3050f990216b97f1437b1d61a8144c1a84433ea036624b729ba749"
+        },
+        "delegation_symbol": "_issue_call",
+        "expected_delegation": "_issue_call(request, current_user, principal, gateway, \"issues.create\", body.model_dump(), True)",
+        "operation": "issues.create",
+        "facade_capability": "project.issue.change.apply",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 122,
+          "end_line": 122,
+          "sha256": "27c14620f0d6168ed25c15cbb27522e886c85bad2145013ffe06ce38238334d5"
+        },
+        "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.issue.change.apply\" if write else \"project.issue.read\", operation, args, write=write)"
+      }
     },
     {
       "scope": "fix_round_1",
@@ -1105,9 +1341,30 @@
       "scope": "original_109",
       "method": "POST",
       "route_path": "/api/follows",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.follow.change.apply.atomic.follows_create",
+      "reason": "Handler delegates operation follows.create to _invoke, whose anchored project.follow.change.apply facade binding has exact stable replacement project.follow.change.apply.atomic.follows_create.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "backend/routers/follows.py",
+          "start_line": 59,
+          "end_line": 61,
+          "sha256": "de9816f7ca5f4417c3c7eedd13b59ae161262a11b225da27a842051a0f09038f"
+        },
+        "delegation_symbol": "_invoke",
+        "expected_delegation": "_invoke(request, current_user, principal, gateway, \"follows.create\", {**body.model_dump(), \"owner_gid\": owner_gid}, write=True)",
+        "operation": "follows.create",
+        "facade_capability": "project.follow.change.apply",
+        "binding": {
+          "source_path": "backend/routers/follows.py",
+          "start_line": 30,
+          "end_line": 45,
+          "sha256": "afa2c188627664ecc204d832ec1b1e4e6bdb693a991ad656b2fb0dbed2e30d0e"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.follow.change.apply\" if write else \"project.follow.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
+      }
     },
     {
       "scope": "original_109",
@@ -1157,25 +1414,72 @@
       "scope": "original_109",
       "method": "GET",
       "route_path": "/api/item-entries/{item_type}/{item_gid}",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.list.read.atomic.item_entries_get",
+      "reason": "Handler invokes the reviewed project.list.read facade operation item_entries.get, whose exact stable replacement is project.list.read.atomic.item_entries_get.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_invocation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/item_entries.py",
+          "start_line": 65,
+          "end_line": 78,
+          "sha256": "f9ca022a2317778ad2a85172798f494dc3521ed9684738cee3c195386d2869ac"
+        },
+        "facade_capability": "project.list.read",
+        "operation": "item_entries.get",
+        "expected_facade_invocation": "_invoke_project(\n        request, current_user, principal, gateway,\n        capability_id=\"project.list.read\",\n        operation=\"item_entries.get\",\n        arguments={\"item_type\": item_type, \"item_gid\": item_gid},\n    )"
+      }
     },
     {
       "scope": "original_109",
       "method": "GET",
       "route_path": "/api/follows",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.follow.read.atomic.follows_list",
+      "reason": "Handler delegates operation follows.list to _invoke, whose anchored project.follow.read facade binding has exact stable replacement project.follow.read.atomic.follows_list.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "backend/routers/follows.py",
+          "start_line": 49,
+          "end_line": 50,
+          "sha256": "2dec3efaf550b97b8f5f371625d9235b07bbec828bfaf88eefa8c4bede5e749c"
+        },
+        "delegation_symbol": "_invoke",
+        "expected_delegation": "_invoke(request, current_user, principal, gateway, \"follows.list\", {\"item_type\": item_type})",
+        "operation": "follows.list",
+        "facade_capability": "project.follow.read",
+        "binding": {
+          "source_path": "backend/routers/follows.py",
+          "start_line": 30,
+          "end_line": 45,
+          "sha256": "afa2c188627664ecc204d832ec1b1e4e6bdb693a991ad656b2fb0dbed2e30d0e"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.follow.change.apply\" if write else \"project.follow.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
+      }
     },
     {
       "scope": "original_109",
       "method": "GET",
       "route_path": "/api/change-logs",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.change_log.read.atomic.change_logs_search",
+      "reason": "Handler invokes the reviewed project.change_log.read facade operation change_logs.search, whose exact stable replacement is project.change_log.read.atomic.change_logs_search.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_invocation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/change_logs.py",
+          "start_line": 19,
+          "end_line": 62,
+          "sha256": "fb3ab595f5582b910f683278dbce1a1d8322bfb1089f73665a89dd434f897409"
+        },
+        "facade_capability": "project.change_log.read",
+        "operation": "change_logs.search",
+        "expected_facade_invocation": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"project.change_log.read\",\n            payload={\n                \"operation\": \"change_logs.search\",\n                \"arguments\": {\n                    \"item_type\": item_type,\n                    \"item_gid\": item_gid,\n                    \"list_gid\": list_gid,\n                    \"limit\": limit,\n                    \"offset\": offset,\n                },\n            },\n            current_user=current_user,\n            principal=principal,\n            request_id=request_id,\n            trace_id=trace_id,\n        )"
+      }
     },
     {
       "scope": "original_109",
@@ -1219,33 +1523,117 @@
       "scope": "original_109",
       "method": "GET",
       "route_path": "/api/approval/orders/{gid}",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.approval.read.atomic.approval_orders_get",
+      "reason": "Handler delegates operation approval.orders.get to _invoke, whose anchored project.approval.read facade binding has exact stable replacement project.approval.read.atomic.approval_orders_get.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/approval.py",
+          "start_line": 74,
+          "end_line": 75,
+          "sha256": "bd5ee4128286c6c2e5089f2db103f12d1383ec01fc2c82ac819b73e373fe9a40"
+        },
+        "delegation_symbol": "_invoke",
+        "expected_delegation": "_invoke(request, current_user, principal, gateway, \"approval.orders.get\", {\"gid\": gid})",
+        "operation": "approval.orders.get",
+        "facade_capability": "project.approval.read",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/approval.py",
+          "start_line": 44,
+          "end_line": 60,
+          "sha256": "5b3835ef26dd5342c3b99640d3c4bf6674a930688b4b65fedf5151425b325f0e"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.approval.change.apply\" if write else \"project.approval.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
+      }
     },
     {
       "scope": "original_109",
       "method": "GET",
       "route_path": "/api/approval/orders",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.approval.read.atomic.approval_orders_search",
+      "reason": "Handler delegates operation approval.orders.search to _invoke, whose anchored project.approval.read facade binding has exact stable replacement project.approval.read.atomic.approval_orders_search.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/approval.py",
+          "start_line": 64,
+          "end_line": 65,
+          "sha256": "4266773de43291e842c559df17df0010ccaa178f1a404546af1757d9c8a36902"
+        },
+        "delegation_symbol": "_invoke",
+        "expected_delegation": "_invoke(request, current_user, principal, gateway, \"approval.orders.search\", {\"status\": status, \"project_gid\": project_gid, \"scope\": build_access_scope(current_user)})",
+        "operation": "approval.orders.search",
+        "facade_capability": "project.approval.read",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/approval.py",
+          "start_line": 44,
+          "end_line": 60,
+          "sha256": "5b3835ef26dd5342c3b99640d3c4bf6674a930688b4b65fedf5151425b325f0e"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.approval.change.apply\" if write else \"project.approval.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
+      }
     },
     {
       "scope": "original_109",
       "method": "GET",
       "route_path": "/api/shares/lists/{list_gid}",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.sharing.read.atomic.shares_list_list",
+      "reason": "Handler delegates operation shares.list.list to _call, whose anchored project.sharing.read facade binding has exact stable replacement project.sharing.read.atomic.shares_list_list.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/shares.py",
+          "start_line": 19,
+          "end_line": 23,
+          "sha256": "dcb616a5bc8c26a9d5fab44584f9ac7eb558bb842c2e28056d148d93ba728d8d"
+        },
+        "delegation_symbol": "_call",
+        "expected_delegation": "_call(request,user,principal,gateway,\"shares.list.list\",{\"list_gid\":list_gid})",
+        "operation": "shares.list.list",
+        "facade_capability": "project.sharing.read",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/shares.py",
+          "start_line": 12,
+          "end_line": 17,
+          "sha256": "242cea424c28e6aa30088950ccdd1edeeb550b7e7caa2dc70af88686dbd25088"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(gateway,capability_id=\"project.sharing.change.apply\" if write else \"project.sharing.read\",payload={\"operation\":operation,\"arguments\":args},current_user=user,principal=principal,request_id=rid,trace_id=request.headers.get(\"X-Trace-ID\") or rid,idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None)"
+      }
     },
     {
       "scope": "original_109",
       "method": "GET",
       "route_path": "/api/annotations/{key}",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.workbench.read.atomic.annotations_get",
+      "reason": "Handler delegates operation annotations.get to _invoke, whose anchored project.workbench.read facade binding has exact stable replacement project.workbench.read.atomic.annotations_get.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "backend/routers/annotations.py",
+          "start_line": 25,
+          "end_line": 26,
+          "sha256": "3bf7dab136dcf2b5354f0478673faac58a4743065233f9a00703b6c69dec846e"
+        },
+        "delegation_symbol": "_invoke",
+        "expected_delegation": "_invoke(request, current_user, principal, gateway, \"annotations.get\", {\"key\": key})",
+        "operation": "annotations.get",
+        "facade_capability": "project.workbench.read",
+        "binding": {
+          "source_path": "backend/routers/annotations.py",
+          "start_line": 17,
+          "end_line": 21,
+          "sha256": "223d6d33db03341ac13f4ba257ce7ab8392b52a8afca1caa475ec95c0445edeb"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(gateway, capability_id=\"project.workbench.change.apply\" if write else \"project.workbench.read\", payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal, request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id, idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None, approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None)"
+      }
     },
     {
       "scope": "original_109",
@@ -1292,17 +1680,59 @@
       "scope": "original_109",
       "method": "DELETE",
       "route_path": "/api/tasks/{gid}",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.task.change.apply.atomic.tasks_delete",
+      "reason": "Handler delegates operation tasks.delete to _task_call, whose anchored project.task.change.apply facade binding has exact stable replacement project.task.change.apply.atomic.tasks_delete.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 152,
+          "end_line": 152,
+          "sha256": "7e618717d6bc6b20d7b85deb80ac52557ed18069afd0ba7e14d8b1d4a152214c"
+        },
+        "delegation_symbol": "_task_call",
+        "expected_delegation": "_task_call(request, current_user, principal, gateway, \"tasks.delete\", {\"gid\": gid}, True)",
+        "operation": "tasks.delete",
+        "facade_capability": "project.task.change.apply",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 121,
+          "end_line": 121,
+          "sha256": "dca2bfda3f8ac98bec5ef0d065f429c09104fb355d90134d2e72ec1a4ae3e1c4"
+        },
+        "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.task.change.apply\" if write else \"project.task.read\", operation, args, write=write)"
+      }
     },
     {
       "scope": "original_109",
       "method": "DELETE",
       "route_path": "/api/task-dependencies/{gid}",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.task.change.apply.atomic.task_dependencies_delete",
+      "reason": "Handler delegates operation task_dependencies.delete to _task_call, whose anchored project.task.change.apply facade binding has exact stable replacement project.task.change.apply.atomic.task_dependencies_delete.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 198,
+          "end_line": 198,
+          "sha256": "259da5d6e149daf3427218f654ee5b1e1e0532d90f4e0130882046f08e28b485"
+        },
+        "delegation_symbol": "_task_call",
+        "expected_delegation": "_task_call(request, current_user, principal, gateway, \"task_dependencies.delete\", {\"gid\": gid}, True)",
+        "operation": "task_dependencies.delete",
+        "facade_capability": "project.task.change.apply",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 121,
+          "end_line": 121,
+          "sha256": "dca2bfda3f8ac98bec5ef0d065f429c09104fb355d90134d2e72ec1a4ae3e1c4"
+        },
+        "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.task.change.apply\" if write else \"project.task.read\", operation, args, write=write)"
+      }
     },
     {
       "scope": "original_109",
@@ -1327,9 +1757,30 @@
       "scope": "original_109",
       "method": "DELETE",
       "route_path": "/api/shares/lists/{list_gid}/{gid}",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.sharing.change.apply.atomic.shares_list_delete",
+      "reason": "Handler delegates operation shares.list.delete to _call, whose anchored project.sharing.change.apply facade binding has exact stable replacement project.sharing.change.apply.atomic.shares_list_delete.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/shares.py",
+          "start_line": 27,
+          "end_line": 27,
+          "sha256": "2cf778405bb7a28d1194fbb5bc4ae1dbea7eb1093f10f5267fbe5cc7d3fa1af5"
+        },
+        "delegation_symbol": "_call",
+        "expected_delegation": "_call(request,user,principal,gateway,\"shares.list.delete\",{\"list_gid\":list_gid,\"gid\":gid})",
+        "operation": "shares.list.delete",
+        "facade_capability": "project.sharing.change.apply",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/shares.py",
+          "start_line": 12,
+          "end_line": 17,
+          "sha256": "242cea424c28e6aa30088950ccdd1edeeb550b7e7caa2dc70af88686dbd25088"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(gateway,capability_id=\"project.sharing.change.apply\" if write else \"project.sharing.read\",payload={\"operation\":operation,\"arguments\":args},current_user=user,principal=principal,request_id=rid,trace_id=request.headers.get(\"X-Trace-ID\") or rid,idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None)"
+      }
     },
     {
       "scope": "original_109",
@@ -1357,9 +1808,30 @@
       "scope": "original_109",
       "method": "DELETE",
       "route_path": "/api/follows/{gid}",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.follow.change.apply.atomic.follows_delete",
+      "reason": "Handler delegates operation follows.delete to _invoke, whose anchored project.follow.change.apply facade binding has exact stable replacement project.follow.change.apply.atomic.follows_delete.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "backend/routers/follows.py",
+          "start_line": 70,
+          "end_line": 71,
+          "sha256": "86533942e6ed7811891716326f7b43cae26d0bf31ea7fcef9c0a1f1eae40488f"
+        },
+        "delegation_symbol": "_invoke",
+        "expected_delegation": "_invoke(request, current_user, principal, gateway, \"follows.delete\", {\"gid\": gid}, write=True)",
+        "operation": "follows.delete",
+        "facade_capability": "project.follow.change.apply",
+        "binding": {
+          "source_path": "backend/routers/follows.py",
+          "start_line": 30,
+          "end_line": 45,
+          "sha256": "afa2c188627664ecc204d832ec1b1e4e6bdb693a991ad656b2fb0dbed2e30d0e"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.follow.change.apply\" if write else \"project.follow.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
+      }
     },
     {
       "scope": "original_109",
@@ -1422,17 +1894,59 @@
       "scope": "original_109",
       "method": "GET",
       "route_path": "/api/task-dependencies",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.task.read.atomic.task_dependencies_list",
+      "reason": "Handler delegates operation task_dependencies.list to _task_call, whose anchored project.task.read facade binding has exact stable replacement project.task.read.atomic.task_dependencies_list.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 186,
+          "end_line": 186,
+          "sha256": "5750a6143dcaa557c617d9f6acb31e4af57bc38945a1474c81bcb712a40c3008"
+        },
+        "delegation_symbol": "_task_call",
+        "expected_delegation": "_task_call(request, current_user, principal, gateway, \"task_dependencies.list\", {\"list_gid\": list_gid})",
+        "operation": "task_dependencies.list",
+        "facade_capability": "project.task.read",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 121,
+          "end_line": 121,
+          "sha256": "dca2bfda3f8ac98bec5ef0d065f429c09104fb355d90134d2e72ec1a4ae3e1c4"
+        },
+        "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.task.change.apply\" if write else \"project.task.read\", operation, args, write=write)"
+      }
     },
     {
       "scope": "original_109",
       "method": "GET",
       "route_path": "/api/task-templates",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.task_template.read.atomic.task_templates_list",
+      "reason": "Handler delegates operation task_templates.list to _invoke, whose anchored project.task_template.read facade binding has exact stable replacement project.task_template.read.atomic.task_templates_list.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/task_templates.py",
+          "start_line": 76,
+          "end_line": 77,
+          "sha256": "6c55aa66add57476b7df450a3b3302360317acfbb7fd8825f8e8332415ad2bfe"
+        },
+        "delegation_symbol": "_invoke",
+        "expected_delegation": "_invoke(request, current_user, principal, gateway, \"task_templates.list\", {})",
+        "operation": "task_templates.list",
+        "facade_capability": "project.task_template.read",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/task_templates.py",
+          "start_line": 60,
+          "end_line": 72,
+          "sha256": "4e23438e7e7b01a87c4be0616d1b8a06a0f1c9c8fa634a1ea93ead426c4b40a0"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.task_template.change.apply\" if write else \"project.task_template.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
+      }
     },
     {
       "scope": "original_109",
@@ -1476,33 +1990,141 @@
       "scope": "original_109",
       "method": "POST",
       "route_path": "/api/approval/orders/{gid}/withdraw",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.approval.change.apply.atomic.approval_orders_withdraw",
+      "reason": "Handler delegates operation approval.orders.withdraw through the anchored _transition and _invoke chain; project.approval.change.apply has exact stable replacement project.approval.change.apply.atomic.approval_orders_withdraw.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation_chain",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/approval.py",
+          "start_line": 97,
+          "end_line": 98,
+          "sha256": "3562c86267ad5bb88be21adc5ee320e001178ab5f0fb4e27d654e04f925ad0ce"
+        },
+        "delegation_symbol": "_transition",
+        "expected_delegation": "_transition(gid, \"approval.orders.withdraw\", \"\", request, current_user, principal, gateway)",
+        "operation": "approval.orders.withdraw",
+        "bridge": {
+          "source_path": "plugins/craft/craft_backend/routers/approval.py",
+          "start_line": 78,
+          "end_line": 79,
+          "sha256": "e86a62900b8aedf49a981b59d007c5cc84d440397bb982ba938c1aa551e8538b"
+        },
+        "facade_symbol": "_invoke",
+        "expected_bridge_delegation": "_invoke(request, user, principal, gateway, operation, {\"gid\": gid, \"comment\": comment}, write=True)",
+        "facade_capability": "project.approval.change.apply",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/approval.py",
+          "start_line": 44,
+          "end_line": 60,
+          "sha256": "5b3835ef26dd5342c3b99640d3c4bf6674a930688b4b65fedf5151425b325f0e"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.approval.change.apply\" if write else \"project.approval.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
+      }
     },
     {
       "scope": "original_109",
       "method": "POST",
       "route_path": "/api/approval/orders/{gid}/start",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.approval.change.apply.atomic.approval_orders_start",
+      "reason": "Handler delegates operation approval.orders.start through the anchored _transition and _invoke chain; project.approval.change.apply has exact stable replacement project.approval.change.apply.atomic.approval_orders_start.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation_chain",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/approval.py",
+          "start_line": 83,
+          "end_line": 84,
+          "sha256": "ab454b363c7741548a931eca091f809b7c95fec5f9acfd9cb8deb554863dbf86"
+        },
+        "delegation_symbol": "_transition",
+        "expected_delegation": "_transition(gid, \"approval.orders.start\", \"\", request, current_user, principal, gateway)",
+        "operation": "approval.orders.start",
+        "bridge": {
+          "source_path": "plugins/craft/craft_backend/routers/approval.py",
+          "start_line": 78,
+          "end_line": 79,
+          "sha256": "e86a62900b8aedf49a981b59d007c5cc84d440397bb982ba938c1aa551e8538b"
+        },
+        "facade_symbol": "_invoke",
+        "expected_bridge_delegation": "_invoke(request, user, principal, gateway, operation, {\"gid\": gid, \"comment\": comment}, write=True)",
+        "facade_capability": "project.approval.change.apply",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/approval.py",
+          "start_line": 44,
+          "end_line": 60,
+          "sha256": "5b3835ef26dd5342c3b99640d3c4bf6674a930688b4b65fedf5151425b325f0e"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.approval.change.apply\" if write else \"project.approval.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
+      }
     },
     {
       "scope": "original_109",
       "method": "POST",
       "route_path": "/api/approval/orders/{gid}/approve",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.approval.change.apply.atomic.approval_orders_approve",
+      "reason": "Handler delegates operation approval.orders.approve through the anchored _transition and _invoke chain; project.approval.change.apply has exact stable replacement project.approval.change.apply.atomic.approval_orders_approve.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation_chain",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/approval.py",
+          "start_line": 88,
+          "end_line": 89,
+          "sha256": "b523ffb316f2fcfc8c5a82a0f23e0162d2f4037b4dcf6c1c5e52acb173b3d154"
+        },
+        "delegation_symbol": "_transition",
+        "expected_delegation": "_transition(gid, \"approval.orders.approve\", body.comment, request, current_user, principal, gateway)",
+        "operation": "approval.orders.approve",
+        "bridge": {
+          "source_path": "plugins/craft/craft_backend/routers/approval.py",
+          "start_line": 78,
+          "end_line": 79,
+          "sha256": "e86a62900b8aedf49a981b59d007c5cc84d440397bb982ba938c1aa551e8538b"
+        },
+        "facade_symbol": "_invoke",
+        "expected_bridge_delegation": "_invoke(request, user, principal, gateway, operation, {\"gid\": gid, \"comment\": comment}, write=True)",
+        "facade_capability": "project.approval.change.apply",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/approval.py",
+          "start_line": 44,
+          "end_line": 60,
+          "sha256": "5b3835ef26dd5342c3b99640d3c4bf6674a930688b4b65fedf5151425b325f0e"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.approval.change.apply\" if write else \"project.approval.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
+      }
     },
     {
       "scope": "original_109",
       "method": "POST",
       "route_path": "/api/approval/orders/scope_upgrade",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.approval.change.apply.atomic.approval_scope_upgrade_create",
+      "reason": "Handler delegates operation approval.scope_upgrade.create to _invoke, whose anchored project.approval.change.apply facade binding has exact stable replacement project.approval.change.apply.atomic.approval_scope_upgrade_create.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/approval.py",
+          "start_line": 102,
+          "end_line": 105,
+          "sha256": "b3485525f20a54f8c5a91d7eaeb15743d6a9135b07e28c858c1fb7577451adcd"
+        },
+        "delegation_symbol": "_invoke",
+        "expected_delegation": "_invoke(request, current_user, principal, gateway, \"approval.scope_upgrade.create\", {**body.model_dump(), \"reviewer_gid\": reviewer_gid}, write=True)",
+        "operation": "approval.scope_upgrade.create",
+        "facade_capability": "project.approval.change.apply",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/approval.py",
+          "start_line": 44,
+          "end_line": 60,
+          "sha256": "5b3835ef26dd5342c3b99640d3c4bf6674a930688b4b65fedf5151425b325f0e"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.approval.change.apply\" if write else \"project.approval.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
+      }
     },
     {
       "scope": "original_109",
@@ -1630,17 +2252,59 @@
       "scope": "original_109",
       "method": "PATCH",
       "route_path": "/api/notifications/{gid}/read",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.notification.change.apply.atomic.notifications_mark_read",
+      "reason": "Handler delegates operation notifications.mark_read to _invoke, whose anchored project.notification.change.apply facade binding has exact stable replacement project.notification.change.apply.atomic.notifications_mark_read.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "backend/routers/notifications.py",
+          "start_line": 59,
+          "end_line": 61,
+          "sha256": "8da2610bff23a8ed70a9fd09416db6b54b444017245df98f4ef3111468c6d764"
+        },
+        "delegation_symbol": "_invoke",
+        "expected_delegation": "_invoke(request, current_user, principal, gateway, \"notifications.mark_read\", {\"gid\": gid}, write=True)",
+        "operation": "notifications.mark_read",
+        "facade_capability": "project.notification.change.apply",
+        "binding": {
+          "source_path": "backend/routers/notifications.py",
+          "start_line": 15,
+          "end_line": 25,
+          "sha256": "be126eec0f6ca7ab3f4b22406749eaada81f44399d7748f96a960d3eeec17959"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.notification.change.apply\" if write else \"project.notification.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
+      }
     },
     {
       "scope": "original_109",
       "method": "PATCH",
       "route_path": "/api/notifications/read_all",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.notification.change.apply.atomic.notifications_mark_all_read",
+      "reason": "Handler delegates operation notifications.mark_all_read to _invoke, whose anchored project.notification.change.apply facade binding has exact stable replacement project.notification.change.apply.atomic.notifications_mark_all_read.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "backend/routers/notifications.py",
+          "start_line": 53,
+          "end_line": 55,
+          "sha256": "be7b6630ac3bd657175948f85fe415326f11cebc4f77a2da9d1f4bda5c6072f2"
+        },
+        "delegation_symbol": "_invoke",
+        "expected_delegation": "_invoke(request, current_user, principal, gateway, \"notifications.mark_all_read\", {}, write=True)",
+        "operation": "notifications.mark_all_read",
+        "facade_capability": "project.notification.change.apply",
+        "binding": {
+          "source_path": "backend/routers/notifications.py",
+          "start_line": 15,
+          "end_line": 25,
+          "sha256": "be126eec0f6ca7ab3f4b22406749eaada81f44399d7748f96a960d3eeec17959"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.notification.change.apply\" if write else \"project.notification.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
+      }
     },
     {
       "scope": "original_109",
@@ -1654,9 +2318,30 @@
       "scope": "original_109",
       "method": "PATCH",
       "route_path": "/api/follows/{gid}",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.follow.change.apply.atomic.follows_update",
+      "reason": "Handler delegates operation follows.update to _invoke, whose anchored project.follow.change.apply facade binding has exact stable replacement project.follow.change.apply.atomic.follows_update.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "backend/routers/follows.py",
+          "start_line": 65,
+          "end_line": 66,
+          "sha256": "dec36c5ce95a960f22bf926a07586ab336af72315b6da391cb5649c1719290fc"
+        },
+        "delegation_symbol": "_invoke",
+        "expected_delegation": "_invoke(request, current_user, principal, gateway, \"follows.update\", {\"gid\": gid, **body.model_dump()}, write=True)",
+        "operation": "follows.update",
+        "facade_capability": "project.follow.change.apply",
+        "binding": {
+          "source_path": "backend/routers/follows.py",
+          "start_line": 30,
+          "end_line": 45,
+          "sha256": "afa2c188627664ecc204d832ec1b1e4e6bdb693a991ad656b2fb0dbed2e30d0e"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.follow.change.apply\" if write else \"project.follow.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
+      }
     },
     {
       "scope": "original_109",
@@ -1763,17 +2448,59 @@
       "scope": "original_109",
       "method": "GET",
       "route_path": "/api/tasks",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.task.read.atomic.tasks_search",
+      "reason": "Handler delegates operation tasks.search to _task_call, whose anchored project.task.read facade binding has exact stable replacement project.task.read.atomic.tasks_search.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 126,
+          "end_line": 127,
+          "sha256": "7282c5af71b05e9439bc53d764a5c72fa1908c3e65a9a47bc6ddc64b5b552509"
+        },
+        "delegation_symbol": "_task_call",
+        "expected_delegation": "_task_call(request, current_user, principal, gateway, \"tasks.search\", {\"project_gid\": project_gid, \"status\": status, \"list_gid\": list_gid, \"scheduled_date_from\": scheduled_date_from, \"q\": q, \"page_size\": page_size, \"scope\": build_access_scope(current_user)})",
+        "operation": "tasks.search",
+        "facade_capability": "project.task.read",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 121,
+          "end_line": 121,
+          "sha256": "dca2bfda3f8ac98bec5ef0d065f429c09104fb355d90134d2e72ec1a4ae3e1c4"
+        },
+        "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.task.change.apply\" if write else \"project.task.read\", operation, args, write=write)"
+      }
     },
     {
       "scope": "original_109",
       "method": "GET",
       "route_path": "/api/task-templates/{gid}",
-      "disposition": "removed",
-      "target_capability": null,
-      "reason": "The cited handler has no anchored invocation or exact delegation to the proposed target."
+      "disposition": "retained",
+      "target_capability": "project.task_template.read.atomic.task_templates_get",
+      "reason": "Handler delegates operation task_templates.get to _invoke, whose anchored project.task_template.read facade binding has exact stable replacement project.task_template.read.atomic.task_templates_get.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/task_templates.py",
+          "start_line": 86,
+          "end_line": 87,
+          "sha256": "8be007e7505145b245a54542f7a5c205d77fed9dcbb6596050cbfe617416f4ea"
+        },
+        "delegation_symbol": "_invoke",
+        "expected_delegation": "_invoke(request, current_user, principal, gateway, \"task_templates.get\", {\"gid\": gid})",
+        "operation": "task_templates.get",
+        "facade_capability": "project.task_template.read",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/task_templates.py",
+          "start_line": 60,
+          "end_line": 72,
+          "sha256": "4e23438e7e7b01a87c4be0616d1b8a06a0f1c9c8fa634a1ea93ead426c4b40a0"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.task_template.change.apply\" if write else \"project.task_template.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
+      }
     },
     {
       "scope": "original_109",
@@ -1812,10 +2539,1083 @@
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.data_exchange.lark.write\", payload=payload,\n        current_user=user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n    )"
       }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "GET",
+      "route_path": "/api/tasks/{gid}",
+      "disposition": "retained",
+      "target_capability": "project.task.read.atomic.tasks_get",
+      "reason": "Handler delegates operation tasks.get to _task_call, whose anchored project.task.read facade binding has exact stable replacement project.task.read.atomic.tasks_get.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 143,
+          "end_line": 143,
+          "sha256": "4143ffc01f1e8913fffb4e1ec01225302a36188febd1c74ee424f7426adb728c"
+        },
+        "delegation_symbol": "_task_call",
+        "expected_delegation": "_task_call(request, current_user, principal, gateway, \"tasks.get\", {\"gid\": gid})",
+        "operation": "tasks.get",
+        "facade_capability": "project.task.read",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 121,
+          "end_line": 121,
+          "sha256": "dca2bfda3f8ac98bec5ef0d065f429c09104fb355d90134d2e72ec1a4ae3e1c4"
+        },
+        "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.task.change.apply\" if write else \"project.task.read\", operation, args, write=write)"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "PATCH",
+      "route_path": "/api/tasks/{gid}",
+      "disposition": "retained",
+      "target_capability": "project.task.change.apply.atomic.tasks_update",
+      "reason": "Handler delegates operation tasks.update to _task_call, whose anchored project.task.change.apply facade binding has exact stable replacement project.task.change.apply.atomic.tasks_update.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 148,
+          "end_line": 148,
+          "sha256": "af6c328a406976b68a6f263a87fde5b341c802ca45c46e0c01c61c6fffa51694"
+        },
+        "delegation_symbol": "_task_call",
+        "expected_delegation": "_task_call(request, current_user, principal, gateway, \"tasks.update\", {\"gid\": gid, \"updates\": body}, True)",
+        "operation": "tasks.update",
+        "facade_capability": "project.task.change.apply",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 121,
+          "end_line": 121,
+          "sha256": "dca2bfda3f8ac98bec5ef0d065f429c09104fb355d90134d2e72ec1a4ae3e1c4"
+        },
+        "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.task.change.apply\" if write else \"project.task.read\", operation, args, write=write)"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "GET",
+      "route_path": "/api/issues",
+      "disposition": "retained",
+      "target_capability": "project.issue.read.atomic.issues_search",
+      "reason": "Handler delegates operation issues.search to _issue_call, whose anchored project.issue.read facade binding has exact stable replacement project.issue.read.atomic.issues_search.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 156,
+          "end_line": 157,
+          "sha256": "bdbee94827f69fbec3542143ab778d0c7d97378107a0c39e58cd2cb71de5889d"
+        },
+        "delegation_symbol": "_issue_call",
+        "expected_delegation": "_issue_call(request, current_user, principal, gateway, \"issues.search\", {\"project_gid\": project_gid, \"status\": status, \"list_gid\": list_gid, \"q\": q, \"page_size\": page_size, \"scope\": build_access_scope(current_user)})",
+        "operation": "issues.search",
+        "facade_capability": "project.issue.read",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 122,
+          "end_line": 122,
+          "sha256": "27c14620f0d6168ed25c15cbb27522e886c85bad2145013ffe06ce38238334d5"
+        },
+        "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.issue.change.apply\" if write else \"project.issue.read\", operation, args, write=write)"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "GET",
+      "route_path": "/api/issues/{gid}",
+      "disposition": "retained",
+      "target_capability": "project.issue.read.atomic.issues_get",
+      "reason": "Handler delegates operation issues.get to _issue_call, whose anchored project.issue.read facade binding has exact stable replacement project.issue.read.atomic.issues_get.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 173,
+          "end_line": 173,
+          "sha256": "22400477a05151c24760b5a203cc69fc4b73e0c8511eba61492955543d0251cb"
+        },
+        "delegation_symbol": "_issue_call",
+        "expected_delegation": "_issue_call(request, current_user, principal, gateway, \"issues.get\", {\"gid\": gid})",
+        "operation": "issues.get",
+        "facade_capability": "project.issue.read",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 122,
+          "end_line": 122,
+          "sha256": "27c14620f0d6168ed25c15cbb27522e886c85bad2145013ffe06ce38238334d5"
+        },
+        "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.issue.change.apply\" if write else \"project.issue.read\", operation, args, write=write)"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "PATCH",
+      "route_path": "/api/issues/{gid}",
+      "disposition": "retained",
+      "target_capability": "project.issue.change.apply.atomic.issues_update",
+      "reason": "Handler delegates operation issues.update to _issue_call, whose anchored project.issue.change.apply facade binding has exact stable replacement project.issue.change.apply.atomic.issues_update.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 178,
+          "end_line": 178,
+          "sha256": "86900df98a892cdca260eadc743ecd4fe14dbb34551e1eac73c9ccd83f678048"
+        },
+        "delegation_symbol": "_issue_call",
+        "expected_delegation": "_issue_call(request, current_user, principal, gateway, \"issues.update\", {\"gid\": gid, \"updates\": body}, True)",
+        "operation": "issues.update",
+        "facade_capability": "project.issue.change.apply",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 122,
+          "end_line": 122,
+          "sha256": "27c14620f0d6168ed25c15cbb27522e886c85bad2145013ffe06ce38238334d5"
+        },
+        "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.issue.change.apply\" if write else \"project.issue.read\", operation, args, write=write)"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "DELETE",
+      "route_path": "/api/issues/{gid}",
+      "disposition": "retained",
+      "target_capability": "project.issue.change.apply.atomic.issues_delete",
+      "reason": "Handler delegates operation issues.delete to _issue_call, whose anchored project.issue.change.apply facade binding has exact stable replacement project.issue.change.apply.atomic.issues_delete.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 182,
+          "end_line": 182,
+          "sha256": "b43815e39f85f43257c7c220661082f398c517af96a5cb285518616439267a77"
+        },
+        "delegation_symbol": "_issue_call",
+        "expected_delegation": "_issue_call(request, current_user, principal, gateway, \"issues.delete\", {\"gid\": gid}, True)",
+        "operation": "issues.delete",
+        "facade_capability": "project.issue.change.apply",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+          "start_line": 122,
+          "end_line": 122,
+          "sha256": "27c14620f0d6168ed25c15cbb27522e886c85bad2145013ffe06ce38238334d5"
+        },
+        "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.issue.change.apply\" if write else \"project.issue.read\", operation, args, write=write)"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "GET",
+      "route_path": "/api/notifications",
+      "disposition": "retained",
+      "target_capability": "project.notification.read.atomic.notifications_list",
+      "reason": "Handler delegates operation notifications.list to _invoke, whose anchored project.notification.read facade binding has exact stable replacement project.notification.read.atomic.notifications_list.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "backend/routers/notifications.py",
+          "start_line": 29,
+          "end_line": 31,
+          "sha256": "bfbc10f3408d94e2f380b4fdfa63b8fa6b65451e787b3bc4d6b8a8d0b771de7c"
+        },
+        "delegation_symbol": "_invoke",
+        "expected_delegation": "_invoke(request, current_user, principal, gateway, \"notifications.list\", {\"unread_only\": unread_only})",
+        "operation": "notifications.list",
+        "facade_capability": "project.notification.read",
+        "binding": {
+          "source_path": "backend/routers/notifications.py",
+          "start_line": 15,
+          "end_line": 25,
+          "sha256": "be126eec0f6ca7ab3f4b22406749eaada81f44399d7748f96a960d3eeec17959"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.notification.change.apply\" if write else \"project.notification.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "GET",
+      "route_path": "/api/notifications/unread_count",
+      "disposition": "retained",
+      "target_capability": "project.notification.read.atomic.notifications_unread_count",
+      "reason": "Handler delegates operation notifications.unread_count to _invoke, whose anchored project.notification.read facade binding has exact stable replacement project.notification.read.atomic.notifications_unread_count.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_delegation",
+        "handler": {
+          "source_path": "backend/routers/notifications.py",
+          "start_line": 35,
+          "end_line": 37,
+          "sha256": "a06dff1d5758d040dafcf1f975d9f29df06f343e0f3b7ef145fc7001133748d4"
+        },
+        "delegation_symbol": "_invoke",
+        "expected_delegation": "_invoke(request, current_user, principal, gateway, \"notifications.unread_count\", {})",
+        "operation": "notifications.unread_count",
+        "facade_capability": "project.notification.read",
+        "binding": {
+          "source_path": "backend/routers/notifications.py",
+          "start_line": 15,
+          "end_line": 25,
+          "sha256": "be126eec0f6ca7ab3f4b22406749eaada81f44399d7748f96a960d3eeec17959"
+        },
+        "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.notification.change.apply\" if write else \"project.notification.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "DELETE",
+      "route_path": "/api/item-entries/{item_type}/{item_gid}",
+      "disposition": "retained",
+      "target_capability": "project.list.change.apply.atomic.item_entries_delete",
+      "reason": "Handler invokes the reviewed project.list.change.apply facade operation item_entries.delete, whose exact stable replacement is project.list.change.apply.atomic.item_entries_delete.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_invocation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/item_entries.py",
+          "start_line": 104,
+          "end_line": 117,
+          "sha256": "4ff77e13935eee690c298450c5c570da1f8c89fef41babbcaace0a5cf014e7ac"
+        },
+        "facade_capability": "project.list.change.apply",
+        "operation": "item_entries.delete",
+        "expected_facade_invocation": "_invoke_project(\n        request, current_user, principal, gateway,\n        capability_id=\"project.list.change.apply\",\n        operation=\"item_entries.delete\",\n        arguments={\"item_type\": item_type, \"item_gid\": item_gid},\n    )"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "GET",
+      "route_path": "/api/item-entries/knowledge_item/{item_gid}",
+      "disposition": "retained",
+      "target_capability": "project.list.read.atomic.item_entries_get",
+      "reason": "Handler invokes the reviewed project.list.read facade operation item_entries.get, whose exact stable replacement is project.list.read.atomic.item_entries_get.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_invocation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/item_entries.py",
+          "start_line": 65,
+          "end_line": 78,
+          "sha256": "f9ca022a2317778ad2a85172798f494dc3521ed9684738cee3c195386d2869ac"
+        },
+        "facade_capability": "project.list.read",
+        "operation": "item_entries.get",
+        "expected_facade_invocation": "_invoke_project(\n        request, current_user, principal, gateway,\n        capability_id=\"project.list.read\",\n        operation=\"item_entries.get\",\n        arguments={\"item_type\": item_type, \"item_gid\": item_gid},\n    )"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "GET",
+      "route_path": "/api/share-links/{token}",
+      "disposition": "retained",
+      "target_capability": "project.sharing.read.atomic.share_links_resolve",
+      "reason": "Handler invokes the reviewed project.sharing.read facade operation share_links.resolve, whose exact stable replacement is project.sharing.read.atomic.share_links_resolve.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "facade_operation_invocation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/share_links.py",
+          "start_line": 40,
+          "end_line": 41,
+          "sha256": "50e0d93118e56878fdc04e55391d253c17f829aa2085b61fc0148d0b40ceb8b4"
+        },
+        "facade_capability": "project.sharing.read",
+        "operation": "share_links.resolve",
+        "expected_facade_invocation": "_invoke(request, user, principal, gateway, \"project.sharing.read\", \"share_links.resolve\", {\"token\": token})"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "GET",
+      "route_path": "/api/knowledge_hub/folders",
+      "disposition": "retained",
+      "target_capability": "knowledge.hub.read.atomic.folders_list",
+      "reason": "Handler passes knowledge.hub.read and operation folders.list to the anchored atomic composer, which constructs exact stable target knowledge.hub.read.atomic.folders_list.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "atomic_composition_invocation",
+        "handler": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 80,
+          "end_line": 82,
+          "sha256": "c810a51e147c752465fbc7fb544581d6e4e935b1fedbd147a174a1a5fb4a36e4"
+        },
+        "facade_capability": "knowledge.hub.read",
+        "operation": "folders.list",
+        "expected_facade_invocation": "_invoke(request, current_user, principal, gateway, \"knowledge.hub.read\", \"folders.list\", {\"scope_type\": scope_type, \"team_gid\": team_gid})",
+        "composition_symbol": "_invoke",
+        "binding": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 17,
+          "end_line": 31,
+          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+        },
+        "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "POST",
+      "route_path": "/api/knowledge_hub/folders",
+      "disposition": "retained",
+      "target_capability": "knowledge.hub.change.apply.atomic.folders_create",
+      "reason": "Handler passes knowledge.hub.change.apply and operation folders.create to the anchored atomic composer, which constructs exact stable target knowledge.hub.change.apply.atomic.folders_create.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "atomic_composition_invocation",
+        "handler": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 86,
+          "end_line": 87,
+          "sha256": "f8019d2609b2c6f30ee1d381f72a601670c8d7f4984058de6126b50d18603188"
+        },
+        "facade_capability": "knowledge.hub.change.apply",
+        "operation": "folders.create",
+        "expected_facade_invocation": "_invoke(request, current_user, principal, gateway, \"knowledge.hub.change.apply\", \"folders.create\", body.model_dump(), write=True)",
+        "composition_symbol": "_invoke",
+        "binding": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 17,
+          "end_line": 31,
+          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+        },
+        "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "PATCH",
+      "route_path": "/api/knowledge_hub/folders/{gid}",
+      "disposition": "retained",
+      "target_capability": "knowledge.hub.change.apply.atomic.folders_update",
+      "reason": "Handler passes knowledge.hub.change.apply and operation folders.update to the anchored atomic composer, which constructs exact stable target knowledge.hub.change.apply.atomic.folders_update.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "atomic_composition_invocation",
+        "handler": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 91,
+          "end_line": 93,
+          "sha256": "bd276ddc65d8d015d83015b6ac4e4a2adbd3cff94cf62eee4d2d05fd6ce77fc3"
+        },
+        "facade_capability": "knowledge.hub.change.apply",
+        "operation": "folders.update",
+        "expected_facade_invocation": "_invoke(request, current_user, principal, gateway, \"knowledge.hub.change.apply\", \"folders.update\", {\"gid\": gid, \"updates\": body.model_dump(exclude_unset=True)}, write=True)",
+        "composition_symbol": "_invoke",
+        "binding": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 17,
+          "end_line": 31,
+          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+        },
+        "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "DELETE",
+      "route_path": "/api/knowledge_hub/folders/{gid}",
+      "disposition": "retained",
+      "target_capability": "knowledge.hub.change.apply.atomic.folders_delete",
+      "reason": "Handler passes knowledge.hub.change.apply and operation folders.delete to the anchored atomic composer, which constructs exact stable target knowledge.hub.change.apply.atomic.folders_delete.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "atomic_composition_invocation",
+        "handler": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 97,
+          "end_line": 99,
+          "sha256": "38476eaa3714c26af665b71f41728cfab8966f4d5ffaa4336c81249550010d95"
+        },
+        "facade_capability": "knowledge.hub.change.apply",
+        "operation": "folders.delete",
+        "expected_facade_invocation": "_invoke(request, current_user, principal, gateway, \"knowledge.hub.change.apply\", \"folders.delete\", {\"gid\": gid}, write=True)",
+        "composition_symbol": "_invoke",
+        "binding": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 17,
+          "end_line": 31,
+          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+        },
+        "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "GET",
+      "route_path": "/api/knowledge_hub/items",
+      "disposition": "retained",
+      "target_capability": "knowledge.hub.read.atomic.items_list",
+      "reason": "Handler passes knowledge.hub.read and operation items.list to the anchored atomic composer, which constructs exact stable target knowledge.hub.read.atomic.items_list.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "atomic_composition_invocation",
+        "handler": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 103,
+          "end_line": 105,
+          "sha256": "82f2b27e49a0d8324037bf0d55f987f633c3603bbeeea767c0fd2962e2bf50ef"
+        },
+        "facade_capability": "knowledge.hub.read",
+        "operation": "items.list",
+        "expected_facade_invocation": "_invoke(request, current_user, principal, gateway, \"knowledge.hub.read\", \"items.list\", {\"folder_gid\": folder_gid, \"scope_type\": scope_type, \"team_gid\": team_gid, \"show_hidden\": show_hidden, \"q\": q})",
+        "composition_symbol": "_invoke",
+        "binding": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 17,
+          "end_line": 31,
+          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+        },
+        "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "GET",
+      "route_path": "/api/knowledge_hub/items/{gid}",
+      "disposition": "retained",
+      "target_capability": "knowledge.hub.read.atomic.items_get",
+      "reason": "Handler passes knowledge.hub.read and operation items.get to the anchored atomic composer, which constructs exact stable target knowledge.hub.read.atomic.items_get.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "atomic_composition_invocation",
+        "handler": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 109,
+          "end_line": 110,
+          "sha256": "1a2f6b7135a89c0fbd7ecbb15354d769aabd0dc2ccbdeb103f5a02da1dab0799"
+        },
+        "facade_capability": "knowledge.hub.read",
+        "operation": "items.get",
+        "expected_facade_invocation": "_invoke(request, current_user, principal, gateway, \"knowledge.hub.read\", \"items.get\", {\"gid\": gid})",
+        "composition_symbol": "_invoke",
+        "binding": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 17,
+          "end_line": 31,
+          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+        },
+        "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "POST",
+      "route_path": "/api/knowledge_hub/items",
+      "disposition": "retained",
+      "target_capability": "knowledge.hub.change.apply.atomic.items_create",
+      "reason": "Handler passes knowledge.hub.change.apply and operation items.create to the anchored atomic composer, which constructs exact stable target knowledge.hub.change.apply.atomic.items_create.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "atomic_composition_invocation",
+        "handler": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 114,
+          "end_line": 115,
+          "sha256": "2b2a1fe1c5d206522e24c327e111b71c60408cae5a607e2422857fbbc3540902"
+        },
+        "facade_capability": "knowledge.hub.change.apply",
+        "operation": "items.create",
+        "expected_facade_invocation": "_invoke(request, current_user, principal, gateway, \"knowledge.hub.change.apply\", \"items.create\", body.model_dump(), write=True)",
+        "composition_symbol": "_invoke",
+        "binding": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 17,
+          "end_line": 31,
+          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+        },
+        "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "PATCH",
+      "route_path": "/api/knowledge_hub/items/{gid}",
+      "disposition": "retained",
+      "target_capability": "knowledge.hub.change.apply.atomic.items_update",
+      "reason": "Handler passes knowledge.hub.change.apply and operation items.update to the anchored atomic composer, which constructs exact stable target knowledge.hub.change.apply.atomic.items_update.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "atomic_composition_invocation",
+        "handler": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 119,
+          "end_line": 121,
+          "sha256": "1173ab40538e7b8ab9e2bc7a28d429a20dedc85ae0b09614d693ea57bdf400da"
+        },
+        "facade_capability": "knowledge.hub.change.apply",
+        "operation": "items.update",
+        "expected_facade_invocation": "_invoke(request, current_user, principal, gateway, \"knowledge.hub.change.apply\", \"items.update\", {\"gid\": gid, \"updates\": body.model_dump(exclude_unset=True)}, write=True)",
+        "composition_symbol": "_invoke",
+        "binding": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 17,
+          "end_line": 31,
+          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+        },
+        "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "GET",
+      "route_path": "/api/knowledge_hub/items/{gid}/history",
+      "disposition": "retained",
+      "target_capability": "knowledge.hub.read.atomic.items_history_get",
+      "reason": "Handler passes knowledge.hub.read and operation items.history.get to the anchored atomic composer, which constructs exact stable target knowledge.hub.read.atomic.items_history_get.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "atomic_composition_invocation",
+        "handler": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 125,
+          "end_line": 127,
+          "sha256": "560c1a03c36627b6fd3f0ffdc586a76b678049fc2b85128db43d37f8e142d0c4"
+        },
+        "facade_capability": "knowledge.hub.read",
+        "operation": "items.history.get",
+        "expected_facade_invocation": "_invoke(request, current_user, principal, gateway, \"knowledge.hub.read\", \"items.history.get\", {\"gid\": gid})",
+        "composition_symbol": "_invoke",
+        "binding": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 17,
+          "end_line": 31,
+          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+        },
+        "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "DELETE",
+      "route_path": "/api/knowledge_hub/items/{gid}",
+      "disposition": "retained",
+      "target_capability": "knowledge.hub.change.apply.atomic.items_delete",
+      "reason": "Handler passes knowledge.hub.change.apply and operation items.delete to the anchored atomic composer, which constructs exact stable target knowledge.hub.change.apply.atomic.items_delete.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "atomic_composition_invocation",
+        "handler": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 131,
+          "end_line": 133,
+          "sha256": "8d3e8c00666ea1fed394a69a61bc899e72ddae086a38dcfcde16976d1c7d0b59"
+        },
+        "facade_capability": "knowledge.hub.change.apply",
+        "operation": "items.delete",
+        "expected_facade_invocation": "_invoke(request, current_user, principal, gateway, \"knowledge.hub.change.apply\", \"items.delete\", {\"gid\": gid}, write=True)",
+        "composition_symbol": "_invoke",
+        "binding": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 17,
+          "end_line": 31,
+          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+        },
+        "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "GET",
+      "route_path": "/api/knowledge_hub/favorites",
+      "disposition": "retained",
+      "target_capability": "knowledge.personalization.read.atomic.favorites_list",
+      "reason": "Handler passes knowledge.personalization.read and operation favorites.list to the anchored atomic composer, which constructs exact stable target knowledge.personalization.read.atomic.favorites_list.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "atomic_composition_invocation",
+        "handler": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 143,
+          "end_line": 145,
+          "sha256": "2af8ce4cee4b594678b82e1e5fa555642e22910aef4acf836257183043e88e05"
+        },
+        "facade_capability": "knowledge.personalization.read",
+        "operation": "favorites.list",
+        "expected_facade_invocation": "_invoke(request, current_user, principal, gateway, \"knowledge.personalization.read\", \"favorites.list\")",
+        "composition_symbol": "_invoke",
+        "binding": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 17,
+          "end_line": 31,
+          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+        },
+        "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "POST",
+      "route_path": "/api/knowledge_hub/items/{gid}/recent",
+      "disposition": "retained",
+      "target_capability": "knowledge.personalization.change.apply.atomic.recent_record",
+      "reason": "Handler passes knowledge.personalization.change.apply and operation recent.record to the anchored atomic composer, which constructs exact stable target knowledge.personalization.change.apply.atomic.recent_record.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "atomic_composition_invocation",
+        "handler": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 149,
+          "end_line": 151,
+          "sha256": "2f96f5279a56fafb7fdb6e06b8989920d732c69d8b301e2b9a6180a5f8db6b98"
+        },
+        "facade_capability": "knowledge.personalization.change.apply",
+        "operation": "recent.record",
+        "expected_facade_invocation": "_invoke(request, current_user, principal, gateway, \"knowledge.personalization.change.apply\", \"recent.record\", {\"gid\": gid}, write=True)",
+        "composition_symbol": "_invoke",
+        "binding": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 17,
+          "end_line": 31,
+          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+        },
+        "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "GET",
+      "route_path": "/api/knowledge_hub/recent",
+      "disposition": "retained",
+      "target_capability": "knowledge.personalization.read.atomic.recent_list",
+      "reason": "Handler passes knowledge.personalization.read and operation recent.list to the anchored atomic composer, which constructs exact stable target knowledge.personalization.read.atomic.recent_list.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "atomic_composition_invocation",
+        "handler": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 155,
+          "end_line": 157,
+          "sha256": "37d9f3d225202e66e7616467776c9b4e197f0a712b739f448339a4ccea8c0e1f"
+        },
+        "facade_capability": "knowledge.personalization.read",
+        "operation": "recent.list",
+        "expected_facade_invocation": "_invoke(request, current_user, principal, gateway, \"knowledge.personalization.read\", \"recent.list\", {\"limit\": limit})",
+        "composition_symbol": "_invoke",
+        "binding": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
+          "start_line": 17,
+          "end_line": 31,
+          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+        },
+        "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "GET",
+      "route_path": "/api/knowledge_entries",
+      "disposition": "retained",
+      "target_capability": "knowledge.search",
+      "reason": "Handler invokes knowledge.search through the anchored call.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "capability_invocation",
+        "handler": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
+          "start_line": 138,
+          "end_line": 163,
+          "sha256": "8d03a4a27c2c6d345594a51a706e1f8c22dbd6ec5e52e0b10e8fc2b8ba530730"
+        },
+        "expected_target_invocation": "_invoke_knowledge(\n        request,\n        current_user,\n        principal,\n        gateway,\n        \"knowledge.search\",\n        {\n            \"query\": \"\",\n            \"entry_type\": entry_type,\n            \"list_gid\": list_gid,\n            \"context_class_gid\": context_class_gid,\n            \"include_content\": True,\n            \"limit\": limit,\n        },\n    )"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "GET",
+      "route_path": "/api/knowledge_entries/{gid}",
+      "disposition": "retained",
+      "target_capability": "knowledge.get",
+      "reason": "Handler invokes knowledge.get through the anchored call.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "capability_invocation",
+        "handler": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
+          "start_line": 187,
+          "end_line": 197,
+          "sha256": "90e94ca7d02767a679a51e9e68d96a2fc726e8a5e246a6cd341d0da156be29fe"
+        },
+        "expected_target_invocation": "_invoke_knowledge(\n        request, current_user, principal, gateway, \"knowledge.get\", {\"gid\": gid}\n    )"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "POST",
+      "route_path": "/api/knowledge_entries",
+      "disposition": "retained",
+      "target_capability": "knowledge.entry.change.apply.atomic.entries_create",
+      "reason": "Handler passes knowledge.entry.change.apply and operation entries.create to the anchored atomic composer, which constructs exact stable target knowledge.entry.change.apply.atomic.entries_create.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "atomic_composition_invocation",
+        "handler": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
+          "start_line": 167,
+          "end_line": 183,
+          "sha256": "0a3623e981fd819e295813cf5207302a9b383b1ec45104cf038cf707485e2db9"
+        },
+        "facade_capability": "knowledge.entry.change.apply",
+        "operation": "entries.create",
+        "expected_facade_invocation": "_invoke_knowledge(\n        request,\n        current_user,\n        principal,\n        gateway,\n        \"knowledge.entry.change.apply\",\n        {\"operation\": \"entries.create\", \"arguments\": body.model_dump(exclude_none=True)},\n        write=True,\n    )",
+        "composition_symbol": "_invoke_knowledge",
+        "binding": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
+          "start_line": 30,
+          "end_line": 50,
+          "sha256": "f7eb59b6b0c04cfcc1fab401c6b728d9a17d319ca625ff32c88ea1b4ead8d0f7"
+        },
+        "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "PATCH",
+      "route_path": "/api/knowledge_entries/{gid}",
+      "disposition": "retained",
+      "target_capability": "knowledge.entry.change.apply.atomic.entries_update",
+      "reason": "Handler passes knowledge.entry.change.apply and operation entries.update to the anchored atomic composer, which constructs exact stable target knowledge.entry.change.apply.atomic.entries_update.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "atomic_composition_invocation",
+        "handler": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
+          "start_line": 201,
+          "end_line": 218,
+          "sha256": "65ddcc9ef57f1a51f9c88de9a72f6c52bb2d7bfc6185c4550213460011d9e1ae"
+        },
+        "facade_capability": "knowledge.entry.change.apply",
+        "operation": "entries.update",
+        "expected_facade_invocation": "_invoke_knowledge(\n        request,\n        current_user,\n        principal,\n        gateway,\n        \"knowledge.entry.change.apply\",\n        {\"operation\": \"entries.update\", \"arguments\": {\"gid\": gid, \"updates\": body}},\n        write=True,\n    )",
+        "composition_symbol": "_invoke_knowledge",
+        "binding": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
+          "start_line": 30,
+          "end_line": 50,
+          "sha256": "f7eb59b6b0c04cfcc1fab401c6b728d9a17d319ca625ff32c88ea1b4ead8d0f7"
+        },
+        "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "DELETE",
+      "route_path": "/api/knowledge_entries/{gid}",
+      "disposition": "retained",
+      "target_capability": "knowledge.entry.change.apply.atomic.entries_delete",
+      "reason": "Handler passes knowledge.entry.change.apply and operation entries.delete to the anchored atomic composer, which constructs exact stable target knowledge.entry.change.apply.atomic.entries_delete.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "atomic_composition_invocation",
+        "handler": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
+          "start_line": 222,
+          "end_line": 238,
+          "sha256": "487e16bac8972e7307c33a045cebfc008be7c6f7e20ac41df6a560fe39e976b9"
+        },
+        "facade_capability": "knowledge.entry.change.apply",
+        "operation": "entries.delete",
+        "expected_facade_invocation": "_invoke_knowledge(\n        request,\n        current_user,\n        principal,\n        gateway,\n        \"knowledge.entry.change.apply\",\n        {\"operation\": \"entries.delete\", \"arguments\": {\"gid\": gid}},\n        write=True,\n    )",
+        "composition_symbol": "_invoke_knowledge",
+        "binding": {
+          "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
+          "start_line": 30,
+          "end_line": 50,
+          "sha256": "f7eb59b6b0c04cfcc1fab401c6b728d9a17d319ca625ff32c88ea1b4ead8d0f7"
+        },
+        "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "GET",
+      "route_path": "/api/ebom/vpps_check",
+      "disposition": "retained",
+      "target_capability": "craft.ebom.vpps_check.read",
+      "reason": "Handler invokes craft.ebom.vpps_check.read through the anchored call.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "capability_invocation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/ebom.py",
+          "start_line": 487,
+          "end_line": 512,
+          "sha256": "63bcd04bbfe545537dd0a56e62c3b028f06f62981fa54c8858232b78fe6bb54a"
+        },
+        "expected_target_invocation": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"craft.ebom.vpps_check.read\",\n            payload={\"operation\": \"check\", \"snapshot_gid\": snapshot_gid},\n            current_user=_u,\n            principal=principal,\n            request_id=request_id,\n            trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        )"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "GET",
+      "route_path": "/api/rules",
+      "disposition": "retained",
+      "target_capability": "craft.rule.library.read",
+      "reason": "Handler invokes craft.rule.library.read through the anchored call.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "capability_invocation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/rules.py",
+          "start_line": 46,
+          "end_line": 47,
+          "sha256": "92acd180a30783ec8e288d5230fc362228d1f77b397177322677d15feb2fe732"
+        },
+        "expected_target_invocation": "_invoke_rule_library(request, current_user, principal, gateway, \"craft.rule.library.read\", \"list\", status=status, list_gid=list_gid, q=q, limit=limit)"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "GET",
+      "route_path": "/api/rules/{gid}",
+      "disposition": "retained",
+      "target_capability": "craft.rule.library.read",
+      "reason": "Handler invokes craft.rule.library.read through the anchored call.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "capability_invocation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/rules.py",
+          "start_line": 56,
+          "end_line": 57,
+          "sha256": "a2281172c3494425f882bea6e1bd9357b4e82dc7646e77effa27f0740683d8df"
+        },
+        "expected_target_invocation": "_invoke_rule_library(request, current_user, principal, gateway, \"craft.rule.library.read\", \"get\", gid=gid)"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "DELETE",
+      "route_path": "/api/rules/{gid}",
+      "disposition": "retained",
+      "target_capability": "craft.rule.library.change.apply",
+      "reason": "Handler invokes craft.rule.library.change.apply through the anchored call.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "capability_invocation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/rules.py",
+          "start_line": 66,
+          "end_line": 67,
+          "sha256": "a0fb1314958addea4dab574c24f730f42cba04021ea722ded65ffc8376839c4b"
+        },
+        "expected_target_invocation": "_invoke_rule_library(request, current_user, principal, gateway, \"craft.rule.library.change.apply\", \"delete\", gid=gid)"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "GET",
+      "route_path": "/api/vpps-operations",
+      "disposition": "retained",
+      "target_capability": "craft.vpps_audit.read",
+      "reason": "Handler invokes craft.vpps_audit.read through the anchored call.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "capability_invocation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/vpps_audit.py",
+          "start_line": 59,
+          "end_line": 60,
+          "sha256": "578ddeaf55c5ce37aa2f50872296325b83b5ea621ef73ce343a91e356bf6a75c"
+        },
+        "expected_target_invocation": "_invoke_vpps_audit(request, user, principal, gateway, \"craft.vpps_audit.read\", \"list\", pbom_version_gid=pbom_version_gid, operation_type=operation_type)"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "GET",
+      "route_path": "/api/import-export/templates",
+      "disposition": "retained",
+      "target_capability": "base.export_template.read",
+      "reason": "Handler invokes base.export_template.read through the anchored call.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "capability_invocation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/import_export.py",
+          "start_line": 112,
+          "end_line": 144,
+          "sha256": "84c02d2286475e315a4a89c3b83506095c059292f016036a4915bbfec8256a4b"
+        },
+        "expected_target_invocation": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"base.export_template.read\",\n            payload={\"module\": module, \"limit\": 500},\n            current_user=user,\n            principal=principal,\n            request_id=request_id,\n            trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        )"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "POST",
+      "route_path": "/api/import-export/templates",
+      "disposition": "retained",
+      "target_capability": "base.export_template.change.apply",
+      "reason": "Handler delegates to _invoke_template_change, whose anchored binding invokes base.export_template.change.apply.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "exact_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/import_export.py",
+          "start_line": 235,
+          "end_line": 255,
+          "sha256": "e70f170e3ccb0e6a83beb29355094dea5e8e4771730e6841906ee9b82b9f86ec"
+        },
+        "delegation_symbol": "_invoke_template_change",
+        "expected_delegation": "_invoke_template_change(\n        request,\n        user,\n        principal,\n        gateway,\n        {\n            \"operation\": \"create\",\n            \"name\": body.name,\n            \"module\": body.module,\n            \"config\": body.config,\n            \"is_shared\": body.is_shared,\n        },\n    )",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/import_export.py",
+          "start_line": 147,
+          "end_line": 175,
+          "sha256": "b05f070e81e7905ce2e8a036b00ce8ef5271d5f71c3c552a685700510ee4a917"
+        },
+        "expected_target_binding": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"base.export_template.change.apply\",\n            payload=payload,\n            current_user=user,\n            principal=principal,\n            request_id=request_id,\n            trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n            idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n            approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        )"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "PATCH",
+      "route_path": "/api/import-export/templates/{gid}",
+      "disposition": "retained",
+      "target_capability": "base.export_template.change.apply",
+      "reason": "Handler delegates to _invoke_template_change, whose anchored binding invokes base.export_template.change.apply.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "exact_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/import_export.py",
+          "start_line": 264,
+          "end_line": 283,
+          "sha256": "fe97432123e7899b0811d885c91d7efefd32415c74648fd4014a2cf556ee08fd"
+        },
+        "delegation_symbol": "_invoke_template_change",
+        "expected_delegation": "_invoke_template_change(\n        request,\n        user,\n        principal,\n        gateway,\n        {\n            \"operation\": \"update\",\n            \"gid\": gid,\n            \"updates\": body.model_dump(exclude_none=True),\n        },\n    )",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/import_export.py",
+          "start_line": 147,
+          "end_line": 175,
+          "sha256": "b05f070e81e7905ce2e8a036b00ce8ef5271d5f71c3c552a685700510ee4a917"
+        },
+        "expected_target_binding": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"base.export_template.change.apply\",\n            payload=payload,\n            current_user=user,\n            principal=principal,\n            request_id=request_id,\n            trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n            idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n            approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        )"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "POST",
+      "route_path": "/api/import-export/export/excel",
+      "disposition": "retained",
+      "target_capability": "craft.data_exchange.export",
+      "reason": "Handler delegates to _invoke_data_exchange, whose anchored binding invokes craft.data_exchange.export.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "exact_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/import_export.py",
+          "start_line": 307,
+          "end_line": 318,
+          "sha256": "9cf86a1f1b485bb674617a81c4ef4d4b2ca24e19cd4059f95bd332b78004ab1d"
+        },
+        "delegation_symbol": "_invoke_data_exchange",
+        "expected_delegation": "_invoke_data_exchange(\n        request, user, principal, gateway,\n        {\"operation\": \"excel\", \"template_config\": body.template_config, \"rows\": body.rows, \"filename\": body.filename},\n    )",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/import_export.py",
+          "start_line": 178,
+          "end_line": 201,
+          "sha256": "2e4e043d3f192080284bdf6d31dd8db6fe29738d4dd75f4391e4dde06ec5f8b2"
+        },
+        "expected_target_binding": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"craft.data_exchange.export\",\n            payload=payload,\n            current_user=user,\n            principal=principal,\n            request_id=request_id,\n            trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n            idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n            approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        )"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "POST",
+      "route_path": "/api/import-export/export/diff-report",
+      "disposition": "retained",
+      "target_capability": "craft.data_exchange.export",
+      "reason": "Handler delegates to _invoke_data_exchange, whose anchored binding invokes craft.data_exchange.export.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "exact_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/import_export.py",
+          "start_line": 726,
+          "end_line": 740,
+          "sha256": "a00ec601e390aaf327b753fbf21af1a39353510ce728775441d63a862d182c15"
+        },
+        "delegation_symbol": "_invoke_data_exchange",
+        "expected_delegation": "_invoke_data_exchange(\n        request, user, principal, gateway,\n        {\n            \"operation\": \"diff_report\", \"columns\": body.columns, \"diff_rows\": body.diff_rows,\n            \"label_a\": body.label_a, \"label_b\": body.label_b, \"filename\": body.filename,\n        },\n    )",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/import_export.py",
+          "start_line": 178,
+          "end_line": 201,
+          "sha256": "2e4e043d3f192080284bdf6d31dd8db6fe29738d4dd75f4391e4dde06ec5f8b2"
+        },
+        "expected_target_binding": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"craft.data_exchange.export\",\n            payload=payload,\n            current_user=user,\n            principal=principal,\n            request_id=request_id,\n            trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n            idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n            approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        )"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "POST",
+      "route_path": "/api/import-export/export/diff-lark-sheet",
+      "disposition": "retained",
+      "target_capability": "craft.data_exchange.export",
+      "reason": "Handler delegates to _invoke_data_exchange, whose anchored binding invokes craft.data_exchange.export.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "exact_delegation",
+        "handler": {
+          "source_path": "plugins/craft/craft_backend/routers/import_export.py",
+          "start_line": 898,
+          "end_line": 914,
+          "sha256": "305f25d874a10701a24355e22f2b6b527858fb98f7cc099c93c7f30ff6fd2c58"
+        },
+        "delegation_symbol": "_invoke_data_exchange",
+        "expected_delegation": "_invoke_data_exchange(\n        request, user, principal, gateway,\n        {\n            \"operation\": \"diff_lark_sheet\", \"user_access_token\": body.user_access_token,\n            \"spreadsheet_token\": body.spreadsheet_token, \"sheet_id\": body.sheet_id,\n            \"columns\": body.columns, \"diff_rows\": body.diff_rows,\n            \"label_a\": body.label_a, \"label_b\": body.label_b,\n        },\n    )",
+        "binding": {
+          "source_path": "plugins/craft/craft_backend/routers/import_export.py",
+          "start_line": 178,
+          "end_line": 201,
+          "sha256": "2e4e043d3f192080284bdf6d31dd8db6fe29738d4dd75f4391e4dde06ec5f8b2"
+        },
+        "expected_target_binding": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"craft.data_exchange.export\",\n            payload=payload,\n            current_user=user,\n            principal=principal,\n            request_id=request_id,\n            trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n            idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n            approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        )"
+      }
+    },
+    {
+      "scope": "fix_round_4",
+      "method": "POST",
+      "route_path": "/api/ai/confirm",
+      "disposition": "retained",
+      "target_capability": "agent.interaction.chat.change.apply",
+      "reason": "Handler delegates to _invoke_interaction_chat, whose anchored binding invokes agent.interaction.chat.change.apply.",
+      "target_major_version": 1,
+      "evidence": {
+        "kind": "exact_delegation",
+        "handler": {
+          "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
+          "start_line": 745,
+          "end_line": 750,
+          "sha256": "107ba0026b78f91e88b96d680a0b9b34540f23b645673351fd45dd5b7bc349e9"
+        },
+        "delegation_symbol": "_invoke_interaction_chat",
+        "expected_delegation": "_invoke_interaction_chat(request, _user, principal, gateway, {\"operation\": \"confirm\", \"body\": body})",
+        "binding": {
+          "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
+          "start_line": 51,
+          "end_line": 63,
+          "sha256": "1f16e8a374b9cb8e8b588629a73bcc9d327b0877ef2ada653e6089571e67f5f3"
+        },
+        "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"agent.interaction.chat.change.apply\", payload=payload,\n        current_user=user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n    )"
+      }
     }
   ],
-  "original_retained_count": 52,
-  "original_removed_count": 57,
-  "retained_count": 56,
-  "removed_count": 57
+  "original_retained_count": 87,
+  "original_removed_count": 22,
+  "retained_count": 132,
+  "removed_count": 22
 }

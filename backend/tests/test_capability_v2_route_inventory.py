@@ -117,6 +117,44 @@ def test_lark_business_routes_are_registered_not_operations_excluded() -> None:
         assert ("POST", f"/api/import-export/{transport}/write") not in operation_keys
 
 
+def test_round4_exact_adapter_families_have_governed_targets() -> None:
+    root = Path(__file__).resolve().parents[2]
+    inventory = load_route_inventory(root / "docs/governance/legacy_route_inventory.json")
+    targets = {
+        (entry.method, entry.route_path): entry.migration_target_capability
+        for entry in inventory.entries
+    }
+    expected = {
+        ("GET", "/api/tasks"): "project.task.read.atomic.tasks_search",
+        ("POST", "/api/tasks"): "project.task.change.apply.atomic.tasks_create",
+        ("PUT", "/api/tasks/{gid}"): "project.task.change.apply.atomic.tasks_update",
+        ("GET", "/api/issues"): "project.issue.read.atomic.issues_search",
+        ("POST", "/api/issues"): "project.issue.change.apply.atomic.issues_create",
+        ("GET", "/api/task-dependencies"): "project.task.read.atomic.task_dependencies_list",
+        ("POST", "/api/task-dependencies"): "project.task.change.apply.atomic.task_dependencies_create",
+        ("POST", "/api/lists"): "project.list.change.apply.atomic.lists_create",
+        ("GET", "/api/follows"): "project.follow.read.atomic.follows_list",
+        ("POST", "/api/follows"): "project.follow.change.apply.atomic.follows_create",
+        ("GET", "/api/notifications"): "project.notification.read.atomic.notifications_list",
+        ("PATCH", "/api/notifications/read_all"): "project.notification.change.apply.atomic.notifications_mark_all_read",
+        ("GET", "/api/approval/orders"): "project.approval.read.atomic.approval_orders_search",
+        ("POST", "/api/approval/orders/{gid}/start"): "project.approval.change.apply.atomic.approval_orders_start",
+        ("GET", "/api/change-logs"): "project.change_log.read.atomic.change_logs_search",
+        ("GET", "/api/knowledge_entries"): "knowledge.search",
+        ("POST", "/api/knowledge_entries"): "knowledge.entry.change.apply.atomic.entries_create",
+        ("GET", "/api/knowledge_hub/items"): "knowledge.hub.read.atomic.items_list",
+        ("POST", "/api/knowledge_hub/items"): "knowledge.hub.change.apply.atomic.items_create",
+        ("GET", "/api/knowledge_hub/recent"): "knowledge.personalization.read.atomic.recent_list",
+        ("GET", "/api/ebom/vpps_check"): "craft.ebom.vpps_check.read",
+        ("GET", "/api/rules"): "craft.rule.library.read",
+        ("GET", "/api/import-export/templates"): "base.export_template.read",
+        ("POST", "/api/import-export/export/excel"): "craft.data_exchange.export",
+        ("POST", "/api/ai/confirm"): "agent.interaction.chat.change.apply",
+    }
+
+    assert {key: targets.get(key) for key in expected} == expected
+
+
 def test_task3_legacy_addition_review_is_complete_and_traceable() -> None:
     root = Path(__file__).resolve().parents[2]
     review = json.loads(
@@ -138,6 +176,18 @@ def test_task3_legacy_addition_review_is_complete_and_traceable() -> None:
     catalog_targets = {
         (entry["id"], entry["major_version"]): entry["lifecycle_status"]
         for entry in catalog["capabilities"]
+    }
+    atomicity = json.loads(
+        (root / "docs/governance/capability-atomicity-dispositions.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    replacements = {
+        (entry["capability_id"], entry["major_version"]): set(
+            entry["replacement_capabilities"]
+        )
+        for entry in atomicity["dispositions"]
+        if entry["disposition"] == "split"
     }
     original = [entry for entry in review["entries"] if entry["scope"] == "original_109"]
     retained = [entry for entry in original if entry["disposition"] == "retained"]
@@ -162,7 +212,14 @@ def test_task3_legacy_addition_review_is_complete_and_traceable() -> None:
             assert targets[key] == (target, major)
             assert catalog_targets[(target, major)] == "stable"
             evidence = entry["evidence"]
-            assert evidence["kind"] in {"capability_invocation", "exact_delegation"}
+            assert evidence["kind"] in {
+                "capability_invocation",
+                "exact_delegation",
+                "atomic_composition_invocation",
+                "facade_operation_invocation",
+                "facade_operation_delegation",
+                "facade_operation_delegation_chain",
+            }
 
             def anchored_text(anchor: dict) -> str:
                 assert set(anchor) == {
@@ -190,7 +247,7 @@ def test_task3_legacy_addition_review_is_complete_and_traceable() -> None:
                 invocation = evidence["expected_target_invocation"]
                 assert target in invocation
                 assert invocation in exact_calls(handler)
-            else:
+            elif evidence["kind"] == "exact_delegation":
                 symbol = evidence["delegation_symbol"]
                 delegation = evidence["expected_delegation"]
                 binding = anchored_text(evidence["binding"])
@@ -199,5 +256,49 @@ def test_task3_legacy_addition_review_is_complete_and_traceable() -> None:
                 assert f"def {symbol}" in binding
                 assert target in target_binding
                 assert target_binding in exact_calls(binding)
+            else:
+                facade = evidence["facade_capability"]
+                operation = evidence["operation"]
+                assert target == f"{facade}.atomic.{operation.replace('.', '_')}"
+                assert target in replacements[(facade, major)]
+                if evidence["kind"] == "atomic_composition_invocation":
+                    invocation = evidence["expected_facade_invocation"]
+                    symbol = evidence["composition_symbol"]
+                    binding = anchored_text(evidence["binding"])
+                    construction = evidence["expected_target_construction"]
+                    assert facade in invocation and operation in invocation
+                    assert symbol in invocation and invocation in exact_calls(handler)
+                    assert f"def {symbol}" in binding
+                    assert construction in binding
+                elif evidence["kind"] == "facade_operation_invocation":
+                    invocation = evidence["expected_facade_invocation"]
+                    assert facade in invocation and operation in invocation
+                    assert invocation in exact_calls(handler)
+                elif evidence["kind"] == "facade_operation_delegation_chain":
+                    symbol = evidence["delegation_symbol"]
+                    delegation = evidence["expected_delegation"]
+                    bridge = anchored_text(evidence["bridge"])
+                    facade_symbol = evidence["facade_symbol"]
+                    bridge_delegation = evidence["expected_bridge_delegation"]
+                    binding = anchored_text(evidence["binding"])
+                    facade_binding = evidence["expected_facade_binding"]
+                    assert symbol in delegation and operation in delegation
+                    assert delegation in exact_calls(handler)
+                    assert f"def {symbol}" in bridge
+                    assert facade_symbol in bridge_delegation
+                    assert bridge_delegation in exact_calls(bridge)
+                    assert f"def {facade_symbol}" in binding
+                    assert facade in facade_binding
+                    assert facade_binding in exact_calls(binding)
+                else:
+                    symbol = evidence["delegation_symbol"]
+                    delegation = evidence["expected_delegation"]
+                    binding = anchored_text(evidence["binding"])
+                    facade_binding = evidence["expected_facade_binding"]
+                    assert symbol in delegation and operation in delegation
+                    assert delegation in exact_calls(handler)
+                    assert f"def {symbol}" in binding
+                    assert facade in facade_binding
+                    assert facade_binding in exact_calls(binding)
         else:
             assert key not in targets

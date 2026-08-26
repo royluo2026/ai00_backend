@@ -15,6 +15,7 @@ from backend.capability_v2.consumer_routes import (
     RouteScanConfigurationError,
     load_lexical_non_routes,
     load_operations_exclusions,
+    load_wrapper_contracts,
     scan_web_api_routes,
 )
 from backend.capability_v2.route_inventory import (
@@ -44,6 +45,9 @@ OPERATIONS_EXCLUSIONS = (
 )
 LEXICAL_NON_ROUTES = (
     REPOSITORY_ROOT / "docs/governance/web-api-lexical-non-routes.json"
+)
+WRAPPER_CONTRACTS = (
+    REPOSITORY_ROOT / "docs/governance/web-api-wrapper-contracts.json"
 )
 
 
@@ -90,6 +94,7 @@ def build_report(web_root: Path, prefixes: tuple[str, ...] = DEFAULT_LEGACY_PREF
         frontend_revision=_frontend_revision(web_root),
         classification_prefixes=prefixes,
         lexical_non_routes=load_lexical_non_routes(LEXICAL_NON_ROUTES),
+        wrapper_contracts=load_wrapper_contracts(WRAPPER_CONTRACTS),
     )
 
 

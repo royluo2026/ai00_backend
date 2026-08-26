@@ -11,12 +11,15 @@ from pathlib import Path, PurePosixPath
 from typing import Literal
 
 from .consumer_routes import (
+    RouteScanConfigurationError,
     canonical_route_index,
     classify_route_disposition,
     load_lexical_non_routes,
     load_operations_exclusions,
+    load_wrapper_contracts,
     normalize_route,
     scan_web_api_routes,
+    wrapper_contracts_hash,
 )
 from .atomicity import load_atomicity_dispositions
 from .catalog_targets import CatalogTargetIndex
@@ -344,6 +347,23 @@ def _stored_web_route_failures(
         return 0, ["web_route_inventory_artifact_missing:1"]
     report = _load_json(artifact)
     failures: list[str] = []
+    wrapper_relative = configuration.get("web_wrapper_contracts_artifact")
+    if isinstance(wrapper_relative, str) and wrapper_relative:
+        wrapper_artifact = _relative_path(
+            root, wrapper_relative, field="web_wrapper_contracts_artifact"
+        )
+        if wrapper_artifact.is_file():
+            try:
+                current_wrapper_hash = wrapper_contracts_hash(
+                    load_wrapper_contracts(wrapper_artifact)
+                )
+            except RouteScanConfigurationError:
+                current_wrapper_hash = None
+            if (
+                current_wrapper_hash is not None
+                and report.get("wrapper_contracts_hash") != current_wrapper_hash
+            ):
+                failures.append("web_wrapper_contracts_evidence_drift:1")
     legacy_index = _web_route_index(
         root, configuration, "legacy_route_inventory_artifact"
     )
@@ -540,6 +560,35 @@ def _web_operations_exclusions(root: Path, configuration: dict):
     )
 
 
+def _web_wrapper_contracts(root: Path, configuration: dict):
+    relative = configuration.get("web_wrapper_contracts_artifact")
+    if not isinstance(relative, str) or not relative:
+        raise CompletionConfigurationError(
+            "web_wrapper_contracts_artifact must be a repository-relative path"
+        )
+    return load_wrapper_contracts(
+        _relative_path(root, relative, field="web_wrapper_contracts_artifact")
+    )
+
+
+def _stored_wrapper_contract_failures(root: Path, configuration: dict) -> list[str]:
+    relative = configuration.get("web_wrapper_contracts_artifact")
+    if relative is None:
+        return ["web_wrapper_contracts_artifact_unconfigured:1"]
+    if not isinstance(relative, str) or not relative:
+        raise CompletionConfigurationError(
+            "web_wrapper_contracts_artifact must be a repository-relative path"
+        )
+    artifact = _relative_path(root, relative, field="web_wrapper_contracts_artifact")
+    if not artifact.is_file():
+        return ["web_wrapper_contracts_artifact_missing:1"]
+    try:
+        load_wrapper_contracts(artifact)
+    except RouteScanConfigurationError:
+        return ["web_wrapper_contracts_artifact_invalid:1"]
+    return []
+
+
 def _route_inventory_failures(root: Path, configuration: dict) -> list[str]:
     artifacts = [
         (field, configuration.get(field))
@@ -644,6 +693,7 @@ def evaluate_completion(
     consumer_bypasses = _consumer_bypasses(root, configuration)
     web_consumer_bypasses = 0
     if mode == "strict" or web_root is not None:
+        failures.extend(_stored_wrapper_contract_failures(root, configuration))
         web_consumer_bypasses, stored_web_failures = _stored_web_route_failures(
             root, configuration
         )
@@ -691,6 +741,7 @@ def evaluate_completion(
             frontend_revision=_web_frontend_revision(web_root),
             classification_prefixes=tuple(web_prefixes),
             lexical_non_routes=lexical_non_routes,
+            wrapper_contracts=_web_wrapper_contracts(root, configuration),
         )
         web_consumer_bypasses = web_scan.unresolved_count
         lexical_unmatched = len(web_scan.lexical_audit.unmatched_tokens)

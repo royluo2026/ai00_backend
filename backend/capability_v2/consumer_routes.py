@@ -18,6 +18,33 @@ class RouteScanConfigurationError(ValueError):
 
 
 @dataclass(frozen=True)
+class SourceAnchor:
+    source_path: str
+    start_line: int
+    end_line: int
+    sha256: str
+
+
+@dataclass(frozen=True)
+class WrapperSignature:
+    route_argument: int
+    method_source: str
+    method_argument: int | None = None
+    default_method: str | None = None
+    method: str | None = None
+
+
+@dataclass(frozen=True)
+class WrapperContract:
+    source: str
+    source_sha256: str
+    callee: str
+    signature: WrapperSignature
+    definition: SourceAnchor
+    expected_definition: str
+
+
+@dataclass(frozen=True)
 class OperationsExclusion:
     route_method: str
     normalized_route: str
@@ -109,6 +136,7 @@ _DISPOSITIONS = (
 class RouteScanReport:
     frontend_revision: str
     content_hash: str
+    wrapper_contracts_hash: str
     scan_roots: tuple[str, ...]
     excluded_roots: tuple[str, ...]
     routes: tuple[RouteUse, ...]
@@ -150,6 +178,7 @@ class RouteScanReport:
         return {
             "frontend_revision": self.frontend_revision,
             "content_hash": self.content_hash,
+            "wrapper_contracts_hash": self.wrapper_contracts_hash,
             "scan_roots": list(self.scan_roots),
             "excluded_roots": list(self.excluded_roots),
             "counts": self.counts,
@@ -199,7 +228,15 @@ _DIRECT_METHOD = re.compile(
 _METHOD_ARGUMENT = re.compile(
     r"^\s*['\"](DELETE|GET|PATCH|POST|PUT)['\"]\s*,\s*$", re.IGNORECASE
 )
+_METHOD_VALUE = re.compile(
+    r"^\s*['\"](DELETE|GET|PATCH|POST|PUT)['\"]\s*$", re.IGNORECASE
+)
+_METHOD_KEY = re.compile(r"(?:\bmethod\b|['\"]method['\"])\s*:")
 _CALLEE = re.compile(r"([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)\s*$")
+_CONTRACT_CALLEE = re.compile(r"[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*")
+_SHA256 = re.compile(r"[0-9a-f]{64}")
+_HTTP_METHODS = {"DELETE", "GET", "PATCH", "POST", "PUT"}
+_WILDCARDS = frozenset("*?[]")
 _DEFAULT_GET_CALLS = {"fetch"}
 _METHOD_FIRST_CALLS = {"_cf"}
 _OPTIONS_METHOD_CALLS = {"fetch", "_cloudFetch"}
@@ -409,13 +446,129 @@ def _direct_options_method(source: str, literal_end: int, call_end: int) -> str 
     return None
 
 
+def _call_arguments(
+    source: str, open_paren: int, call_end: int
+) -> tuple[tuple[int, int], ...]:
+    arguments: list[tuple[int, int]] = []
+    start = open_paren + 1
+    depths = {"(": 0, "[": 0, "{": 0}
+    closing = {")": "(", "]": "[", "}": "{"}
+    quote: str | None = None
+    escaped = False
+    index = start
+    while index < call_end:
+        char = source[index]
+        if quote:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == quote:
+                quote = None
+            index += 1
+            continue
+        if char in {"'", '"', "`"}:
+            quote = char
+        elif char in depths:
+            depths[char] += 1
+        elif char in closing:
+            opened = closing[char]
+            if depths[opened]:
+                depths[opened] -= 1
+        elif char == "," and not any(depths.values()):
+            arguments.append((start, index))
+            start = index + 1
+        index += 1
+    if source[start:call_end].strip() or arguments:
+        arguments.append((start, call_end))
+    return tuple(arguments)
+
+
+def _object_options_method(value: str, default_method: str) -> str | None:
+    stripped = value.strip()
+    if not stripped:
+        return default_method
+    if stripped == "undefined":
+        return default_method
+    if not stripped.startswith("{") or not stripped.endswith("}"):
+        return None
+    depth = 0
+    quote: str | None = None
+    escaped = False
+    index = 0
+    while index < len(stripped):
+        char = stripped[index]
+        if quote:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == quote:
+                quote = None
+            index += 1
+            continue
+        if depth == 1:
+            direct = _DIRECT_METHOD.match(stripped, index)
+            if direct:
+                method = direct.group(1).upper()
+                return method if method in _HTTP_METHODS else None
+            if _METHOD_KEY.match(stripped, index):
+                return None
+        if char in {"'", '"', "`"}:
+            quote = char
+        elif char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+        index += 1
+    return default_method
+
+
+def _contract_method(
+    contract: WrapperContract,
+    source: str,
+    open_paren: int,
+    literal_start: int,
+    literal_end: int,
+) -> str | None:
+    call_end = _matching_paren(source, open_paren)
+    arguments = _call_arguments(source, open_paren, call_end)
+    signature = contract.signature
+    if signature.route_argument >= len(arguments):
+        return None
+    route_start, route_end = arguments[signature.route_argument]
+    if not (route_start <= literal_start and literal_end <= route_end):
+        return None
+    if signature.method_source == "constant":
+        return signature.method
+    assert signature.method_argument is not None
+    if signature.method_source == "method_argument":
+        if signature.method_argument >= len(arguments):
+            return None
+        start, end = arguments[signature.method_argument]
+        match = _METHOD_VALUE.fullmatch(source[start:end])
+        return match.group(1).upper() if match else None
+    if signature.method_argument >= len(arguments):
+        return signature.default_method
+    start, end = arguments[signature.method_argument]
+    assert signature.default_method is not None
+    return _object_options_method(source[start:end], signature.default_method)
+
+
 def _method_for_occurrence(
-    source: str, literal_start: int, literal_end: int
+    source: str,
+    literal_start: int,
+    literal_end: int,
+    wrapper_contract: WrapperContract | None = None,
 ) -> str | None:
     call = _find_call(source, literal_start)
     if call is None:
         return None
     callee, open_paren = call
+    if wrapper_contract is not None and wrapper_contract.callee == callee:
+        return _contract_method(
+            wrapper_contract, source, open_paren, literal_start, literal_end
+        )
     method_argument = _METHOD_ARGUMENT.match(source[open_paren + 1:literal_start])
     if method_argument and callee in _METHOD_FIRST_CALLS:
         return method_argument.group(1).upper()
@@ -566,6 +719,217 @@ def load_lexical_non_routes(path: Path) -> tuple[LexicalNonRoute, ...]:
     return tuple(parsed)
 
 
+def _exact_source_path(value: object, context: str) -> str:
+    if not isinstance(value, str) or not value or "\\" in value:
+        raise RouteScanConfigurationError(f"invalid wrapper contract {context}")
+    pure = PurePosixPath(value)
+    if pure.is_absolute() or ".." in pure.parts:
+        raise RouteScanConfigurationError(f"invalid wrapper contract {context}")
+    if any(character in value for character in _WILDCARDS):
+        raise RouteScanConfigurationError(f"wrapper contract wildcard is forbidden: {context}")
+    return value
+
+
+def _wrapper_signature(raw: object) -> WrapperSignature:
+    if not isinstance(raw, dict):
+        raise RouteScanConfigurationError("wrapper contract signature must be an object")
+    route_argument = raw.get("route_argument")
+    method_source = raw.get("method_source")
+    if not isinstance(route_argument, int) or isinstance(route_argument, bool) or route_argument < 0:
+        raise RouteScanConfigurationError("wrapper contract route argument is invalid")
+    if method_source == "constant":
+        if set(raw) != {"route_argument", "method_source", "method"}:
+            raise RouteScanConfigurationError("wrapper constant signature has invalid fields")
+        method = raw.get("method")
+        if not isinstance(method, str) or method.upper() not in _HTTP_METHODS:
+            raise RouteScanConfigurationError("wrapper constant method is invalid")
+        return WrapperSignature(route_argument, method_source, method=method.upper())
+    if method_source == "method_argument":
+        if set(raw) != {"route_argument", "method_source", "method_argument"}:
+            raise RouteScanConfigurationError("wrapper method-argument signature has invalid fields")
+        method_argument = raw.get("method_argument")
+        if (
+            not isinstance(method_argument, int)
+            or isinstance(method_argument, bool)
+            or method_argument < 0
+            or method_argument == route_argument
+        ):
+            raise RouteScanConfigurationError("wrapper method argument is invalid")
+        return WrapperSignature(route_argument, method_source, method_argument=method_argument)
+    if method_source == "options_argument":
+        if set(raw) != {
+            "route_argument", "method_source", "method_argument", "default_method"
+        }:
+            raise RouteScanConfigurationError("wrapper options signature has invalid fields")
+        method_argument = raw.get("method_argument")
+        default_method = raw.get("default_method")
+        if (
+            not isinstance(method_argument, int)
+            or isinstance(method_argument, bool)
+            or method_argument < 0
+            or method_argument == route_argument
+            or not isinstance(default_method, str)
+            or default_method.upper() not in _HTTP_METHODS
+        ):
+            raise RouteScanConfigurationError("wrapper options argument is invalid")
+        return WrapperSignature(
+            route_argument,
+            method_source,
+            method_argument=method_argument,
+            default_method=default_method.upper(),
+        )
+    raise RouteScanConfigurationError("wrapper contract method source is invalid")
+
+
+def load_wrapper_contracts(path: Path) -> tuple[WrapperContract, ...]:
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise RouteScanConfigurationError(f"invalid wrapper contracts: {path}") from exc
+    if not isinstance(document, dict) or document.get("schema_version") != 1:
+        raise RouteScanConfigurationError("unsupported wrapper contracts schema version")
+    entries = document.get("entries")
+    if not isinstance(entries, list):
+        raise RouteScanConfigurationError("wrapper contracts entries must be an array")
+    expected = {
+        "source", "source_sha256", "callee", "signature", "definition",
+        "expected_definition",
+    }
+    parsed: list[WrapperContract] = []
+    seen: set[tuple[str, str]] = set()
+    for raw in entries:
+        if not isinstance(raw, dict) or set(raw) != expected:
+            raise RouteScanConfigurationError("wrapper contract has invalid fields")
+        source = _exact_source_path(raw["source"], "source")
+        source_sha256 = raw["source_sha256"]
+        callee = raw["callee"]
+        expected_definition = raw["expected_definition"]
+        if not isinstance(source_sha256, str) or _SHA256.fullmatch(source_sha256) is None:
+            raise RouteScanConfigurationError("wrapper contract source hash is invalid")
+        if (
+            not isinstance(callee, str)
+            or any(character in callee for character in _WILDCARDS)
+            or _CONTRACT_CALLEE.fullmatch(callee) is None
+        ):
+            if isinstance(callee, str) and any(character in callee for character in _WILDCARDS):
+                raise RouteScanConfigurationError("wrapper contract wildcard is forbidden: callee")
+            raise RouteScanConfigurationError("wrapper contract callee is invalid")
+        if not isinstance(expected_definition, str) or not expected_definition:
+            raise RouteScanConfigurationError("wrapper expected definition is required")
+        anchor = raw["definition"]
+        if not isinstance(anchor, dict) or set(anchor) != {
+            "source_path", "start_line", "end_line", "sha256"
+        }:
+            raise RouteScanConfigurationError("wrapper definition anchor is invalid")
+        source_path = _exact_source_path(anchor["source_path"], "definition source")
+        start_line = anchor["start_line"]
+        end_line = anchor["end_line"]
+        sha256 = anchor["sha256"]
+        if (
+            not isinstance(start_line, int)
+            or isinstance(start_line, bool)
+            or not isinstance(end_line, int)
+            or isinstance(end_line, bool)
+            or start_line < 1
+            or end_line < start_line
+            or not isinstance(sha256, str)
+            or _SHA256.fullmatch(sha256) is None
+        ):
+            raise RouteScanConfigurationError("wrapper definition anchor is invalid")
+        key = source, callee
+        if key in seen:
+            raise RouteScanConfigurationError(
+                f"ambiguous wrapper contract: {source}:{callee}"
+            )
+        seen.add(key)
+        parsed.append(
+            WrapperContract(
+                source=source,
+                source_sha256=source_sha256,
+                callee=callee,
+                signature=_wrapper_signature(raw["signature"]),
+                definition=SourceAnchor(source_path, start_line, end_line, sha256),
+                expected_definition=expected_definition,
+            )
+        )
+    return tuple(parsed)
+
+
+def _validate_wrapper_contracts(
+    contracts: Sequence[WrapperContract],
+    sources: Mapping[str, str],
+) -> dict[tuple[str, str], WrapperContract]:
+    result: dict[tuple[str, str], WrapperContract] = {}
+    for contract in contracts:
+        if not isinstance(contract, WrapperContract):
+            raise RouteScanConfigurationError("wrapper contract must be an object")
+        key = contract.source, contract.callee
+        if key in result:
+            raise RouteScanConfigurationError(
+                f"ambiguous wrapper contract: {contract.source}:{contract.callee}"
+            )
+        source = sources.get(contract.source)
+        if source is None:
+            raise RouteScanConfigurationError(
+                f"wrapper contract source is stale: {contract.source}"
+            )
+        if hashlib.sha256(source.encode("utf-8")).hexdigest() != contract.source_sha256:
+            raise RouteScanConfigurationError(
+                f"wrapper contract source hash is stale: {contract.source}"
+            )
+        anchor = contract.definition
+        definition_source = sources.get(anchor.source_path)
+        if definition_source is None:
+            raise RouteScanConfigurationError(
+                f"wrapper contract definition source is stale: {anchor.source_path}"
+            )
+        lines = definition_source.splitlines(keepends=True)
+        if anchor.end_line > len(lines):
+            raise RouteScanConfigurationError(
+                f"wrapper contract definition range is stale: {anchor.source_path}"
+            )
+        definition = "".join(lines[anchor.start_line - 1:anchor.end_line])
+        if hashlib.sha256(definition.encode("utf-8")).hexdigest() != anchor.sha256:
+            raise RouteScanConfigurationError(
+                f"wrapper contract definition hash is stale: {anchor.source_path}"
+            )
+        if contract.expected_definition not in definition:
+            raise RouteScanConfigurationError(
+                f"wrapper contract definition is ambiguous: {anchor.source_path}"
+            )
+        result[key] = contract
+    return result
+
+
+def wrapper_contracts_hash(contracts: Sequence[WrapperContract]) -> str:
+    serialized: list[dict[str, object]] = []
+    for contract in sorted(contracts, key=lambda item: (item.source, item.callee)):
+        signature = {
+            "route_argument": contract.signature.route_argument,
+            "method_source": contract.signature.method_source,
+            "method_argument": contract.signature.method_argument,
+            "default_method": contract.signature.default_method,
+            "method": contract.signature.method,
+        }
+        serialized.append({
+            "source": contract.source,
+            "source_sha256": contract.source_sha256,
+            "callee": contract.callee,
+            "signature": signature,
+            "definition": {
+                "source_path": contract.definition.source_path,
+                "start_line": contract.definition.start_line,
+                "end_line": contract.definition.end_line,
+                "sha256": contract.definition.sha256,
+            },
+            "expected_definition": contract.expected_definition,
+        })
+    payload = json.dumps(
+        serialized, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
 def classify_route_disposition(
     method: str | None,
     route: str,
@@ -603,12 +967,20 @@ def scan_web_api_routes(
     *,
     classification_prefixes: Sequence[str] = (),
     lexical_non_routes: Sequence[LexicalNonRoute] = (),
+    wrapper_contracts: Sequence[WrapperContract] = (),
 ) -> RouteScanReport:
     """Discover every source ``/api/`` occurrence and assign one disposition."""
 
     if not isinstance(frontend_revision, str) or not frontend_revision:
         raise RouteScanConfigurationError("frontend revision is required")
     common_base, sources = _iter_sources(roots)
+    source_documents: dict[str, str] = {}
+    for path in sources:
+        relative = path.relative_to(common_base).as_posix()
+        source = path.read_text(encoding="utf-8")
+        _validate_source(source, relative, path)
+        source_documents[relative] = source
+    contract_index = _validate_wrapper_contracts(wrapper_contracts, source_documents)
     legacy_keys = canonical_route_index(legacy_index)
     bff_keys = canonical_route_index(bff_index)
     operations = _validate_exclusions(exclusions)
@@ -620,8 +992,7 @@ def scan_web_api_routes(
     digest = hashlib.sha256()
     for path in sources:
         relative = path.relative_to(common_base).as_posix()
-        source = path.read_text(encoding="utf-8")
-        _validate_source(source, relative, path)
+        source = source_documents[relative]
         digest.update(relative.encode("utf-8"))
         digest.update(b"\0")
         digest.update(source.encode("utf-8"))
@@ -644,7 +1015,11 @@ def scan_web_api_routes(
             line = source.count("\n", 0, route_offset) + 1
             line_start = source.rfind("\n", 0, route_offset) + 1
             column = route_offset - line_start + 1
-            method = _method_for_occurrence(scan_source, literal_start, literal_end)
+            call = _find_call(scan_source, literal_start)
+            contract = contract_index.get((relative, call[0])) if call else None
+            method = _method_for_occurrence(
+                scan_source, literal_start, literal_end, contract
+            )
             disposition = classify_route_disposition(
                 method, normalized, legacy_keys, bff_keys, operations_keys
             )
@@ -710,6 +1085,7 @@ def scan_web_api_routes(
     return RouteScanReport(
         frontend_revision=frontend_revision,
         content_hash=digest.hexdigest(),
+        wrapper_contracts_hash=wrapper_contracts_hash(wrapper_contracts),
         scan_roots=scan_roots,
         excluded_roots=_EXCLUDED_ROOTS,
         routes=tuple(routes),
@@ -770,6 +1146,9 @@ def scan_web_routes(
 
 
 __all__ = [
+    "SourceAnchor",
+    "WrapperContract",
+    "WrapperSignature",
     "OperationsExclusion",
     "LexicalAudit",
     "LexicalNonRoute",
@@ -780,6 +1159,8 @@ __all__ = [
     "classify_route_disposition",
     "load_operations_exclusions",
     "load_lexical_non_routes",
+    "load_wrapper_contracts",
+    "wrapper_contracts_hash",
     "normalize_route",
     "scan_web_api_routes",
     "scan_web_routes",

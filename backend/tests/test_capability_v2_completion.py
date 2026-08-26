@@ -91,7 +91,13 @@ def _complete_repository(tmp_path: Path) -> Path:
                 "proposed_final_catalog_capabilities": 173,
             },
             "web_route_inventory_artifact": "docs/web-routes.json",
+            "web_wrapper_contracts_artifact": "docs/web-wrapper-contracts.json",
         },
+    )
+    _write_json(
+        tmp_path,
+        "docs/web-wrapper-contracts.json",
+        {"schema_version": 1, "entries": []},
     )
     _write_json(
         tmp_path,
@@ -99,6 +105,7 @@ def _complete_repository(tmp_path: Path) -> Path:
         {
             "frontend_revision": "0" * 40,
             "content_hash": "0" * 64,
+            "wrapper_contracts_hash": hashlib.sha256(b"[]").hexdigest(),
             "scan_roots": [],
             "excluded_roots": [],
             "counts": {
@@ -585,6 +592,34 @@ def test_strict_completion_requires_stored_web_artifact_file(tmp_path: Path) -> 
     report = evaluate_completion(root, mode="strict")
 
     assert "web_route_inventory_artifact_missing:1" in report.failed
+
+
+def test_strict_completion_requires_checked_wrapper_contract_registry(
+    tmp_path: Path,
+) -> None:
+    root = _complete_repository(tmp_path)
+    path = root / "backend/governance/capability_v2_completion.json"
+    configuration = json.loads(path.read_text(encoding="utf-8"))
+    configuration.pop("web_wrapper_contracts_artifact")
+    path.write_text(json.dumps(configuration), encoding="utf-8")
+
+    report = evaluate_completion(root, mode="strict")
+
+    assert "web_wrapper_contracts_artifact_unconfigured:1" in report.failed
+
+
+def test_strict_completion_rejects_stored_wrapper_contract_hash_drift(
+    tmp_path: Path,
+) -> None:
+    root = _complete_repository(tmp_path)
+    path = root / "docs/web-routes.json"
+    report = json.loads(path.read_text(encoding="utf-8"))
+    report["wrapper_contracts_hash"] = "0" * 64
+    path.write_text(json.dumps(report), encoding="utf-8")
+
+    completion = evaluate_completion(root, mode="strict")
+
+    assert "web_wrapper_contracts_evidence_drift:1" in completion.failed
 
 
 def test_strict_completion_recomputes_unresolved_from_stored_routes(

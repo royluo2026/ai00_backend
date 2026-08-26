@@ -59,6 +59,14 @@
       "expires_at": "2026-11-21T23:59:59+08:00"
     },
     {
+      "route_method": "GET",
+      "normalized_route": "/api/file-store/config",
+      "owner": "platform-runtime",
+      "reason": "Reads deployment file-transfer adapter configuration; it does not execute a business capability.",
+      "approval_reference": "capability-governance-evidence-closure/task-3-fix-round-4",
+      "expires_at": "2026-11-21T23:59:59+08:00"
+    },
+    {
       "route_method": "POST",
       "normalized_route": "/api/file-store/ois-config",
       "owner": "platform-runtime",

@@ -1,0 +1,1130 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "source": "packages/agent-plugin/web/automation_hub/skill_lib.js",
+      "source_sha256": "66b7501f2f260657cb062e1afd4ad12206c03687c913c98cdc50aa5d0b046120",
+      "callee": "cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "packages/agent-plugin/web/automation_hub/skill_lib.js",
+        "start_line": 50,
+        "end_line": 53,
+        "sha256": "d27e18d643ba1ba31817dcebc19e24ddd4bf640037e1b3fdf52d6b45145dfc45"
+      },
+      "expected_definition": "function _cf()"
+    },
+    {
+      "source": "packages/agent-plugin/web/automation_hub/workflow_canvas.js",
+      "source_sha256": "8b896069a0962359dfb4be9fc4487428d2b37d08a2ca9a1e24e0d116a82b397b",
+      "callee": "cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "packages/agent-plugin/web/automation_hub/workflow_canvas.js",
+        "start_line": 1607,
+        "end_line": 1612,
+        "sha256": "f146c0610a31792a83c4bb585a74e022a9d6cf44f015efaaf903f3e5daeaf731"
+      },
+      "expected_definition": "_cf() { return window.top?._cloudFetch"
+    },
+    {
+      "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
+      "source_sha256": "945fed7c33750fb80d9860f03f46b2a0ea250579948d48e5f43b7154ad801151",
+      "callee": "_apiCall",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
+        "start_line": 11,
+        "end_line": 14,
+        "sha256": "5389cc4116ba54463f483e1d4512ea5a6278047c4e1ea306c700c375dfd0d635"
+      },
+      "expected_definition": "return fn(path, opts);"
+    },
+    {
+      "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+      "source_sha256": "098002214336b06613e34bddb618bb9ba9426b3f5171f047fce4002ca1443087",
+      "callee": "_fetchAiChatStreamRaw",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "constant",
+        "method": "POST"
+      },
+      "definition": {
+        "source_path": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+        "start_line": 622,
+        "end_line": 637,
+        "sha256": "c0091151940a7ee9c62397152e3dc25214fa82b621b3904d52f226467970344d"
+      },
+      "expected_definition": "method:  'POST'"
+    },
+    {
+      "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+      "source_sha256": "098002214336b06613e34bddb618bb9ba9426b3f5171f047fce4002ca1443087",
+      "callee": "window._cloudFetch",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "packages/core/electron/preload.js",
+        "start_line": 264,
+        "end_line": 278,
+        "sha256": "072d6ef2fed1b159158525a0fde7aba1f62782fd82a03feb7545ef71aa3e06f3"
+      },
+      "expected_definition": "async function _cloudFetch(path, opts = {})"
+    },
+    {
+      "source": "packages/craft-plugin/web/approval/approval.js",
+      "source_sha256": "18a4a09a2d1a8d2d250d39aa085df097fd2b05e14e909f2a56f4f8fb3eb25379",
+      "callee": "api",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "packages/craft-plugin/web/approval/approval.js",
+        "start_line": 6,
+        "end_line": 10,
+        "sha256": "5d96fa767a7c178abadc6ccab2a135a0260d4e5edb5512f632d651d920ba3a49"
+      },
+      "expected_definition": "return await fn(path, opts);"
+    },
+    {
+      "source": "packages/craft-plugin/web/bop/bop.js",
+      "source_sha256": "260381eb5085e4db977539518d7c32ef87c894b9cd85d6eff0d1fa3653611c07",
+      "callee": "ListShell._cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/list_shell.js",
+        "start_line": 1211,
+        "end_line": 1215,
+        "sha256": "40dd7e5a8dd46440b526e7d6aeb0d26cffde983594cdd671b5b345c5de9f4cd7"
+      },
+      "expected_definition": "static _cf(path, opts = {})"
+    },
+    {
+      "source": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
+      "source_sha256": "8ec26428a5601865046a7b336e9137233b30c7cc291452704f1ee712cd46ee35",
+      "callee": "ListShell._cfSafe",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/list_shell.js",
+        "start_line": 1218,
+        "end_line": 1221,
+        "sha256": "ffadc1c22e264e3e8646451b533728647fd37ec91685826caee27f699f4a24cf"
+      },
+      "expected_definition": "ListShell._cf(path, opts)"
+    },
+    {
+      "source": "packages/craft-plugin/web/craft_table/table.js",
+      "source_sha256": "64c975fec4fba2da426ff54485b34949119320ca5f08ff4663fbcce63dcd505c",
+      "callee": "fn",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "packages/craft-plugin/web/craft_table/table.js",
+        "start_line": 71,
+        "end_line": 71,
+        "sha256": "ea464bf07bb099746263f35232d256550a51685bf3167003711009204d88da3e"
+      },
+      "expected_definition": "const fn = window.parent?._cloudFetch || window._cloudFetch;"
+    },
+    {
+      "source": "packages/craft-plugin/web/ebom/ebom.js",
+      "source_sha256": "637d879f9a11b8e3b6f37ac4e72f18c3ac2587351f99e6cde770dcb0e7056495",
+      "callee": "_cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "packages/craft-plugin/web/ebom/ebom.js",
+        "start_line": 30,
+        "end_line": 33,
+        "sha256": "a54c8ae8c53f376bda8eda46955f64285930a8f6c81260436f1d1796f09b6e9a"
+      },
+      "expected_definition": "return fn(path, opts)"
+    },
+    {
+      "source": "packages/craft-plugin/web/issue/issue.js",
+      "source_sha256": "b7ae96fb40a57076fc6c0756487fe2db56b4fd7fb0ec4d26989a74982d054572",
+      "callee": "ListShell._cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/list_shell.js",
+        "start_line": 1211,
+        "end_line": 1215,
+        "sha256": "40dd7e5a8dd46440b526e7d6aeb0d26cffde983594cdd671b5b345c5de9f4cd7"
+      },
+      "expected_definition": "static _cf(path, opts = {})"
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
+      "source_sha256": "92fea88f5bf82fd53ec0cde972145dd7ef9acb127babcca26240fb50c2080de7",
+      "callee": "this._cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
+        "start_line": 517,
+        "end_line": 521,
+        "sha256": "7def55a201a3d0ce8d0fcd10a38dd63081ad9e1306e18548efe0925e71a98a60"
+      },
+      "expected_definition": "this._cf        = opts.cf;"
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+      "source_sha256": "d40c42ec3c3be5d7efe63cdd23523a63dfae729c00fbfd6e37b31d357a14d02a",
+      "callee": "this._cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+        "start_line": 197,
+        "end_line": 209,
+        "sha256": "e21e1495d0faa53e6bb74fdb4d7d710057fc3fd45cd53a5c8326b88e73c542c9"
+      },
+      "expected_definition": "opts.cf             - _cloudFetch(path, opts?)"
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/lineage.js",
+      "source_sha256": "279e1855579b8d23849af1c08013dc4da4d80b9e37ed16841a68cb791753384e",
+      "callee": "_cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "packages/craft-plugin/web/lineage_view/lineage.js",
+        "start_line": 141,
+        "end_line": 144,
+        "sha256": "e928daef7524a09ebd1b01a3009c6ba321b1b40999cf4bbc4c67fdb16cbde5e1"
+      },
+      "expected_definition": "return fn(path, opts);"
+    },
+    {
+      "source": "packages/craft-plugin/web/pbom_check/pbom_check.js",
+      "source_sha256": "0485ce323d2c9f167ecda7fdff9e2ac9b9067b511f31b31afb7559e7d0c87209",
+      "callee": "window._cloudFetch",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "packages/core/electron/preload.js",
+        "start_line": 264,
+        "end_line": 278,
+        "sha256": "072d6ef2fed1b159158525a0fde7aba1f62782fd82a03feb7545ef71aa3e06f3"
+      },
+      "expected_definition": "async function _cloudFetch(path, opts = {})"
+    },
+    {
+      "source": "packages/craft-plugin/web/std_op_lib/std_op_lib.js",
+      "source_sha256": "0728ea582a1a63ed1596ee8eed9fc8ac884c098df079833a2a6c14759f179a4f",
+      "callee": "ListShell._cfSafe",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/list_shell.js",
+        "start_line": 1218,
+        "end_line": 1221,
+        "sha256": "ffadc1c22e264e3e8646451b533728647fd37ec91685826caee27f699f4a24cf"
+      },
+      "expected_definition": "ListShell._cf(path, opts)"
+    },
+    {
+      "source": "packages/craft-plugin/web/std_op_lib/std_op_lib.js",
+      "source_sha256": "0728ea582a1a63ed1596ee8eed9fc8ac884c098df079833a2a6c14759f179a4f",
+      "callee": "ListShell.buildLoadHandler",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "constant",
+        "method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/list_shell.js",
+        "start_line": 1276,
+        "end_line": 1286,
+        "sha256": "73855212080e250b33bf1302a26d1be521ffabeffbc4c19133dafb2b0761cf33"
+      },
+      "expected_definition": "ListShell._cfSafe(`${cloudPath}?${qp}`)"
+    },
+    {
+      "source": "packages/craft-plugin/web/task/task.js",
+      "source_sha256": "ca7d14eb741a30c6536cecccd07a1e7fbb455c31430feeaef3bcedca8303ad1b",
+      "callee": "ListShell._cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/list_shell.js",
+        "start_line": 1211,
+        "end_line": 1215,
+        "sha256": "40dd7e5a8dd46440b526e7d6aeb0d26cffde983594cdd671b5b345c5de9f4cd7"
+      },
+      "expected_definition": "static _cf(path, opts = {})"
+    },
+    {
+      "source": "packages/plugin-sdk/template/web/app.js",
+      "source_sha256": "1d67c59addd59166bde0521a83dd277dcf8fb3e18ceb4cfaa7319869459ea189",
+      "callee": "AI00.fetch",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "packages/plugin-sdk/frontend/plugin-sdk.js",
+        "start_line": 47,
+        "end_line": 50,
+        "sha256": "d2e45b09573eb6c2e1e1b8f20125509db72407de041753f38a56af78153880d5"
+      },
+      "expected_definition": "return cf(path, opts);"
+    },
+    {
+      "source": "web/admin/task_planning.html",
+      "source_sha256": "9458faf6cb26c55b84344d405084358da501c59cae64b8725f18b559fd6b29e7",
+      "callee": "_cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/admin/task_planning.html",
+        "start_line": 980,
+        "end_line": 983,
+        "sha256": "ce1e794327dc69d65569dd76ff5412aa1e5a0878ee2f73a451d3895318cdc09f"
+      },
+      "expected_definition": "return fn(path, opts);"
+    },
+    {
+      "source": "web/canvas/types/flow_type.js",
+      "source_sha256": "b6c284146ec80a8ec4c3ee03e3776ed4f50fe568babaf58825c1dc1d24f17081",
+      "callee": "cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/canvas/types/flow_type.js",
+        "start_line": 109,
+        "end_line": 110,
+        "sha256": "6d5289002e23317f81b13dc1a062ad0145903025870f48086dcb297734fb8fea"
+      },
+      "expected_definition": "const cf = _cf()?._cloudFetch;"
+    },
+    {
+      "source": "web/canvas/types/flow_type.js",
+      "source_sha256": "b6c284146ec80a8ec4c3ee03e3776ed4f50fe568babaf58825c1dc1d24f17081",
+      "callee": "cfObj._cloudFetch",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/canvas/types/flow_type.js",
+        "start_line": 151,
+        "end_line": 154,
+        "sha256": "2bdc56390a03e43229ac86909a81f44bc11a85cc0bf131b70a60c7df9a70f38e"
+      },
+      "expected_definition": "return window.parent?._cloudFetch ? window.parent"
+    },
+    {
+      "source": "web/components/attachments_widget.js",
+      "source_sha256": "196573922eb03b0dc6981e68b554894917f0497e101fdd62256c23455994f43a",
+      "callee": "cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/attachments_widget.js",
+        "start_line": 158,
+        "end_line": 158,
+        "sha256": "84e924d88d74dead6efef41e94cf81f873cfdd66ad5d31fa6fcf6cfee8fc6c51"
+      },
+      "expected_definition": "const cf = window._cloudFetch || window.parent?._cloudFetch;"
+    },
+    {
+      "source": "web/components/bitable_sync_manager.js",
+      "source_sha256": "d549e4b63078017d6101cf92ca977df5b733e286fa1faba987c086d4aeab3128",
+      "callee": "window._cloudFetch",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "packages/core/electron/preload.js",
+        "start_line": 264,
+        "end_line": 278,
+        "sha256": "072d6ef2fed1b159158525a0fde7aba1f62782fd82a03feb7545ef71aa3e06f3"
+      },
+      "expected_definition": "async function _cloudFetch(path, opts = {})"
+    },
+    {
+      "source": "web/components/diff_manager.js",
+      "source_sha256": "7581dc52e817dc616a461b479e017343c3db452dd8af314dcb2338ba97efa727",
+      "callee": "this._cloudPost",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "constant",
+        "method": "POST"
+      },
+      "definition": {
+        "source_path": "web/components/diff_manager.js",
+        "start_line": 664,
+        "end_line": 669,
+        "sha256": "a90e5eaced82a6c32b8cc7d0323c08889e3afdd1490f13daa8411c1e6ee55823"
+      },
+      "expected_definition": "method: 'POST'"
+    },
+    {
+      "source": "web/components/import_export.js",
+      "source_sha256": "0f66456b60284285b989fcde11b9a60056d011b08f152d6ab0f34e30c274a359",
+      "callee": "this._cloudGet",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "constant",
+        "method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/import_export.js",
+        "start_line": 882,
+        "end_line": 888,
+        "sha256": "641b36c4f69d76310e0f5941dfc540ca0842883dc3845e1d0e98c68c6118be97"
+      },
+      "expected_definition": "const resp = await fn(path);"
+    },
+    {
+      "source": "web/components/import_export.js",
+      "source_sha256": "0f66456b60284285b989fcde11b9a60056d011b08f152d6ab0f34e30c274a359",
+      "callee": "this._cloudPost",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "constant",
+        "method": "POST"
+      },
+      "definition": {
+        "source_path": "web/components/import_export.js",
+        "start_line": 890,
+        "end_line": 896,
+        "sha256": "07ed40d8280836b94803722da1c22e5d52620de18fa6d8a375df80f389cb6e80"
+      },
+      "expected_definition": "method: 'POST'"
+    },
+    {
+      "source": "web/components/import_export.js",
+      "source_sha256": "0f66456b60284285b989fcde11b9a60056d011b08f152d6ab0f34e30c274a359",
+      "callee": "this._cloudPatch",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "constant",
+        "method": "PATCH"
+      },
+      "definition": {
+        "source_path": "web/components/import_export.js",
+        "start_line": 898,
+        "end_line": 904,
+        "sha256": "02e43679ea186ff2e497bec5c3d7d6d7062a4e96b7c3dd2a3de3405e82dc51a6"
+      },
+      "expected_definition": "method: 'PATCH'"
+    },
+    {
+      "source": "web/components/list_nav.html",
+      "source_sha256": "9cb86e13d1cc152d5f5ed70b9cdf329e80578c6381587cdba279a9cef3d23875",
+      "callee": "cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/list_nav.html",
+        "start_line": 128,
+        "end_line": 128,
+        "sha256": "708de4f9278cb79d0140016246f743ee748083f0a395b945c132e9f87283d69c"
+      },
+      "expected_definition": "const cf = window._cloudFetch || window.parent?._cloudFetch;"
+    },
+    {
+      "source": "web/components/list_shell.js",
+      "source_sha256": "265854a2b3dba06b26d9b79246fd568efef8c6f1f64c38845bb3e8d773e5ac98",
+      "callee": "ListShell._cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/list_shell.js",
+        "start_line": 1211,
+        "end_line": 1215,
+        "sha256": "40dd7e5a8dd46440b526e7d6aeb0d26cffde983594cdd671b5b345c5de9f4cd7"
+      },
+      "expected_definition": "static _cf(path, opts = {})"
+    },
+    {
+      "source": "web/components/list_shell.js",
+      "source_sha256": "265854a2b3dba06b26d9b79246fd568efef8c6f1f64c38845bb3e8d773e5ac98",
+      "callee": "this.cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/list_shell.js",
+        "start_line": 1160,
+        "end_line": 1163,
+        "sha256": "1e2ac1dd1f6bce2977c3c093872209041e2c507c14c4c4245b0382d513d69f55"
+      },
+      "expected_definition": "if (cf) return cf(path, opts);"
+    },
+    {
+      "source": "web/components/list_sidebar.js",
+      "source_sha256": "a02feed0a9eb44e42c60782183d436a9df49b20b4191beb3020527a58f952702",
+      "callee": "this._cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/list_sidebar.js",
+        "start_line": 77,
+        "end_line": 80,
+        "sha256": "000237cbfdb1872bcaf9e75502bef34af56d3a93b97864af9ef7e5eb19ddb1dd"
+      },
+      "expected_definition": "if (cf) return cf(path, opts);"
+    },
+    {
+      "source": "web/components/list_tree.html",
+      "source_sha256": "8bdb8a92933eee984887d55362bb8d7ac56ffaba5450972f5e3d682f12c8ba38",
+      "callee": "cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/list_tree.html",
+        "start_line": 273,
+        "end_line": 273,
+        "sha256": "2c2a3d1ee8da1401b036aadbe482a948bfad0c4a5d8abf75cd54ace7aee4fb07"
+      },
+      "expected_definition": "const cf  = window._cloudFetch || window.parent?._cloudFetch || window.top?._cloudFetch;"
+    },
+    {
+      "source": "web/components/quick_list.html",
+      "source_sha256": "92fa2ac3650e17ec1f9a02b206248c89affb68e6174c62f4eafaaf4a12264626",
+      "callee": "cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/quick_list.html",
+        "start_line": 309,
+        "end_line": 312,
+        "sha256": "4f991d9a4d4b5304be438e69c43c8c82949fcf2f9bd152a1e788eaad54345015"
+      },
+      "expected_definition": "const cf = _cf();"
+    },
+    {
+      "source": "web/components/scope_badge.js",
+      "source_sha256": "2d04b6612e4c6a09b3dbc5e0639b39082d779bd73472bb064ebae640c9352b09",
+      "callee": "cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/scope_badge.js",
+        "start_line": 122,
+        "end_line": 122,
+        "sha256": "89d8105ae3b1635193a3b4d2473a47729b9e904854c01104db930308459a4663"
+      },
+      "expected_definition": "const cf = (window.parent && window.parent._cloudFetch) || window._cloudFetch;"
+    },
+    {
+      "source": "web/components/self_annotation_panel.js",
+      "source_sha256": "f71c0481f4796532b1267048d6304a9d2f1f42ac80f7fe21a200c798ab75a995",
+      "callee": "_cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/self_annotation_panel.js",
+        "start_line": 20,
+        "end_line": 223,
+        "sha256": "ed7e0383ea00ce8c2c11d1c660df85e7349c0dafdf88ba5074b0abc5949cd3eb"
+      },
+      "expected_definition": "function _cf(path, opts)"
+    },
+    {
+      "source": "web/components/sidebar_detail_panel.js",
+      "source_sha256": "c6545f40a322ba980582c7f4681dc2d22b7e70f4743c082b901723ba3ebe949a",
+      "callee": "cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/sidebar_detail_panel.js",
+        "start_line": 609,
+        "end_line": 609,
+        "sha256": "d0791776c644d3ee357eda20f1d7ed38d9f11e7518df54d4b4683c6343122f3c"
+      },
+      "expected_definition": "const cf = window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;"
+    },
+    {
+      "source": "web/components/subscribe_button.js",
+      "source_sha256": "267347cf2feebe0aa377e7b646d921bb6c01b534d517131bd793a275d702300d",
+      "callee": "cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/subscribe_button.js",
+        "start_line": 13,
+        "end_line": 20,
+        "sha256": "28d06e13fd46523c33982a2b8f112ea615d7c11877aa8985990a42f7a70e3bc1"
+      },
+      "expected_definition": "cf,           // cloudFetch"
+    },
+    {
+      "source": "web/components/view_manager.js",
+      "source_sha256": "31dfef4f2356866fe3466b10ada8dbe655ac4c720ba8a7006e1f6302ddfc67c0",
+      "callee": "fn",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/view_manager.js",
+        "start_line": 538,
+        "end_line": 538,
+        "sha256": "019433881b343a942a44a52c77bd406ff03626209533e2c97042a87ba3979558"
+      },
+      "expected_definition": "const fn = window.parent?._cloudFetch || window._cloudFetch;"
+    },
+    {
+      "source": "web/components/visibility_selector.js",
+      "source_sha256": "61e771f0a8832f9acbf5743af0d74d503e02f41d23f8da8bf77acc9bffd76f2b",
+      "callee": "cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/visibility_selector.js",
+        "start_line": 47,
+        "end_line": 50,
+        "sha256": "e579527d5c7471dc80b1d16c9b4478fe836035e4f26f947f47c1a42e86888026"
+      },
+      "expected_definition": "const cf = _cf();"
+    },
+    {
+      "source": "web/container_card/modes/container_item_detail.js",
+      "source_sha256": "c3efacb547e794ec806c02c85680a241f3b0e507756971ae97981f81045b7fad",
+      "callee": "_cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/container_card/modes/container_item_detail.js",
+        "start_line": 76,
+        "end_line": 79,
+        "sha256": "0e67a19859e4a4ca2c3a89b3437dae3d5973a0d36350d2af673a4d620378973c"
+      },
+      "expected_definition": "if (cf) return cf(path, opts);"
+    },
+    {
+      "source": "web/container_card/modes/mode_field_detail.js",
+      "source_sha256": "a7f29d41afa2601ea1c34aeed7cf8a298dfaf7de487ee00e3048d5c585561917",
+      "callee": "cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/container_card/modes/mode_field_detail.js",
+        "start_line": 28,
+        "end_line": 40,
+        "sha256": "e9d05c4141eba20da244dc96ea4b6350b65a5d0b98e15154e98110f788d78f53"
+      },
+      "expected_definition": "const cf = cloudFetch || window.top?._cloudFetch"
+    },
+    {
+      "source": "web/container_card/modes/mode_image_gallery.js",
+      "source_sha256": "8906826f13efc3d72ec9da7e607b56753c2b61a2a2bd6185d659fe6b7655648a",
+      "callee": "cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/container_card/modes/mode_image_gallery.js",
+        "start_line": 24,
+        "end_line": 46,
+        "sha256": "59f3978aca674a405a0acd5e4a5c87e73429167b77fc24f174a005a945f21359"
+      },
+      "expected_definition": "const cf = window.parent?._cloudFetch || window._cloudFetch;"
+    },
+    {
+      "source": "web/container_card/modes/mode_richtext.js",
+      "source_sha256": "954c63c4e8abdc2d3b8358637ea359420031d599199bee849463be1419d302a8",
+      "callee": "cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/container_card/modes/mode_richtext.js",
+        "start_line": 57,
+        "end_line": 64,
+        "sha256": "9bffc1d068c5e76379a36c4579769f39110c9eaed48399e26300ea2ddd1bb381"
+      },
+      "expected_definition": "const cf = _cf();"
+    },
+    {
+      "source": "web/container_card/modes/mode_text_image.js",
+      "source_sha256": "ae5442b2fd701833f0a28ed8ce4c785af10fbcfe9af8ee5219ec66f5f1568ed0",
+      "callee": "cloudFetch",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "constant",
+        "method": "GET"
+      },
+      "definition": {
+        "source_path": "web/container_card/modes/mode_text_image.js",
+        "start_line": 23,
+        "end_line": 26,
+        "sha256": "261d4f96721126474e3f5b5c85a8295e5b806e894c127ab68da9298a0d14286e"
+      },
+      "expected_definition": "const res = await cloudFetch(`/api/${itemType}s/${gid}`);"
+    },
+    {
+      "source": "web/core/global_search.js",
+      "source_sha256": "faec99392430722ada551c45de25d4700cf373a818c4c7d1a8a651541a74af84",
+      "callee": "window._cloudFetch",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "packages/core/electron/preload.js",
+        "start_line": 264,
+        "end_line": 278,
+        "sha256": "072d6ef2fed1b159158525a0fde7aba1f62782fd82a03feb7545ef71aa3e06f3"
+      },
+      "expected_definition": "async function _cloudFetch(path, opts = {})"
+    },
+    {
+      "source": "web/core/notification_manager.js",
+      "source_sha256": "d98e9b408e9dcda7774abe3080dcedb004d3b2940ffa0710be491d0189e636aa",
+      "callee": "_cloudFetch",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/core/notification_manager.js",
+        "start_line": 16,
+        "end_line": 18,
+        "sha256": "2206cc9a6af2c47a2658ccf69ffeca65c5f51f145f7f2b3a743841ab4d33a8ff"
+      },
+      "expected_definition": "return window._cloudFetch(path, opts);"
+    },
+    {
+      "source": "web/ext_datasource/ext_ds.js",
+      "source_sha256": "7e961869786921e6d981bce2678f6c231371fb45bdf99133b28c9210887bdb7a",
+      "callee": "_cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/ext_datasource/ext_ds.js",
+        "start_line": 7,
+        "end_line": 10,
+        "sha256": "bb0c7d651567b67238c517bb69d673bb89c2da6931f108c323b8f43b41681735"
+      },
+      "expected_definition": "return fn(path, opts);"
+    },
+    {
+      "source": "web/feishu/feishu.js",
+      "source_sha256": "b8899310fc924aea9995ee00487240bd61a17aa3dec18c3cc138e1c5609014a7",
+      "callee": "cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/feishu/feishu.js",
+        "start_line": 20,
+        "end_line": 20,
+        "sha256": "708de4f9278cb79d0140016246f743ee748083f0a395b945c132e9f87283d69c"
+      },
+      "expected_definition": "const cf = window._cloudFetch || window.parent?._cloudFetch;"
+    },
+    {
+      "source": "web/knowledge/knowledge.js",
+      "source_sha256": "a59a5f859c363edcb4ee0ddcecfa7c7afe0ad845c24bd4956d4ed6342cf69141",
+      "callee": "ListShell._cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/list_shell.js",
+        "start_line": 1211,
+        "end_line": 1215,
+        "sha256": "40dd7e5a8dd46440b526e7d6aeb0d26cffde983594cdd671b5b345c5de9f4cd7"
+      },
+      "expected_definition": "static _cf(path, opts = {})"
+    },
+    {
+      "source": "web/knowledge/knowledge.js",
+      "source_sha256": "a59a5f859c363edcb4ee0ddcecfa7c7afe0ad845c24bd4956d4ed6342cf69141",
+      "callee": "ListShell.buildLoadHandler",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "constant",
+        "method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/list_shell.js",
+        "start_line": 1276,
+        "end_line": 1286,
+        "sha256": "73855212080e250b33bf1302a26d1be521ffabeffbc4c19133dafb2b0761cf33"
+      },
+      "expected_definition": "ListShell._cfSafe(`${cloudPath}?${qp}`)"
+    },
+    {
+      "source": "web/knowledge_hub/knowledge_hub.js",
+      "source_sha256": "a0ce1f0c96e4c816ac0b3b53a578cfe0bfbd4598c44a62a5c1beaf4e96e2e48d",
+      "callee": "cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/knowledge_hub/knowledge_hub.js",
+        "start_line": 8,
+        "end_line": 10,
+        "sha256": "9e53a5fa03b790bbf959fd9af960094da63f2ec7ad16e2318a7b48be95720a62"
+      },
+      "expected_definition": "return window._cloudFetch || window.parent?._cloudFetch || null;"
+    },
+    {
+      "source": "web/knowledge_hub/pages/factory_info.html",
+      "source_sha256": "24e032d324fa220b3d10bbc284887f77a6f5b88a6f882f563fe6fd44d9de85d0",
+      "callee": "cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/knowledge_hub/pages/factory_info.html",
+        "start_line": 310,
+        "end_line": 319,
+        "sha256": "5cff3f897c3ef5d102bd5232214f21e24eff24085578d5674e834e597b7a90a4"
+      },
+      "expected_definition": "if (w._cloudFetch) return w._cloudFetch;"
+    },
+    {
+      "source": "web/knowledge_hub/pages/gbop_vpps.html",
+      "source_sha256": "8903711c3e9b01c6aa32cf44cfac673fb358d0984caa4c2a8e70f94c8249d9f1",
+      "callee": "cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/knowledge_hub/pages/gbop_vpps.html",
+        "start_line": 198,
+        "end_line": 207,
+        "sha256": "5cff3f897c3ef5d102bd5232214f21e24eff24085578d5674e834e597b7a90a4"
+      },
+      "expected_definition": "if (w._cloudFetch) return w._cloudFetch;"
+    },
+    {
+      "source": "web/main.js",
+      "source_sha256": "a31b1e2083a6b9a2d3c3290267bea98f6320a5b7aa5e40d6a914040f89a8ef88",
+      "callee": "window._cloudFetch",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/main.js",
+        "start_line": 1081,
+        "end_line": 1094,
+        "sha256": "85ed207676755427ce9225c36f087b697bd5d5db79e8c7f56a08a7e68f71fe3a"
+      },
+      "expected_definition": "const method = opts.method || 'GET';"
+    },
+    {
+      "source": "web/ontology/ontology.js",
+      "source_sha256": "89db52c2dabaa6d92953a4b4300b5081a3912587ba78d5df9f71c9e904a9e585",
+      "callee": "_cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/ontology/ontology.js",
+        "start_line": 18,
+        "end_line": 21,
+        "sha256": "bb0c7d651567b67238c517bb69d673bb89c2da6931f108c323b8f43b41681735"
+      },
+      "expected_definition": "return fn(path, opts);"
+    },
+    {
+      "source": "web/org_mgmt/org_mgmt.js",
+      "source_sha256": "fad0e295549c2969854978e025ec652fa8fcdae0cc7d815be8195a2cb8984c83",
+      "callee": "api",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/org_mgmt/org_mgmt.js",
+        "start_line": 13,
+        "end_line": 20,
+        "sha256": "cf562a8fd5507ece9cbae5c0c5781dd344e16a771bae7925b7222303d50f22c1"
+      },
+      "expected_definition": "return await cf(path, opts);"
+    },
+    {
+      "source": "web/rule_mgmt/rule_mgmt.js",
+      "source_sha256": "8a5ee070a1e5c23b61db24edbe2d37a254bc18045bc330e29240c843de27f91b",
+      "callee": "ListShell._cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/list_shell.js",
+        "start_line": 1211,
+        "end_line": 1215,
+        "sha256": "40dd7e5a8dd46440b526e7d6aeb0d26cffde983594cdd671b5b345c5de9f4cd7"
+      },
+      "expected_definition": "static _cf(path, opts = {})"
+    },
+    {
+      "source": "web/rule_mgmt/rule_mgmt.js",
+      "source_sha256": "8a5ee070a1e5c23b61db24edbe2d37a254bc18045bc330e29240c843de27f91b",
+      "callee": "ListShell.buildLoadHandler",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "constant",
+        "method": "GET"
+      },
+      "definition": {
+        "source_path": "web/components/list_shell.js",
+        "start_line": 1276,
+        "end_line": 1286,
+        "sha256": "73855212080e250b33bf1302a26d1be521ffabeffbc4c19133dafb2b0761cf33"
+      },
+      "expected_definition": "ListShell._cfSafe(`${cloudPath}?${qp}`)"
+    },
+    {
+      "source": "web/settings/settings.js",
+      "source_sha256": "3139807edda51dada2d8faff45ba627478faa259cb2de03bbd9170b2b72c6e40",
+      "callee": "_backendFetch",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/settings/settings.js",
+        "start_line": 1226,
+        "end_line": 1246,
+        "sha256": "f3ecd2e7f75750fea960f153f537821493ae0be3f86a6ce9a1126afde4c7a6aa"
+      },
+      "expected_definition": "...opts,"
+    },
+    {
+      "source": "web/team_space/team_space.js",
+      "source_sha256": "6467204aaa1a42765adb0705d3b5f5068d8291f04c4b5f7a3e9692f2eee1ee08",
+      "callee": "_cf",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/team_space/team_space.js",
+        "start_line": 26,
+        "end_line": 29,
+        "sha256": "c4894067216fb59f3497194261dfc26501d4861b15259c1f87370fc4171056a4"
+      },
+      "expected_definition": "return fetch(path, opts);"
+    },
+    {
+      "source": "web/workbench/workbench.js",
+      "source_sha256": "e247fe2a09440d8a9dc3fef4c4da7bff36490f041104f05e9fc32bef6641c78f",
+      "callee": "fn",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/workbench/workbench.js",
+        "start_line": 1178,
+        "end_line": 1178,
+        "sha256": "0a9386921b21e410fea98f17d4228a2a198e578bfb51ee6fc774f873895d1a4e"
+      },
+      "expected_definition": "function _cf() { return window._cloudFetch || window.parent?._cloudFetch || null; }"
+    },
+    {
+      "source": "web/workspace/nav_manager.js",
+      "source_sha256": "12a04db6aa114243bc5f1e24ec48719bcf91ad38d952f58f7ea9707f3aecc606",
+      "callee": "window._cloudFetch",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "packages/core/electron/preload.js",
+        "start_line": 264,
+        "end_line": 278,
+        "sha256": "072d6ef2fed1b159158525a0fde7aba1f62782fd82a03feb7545ef71aa3e06f3"
+      },
+      "expected_definition": "async function _cloudFetch(path, opts = {})"
+    }
+  ]
+}
