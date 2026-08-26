@@ -890,7 +890,13 @@ def main(argv: list[str] | None = None) -> int:
     existing = load_registry()
     discovered = discover_user_functions()
     if args.check or args.strict:
-        errors = registry_errors(existing, discovered, include_governance=False)
+        catalog_index = (
+            CatalogTargetIndex.from_catalog(json.loads(CATALOG_PATH.read_text(encoding="utf-8")))
+            if args.strict else None
+        )
+        errors = registry_errors(
+            existing, discovered, include_governance=False, catalog_index=catalog_index,
+        )
         if args.strict:
             reviews = load_coverage_reviews()
             errors.extend(review_disposition_errors(existing, reviews, load_catalog_owners()))

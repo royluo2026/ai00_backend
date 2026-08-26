@@ -17,6 +17,12 @@ def test_orchestration_registry_audit_requires_catalog_capability(tmp_path: Path
     report = audit_orchestration_registry(registry, {"capabilities": [{"id": "base.present"}]})
 
     assert report.missing_capabilities == ("task-1:base.missing",)
+    assert report.serialized()["target_failures"] == [{
+        "entry_key": "task-1",
+        "reason_code": "target_missing",
+        "capability_id": "base.missing",
+        "major_version": 1,
+    }]
     assert report.passed is False
 
 

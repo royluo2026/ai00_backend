@@ -104,7 +104,7 @@ def audit_orchestration_registry(
         resolution = catalog_index.resolve_stable(capability_id, major_version, owner_domain)
         if resolution.reason_code == "target_missing":
             missing.append(f"{key}:{capability_id}")
-        elif not resolution.ok:
+        if not resolution.ok:
             target_failures.append(OrchestrationTargetFailure(key, resolution))
     return OrchestrationAudit(
         kind, len(entries), tuple(sorted(invalid)), tuple(sorted(missing)), tuple(sorted(duplicates)),

@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 from .atomicity import AtomicityAudit, audit_generic_operations, load_atomicity_dispositions
+from .catalog_targets import CatalogTargetIndex
 from .orchestration_audit import OrchestrationAudit, audit_orchestration_registry
 from .catalog_audit import CatalogAuditReport, audit_catalog
 from .completion import CompletionReport, evaluate_completion
@@ -69,14 +70,23 @@ def evaluate_release_gate(
     resolved_catalog = catalog_path or root / "docs/capabilities/catalog.v2.json"
     resolved_atomicity = atomicity_path or root / "docs/governance/capability-atomicity-dispositions.json"
     catalog = json.loads(resolved_catalog.read_text(encoding="utf-8"))
+    dispositions = load_atomicity_dispositions(resolved_atomicity)
+    catalog_index = CatalogTargetIndex.from_catalog(
+        catalog,
+        replacements={
+            (item.capability_id, item.major_version): item.replacement_capabilities[0]
+            for item in dispositions.dispositions
+            if item.replacement_capabilities
+        },
+    )
     orchestration = tuple(
-        audit_orchestration_registry(root / "docs/governance" / name, catalog)
+        audit_orchestration_registry(root / "docs/governance" / name, catalog_index)
         for name in ("task_tool_registry.json", "bff_capability_registry.json", "business_capability_ledger.json")
     )
     return ReleaseGateReport(
         completion=evaluate_completion(root, mode="strict", web_root=web_root),
         audit=audit_catalog(resolved_catalog),
-        atomicity=audit_generic_operations(catalog, load_atomicity_dispositions(resolved_atomicity)),
+        atomicity=audit_generic_operations(catalog, dispositions),
         orchestration=orchestration,
     )
 
