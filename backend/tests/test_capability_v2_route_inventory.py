@@ -3,6 +3,8 @@ from __future__ import annotations
 import ast
 import hashlib
 import json
+from collections import Counter
+from dataclasses import replace
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -19,17 +21,299 @@ from backend.capability_v2.route_root_cause_ledger import (
 )
 
 
-def test_task3b3a_root_cause_ledger_covers_pinned_unresolved_evidence() -> None:
-    root = Path(__file__).resolve().parents[2]
-    ledger = load_route_root_cause_ledger(
-        root / "docs/governance/web-route-root-cause-ledger.json"
+ROOT = Path(__file__).resolve().parents[2]
+LEDGER_PATH = ROOT / "docs/governance/web-route-root-cause-ledger.json"
+BASELINE_BACKEND_REVISION = "800ec6ba559db3301221e674b2a5026d354214ff"
+BASELINE_INVENTORY_SHA256 = "55f3de074e060a71dc6acab4bee993d42d7af05026e6acd4c0e8d7f6d06b9694"
+
+
+def _root_cause_ledger():
+    return load_route_root_cause_ledger(LEDGER_PATH)
+
+
+def _entry(ledger, method: str, route: str):
+    return next(item for item in ledger.entries if item.key == (method, route))
+
+
+def _replace_ledger_entry(ledger, replacement):
+    return replace(
+        ledger,
+        entries=tuple(
+            replacement if item.key == replacement.key else item
+            for item in ledger.entries
+        ),
     )
+
+
+def test_task3b3a_root_cause_ledger_covers_pinned_unresolved_evidence() -> None:
+    ledger = _root_cause_ledger()
 
     assert ledger.baseline_unresolved_count == 148
     assert ledger.baseline_group_count == 93
-    assert sum(entry.occurrence_count for entry in ledger.entries) == 148
-    assert len(ledger.entries) == 93
-    assert audit_route_root_cause_ledger(root, ledger) == ()
+    assert getattr(ledger, "baseline_backend_revision", None) == BASELINE_BACKEND_REVISION
+    assert getattr(ledger, "baseline_inventory_sha256", None) == BASELINE_INVENTORY_SHA256
+    baseline = [
+        entry for entry in ledger.entries
+        if getattr(entry, "occurrence_scope", None) == "baseline"
+    ]
+    assert sum(entry.occurrence_count for entry in baseline) == 148
+    assert len(baseline) == 93
+    assert audit_route_root_cause_ledger(ROOT, ledger) == ()
+
+
+def test_task3b3a_ledger_rejects_replaced_baseline_occurrence() -> None:
+    ledger = _root_cause_ledger()
+    original = next(
+        (
+            entry for entry in ledger.entries
+            if getattr(entry, "occurrence_scope", None) == "baseline"
+        ),
+        ledger.entries[0],
+    )
+    fabricated = dict(original.occurrences[0])
+    fabricated["raw_route"] = str(fabricated["raw_route"]) + "-fabricated"
+    replacement = replace(
+        original,
+        occurrences=(fabricated, *original.occurrences[1:]),
+    )
+
+    issues = audit_route_root_cause_ledger(
+        ROOT, _replace_ledger_entry(ledger, replacement)
+    )
+
+    assert "ledger_baseline_occurrence_mismatch:1" in issues
+
+
+def test_task3b3a_bff_requires_real_anchored_multi_capability_aggregation() -> None:
+    ledger = _root_cause_ledger()
+    bff_entries = [
+        entry for entry in ledger.entries
+        if entry.disposition == "truthful_bff_required"
+    ]
+
+    assert {entry.key for entry in bff_entries} == {
+        ("GET", "/api/workbench/home"),
+        ("GET", "/api/workbench/panel1"),
+    }
+    assert all(len(entry.disposition_details["constituent_capabilities"]) >= 2 for entry in bff_entries)
+    assert all(entry.backend_evidence["route_definition"] for entry in bff_entries)
+    assert all(entry.disposition_details["aggregation_evidence"]["kind"] == "multi_result_merge" for entry in bff_entries)
+
+    original = bff_entries[0]
+    single = dict(original.disposition_details)
+    single["constituent_capabilities"] = single["constituent_capabilities"][:1]
+    issues = audit_route_root_cause_ledger(
+        ROOT,
+        _replace_ledger_entry(ledger, replace(original, disposition_details=single)),
+    )
+    assert f"ledger_bff_constituent_count_invalid:{original.method}:{original.normalized_route}" in issues
+
+    generic = dict(original.disposition_details)
+    generic["aggregation_evidence"] = "conditional dispatch is aggregation"
+    issues = audit_route_root_cause_ledger(
+        ROOT,
+        _replace_ledger_entry(ledger, replace(original, disposition_details=generic)),
+    )
+    assert f"ledger_bff_aggregation_invalid:{original.method}:{original.normalized_route}" in issues
+
+
+def test_task3b3a_conditional_dispatch_is_not_bff_aggregation() -> None:
+    ledger = _root_cause_ledger()
+    lists = _entry(ledger, "GET", "/api/lists")
+
+    assert lists.disposition == "conditional_dispatch_required"
+    assert lists.disposition_details["selector"] == "item_type"
+    assert len(lists.disposition_details["branch_capabilities"]) == 2
+
+    fake_bff = replace(
+        lists,
+        disposition="truthful_bff_required",
+        disposition_details={
+            "constituent_capabilities": lists.disposition_details["branch_capabilities"],
+            "aggregation_evidence": {
+                "kind": "conditional_dispatch",
+                "anchor": lists.backend_evidence["route_definition"],
+            },
+        },
+    )
+    issues = audit_route_root_cause_ledger(
+        ROOT, _replace_ledger_entry(ledger, fake_bff)
+    )
+    assert "ledger_bff_aggregation_invalid:GET:/api/lists" in issues
+
+
+def test_task3b3a_retirement_proofs_cover_every_supported_evidence_kind() -> None:
+    ledger = _root_cause_ledger()
+    retired = [entry for entry in ledger.entries if entry.disposition == "frontend_retire"]
+    kinds = Counter(
+        entry.disposition_details.get("retirement_proof", {}).get("kind")
+        for entry in retired
+    )
+
+    assert len(retired) == 17
+    assert sum(entry.occurrence_count for entry in retired) == 21
+    assert kinds == Counter({
+        "explicit_product_retirement": 8,
+        "backend_route_retired": 4,
+        "http_410": 2,
+        "sample_template_only": 2,
+        "backend_route_absent": 1,
+    })
+    assert all(entry.disposition_details.get("retirement_proof", {}).get("anchors") for entry in retired)
+    assert all(entry.disposition_details.get("retirement_proof", {}).get("final_sources") for entry in retired)
+
+
+def test_task3b3a_retirement_rejects_empty_or_generic_proof() -> None:
+    ledger = _root_cause_ledger()
+    original = next(entry for entry in ledger.entries if entry.disposition == "frontend_retire")
+    details = dict(original.disposition_details)
+    proof = dict(details.get("retirement_proof", {}))
+    proof["anchors"] = []
+    proof["rationale"] = "reviewed"
+    details["retirement_proof"] = proof
+
+    issues = audit_route_root_cause_ledger(
+        ROOT,
+        _replace_ledger_entry(ledger, replace(original, disposition_details=details)),
+    )
+
+    assert f"ledger_retirement_proof_invalid:{original.method}:{original.normalized_route}" in issues
+
+
+def test_task3b3a_promotes_every_finite_residual_to_a_first_class_group() -> None:
+    ledger = _root_cause_ledger()
+    derived = {
+        entry.key: entry for entry in ledger.entries
+        if getattr(entry, "occurrence_scope", None) == "post_normalization"
+    }
+    expected = {
+        ("DELETE", "/api/knowledges/{dynamic}"),
+        ("GET", "/api/knowledge/entries"),
+        ("GET", "/api/knowledges/{dynamic}"),
+        ("PATCH", "/api/knowledges/{dynamic}"),
+        ("POST", "/api/knowledges"),
+        ("PUT", "/api/knowledges/{dynamic}"),
+        ("PUT", "/api/rules/{dynamic}"),
+        ("POST", "/api/rules/{dynamic}/activate"),
+        ("POST", "/api/rules/{dynamic}/suspend"),
+    }
+
+    assert set(derived) == expected
+    assert sum(entry.occurrence_count for entry in derived.values()) == 13
+    assert all(
+        "residual_unresolved_routes" not in entry.disposition_details
+        for entry in ledger.entries
+        if entry.disposition == "frontend_route_normalize"
+    )
+    assert all(
+        derived[key].backend_evidence["source_path"]
+        == "plugins/craft/craft_backend/routers/rules.py"
+        for key in {
+            ("PUT", "/api/rules/{dynamic}"),
+            ("POST", "/api/rules/{dynamic}/activate"),
+            ("POST", "/api/rules/{dynamic}/suspend"),
+        }
+    )
+
+
+def test_task3b3a_handler_evidence_is_existing_and_route_exact() -> None:
+    ledger = _root_cause_ledger()
+    plugin_list = _entry(ledger, "GET", "/api/plugin/list")
+
+    assert plugin_list.backend_evidence["source_path"] == "backend/routers/plugins.py"
+    assert plugin_list.backend_evidence["handler_status"] == "registered"
+    assert plugin_list.backend_evidence["route_definition"]["method"] == "GET"
+    assert plugin_list.backend_evidence["route_definition"]["normalized_route"] == "/api/plugin/list"
+
+    missing = dict(plugin_list.backend_evidence)
+    missing["source_path"] = "backend/routers/not_a_real_handler.py"
+    issues = audit_route_root_cause_ledger(
+        ROOT,
+        _replace_ledger_entry(ledger, replace(plugin_list, backend_evidence=missing)),
+    )
+    assert "ledger_handler_path_missing:GET:/api/plugin/list" in issues
+
+    wrong = dict(plugin_list.backend_evidence)
+    wrong_definition = dict(wrong["route_definition"])
+    wrong_definition["method"] = "POST"
+    wrong["route_definition"] = wrong_definition
+    issues = audit_route_root_cause_ledger(
+        ROOT,
+        _replace_ledger_entry(ledger, replace(plugin_list, backend_evidence=wrong)),
+    )
+    assert "ledger_handler_route_mismatch:GET:/api/plugin/list" in issues
+
+
+def test_task3b3a_operations_candidate_is_exact_and_unapproved() -> None:
+    ledger = _root_cause_ledger()
+    operations = [
+        entry for entry in ledger.entries
+        if entry.disposition == "operations_candidate"
+    ]
+    flow_test = _entry(ledger, "POST", "/api/flows/test-node")
+
+    assert len(operations) == 1
+    assert operations[0].key == ("GET", "/api/file-store/config")
+    assert operations[0].owner_domain == "platform-runtime"
+    assert operations[0].backend_evidence["source_path"] == "backend/routers/file_store.py"
+    assert operations[0].backend_evidence["handler_status"] == "registered"
+    assert operations[0].disposition_details["approval_needed"] is True
+    assert operations[0].disposition_details["non_business_operation"] == "runtime storage configuration read"
+    assert flow_test.disposition == "new_atomic_capability_required"
+    assert flow_test.owner_domain == "agent"
+
+
+def test_task3b3a_operations_validator_rejects_weak_candidate() -> None:
+    ledger = _root_cause_ledger()
+    original = _entry(ledger, "GET", "/api/file-store/config")
+    evidence = dict(original.backend_evidence)
+    evidence["source_path"] = "backend/routers/not_a_real_handler.py"
+    details = dict(original.disposition_details)
+    details["approval_needed"] = False
+    details["non_business_operation"] = ""
+    weak = replace(
+        original,
+        owner_domain="base",
+        backend_evidence=evidence,
+        disposition_details=details,
+    )
+
+    issues = audit_route_root_cause_ledger(
+        ROOT, _replace_ledger_entry(ledger, weak)
+    )
+
+    assert "ledger_operations_candidate_invalid:GET:/api/file-store/config" in issues
+
+
+def test_task3b3a_reviewed_disposition_totals_are_exact() -> None:
+    ledger = _root_cause_ledger()
+    groups = Counter(entry.disposition for entry in ledger.entries)
+    occurrences = Counter()
+    for entry in ledger.entries:
+        occurrences[entry.disposition] += entry.occurrence_count
+
+    assert len(ledger.entries) == 102
+    assert sum(entry.occurrence_count for entry in ledger.entries) == 161
+    assert groups == Counter({
+        "existing_capability_migration_required": 53,
+        "frontend_retire": 17,
+        "frontend_route_normalize": 15,
+        "new_atomic_capability_required": 6,
+        "existing_stable_capability": 5,
+        "conditional_dispatch_required": 3,
+        "truthful_bff_required": 2,
+        "operations_candidate": 1,
+    })
+    assert occurrences == Counter({
+        "existing_capability_migration_required": 80,
+        "frontend_route_normalize": 23,
+        "frontend_retire": 21,
+        "conditional_dispatch_required": 20,
+        "existing_stable_capability": 7,
+        "new_atomic_capability_required": 7,
+        "truthful_bff_required": 2,
+        "operations_candidate": 1,
+    })
 
 
 def test_route_scan_excludes_named_generated_dist_outputs(tmp_path: Path) -> None:

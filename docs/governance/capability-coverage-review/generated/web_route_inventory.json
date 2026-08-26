@@ -1,6 +1,6 @@
 {
-  "frontend_revision": "b6d154dd75acf6eb0555a365591e20bb41c70c54",
-  "content_hash": "1bce0e94067b98dfa159dc5ccc74262ea7da3c18b59f29e5c9bdfb1701de00fb",
+  "frontend_revision": "c1804e94ad8a3c4660be6bebb1b010744ed8da6f",
+  "content_hash": "58400ca2fc26c2c29f87d1b43def748bd3f32d515714fe7084258893037779a0",
   "wrapper_contracts_hash": "7467489f3d7eed7d9c0dc4fe53f13103ed137fcb7da89da01062a5d84a1f6e4b",
   "scan_roots": [
     "web",
@@ -27,12 +27,12 @@
     "legacy_registered": 311,
     "bff_registered": 0,
     "operations_excluded": 19,
-    "unresolved": 109
+    "unresolved": 110
   },
   "lexical_audit": {
-    "token_count": 495,
-    "token_hash": "eb93bed926cba63c0f1d63610d7297c7e09d7e0a3ef334e270befec8c736089a",
-    "mapped_count": 476,
+    "token_count": 496,
+    "token_hash": "5455efbbb5b3be1ed87e604481c922c93f20c19e3b38ef560da7a4d8c432ae9d",
+    "mapped_count": 477,
     "reviewed_non_route_count": 19,
     "reviewed_non_route_tokens": [
       "packages/craft-plugin/web/bop_nav/bop_nav.js:12:13:/api/",
@@ -4187,63 +4187,73 @@
     },
     {
       "source": "web/rule_mgmt/rule_mgmt.js",
-      "line": 172,
-      "column": 24,
-      "raw_route": "/api/rules/${gid}/${action}",
-      "normalized_route": "/api/rules/{dynamic}/{dynamic}",
+      "line": 173,
+      "column": 26,
+      "raw_route": "/api/rules/${gid}/activate",
+      "normalized_route": "/api/rules/{dynamic}/activate",
       "method": "POST",
       "disposition": "unresolved",
-      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:172:24:POST:/api/rules/{dynamic}/{dynamic}"
+      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:173:26:POST:/api/rules/{dynamic}/activate"
     },
     {
       "source": "web/rule_mgmt/rule_mgmt.js",
-      "line": 184,
+      "line": 175,
+      "column": 26,
+      "raw_route": "/api/rules/${gid}/suspend",
+      "normalized_route": "/api/rules/{dynamic}/suspend",
+      "method": "POST",
+      "disposition": "unresolved",
+      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:175:26:POST:/api/rules/{dynamic}/suspend"
+    },
+    {
+      "source": "web/rule_mgmt/rule_mgmt.js",
+      "line": 190,
       "column": 37,
       "raw_route": "/api/rule-engine/check",
       "normalized_route": "/api/rule-engine/check",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:184:37:POST:/api/rule-engine/check"
+      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:190:37:POST:/api/rule-engine/check"
     },
     {
       "source": "web/rule_mgmt/rule_mgmt.js",
-      "line": 214,
+      "line": 220,
       "column": 36,
       "raw_route": "/api/rules/${_devRuleGid}/deviations",
       "normalized_route": "/api/rules/{dynamic}/deviations",
       "method": "POST",
       "disposition": "unresolved",
-      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:214:36:POST:/api/rules/{dynamic}/deviations"
+      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:220:36:POST:/api/rules/{dynamic}/deviations"
     },
     {
       "source": "web/rule_mgmt/rule_mgmt.js",
-      "line": 256,
+      "line": 262,
       "column": 108,
       "raw_route": "/api/rules/${row.gid}",
       "normalized_route": "/api/rules/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:256:108:PATCH:/api/rules/{dynamic}"
+      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:262:108:PATCH:/api/rules/{dynamic}"
     },
     {
       "source": "web/rule_mgmt/rule_mgmt.js",
-      "line": 261,
+      "line": 267,
       "column": 30,
       "raw_route": "/api/rules",
       "normalized_route": "/api/rules",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:261:30:POST:/api/rules"
+      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:267:30:POST:/api/rules"
     },
     {
       "source": "web/rule_mgmt/rule_mgmt.js",
-      "line": 326,
+      "line": 332,
       "column": 27,
       "raw_route": "/api/rules/${row.gid}",
       "normalized_route": "/api/rules/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:326:27:PATCH:/api/rules/{dynamic}"
+      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:332:27:PATCH:/api/rules/{dynamic}"
     },
     {
       "source": "web/settings/settings.js",

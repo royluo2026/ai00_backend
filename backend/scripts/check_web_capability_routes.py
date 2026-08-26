@@ -139,7 +139,9 @@ def main(argv: list[str] | None = None) -> int:
             return 1
     try:
         ledger = load_route_root_cause_ledger(ROOT_CAUSE_LEDGER)
-        ledger_issues = audit_route_root_cause_ledger(REPOSITORY_ROOT, ledger)
+        ledger_issues = audit_route_root_cause_ledger(
+            REPOSITORY_ROOT, ledger, web_root=args.web_root.resolve()
+        )
     except RouteRootCauseLedgerConfigurationError as exc:
         print(f"web-route-root-cause-ledger invalid: {exc}", file=sys.stderr)
         return 1
