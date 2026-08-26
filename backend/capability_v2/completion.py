@@ -8,6 +8,8 @@ from pathlib import Path, PurePosixPath
 from typing import Literal
 
 from .consumer_routes import scan_web_routes
+from .atomicity import load_atomicity_dispositions
+from .catalog_targets import CatalogTargetIndex
 from .route_inventory import audit_route_inventory, load_route_inventory
 
 
@@ -268,15 +270,32 @@ def _web_route_inventory_drift(
 
 
 def _route_inventory_failures(root: Path, configuration: dict) -> list[str]:
+    artifacts = [
+        (field, configuration.get(field))
+        for field in ("legacy_route_inventory_artifact", "bff_route_inventory_artifact")
+        if configuration.get(field) is not None
+    ]
+    if not artifacts:
+        return []
+    replacements: dict[tuple[str, int], str] = {}
+    disposition_path = root / "docs/governance/capability-atomicity-dispositions.json"
+    if disposition_path.is_file():
+        replacements = {
+            (item.capability_id, item.major_version): item.replacement_capabilities[0]
+            for item in load_atomicity_dispositions(disposition_path).dispositions
+            if item.replacement_capabilities
+        }
+    catalog_index = CatalogTargetIndex.from_catalog(
+        _load_json(root / "docs/capabilities/catalog.v2.json"), replacements=replacements
+    )
     failures: list[str] = []
-    for field in ("legacy_route_inventory_artifact", "bff_route_inventory_artifact"):
-        relative = configuration.get(field)
-        if relative is None:
-            continue
+    for field, relative in artifacts:
         if not isinstance(relative, str) or not relative:
             raise CompletionConfigurationError(f"{field} must be a repository-relative path")
         inventory = load_route_inventory(_relative_path(root, relative, field=field))
-        failures.extend(f"{field}:{issue}" for issue in audit_route_inventory(inventory))
+        failures.extend(
+            f"{field}:{issue}" for issue in audit_route_inventory(inventory, catalog_index=catalog_index)
+        )
     return failures
 
 

@@ -304,6 +304,32 @@ def test_check_reports_missing_stable_function():
     assert errors == ["missing stable function: rest:GET:/api/example"]
 
 
+def test_user_function_strict_mode_blocks_non_stable_target():
+    builder = _builder_module()
+    row = {
+        "function_id": "rest:GET:/api/example",
+        "domain": "Craft",
+        "stability": "stable",
+        "current_consumers": ["REST"],
+        "source_paths": ["backend/routers/example.py"],
+        "target_capability": "craft.old.read",
+        "classification": "mapped",
+        "migration_status": "registered",
+    }
+    from backend.capability_v2.catalog_targets import CatalogTargetIndex
+
+    catalog_index = CatalogTargetIndex.from_catalog({"capabilities": [{
+        "id": "craft.old.read", "major_version": 1,
+        "lifecycle_status": "deprecated", "owner_domain": "craft",
+    }]})
+
+    errors = builder.registry_errors(
+        {row["function_id"]: row}, [row], catalog_index=catalog_index,
+    )
+
+    assert any(error["reason_code"] == "target_not_stable" for error in errors if isinstance(error, dict))
+
+
 def test_check_reports_stale_ids_and_field_level_evidence_drift():
     builder = _builder_module()
     discovered = [{

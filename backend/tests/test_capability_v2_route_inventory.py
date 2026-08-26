@@ -5,6 +5,7 @@ from datetime import date, timedelta
 from pathlib import Path
 
 from backend.capability_v2.consumer_routes import scan_web_routes
+from backend.capability_v2.catalog_targets import CatalogTargetIndex
 from backend.capability_v2.route_inventory import audit_route_inventory, load_route_inventory
 
 
@@ -49,3 +50,24 @@ def test_route_inventory_reports_expired_unapproved_route(tmp_path: Path) -> Non
     }), encoding="utf-8")
 
     assert audit_route_inventory(load_route_inventory(path)) == ("expired:POST:/api/legacy",)
+
+
+def test_route_inventory_blocks_deprecated_target(tmp_path: Path) -> None:
+    path = tmp_path / "inventory.json"
+    path.write_text(json.dumps({
+        "inventory_kind": "legacy_rest",
+        "entries": [{
+            "route_path": "/api/legacy", "method": "GET", "owner": "craft",
+            "migration_target_capability": "craft.legacy.read", "migration_deadline": "2099-01-01",
+            "source": "web/app.js",
+        }],
+    }), encoding="utf-8")
+    catalog_index = CatalogTargetIndex.from_catalog({"capabilities": [{
+        "id": "craft.legacy.read", "major_version": 1,
+        "lifecycle_status": "deprecated", "owner_domain": "craft",
+    }]})
+
+    failures = audit_route_inventory(load_route_inventory(path), catalog_index=catalog_index)
+
+    assert failures[0].reason_code == "target_not_stable"
+    assert failures[0].entry.route_path == "/api/legacy"

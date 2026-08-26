@@ -16,8 +16,13 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Iterable
 
-
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+if str(REPOSITORY_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPOSITORY_ROOT))
+
+from backend.capability_v2.catalog_targets import CatalogTargetIndex
+
+
 REGISTRY_PATH = REPOSITORY_ROOT / "docs" / "governance" / "user-function-registry.json"
 REVIEW_PATH = REPOSITORY_ROOT / "docs" / "governance" / "capability-coverage-review"
 CATALOG_PATH = REPOSITORY_ROOT / "docs" / "capabilities" / "catalog.v2.json"
@@ -570,10 +575,11 @@ def registry_errors(
     discovered: list[dict],
     *,
     include_governance: bool = True,
-) -> list[str]:
+    catalog_index: CatalogTargetIndex | None = None,
+) -> list[str | dict[str, object]]:
     discovered_by_id = {row["function_id"]: row for row in discovered}
     discovered_ids = set(discovered_by_id)
-    errors: list[str] = []
+    errors: list[str | dict[str, object]] = []
     for row in discovered:
         if row["stability"] == "stable" and row["function_id"] not in existing:
             errors.append(f"missing stable function: {row['function_id']}")
@@ -605,7 +611,25 @@ def registry_errors(
                 if (not isinstance(reason, str) or len(reason.strip()) < 20
                         or reason == DEFAULT_EXCLUSION_REASON):
                     errors.append(f"stable function lacks a specific reviewed exclusion: {function_id}")
-    return sorted(set(errors))
+        if catalog_index is not None and row.get("stability") == "stable":
+            capability_id = row.get("target_capability")
+            major_version = row.get("target_major_version", 1)
+            if isinstance(capability_id, str) and capability_id and isinstance(major_version, int):
+                resolution = catalog_index.resolve_stable(
+                    capability_id, major_version, _owner_key(row["domain"])
+                )
+                if not resolution.ok:
+                    errors.append({
+                        "function_id": function_id,
+                        "capability_id": capability_id,
+                        "major_version": major_version,
+                        "reason_code": resolution.reason_code,
+                    })
+    unique = {
+        json.dumps(error, sort_keys=True) if isinstance(error, dict) else error: error
+        for error in errors
+    }
+    return [unique[key] for key in sorted(unique)]
 
 
 def _owner_key(domain: str) -> str:

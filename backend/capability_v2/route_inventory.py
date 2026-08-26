@@ -7,6 +7,8 @@ from datetime import date
 from pathlib import Path
 from typing import Any, Mapping
 
+from .catalog_targets import CatalogTargetIndex, TargetResolution
+
 
 class RouteInventoryConfigurationError(ValueError):
     """Raised when a route inventory is incomplete or unsafe."""
@@ -20,6 +22,7 @@ class RouteInventoryEntry:
     migration_target_capability: str
     migration_deadline: date
     source: str
+    migration_target_major_version: int = 1
     allowed_consumers: tuple[str, ...] = ()
     exception_approval_reference: str | None = None
 
@@ -38,6 +41,20 @@ class RouteInventory:
     def serialized(self) -> dict[str, Any]:
         return {"inventory_kind": self.inventory_kind,
                 "entries": [entry.serialized() for entry in self.entries]}
+
+
+@dataclass(frozen=True)
+class RouteInventoryTargetFailure:
+    entry: RouteInventoryEntry
+    resolution: TargetResolution
+
+    @property
+    def reason_code(self) -> str:
+        assert self.resolution.reason_code is not None
+        return self.resolution.reason_code
+
+    def __str__(self) -> str:
+        return f"{self.reason_code}:{self.entry.method}:{self.entry.route_path}"
 
 
 def _load(path: Path) -> Mapping[str, Any]:
@@ -84,30 +101,48 @@ def load_route_inventory(path: Path) -> RouteInventory:
         approval = raw.get("exception_approval_reference")
         if approval is not None and (not isinstance(approval, str) or not approval):
             raise RouteInventoryConfigurationError(f"invalid exception approval: {route_path}")
+        major_version = raw.get("migration_target_major_version", 1)
+        if not isinstance(major_version, int) or major_version < 1:
+            raise RouteInventoryConfigurationError(f"invalid migration target version: {route_path}")
         entries.append(RouteInventoryEntry(
             route_path=route_path, method=method, owner=raw["owner"],
             migration_target_capability=raw["migration_target_capability"],
             migration_deadline=deadline, source=raw["source"],
+            migration_target_major_version=major_version,
             allowed_consumers=tuple(consumers), exception_approval_reference=approval,
         ))
     return RouteInventory(str(kind), tuple(entries))
 
 
-def audit_route_inventory(inventory: RouteInventory, *, today: date | None = None) -> tuple[str, ...]:
+def audit_route_inventory(
+    inventory: RouteInventory,
+    *,
+    today: date | None = None,
+    catalog_index: CatalogTargetIndex | None = None,
+) -> tuple[str | RouteInventoryTargetFailure, ...]:
     """Return blocking issues; deadlines are intentionally checked centrally."""
 
     now = today or date.today()
-    issues: list[str] = []
+    issues: list[str | RouteInventoryTargetFailure] = []
     for entry in inventory.entries:
+        if catalog_index is not None:
+            resolution = catalog_index.resolve_stable(
+                entry.migration_target_capability,
+                entry.migration_target_major_version,
+                entry.owner,
+            )
+            if not resolution.ok:
+                issues.append(RouteInventoryTargetFailure(entry, resolution))
         if entry.migration_deadline < now and not entry.exception_approval_reference:
             issues.append(f"expired:{entry.method}:{entry.route_path}")
-    return tuple(sorted(issues))
+    return tuple(sorted(issues, key=str))
 
 
 __all__ = [
     "RouteInventory",
     "RouteInventoryConfigurationError",
     "RouteInventoryEntry",
+    "RouteInventoryTargetFailure",
     "audit_route_inventory",
     "load_route_inventory",
 ]
