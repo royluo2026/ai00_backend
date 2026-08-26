@@ -26,18 +26,60 @@ MAPPING_PATH = ROOT / "docs/governance/legacy-route-target-mappings.json"
 INVENTORY_PATH = ROOT / "docs/governance/legacy_route_inventory.json"
 CATALOG_PATH = ROOT / "docs/capabilities/catalog.v2.json"
 ATOMICITY_PATH = ROOT / "docs/governance/capability-atomicity-dispositions.json"
+EXPECTED_FAMILIES = MappingProxyType({
+    "craft-manufacturing-resource-change": (
+        "craft.manufacturing_resource.change.apply", 1, 37
+    ),
+    "craft-manufacturing-resource-read": (
+        "craft.manufacturing_resource.read", 1, 11
+    ),
+    "craft-gbop-change": ("craft.gbop.change.apply", 1, 24),
+    "craft-gbop-read": ("craft.gbop.read", 1, 8),
+    "project-craft-scope-read": ("project.craft_scope.read", 1, 1),
+})
 EXPECTED_COUNTS = MappingProxyType({
-    "craft.manufacturing_resource.change.apply": 37,
-    "craft.manufacturing_resource.read": 11,
-    "craft.gbop.change.apply": 24,
-    "craft.gbop.read": 8,
-    "project.craft_scope.read": 1,
+    source_id: count
+    for source_id, _source_major_version, count in EXPECTED_FAMILIES.values()
 })
 _PARAMETER = re.compile(r"\{[^/{}]+\}")
 
 
+@dataclass(frozen=True)
+class RepairFailure:
+    reason_code: str
+    family_id: str
+    source_capability_id: str
+    source_major_version: int
+    method: str
+    route_pattern: str
+    target_capability_id: str | None = None
+    target_major_version: int | None = None
+
+    def serialized(self) -> dict[str, str | int]:
+        result: dict[str, str | int] = {
+            "reason_code": self.reason_code,
+            "family_id": self.family_id,
+            "source_capability_id": self.source_capability_id,
+            "source_major_version": self.source_major_version,
+            "method": self.method,
+            "route_pattern": self.route_pattern,
+        }
+        if self.target_capability_id is not None:
+            result["target_capability_id"] = self.target_capability_id
+        if self.target_major_version is not None:
+            result["target_major_version"] = self.target_major_version
+        return result
+
+    def __str__(self) -> str:
+        return json.dumps(self.serialized(), ensure_ascii=False, separators=(",", ":"))
+
+
 class MappingConfigurationError(ValueError):
     """Raised when reviewed route mappings are incomplete or unsafe."""
+
+    def __init__(self, message: str, *, failure: RepairFailure | None = None) -> None:
+        self.failure = failure
+        super().__init__(f"{message}: {failure}" if failure is not None else message)
 
 
 @dataclass(frozen=True)
@@ -66,7 +108,7 @@ class RouteTargetFamily:
 class RepairResult:
     updated: int
     unchanged: int
-    unmatched: tuple[str, ...]
+    unmatched: tuple[RepairFailure, ...]
     counts_by_source: Mapping[str, int]
 
 
@@ -105,7 +147,7 @@ def load_mapping_families(path: Path) -> tuple[RouteTargetFamily, ...]:
         raise MappingConfigurationError("mapping_families must be an array")
     families: list[RouteTargetFamily] = []
     family_ids: set[str] = set()
-    source_ids: set[str] = set()
+    source_ids: set[tuple[str, int]] = set()
     route_keys: set[tuple[str, str]] = set()
     for raw_family in raw_families:
         if not isinstance(raw_family, dict):
@@ -115,10 +157,13 @@ def load_mapping_families(path: Path) -> tuple[RouteTargetFamily, ...]:
         source_version = _required_version(raw_family, "source_major_version", family_id)
         if family_id in family_ids:
             raise MappingConfigurationError(f"duplicate family_id: {family_id}")
-        if source_id in source_ids:
-            raise MappingConfigurationError(f"duplicate source capability: {source_id}")
+        source_key = source_id, source_version
+        if source_key in source_ids:
+            raise MappingConfigurationError(
+                f"duplicate source capability: {source_id}@{source_version}"
+            )
         family_ids.add(family_id)
-        source_ids.add(source_id)
+        source_ids.add(source_key)
         raw_routes = raw_family.get("routes")
         if not isinstance(raw_routes, list) or not raw_routes:
             raise MappingConfigurationError(f"{family_id} routes must be a non-empty array")
@@ -144,10 +189,18 @@ def load_mapping_families(path: Path) -> tuple[RouteTargetFamily, ...]:
                 review_reference=_required_string(raw_route, "review_reference", f"{method} {pattern}"),
             ))
         families.append(RouteTargetFamily(family_id, source_id, source_version, tuple(routes)))
-    actual_counts = {family.source_capability_id: len(family.routes) for family in families}
-    if actual_counts != dict(EXPECTED_COUNTS):
+    actual_families = {
+        family.family_id: (
+            family.source_capability_id,
+            family.source_major_version,
+            len(family.routes),
+        )
+        for family in families
+    }
+    if actual_families != dict(EXPECTED_FAMILIES):
         raise MappingConfigurationError(
-            f"mapping counts must be {dict(EXPECTED_COUNTS)}, got {actual_counts}"
+            "unexpected_mapping_family: "
+            f"expected {dict(EXPECTED_FAMILIES)}, got {actual_families}"
         )
     return tuple(families)
 
@@ -161,16 +214,32 @@ def repair_inventory(
     if not isinstance(entries, list):
         raise MappingConfigurationError("legacy route inventory entries must be an array")
     rules: dict[tuple[str, str], tuple[RouteTargetFamily, RouteTarget]] = {}
-    source_ids = {family.source_capability_id for family in families}
+    source_families = {
+        (family.source_capability_id, family.source_major_version): family
+        for family in families
+    }
+    source_families_by_id = {
+        family.source_capability_id: family for family in families
+    }
     for family in families:
         for route in family.routes:
             resolution = catalog_index.resolve_stable(
                 route.target_capability_id, route.target_major_version, route.owner
             )
             if not resolution.ok:
+                failure = RepairFailure(
+                    reason_code=resolution.reason_code or "target_invalid",
+                    family_id=family.family_id,
+                    source_capability_id=family.source_capability_id,
+                    source_major_version=family.source_major_version,
+                    method=route.route_method,
+                    route_pattern=route.route_pattern,
+                    target_capability_id=route.target_capability_id,
+                    target_major_version=route.target_major_version,
+                )
                 raise MappingConfigurationError(
-                    f"{resolution.reason_code}: {route.target_capability_id}@{route.target_major_version} "
-                    f"for {route.route_method} {route.route_pattern}"
+                    failure.reason_code,
+                    failure=failure,
                 )
             if route.key in rules:
                 raise MappingConfigurationError(
@@ -181,7 +250,7 @@ def repair_inventory(
     updated = 0
     unchanged = 0
     counts = {source_id: 0 for source_id in EXPECTED_COUNTS}
-    unmatched: list[str] = []
+    unmatched: list[RepairFailure] = []
     seen_inventory: set[tuple[str, str]] = set()
     matched_rules: set[tuple[str, str]] = set()
     for entry in entries:
@@ -197,8 +266,27 @@ def repair_inventory(
         seen_inventory.add(key)
         mapping = rules.get(key)
         if mapping is None:
-            if entry.get("migration_target_capability") in source_ids:
-                unmatched.append(f"{key[0]} {path}")
+            source_id = entry.get("migration_target_capability")
+            source_version = entry.get("migration_target_major_version", 1)
+            if isinstance(source_id, str) and source_id in source_families_by_id:
+                expected_family = source_families_by_id[source_id]
+                exact_family = source_families.get((source_id, source_version))
+                unmatched.append(RepairFailure(
+                    reason_code=(
+                        "source_route_unmapped"
+                        if exact_family is not None
+                        else "source_major_version_mismatch"
+                    ),
+                    family_id=expected_family.family_id,
+                    source_capability_id=source_id,
+                    source_major_version=(
+                        source_version if isinstance(source_version, int)
+                        and not isinstance(source_version, bool)
+                        else expected_family.source_major_version
+                    ),
+                    method=key[0],
+                    route_pattern=key[1],
+                ))
             continue
         family, route = mapping
         matched_rules.add(key)
@@ -221,11 +309,27 @@ def repair_inventory(
         entry["owner"] = route.owner
         updated += 1
     for method, pattern in sorted(set(rules) - matched_rules):
-        unmatched.append(f"missing inventory route: {method} {pattern}")
+        family, _route = rules[(method, pattern)]
+        unmatched.append(RepairFailure(
+            reason_code="inventory_route_missing",
+            family_id=family.family_id,
+            source_capability_id=family.source_capability_id,
+            source_major_version=family.source_major_version,
+            method=method,
+            route_pattern=pattern,
+        ))
     return RepairResult(
         updated=updated,
         unchanged=unchanged,
-        unmatched=tuple(sorted(unmatched)),
+        unmatched=tuple(sorted(
+            unmatched,
+            key=lambda failure: (
+                failure.reason_code,
+                failure.family_id,
+                failure.method,
+                failure.route_pattern,
+            ),
+        )),
         counts_by_source=MappingProxyType(counts),
     )
 
@@ -287,11 +391,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             inventory, load_mapping_families(MAPPING_PATH), _catalog_index()
         )
     except MappingConfigurationError as exc:
-        print(f"legacy-route-target-repair failed: {exc}", file=sys.stderr)
+        if exc.failure is not None:
+            print(f"legacy-route-target-repair failure={exc.failure}", file=sys.stderr)
+        else:
+            print(f"legacy-route-target-repair failed: {exc}", file=sys.stderr)
         return 1
     print(_render_result(result, selected_mode))
     for item in result.unmatched:
-        print(f"unmatched: {item}", file=sys.stderr)
+        print(f"failure={item}", file=sys.stderr)
     counts_ok = dict(result.counts_by_source) == dict(EXPECTED_COUNTS)
     if result.unmatched or not counts_ok:
         return 1
@@ -307,6 +414,7 @@ if __name__ == "__main__":
 
 __all__ = [
     "MappingConfigurationError",
+    "RepairFailure",
     "RepairResult",
     "RouteTarget",
     "RouteTargetFamily",

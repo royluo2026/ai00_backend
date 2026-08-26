@@ -21,13 +21,14 @@ MAPPING_PATH = ROOT / "docs/governance/legacy-route-target-mappings.json"
 SCHEMA_PATH = ROOT / "docs/governance/legacy-route-target-mappings.schema.json"
 INVENTORY_PATH = ROOT / "docs/governance/legacy_route_inventory.json"
 CATALOG_PATH = ROOT / "docs/capabilities/catalog.v2.json"
-EXPECTED_COUNTS = {
-    "craft.manufacturing_resource.change.apply": 37,
-    "craft.manufacturing_resource.read": 11,
-    "craft.gbop.change.apply": 24,
-    "craft.gbop.read": 8,
-    "project.craft_scope.read": 1,
+EXPECTED_FAMILIES = {
+    "craft-manufacturing-resource-change": ("craft.manufacturing_resource.change.apply", 1, 37),
+    "craft-manufacturing-resource-read": ("craft.manufacturing_resource.read", 1, 11),
+    "craft-gbop-change": ("craft.gbop.change.apply", 1, 24),
+    "craft-gbop-read": ("craft.gbop.read", 1, 8),
+    "project-craft-scope-read": ("project.craft_scope.read", 1, 1),
 }
+EXPECTED_COUNTS = {source_id: count for source_id, _version, count in EXPECTED_FAMILIES.values()}
 
 
 def _document(path: Path) -> dict[str, object]:
@@ -47,8 +48,34 @@ def test_mapping_file_matches_schema_and_contains_five_complete_families() -> No
 
     families = load_mapping_families(MAPPING_PATH)
 
-    assert {family.source_capability_id for family in families} == set(EXPECTED_COUNTS)
-    assert {family.source_capability_id: len(family.routes) for family in families} == EXPECTED_COUNTS
+    assert {
+        family.family_id: (
+            family.source_capability_id,
+            family.source_major_version,
+            len(family.routes),
+        )
+        for family in families
+    } == EXPECTED_FAMILIES
+
+
+def test_mapping_loader_rejects_wrong_source_major_version(tmp_path: Path) -> None:
+    document = _document(MAPPING_PATH)
+    document["mapping_families"][0]["source_major_version"] = 2
+    path = tmp_path / "wrong-major.json"
+    _write(path, document)
+
+    with pytest.raises(MappingConfigurationError, match="unexpected_mapping_family"):
+        load_mapping_families(path)
+
+
+def test_mapping_loader_rejects_arbitrary_family_id(tmp_path: Path) -> None:
+    document = _document(MAPPING_PATH)
+    document["mapping_families"][0]["family_id"] = "arbitrary-family"
+    path = tmp_path / "wrong-family.json"
+    _write(path, document)
+
+    with pytest.raises(MappingConfigurationError, match="unexpected_mapping_family"):
+        load_mapping_families(path)
 
 
 def test_mapping_loader_rejects_duplicate_normalized_route_keys(tmp_path: Path) -> None:
@@ -71,12 +98,23 @@ def test_repair_rejects_deprecated_replacement() -> None:
     )
     target["lifecycle_status"] = "deprecated"
 
-    with pytest.raises(MappingConfigurationError, match="target_not_stable"):
+    with pytest.raises(MappingConfigurationError, match="target_not_stable") as captured:
         repair_inventory(
             _document(INVENTORY_PATH),
             load_mapping_families(MAPPING_PATH),
             _catalog_index(catalog),
         )
+
+    assert captured.value.failure.serialized() == {
+        "reason_code": "target_not_stable",
+        "family_id": "craft-manufacturing-resource-change",
+        "source_capability_id": "craft.manufacturing_resource.change.apply",
+        "source_major_version": 1,
+        "method": "DELETE",
+        "route_pattern": "/api/bop/factories/{}",
+        "target_capability_id": "factory.structure.archive",
+        "target_major_version": 1,
+    }
 
 
 def test_repair_rejects_cross_owner_replacement(tmp_path: Path) -> None:
@@ -160,5 +198,32 @@ def test_repair_reports_source_row_without_mapping() -> None:
 
     result = repair_inventory(inventory, families, _catalog_index())
 
-    assert "GET /api/gbop/unreviewed" in result.unmatched
-    assert any(item.startswith("missing inventory route:") for item in result.unmatched)
+    assert [failure.serialized() for failure in result.unmatched] == [
+        {
+            "reason_code": "inventory_route_missing",
+            "family_id": "craft-gbop-read",
+            "source_capability_id": "craft.gbop.read",
+            "source_major_version": 1,
+            "method": "GET",
+            "route_pattern": "/api/gbop/entries/{}/links",
+        },
+        {
+            "reason_code": "source_route_unmapped",
+            "family_id": "craft-gbop-read",
+            "source_capability_id": "craft.gbop.read",
+            "source_major_version": 1,
+            "method": "GET",
+            "route_pattern": "/api/gbop/unreviewed",
+        },
+    ]
+    assert json.loads(str(result.unmatched[1])) == result.unmatched[1].serialized()
+
+
+def test_members_matrix_is_not_falsely_registered_as_legacy_member_list() -> None:
+    inventory = _document(INVENTORY_PATH)
+
+    assert not any(
+        entry["method"] == "GET"
+        and entry["route_path"] == "/api/projects/members/matrix"
+        for entry in inventory["entries"]
+    )

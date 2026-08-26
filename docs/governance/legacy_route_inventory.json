@@ -2580,19 +2580,6 @@
       "migration_target_major_version": 1
     },
     {
-      "route_path": "/api/projects/members/matrix",
-      "method": "GET",
-      "owner": "project_management",
-      "migration_target_capability": "project.member.read.atomic.members_list",
-      "migration_deadline": "2026-11-21",
-      "source": "plugins/craft/craft_backend/routers/projects.py",
-      "allowed_consumers": [
-        "web",
-        "rest"
-      ],
-      "migration_target_major_version": 1
-    },
-    {
       "route_path": "/api/projects/vehicle_models",
       "method": "GET",
       "owner": "project_management",
