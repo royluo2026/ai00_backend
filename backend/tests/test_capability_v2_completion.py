@@ -477,3 +477,19 @@ def test_completion_cli_reports_complete_in_progress_and_strict_modes() -> None:
     assert strict.returncode == 0
     assert json.loads(strict.stdout)["complete"] is True
     assert json.loads(strict.stdout)["cross_domain_sql"] == 0
+
+
+def test_completion_cli_static_only_alias_runs_the_strict_static_gate() -> None:
+    root = Path(__file__).resolve().parents[2]
+    script = root / "backend/scripts/check_capability_v2_completion.py"
+
+    result = subprocess.run(
+        [sys.executable, str(script), "--static-only"],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert json.loads(result.stdout)["complete"] is True

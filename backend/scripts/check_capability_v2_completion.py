@@ -130,13 +130,20 @@ def _governance_acceptance(path: Path) -> dict[str, object]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--mode", choices=("progress", "strict"), required=True)
+    mode_group = parser.add_mutually_exclusive_group(required=True)
+    mode_group.add_argument("--mode", choices=("progress", "strict"))
+    mode_group.add_argument(
+        "--static-only",
+        action="store_true",
+        help="run the existing strict static completion evaluation",
+    )
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--report", type=Path)
     parser.add_argument("--web-root", type=Path, help="scan a Web worktree for legacy routes")
     parser.add_argument("--governance-acceptance-report", type=Path)
     args = parser.parse_args()
-    report = evaluate_completion(args.root, mode=args.mode, web_root=args.web_root)
+    selected_mode = "strict" if args.static_only else args.mode
+    report = evaluate_completion(args.root, mode=selected_mode, web_root=args.web_root)
     rendered_report = report.serialized()
     governance_acceptance = None
     if args.governance_acceptance_report:
@@ -151,7 +158,7 @@ def main() -> int:
         target.write_text(rendered, encoding="utf-8", newline="\n")
     print(rendered, end="")
     failed = not report.complete or (governance_acceptance is not None and governance_acceptance["status"] != "passed")
-    return 1 if args.mode == "strict" and failed else 0
+    return 1 if selected_mode == "strict" and failed else 0
 
 
 if __name__ == "__main__":

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "legacy-route-target-mappings.schema.json",
+  "type": "object",
+  "required": ["schema_version", "mapping_families"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "schema_version": {"const": 1},
+    "mapping_families": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {"$ref": "#/$defs/MappingFamily"}
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "MappingFamily": {
+      "type": "object",
+      "required": ["family_id", "source_capability_id", "source_major_version", "routes"],
+      "properties": {
+        "family_id": {"type": "string", "minLength": 1},
+        "source_capability_id": {"type": "string", "minLength": 1},
+        "source_major_version": {"type": "integer", "minimum": 1},
+        "routes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/RouteTarget"}
+        }
+      },
+      "additionalProperties": false
+    },
+    "RouteTarget": {
+      "type": "object",
+      "required": [
+        "route_method",
+        "route_pattern",
+        "target_capability_id",
+        "target_major_version",
+        "owner",
+        "review_reference"
+      ],
+      "properties": {
+        "route_method": {"enum": ["DELETE", "GET", "PATCH", "POST", "PUT"]},
+        "route_pattern": {"type": "string", "pattern": "^/api/"},
+        "target_capability_id": {"type": "string", "minLength": 1},
+        "target_major_version": {"type": "integer", "minimum": 1},
+        "owner": {"type": "string", "minLength": 1},
+        "review_reference": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "$schema": "legacy-route-target-mappings.schema.json",
+  "schema_version": 1,
+  "mapping_families": [
+    {
+      "family_id": "craft-manufacturing-resource-change",
+      "source_capability_id": "craft.manufacturing_resource.change.apply",
+      "source_major_version": 1,
+      "routes": [
+        {"route_method": "DELETE", "route_pattern": "/api/bop/factories/{}", "target_capability_id": "factory.structure.archive", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/_bop/factory.py:120"},
+        {"route_method": "DELETE", "route_pattern": "/api/bop/factory_sections/{}", "target_capability_id": "factory.structure.archive", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/_bop/factory.py:141"},
+        {"route_method": "DELETE", "route_pattern": "/api/bop/factory_stations/{}", "target_capability_id": "factory.structure.archive", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/_bop/factory.py:162"},
+        {"route_method": "DELETE", "route_pattern": "/api/bop/layout_templates/{}", "target_capability_id": "factory.resource_catalog.deprecate", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/_bop/factory.py:210"},
+        {"route_method": "DELETE", "route_pattern": "/api/factory/equipments/{}", "target_capability_id": "factory.asset.scrap", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:93"},
+        {"route_method": "DELETE", "route_pattern": "/api/factory/fixtures/{}", "target_capability_id": "factory.asset.scrap", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:93"},
+        {"route_method": "DELETE", "route_pattern": "/api/factory/sections/{}", "target_capability_id": "factory.structure.archive", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:266"},
+        {"route_method": "DELETE", "route_pattern": "/api/factory/stations/{}", "target_capability_id": "factory.structure.archive", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:271"},
+        {"route_method": "DELETE", "route_pattern": "/api/factory/tools/{}", "target_capability_id": "factory.asset.scrap", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:93"},
+        {"route_method": "PATCH", "route_pattern": "/api/bop/factories/{}", "target_capability_id": "factory.structure.update", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/_bop/factory.py:115"},
+        {"route_method": "PATCH", "route_pattern": "/api/bop/factory_sections/{}", "target_capability_id": "factory.structure.update", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/_bop/factory.py:136"},
+        {"route_method": "PATCH", "route_pattern": "/api/bop/factory_stations/{}", "target_capability_id": "factory.structure.update", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/_bop/factory.py:157"},
+        {"route_method": "PATCH", "route_pattern": "/api/bop/layout_templates/{}", "target_capability_id": "factory.resource_catalog.revise", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/_bop/factory.py:197"},
+        {"route_method": "PATCH", "route_pattern": "/api/factory/equipments/{}", "target_capability_id": "factory.asset.update", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:113"},
+        {"route_method": "PATCH", "route_pattern": "/api/factory/fixtures/{}", "target_capability_id": "factory.asset.update", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:113"},
+        {"route_method": "PATCH", "route_pattern": "/api/factory/sections/{}", "target_capability_id": "factory.structure.update", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:249"},
+        {"route_method": "PATCH", "route_pattern": "/api/factory/stations/{}", "target_capability_id": "factory.structure.update", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:254"},
+        {"route_method": "PATCH", "route_pattern": "/api/factory/tools/{}", "target_capability_id": "factory.asset.update", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:113"},
+        {"route_method": "POST", "route_pattern": "/api/bop/factories", "target_capability_id": "factory.structure.create", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/_bop/factory.py:105"},
+        {"route_method": "POST", "route_pattern": "/api/bop/factories/{}/layout_templates", "target_capability_id": "factory.resource_catalog.create", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/_bop/factory.py:185"},
+        {"route_method": "POST", "route_pattern": "/api/bop/factories/{}/sections", "target_capability_id": "factory.structure.create", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/_bop/factory.py:130"},
+        {"route_method": "POST", "route_pattern": "/api/bop/factory_sections/{}/stations", "target_capability_id": "factory.structure.create", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/_bop/factory.py:151"},
+        {"route_method": "POST", "route_pattern": "/api/bop/layout_templates/{}/apply", "target_capability_id": "factory.structure.create", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/_bop/factory.py:222"},
+        {"route_method": "POST", "route_pattern": "/api/factory/equipments", "target_capability_id": "factory.asset.register", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:89"},
+        {"route_method": "POST", "route_pattern": "/api/factory/equipments/{}/maintenance", "target_capability_id": "factory.asset.maintenance.start", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:98"},
+        {"route_method": "POST", "route_pattern": "/api/factory/equipments/{}/return", "target_capability_id": "factory.asset.maintenance.complete", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:103"},
+        {"route_method": "POST", "route_pattern": "/api/factory/equipments/{}/scrap", "target_capability_id": "factory.asset.scrap", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:108"},
+        {"route_method": "POST", "route_pattern": "/api/factory/fixtures", "target_capability_id": "factory.asset.register", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:89"},
+        {"route_method": "POST", "route_pattern": "/api/factory/fixtures/{}/maintenance", "target_capability_id": "factory.asset.maintenance.start", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:98"},
+        {"route_method": "POST", "route_pattern": "/api/factory/fixtures/{}/return", "target_capability_id": "factory.asset.maintenance.complete", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:103"},
+        {"route_method": "POST", "route_pattern": "/api/factory/fixtures/{}/scrap", "target_capability_id": "factory.asset.scrap", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:108"},
+        {"route_method": "POST", "route_pattern": "/api/factory/sections", "target_capability_id": "factory.structure.create", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:220"},
+        {"route_method": "POST", "route_pattern": "/api/factory/stations", "target_capability_id": "factory.structure.create", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:231"},
+        {"route_method": "POST", "route_pattern": "/api/factory/tools", "target_capability_id": "factory.asset.register", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:89"},
+        {"route_method": "POST", "route_pattern": "/api/factory/tools/{}/maintenance", "target_capability_id": "factory.asset.maintenance.start", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:98"},
+        {"route_method": "POST", "route_pattern": "/api/factory/tools/{}/return", "target_capability_id": "factory.asset.maintenance.complete", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:103"},
+        {"route_method": "POST", "route_pattern": "/api/factory/tools/{}/scrap", "target_capability_id": "factory.asset.scrap", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:108"}
+      ]
+    },
+    {
+      "family_id": "craft-manufacturing-resource-read",
+      "source_capability_id": "craft.manufacturing_resource.read",
+      "source_major_version": 1,
+      "routes": [
+        {"route_method": "GET", "route_pattern": "/api/bop/factories", "target_capability_id": "factory.structure.search", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/_bop/factory.py:100"},
+        {"route_method": "GET", "route_pattern": "/api/bop/factories/{}/layout_templates", "target_capability_id": "factory.resource_catalog.search", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/_bop/factory.py:180"},
+        {"route_method": "GET", "route_pattern": "/api/bop/factories/{}/sections", "target_capability_id": "factory.structure.search", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/_bop/factory.py:125"},
+        {"route_method": "GET", "route_pattern": "/api/bop/factories/{}", "target_capability_id": "factory.structure.get", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/_bop/factory.py:110"},
+        {"route_method": "GET", "route_pattern": "/api/bop/factory_sections/{}/stations", "target_capability_id": "factory.structure.search", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/_bop/factory.py:146"},
+        {"route_method": "GET", "route_pattern": "/api/bop/layout_templates/{}", "target_capability_id": "factory.resource_catalog.get", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/_bop/factory.py:190"},
+        {"route_method": "GET", "route_pattern": "/api/factory/equipments", "target_capability_id": "factory.asset.search", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:84"},
+        {"route_method": "GET", "route_pattern": "/api/factory/fixtures", "target_capability_id": "factory.asset.search", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:84"},
+        {"route_method": "GET", "route_pattern": "/api/factory/sections", "target_capability_id": "factory.structure.search", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:215"},
+        {"route_method": "GET", "route_pattern": "/api/factory/stations", "target_capability_id": "factory.structure.search", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:226"},
+        {"route_method": "GET", "route_pattern": "/api/factory/tools", "target_capability_id": "factory.asset.search", "target_major_version": 1, "owner": "factory", "review_reference": "plugins/craft/craft_backend/routers/factory.py:84"}
+      ]
+    },
+    {
+      "family_id": "craft-gbop-change",
+      "source_capability_id": "craft.gbop.change.apply",
+      "source_major_version": 1,
+      "routes": [
+        {"route_method": "DELETE", "route_pattern": "/api/gbop/entries/{}", "target_capability_id": "craft.gbop.entity.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:630"},
+        {"route_method": "DELETE", "route_pattern": "/api/gbop/entry-links/{}", "target_capability_id": "craft.gbop.entity.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:964"},
+        {"route_method": "DELETE", "route_pattern": "/api/gbop/operations/{}", "target_capability_id": "craft.gbop.entity.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:911"},
+        {"route_method": "DELETE", "route_pattern": "/api/gbop/processes/{}", "target_capability_id": "craft.gbop.entity.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:772"},
+        {"route_method": "DELETE", "route_pattern": "/api/gbop/version-families/{}/archive", "target_capability_id": "craft.gbop.version.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:525"},
+        {"route_method": "PATCH", "route_pattern": "/api/gbop/entries/{}", "target_capability_id": "craft.gbop.entity.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:582"},
+        {"route_method": "PATCH", "route_pattern": "/api/gbop/operations/{}", "target_capability_id": "craft.gbop.entity.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:870"},
+        {"route_method": "PATCH", "route_pattern": "/api/gbop/processes/{}", "target_capability_id": "craft.gbop.entity.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:731"},
+        {"route_method": "PATCH", "route_pattern": "/api/gbop/versions/{}", "target_capability_id": "craft.gbop.version.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:456"},
+        {"route_method": "POST", "route_pattern": "/api/gbop/bop-versions/{}/station-autolink", "target_capability_id": "craft.gbop.station_autolink.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:2073"},
+        {"route_method": "POST", "route_pattern": "/api/gbop/bop-versions/{}/station-autolink-undo", "target_capability_id": "craft.gbop.station_autolink.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:2409"},
+        {"route_method": "POST", "route_pattern": "/api/gbop/entries", "target_capability_id": "craft.gbop.entity.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:550"},
+        {"route_method": "POST", "route_pattern": "/api/gbop/entry-links", "target_capability_id": "craft.gbop.entity.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:935"},
+        {"route_method": "POST", "route_pattern": "/api/gbop/operations", "target_capability_id": "craft.gbop.entity.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:802"},
+        {"route_method": "POST", "route_pattern": "/api/gbop/pbom-versions/{}/vpps-auto-link", "target_capability_id": "craft.gbop.navigation.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:1620"},
+        {"route_method": "POST", "route_pattern": "/api/gbop/pbom-versions/{}/vpps-auto-link-confirm", "target_capability_id": "craft.gbop.navigation.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:1611"},
+        {"route_method": "POST", "route_pattern": "/api/gbop/processes", "target_capability_id": "craft.gbop.entity.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:663"},
+        {"route_method": "POST", "route_pattern": "/api/gbop/version-families/{}/archive", "target_capability_id": "craft.gbop.version.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:507"},
+        {"route_method": "POST", "route_pattern": "/api/gbop/versions", "target_capability_id": "craft.gbop.version.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:433"},
+        {"route_method": "POST", "route_pattern": "/api/gbop/versions/{}/freeze", "target_capability_id": "craft.gbop.version.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:486"},
+        {"route_method": "POST", "route_pattern": "/api/gbop/versions/{}/fork", "target_capability_id": "craft.gbop.version.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:1411"},
+        {"route_method": "POST", "route_pattern": "/api/gbop/versions/{}/import-entries", "target_capability_id": "craft.gbop.import.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:1071"},
+        {"route_method": "POST", "route_pattern": "/api/gbop/versions/{}/import-tc-excel", "target_capability_id": "craft.gbop.import.tc.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:1125"},
+        {"route_method": "POST", "route_pattern": "/api/gbop/versions/{}/import-vpps-parts", "target_capability_id": "craft.gbop.import.change.apply", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:995"}
+      ]
+    },
+    {
+      "family_id": "craft-gbop-read",
+      "source_capability_id": "craft.gbop.read",
+      "source_major_version": 1,
+      "routes": [
+        {"route_method": "GET", "route_pattern": "/api/gbop/entries/{}/links", "target_capability_id": "craft.gbop.catalog.read", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:988"},
+        {"route_method": "GET", "route_pattern": "/api/gbop/pbom-versions/{}/gbop-nav-link-summary", "target_capability_id": "craft.gbop.navigation.read", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:1601"},
+        {"route_method": "GET", "route_pattern": "/api/gbop/pbom-versions/{}/process-hierarchy", "target_capability_id": "craft.gbop.process_hierarchy.read", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:1761"},
+        {"route_method": "GET", "route_pattern": "/api/gbop/pbom-versions/{}/vpps-auto-link-status", "target_capability_id": "craft.gbop.navigation.read", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:1606"},
+        {"route_method": "GET", "route_pattern": "/api/gbop/versions", "target_capability_id": "craft.gbop.release.search", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:414"},
+        {"route_method": "GET", "route_pattern": "/api/gbop/versions/{}/entries", "target_capability_id": "craft.gbop.catalog.read", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:545"},
+        {"route_method": "GET", "route_pattern": "/api/gbop/versions/{}/operations", "target_capability_id": "craft.gbop.catalog.read", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:797"},
+        {"route_method": "GET", "route_pattern": "/api/gbop/versions/{}/processes", "target_capability_id": "craft.gbop.catalog.read", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/gbop.py:658"}
+      ]
+    },
+    {
+      "family_id": "project-craft-scope-read",
+      "source_capability_id": "project.craft_scope.read",
+      "source_major_version": 1,
+      "routes": [
+        {"route_method": "GET", "route_pattern": "/api/projects/{}/bop-lines", "target_capability_id": "craft.bop.entry.legacy_read", "target_major_version": 1, "owner": "craft", "review_reference": "plugins/craft/craft_backend/routers/projects.py:274"}
+      ]
+    }
+  ]
+}
