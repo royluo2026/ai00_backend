@@ -11,8 +11,11 @@ from pathlib import Path, PurePosixPath
 from typing import Literal
 
 from .consumer_routes import (
+    canonical_route_index,
+    classify_route_disposition,
     load_lexical_non_routes,
     load_operations_exclusions,
+    normalize_route,
     scan_web_api_routes,
 )
 from .atomicity import load_atomicity_dispositions
@@ -341,9 +344,17 @@ def _stored_web_route_failures(
         return 0, ["web_route_inventory_artifact_missing:1"]
     report = _load_json(artifact)
     failures: list[str] = []
+    legacy_index = _web_route_index(
+        root, configuration, "legacy_route_inventory_artifact"
+    )
+    bff_index = _web_route_index(root, configuration, "bff_route_inventory_artifact")
+    operations_index = {
+        exclusion.key for exclusion in _web_operations_exclusions(root, configuration)
+    }
     routes = report.get("routes")
     computed = Counter({disposition: 0 for disposition in _WEB_DISPOSITIONS})
     identities: set[str] = set()
+    disposition_mismatches = 0
     routes_valid = isinstance(routes, list)
     if isinstance(routes, list):
         allowed_keys = {
@@ -364,6 +375,7 @@ def _stored_web_route_failures(
             disposition = route.get("disposition")
             identity = route.get("occurrence_id")
             prefix = route.get("classification_prefix")
+            canonical_route = normalize_route(raw_route) if isinstance(raw_route, str) else None
             expected_identity = (
                 f"{source}:{line}:{column}:{method or 'UNKNOWN'}:{normalized}"
             )
@@ -383,6 +395,7 @@ def _stored_web_route_failures(
                 and "/api/" in raw_route
                 and isinstance(normalized, str)
                 and normalized.startswith("/api/")
+                and normalized == canonical_route
                 and (method is None or (
                     isinstance(method, str) and method in _WEB_METHODS
                 ))
@@ -397,9 +410,18 @@ def _stored_web_route_failures(
                 routes_valid = False
                 continue
             identities.add(identity)
-            computed[disposition] += 1
+            derived_disposition = classify_route_disposition(
+                method, canonical_route, legacy_index, bff_index, operations_index
+            )
+            if derived_disposition != disposition:
+                disposition_mismatches += 1
+            computed[derived_disposition] += 1
     if not routes_valid:
         failures.append("web_route_inventory_routes_invalid:1")
+    if disposition_mismatches:
+        failures.append(
+            f"web_route_inventory_disposition_mismatch:{disposition_mismatches}"
+        )
     counts = report.get("counts")
     counts_valid = (
         isinstance(counts, dict)
@@ -500,7 +522,22 @@ def _web_route_index(root: Path, configuration: dict, field: str) -> set[tuple[s
     if not isinstance(relative, str) or not relative:
         raise CompletionConfigurationError(f"{field} must be a repository-relative path")
     inventory = load_route_inventory(_relative_path(root, relative, field=field))
-    return {(entry.method, entry.route_path) for entry in inventory.entries}
+    return canonical_route_index(
+        (entry.method, entry.route_path) for entry in inventory.entries
+    )
+
+
+def _web_operations_exclusions(root: Path, configuration: dict):
+    relative = configuration.get("web_operations_exclusions_artifact")
+    if relative is None:
+        return ()
+    if not isinstance(relative, str) or not relative:
+        raise CompletionConfigurationError(
+            "web_operations_exclusions_artifact must be a repository-relative path"
+        )
+    return load_operations_exclusions(
+        _relative_path(root, relative, field="web_operations_exclusions_artifact")
+    )
 
 
 def _route_inventory_failures(root: Path, configuration: dict) -> list[str]:
@@ -622,20 +659,7 @@ def evaluate_completion(
         )
         if not isinstance(web_prefixes, list):
             raise CompletionConfigurationError("web_legacy_route_prefixes must be an array")
-        exclusions_relative = configuration.get("web_operations_exclusions_artifact")
-        exclusions = ()
-        if exclusions_relative is not None:
-            if not isinstance(exclusions_relative, str) or not exclusions_relative:
-                raise CompletionConfigurationError(
-                    "web_operations_exclusions_artifact must be a repository-relative path"
-                )
-            exclusions = load_operations_exclusions(
-                _relative_path(
-                    root,
-                    exclusions_relative,
-                    field="web_operations_exclusions_artifact",
-                )
-            )
+        exclusions = _web_operations_exclusions(root, configuration)
         lexical_non_routes_relative = configuration.get(
             "web_lexical_non_routes_artifact"
         )

@@ -441,7 +441,7 @@ def _raw_route(source: str, literal_end: int, fragment: str) -> str:
     return fragment
 
 
-def _canonical_index(
+def canonical_route_index(
     index: Iterable[tuple[str, str]] | Mapping[tuple[str, str], object],
 ) -> set[tuple[str, str]]:
     keys = index.keys() if isinstance(index, Mapping) else index
@@ -566,7 +566,7 @@ def load_lexical_non_routes(path: Path) -> tuple[LexicalNonRoute, ...]:
     return tuple(parsed)
 
 
-def _disposition(
+def classify_route_disposition(
     method: str | None,
     route: str,
     legacy_index: set[tuple[str, str]],
@@ -609,8 +609,8 @@ def scan_web_api_routes(
     if not isinstance(frontend_revision, str) or not frontend_revision:
         raise RouteScanConfigurationError("frontend revision is required")
     common_base, sources = _iter_sources(roots)
-    legacy_keys = _canonical_index(legacy_index)
-    bff_keys = _canonical_index(bff_index)
+    legacy_keys = canonical_route_index(legacy_index)
+    bff_keys = canonical_route_index(bff_index)
     operations = _validate_exclusions(exclusions)
     operations_keys = {item.key for item in operations}
     prefixes = tuple(sorted(set(classification_prefixes)))
@@ -645,7 +645,7 @@ def scan_web_api_routes(
             line_start = source.rfind("\n", 0, route_offset) + 1
             column = route_offset - line_start + 1
             method = _method_for_occurrence(scan_source, literal_start, literal_end)
-            disposition = _disposition(
+            disposition = classify_route_disposition(
                 method, normalized, legacy_keys, bff_keys, operations_keys
             )
             prefix = next(
@@ -776,6 +776,8 @@ __all__ = [
     "RouteScanConfigurationError",
     "RouteScanReport",
     "RouteUse",
+    "canonical_route_index",
+    "classify_route_disposition",
     "load_operations_exclusions",
     "load_lexical_non_routes",
     "normalize_route",

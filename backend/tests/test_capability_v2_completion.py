@@ -619,6 +619,112 @@ def test_strict_completion_rejects_noncanonical_stored_route(tmp_path: Path) -> 
     assert "web_route_inventory_routes_invalid:1" in report.failed
 
 
+def test_strict_completion_rederives_forged_stored_disposition(
+    tmp_path: Path,
+) -> None:
+    root = _complete_repository(tmp_path)
+    _web, artifact = _configure_complete_web_evidence(
+        root, "client.request('/api/tasks');\n"
+    )
+    catalog_path = root / "docs/capabilities/catalog.v2.json"
+    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    catalog["capabilities"][1]["owner_domain"] = "craft"
+    _write_json(root, "docs/capabilities/catalog.v2.json", catalog)
+    _write_json(
+        root,
+        "docs/legacy-routes.json",
+        {
+            "inventory_kind": "legacy_rest",
+            "entries": [
+                {
+                    "route_path": "/api/tasks",
+                    "method": "GET",
+                    "owner": "craft",
+                    "migration_target_capability": "test.capability_1",
+                    "migration_target_major_version": 1,
+                    "migration_deadline": "2026-11-21",
+                    "source": "backend/routers/tasks.py",
+                    "allowed_consumers": ["web", "rest"],
+                }
+            ],
+        },
+    )
+    document = json.loads(artifact.read_text(encoding="utf-8"))
+    document["routes"][0]["disposition"] = "legacy_registered"
+    document["counts"]["legacy_registered"] = 1
+    document["counts"]["unresolved"] = 0
+    _write_json(root, "docs/web-routes.json", document)
+
+    report = evaluate_completion(root, mode="strict")
+
+    assert report.web_consumer_bypasses == 1
+    assert "web_route_inventory_disposition_mismatch:1" in report.failed
+    assert "web_route_inventory_unresolved:1" in report.failed
+
+
+def test_strict_completion_rederives_parameterized_stored_registration(
+    tmp_path: Path,
+) -> None:
+    root = _complete_repository(tmp_path)
+    _web, artifact = _configure_complete_web_evidence(
+        root,
+        "fetch(`/api/tasks/${taskId}`, { method: 'DELETE' });\n",
+    )
+    catalog_path = root / "docs/capabilities/catalog.v2.json"
+    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    catalog["capabilities"][1]["owner_domain"] = "craft"
+    _write_json(root, "docs/capabilities/catalog.v2.json", catalog)
+    _write_json(
+        root,
+        "docs/legacy-routes.json",
+        {
+            "inventory_kind": "legacy_rest",
+            "entries": [
+                {
+                    "route_path": "/api/tasks/{gid}",
+                    "method": "DELETE",
+                    "owner": "craft",
+                    "migration_target_capability": "test.capability_1",
+                    "migration_target_major_version": 1,
+                    "migration_deadline": "2026-11-21",
+                    "source": "backend/routers/tasks.py",
+                    "allowed_consumers": ["web", "rest"],
+                }
+            ],
+        },
+    )
+    document = json.loads(artifact.read_text(encoding="utf-8"))
+    document["routes"][0]["disposition"] = "legacy_registered"
+    document["counts"]["legacy_registered"] = 1
+    document["counts"]["unresolved"] = 0
+    _write_json(root, "docs/web-routes.json", document)
+
+    report = evaluate_completion(root, mode="strict")
+
+    assert report.web_consumer_bypasses == 0
+    assert "web_route_inventory_disposition_mismatch:1" not in report.failed
+
+
+def test_strict_completion_rejects_normalized_route_not_derived_from_raw(
+    tmp_path: Path,
+) -> None:
+    root = _complete_repository(tmp_path)
+    _web, artifact = _configure_complete_web_evidence(
+        root, "client.request('/api/tasks');\n"
+    )
+    document = json.loads(artifact.read_text(encoding="utf-8"))
+    route = document["routes"][0]
+    route["normalized_route"] = "/api/forged"
+    route["occurrence_id"] = (
+        f"{route['source']}:{route['line']}:{route['column']}:UNKNOWN:/api/forged"
+    )
+    _write_json(root, "docs/web-routes.json", document)
+
+    report = evaluate_completion(root, mode="strict")
+
+    assert "web_route_inventory_routes_invalid:1" in report.failed
+
+
 def test_fresh_web_verification_rejects_missing_frontend_root(tmp_path: Path) -> None:
     root = _complete_repository(tmp_path)
 
