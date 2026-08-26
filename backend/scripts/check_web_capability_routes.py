@@ -92,9 +92,18 @@ def _inventory_index(path: Path) -> set[tuple[str, str]]:
     return {(entry.method, entry.route_path) for entry in inventory.entries}
 
 
+def _require_known_methods(report):
+    unknown = next((route for route in report.routes if route.method is None), None)
+    if unknown is not None:
+        raise RouteScanConfigurationError(
+            f"canonical Web route method is unknown: {unknown.occurrence_id}"
+        )
+    return report
+
+
 def build_report(web_root: Path, prefixes: tuple[str, ...] = DEFAULT_LEGACY_PREFIXES):
     web_root = web_root.resolve()
-    return scan_web_api_routes(
+    return _require_known_methods(scan_web_api_routes(
         [web_root / "web", web_root / "packages"],
         legacy_index=_inventory_index(LEGACY_INVENTORY),
         bff_index=_inventory_index(BFF_INVENTORY),
@@ -103,7 +112,7 @@ def build_report(web_root: Path, prefixes: tuple[str, ...] = DEFAULT_LEGACY_PREF
         classification_prefixes=prefixes,
         lexical_non_routes=load_lexical_non_routes(LEXICAL_NON_ROUTES),
         wrapper_contracts=load_wrapper_contracts(WRAPPER_CONTRACTS),
-    )
+    ))
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -612,13 +612,14 @@ def audit_route_root_cause_ledger(
                 or not details.get("response_transform", "").strip()
                 or not isinstance(equivalence, Mapping)
                 or equivalence.get("proof_kind") != "provider_equivalent_adapter"
-                or not isinstance(equivalence.get("sources"), list)
-                or not equivalence.get("sources")
+                or not isinstance(equivalence.get("provider_contract"), Mapping)
             ):
                 issues.append(f"ledger_migrated_target_invalid:{context}")
         elif entry.disposition == "existing_capability_reclassified":
             target = _target(details.get("candidate_target_capability"))
-            sources = details.get("sources")
+            legacy_contract = details.get("legacy_contract")
+            candidate_contracts = details.get("candidate_contracts")
+            contract_mismatch = details.get("contract_mismatch")
             if (
                 target is None or catalog.get(target) != ("stable", entry.owner_domain)
                 or details.get("reason_code") not in {
@@ -630,7 +631,10 @@ def audit_route_root_cause_ledger(
                 }
                 or not isinstance(details.get("finding"), str)
                 or len(details.get("finding", "").strip()) < 20
-                or not isinstance(sources, list) or not sources
+                or not isinstance(legacy_contract, Mapping)
+                or not isinstance(candidate_contracts, list) or not candidate_contracts
+                or not isinstance(contract_mismatch, Mapping)
+                or set(contract_mismatch) != {"input", "output", "side_effects"}
             ):
                 issues.append(f"ledger_reclassification_invalid:{context}")
         elif entry.disposition == "truthful_bff_required":

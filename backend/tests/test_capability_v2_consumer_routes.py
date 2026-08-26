@@ -17,6 +17,7 @@ from backend.capability_v2.consumer_routes import (
     scan_web_api_routes,
     scan_web_routes,
 )
+from backend.scripts.check_web_capability_routes import _require_known_methods
 
 
 def _scan(source: str, tmp_path: Path, **kwargs):
@@ -177,6 +178,13 @@ def test_ambiguous_method_is_unresolved(tmp_path: Path) -> None:
 
     assert report.routes[0].method is None
     assert report.routes[0].disposition == "unresolved"
+
+
+def test_canonical_gate_rejects_ambiguous_method(tmp_path: Path) -> None:
+    report = _scan("client.request('/api/tasks')\n", tmp_path)
+
+    with pytest.raises(RouteScanConfigurationError, match="method is unknown"):
+        _require_known_methods(report)
 
 
 @pytest.mark.parametrize("callee", ["api", "cf", "fn"])

@@ -23,6 +23,7 @@ from backend.capability_v2.route_root_cause_ledger import (
 
 ROOT = Path(__file__).resolve().parents[2]
 LEDGER_PATH = ROOT / "docs/governance/web-route-root-cause-ledger.json"
+CANONICAL_WEB_INVENTORY = ROOT / "docs/governance/capability-coverage-review/generated/web_route_inventory.json"
 BASELINE_BACKEND_REVISION = "800ec6ba559db3301221e674b2a5026d354214ff"
 BASELINE_INVENTORY_SHA256 = "55f3de074e060a71dc6acab4bee993d42d7af05026e6acd4c0e8d7f6d06b9694"
 
@@ -43,6 +44,13 @@ def _replace_ledger_entry(ledger, replacement):
             for item in ledger.entries
         ),
     )
+
+
+def test_canonical_web_inventory_has_no_unknown_method() -> None:
+    inventory = json.loads(CANONICAL_WEB_INVENTORY.read_text(encoding="utf-8"))
+
+    assert all(route.get("method") is not None for route in inventory["routes"])
+    assert all("UNKNOWN:" not in route["occurrence_id"] for route in inventory["routes"])
 
 
 def test_task3b3a_root_cause_ledger_covers_pinned_unresolved_evidence() -> None:

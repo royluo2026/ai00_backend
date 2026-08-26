@@ -5,6 +5,7 @@ import argparse
 from collections import Counter, defaultdict
 import hashlib
 import json
+from functools import lru_cache
 from pathlib import Path
 import subprocess
 import sys
@@ -27,6 +28,7 @@ from backend.capability_v2.route_root_cause_ledger import (
     build_route_definition_evidence,
 )
 from backend.capability_v2.existing_capability_migrations import (
+    audit_existing_capability_migrations,
     load_existing_capability_migrations,
 )
 from backend.scripts.check_web_capability_routes import build_report
@@ -35,8 +37,16 @@ DEFAULT_LEDGER = ROOT / "docs/governance/web-route-root-cause-ledger.json"
 MIGRATION_MANIFEST = ROOT / "docs/governance/existing-capability-web-migrations.json"
 
 
-def _migration_decisions():
+@lru_cache(maxsize=1)
+def _migration_decisions(web_root: Path):
     manifest = load_existing_capability_migrations(MIGRATION_MANIFEST)
+    issues = audit_existing_capability_migrations(
+        ROOT, manifest, web_root=web_root
+    )
+    if issues:
+        raise RuntimeError(
+            "Task 3B.3b independent migration review failed: " + "; ".join(issues)
+        )
     return {(group.method, group.normalized_route): group for group in manifest.groups}
 
 EXISTING = {
@@ -516,7 +526,7 @@ def _classify(
         }, "The handler selects exactly one branch per request; conditional dispatch is not aggregation and cannot be registered as a BFF."
     target = _migration_target(key)
     if target:
-        decision = _migration_decisions().get(key)
+        decision = _migration_decisions(web_root).get(key)
         if decision is None or f"{decision.target_capability_id}@{decision.target_major_version}" != target:
             raise RuntimeError(f"Task 3B.3b migration decision missing or stale: {key}")
         if decision.decision == "migrate":
