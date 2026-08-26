@@ -1,6 +1,6 @@
 {
-  "frontend_revision": "06fb5da0a05707a61dcf5ab0ea86e6ce4c1c794a",
-  "content_hash": "5f8831d642713d7be7504e5819b6029654e9fba6b36d83e78b5cb4688b8c68e5",
+  "frontend_revision": "7848e30803ada6cc687c9e8b3b14ce4020254886",
+  "content_hash": "227927b5c91ae24747115ccea4ab72097b951be0dd4d96c8f954455984a71b38",
   "wrapper_contracts_hash": "32d10dab46359a55ca2a0c9c48648c4f313b27cee7f0371d14bd4f08162ff68a",
   "scan_roots": [
     "web",
@@ -31,7 +31,7 @@
   },
   "lexical_audit": {
     "token_count": 495,
-    "token_hash": "269a14d2964e87b773f183a80fe8c65fd14e376aedbc975d64cd34ac830942d6",
+    "token_hash": "470ca1c5e8e3bb8a7a0f20d80369fe8c26fa2cb05889269103abdf7a6157058d",
     "mapped_count": 476,
     "reviewed_non_route_count": 19,
     "reviewed_non_route_tokens": [
@@ -4027,113 +4027,113 @@
     },
     {
       "source": "web/org_mgmt/org_mgmt.js",
-      "line": 28,
+      "line": 30,
       "column": 39,
       "raw_route": "/api/v1/capabilities/${id}:invoke",
       "normalized_route": "/api/v1/capabilities/{dynamic}:invoke",
       "method": "POST",
       "disposition": "capability",
-      "occurrence_id": "web/org_mgmt/org_mgmt.js:28:39:POST:/api/v1/capabilities/{dynamic}:invoke"
+      "occurrence_id": "web/org_mgmt/org_mgmt.js:30:39:POST:/api/v1/capabilities/{dynamic}:invoke"
     },
     {
       "source": "web/org_mgmt/org_mgmt.js",
-      "line": 90,
+      "line": 92,
       "column": 17,
       "raw_route": "/api/org/teams",
       "normalized_route": "/api/org/teams",
       "method": "GET",
       "disposition": "unresolved",
-      "occurrence_id": "web/org_mgmt/org_mgmt.js:90:17:GET:/api/org/teams"
+      "occurrence_id": "web/org_mgmt/org_mgmt.js:92:17:GET:/api/org/teams"
     },
     {
       "source": "web/org_mgmt/org_mgmt.js",
-      "line": 91,
+      "line": 93,
       "column": 75,
       "raw_route": "/api/users/",
       "normalized_route": "/api/users",
       "method": "GET",
       "disposition": "unresolved",
-      "occurrence_id": "web/org_mgmt/org_mgmt.js:91:75:GET:/api/users"
+      "occurrence_id": "web/org_mgmt/org_mgmt.js:93:75:GET:/api/users"
     },
     {
       "source": "web/org_mgmt/org_mgmt.js",
-      "line": 329,
+      "line": 331,
       "column": 36,
       "raw_route": "/api/org/sync-from-feishu",
       "normalized_route": "/api/org/sync-from-feishu",
       "method": "POST",
       "disposition": "unresolved",
-      "occurrence_id": "web/org_mgmt/org_mgmt.js:329:36:POST:/api/org/sync-from-feishu"
+      "occurrence_id": "web/org_mgmt/org_mgmt.js:331:36:POST:/api/org/sync-from-feishu"
     },
     {
       "source": "web/org_mgmt/org_mgmt.js",
-      "line": 340,
+      "line": 342,
       "column": 44,
       "raw_route": "/api/users/",
       "normalized_route": "/api/users",
       "method": "GET",
       "disposition": "unresolved",
-      "occurrence_id": "web/org_mgmt/org_mgmt.js:340:44:GET:/api/users"
+      "occurrence_id": "web/org_mgmt/org_mgmt.js:342:44:GET:/api/users"
     },
     {
       "source": "web/org_mgmt/org_mgmt.js",
-      "line": 374,
+      "line": 376,
       "column": 40,
       "raw_route": "/api/users/",
       "normalized_route": "/api/users",
       "method": "GET",
       "disposition": "unresolved",
-      "occurrence_id": "web/org_mgmt/org_mgmt.js:374:40:GET:/api/users"
+      "occurrence_id": "web/org_mgmt/org_mgmt.js:376:40:GET:/api/users"
     },
     {
       "source": "web/org_mgmt/org_mgmt.js",
-      "line": 489,
+      "line": 491,
       "column": 35,
       "raw_route": "/api/users/${_editingUserId}/role",
       "normalized_route": "/api/users/{dynamic}/role",
       "method": "PATCH",
       "disposition": "unresolved",
-      "occurrence_id": "web/org_mgmt/org_mgmt.js:489:35:PATCH:/api/users/{dynamic}/role"
+      "occurrence_id": "web/org_mgmt/org_mgmt.js:491:35:PATCH:/api/users/{dynamic}/role"
     },
     {
       "source": "web/org_mgmt/org_mgmt.js",
-      "line": 686,
+      "line": 688,
       "column": 19,
       "raw_route": "/api/org/teams",
       "normalized_route": "/api/org/teams",
       "method": "GET",
       "disposition": "unresolved",
-      "occurrence_id": "web/org_mgmt/org_mgmt.js:686:19:GET:/api/org/teams"
+      "occurrence_id": "web/org_mgmt/org_mgmt.js:688:19:GET:/api/org/teams"
     },
     {
       "source": "web/org_mgmt/org_mgmt.js",
-      "line": 687,
+      "line": 689,
       "column": 19,
       "raw_route": "/api/users/",
       "normalized_route": "/api/users",
       "method": "GET",
       "disposition": "unresolved",
-      "occurrence_id": "web/org_mgmt/org_mgmt.js:687:19:GET:/api/users"
+      "occurrence_id": "web/org_mgmt/org_mgmt.js:689:19:GET:/api/users"
     },
     {
       "source": "web/org_mgmt/org_mgmt.js",
-      "line": 726,
+      "line": 728,
       "column": 19,
       "raw_route": "/api/org/teams",
       "normalized_route": "/api/org/teams",
       "method": "GET",
       "disposition": "unresolved",
-      "occurrence_id": "web/org_mgmt/org_mgmt.js:726:19:GET:/api/org/teams"
+      "occurrence_id": "web/org_mgmt/org_mgmt.js:728:19:GET:/api/org/teams"
     },
     {
       "source": "web/org_mgmt/org_mgmt.js",
-      "line": 727,
+      "line": 729,
       "column": 19,
       "raw_route": "/api/users/",
       "normalized_route": "/api/users",
       "method": "GET",
       "disposition": "unresolved",
-      "occurrence_id": "web/org_mgmt/org_mgmt.js:727:19:GET:/api/users"
+      "occurrence_id": "web/org_mgmt/org_mgmt.js:729:19:GET:/api/users"
     },
     {
       "source": "web/rule_mgmt/rule_mgmt.js",
