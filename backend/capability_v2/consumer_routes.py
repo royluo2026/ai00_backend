@@ -327,22 +327,84 @@ def _mask_strings(source: str) -> str:
     """Blank JS string literals while preserving offsets and line numbers."""
 
     chars = list(source)
-    quote: str | None = None
-    escaped = False
-    for index, char in enumerate(source):
-        if quote is None:
-            if char in {"'", '"', "`"}:
-                quote = char
-                chars[index] = " "
-            continue
-        if char not in {"\r", "\n"}:
+    length = len(source)
+
+    def blank(index: int) -> None:
+        if chars[index] not in {"\r", "\n"}:
             chars[index] = " "
-        if escaped:
-            escaped = False
-        elif char == "\\":
-            escaped = True
-        elif char == quote:
-            quote = None
+
+    def mask_quoted(index: int, quote: str) -> int:
+        blank(index)
+        index += 1
+        escaped = False
+        while index < length:
+            char = source[index]
+            blank(index)
+            index += 1
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == quote:
+                break
+        return index
+
+    def mask_template(index: int) -> int:
+        blank(index)
+        index += 1
+        while index < length:
+            if source[index] == "\\":
+                blank(index)
+                index += 1
+                if index < length:
+                    blank(index)
+                    index += 1
+            elif source[index] == "`":
+                blank(index)
+                return index + 1
+            elif source.startswith("${", index):
+                blank(index)
+                blank(index + 1)
+                index = mask_code(index + 2, stop_at_brace=True)
+            else:
+                blank(index)
+                index += 1
+        return index
+
+    def mask_code(index: int, *, stop_at_brace: bool = False) -> int:
+        depth = 1
+        while index < length:
+            char = source[index]
+            if char in {"'", '"'}:
+                index = mask_quoted(index, char)
+            elif char == "`":
+                index = mask_template(index)
+            elif source.startswith("//", index):
+                end = source.find("\n", index)
+                end = length if end < 0 else end
+                while index < end:
+                    blank(index)
+                    index += 1
+            elif source.startswith("/*", index):
+                end = source.find("*/", index + 2)
+                end = length if end < 0 else end + 2
+                while index < end:
+                    blank(index)
+                    index += 1
+            elif stop_at_brace and char == "{":
+                depth += 1
+                index += 1
+            elif stop_at_brace and char == "}":
+                depth -= 1
+                blank(index)
+                index += 1
+                if depth == 0:
+                    return index
+            else:
+                index += 1
+        return index
+
+    mask_code(0)
     return "".join(chars)
 
 
@@ -406,17 +468,30 @@ def normalize_route(route: str) -> str:
     return normalized
 
 
-def _find_call(source: str, literal_start: int) -> tuple[str, int] | None:
+def _find_call_details(
+    source: str, literal_start: int
+) -> tuple[str, int, int, int] | None:
     open_paren = source.rfind("(", max(0, literal_start - 160), literal_start)
     if open_paren < 0:
         return None
-    callee_source = source[max(0, open_paren - 120):open_paren].rstrip()
+    callee_start = max(0, open_paren - 120)
+    callee_source = source[callee_start:open_paren].rstrip()
     if callee_source.endswith("?."):
         callee_source = callee_source[:-2].rstrip()
     match = _CALLEE.search(callee_source)
     if match is None:
         return None
-    return match.group(1), open_paren
+    return (
+        match.group(1),
+        open_paren,
+        callee_start + match.start(1),
+        callee_start + match.end(1),
+    )
+
+
+def _find_call(source: str, literal_start: int) -> tuple[str, int] | None:
+    details = _find_call_details(source, literal_start)
+    return (details[0], details[1]) if details is not None else None
 
 
 def _matching_paren(source: str, open_paren: int) -> int:
@@ -998,7 +1073,7 @@ def _declared_parameters(value: str) -> tuple[str, ...]:
 
 def _binding_parameter_contract(
     contract: WrapperContract, definition: str
-) -> tuple[str, ...]:
+) -> tuple[tuple[str, ...], tuple[int, int]]:
     masked = _mask_strings(_mask_comments(definition))
     callee = contract.callee
     name = callee.rsplit(".", 1)[-1]
@@ -1008,15 +1083,18 @@ def _binding_parameter_contract(
             raise RouteScanConfigurationError(
                 f"wrapper contract binding is not exact: {callee}"
             )
-        pattern = rf"(?:async\s+)?function\s+{identifier}\s*\(([^)]*)\)"
+        pattern = (
+            rf"(?:async\s+)?function\s+"
+            rf"(?P<binding>{identifier})\s*\((?P<parameters>[^)]*)\)"
+        )
     elif contract.binding.kind == "arrow_assignment":
         if "." in callee:
             raise RouteScanConfigurationError(
                 f"wrapper contract binding is not exact: {callee}"
             )
         pattern = (
-            rf"(?:const|let|var)\s+{identifier}\s*=\s*(?:async\s*)?"
-            rf"\(([^)]*)\)\s*=>"
+            rf"(?:const|let|var)\s+(?P<binding>{identifier})\s*=\s*"
+            rf"(?:async\s*)?\((?P<parameters>[^)]*)\)\s*=>"
         )
     elif contract.binding.kind == "member_assignment":
         if "." not in callee:
@@ -1024,56 +1102,31 @@ def _binding_parameter_contract(
                 f"wrapper contract binding is not exact: {callee}"
             )
         pattern = (
-            rf"{re.escape(callee)}\s*=\s*(?:async\s*)?function"
-            rf"(?:\s+{identifier})?\s*\(([^)]*)\)"
+            rf"(?P<binding>{re.escape(callee)})\s*=\s*(?:async\s*)?function"
+            rf"(?:\s+{identifier})?\s*\((?P<parameters>[^)]*)\)"
         )
     else:
         raise RouteScanConfigurationError(
             f"wrapper contract binding kind is invalid: {contract.binding.kind}"
         )
-    matches = re.findall(pattern, masked)
+    matches = tuple(re.finditer(pattern, masked))
     anchored = re.match(rf"\s*{pattern}", masked)
     if len(matches) != 1 or anchored is None:
         raise RouteScanConfigurationError(
             f"wrapper contract definition binding is ambiguous: {contract.definition.source_path}"
         )
-    return _declared_parameters(anchored.group(1))
-
-
-def _callee_binding_positions(contract: WrapperContract, source: str) -> set[int]:
-    masked = _mask_comments(source)
-    callee = contract.callee
-    escaped = re.escape(callee)
-    if "." in callee:
-        return {
-            match.start("binding")
-            for match in re.finditer(
-                rf"(?<![\w$.])(?P<binding>{escaped})\s*=(?!=)",
-                masked,
-            )
-        }
-
-    identifier = re.escape(callee)
-    positions: set[int] = set()
-    patterns = (
-        rf"\bfunction\s+(?P<binding>{identifier})\s*\(",
-        rf"\b(?:const|let|var|class)\s+(?P<binding>{identifier})\b",
-        rf"(?<![\w$.])(?P<binding>{identifier})\s*=(?!=)",
-        rf"\bcatch\s*\(\s*(?P<binding>{identifier})\b",
-        rf"(?<![\w$])(?P<binding>{identifier})\s*=>",
+    return (
+        _declared_parameters(anchored.group("parameters")),
+        (anchored.start("binding"), anchored.end("binding")),
     )
-    for pattern in patterns:
-        positions.update(
-            match.start("binding") for match in re.finditer(pattern, masked)
-        )
-    return positions
 
 
 def _validate_call_sites(
     contract: WrapperContract,
     sources: Mapping[str, str],
-) -> None:
+) -> set[tuple[int, int]]:
     identities: set[tuple[str, int, int, str, str, str]] = set()
+    callee_spans: set[tuple[int, int]] = set()
     for anchor in contract.call_sites:
         if anchor.source_path != contract.source:
             raise RouteScanConfigurationError(
@@ -1104,6 +1157,7 @@ def _validate_call_sites(
             )
         masked = _mask_comments(source)
         matches = 0
+        matched_span: tuple[int, int] | None = None
         for match in _ROUTE_LITERAL.finditer(masked):
             raw_fragment = source[match.start("route"):match.end("route")]
             raw_route = _raw_route(source, match.end(), raw_fragment)
@@ -1111,7 +1165,7 @@ def _validate_call_sites(
             line = source.count("\n", 0, route_offset) + 1
             line_start = source.rfind("\n", 0, route_offset) + 1
             column = route_offset - line_start + 1
-            call = _find_call(masked, match.start())
+            call = _find_call_details(masked, match.start())
             if (
                 call is not None
                 and call[0] == contract.callee
@@ -1121,11 +1175,36 @@ def _validate_call_sites(
                 and normalize_route(raw_route) == anchor.normalized_route
             ):
                 matches += 1
+                matched_span = call[2], call[3]
         if matches != 1:
             raise RouteScanConfigurationError(
                 f"wrapper contract call site occurrence is stale: "
                 f"{contract.source}:{contract.callee}"
             )
+        assert matched_span is not None
+        callee_spans.add(matched_span)
+    return callee_spans
+
+
+def _validate_closed_wrapper_references(
+    contract: WrapperContract,
+    source: str,
+    proved_spans: set[tuple[int, int]],
+) -> None:
+    name = contract.callee.rsplit(".", 1)[-1]
+    allowed = {(end - len(name), end) for _, end in proved_spans}
+    masked = _mask_strings(_mask_comments(source))
+    references = {
+        (match.start(), match.end())
+        for match in re.finditer(
+            rf"(?<![\w$]){re.escape(name)}(?![\w$])",
+            masked,
+        )
+    }
+    if references != allowed:
+        raise RouteScanConfigurationError(
+            f"wrapper contract reference is ambiguous: {contract.source}:{contract.callee}"
+        )
 
 
 def _validate_wrapper_contracts(
@@ -1160,11 +1239,9 @@ def _validate_wrapper_contracts(
             raise RouteScanConfigurationError(
                 f"wrapper contract definition is ambiguous: {anchor.source_path}"
             )
-        if len(_callee_binding_positions(contract, source)) != 1:
-            raise RouteScanConfigurationError(
-                f"wrapper contract definition binding is ambiguous: {anchor.source_path}"
-            )
-        declared_parameters = _binding_parameter_contract(contract, definition)
+        declared_parameters, relative_binding_span = _binding_parameter_contract(
+            contract, definition
+        )
         if declared_parameters != contract.binding.parameters:
             raise RouteScanConfigurationError(
                 f"wrapper contract parameter contract is stale: {anchor.source_path}"
@@ -1176,7 +1253,18 @@ def _validate_wrapper_contracts(
             raise RouteScanConfigurationError(
                 f"wrapper contract parameter contract is invalid: {anchor.source_path}"
             )
-        _validate_call_sites(contract, sources)
+        definition_start = sum(
+            len(line)
+            for line in source.splitlines(keepends=True)[:anchor.start_line - 1]
+        )
+        proved_spans = {
+            (
+                definition_start + relative_binding_span[0],
+                definition_start + relative_binding_span[1],
+            ),
+            *_validate_call_sites(contract, sources),
+        }
+        _validate_closed_wrapper_references(contract, source, proved_spans)
         result[key] = contract
     return result
 

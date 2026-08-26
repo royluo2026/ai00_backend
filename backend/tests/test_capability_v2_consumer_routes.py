@@ -22,7 +22,7 @@ from backend.capability_v2.consumer_routes import (
 def _scan(source: str, tmp_path: Path, **kwargs):
     web = tmp_path / "web"
     web.mkdir(exist_ok=True)
-    (web / "app.js").write_text(source, encoding="utf-8")
+    (web / kwargs.get("source_name", "app.js")).write_text(source, encoding="utf-8")
     return scan_web_api_routes(
         [web],
         legacy_index=kwargs.get("legacy_index", set()),
@@ -110,6 +110,7 @@ def _exact_wrapper_contracts(
     contract_source_sha256: str | None = None,
     call_source_sha256: str | None = None,
     definition_source_path: str = "web/app.js",
+    source_path: str = "web/app.js",
 ):
     lines = source.splitlines(keepends=True)
     definition = lines[0]
@@ -123,7 +124,7 @@ def _exact_wrapper_contracts(
         line_start = source.rfind("\n", 0, offset) + 1
         call_sites.append(
             {
-                "source_path": "web/app.js",
+                "source_path": source_path,
                 "line": line,
                 "column": offset - line_start + 1,
                 "raw_route": raw_route,
@@ -135,7 +136,7 @@ def _exact_wrapper_contracts(
         "schema_version": 3,
         "entries": [
             {
-                "source": "web/app.js",
+                "source": source_path,
                 "source_sha256": contract_source_sha256 or source_sha256,
                 "callee": "request",
                 "signature": {
@@ -554,7 +555,7 @@ def test_direct_fetch_options_spread_does_not_fall_back_to_get(
     assert report.routes[0].disposition == "unresolved"
 
 
-def test_wrapper_contract_applies_only_to_anchored_call_scope(tmp_path: Path) -> None:
+def test_wrapper_contract_rejects_unanchored_call_reference(tmp_path: Path) -> None:
     source = (
         "function request(route, options = {}) { return fetch(route, options); }\n"
         "function first() { return request('/api/tasks'); }\n"
@@ -577,18 +578,11 @@ def test_wrapper_contract_applies_only_to_anchored_call_scope(tmp_path: Path) ->
         ],
     )
 
-    report = _scan(
-        source,
-        tmp_path,
-        wrapper_contracts=contracts,
-        legacy_index={("GET", "/api/tasks"), ("POST", "/api/issues")},
-    )
-
-    assert [route.method for route in report.routes] == ["GET", None]
-    assert [route.disposition for route in report.routes] == [
-        "legacy_registered",
-        "unresolved",
-    ]
+    with pytest.raises(
+        RouteScanConfigurationError,
+        match="reference is ambiguous",
+    ):
+        _scan(source, tmp_path, wrapper_contracts=contracts)
 
 
 def test_exact_wrapper_contract_rejects_same_line_shadowed_binding(
@@ -607,7 +601,7 @@ def test_exact_wrapper_contract_rejects_same_line_shadowed_binding(
 
     with pytest.raises(
         RouteScanConfigurationError,
-        match="definition binding is ambiguous",
+        match="reference is ambiguous",
     ):
         _scan(source, tmp_path, wrapper_contracts=contracts)
 
@@ -631,9 +625,88 @@ def test_exact_wrapper_contract_rejects_anchored_shadowed_binding(
 
     with pytest.raises(
         RouteScanConfigurationError,
-        match="definition binding is ambiguous",
+        match="reference is ambiguous",
     ):
         _scan(source, tmp_path, wrapper_contracts=contracts)
+
+
+def test_exact_wrapper_contract_rejects_anchored_parameter_shadow(
+    tmp_path: Path,
+) -> None:
+    source = (
+        "function request(route, options = {}) { return fetch(route, options); }\n"
+        "function invoke(request) { return request('/api/issues'); }\n"
+        "request('/api/tasks');\n"
+    )
+    contracts = _exact_wrapper_contracts(
+        tmp_path,
+        source,
+        call_routes=["/api/issues", "/api/tasks"],
+    )
+
+    with pytest.raises(
+        RouteScanConfigurationError,
+        match="reference is ambiguous",
+    ):
+        _scan(source, tmp_path, wrapper_contracts=contracts)
+
+
+@pytest.mark.parametrize(
+    "extra_reference",
+    [
+        "const { request: alias } = clients;",
+        "import { request as importedRequest } from './client.js';",
+        "const alias = request;",
+        "const alias = `${request}`;",
+        "const client = { request: unrelated };",
+    ],
+)
+def test_wrapper_contract_rejects_unproved_callee_reference(
+    tmp_path: Path,
+    extra_reference: str,
+) -> None:
+    source = (
+        "function request(route, options = {}) { return fetch(route, options); }\n"
+        f"{extra_reference}\n"
+        "request('/api/tasks');\n"
+    )
+    contracts = _exact_wrapper_contracts(
+        tmp_path,
+        source,
+        call_routes=["/api/tasks"],
+        definition_source_path="web/app.html",
+        source_path="web/app.html",
+    )
+
+    with pytest.raises(
+        RouteScanConfigurationError,
+        match="reference is ambiguous",
+    ):
+        _scan(
+            source,
+            tmp_path,
+            wrapper_contracts=contracts,
+            source_name="app.html",
+        )
+
+
+def test_wrapper_contract_accepts_only_definition_and_exact_call_references(
+    tmp_path: Path,
+) -> None:
+    source = (
+        "function request(route, options = {}) { return fetch(route, options); }\n"
+        "request('/api/tasks');\n"
+        "request('/api/issues', { method: 'POST' });\n"
+    )
+    contracts = _exact_wrapper_contracts(
+        tmp_path,
+        source,
+        call_routes=["/api/tasks", "/api/issues"],
+    )
+
+    report = _scan(source, tmp_path, wrapper_contracts=contracts)
+
+    assert [route.method for route in report.routes] == ["GET", "POST"]
 
 
 def test_wrapper_contract_rejects_cross_source_definition(
@@ -696,7 +769,7 @@ def test_wrapper_contract_rejects_additional_callee_assignment(
 
     with pytest.raises(
         RouteScanConfigurationError,
-        match="definition binding is ambiguous",
+        match="reference is ambiguous",
     ):
         _scan(source, tmp_path, wrapper_contracts=contracts)
 
@@ -1021,7 +1094,7 @@ def test_repository_wrapper_contracts_are_exact_and_unambiguous() -> None:
         )
         for anchor in anchors
     }
-    assert len(anchors) == len(identities) == 97
+    assert len(anchors) == len(identities) == 24
     assert all(
         anchor.source_sha256 == contract.source_sha256
         for contract in contracts
