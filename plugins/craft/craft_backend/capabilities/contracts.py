@@ -601,8 +601,28 @@ INPUT_SCHEMAS[("craft.bop.entry_link.change.apply", 1)] = _object({"operation": 
 OUTPUT_SCHEMAS[("craft.bop.entry_link.change.apply", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
 INPUT_SCHEMAS[("craft.bop.staging.lifecycle.change.apply", 1)] = _object({"operation": {"type": "string", "enum": ["demote", "promote"]}, "entry_gid": STRING, "staging_gid": STRING, "parent_gid": {"type": ["string", "null"]}, "sort_order": {"type": "number"}}, required=("operation",))
 OUTPUT_SCHEMAS[("craft.bop.staging.lifecycle.change.apply", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
-INPUT_SCHEMAS[("craft.bop.entry.change.apply", 1)] = _object({"operation": {"type": "string", "enum": ["update", "delete"]}, "entry_gid": STRING, "updates": {"type": "object", "additionalProperties": True}}, required=("operation", "entry_gid"))
-OUTPUT_SCHEMAS[("craft.bop.entry.change.apply", 1)] = _object({"data": {"type": "object", "additionalProperties": True}, "version_gid": STRING}, required=("data",))
+_BOP_ENTRY_UPDATES = _object({
+    name: {"description": "Provider-validated entry field value."}
+    for name in (
+        "parent_gid", "node_type", "sort_order", "title", "vpps", "vpps_desc",
+        "parent_bop_title", "process_flow_pic", "cad_sim_pics", "meta",
+    )
+})
+_BOP_PROPERTY_UPDATE = _object({
+    "name": STRING,
+    "value": {"description": "Provider-validated JSON property value."},
+}, required=("name", "value"))
+INPUT_SCHEMAS[("craft.bop.entry.change.apply", 1)] = _object({
+    "operation": {"type": "string", "enum": ["update", "delete"]},
+    "entry_gid": STRING,
+    "updates": _BOP_ENTRY_UPDATES,
+    "properties": {"type": "array", "minItems": 1, "maxItems": 200, "items": _BOP_PROPERTY_UPDATE},
+}, required=("operation", "entry_gid"))
+OUTPUT_SCHEMAS[("craft.bop.entry.change.apply", 1)] = _object({
+    "data": {"type": "object", "additionalProperties": True},
+    "version_gid": STRING,
+    "warnings": {"type": "array", "maxItems": 200, "items": {"description": "Advisory rule violation."}},
+}, required=("data",))
 INPUT_SCHEMAS[("craft.bop.picture.upload", 1)] = _object({"filename": STRING, "mime": STRING, "data_b64": STRING}, required=("filename", "mime", "data_b64"))
 OUTPUT_SCHEMAS[("craft.bop.picture.upload", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
 INPUT_SCHEMAS[("craft.bop.lifecycle.state.change.apply", 1)] = _object({"operation": {"type": "string", "enum": ["init.update", "phase.confirm"]}, "version_gid": STRING, "route": {"type": ["string", "null"]}, "checklist": {"type": "object", "additionalProperties": True}, "note": {"type": ["string", "null"]}}, required=("operation", "version_gid"))

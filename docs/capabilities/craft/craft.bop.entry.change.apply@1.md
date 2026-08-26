@@ -8,7 +8,7 @@ Update or soft-delete an active BOP main-tree entry with linked-entity and audit
 - 不适用：The request creates/copies/imports entries, changes links only, or operates on staging.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_1b40890bffd2481e1cc55591ae4ffb0c`
+- Catalog Release：`rel_40ed2fbd3abc82881c2856c99c4b200a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -81,9 +81,62 @@ Update or soft-delete an active BOP main-tree entry with linked-entity and audit
       ],
       "type": "string"
     },
+    "properties": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "value": {
+            "description": "Provider-validated JSON property value."
+          }
+        },
+        "required": [
+          "name",
+          "value"
+        ],
+        "type": "object"
+      },
+      "maxItems": 200,
+      "minItems": 1,
+      "type": "array"
+    },
     "updates": {
       "additionalProperties": false,
-      "properties": {},
+      "properties": {
+        "cad_sim_pics": {
+          "description": "Provider-validated entry field value."
+        },
+        "meta": {
+          "description": "Provider-validated entry field value."
+        },
+        "node_type": {
+          "description": "Provider-validated entry field value."
+        },
+        "parent_bop_title": {
+          "description": "Provider-validated entry field value."
+        },
+        "parent_gid": {
+          "description": "Provider-validated entry field value."
+        },
+        "process_flow_pic": {
+          "description": "Provider-validated entry field value."
+        },
+        "sort_order": {
+          "description": "Provider-validated entry field value."
+        },
+        "title": {
+          "description": "Provider-validated entry field value."
+        },
+        "vpps": {
+          "description": "Provider-validated entry field value."
+        },
+        "vpps_desc": {
+          "description": "Provider-validated entry field value."
+        }
+      },
       "type": "object"
     }
   },
@@ -100,7 +153,7 @@ Update or soft-delete an active BOP main-tree entry with linked-entity and audit
 ```json
 {
   "capability_id": "craft.bop.entry.change.apply",
-  "catalog_release": "rel_1b40890bffd2481e1cc55591ae4ffb0c",
+  "catalog_release": "rel_40ed2fbd3abc82881c2856c99c4b200a",
   "major_version": 1,
   "payload": {
     "entry_gid": "example",
@@ -125,6 +178,13 @@ Update or soft-delete an active BOP main-tree entry with linked-entity and audit
     "version_gid": {
       "minLength": 1,
       "type": "string"
+    },
+    "warnings": {
+      "items": {
+        "description": "Advisory rule violation."
+      },
+      "maxItems": 200,
+      "type": "array"
     }
   },
   "required": [

@@ -12,6 +12,14 @@ def _object(properties: dict, required: tuple[str, ...] = ()) -> dict:
 STRING = {"type": "string"}
 INTEGER = {"type": "integer"}
 BOOLEAN = {"type": "boolean"}
+DB_CONFIG = {
+    "host": STRING,
+    "port": INTEGER,
+    "user": STRING,
+    "password": STRING,
+    "collab_db": STRING,
+    "public_db": STRING,
+}
 ANY_JSON = {"type": ["object", "array", "string", "number", "boolean", "null"]}
 ANY_ARRAY = {"type": "array", "items": ANY_JSON}
 REVIEWED_INPUT = _object(
@@ -105,6 +113,9 @@ STABLE_REF = _object({
 }, ("object_ref", "owner"))
 
 INPUT_SCHEMAS = {
+    "base.runtime.database_config.get": _object({}),
+    "base.runtime.database_config.change.apply": _object(DB_CONFIG, tuple(DB_CONFIG)),
+    "base.runtime.database_connection.test": _object(DB_CONFIG, tuple(DB_CONFIG)),
     "system.echo": _object({"echo": ANY_JSON}),
     "plugin.install": PLUGIN_RELEASE,
     "plugin.enable": PLUGIN_ID,
@@ -200,6 +211,17 @@ INPUT_SCHEMAS = {
 }
 
 OUTPUT_SCHEMAS = {
+    "base.runtime.database_config.get": _object({
+        "host": STRING, "port": INTEGER, "user": STRING,
+        "password_configured": BOOLEAN, "collab_db": STRING, "public_db": STRING,
+    }, ("host", "port", "user", "password_configured", "collab_db", "public_db")),
+    "base.runtime.database_config.change.apply": _object(
+        {"saved": BOOLEAN, "password_configured": BOOLEAN},
+        ("saved", "password_configured"),
+    ),
+    "base.runtime.database_connection.test": _object(
+        {"connected": BOOLEAN, "error_code": STRING}, ("connected",),
+    ),
     "system.echo": _object({"echo": ANY_JSON}),
     **{capability_id: PLUGIN_STATE for capability_id in (
         "plugin.install", "plugin.enable", "plugin.disable", "plugin.upgrade.finish",

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 from contextlib import contextmanager
 from typing import Any, Callable, Iterator, Mapping, Sequence
 
@@ -12,6 +13,20 @@ ALLOWED_OPERATIONS = frozenset(
     | {"parent.change"}
 )
 REVIEW_DECISIONS = frozenset({"approve", "reject", "request_changes"})
+_ONTOLOGY_IDENTIFIER_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+
+
+def _validate_property_identifiers(operation: str, value: Mapping[str, Any]) -> None:
+    if not operation.startswith("property."):
+        return
+    name = value.get("name")
+    if operation == "property.add" and not name:
+        raise ValueError("property name is required")
+    if name is not None and (not isinstance(name, str) or not _ONTOLOGY_IDENTIFIER_RE.fullmatch(name)):
+        raise ValueError("property name must use letters, numbers and underscores and cannot start with a number")
+    mapped_column = value.get("mapped_column")
+    if mapped_column not in (None, "") and (not isinstance(mapped_column, str) or not _ONTOLOGY_IDENTIFIER_RE.fullmatch(mapped_column)):
+        raise ValueError("property mapped_column must use letters, numbers and underscores and cannot start with a number")
 
 
 def normalize_changes(changes: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
@@ -29,6 +44,7 @@ def normalize_changes(changes: Sequence[Mapping[str, Any]]) -> list[dict[str, An
             raise ValueError(f"unsupported ontology change operation: {operation or '<empty>'}")
         if not stable_gid or not isinstance(value, Mapping):
             raise ValueError("stable_gid and value object are required for each operation")
+        _validate_property_identifiers(operation, value)
         identity = (operation, stable_gid)
         if identity in identities:
             raise ValueError(f"duplicate change operation: {operation}/{stable_gid}")

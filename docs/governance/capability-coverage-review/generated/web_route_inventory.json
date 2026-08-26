@@ -14,9 +14,9 @@
   ],
   "counts": {
     "legacy": 0,
-    "capability": 36,
+    "capability": 37,
     "allowlisted": 6,
-    "total": 42
+    "total": 43
   },
   "routes": [
     {
@@ -133,17 +133,17 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 223,
-      "column": 39,
-      "route": "/api/v1/capabilities/${id}:invoke",
+      "line": 229,
+      "column": 50,
+      "route": "/api/v1/capabilities/${id}:${suffix}",
       "kind": "capability",
       "method": null
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/layout_mode.js",
-      "line": 49,
-      "column": 30,
-      "route": "/api/v1/capabilities/${id}:invoke",
+      "line": 73,
+      "column": 41,
+      "route": "/api/v1/capabilities/${id}:${suffix}",
       "kind": "capability",
       "method": null
     },
@@ -325,9 +325,9 @@
     },
     {
       "source": "web/ontology/ontology.js",
-      "line": 25,
-      "column": 30,
-      "route": "/api/v1/capabilities/${id}:invoke",
+      "line": 34,
+      "column": 41,
+      "route": "/api/v1/capabilities/${id}:${suffix}",
       "kind": "capability",
       "method": null
     },
@@ -344,6 +344,14 @@
       "line": 52,
       "column": 38,
       "route": "/api/v1/capabilities/ontology.object.list:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "web/settings/settings.js",
+      "line": 50,
+      "column": 51,
+      "route": "/api/v1/capabilities/${id}:${suffix}",
       "kind": "capability",
       "method": null
     },

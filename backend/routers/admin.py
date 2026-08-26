@@ -23,13 +23,20 @@ from pathlib import Path
 from typing import Optional
 from urllib.parse import quote
 
-import pymysql
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from pydantic import BaseModel
 
 from backend.db.connection import get_conn
 from backend.config import get_settings
 from backend.routers.deps import require_role, get_current_user_claims_only
+from backend.base.runtime_database_config import resolve_password as _resolve_cloud_db_password
+from backend.capability_v2.contracts import (
+    ActorIdentity, ConsumerDescriptor, ConsumerIdentity, ConsumerType,
+    InvocationEnvelope, TenantIdentity,
+)
+from backend.capability_v2.gateway import get_default_gateway
+from backend.capability_v2.web_compatibility import invoke_trusted_web_compatibility
+from backend.platform_sdk.auth import get_authenticated_principal
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -114,6 +121,43 @@ def _cloud_db_config_from_system_json() -> dict:
     return raw.get('cloud_db_config') or raw.get('CLOUD_DB_CONFIG') or {}
 
 
+async def _invoke_runtime_database_capability(
+    capability_id: str,
+    payload: dict,
+    request: Request,
+    current_user: dict,
+    principal,
+    gateway,
+    *,
+    write: bool = False,
+):
+    request_id = request.headers.get("X-Request-ID") or f"base_runtime_database_{os.urandom(8).hex()}"
+    envelope = InvocationEnvelope(
+        capability_id=capability_id,
+        major_version=1,
+        catalog_release=gateway.catalog_release,
+        payload=payload,
+        identity=ConsumerIdentity(
+            actor=ActorIdentity(**principal.model_dump()),
+            tenant=TenantIdentity(
+                tenant_id=str(current_user.get("team_id") or f"user:{current_user['gid']}"),
+                membership="member",
+                active_roles=tuple(filter(None, (current_user.get("org_role"), current_user.get("system_role")))),
+            ),
+            consumer=ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="ai00.web.base.runtime-database.compatibility"),
+        ),
+        idempotency_key=(request.headers.get("X-Idempotency-Key") or request_id) if write else None,
+        approval_reference=request.headers.get("X-Capability-Approval") if write else None,
+        request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+    )
+    result = await invoke_trusted_web_compatibility(gateway, envelope)
+    if not result.ok:
+        detail = result.error.model_dump(mode="json") if result.error else {"code": "provider_error"}
+        raise HTTPException(status_code=422, detail=detail)
+    return result.data
+
+
 def _sync_feishu_config_to_system_json(key: str, value: str) -> None:
     mapping = {
         "FEISHU_APP_ID": "app_id",
@@ -133,86 +177,52 @@ def _sync_feishu_config_to_system_json(key: str, value: str) -> None:
 
 
 @router.get("/cloud-db-config")
-def get_cloud_db_config(_=Depends(_require_super_claims)):
-    cfg = _cloud_db_config_from_system_json()
+async def get_cloud_db_config(
+    request: Request,
+    current_user=Depends(_require_super_claims),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    data = await _invoke_runtime_database_capability(
+        "base.runtime.database_config.get", {}, request, current_user, principal, gateway,
+    )
     return {
         "success": True,
-        "data": {
-            "host": cfg.get("host", ""),
-            "port": cfg.get("port", 2883),
-            "user": cfg.get("user", ""),
-            "password_configured": bool(cfg.get("password")),
-            "collab_db": cfg.get("collab_db", ""),
-            "public_db": cfg.get("public_db", ""),
-        },
+        "data": data,
     }
 
 
 @router.post("/cloud-db-config")
-def save_cloud_db_config(body: CloudDbConfigBody, current_user=Depends(_require_super_claims)):
-    print(f"[cloud-db-config] save hit role={current_user.get('org_role')} gid={current_user.get('gid')}", flush=True)
-    print(f"[cloud-db-config] save payload host={body.host!r} port={body.port!r} user={body.user!r} collab_db={body.collab_db!r} public_db={body.public_db!r} pwd_len={len(body.password or '')}", flush=True)
-    if not body.host.strip() or not body.user.strip() or not body.collab_db.strip():
-        raise HTTPException(status_code=400, detail="host、user、collab_db 不能为空")
-
-    raw = _load_system_json()
-    existing = raw.get('cloud_db_config') or raw.get('CLOUD_DB_CONFIG') or {}
-    password = body.password if body.password.strip() else existing.get('password', '')
-    cfg = {
-        "host": body.host.strip(),
-        "port": int(body.port or 2883),
-        "user": body.user.strip(),
-        "password": password,
-        "collab_db": body.collab_db.strip(),
-        "public_db": body.public_db.strip() or body.collab_db.strip(),
-        "users_db_url": _cloud_db_url_from_payload(
-            CloudDbConfigBody(
-                host=body.host.strip(),
-                port=int(body.port or 2883),
-                user=body.user.strip(),
-                password=password,
-                collab_db=body.collab_db.strip(),
-                public_db=body.public_db.strip() or body.collab_db.strip(),
-            )
-        ),
-    }
-    raw['cloud_db_config'] = cfg
-    path = _system_json_path()
-    print(f"[cloud-db-config] writing file path={path}", flush=True)
-    try:
-        _save_system_json(raw)
-        print(f"[cloud-db-config] write ok keys={list(raw.keys())}", flush=True)
-    except Exception as e:
-        import traceback
-        print(f"[cloud-db-config] write failed: {e}\n{traceback.format_exc()}", flush=True)
-        raise
+async def save_cloud_db_config(
+    body: CloudDbConfigBody,
+    request: Request,
+    current_user=Depends(_require_super_claims),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    await _invoke_runtime_database_capability(
+        "base.runtime.database_config.change.apply", body.model_dump(), request,
+        current_user, principal, gateway, write=True,
+    )
     return {"success": True, "msg": "云端数据库配置已保存"}
 
 
 @router.post("/cloud-db-config/test")
-def test_cloud_db_config(body: CloudDbConfigBody, _=Depends(_require_super_claims)):
-    if not body.host.strip() or not body.user.strip() or not body.collab_db.strip():
-        raise HTTPException(status_code=400, detail="host、user、collab_db 不能为空")
-    try:
-        conn = pymysql.connect(
-            host=body.host.strip(),
-            port=int(body.port or 2883),
-            user=body.user.strip(),
-            password=body.password,
-            database=body.collab_db.strip(),
-            charset='utf8mb4',
-            connect_timeout=8,
-            read_timeout=8,
-            write_timeout=8,
-            cursorclass=pymysql.cursors.DictCursor,
-        )
-        with conn.cursor() as cur:
-            cur.execute('SELECT 1 AS ok')
-            cur.fetchone()
-        conn.close()
-        return {"success": True, "msg": "MySQL 连接成功"}
-    except Exception as e:
-        return {"success": False, "msg": str(e)}
+async def test_cloud_db_config(
+    body: CloudDbConfigBody,
+    request: Request,
+    current_user=Depends(_require_super_claims),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    data = await _invoke_runtime_database_capability(
+        "base.runtime.database_connection.test", body.model_dump(), request,
+        current_user, principal, gateway,
+    )
+    return {
+        "success": bool(data.get("connected")),
+        "msg": "MySQL 连接成功" if data.get("connected") else "MySQL 连接失败",
+    }
 
 
 # ── 读取 ──────────────────────────────────────────────────────────────────────
