@@ -1,5 +1,6 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
+  "artifact_id": "web-api-legacy-addition-review",
   "review_authority": "capability-governance-evidence-closure/task-3-fix-round-4",
   "baseline_revision": "565b00a0",
   "original_additions": 109,
@@ -139,7 +140,8 @@
           "sha256": "dca2bfda3f8ac98bec5ef0d065f429c09104fb355d90134d2e72ec1a4ae3e1c4"
         },
         "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.task.change.apply\" if write else \"project.task.read\", operation, args, write=write)"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -168,7 +170,8 @@
           "sha256": "dca2bfda3f8ac98bec5ef0d065f429c09104fb355d90134d2e72ec1a4ae3e1c4"
         },
         "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.task.change.apply\" if write else \"project.task.read\", operation, args, write=write)"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -219,7 +222,8 @@
         "facade_capability": "project.list.change.apply",
         "operation": "item_entries.replace",
         "expected_facade_invocation": "_invoke_project(\n        request, current_user, principal, gateway,\n        capability_id=\"project.list.change.apply\",\n        operation=\"item_entries.replace\",\n        arguments={\n            \"item_type\": item_type,\n            \"item_gid\": item_gid,\n            \"entries\": body.entries or [],\n        },\n    )"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -248,7 +252,8 @@
           "sha256": "27c14620f0d6168ed25c15cbb27522e886c85bad2145013ffe06ce38238334d5"
         },
         "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.issue.change.apply\" if write else \"project.issue.read\", operation, args, write=write)"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -277,7 +282,8 @@
           "sha256": "223d6d33db03341ac13f4ba257ce7ab8392b52a8afca1caa475ec95c0445edeb"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(gateway, capability_id=\"project.workbench.change.apply\" if write else \"project.workbench.read\", payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal, request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id, idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None, approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None)"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -374,7 +380,8 @@
           "sha256": "dca2bfda3f8ac98bec5ef0d065f429c09104fb355d90134d2e72ec1a4ae3e1c4"
         },
         "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.task.change.apply\" if write else \"project.task.read\", operation, args, write=write)"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -403,7 +410,8 @@
           "sha256": "4e23438e7e7b01a87c4be0616d1b8a06a0f1c9c8fa634a1ea93ead426c4b40a0"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.task_template.change.apply\" if write else \"project.task_template.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -432,7 +440,8 @@
           "sha256": "dca2bfda3f8ac98bec5ef0d065f429c09104fb355d90134d2e72ec1a4ae3e1c4"
         },
         "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.task.change.apply\" if write else \"project.task.read\", operation, args, write=write)"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -480,7 +489,8 @@
           "sha256": "242cea424c28e6aa30088950ccdd1edeeb550b7e7caa2dc70af88686dbd25088"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(gateway,capability_id=\"project.sharing.change.apply\" if write else \"project.sharing.read\",payload={\"operation\":operation,\"arguments\":args},current_user=user,principal=principal,request_id=rid,trace_id=request.headers.get(\"X-Trace-ID\") or rid,idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None)"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -528,7 +538,8 @@
         "facade_capability": "project.permission_request.change.apply",
         "operation": "permission_requests.create",
         "expected_facade_invocation": "_invoke(request, user, principal, gateway, \"project.permission_request.change.apply\", \"permission_requests.create\", body.model_dump())"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -568,7 +579,8 @@
           "sha256": "f7fef265701c240e46f0d650b14cf205e83de56de0f960cbbcd4ea841d8b8fc9"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.list.change.apply\" if write else \"project.list.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user,\n        principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -1289,7 +1301,8 @@
           "sha256": "27c14620f0d6168ed25c15cbb27522e886c85bad2145013ffe06ce38238334d5"
         },
         "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.issue.change.apply\" if write else \"project.issue.read\", operation, args, write=write)"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "fix_round_1",
@@ -1364,7 +1377,8 @@
           "sha256": "afa2c188627664ecc204d832ec1b1e4e6bdb693a991ad656b2fb0dbed2e30d0e"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.follow.change.apply\" if write else \"project.follow.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -1429,7 +1443,8 @@
         "facade_capability": "project.list.read",
         "operation": "item_entries.get",
         "expected_facade_invocation": "_invoke_project(\n        request, current_user, principal, gateway,\n        capability_id=\"project.list.read\",\n        operation=\"item_entries.get\",\n        arguments={\"item_type\": item_type, \"item_gid\": item_gid},\n    )"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -1458,7 +1473,8 @@
           "sha256": "afa2c188627664ecc204d832ec1b1e4e6bdb693a991ad656b2fb0dbed2e30d0e"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.follow.change.apply\" if write else \"project.follow.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -1479,7 +1495,8 @@
         "facade_capability": "project.change_log.read",
         "operation": "change_logs.search",
         "expected_facade_invocation": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"project.change_log.read\",\n            payload={\n                \"operation\": \"change_logs.search\",\n                \"arguments\": {\n                    \"item_type\": item_type,\n                    \"item_gid\": item_gid,\n                    \"list_gid\": list_gid,\n                    \"limit\": limit,\n                    \"offset\": offset,\n                },\n            },\n            current_user=current_user,\n            principal=principal,\n            request_id=request_id,\n            trace_id=trace_id,\n        )"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -1546,7 +1563,8 @@
           "sha256": "5b3835ef26dd5342c3b99640d3c4bf6674a930688b4b65fedf5151425b325f0e"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.approval.change.apply\" if write else \"project.approval.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -1575,7 +1593,8 @@
           "sha256": "5b3835ef26dd5342c3b99640d3c4bf6674a930688b4b65fedf5151425b325f0e"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.approval.change.apply\" if write else \"project.approval.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -1604,7 +1623,8 @@
           "sha256": "242cea424c28e6aa30088950ccdd1edeeb550b7e7caa2dc70af88686dbd25088"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(gateway,capability_id=\"project.sharing.change.apply\" if write else \"project.sharing.read\",payload={\"operation\":operation,\"arguments\":args},current_user=user,principal=principal,request_id=rid,trace_id=request.headers.get(\"X-Trace-ID\") or rid,idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None)"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -1633,7 +1653,8 @@
           "sha256": "223d6d33db03341ac13f4ba257ce7ab8392b52a8afca1caa475ec95c0445edeb"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(gateway, capability_id=\"project.workbench.change.apply\" if write else \"project.workbench.read\", payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal, request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id, idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None, approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None)"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -1703,7 +1724,8 @@
           "sha256": "dca2bfda3f8ac98bec5ef0d065f429c09104fb355d90134d2e72ec1a4ae3e1c4"
         },
         "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.task.change.apply\" if write else \"project.task.read\", operation, args, write=write)"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -1732,7 +1754,8 @@
           "sha256": "dca2bfda3f8ac98bec5ef0d065f429c09104fb355d90134d2e72ec1a4ae3e1c4"
         },
         "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.task.change.apply\" if write else \"project.task.read\", operation, args, write=write)"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -1780,7 +1803,8 @@
           "sha256": "242cea424c28e6aa30088950ccdd1edeeb550b7e7caa2dc70af88686dbd25088"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(gateway,capability_id=\"project.sharing.change.apply\" if write else \"project.sharing.read\",payload={\"operation\":operation,\"arguments\":args},current_user=user,principal=principal,request_id=rid,trace_id=request.headers.get(\"X-Trace-ID\") or rid,idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None)"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -1831,7 +1855,8 @@
           "sha256": "afa2c188627664ecc204d832ec1b1e4e6bdb693a991ad656b2fb0dbed2e30d0e"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.follow.change.apply\" if write else \"project.follow.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -1917,7 +1942,8 @@
           "sha256": "dca2bfda3f8ac98bec5ef0d065f429c09104fb355d90134d2e72ec1a4ae3e1c4"
         },
         "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.task.change.apply\" if write else \"project.task.read\", operation, args, write=write)"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -1946,7 +1972,8 @@
           "sha256": "4e23438e7e7b01a87c4be0616d1b8a06a0f1c9c8fa634a1ea93ead426c4b40a0"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.task_template.change.apply\" if write else \"project.task_template.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -2021,7 +2048,8 @@
           "sha256": "5b3835ef26dd5342c3b99640d3c4bf6674a930688b4b65fedf5151425b325f0e"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.approval.change.apply\" if write else \"project.approval.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -2058,7 +2086,8 @@
           "sha256": "5b3835ef26dd5342c3b99640d3c4bf6674a930688b4b65fedf5151425b325f0e"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.approval.change.apply\" if write else \"project.approval.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -2095,7 +2124,8 @@
           "sha256": "5b3835ef26dd5342c3b99640d3c4bf6674a930688b4b65fedf5151425b325f0e"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.approval.change.apply\" if write else \"project.approval.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -2124,7 +2154,8 @@
           "sha256": "5b3835ef26dd5342c3b99640d3c4bf6674a930688b4b65fedf5151425b325f0e"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.approval.change.apply\" if write else \"project.approval.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -2275,7 +2306,8 @@
           "sha256": "be126eec0f6ca7ab3f4b22406749eaada81f44399d7748f96a960d3eeec17959"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.notification.change.apply\" if write else \"project.notification.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -2304,7 +2336,8 @@
           "sha256": "be126eec0f6ca7ab3f4b22406749eaada81f44399d7748f96a960d3eeec17959"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.notification.change.apply\" if write else \"project.notification.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -2341,7 +2374,8 @@
           "sha256": "afa2c188627664ecc204d832ec1b1e4e6bdb693a991ad656b2fb0dbed2e30d0e"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.follow.change.apply\" if write else \"project.follow.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -2471,7 +2505,8 @@
           "sha256": "dca2bfda3f8ac98bec5ef0d065f429c09104fb355d90134d2e72ec1a4ae3e1c4"
         },
         "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.task.change.apply\" if write else \"project.task.read\", operation, args, write=write)"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -2500,7 +2535,8 @@
           "sha256": "4e23438e7e7b01a87c4be0616d1b8a06a0f1c9c8fa634a1ea93ead426c4b40a0"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.task_template.change.apply\" if write else \"project.task_template.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
-      }
+      },
+      "round_4_change": "re_retained"
     },
     {
       "scope": "original_109",
@@ -2567,7 +2603,8 @@
           "sha256": "dca2bfda3f8ac98bec5ef0d065f429c09104fb355d90134d2e72ec1a4ae3e1c4"
         },
         "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.task.change.apply\" if write else \"project.task.read\", operation, args, write=write)"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -2596,7 +2633,8 @@
           "sha256": "dca2bfda3f8ac98bec5ef0d065f429c09104fb355d90134d2e72ec1a4ae3e1c4"
         },
         "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.task.change.apply\" if write else \"project.task.read\", operation, args, write=write)"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -2625,7 +2663,8 @@
           "sha256": "27c14620f0d6168ed25c15cbb27522e886c85bad2145013ffe06ce38238334d5"
         },
         "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.issue.change.apply\" if write else \"project.issue.read\", operation, args, write=write)"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -2654,7 +2693,8 @@
           "sha256": "27c14620f0d6168ed25c15cbb27522e886c85bad2145013ffe06ce38238334d5"
         },
         "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.issue.change.apply\" if write else \"project.issue.read\", operation, args, write=write)"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -2683,7 +2723,8 @@
           "sha256": "27c14620f0d6168ed25c15cbb27522e886c85bad2145013ffe06ce38238334d5"
         },
         "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.issue.change.apply\" if write else \"project.issue.read\", operation, args, write=write)"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -2712,7 +2753,8 @@
           "sha256": "27c14620f0d6168ed25c15cbb27522e886c85bad2145013ffe06ce38238334d5"
         },
         "expected_facade_binding": "_invoke(request, user, principal, gateway, \"project.issue.change.apply\" if write else \"project.issue.read\", operation, args, write=write)"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -2741,7 +2783,8 @@
           "sha256": "be126eec0f6ca7ab3f4b22406749eaada81f44399d7748f96a960d3eeec17959"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.notification.change.apply\" if write else \"project.notification.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -2770,7 +2813,8 @@
           "sha256": "be126eec0f6ca7ab3f4b22406749eaada81f44399d7748f96a960d3eeec17959"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.notification.change.apply\" if write else \"project.notification.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -2791,7 +2835,8 @@
         "facade_capability": "project.list.change.apply",
         "operation": "item_entries.delete",
         "expected_facade_invocation": "_invoke_project(\n        request, current_user, principal, gateway,\n        capability_id=\"project.list.change.apply\",\n        operation=\"item_entries.delete\",\n        arguments={\"item_type\": item_type, \"item_gid\": item_gid},\n    )"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -2812,7 +2857,8 @@
         "facade_capability": "project.list.read",
         "operation": "item_entries.get",
         "expected_facade_invocation": "_invoke_project(\n        request, current_user, principal, gateway,\n        capability_id=\"project.list.read\",\n        operation=\"item_entries.get\",\n        arguments={\"item_type\": item_type, \"item_gid\": item_gid},\n    )"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -2833,7 +2879,8 @@
         "facade_capability": "project.sharing.read",
         "operation": "share_links.resolve",
         "expected_facade_invocation": "_invoke(request, user, principal, gateway, \"project.sharing.read\", \"share_links.resolve\", {\"token\": token})"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -2862,7 +2909,8 @@
           "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -2891,7 +2939,8 @@
           "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -2920,7 +2969,8 @@
           "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -2949,7 +2999,8 @@
           "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -2978,7 +3029,8 @@
           "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3007,7 +3059,8 @@
           "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3036,7 +3089,8 @@
           "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3065,7 +3119,8 @@
           "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3094,7 +3149,8 @@
           "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3123,7 +3179,8 @@
           "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3152,7 +3209,8 @@
           "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3181,7 +3239,8 @@
           "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3210,7 +3269,8 @@
           "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3229,7 +3289,8 @@
           "sha256": "8d03a4a27c2c6d345594a51a706e1f8c22dbd6ec5e52e0b10e8fc2b8ba530730"
         },
         "expected_target_invocation": "_invoke_knowledge(\n        request,\n        current_user,\n        principal,\n        gateway,\n        \"knowledge.search\",\n        {\n            \"query\": \"\",\n            \"entry_type\": entry_type,\n            \"list_gid\": list_gid,\n            \"context_class_gid\": context_class_gid,\n            \"include_content\": True,\n            \"limit\": limit,\n        },\n    )"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3248,7 +3309,8 @@
           "sha256": "90e94ca7d02767a679a51e9e68d96a2fc726e8a5e246a6cd341d0da156be29fe"
         },
         "expected_target_invocation": "_invoke_knowledge(\n        request, current_user, principal, gateway, \"knowledge.get\", {\"gid\": gid}\n    )"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3277,7 +3339,8 @@
           "sha256": "f7eb59b6b0c04cfcc1fab401c6b728d9a17d319ca625ff32c88ea1b4ead8d0f7"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3306,7 +3369,8 @@
           "sha256": "f7eb59b6b0c04cfcc1fab401c6b728d9a17d319ca625ff32c88ea1b4ead8d0f7"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3335,7 +3399,8 @@
           "sha256": "f7eb59b6b0c04cfcc1fab401c6b728d9a17d319ca625ff32c88ea1b4ead8d0f7"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3354,7 +3419,8 @@
           "sha256": "63bcd04bbfe545537dd0a56e62c3b028f06f62981fa54c8858232b78fe6bb54a"
         },
         "expected_target_invocation": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"craft.ebom.vpps_check.read\",\n            payload={\"operation\": \"check\", \"snapshot_gid\": snapshot_gid},\n            current_user=_u,\n            principal=principal,\n            request_id=request_id,\n            trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        )"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3373,7 +3439,8 @@
           "sha256": "92acd180a30783ec8e288d5230fc362228d1f77b397177322677d15feb2fe732"
         },
         "expected_target_invocation": "_invoke_rule_library(request, current_user, principal, gateway, \"craft.rule.library.read\", \"list\", status=status, list_gid=list_gid, q=q, limit=limit)"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3392,7 +3459,8 @@
           "sha256": "a2281172c3494425f882bea6e1bd9357b4e82dc7646e77effa27f0740683d8df"
         },
         "expected_target_invocation": "_invoke_rule_library(request, current_user, principal, gateway, \"craft.rule.library.read\", \"get\", gid=gid)"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3411,7 +3479,8 @@
           "sha256": "a0fb1314958addea4dab574c24f730f42cba04021ea722ded65ffc8376839c4b"
         },
         "expected_target_invocation": "_invoke_rule_library(request, current_user, principal, gateway, \"craft.rule.library.change.apply\", \"delete\", gid=gid)"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3430,7 +3499,8 @@
           "sha256": "578ddeaf55c5ce37aa2f50872296325b83b5ea621ef73ce343a91e356bf6a75c"
         },
         "expected_target_invocation": "_invoke_vpps_audit(request, user, principal, gateway, \"craft.vpps_audit.read\", \"list\", pbom_version_gid=pbom_version_gid, operation_type=operation_type)"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3449,7 +3519,8 @@
           "sha256": "84c02d2286475e315a4a89c3b83506095c059292f016036a4915bbfec8256a4b"
         },
         "expected_target_invocation": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"base.export_template.read\",\n            payload={\"module\": module, \"limit\": 500},\n            current_user=user,\n            principal=principal,\n            request_id=request_id,\n            trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        )"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3476,7 +3547,8 @@
           "sha256": "b05f070e81e7905ce2e8a036b00ce8ef5271d5f71c3c552a685700510ee4a917"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"base.export_template.change.apply\",\n            payload=payload,\n            current_user=user,\n            principal=principal,\n            request_id=request_id,\n            trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n            idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n            approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        )"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3503,7 +3575,8 @@
           "sha256": "b05f070e81e7905ce2e8a036b00ce8ef5271d5f71c3c552a685700510ee4a917"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"base.export_template.change.apply\",\n            payload=payload,\n            current_user=user,\n            principal=principal,\n            request_id=request_id,\n            trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n            idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n            approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        )"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3530,7 +3603,8 @@
           "sha256": "2e4e043d3f192080284bdf6d31dd8db6fe29738d4dd75f4391e4dde06ec5f8b2"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"craft.data_exchange.export\",\n            payload=payload,\n            current_user=user,\n            principal=principal,\n            request_id=request_id,\n            trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n            idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n            approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        )"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3557,7 +3631,8 @@
           "sha256": "2e4e043d3f192080284bdf6d31dd8db6fe29738d4dd75f4391e4dde06ec5f8b2"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"craft.data_exchange.export\",\n            payload=payload,\n            current_user=user,\n            principal=principal,\n            request_id=request_id,\n            trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n            idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n            approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        )"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3584,7 +3659,8 @@
           "sha256": "2e4e043d3f192080284bdf6d31dd8db6fe29738d4dd75f4391e4dde06ec5f8b2"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"craft.data_exchange.export\",\n            payload=payload,\n            current_user=user,\n            principal=principal,\n            request_id=request_id,\n            trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n            idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n            approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        )"
-      }
+      },
+      "round_4_change": "new"
     },
     {
       "scope": "fix_round_4",
@@ -3611,11 +3687,15 @@
           "sha256": "1f16e8a374b9cb8e8b588629a73bcc9d327b0877ef2ada653e6089571e67f5f3"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"agent.interaction.chat.change.apply\", payload=payload,\n        current_user=user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n    )"
-      }
+      },
+      "round_4_change": "new"
     }
   ],
   "original_retained_count": 87,
   "original_removed_count": 22,
   "retained_count": 132,
-  "removed_count": 22
+  "removed_count": 22,
+  "round_4_re_retained_count": 35,
+  "round_4_new_count": 41,
+  "round_4_delta_count": 76
 }

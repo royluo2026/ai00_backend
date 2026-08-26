@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai00.local/governance/web-api-wrapper-contracts.schema.json",
+  "title": "Web API wrapper contracts",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "entries"],
+  "properties": {
+    "schema_version": {
+      "const": 2
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/contract"
+      }
+    }
+  },
+  "$defs": {
+    "anchor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_path", "start_line", "end_line", "sha256"],
+      "properties": {
+        "source_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "start_line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "end_line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "parameters"],
+      "properties": {
+        "kind": {
+          "enum": [
+            "arrow_assignment",
+            "function_declaration",
+            "member_assignment"
+          ]
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "signature": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["route_argument", "method_source", "method"],
+          "properties": {
+            "route_argument": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "method_source": {
+              "const": "constant"
+            },
+            "method": {
+              "enum": ["DELETE", "GET", "PATCH", "POST", "PUT"]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["route_argument", "method_source", "method_argument"],
+          "properties": {
+            "route_argument": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "method_source": {
+              "const": "method_argument"
+            },
+            "method_argument": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "route_argument",
+            "method_source",
+            "method_argument",
+            "default_method"
+          ],
+          "properties": {
+            "route_argument": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "method_source": {
+              "const": "options_argument"
+            },
+            "method_argument": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "default_method": {
+              "enum": ["DELETE", "GET", "PATCH", "POST", "PUT"]
+            }
+          }
+        }
+      ]
+    },
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "source_sha256",
+        "callee",
+        "signature",
+        "definition",
+        "expected_definition",
+        "binding",
+        "call_sites"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "callee": {
+          "type": "string",
+          "pattern": "^[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z_$][A-Za-z0-9_$]*)*$"
+        },
+        "signature": {
+          "$ref": "#/$defs/signature"
+        },
+        "definition": {
+          "$ref": "#/$defs/anchor"
+        },
+        "expected_definition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "binding": {
+          "$ref": "#/$defs/binding"
+        },
+        "call_sites": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/anchor"
+          }
+        }
+      }
+    }
+  }
+}

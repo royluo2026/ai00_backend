@@ -35,6 +35,12 @@ class WrapperSignature:
 
 
 @dataclass(frozen=True)
+class WrapperBinding:
+    kind: str
+    parameters: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class WrapperContract:
     source: str
     source_sha256: str
@@ -42,6 +48,8 @@ class WrapperContract:
     signature: WrapperSignature
     definition: SourceAnchor
     expected_definition: str
+    binding: WrapperBinding
+    call_sites: tuple[SourceAnchor, ...]
 
 
 @dataclass(frozen=True)
@@ -305,6 +313,29 @@ def _mask_comments(source: str) -> str:
     return "".join(chars)
 
 
+def _mask_strings(source: str) -> str:
+    """Blank JS string literals while preserving offsets and line numbers."""
+
+    chars = list(source)
+    quote: str | None = None
+    escaped = False
+    for index, char in enumerate(source):
+        if quote is None:
+            if char in {"'", '"', "`"}:
+                quote = char
+                chars[index] = " "
+            continue
+        if char not in {"\r", "\n"}:
+            chars[index] = " "
+        if escaped:
+            escaped = False
+        elif char == "\\":
+            escaped = True
+        elif char == quote:
+            quote = None
+    return "".join(chars)
+
+
 def _validate_source(source: str, relative: str, path: Path) -> None:
     if _EMPTY_ASSIGNMENT.search(source):
         raise RouteScanConfigurationError(f"Web source cannot be parsed: {relative}")
@@ -403,47 +434,27 @@ def _matching_paren(source: str, open_paren: int) -> int:
     return min(len(source), open_paren + 2000)
 
 
-def _direct_options_method(source: str, literal_end: int, call_end: int) -> str | None:
-    index = literal_end
-    while index < call_end and source[index].isspace():
-        index += 1
-    if index >= call_end or source[index] != ",":
-        return None
-    index += 1
-    while index < call_end and source[index].isspace():
-        index += 1
-    if index >= call_end or source[index] != "{":
-        return None
-    depth = 0
-    quote: str | None = None
-    escaped = False
-    while index < call_end:
-        char = source[index]
-        if quote:
-            if escaped:
-                escaped = False
-            elif char == "\\":
-                escaped = True
-            elif char == quote:
-                quote = None
-            index += 1
-            continue
-        if depth == 1:
-            match = _DIRECT_METHOD.match(source, index)
-            if match:
-                return match.group(1).upper()
-        if char in {"'", '"', "`"}:
-            quote = char
-            index += 1
-            continue
-        if char == "{":
-            depth += 1
-        elif char == "}":
-            depth -= 1
-            if depth == 0:
-                return None
-        index += 1
-    return None
+def _direct_options_method(
+    source: str,
+    open_paren: int,
+    literal_start: int,
+    literal_end: int,
+    call_end: int,
+    default_method: str | None,
+) -> tuple[bool, str | None]:
+    arguments = _call_arguments(source, open_paren, call_end)
+    route_index = next(
+        (
+            index
+            for index, (start, end) in enumerate(arguments)
+            if start <= literal_start and literal_end <= end
+        ),
+        None,
+    )
+    if route_index is None or route_index + 1 >= len(arguments):
+        return False, None
+    start, end = arguments[route_index + 1]
+    return True, _object_options_method(source[start:end], default_method)
 
 
 def _call_arguments(
@@ -484,7 +495,7 @@ def _call_arguments(
     return tuple(arguments)
 
 
-def _object_options_method(value: str, default_method: str) -> str | None:
+def _object_options_method(value: str, default_method: str | None) -> str | None:
     stripped = value.strip()
     if not stripped:
         return default_method
@@ -492,36 +503,34 @@ def _object_options_method(value: str, default_method: str) -> str | None:
         return default_method
     if not stripped.startswith("{") or not stripped.endswith("}"):
         return None
-    depth = 0
-    quote: str | None = None
-    escaped = False
-    index = 0
-    while index < len(stripped):
-        char = stripped[index]
-        if quote:
-            if escaped:
-                escaped = False
-            elif char == "\\":
-                escaped = True
-            elif char == quote:
-                quote = None
-            index += 1
-            continue
-        if depth == 1:
-            direct = _DIRECT_METHOD.match(stripped, index)
-            if direct:
-                method = direct.group(1).upper()
-                return method if method in _HTTP_METHODS else None
-            if _METHOD_KEY.match(stripped, index):
+    body = f"({stripped[1:-1]})"
+    properties = tuple(
+        body[start:end].strip()
+        for start, end in _call_arguments(body, 0, len(body) - 1)
+        if body[start:end].strip()
+    )
+    method: str | None = None
+    for property_source in properties:
+        if property_source.startswith("...") or re.match(
+            r"(?:(?:async|get|set)\s+)?(?:\*\s*)?\[", property_source
+        ):
+            return None
+        direct = _DIRECT_METHOD.fullmatch(property_source)
+        if direct:
+            if method is not None:
                 return None
-        if char in {"'", '"', "`"}:
-            quote = char
-        elif char == "{":
-            depth += 1
-        elif char == "}":
-            depth -= 1
-        index += 1
-    return default_method
+            candidate = direct.group(1).upper()
+            if candidate not in _HTTP_METHODS:
+                return None
+            method = candidate
+            continue
+        if (
+            _METHOD_KEY.match(property_source)
+            or re.fullmatch(r"method", property_source)
+            or re.match(r"(?:(?:async|get|set)\s+)?method\s*\(", property_source)
+        ):
+            return None
+    return method or default_method
 
 
 def _contract_method(
@@ -573,13 +582,17 @@ def _method_for_occurrence(
     if method_argument and callee in _METHOD_FIRST_CALLS:
         return method_argument.group(1).upper()
     call_end = _matching_paren(source, open_paren)
-    explicit = (
-        _direct_options_method(source, literal_end, call_end)
-        if callee in _OPTIONS_METHOD_CALLS
-        else None
-    )
-    if explicit:
-        return explicit
+    if callee in _OPTIONS_METHOD_CALLS:
+        options_present, method = _direct_options_method(
+            source,
+            open_paren,
+            literal_start,
+            literal_end,
+            call_end,
+            "GET" if callee in _DEFAULT_GET_CALLS else None,
+        )
+        if options_present:
+            return method
     if callee in _DEFAULT_GET_CALLS:
         return "GET"
     return None
@@ -730,6 +743,48 @@ def _exact_source_path(value: object, context: str) -> str:
     return value
 
 
+def _source_anchor(raw: object, context: str) -> SourceAnchor:
+    if not isinstance(raw, dict) or set(raw) != {
+        "source_path", "start_line", "end_line", "sha256"
+    }:
+        raise RouteScanConfigurationError(f"wrapper {context} anchor is invalid")
+    source_path = _exact_source_path(raw["source_path"], f"{context} source")
+    start_line = raw["start_line"]
+    end_line = raw["end_line"]
+    sha256 = raw["sha256"]
+    if (
+        not isinstance(start_line, int)
+        or isinstance(start_line, bool)
+        or not isinstance(end_line, int)
+        or isinstance(end_line, bool)
+        or start_line < 1
+        or end_line < start_line
+        or not isinstance(sha256, str)
+        or _SHA256.fullmatch(sha256) is None
+    ):
+        raise RouteScanConfigurationError(f"wrapper {context} anchor is invalid")
+    return SourceAnchor(source_path, start_line, end_line, sha256)
+
+
+def _wrapper_binding(raw: object) -> WrapperBinding:
+    if not isinstance(raw, dict) or set(raw) != {"kind", "parameters"}:
+        raise RouteScanConfigurationError("wrapper binding is invalid")
+    kind = raw.get("kind")
+    parameters = raw.get("parameters")
+    if kind not in {
+        "arrow_assignment",
+        "function_declaration",
+        "member_assignment",
+    }:
+        raise RouteScanConfigurationError("wrapper binding kind is invalid")
+    if (
+        not isinstance(parameters, list)
+        or not all(isinstance(value, str) and value.strip() for value in parameters)
+    ):
+        raise RouteScanConfigurationError("wrapper binding parameters are invalid")
+    return WrapperBinding(str(kind), tuple(value.strip() for value in parameters))
+
+
 def _wrapper_signature(raw: object) -> WrapperSignature:
     if not isinstance(raw, dict):
         raise RouteScanConfigurationError("wrapper contract signature must be an object")
@@ -786,14 +841,14 @@ def load_wrapper_contracts(path: Path) -> tuple[WrapperContract, ...]:
         document = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise RouteScanConfigurationError(f"invalid wrapper contracts: {path}") from exc
-    if not isinstance(document, dict) or document.get("schema_version") != 1:
+    if not isinstance(document, dict) or document.get("schema_version") != 2:
         raise RouteScanConfigurationError("unsupported wrapper contracts schema version")
     entries = document.get("entries")
     if not isinstance(entries, list):
         raise RouteScanConfigurationError("wrapper contracts entries must be an array")
     expected = {
         "source", "source_sha256", "callee", "signature", "definition",
-        "expected_definition",
+        "expected_definition", "binding", "call_sites",
     }
     parsed: list[WrapperContract] = []
     seen: set[tuple[str, str]] = set()
@@ -816,26 +871,14 @@ def load_wrapper_contracts(path: Path) -> tuple[WrapperContract, ...]:
             raise RouteScanConfigurationError("wrapper contract callee is invalid")
         if not isinstance(expected_definition, str) or not expected_definition:
             raise RouteScanConfigurationError("wrapper expected definition is required")
-        anchor = raw["definition"]
-        if not isinstance(anchor, dict) or set(anchor) != {
-            "source_path", "start_line", "end_line", "sha256"
-        }:
-            raise RouteScanConfigurationError("wrapper definition anchor is invalid")
-        source_path = _exact_source_path(anchor["source_path"], "definition source")
-        start_line = anchor["start_line"]
-        end_line = anchor["end_line"]
-        sha256 = anchor["sha256"]
-        if (
-            not isinstance(start_line, int)
-            or isinstance(start_line, bool)
-            or not isinstance(end_line, int)
-            or isinstance(end_line, bool)
-            or start_line < 1
-            or end_line < start_line
-            or not isinstance(sha256, str)
-            or _SHA256.fullmatch(sha256) is None
-        ):
-            raise RouteScanConfigurationError("wrapper definition anchor is invalid")
+        definition = _source_anchor(raw["definition"], "definition")
+        binding = _wrapper_binding(raw["binding"])
+        call_sites_raw = raw["call_sites"]
+        if not isinstance(call_sites_raw, list) or not call_sites_raw:
+            raise RouteScanConfigurationError("wrapper call sites are required")
+        call_sites = tuple(
+            _source_anchor(item, "call site") for item in call_sites_raw
+        )
         key = source, callee
         if key in seen:
             raise RouteScanConfigurationError(
@@ -848,11 +891,120 @@ def load_wrapper_contracts(path: Path) -> tuple[WrapperContract, ...]:
                 source_sha256=source_sha256,
                 callee=callee,
                 signature=_wrapper_signature(raw["signature"]),
-                definition=SourceAnchor(source_path, start_line, end_line, sha256),
+                definition=definition,
                 expected_definition=expected_definition,
+                binding=binding,
+                call_sites=call_sites,
             )
         )
     return tuple(parsed)
+
+
+def _anchored_source_text(
+    anchor: SourceAnchor,
+    sources: Mapping[str, str],
+    context: str,
+) -> str:
+    source = sources.get(anchor.source_path)
+    if source is None:
+        raise RouteScanConfigurationError(
+            f"wrapper contract {context} source is stale: {anchor.source_path}"
+        )
+    lines = source.splitlines(keepends=True)
+    if anchor.end_line > len(lines):
+        raise RouteScanConfigurationError(
+            f"wrapper contract {context} range is stale: {anchor.source_path}"
+        )
+    text = "".join(lines[anchor.start_line - 1:anchor.end_line])
+    if hashlib.sha256(text.encode("utf-8")).hexdigest() != anchor.sha256:
+        raise RouteScanConfigurationError(
+            f"wrapper contract {context} hash is stale: {anchor.source_path}"
+        )
+    return text
+
+
+def _declared_parameters(value: str) -> tuple[str, ...]:
+    wrapped = f"({value})"
+    return tuple(
+        wrapped[start:end].strip()
+        for start, end in _call_arguments(wrapped, 0, len(wrapped) - 1)
+        if wrapped[start:end].strip()
+    )
+
+
+def _binding_parameter_contract(
+    contract: WrapperContract, definition: str
+) -> tuple[str, ...]:
+    masked = _mask_strings(_mask_comments(definition))
+    callee = contract.callee
+    name = callee.rsplit(".", 1)[-1]
+    identifier = re.escape(name)
+    if contract.binding.kind == "function_declaration":
+        if "." in callee:
+            raise RouteScanConfigurationError(
+                f"wrapper contract binding is not exact: {callee}"
+            )
+        pattern = rf"(?:async\s+)?function\s+{identifier}\s*\(([^)]*)\)"
+    elif contract.binding.kind == "arrow_assignment":
+        if "." in callee:
+            raise RouteScanConfigurationError(
+                f"wrapper contract binding is not exact: {callee}"
+            )
+        pattern = (
+            rf"(?:const|let|var)\s+{identifier}\s*=\s*(?:async\s*)?"
+            rf"\(([^)]*)\)\s*=>"
+        )
+    elif contract.binding.kind == "member_assignment":
+        if "." not in callee:
+            raise RouteScanConfigurationError(
+                f"wrapper contract binding is not exact: {callee}"
+            )
+        pattern = (
+            rf"{re.escape(callee)}\s*=\s*(?:async\s*)?function"
+            rf"(?:\s+{identifier})?\s*\(([^)]*)\)"
+        )
+    else:
+        raise RouteScanConfigurationError(
+            f"wrapper contract binding kind is invalid: {contract.binding.kind}"
+        )
+    matches = re.findall(pattern, masked)
+    anchored = re.match(rf"\s*{pattern}", masked)
+    if len(matches) != 1 or anchored is None:
+        raise RouteScanConfigurationError(
+            f"wrapper contract definition binding is ambiguous: {contract.definition.source_path}"
+        )
+    return _declared_parameters(anchored.group(1))
+
+
+def _validate_call_sites(
+    contract: WrapperContract,
+    sources: Mapping[str, str],
+) -> None:
+    ranges: list[tuple[int, int]] = []
+    for anchor in contract.call_sites:
+        if anchor.source_path != contract.source:
+            raise RouteScanConfigurationError(
+                f"wrapper contract call site source is ambiguous: {anchor.source_path}"
+            )
+        if any(
+            anchor.start_line <= end and start <= anchor.end_line
+            for start, end in ranges
+        ):
+            raise RouteScanConfigurationError(
+                f"wrapper contract call sites overlap: {contract.source}:{contract.callee}"
+            )
+        ranges.append((anchor.start_line, anchor.end_line))
+        text = _anchored_source_text(anchor, sources, "call site")
+        masked = _mask_comments(text)
+        callees = []
+        for match in _ROUTE_LITERAL.finditer(masked):
+            call = _find_call(masked, match.start())
+            if call is not None:
+                callees.append(call[0])
+        if contract.callee not in callees:
+            raise RouteScanConfigurationError(
+                f"wrapper contract call site is ambiguous: {contract.source}:{contract.callee}"
+            )
 
 
 def _validate_wrapper_contracts(
@@ -878,25 +1030,24 @@ def _validate_wrapper_contracts(
                 f"wrapper contract source hash is stale: {contract.source}"
             )
         anchor = contract.definition
-        definition_source = sources.get(anchor.source_path)
-        if definition_source is None:
-            raise RouteScanConfigurationError(
-                f"wrapper contract definition source is stale: {anchor.source_path}"
-            )
-        lines = definition_source.splitlines(keepends=True)
-        if anchor.end_line > len(lines):
-            raise RouteScanConfigurationError(
-                f"wrapper contract definition range is stale: {anchor.source_path}"
-            )
-        definition = "".join(lines[anchor.start_line - 1:anchor.end_line])
-        if hashlib.sha256(definition.encode("utf-8")).hexdigest() != anchor.sha256:
-            raise RouteScanConfigurationError(
-                f"wrapper contract definition hash is stale: {anchor.source_path}"
-            )
+        definition = _anchored_source_text(anchor, sources, "definition")
         if contract.expected_definition not in definition:
             raise RouteScanConfigurationError(
                 f"wrapper contract definition is ambiguous: {anchor.source_path}"
             )
+        declared_parameters = _binding_parameter_contract(contract, definition)
+        if declared_parameters != contract.binding.parameters:
+            raise RouteScanConfigurationError(
+                f"wrapper contract parameter contract is stale: {anchor.source_path}"
+            )
+        positions = [contract.signature.route_argument]
+        if contract.signature.method_argument is not None:
+            positions.append(contract.signature.method_argument)
+        if any(position >= len(declared_parameters) for position in positions):
+            raise RouteScanConfigurationError(
+                f"wrapper contract parameter contract is invalid: {anchor.source_path}"
+            )
+        _validate_call_sites(contract, sources)
         result[key] = contract
     return result
 
@@ -923,6 +1074,19 @@ def wrapper_contracts_hash(contracts: Sequence[WrapperContract]) -> str:
                 "sha256": contract.definition.sha256,
             },
             "expected_definition": contract.expected_definition,
+            "binding": {
+                "kind": contract.binding.kind,
+                "parameters": list(contract.binding.parameters),
+            },
+            "call_sites": [
+                {
+                    "source_path": anchor.source_path,
+                    "start_line": anchor.start_line,
+                    "end_line": anchor.end_line,
+                    "sha256": anchor.sha256,
+                }
+                for anchor in contract.call_sites
+            ],
         })
     payload = json.dumps(
         serialized, ensure_ascii=False, sort_keys=True, separators=(",", ":")
@@ -1016,7 +1180,16 @@ def scan_web_api_routes(
             line_start = source.rfind("\n", 0, route_offset) + 1
             column = route_offset - line_start + 1
             call = _find_call(scan_source, literal_start)
-            contract = contract_index.get((relative, call[0])) if call else None
+            candidate = contract_index.get((relative, call[0])) if call else None
+            contract = (
+                candidate
+                if candidate is not None
+                and any(
+                    anchor.start_line <= line <= anchor.end_line
+                    for anchor in candidate.call_sites
+                )
+                else None
+            )
             method = _method_for_occurrence(
                 scan_source, literal_start, literal_end, contract
             )
@@ -1147,6 +1320,7 @@ def scan_web_routes(
 
 __all__ = [
     "SourceAnchor",
+    "WrapperBinding",
     "WrapperContract",
     "WrapperSignature",
     "OperationsExclusion",

@@ -117,6 +117,20 @@ def test_lark_business_routes_are_registered_not_operations_excluded() -> None:
         assert ("POST", f"/api/import-export/{transport}/write") not in operation_keys
 
 
+def test_unapproved_file_store_read_is_not_operations_excluded() -> None:
+    root = Path(__file__).resolve().parents[2]
+    operations = json.loads(
+        (root / "docs/governance/web-api-operations-exclusions.json").read_text(
+            encoding="utf-8"
+        )
+    )["entries"]
+
+    assert ("GET", "/api/file-store/config") not in {
+        (entry["route_method"], entry["normalized_route"])
+        for entry in operations
+    }
+
+
 def test_round4_exact_adapter_families_have_governed_targets() -> None:
     root = Path(__file__).resolve().parents[2]
     inventory = load_route_inventory(root / "docs/governance/legacy_route_inventory.json")
@@ -203,6 +217,23 @@ def test_task3_legacy_addition_review_is_complete_and_traceable() -> None:
     assert review["removed_count"] == len(
         [entry for entry in review["entries"] if entry["disposition"] == "removed"]
     )
+    round_4_re_retained = [
+        entry
+        for entry in review["entries"]
+        if entry.get("round_4_change") == "re_retained"
+    ]
+    round_4_new = [
+        entry
+        for entry in review["entries"]
+        if entry.get("round_4_change") == "new"
+    ]
+    assert review["round_4_re_retained_count"] == len(round_4_re_retained) == 35
+    assert review["round_4_new_count"] == len(round_4_new) == 41
+    assert review["round_4_delta_count"] == (
+        len(round_4_re_retained) + len(round_4_new)
+    ) == 76
+    assert all(entry["disposition"] == "retained" for entry in round_4_re_retained)
+    assert all(entry["scope"] == "fix_round_4" for entry in round_4_new)
     for entry in review["entries"]:
         key = (entry["method"], entry["route_path"])
         assert entry["reason"]

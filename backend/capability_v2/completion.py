@@ -23,7 +23,12 @@ from .consumer_routes import (
 )
 from .atomicity import load_atomicity_dispositions
 from .catalog_targets import CatalogTargetIndex
-from .route_inventory import audit_route_inventory, load_route_inventory
+from .route_inventory import (
+    LegacyRouteProofConfigurationError,
+    audit_legacy_route_proofs,
+    audit_route_inventory,
+    load_route_inventory,
+)
 
 
 _WEB_DISPOSITIONS = {
@@ -598,24 +603,61 @@ def _route_inventory_failures(root: Path, configuration: dict) -> list[str]:
     if not artifacts:
         return []
     replacements: dict[tuple[str, int], str] = {}
+    replacement_sets: dict[tuple[str, int], set[str]] = {}
     disposition_path = root / "docs/governance/capability-atomicity-dispositions.json"
     if disposition_path.is_file():
+        dispositions = load_atomicity_dispositions(disposition_path).dispositions
         replacements = {
             (item.capability_id, item.major_version): item.replacement_capabilities[0]
-            for item in load_atomicity_dispositions(disposition_path).dispositions
+            for item in dispositions
+            if item.replacement_capabilities
+        }
+        replacement_sets = {
+            (item.capability_id, item.major_version): set(item.replacement_capabilities)
+            for item in dispositions
             if item.replacement_capabilities
         }
     catalog_index = CatalogTargetIndex.from_catalog(
         _load_json(root / "docs/capabilities/catalog.v2.json"), replacements=replacements
     )
     failures: list[str] = []
+    legacy_inventory = None
     for field, relative in artifacts:
         if not isinstance(relative, str) or not relative:
             raise CompletionConfigurationError(f"{field} must be a repository-relative path")
         inventory = load_route_inventory(_relative_path(root, relative, field=field))
+        if field == "legacy_route_inventory_artifact":
+            legacy_inventory = inventory
         failures.extend(
             f"{field}:{issue}" for issue in audit_route_inventory(inventory, catalog_index=catalog_index)
         )
+    if legacy_inventory is not None:
+        proof_relative = configuration.get("web_legacy_route_proof_artifact")
+        if proof_relative is None:
+            failures.append("legacy_route_proof_artifact_unconfigured:1")
+        elif not isinstance(proof_relative, str) or not proof_relative:
+            raise CompletionConfigurationError(
+                "web_legacy_route_proof_artifact must be a repository-relative path"
+            )
+        else:
+            proof_path = _relative_path(
+                root, proof_relative, field="web_legacy_route_proof_artifact"
+            )
+            if not proof_path.is_file():
+                failures.append("legacy_route_proof_artifact_missing:1")
+            else:
+                try:
+                    failures.extend(
+                        audit_legacy_route_proofs(
+                            root,
+                            legacy_inventory,
+                            proof_path,
+                            catalog_index=catalog_index,
+                            replacements=replacement_sets,
+                        )
+                    )
+                except LegacyRouteProofConfigurationError:
+                    failures.append("legacy_route_proof_artifact_invalid:1")
     return failures
 
 

@@ -42,6 +42,21 @@ def _wrapper_contracts(
         start_line = int(entry.pop("definition_start_line", 1))
         end_line = int(entry.pop("definition_end_line", start_line))
         definition = "".join(lines[start_line - 1:end_line])
+        binding = entry.pop(
+            "binding",
+            {
+                "kind": "function_declaration",
+                "parameters": ["route", "options = {}"],
+            },
+        )
+        call_site_lines = entry.pop(
+            "call_site_lines",
+            [
+                index
+                for index, line in enumerate(lines, start=1)
+                if index > end_line and "/api/" in line
+            ],
+        )
         entry.update(
             {
                 "source": "web/app.js",
@@ -53,11 +68,21 @@ def _wrapper_contracts(
                     "sha256": hashlib.sha256(definition.encode("utf-8")).hexdigest(),
                 },
                 "expected_definition": definition.strip(),
+                "binding": binding,
+                "call_sites": [
+                    {
+                        "source_path": "web/app.js",
+                        "start_line": line,
+                        "end_line": line,
+                        "sha256": hashlib.sha256(lines[line - 1].encode("utf-8")).hexdigest(),
+                    }
+                    for line in call_site_lines
+                ],
             }
         )
     path = tmp_path / "wrapper-contracts.json"
     path.write_text(
-        json.dumps({"schema_version": 1, "entries": entries}),
+        json.dumps({"schema_version": 2, "entries": entries}),
         encoding="utf-8",
     )
     return consumer_routes.load_wrapper_contracts(path)
@@ -193,15 +218,15 @@ def test_source_anchored_wrapper_contract_resolves_group_through_shared_classifi
 ) -> None:
     source = (
         "function request(route, options = {}) { return fetch(route, options); }\n"
-        "client.request('/api/tasks');\n"
-        "client.request('/api/tasks', { method: 'POST' });\n"
+        "request('/api/tasks');\n"
+        "request('/api/tasks', { method: 'POST' });\n"
     )
     contracts = _wrapper_contracts(
         tmp_path,
         source,
         [
             {
-                "callee": "client.request",
+                "callee": "request",
                 "signature": {
                     "route_argument": 0,
                     "method_source": "options_argument",
@@ -242,6 +267,11 @@ def test_wrapper_contract_modes_use_exact_signature_positions(tmp_path: Path) ->
                     "method": "POST",
                 },
                 "definition_start_line": 1,
+                "binding": {
+                    "kind": "function_declaration",
+                    "parameters": ["route", "body"],
+                },
+                "call_site_lines": [3],
             },
             {
                 "callee": "request",
@@ -251,6 +281,11 @@ def test_wrapper_contract_modes_use_exact_signature_positions(tmp_path: Path) ->
                     "method_argument": 0,
                 },
                 "definition_start_line": 2,
+                "binding": {
+                    "kind": "function_declaration",
+                    "parameters": ["method", "route"],
+                },
+                "call_site_lines": [4],
             },
         ],
     )
@@ -278,7 +313,7 @@ def test_wrapper_contract_rejects_stale_source_and_definition_anchors(
         source,
         [
             {
-                "callee": "client.request",
+                "callee": "request",
                 "signature": {
                     "route_argument": 0,
                     "method_source": "constant",
@@ -305,6 +340,8 @@ def test_wrapper_contract_rejects_stale_source_and_definition_anchors(
                 sha256="0" * 64,
             ),
             expected_definition=contracts[0].expected_definition,
+            binding=contracts[0].binding,
+            call_sites=contracts[0].call_sites,
         ),
     )
     with pytest.raises(RouteScanConfigurationError, match="definition hash is stale"):
@@ -314,13 +351,20 @@ def test_wrapper_contract_rejects_stale_source_and_definition_anchors(
 def test_wrapper_contract_rejects_ambiguous_and_wildcard_contracts(
     tmp_path: Path,
 ) -> None:
-    source = "client.request('/api/tasks');\n"
+    source = (
+        "function request(route) { return fetch(route); }\n"
+        "request('/api/tasks');\n"
+    )
     entry = {
-        "callee": "client.request",
+        "callee": "request",
         "signature": {
             "route_argument": 0,
             "method_source": "constant",
             "method": "GET",
+        },
+        "binding": {
+            "kind": "function_declaration",
+            "parameters": ["route"],
         },
     }
     with pytest.raises(RouteScanConfigurationError, match="ambiguous wrapper contract"):
@@ -341,6 +385,202 @@ def test_wrapper_contract_rejects_ambiguous_and_wildcard_contracts(
                 }
             ],
         )
+
+
+@pytest.mark.parametrize(
+    "options",
+    [
+        "{ ...opts }",
+        "{ /* runtime overrides */ ...opts }",
+        "{ method }",
+        "{ ['method']: 'POST' }",
+        "{ method: 'GET', method: 'POST' }",
+    ],
+)
+def test_options_contract_fails_closed_on_runtime_method_overrides(
+    tmp_path: Path, options: str
+) -> None:
+    source = (
+        "function request(route, options = {}) { return fetch(route, options); }\n"
+        f"request('/api/tasks', {options});\n"
+    )
+    contracts = _wrapper_contracts(
+        tmp_path,
+        source,
+        [
+            {
+                "callee": "request",
+                "signature": {
+                    "route_argument": 0,
+                    "method_source": "options_argument",
+                    "method_argument": 1,
+                    "default_method": "GET",
+                },
+            }
+        ],
+    )
+
+    report = _scan(
+        source,
+        tmp_path,
+        wrapper_contracts=contracts,
+        legacy_index={("GET", "/api/tasks"), ("POST", "/api/tasks")},
+    )
+
+    assert report.routes[0].method is None
+    assert report.routes[0].disposition == "unresolved"
+
+
+def test_options_contract_defaults_get_only_for_unambiguous_object(
+    tmp_path: Path,
+) -> None:
+    source = (
+        "function request(route, options = {}) { return fetch(route, options); }\n"
+        "request('/api/tasks', { headers: {} });\n"
+    )
+    contracts = _wrapper_contracts(
+        tmp_path,
+        source,
+        [
+            {
+                "callee": "request",
+                "signature": {
+                    "route_argument": 0,
+                    "method_source": "options_argument",
+                    "method_argument": 1,
+                    "default_method": "GET",
+                },
+            }
+        ],
+    )
+
+    report = _scan(
+        source,
+        tmp_path,
+        wrapper_contracts=contracts,
+        legacy_index={("GET", "/api/tasks")},
+    )
+
+    assert report.routes[0].method == "GET"
+    assert report.routes[0].disposition == "legacy_registered"
+
+
+def test_direct_fetch_options_spread_does_not_fall_back_to_get(
+    tmp_path: Path,
+) -> None:
+    report = _scan(
+        "fetch('/api/tasks', { ...opts });\n",
+        tmp_path,
+        legacy_index={("GET", "/api/tasks")},
+    )
+
+    assert report.routes[0].method is None
+    assert report.routes[0].disposition == "unresolved"
+
+
+def test_wrapper_contract_applies_only_to_anchored_call_scope(tmp_path: Path) -> None:
+    source = (
+        "function request(route, options = {}) { return fetch(route, options); }\n"
+        "function first() { return request('/api/tasks'); }\n"
+        "function second() {\n"
+        "  function request(route) { return fetch(route, { method: 'POST' }); }\n"
+        "  return request('/api/issues');\n"
+        "}\n"
+    )
+    contracts = _wrapper_contracts(
+        tmp_path,
+        source,
+        [
+            {
+                "callee": "request",
+                "signature": {
+                    "route_argument": 0,
+                    "method_source": "options_argument",
+                    "method_argument": 1,
+                    "default_method": "GET",
+                },
+                "call_site_lines": [2],
+            }
+        ],
+    )
+
+    report = _scan(
+        source,
+        tmp_path,
+        wrapper_contracts=contracts,
+        legacy_index={("GET", "/api/tasks"), ("POST", "/api/issues")},
+    )
+
+    assert [route.method for route in report.routes] == ["GET", None]
+    assert [route.disposition for route in report.routes] == [
+        "legacy_registered",
+        "unresolved",
+    ]
+
+
+def test_wrapper_contract_rejects_mismatched_declared_signature(
+    tmp_path: Path,
+) -> None:
+    source = (
+        "function request(options, route) { return fetch(route, options); }\n"
+        "request({}, '/api/tasks');\n"
+    )
+    contracts = _wrapper_contracts(
+        tmp_path,
+        source,
+        [
+            {
+                "callee": "request",
+                "signature": {
+                    "route_argument": 0,
+                    "method_source": "options_argument",
+                    "method_argument": 1,
+                    "default_method": "GET",
+                },
+                "binding": {
+                    "kind": "function_declaration",
+                    "parameters": ["route", "options = {}"],
+                },
+            }
+        ],
+    )
+
+    with pytest.raises(RouteScanConfigurationError, match="parameter contract"):
+        _scan(source, tmp_path, wrapper_contracts=contracts)
+
+
+@pytest.mark.parametrize(
+    "injected_definition",
+    [
+        'const injected = "function request(route, options = {})";',
+        "const injected = /function request(route, options = {})/;",
+    ],
+)
+def test_wrapper_contract_rejects_injected_definition_text(
+    tmp_path: Path, injected_definition: str,
+) -> None:
+    source = (
+        f"{injected_definition}\n"
+        "request('/api/tasks');\n"
+    )
+    contracts = _wrapper_contracts(
+        tmp_path,
+        source,
+        [
+            {
+                "callee": "request",
+                "signature": {
+                    "route_argument": 0,
+                    "method_source": "options_argument",
+                    "method_argument": 1,
+                    "default_method": "GET",
+                },
+            }
+        ],
+    )
+
+    with pytest.raises(RouteScanConfigurationError, match="definition binding"):
+        _scan(source, tmp_path, wrapper_contracts=contracts)
 
 
 def test_scanner_assigns_exactly_one_governed_disposition_per_occurrence(

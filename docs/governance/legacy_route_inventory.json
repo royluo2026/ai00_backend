@@ -2782,7 +2782,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/canvases/{gid}",
@@ -2795,7 +2796,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/skills/{gid}",
@@ -2808,7 +2810,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/ai/sessions",
@@ -2821,7 +2824,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/ai/sessions/{gid}",
@@ -2834,7 +2838,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/canvases",
@@ -2847,7 +2852,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/canvases/{gid}",
@@ -2860,7 +2866,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/skills",
@@ -2873,7 +2880,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/vpps-operations/rule4-ignores",
@@ -2886,7 +2894,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/canvases/{gid}/shared",
@@ -2899,7 +2908,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/ebom/snapshots/{gid}",
@@ -2912,7 +2922,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/ai/abort",
@@ -2925,7 +2936,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/ai/chat",
@@ -2938,7 +2950,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/ai/chat/stream",
@@ -2951,7 +2964,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/ai/confirm/sync",
@@ -2964,7 +2978,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/canvases",
@@ -2977,7 +2992,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/ebom/snapshots",
@@ -2990,7 +3006,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/import-export/import/parse-excel",
@@ -3003,7 +3020,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/rule-engine/check",
@@ -3016,7 +3034,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/skills",
@@ -3029,7 +3048,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/vpps-operations/rule4-bulk-ignore",
@@ -3042,7 +3062,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/vpps-operations/{gid}/revert",
@@ -3055,7 +3076,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/skills/{gid}",
@@ -3068,7 +3090,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/craft_lib/equipments",
@@ -3081,7 +3104,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/craft_lib/equipments",
@@ -3094,7 +3118,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/craft_lib/equipments/{gid}",
@@ -3107,7 +3132,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/craft_lib/fasteners",
@@ -3120,7 +3146,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/craft_lib/fasteners",
@@ -3133,7 +3160,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/craft_lib/fasteners/{gid}",
@@ -3146,7 +3174,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/craft_lib/fasteners/{gid}",
@@ -3159,7 +3188,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/craft_lib/fixtures",
@@ -3172,7 +3202,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/craft_lib/fixtures",
@@ -3185,7 +3216,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/craft_lib/fixtures/{gid}",
@@ -3198,7 +3230,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/craft_lib/part_names",
@@ -3211,7 +3244,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/craft_lib/part_names",
@@ -3224,7 +3258,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/craft_lib/part_names/{gid}",
@@ -3237,7 +3272,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/craft_lib/part_names/{gid}",
@@ -3250,7 +3286,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/craft_lib/part_names/{gid}/accept_alias",
@@ -3263,7 +3300,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/craft_lib/part_names/batch_accept_alias",
@@ -3276,7 +3314,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/craft_lib/part_names/batch_add_from_pbom",
@@ -3289,7 +3328,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/craft_lib/tools",
@@ -3302,7 +3342,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/craft_lib/tools",
@@ -3315,7 +3356,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/craft_lib/tools/{gid}",
@@ -3328,7 +3370,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/craft_lib/tools/{gid}",
@@ -3341,7 +3384,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/ebom/snapshots",
@@ -3354,7 +3398,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/ebom/snapshots/{gid}/parts",
@@ -3367,7 +3412,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/rules",
@@ -3380,7 +3426,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/rules/{gid}",
@@ -3393,7 +3440,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/std_op/operations",
@@ -3406,7 +3454,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/std_op/operations",
@@ -3419,7 +3468,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/std_op/operations/{gid}/deprecate",
@@ -3432,7 +3482,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/std_op/operations/{gid}/publish",
@@ -3445,7 +3496,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/import-export/lark-bitable/read",
@@ -3458,7 +3510,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_1"
     },
     {
       "route_path": "/api/import-export/lark-sheets/read",
@@ -3471,7 +3524,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_1"
     },
     {
       "route_path": "/api/import-export/lark-sheets/write",
@@ -3484,7 +3538,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_1"
     },
     {
       "route_path": "/api/import-export/lark-bitable/write",
@@ -3497,7 +3552,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_1"
     },
     {
       "route_path": "/api/tasks",
@@ -3510,7 +3566,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/tasks/{gid}",
@@ -3523,7 +3580,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/task-dependencies",
@@ -3536,7 +3594,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/tasks",
@@ -3549,7 +3608,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/tasks/{gid}",
@@ -3562,7 +3622,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/tasks/{gid}",
@@ -3575,7 +3636,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/tasks/{gid}",
@@ -3588,7 +3650,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/task-dependencies",
@@ -3601,7 +3664,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/task-dependencies/{gid}",
@@ -3614,7 +3678,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/task-dependencies/{gid}",
@@ -3627,7 +3692,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/issues",
@@ -3640,7 +3706,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/issues/{gid}",
@@ -3653,7 +3720,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/issues",
@@ -3666,7 +3734,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/issues/{gid}",
@@ -3679,7 +3748,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/issues/{gid}",
@@ -3692,7 +3762,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/issues/{gid}",
@@ -3705,7 +3776,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/lists",
@@ -3718,7 +3790,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/follows",
@@ -3731,7 +3804,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/follows",
@@ -3744,7 +3818,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/follows/{gid}",
@@ -3757,7 +3832,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/follows/{gid}",
@@ -3770,7 +3846,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/notifications",
@@ -3783,7 +3860,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/notifications/unread_count",
@@ -3796,7 +3874,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/notifications/read_all",
@@ -3809,7 +3888,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/notifications/{gid}/read",
@@ -3822,7 +3902,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/approval/orders",
@@ -3835,7 +3916,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/approval/orders/{gid}",
@@ -3848,7 +3930,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/approval/orders/scope_upgrade",
@@ -3861,7 +3944,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/approval/orders/{gid}/start",
@@ -3874,7 +3958,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/approval/orders/{gid}/approve",
@@ -3887,7 +3972,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/approval/orders/{gid}/withdraw",
@@ -3900,7 +3986,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/shares/lists/{list_gid}",
@@ -3913,7 +4000,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/shares/lists/{list_gid}",
@@ -3926,7 +4014,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/shares/lists/{list_gid}/{gid}",
@@ -3939,7 +4028,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/task-templates",
@@ -3952,7 +4042,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/task-templates/{gid}",
@@ -3965,7 +4056,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/task-templates/{gid}/instantiate",
@@ -3978,7 +4070,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/annotations/{key}",
@@ -3991,7 +4084,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/annotations/{key}",
@@ -4004,7 +4098,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/item-entries/{item_type}/{item_gid}",
@@ -4017,7 +4112,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/item-entries/{item_type}/{item_gid}",
@@ -4030,7 +4126,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/item-entries/{item_type}/{item_gid}",
@@ -4043,7 +4140,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/item-entries/knowledge_item/{item_gid}",
@@ -4056,7 +4154,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/permission-requests",
@@ -4069,7 +4168,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/change-logs",
@@ -4082,7 +4182,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
       "route_path": "/api/share-links/{token}",
@@ -4095,7 +4196,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/knowledge_hub/folders",
@@ -4108,7 +4210,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/knowledge_hub/folders",
@@ -4121,7 +4224,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/knowledge_hub/folders/{gid}",
@@ -4134,7 +4238,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/knowledge_hub/folders/{gid}",
@@ -4147,7 +4252,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/knowledge_hub/items",
@@ -4160,7 +4266,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/knowledge_hub/items/{gid}",
@@ -4173,7 +4280,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/knowledge_hub/items",
@@ -4186,7 +4294,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/knowledge_hub/items/{gid}",
@@ -4199,7 +4308,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/knowledge_hub/items/{gid}/history",
@@ -4212,7 +4322,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/knowledge_hub/items/{gid}",
@@ -4225,7 +4336,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/knowledge_hub/favorites",
@@ -4238,7 +4350,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/knowledge_hub/items/{gid}/recent",
@@ -4251,7 +4364,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/knowledge_hub/recent",
@@ -4264,7 +4378,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/knowledge_entries",
@@ -4277,7 +4392,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/knowledge_entries/{gid}",
@@ -4290,7 +4406,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/knowledge_entries",
@@ -4303,7 +4420,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/knowledge_entries/{gid}",
@@ -4316,7 +4434,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/knowledge_entries/{gid}",
@@ -4329,7 +4448,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/ebom/vpps_check",
@@ -4342,7 +4462,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/rules",
@@ -4355,7 +4476,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/rules/{gid}",
@@ -4368,7 +4490,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/rules/{gid}",
@@ -4381,7 +4504,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/vpps-operations",
@@ -4394,7 +4518,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/import-export/templates",
@@ -4407,7 +4532,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/import-export/templates",
@@ -4420,7 +4546,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/import-export/templates/{gid}",
@@ -4433,7 +4560,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/import-export/export/excel",
@@ -4446,7 +4574,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/import-export/export/diff-report",
@@ -4459,7 +4588,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/import-export/export/diff-lark-sheet",
@@ -4472,7 +4602,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {
       "route_path": "/api/ai/confirm",
@@ -4485,7 +4616,8 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1
+      "migration_target_major_version": 1,
+      "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     }
   ]
 }

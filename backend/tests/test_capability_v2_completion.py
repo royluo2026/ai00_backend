@@ -92,12 +92,44 @@ def _complete_repository(tmp_path: Path) -> Path:
             },
             "web_route_inventory_artifact": "docs/web-routes.json",
             "web_wrapper_contracts_artifact": "docs/web-wrapper-contracts.json",
+            "legacy_route_inventory_artifact": "docs/legacy-routes.json",
+            "bff_route_inventory_artifact": "docs/bff-routes.json",
+            "web_legacy_route_proof_artifact": "docs/legacy-route-proofs.json",
         },
     )
     _write_json(
         tmp_path,
         "docs/web-wrapper-contracts.json",
-        {"schema_version": 1, "entries": []},
+        {"schema_version": 2, "entries": []},
+    )
+    _write_json(
+        tmp_path,
+        "docs/legacy-routes.json",
+        {"inventory_kind": "legacy_rest", "entries": []},
+    )
+    _write_json(
+        tmp_path,
+        "docs/bff-routes.json",
+        {"inventory_kind": "bff", "entries": []},
+    )
+    _write_json(
+        tmp_path,
+        "docs/legacy-route-proofs.json",
+        {
+            "schema_version": 2,
+            "artifact_id": "web-api-legacy-addition-review",
+            "review_authority": "tests",
+            "baseline_revision": "tests",
+            "original_additions": 0,
+            "entries": [],
+            "original_retained_count": 0,
+            "original_removed_count": 0,
+            "retained_count": 0,
+            "removed_count": 0,
+            "round_4_re_retained_count": 0,
+            "round_4_new_count": 0,
+            "round_4_delta_count": 0,
+        },
     )
     _write_json(
         tmp_path,
@@ -507,6 +539,169 @@ def _configure_complete_web_evidence(
     artifact = root / "docs/web-routes.json"
     artifact.write_text(report.json(), encoding="utf-8", newline="\n")
     return web, artifact
+
+
+def _configure_complete_legacy_proof(root: Path) -> tuple[Path, Path, Path]:
+    source = root / "backend/routers/reviewed.py"
+    source.parent.mkdir(parents=True, exist_ok=True)
+    source_text = 'invoke_capability("test.capability_1")\n'
+    source.write_text(source_text, encoding="utf-8")
+    source_hash = hashlib.sha256(source_text.encode("utf-8")).hexdigest()
+    catalog_path = root / "docs/capabilities/catalog.v2.json"
+    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    catalog["capabilities"][1].update(
+        {"owner_domain": "craft", "lifecycle_status": "stable"}
+    )
+    _write_json(root, "docs/capabilities/catalog.v2.json", catalog)
+    inventory_path = root / "docs/legacy-routes.json"
+    _write_json(
+        root,
+        "docs/legacy-routes.json",
+        {
+            "inventory_kind": "legacy_rest",
+            "entries": [
+                {
+                    "route_path": "/api/tasks",
+                    "method": "GET",
+                    "owner": "craft",
+                    "migration_target_capability": "test.capability_1",
+                    "migration_target_major_version": 1,
+                    "migration_deadline": "2099-01-01",
+                    "source": "backend/routers/reviewed.py",
+                    "allowed_consumers": ["web"],
+                    "evidence_provenance": (
+                        "web-api-legacy-addition-review/test"
+                    ),
+                }
+            ],
+        },
+    )
+    proof_path = root / "docs/legacy-route-proofs.json"
+    _write_json(
+        root,
+        "docs/legacy-route-proofs.json",
+        {
+            "schema_version": 2,
+            "artifact_id": "web-api-legacy-addition-review",
+            "review_authority": "tests",
+            "baseline_revision": "tests",
+            "original_additions": 0,
+            "entries": [
+                {
+                    "scope": "test",
+                    "method": "GET",
+                    "route_path": "/api/tasks",
+                    "disposition": "retained",
+                    "target_capability": "test.capability_1",
+                    "target_major_version": 1,
+                    "reason": "Anchored test invocation.",
+                    "evidence": {
+                        "kind": "capability_invocation",
+                        "handler": {
+                            "source_path": "backend/routers/reviewed.py",
+                            "start_line": 1,
+                            "end_line": 1,
+                            "sha256": source_hash,
+                        },
+                        "expected_target_invocation": (
+                            'invoke_capability("test.capability_1")'
+                        ),
+                    },
+                }
+            ],
+            "original_retained_count": 0,
+            "original_removed_count": 0,
+            "retained_count": 1,
+            "removed_count": 0,
+            "round_4_re_retained_count": 0,
+            "round_4_new_count": 0,
+            "round_4_delta_count": 0,
+        },
+    )
+    return inventory_path, proof_path, catalog_path
+
+
+def test_strict_completion_accepts_complete_legacy_proof_bijection(
+    tmp_path: Path,
+) -> None:
+    root = _complete_repository(tmp_path)
+    _configure_complete_legacy_proof(root)
+
+    report = evaluate_completion(root, mode="strict")
+
+    assert not any(item.startswith("legacy_route_proof_") for item in report.failed)
+
+
+def test_strict_completion_rejects_inventory_entry_without_active_proof(
+    tmp_path: Path,
+) -> None:
+    root = _complete_repository(tmp_path)
+    _inventory_path, proof_path, _catalog_path = _configure_complete_legacy_proof(root)
+    proof = json.loads(proof_path.read_text(encoding="utf-8"))
+    proof["entries"] = []
+    proof["retained_count"] = 0
+    _write_json(root, "docs/legacy-route-proofs.json", proof)
+
+    report = evaluate_completion(root, mode="strict")
+
+    assert "legacy_route_proof_missing:1" in report.failed
+
+
+def test_strict_completion_rejects_active_proof_without_inventory_entry(
+    tmp_path: Path,
+) -> None:
+    root = _complete_repository(tmp_path)
+    inventory_path, _proof_path, _catalog_path = _configure_complete_legacy_proof(root)
+    inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+    inventory["entries"] = []
+    _write_json(root, "docs/legacy-routes.json", inventory)
+
+    report = evaluate_completion(root, mode="strict")
+
+    assert "legacy_route_proof_orphaned:1" in report.failed
+
+
+def test_strict_completion_rejects_duplicate_active_legacy_proof(
+    tmp_path: Path,
+) -> None:
+    root = _complete_repository(tmp_path)
+    _inventory_path, proof_path, _catalog_path = _configure_complete_legacy_proof(root)
+    proof = json.loads(proof_path.read_text(encoding="utf-8"))
+    proof["entries"].append(dict(proof["entries"][0]))
+    proof["retained_count"] = 2
+    _write_json(root, "docs/legacy-route-proofs.json", proof)
+
+    report = evaluate_completion(root, mode="strict")
+
+    assert "legacy_route_proof_duplicate:1" in report.failed
+
+
+def test_strict_completion_rejects_stale_legacy_proof_source_hash(
+    tmp_path: Path,
+) -> None:
+    root = _complete_repository(tmp_path)
+    _inventory_path, proof_path, _catalog_path = _configure_complete_legacy_proof(root)
+    proof = json.loads(proof_path.read_text(encoding="utf-8"))
+    proof["entries"][0]["evidence"]["handler"]["sha256"] = "0" * 64
+    _write_json(root, "docs/legacy-route-proofs.json", proof)
+
+    report = evaluate_completion(root, mode="strict")
+
+    assert "legacy_route_proof_anchor_invalid:1" in report.failed
+
+
+def test_strict_completion_rejects_invalid_legacy_proof_target_lifecycle(
+    tmp_path: Path,
+) -> None:
+    root = _complete_repository(tmp_path)
+    _inventory_path, _proof_path, catalog_path = _configure_complete_legacy_proof(root)
+    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    catalog["capabilities"][1]["lifecycle_status"] = "deprecated"
+    _write_json(root, "docs/capabilities/catalog.v2.json", catalog)
+
+    report = evaluate_completion(root, mode="strict")
+
+    assert "legacy_route_proof_target_not_stable:1" in report.failed
 
 
 def test_completion_distinguishes_missing_stored_web_occurrence(tmp_path: Path) -> None:

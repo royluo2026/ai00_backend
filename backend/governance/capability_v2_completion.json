@@ -47,5 +47,6 @@
   "bff_route_inventory_artifact": "docs/governance/bff_route_inventory.json",
   "web_operations_exclusions_artifact": "docs/governance/web-api-operations-exclusions.json",
   "web_lexical_non_routes_artifact": "docs/governance/web-api-lexical-non-routes.json",
-  "web_wrapper_contracts_artifact": "docs/governance/web-api-wrapper-contracts.json"
+  "web_wrapper_contracts_artifact": "docs/governance/web-api-wrapper-contracts.json",
+  "web_legacy_route_proof_artifact": "docs/governance/web-api-legacy-addition-review.json"
 }
