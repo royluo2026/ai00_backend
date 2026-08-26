@@ -13,10 +13,10 @@
     "/api/device"
   ],
   "counts": {
-    "legacy": 25,
-    "capability": 35,
+    "legacy": 0,
+    "capability": 36,
     "allowlisted": 6,
-    "total": 66
+    "total": 42
   },
   "routes": [
     {
@@ -61,10 +61,10 @@
     },
     {
       "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
-      "line": 1700,
-      "column": 44,
-      "route": "/api/bop/versions/${versionGid}/entries",
-      "kind": "legacy",
+      "line": 1705,
+      "column": 46,
+      "route": "/api/v1/capabilities/craft.bop.entry.legacy_read:invoke",
+      "kind": "capability",
       "method": null
     },
     {
@@ -73,14 +73,6 @@
       "column": 40,
       "route": "/api/v1/capabilities/${id}:invoke",
       "kind": "capability",
-      "method": null
-    },
-    {
-      "source": "packages/craft-plugin/web/bop/bop.js",
-      "line": 136,
-      "column": 38,
-      "route": "/api/bop/versions/${_currentVersion}/entries",
-      "kind": "legacy",
       "method": null
     },
     {
@@ -277,26 +269,10 @@
     },
     {
       "source": "web/components/quick_list.html",
-      "line": 289,
-      "column": 28,
-      "route": "/api/bop/versions",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/components/quick_list.html",
-      "line": 313,
+      "line": 314,
       "column": 29,
       "route": "/api/v1/capabilities/${id}:invoke",
       "kind": "capability",
-      "method": null
-    },
-    {
-      "source": "web/components/quick_list.html",
-      "line": 678,
-      "column": 13,
-      "route": "/api/bop/versions/${listGid}/entries",
-      "kind": "legacy",
       "method": null
     },
     {
@@ -353,174 +329,6 @@
       "column": 30,
       "route": "/api/v1/capabilities/${id}:invoke",
       "kind": "capability",
-      "method": null
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 378,
-      "column": 19,
-      "route": "/api/ontology/${api}/${gid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 522,
-      "column": 26,
-      "route": "/api/ontology/classes/${gid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 610,
-      "column": 30,
-      "route": "/api/ontology/classes/${_selectedGid}/full",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 642,
-      "column": 30,
-      "route": "/api/ontology/classes/${_selectedGid}/full",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 732,
-      "column": 15,
-      "route": "/api/ontology/classes/${_selectedGid}",
-      "kind": "legacy",
-      "method": "PATCH"
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 824,
-      "column": 14,
-      "route": "/api/ontology/properties/${gid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 953,
-      "column": 17,
-      "route": "/api/ontology/properties",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 1091,
-      "column": 17,
-      "route": "/api/ontology/properties/${prop.gid}/promote",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 1117,
-      "column": 17,
-      "route": "/api/ontology/properties/${prop.gid}",
-      "kind": "legacy",
-      "method": "PATCH"
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 1139,
-      "column": 15,
-      "route": "/api/ontology/properties/${propGid}",
-      "kind": "legacy",
-      "method": "DELETE"
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 1179,
-      "column": 17,
-      "route": "/api/ontology/relations/${btn.dataset.gid}",
-      "kind": "legacy",
-      "method": "DELETE"
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 1188,
-      "column": 14,
-      "route": "/api/ontology/relations/${gid}",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 1276,
-      "column": 19,
-      "route": "/api/ontology/relations/${editRel.gid}",
-      "kind": "legacy",
-      "method": "DELETE"
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 1278,
-      "column": 17,
-      "route": "/api/ontology/relations",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 1418,
-      "column": 15,
-      "route": "/api/ontology/classes",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 1433,
-      "column": 15,
-      "route": "/api/ontology/classes/${cls.gid}",
-      "kind": "legacy",
-      "method": "PATCH"
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 1443,
-      "column": 15,
-      "route": "/api/ontology/classes/${cls.gid}",
-      "kind": "legacy",
-      "method": "DELETE"
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 1472,
-      "column": 27,
-      "route": "/api/ontology/classes/${classGid}/axioms",
-      "kind": "legacy",
-      "method": null
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 1501,
-      "column": 19,
-      "route": "/api/ontology/axioms/${btn.dataset.gid}",
-      "kind": "legacy",
-      "method": "DELETE"
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 1544,
-      "column": 17,
-      "route": "/api/ontology/axioms",
-      "kind": "legacy",
-      "method": "POST"
-    },
-    {
-      "source": "web/ontology/ontology.js",
-      "line": 1650,
-      "column": 15,
-      "route": "/api/ontology/classes/${gid}",
-      "kind": "legacy",
       "method": null
     },
     {
