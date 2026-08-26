@@ -2625,3 +2625,94 @@ Exact implementation commits:
 
 No dependencies were installed, and no push, merge, production database,
 BFF/operations approval, or cross-domain direct database access was performed.
+
+## Task 3B.3c Fix Round 1
+
+Fix Round 1 resolves the review's Critical permission failure and four
+Important contract/provider/evidence failures without granting the rejected
+`base.read`, `base.write`, or `craft.rule.write` umbrella permissions. The
+48-group / 71-occurrence atomic scope remains conserved exactly. Eight Base
+outcomes covering 11 occurrences remain migrated; 40 groups / 60 occurrences
+are transparently reclassified and their Web consumers use their original REST
+paths.
+
+| Owner domain | Scope groups/occurrences | Migrated groups/occurrences | Reclassified groups/occurrences |
+| --- | ---: | ---: | ---: |
+| Base | 24 / 44 | 8 / 11 | 16 / 33 |
+| Integration | 12 / 12 | 0 / 0 | 12 / 12 |
+| Craft | 7 / 9 | 0 / 0 | 7 / 9 |
+| Agent | 4 / 5 | 0 / 0 | 4 / 5 |
+| Project Management | 1 / 1 | 0 / 0 | 1 / 1 |
+| **Total** | **48 / 71** | **8 / 11** | **40 / 60** |
+
+The retained stable capabilities are:
+
+- `base.authorization.grant.list@1`
+- `base.authorization.grant.create@1`
+- `base.authorization.grant.revoke@1`
+- `base.notification.preference.atomic.get@1`
+- `base.notification.preference.atomic.update@1`
+- `base.identity.directory.feishu.sync@1`
+- `base.plugin.installed.list@1`
+- `base.identity.user.search@1`
+
+All eight use closed typed business outputs; no `result_json` transport
+remains. REST and Capability providers share explicit Base owner services.
+Grant management retains the legacy `system.user.manage` coarse permission and
+the owner service rechecks super-admin/team-admin/scoped-grant object
+authorization. Feishu synchronization requires `system.tech_config` at the
+Gateway and rechecks `super_admin` inside the provider. Authenticated reads do
+not acquire broad write permissions. The production Gateway suite covers
+super-admin, team-admin, member, and unauthorized actors, approval,
+idempotency replay, malformed provider output, and outcome persistence failure
+after an external mutation.
+
+The private-router re-export `backend.platform_sdk.base_web_outcomes` was
+removed. The dependency checker now inspects Platform SDK private-router
+imports and reports zero new violations; the sole older
+`backend/platform_sdk/auth.py -> backend.routers.deps` edge is represented by
+an explicit narrow baseline rather than hidden by the shared-prefix rule.
+Manifest side effects, authorization, confirmation, idempotency, consistency,
+and atomicity are derived from the registered production spec/descriptor and
+handler evidence instead of HTTP method.
+
+Final generated evidence:
+
+- Catalog release `rel_5915db601d7c6ce939a106d76a78b90a`: 464
+  descriptors/pages, 448 stable capabilities.
+- Official-domain manifest hash
+  `sha256:1db4cca91b3ae5bbc50aa697fee8dbcb99e45ae77628074cdf97cba45a6d4776`.
+- Frontend revision `af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1`, content hash
+  `5b1c2e258eb0b41fb7f3e558578ac18dff02f6f24a5747ef1b640700a9410643`.
+- Canonical Web inventory: total 451, capability 38, legacy registered 311,
+  operations excluded 19, unresolved 83; root ledger 102 groups / 161
+  occurrences with 46 unresolved groups.
+- Root-ledger final dispositions: 19 migrated groups / 27 occurrences and 35
+  reclassified groups / 54 occurrences, plus the unchanged retirement,
+  normalization, conditional, BFF, operations, stable, and new-atomic classes.
+
+Verification evidence:
+
+```text
+GREEN: focused production Gateway/provider/schema/dependency suite: 26 passed
+GREEN: consumer/completion/route-proof suite: 151 passed
+GREEN: strict offline acceptance: 3,136/3,136 validated; failed=0; skipped=0
+GREEN: Catalog/docs/acceptance/atomic/domain/root-ledger/inventory checks
+GREEN: frontend npm test, including Web 134/134
+GREEN: frontend production Vite build: 172 modules
+GREEN: frontend/backend diff --check and Python compileall
+KNOWN GLOBAL DRIFT: build_user_function_registry.py --strict still reports
+pre-existing deprecated/replaced Catalog targets across unrelated domains;
+the Fix R1 implementation does not weaken or baseline those findings.
+```
+
+Exact implementation commits:
+
+- Frontend `af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1`
+  (`fix: restore unsafe atomic web consumers`).
+- Backend `15cfe69fdc63890940ab6a4c9b1b04175b24c5a3`
+  (`fix: enforce exact atomic capability contracts`).
+
+No dependency was installed and no push, merge, production database mutation,
+BFF/operations approval, public REST fallback, or cross-domain direct database
+access was performed.
