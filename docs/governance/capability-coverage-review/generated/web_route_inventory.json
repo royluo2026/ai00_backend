@@ -1,6 +1,6 @@
 {
-  "frontend_revision": "c1804e94ad8a3c4660be6bebb1b010744ed8da6f",
-  "content_hash": "58400ca2fc26c2c29f87d1b43def748bd3f32d515714fe7084258893037779a0",
+  "frontend_revision": "bf53e888cdb1c06528543c1f22dc5205a8a3b772",
+  "content_hash": "dea9fc41773dc51891a91c0be640e9ddf7ef60783f6d9662af7750637a1caf38",
   "wrapper_contracts_hash": "7467489f3d7eed7d9c0dc4fe53f13103ed137fcb7da89da01062a5d84a1f6e4b",
   "scan_roots": [
     "web",
@@ -23,16 +23,16 @@
     "**/*.test.*"
   ],
   "counts": {
-    "capability": 37,
+    "capability": 38,
     "legacy_registered": 311,
     "bff_registered": 0,
     "operations_excluded": 19,
-    "unresolved": 110
+    "unresolved": 92
   },
   "lexical_audit": {
-    "token_count": 496,
-    "token_hash": "5455efbbb5b3be1ed87e604481c922c93f20c19e3b38ef560da7a4d8c432ae9d",
-    "mapped_count": 477,
+    "token_count": 479,
+    "token_hash": "70b12b979839cd8cc769414575a7f038ceef8cca8cf06be789f09c5f6ebf924b",
+    "mapped_count": 460,
     "reviewed_non_route_count": 19,
     "reviewed_non_route_tokens": [
       "packages/craft-plugin/web/bop_nav/bop_nav.js:12:13:/api/",
@@ -1977,16 +1977,6 @@
     },
     {
       "source": "web/components/list_shell.js",
-      "line": 567,
-      "column": 51,
-      "raw_route": "/api/knowledges/${gid}",
-      "normalized_route": "/api/knowledges/{dynamic}",
-      "method": "DELETE",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/list_shell.js:567:51:DELETE:/api/knowledges/{dynamic}"
-    },
-    {
-      "source": "web/components/list_shell.js",
       "line": 568,
       "column": 46,
       "raw_route": "/api/rules/${gid}",
@@ -2014,16 +2004,6 @@
       "method": "PATCH",
       "disposition": "legacy_registered",
       "occurrence_id": "web/components/list_shell.js:574:47:PATCH:/api/issues/{dynamic}"
-    },
-    {
-      "source": "web/components/list_shell.js",
-      "line": 575,
-      "column": 51,
-      "raw_route": "/api/knowledges/${gid}",
-      "normalized_route": "/api/knowledges/{dynamic}",
-      "method": "PATCH",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/list_shell.js:575:51:PATCH:/api/knowledges/{dynamic}"
     },
     {
       "source": "web/components/list_shell.js",
@@ -2237,123 +2217,63 @@
     },
     {
       "source": "web/components/quick_list.html",
-      "line": 289,
-      "column": 50,
-      "raw_route": "/api/tasks",
-      "normalized_route": "/api/tasks",
-      "method": "PUT",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/quick_list.html:289:50:PUT:/api/tasks"
-    },
-    {
-      "source": "web/components/quick_list.html",
-      "line": 292,
+      "line": 296,
       "column": 44,
       "raw_route": "/api/lists?item_type=${t}",
       "normalized_route": "/api/lists",
       "method": "GET",
       "disposition": "unresolved",
-      "occurrence_id": "web/components/quick_list.html:292:44:GET:/api/lists"
+      "occurrence_id": "web/components/quick_list.html:296:44:GET:/api/lists"
     },
     {
       "source": "web/components/quick_list.html",
-      "line": 293,
+      "line": 297,
       "column": 50,
       "raw_route": "/api/issues",
       "normalized_route": "/api/issues",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/components/quick_list.html:293:50:GET:/api/issues"
+      "occurrence_id": "web/components/quick_list.html:297:50:GET:/api/issues"
     },
     {
       "source": "web/components/quick_list.html",
-      "line": 294,
-      "column": 50,
-      "raw_route": "/api/issues",
-      "normalized_route": "/api/issues",
-      "method": "PUT",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/quick_list.html:294:50:PUT:/api/issues"
-    },
-    {
-      "source": "web/components/quick_list.html",
-      "line": 297,
+      "line": 305,
       "column": 44,
       "raw_route": "/api/lists?item_type=${t}",
       "normalized_route": "/api/lists",
       "method": "GET",
       "disposition": "unresolved",
-      "occurrence_id": "web/components/quick_list.html:297:44:GET:/api/lists"
+      "occurrence_id": "web/components/quick_list.html:305:44:GET:/api/lists"
     },
     {
       "source": "web/components/quick_list.html",
-      "line": 298,
-      "column": 50,
-      "raw_route": "/api/knowledge/entries",
-      "normalized_route": "/api/knowledge/entries",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/quick_list.html:298:50:GET:/api/knowledge/entries"
-    },
-    {
-      "source": "web/components/quick_list.html",
-      "line": 299,
-      "column": 50,
-      "raw_route": "/api/knowledge/entries",
-      "normalized_route": "/api/knowledge/entries",
-      "method": "PUT",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/quick_list.html:299:50:PUT:/api/knowledge/entries"
-    },
-    {
-      "source": "web/components/quick_list.html",
-      "line": 304,
+      "line": 317,
       "column": 41,
       "raw_route": "/api/ebom/snapshots",
       "normalized_route": "/api/ebom/snapshots",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/components/quick_list.html:304:41:GET:/api/ebom/snapshots"
+      "occurrence_id": "web/components/quick_list.html:317:41:GET:/api/ebom/snapshots"
     },
     {
       "source": "web/components/quick_list.html",
-      "line": 305,
+      "line": 318,
       "column": 50,
       "raw_route": "/api/ebom/snapshots/${listGid}/parts",
       "normalized_route": "/api/ebom/snapshots/{dynamic}/parts",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/components/quick_list.html:305:50:GET:/api/ebom/snapshots/{dynamic}/parts"
+      "occurrence_id": "web/components/quick_list.html:318:50:GET:/api/ebom/snapshots/{dynamic}/parts"
     },
     {
       "source": "web/components/quick_list.html",
-      "line": 329,
+      "line": 342,
       "column": 39,
       "raw_route": "/api/v1/capabilities/${id}:invoke",
       "normalized_route": "/api/v1/capabilities/{dynamic}:invoke",
       "method": "POST",
       "disposition": "capability",
-      "occurrence_id": "web/components/quick_list.html:329:39:POST:/api/v1/capabilities/{dynamic}:invoke"
-    },
-    {
-      "source": "web/components/quick_list.html",
-      "line": 753,
-      "column": 28,
-      "raw_route": "/api/tasks",
-      "normalized_route": "/api/tasks",
-      "method": "PUT",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/quick_list.html:753:28:PUT:/api/tasks"
-    },
-    {
-      "source": "web/components/quick_list.html",
-      "line": 769,
-      "column": 28,
-      "raw_route": "/api/issues",
-      "normalized_route": "/api/issues",
-      "method": "PUT",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/quick_list.html:769:28:PUT:/api/issues"
+      "occurrence_id": "web/components/quick_list.html:342:39:POST:/api/v1/capabilities/{dynamic}:invoke"
     },
     {
       "source": "web/components/scope_badge.js",
@@ -2607,16 +2527,6 @@
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 111,
-      "column": 64,
-      "raw_route": "/api/knowledges/${gid}",
-      "normalized_route": "/api/knowledges/{dynamic}",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:111:64:GET:/api/knowledges/{dynamic}"
-    },
-    {
-      "source": "web/container_card/modes/container_item_detail.js",
       "line": 112,
       "column": 59,
       "raw_route": "/api/rules/${gid}",
@@ -2667,26 +2577,6 @@
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 136,
-      "column": 58,
-      "raw_route": "/api/knowledges/${gid}",
-      "normalized_route": "/api/knowledges/{dynamic}",
-      "method": "PUT",
-      "disposition": "unresolved",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:136:58:PUT:/api/knowledges/{dynamic}"
-    },
-    {
-      "source": "web/container_card/modes/container_item_detail.js",
-      "line": 137,
-      "column": 53,
-      "raw_route": "/api/rules/${gid}",
-      "normalized_route": "/api/rules/{dynamic}",
-      "method": "PUT",
-      "disposition": "unresolved",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:137:53:PUT:/api/rules/{dynamic}"
-    },
-    {
-      "source": "web/container_card/modes/container_item_detail.js",
       "line": 154,
       "column": 55,
       "raw_route": "/api/tasks",
@@ -2704,16 +2594,6 @@
       "method": "POST",
       "disposition": "legacy_registered",
       "occurrence_id": "web/container_card/modes/container_item_detail.js:155:61:POST:/api/issues"
-    },
-    {
-      "source": "web/container_card/modes/container_item_detail.js",
-      "line": 156,
-      "column": 65,
-      "raw_route": "/api/knowledges",
-      "normalized_route": "/api/knowledges",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:156:65:POST:/api/knowledges"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
@@ -2747,16 +2627,6 @@
     },
     {
       "source": "web/container_card/modes/mode_field_detail.js",
-      "line": 34,
-      "column": 66,
-      "raw_route": "/api/knowledges/${gid}",
-      "normalized_route": "/api/knowledges/{dynamic}",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/container_card/modes/mode_field_detail.js:34:66:GET:/api/knowledges/{dynamic}"
-    },
-    {
-      "source": "web/container_card/modes/mode_field_detail.js",
       "line": 35,
       "column": 61,
       "raw_route": "/api/rules/${gid}",
@@ -2784,26 +2654,6 @@
       "method": "PUT",
       "disposition": "legacy_registered",
       "occurrence_id": "web/container_card/modes/mode_field_detail.js:45:51:PUT:/api/issues/{dynamic}"
-    },
-    {
-      "source": "web/container_card/modes/mode_field_detail.js",
-      "line": 46,
-      "column": 55,
-      "raw_route": "/api/knowledges/${gid}",
-      "normalized_route": "/api/knowledges/{dynamic}",
-      "method": "PUT",
-      "disposition": "unresolved",
-      "occurrence_id": "web/container_card/modes/mode_field_detail.js:46:55:PUT:/api/knowledges/{dynamic}"
-    },
-    {
-      "source": "web/container_card/modes/mode_field_detail.js",
-      "line": 47,
-      "column": 50,
-      "raw_route": "/api/rules/${gid}",
-      "normalized_route": "/api/rules/{dynamic}",
-      "method": "PUT",
-      "disposition": "unresolved",
-      "occurrence_id": "web/container_card/modes/mode_field_detail.js:47:50:PUT:/api/rules/{dynamic}"
     },
     {
       "source": "web/container_card/modes/mode_image_gallery.js",
@@ -2887,16 +2737,6 @@
     },
     {
       "source": "web/container_card/modes/mode_text_image.js",
-      "line": 28,
-      "column": 65,
-      "raw_route": "/api/knowledges/${gid}",
-      "normalized_route": "/api/knowledges/{dynamic}",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/container_card/modes/mode_text_image.js:28:65:GET:/api/knowledges/{dynamic}"
-    },
-    {
-      "source": "web/container_card/modes/mode_text_image.js",
       "line": 29,
       "column": 60,
       "raw_route": "/api/rules/${gid}",
@@ -2904,6 +2744,16 @@
       "method": "GET",
       "disposition": "legacy_registered",
       "occurrence_id": "web/container_card/modes/mode_text_image.js:29:60:GET:/api/rules/{dynamic}"
+    },
+    {
+      "source": "web/core/existing_capability_client.js",
+      "line": 72,
+      "column": 41,
+      "raw_route": "/api/v1/capabilities/${capabilityId}:invoke",
+      "normalized_route": "/api/v1/capabilities/{dynamic}:invoke",
+      "method": null,
+      "disposition": "capability",
+      "occurrence_id": "web/core/existing_capability_client.js:72:41:UNKNOWN:/api/v1/capabilities/{dynamic}:invoke"
     },
     {
       "source": "web/core/global_search.js",
@@ -3964,26 +3814,6 @@
       "method": "PUT",
       "disposition": "legacy_registered",
       "occurrence_id": "web/main.js:1484:26:PUT:/api/tasks/{dynamic}"
-    },
-    {
-      "source": "web/main.js",
-      "line": 1495,
-      "column": 36,
-      "raw_route": "/api/tasks/${task.gid}/entries",
-      "normalized_route": "/api/tasks/{dynamic}/entries",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/main.js:1495:36:GET:/api/tasks/{dynamic}/entries"
-    },
-    {
-      "source": "web/main.js",
-      "line": 1528,
-      "column": 32,
-      "raw_route": "/api/tasks/${task.gid}/entries",
-      "normalized_route": "/api/tasks/{dynamic}/entries",
-      "method": "PUT",
-      "disposition": "unresolved",
-      "occurrence_id": "web/main.js:1528:32:PUT:/api/tasks/{dynamic}/entries"
     },
     {
       "source": "web/my_files/my_files.js",

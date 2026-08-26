@@ -58,10 +58,10 @@
     "web/workspace/nav_manager.js": "e229fb407361c139cfc265cd438f929a944cd1919c321c4b6a1cf5bf57cfcd7d"
   },
   "final_evidence": {
-    "frontend_revision": "c1804e94ad8a3c4660be6bebb1b010744ed8da6f",
-    "content_hash": "58400ca2fc26c2c29f87d1b43def748bd3f32d515714fe7084258893037779a0",
-    "unresolved_count": 110,
-    "unresolved_group_count": 65
+    "frontend_revision": "bf53e888cdb1c06528543c1f22dc5205a8a3b772",
+    "content_hash": "dea9fc41773dc51891a91c0be640e9ddf7ef60783f6d9662af7750637a1caf38",
+    "unresolved_count": 92,
+    "unresolved_group_count": 53
   },
   "final_unresolved_groups": [
     {
@@ -80,13 +80,7 @@
       "method": "DELETE",
       "normalized_route": "/api/grants/{dynamic}",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
-    },
-    {
-      "method": "DELETE",
-      "normalized_route": "/api/knowledges/{dynamic}",
-      "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "DELETE",
@@ -98,49 +92,49 @@
       "method": "DELETE",
       "normalized_route": "/api/plugin/uninstall/{dynamic}",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "DELETE",
       "normalized_route": "/api/views/{dynamic}",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "GET",
       "normalized_route": "/api/ext-datasources",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "GET",
       "normalized_route": "/api/ext-datasources/{dynamic}/tables",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "GET",
       "normalized_route": "/api/ext-field-mappings",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "GET",
       "normalized_route": "/api/ext-mappings",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "GET",
       "normalized_route": "/api/ext-mappings/{dynamic}/columns",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "GET",
       "normalized_route": "/api/ext-mappings/{dynamic}/preview",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "GET",
@@ -152,19 +146,7 @@
       "method": "GET",
       "normalized_route": "/api/grants",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
-    },
-    {
-      "method": "GET",
-      "normalized_route": "/api/knowledge/entries",
-      "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
-    },
-    {
-      "method": "GET",
-      "normalized_route": "/api/knowledges/{dynamic}",
-      "occurrence_count": 3,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "GET",
@@ -176,13 +158,13 @@
       "method": "GET",
       "normalized_route": "/api/notifications/prefs",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "GET",
       "normalized_route": "/api/org/teams",
       "occurrence_count": 3,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "GET",
@@ -194,61 +176,55 @@
       "method": "GET",
       "normalized_route": "/api/rule-engine/check-entry",
       "occurrence_count": 2,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "GET",
       "normalized_route": "/api/self_ann/batch",
       "occurrence_count": 5,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "GET",
       "normalized_route": "/api/self_ann/list",
       "occurrence_count": 3,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "GET",
       "normalized_route": "/api/self_ann/{dynamic}",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
-    },
-    {
-      "method": "GET",
-      "normalized_route": "/api/tasks/{dynamic}/entries",
-      "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "GET",
       "normalized_route": "/api/teams",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "GET",
       "normalized_route": "/api/users",
       "occurrence_count": 6,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "GET",
       "normalized_route": "/api/users/me",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "GET",
       "normalized_route": "/api/users/search",
       "occurrence_count": 3,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "GET",
       "normalized_route": "/api/views",
       "occurrence_count": 2,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "GET",
@@ -266,13 +242,7 @@
       "method": "PATCH",
       "normalized_route": "/api/ext-datasources/{dynamic}",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
-    },
-    {
-      "method": "PATCH",
-      "normalized_route": "/api/knowledges/{dynamic}",
-      "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "PATCH",
@@ -284,49 +254,49 @@
       "method": "PATCH",
       "normalized_route": "/api/notifications/prefs",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "PATCH",
       "normalized_route": "/api/users/{dynamic}/role",
       "occurrence_count": 2,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "PATCH",
       "normalized_route": "/api/views/{dynamic}",
       "occurrence_count": 2,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "POST",
       "normalized_route": "/api/approval/orders/{dynamic}/reject",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "POST",
       "normalized_route": "/api/ext-datasources",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "POST",
       "normalized_route": "/api/ext-datasources/{dynamic}/test",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "POST",
       "normalized_route": "/api/ext-mappings",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "POST",
       "normalized_route": "/api/ext-mappings/{dynamic}/import",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "POST",
@@ -338,37 +308,31 @@
       "method": "POST",
       "normalized_route": "/api/grants",
       "occurrence_count": 2,
-      "disposition": "existing_capability_migration_required"
-    },
-    {
-      "method": "POST",
-      "normalized_route": "/api/knowledges",
-      "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "POST",
       "normalized_route": "/api/org/sync-from-feishu",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "POST",
       "normalized_route": "/api/plugin/install",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "POST",
       "normalized_route": "/api/rules/{dynamic}/activate",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "POST",
       "normalized_route": "/api/rules/{dynamic}/deviations",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "POST",
@@ -386,73 +350,37 @@
       "method": "POST",
       "normalized_route": "/api/skills/execute-canvas",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "POST",
       "normalized_route": "/api/skills/resume-canvas",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "POST",
       "normalized_route": "/api/views",
       "occurrence_count": 2,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "POST",
       "normalized_route": "/api/views/{dynamic}/copy",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "PUT",
       "normalized_route": "/api/ext-field-mappings/batch",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
-    },
-    {
-      "method": "PUT",
-      "normalized_route": "/api/issues",
-      "occurrence_count": 2,
-      "disposition": "existing_capability_migration_required"
-    },
-    {
-      "method": "PUT",
-      "normalized_route": "/api/knowledge/entries",
-      "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
-    },
-    {
-      "method": "PUT",
-      "normalized_route": "/api/knowledges/{dynamic}",
-      "occurrence_count": 2,
-      "disposition": "existing_capability_migration_required"
-    },
-    {
-      "method": "PUT",
-      "normalized_route": "/api/rules/{dynamic}",
-      "occurrence_count": 2,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     },
     {
       "method": "PUT",
       "normalized_route": "/api/self_ann/{dynamic}",
       "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
-    },
-    {
-      "method": "PUT",
-      "normalized_route": "/api/tasks",
-      "occurrence_count": 2,
-      "disposition": "existing_capability_migration_required"
-    },
-    {
-      "method": "PUT",
-      "normalized_route": "/api/tasks/{dynamic}/entries",
-      "occurrence_count": 1,
-      "disposition": "existing_capability_migration_required"
+      "disposition": "existing_capability_reclassified"
     }
   ],
   "entries": [
@@ -493,7 +421,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "c1804e94ad8a3c4660be6bebb1b010744ed8da6f",
+        "removed_in_frontend_revision": "bf53e888cdb1c06528543c1f22dc5205a8a3b772",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -625,12 +553,19 @@
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "base.authorization.grant.change.apply@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "base.authorization.grant.change.apply@1",
+        "reason_code": "provider_equivalence_missing",
+        "finding": "The stable descriptor is registered through an unbound reviewed Base outcome port or lacks an adapter proving the legacy projection and side effects.",
+        "followup": "provider_adapter_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/grants.py",
+            "sha256": "0ffdcf3f9f160562a83dda89b11b9f2a3615a49f211ed61e1f74dd99d6fcf463"
+          }
+        ]
       }
     },
     {
@@ -648,7 +583,7 @@
           "method": "DELETE",
           "disposition": "unresolved",
           "occurrence_id": "web/components/list_shell.js:567:51:DELETE:/api/knowledges/{dynamic}",
-          "source_sha256": "cc370477e440c01f49fc4e57b961462c91699c7d3b0d2db260c7fd0960c140a7"
+          "source_sha256": "88de48a5a684909177d354b9092516bc6aaced6b1d1a0699a8e2e61fb5e36c9a"
         }
       ],
       "owner_domain": "knowledge",
@@ -659,12 +594,23 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "The frontend now invokes the exact stable target through the shared Gateway adapter using provider-equivalent request and response transformations.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
         "target_capability": "knowledge.entry.change.apply.atomic.entries_delete@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "provider_equivalence": "proven",
+        "request_transform": "gid -> entries_delete payload",
+        "response_transform": "unwrap CapabilityResultV2 and preserve the legacy {success,data} envelope",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "finding": "An existing owner-domain compatibility adapter invokes this exact stable target and proves the request/result transformation.",
+          "sources": [
+            {
+              "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
+              "sha256": "8f22a4db822c9ff66600e8c0e3ae1ea0593fa0dcb80cca248f821ce4706c6e2a"
+            }
+          ]
+        }
       }
     },
     {
@@ -768,12 +714,19 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "plugin.uninstall@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "plugin.uninstall@1",
+        "reason_code": "contract_shape_mismatch",
+        "finding": "URL installation and unrestricted uninstall are not equivalent to the signed release lifecycle contract and state preconditions.",
+        "followup": "atomic_capability_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/plugins.py",
+            "sha256": "cf0ab10ba195dc67cc42718478fc00a7e133a1fee6fb991eedbf295f19a86395"
+          }
+        ]
       }
     },
     {
@@ -809,12 +762,19 @@
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "base.saved_view.change.apply@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "base.saved_view.change.apply@1",
+        "reason_code": "provider_equivalence_missing",
+        "finding": "The stable descriptor is registered through an unbound reviewed Base outcome port or lacks an adapter proving the legacy projection and side effects.",
+        "followup": "provider_adapter_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/views.py",
+            "sha256": "10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f"
+          }
+        ]
       }
     },
     {
@@ -981,7 +941,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "c1804e94ad8a3c4660be6bebb1b010744ed8da6f",
+        "removed_in_frontend_revision": "bf53e888cdb1c06528543c1f22dc5205a8a3b772",
         "retirement_proof": {
           "kind": "http_410",
           "rationale": "The registered AI balance compatibility endpoint is permanently gone and returns HTTP 410, so polling it cannot yield a supported outcome.",
@@ -1050,7 +1010,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "c1804e94ad8a3c4660be6bebb1b010744ed8da6f",
+        "removed_in_frontend_revision": "bf53e888cdb1c06528543c1f22dc5205a8a3b772",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -1112,7 +1072,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "c1804e94ad8a3c4660be6bebb1b010744ed8da6f",
+        "removed_in_frontend_revision": "bf53e888cdb1c06528543c1f22dc5205a8a3b772",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -1174,7 +1134,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "c1804e94ad8a3c4660be6bebb1b010744ed8da6f",
+        "removed_in_frontend_revision": "bf53e888cdb1c06528543c1f22dc5205a8a3b772",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -1247,7 +1207,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "c1804e94ad8a3c4660be6bebb1b010744ed8da6f",
+        "removed_in_frontend_revision": "bf53e888cdb1c06528543c1f22dc5205a8a3b772",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -1321,7 +1281,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "c1804e94ad8a3c4660be6bebb1b010744ed8da6f",
+        "removed_in_frontend_revision": "bf53e888cdb1c06528543c1f22dc5205a8a3b772",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -1394,7 +1354,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "c1804e94ad8a3c4660be6bebb1b010744ed8da6f",
+        "removed_in_frontend_revision": "bf53e888cdb1c06528543c1f22dc5205a8a3b772",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -1626,12 +1586,19 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "integration.connector.search@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "integration.connector.search@1",
+        "reason_code": "contract_shape_mismatch",
+        "finding": "The legacy UI payload/result uses datasource, mapping, synchronous import, or field-mapping shapes that the stable Integration contract does not accept or return.",
+        "followup": "atomic_capability_review",
+        "sources": [
+          {
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7"
+          }
+        ]
       }
     },
     {
@@ -1660,12 +1627,19 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "integration.connector.schema.discover@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "integration.connector.schema.discover@1",
+        "reason_code": "contract_shape_mismatch",
+        "finding": "The legacy UI payload/result uses datasource, mapping, synchronous import, or field-mapping shapes that the stable Integration contract does not accept or return.",
+        "followup": "atomic_capability_review",
+        "sources": [
+          {
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7"
+          }
+        ]
       }
     },
     {
@@ -1694,12 +1668,19 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "integration.mapping.get@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "integration.mapping.get@1",
+        "reason_code": "contract_shape_mismatch",
+        "finding": "The legacy UI payload/result uses datasource, mapping, synchronous import, or field-mapping shapes that the stable Integration contract does not accept or return.",
+        "followup": "atomic_capability_review",
+        "sources": [
+          {
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7"
+          }
+        ]
       }
     },
     {
@@ -1728,12 +1709,19 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "integration.mapping.search@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "integration.mapping.search@1",
+        "reason_code": "contract_shape_mismatch",
+        "finding": "The legacy UI payload/result uses datasource, mapping, synchronous import, or field-mapping shapes that the stable Integration contract does not accept or return.",
+        "followup": "atomic_capability_review",
+        "sources": [
+          {
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7"
+          }
+        ]
       }
     },
     {
@@ -1762,12 +1750,19 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "integration.connector.schema.discover@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "integration.connector.schema.discover@1",
+        "reason_code": "contract_shape_mismatch",
+        "finding": "The legacy UI payload/result uses datasource, mapping, synchronous import, or field-mapping shapes that the stable Integration contract does not accept or return.",
+        "followup": "atomic_capability_review",
+        "sources": [
+          {
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7"
+          }
+        ]
       }
     },
     {
@@ -1796,12 +1791,19 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "integration.mapping.preview@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "integration.mapping.preview@1",
+        "reason_code": "contract_shape_mismatch",
+        "finding": "The legacy UI payload/result uses datasource, mapping, synchronous import, or field-mapping shapes that the stable Integration contract does not accept or return.",
+        "followup": "atomic_capability_review",
+        "sources": [
+          {
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7"
+          }
+        ]
       }
     },
     {
@@ -1841,7 +1843,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "c1804e94ad8a3c4660be6bebb1b010744ed8da6f",
+        "removed_in_frontend_revision": "bf53e888cdb1c06528543c1f22dc5205a8a3b772",
         "retirement_proof": {
           "kind": "backend_route_absent",
           "rationale": "The standalone Feishu UI had no matching API-prefixed configuration handler; it now uses a bounded local default configuration.",
@@ -1940,12 +1942,19 @@
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "base.authorization.grant.read@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "base.authorization.grant.read@1",
+        "reason_code": "provider_equivalence_missing",
+        "finding": "The stable descriptor is registered through an unbound reviewed Base outcome port or lacks an adapter proving the legacy projection and side effects.",
+        "followup": "provider_adapter_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/grants.py",
+            "sha256": "0ffdcf3f9f160562a83dda89b11b9f2a3615a49f211ed61e1f74dd99d6fcf463"
+          }
+        ]
       }
     },
     {
@@ -1999,7 +2008,7 @@
           "method": "GET",
           "disposition": "unresolved",
           "occurrence_id": "web/components/quick_list.html:298:50:GET:/api/knowledge/entries",
-          "source_sha256": "021464bcb3b00c207aa151b88504cfdd4f57c8c530f508d01805fcf016855601"
+          "source_sha256": "0b5f12cfe1cdfba7f2236a1ace752af95f79e2a38f83ed73a66ce0a0799e3a39"
         }
       ],
       "owner_domain": "knowledge",
@@ -2010,12 +2019,23 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "The frontend now invokes the exact stable target through the shared Gateway adapter using provider-equivalent request and response transformations.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
         "target_capability": "knowledge.search@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "provider_equivalence": "proven",
+        "request_transform": "list filters or gid -> exact Knowledge read payload",
+        "response_transform": "unwrap CapabilityResultV2 and preserve the legacy {success,data} envelope",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "finding": "An existing owner-domain compatibility adapter invokes this exact stable target and proves the request/result transformation.",
+          "sources": [
+            {
+              "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
+              "sha256": "8f22a4db822c9ff66600e8c0e3ae1ea0593fa0dcb80cca248f821ce4706c6e2a"
+            }
+          ]
+        }
       }
     },
     {
@@ -2069,7 +2089,7 @@
           "method": "GET",
           "disposition": "unresolved",
           "occurrence_id": "web/container_card/modes/container_item_detail.js:111:64:GET:/api/knowledges/{dynamic}",
-          "source_sha256": "afceffd9217b2a420de98f182ccd7c0a775408814759eedb7fa685f68684b247"
+          "source_sha256": "de7b856440c81cc34bdf158e98386d085638543ab2375a2a520360833c4f2e13"
         },
         {
           "source": "web/container_card/modes/mode_field_detail.js",
@@ -2080,7 +2100,7 @@
           "method": "GET",
           "disposition": "unresolved",
           "occurrence_id": "web/container_card/modes/mode_field_detail.js:34:66:GET:/api/knowledges/{dynamic}",
-          "source_sha256": "c51f7e2400b9d2a3e2a09e645abbd202e2bd542709cb7014bfd821986f8d84fb"
+          "source_sha256": "9071abd133c291ef105d11964e5e5287021b12078b8544434ded2228d135f9cc"
         },
         {
           "source": "web/container_card/modes/mode_text_image.js",
@@ -2091,7 +2111,7 @@
           "method": "GET",
           "disposition": "unresolved",
           "occurrence_id": "web/container_card/modes/mode_text_image.js:28:65:GET:/api/knowledges/{dynamic}",
-          "source_sha256": "3e6213bc417e3181458076251f708480bf2465e69c7c9d25e6ce055c77c065f4"
+          "source_sha256": "b600a655255138223b1a14e56f6d70b1b004a5cce3c7a378a8423352593f686d"
         }
       ],
       "owner_domain": "knowledge",
@@ -2102,12 +2122,23 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "The frontend now invokes the exact stable target through the shared Gateway adapter using provider-equivalent request and response transformations.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
         "target_capability": "knowledge.get@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "provider_equivalence": "proven",
+        "request_transform": "list filters or gid -> exact Knowledge read payload",
+        "response_transform": "unwrap CapabilityResultV2 and preserve the legacy {success,data} envelope",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "finding": "An existing owner-domain compatibility adapter invokes this exact stable target and proves the request/result transformation.",
+          "sources": [
+            {
+              "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
+              "sha256": "8f22a4db822c9ff66600e8c0e3ae1ea0593fa0dcb80cca248f821ce4706c6e2a"
+            }
+          ]
+        }
       }
     },
     {
@@ -2332,7 +2363,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "c1804e94ad8a3c4660be6bebb1b010744ed8da6f",
+        "removed_in_frontend_revision": "bf53e888cdb1c06528543c1f22dc5205a8a3b772",
         "retirement_proof": {
           "kind": "sample_template_only",
           "rationale": "The only caller lived in the distributable plugin SDK template and represented placeholder sample data rather than a shipped product route.",
@@ -2390,12 +2421,19 @@
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "base.notification.preference.get@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "base.notification.preference.get@1",
+        "reason_code": "state_model_mismatch",
+        "finding": "The stable preference capability uses versioned Base collaboration state while the REST route reads the legacy user projection.",
+        "followup": "provider_adapter_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/notifications.py",
+            "sha256": "3dfe1eb9d64f7a16c5e471ee0f8c38020e217f5a52431a367a00222ec6ca0a8e"
+          }
+        ]
       }
     },
     {
@@ -2453,12 +2491,19 @@
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "base.team.read@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "base.team.read@1",
+        "reason_code": "provider_equivalence_missing",
+        "finding": "The stable descriptor is registered through an unbound reviewed Base outcome port or lacks an adapter proving the legacy projection and side effects.",
+        "followup": "provider_adapter_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/org.py",
+            "sha256": "3dd9133921d1a0a2d49568350b150aef133b19ccc868ff88e20d61740214b36e"
+          }
+        ]
       }
     },
     {
@@ -2542,12 +2587,19 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "craft.rule.engine.evaluate@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "craft.rule.engine.evaluate@1",
+        "reason_code": "outcome_mismatch",
+        "finding": "The candidate input/result does not cover the entry audit, release lifecycle, or deviation workflow consumed by the UI.",
+        "followup": "atomic_capability_review",
+        "sources": [
+          {
+            "source_path": "plugins/craft/craft_backend/routers/rule_engine.py",
+            "sha256": "ac258d5ffc6531a5da259750f8b637fea6e467c0a50d4f64a379069aa660f86a"
+          }
+        ]
       }
     },
     {
@@ -2627,12 +2679,19 @@
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "base.annotation.read@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "base.annotation.read@1",
+        "reason_code": "provider_equivalence_missing",
+        "finding": "The stable descriptor is registered through an unbound reviewed Base outcome port or lacks an adapter proving the legacy projection and side effects.",
+        "followup": "provider_adapter_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/self_annotations.py",
+            "sha256": "4a75270d28bb12c80ced69f16583041f1b9ac3b47b4688622f1461f8addf8e0a"
+          }
+        ]
       }
     },
     {
@@ -2690,12 +2749,19 @@
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "base.annotation.read@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "base.annotation.read@1",
+        "reason_code": "provider_equivalence_missing",
+        "finding": "The stable descriptor is registered through an unbound reviewed Base outcome port or lacks an adapter proving the legacy projection and side effects.",
+        "followup": "provider_adapter_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/self_annotations.py",
+            "sha256": "4a75270d28bb12c80ced69f16583041f1b9ac3b47b4688622f1461f8addf8e0a"
+          }
+        ]
       }
     },
     {
@@ -2731,12 +2797,19 @@
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "base.annotation.read@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "base.annotation.read@1",
+        "reason_code": "provider_equivalence_missing",
+        "finding": "The stable descriptor is registered through an unbound reviewed Base outcome port or lacks an adapter proving the legacy projection and side effects.",
+        "followup": "provider_adapter_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/self_annotations.py",
+            "sha256": "4a75270d28bb12c80ced69f16583041f1b9ac3b47b4688622f1461f8addf8e0a"
+          }
+        ]
       }
     },
     {
@@ -2801,12 +2874,23 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "The frontend now invokes the exact stable target through the shared Gateway adapter using provider-equivalent request and response transformations.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
         "target_capability": "project.list.read.atomic.item_entries_get@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "provider_equivalence": "proven",
+        "request_transform": "task gid and entries -> atomic {arguments:{item_type:'task',item_gid,entries?}}",
+        "response_transform": "unwrap Project atomic data; GET preserves data as the entries array",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "finding": "An existing owner-domain compatibility adapter invokes this exact stable target and proves the request/result transformation.",
+          "sources": [
+            {
+              "source_path": "plugins/craft/craft_backend/routers/item_entries.py",
+              "sha256": "be4cc14f8dbb494168ac3c0889635cf8b7bc411bc021bae66c55bcad3895ba85"
+            }
+          ]
+        }
       }
     },
     {
@@ -2835,12 +2919,19 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "base.team.read@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "base.team.read@1",
+        "reason_code": "provider_equivalence_missing",
+        "finding": "The stable descriptor is registered through an unbound reviewed Base outcome port or lacks an adapter proving the legacy projection and side effects.",
+        "followup": "provider_adapter_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/teams.py",
+            "sha256": "4e36ea16c386ae5f207cdda5fa747fb857e520acdad66d25f886b208f404b36f"
+          }
+        ]
       }
     },
     {
@@ -2931,12 +3022,19 @@
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "identity.principal.search@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "identity.principal.search@1",
+        "reason_code": "projection_mismatch",
+        "finding": "The stable shared search returns bounded principal references, not the administrative/full user projection consumed by these routes.",
+        "followup": "atomic_capability_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/users.py",
+            "sha256": "1447c4ff79a3f9e2382ea6865a9a61f8b3ac595e13e463bf9fb0294a89b8780c"
+          }
+        ]
       }
     },
     {
@@ -2972,12 +3070,19 @@
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "base.identity.session.get@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "base.identity.session.get@1",
+        "reason_code": "provider_equivalence_missing",
+        "finding": "The stable descriptor is registered through an unbound reviewed Base outcome port or lacks an adapter proving the legacy projection and side effects.",
+        "followup": "provider_adapter_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/users.py",
+            "sha256": "1447c4ff79a3f9e2382ea6865a9a61f8b3ac595e13e463bf9fb0294a89b8780c"
+          }
+        ]
       }
     },
     {
@@ -3035,12 +3140,19 @@
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "identity.principal.search@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "identity.principal.search@1",
+        "reason_code": "projection_mismatch",
+        "finding": "The stable shared search returns bounded principal references, not the administrative/full user projection consumed by these routes.",
+        "followup": "atomic_capability_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/users.py",
+            "sha256": "1447c4ff79a3f9e2382ea6865a9a61f8b3ac595e13e463bf9fb0294a89b8780c"
+          }
+        ]
       }
     },
     {
@@ -3087,12 +3199,19 @@
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "base.saved_view.read@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "base.saved_view.read@1",
+        "reason_code": "provider_equivalence_missing",
+        "finding": "The stable descriptor is registered through an unbound reviewed Base outcome port or lacks an adapter proving the legacy projection and side effects.",
+        "followup": "provider_adapter_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/views.py",
+            "sha256": "10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f"
+          }
+        ]
       }
     },
     {
@@ -3373,12 +3492,19 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "integration.connector.update@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "integration.connector.update@1",
+        "reason_code": "contract_shape_mismatch",
+        "finding": "The legacy UI payload/result uses datasource, mapping, synchronous import, or field-mapping shapes that the stable Integration contract does not accept or return.",
+        "followup": "atomic_capability_review",
+        "sources": [
+          {
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7"
+          }
+        ]
       }
     },
     {
@@ -3396,7 +3522,7 @@
           "method": "PATCH",
           "disposition": "unresolved",
           "occurrence_id": "web/components/list_shell.js:575:51:PATCH:/api/knowledges/{dynamic}",
-          "source_sha256": "cc370477e440c01f49fc4e57b961462c91699c7d3b0d2db260c7fd0960c140a7"
+          "source_sha256": "88de48a5a684909177d354b9092516bc6aaced6b1d1a0699a8e2e61fb5e36c9a"
         }
       ],
       "owner_domain": "knowledge",
@@ -3407,12 +3533,23 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "The frontend now invokes the exact stable target through the shared Gateway adapter using provider-equivalent request and response transformations.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
         "target_capability": "knowledge.entry.change.apply.atomic.entries_update@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "provider_equivalence": "proven",
+        "request_transform": "gid + patch -> entries_update {gid,updates}",
+        "response_transform": "unwrap CapabilityResultV2 and preserve the legacy {success,data} envelope",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "finding": "An existing owner-domain compatibility adapter invokes this exact stable target and proves the request/result transformation.",
+          "sources": [
+            {
+              "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
+              "sha256": "8f22a4db822c9ff66600e8c0e3ae1ea0593fa0dcb80cca248f821ce4706c6e2a"
+            }
+          ]
+        }
       }
     },
     {
@@ -3567,12 +3704,19 @@
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "base.notification.preference.update@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "base.notification.preference.update@1",
+        "reason_code": "state_model_mismatch",
+        "finding": "The stable preference capability uses versioned Base collaboration state while the REST route reads the legacy user projection.",
+        "followup": "provider_adapter_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/notifications.py",
+            "sha256": "3dfe1eb9d64f7a16c5e471ee0f8c38020e217f5a52431a367a00222ec6ca0a8e"
+          }
+        ]
       }
     },
     {
@@ -3678,12 +3822,19 @@
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "base.identity.role.assign@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "base.identity.role.assign@1",
+        "reason_code": "provider_equivalence_missing",
+        "finding": "The stable descriptor is registered through an unbound reviewed Base outcome port or lacks an adapter proving the legacy projection and side effects.",
+        "followup": "provider_adapter_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/users.py",
+            "sha256": "1447c4ff79a3f9e2382ea6865a9a61f8b3ac595e13e463bf9fb0294a89b8780c"
+          }
+        ]
       }
     },
     {
@@ -3730,12 +3881,19 @@
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "base.saved_view.change.apply@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "base.saved_view.change.apply@1",
+        "reason_code": "provider_equivalence_missing",
+        "finding": "The stable descriptor is registered through an unbound reviewed Base outcome port or lacks an adapter proving the legacy projection and side effects.",
+        "followup": "provider_adapter_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/views.py",
+            "sha256": "10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f"
+          }
+        ]
       }
     },
     {
@@ -3825,12 +3983,19 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "project.approval.change.apply.atomic.approval_orders_reject@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "project.approval.change.apply.atomic.approval_orders_reject@1",
+        "reason_code": "adapter_side_effect_missing",
+        "finding": "The REST adapter publishes the returned approval notification; direct Gateway invocation does not perform that composition.",
+        "followup": "bff_review",
+        "sources": [
+          {
+            "source_path": "plugins/craft/craft_backend/routers/approval.py",
+            "sha256": "1b6d618b9562ad4509f81a848234af9c02f75e17392fe26ed9ca203bf1c7569a"
+          }
+        ]
       }
     },
     {
@@ -3870,7 +4035,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "c1804e94ad8a3c4660be6bebb1b010744ed8da6f",
+        "removed_in_frontend_revision": "bf53e888cdb1c06528543c1f22dc5205a8a3b772",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -3932,7 +4097,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "c1804e94ad8a3c4660be6bebb1b010744ed8da6f",
+        "removed_in_frontend_revision": "bf53e888cdb1c06528543c1f22dc5205a8a3b772",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -3994,7 +4159,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "c1804e94ad8a3c4660be6bebb1b010744ed8da6f",
+        "removed_in_frontend_revision": "bf53e888cdb1c06528543c1f22dc5205a8a3b772",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4056,7 +4221,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "c1804e94ad8a3c4660be6bebb1b010744ed8da6f",
+        "removed_in_frontend_revision": "bf53e888cdb1c06528543c1f22dc5205a8a3b772",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4118,7 +4283,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "c1804e94ad8a3c4660be6bebb1b010744ed8da6f",
+        "removed_in_frontend_revision": "bf53e888cdb1c06528543c1f22dc5205a8a3b772",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -4313,12 +4478,19 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "integration.connector.create@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "integration.connector.create@1",
+        "reason_code": "contract_shape_mismatch",
+        "finding": "The legacy UI payload/result uses datasource, mapping, synchronous import, or field-mapping shapes that the stable Integration contract does not accept or return.",
+        "followup": "atomic_capability_review",
+        "sources": [
+          {
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7"
+          }
+        ]
       }
     },
     {
@@ -4347,12 +4519,19 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "integration.connector.connection.test@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "integration.connector.connection.test@1",
+        "reason_code": "contract_shape_mismatch",
+        "finding": "The legacy UI payload/result uses datasource, mapping, synchronous import, or field-mapping shapes that the stable Integration contract does not accept or return.",
+        "followup": "atomic_capability_review",
+        "sources": [
+          {
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7"
+          }
+        ]
       }
     },
     {
@@ -4381,12 +4560,19 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "integration.mapping.create@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "integration.mapping.create@1",
+        "reason_code": "contract_shape_mismatch",
+        "finding": "The legacy UI payload/result uses datasource, mapping, synchronous import, or field-mapping shapes that the stable Integration contract does not accept or return.",
+        "followup": "atomic_capability_review",
+        "sources": [
+          {
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7"
+          }
+        ]
       }
     },
     {
@@ -4415,12 +4601,19 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "integration.sync.start@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "integration.sync.start@1",
+        "reason_code": "contract_shape_mismatch",
+        "finding": "The legacy UI payload/result uses datasource, mapping, synchronous import, or field-mapping shapes that the stable Integration contract does not accept or return.",
+        "followup": "atomic_capability_review",
+        "sources": [
+          {
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7"
+          }
+        ]
       }
     },
     {
@@ -4517,12 +4710,19 @@
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "base.authorization.grant.change.apply@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "base.authorization.grant.change.apply@1",
+        "reason_code": "provider_equivalence_missing",
+        "finding": "The stable descriptor is registered through an unbound reviewed Base outcome port or lacks an adapter proving the legacy projection and side effects.",
+        "followup": "provider_adapter_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/grants.py",
+            "sha256": "0ffdcf3f9f160562a83dda89b11b9f2a3615a49f211ed61e1f74dd99d6fcf463"
+          }
+        ]
       }
     },
     {
@@ -4540,7 +4740,7 @@
           "method": "POST",
           "disposition": "unresolved",
           "occurrence_id": "web/container_card/modes/container_item_detail.js:156:65:POST:/api/knowledges",
-          "source_sha256": "afceffd9217b2a420de98f182ccd7c0a775408814759eedb7fa685f68684b247"
+          "source_sha256": "de7b856440c81cc34bdf158e98386d085638543ab2375a2a520360833c4f2e13"
         }
       ],
       "owner_domain": "knowledge",
@@ -4551,12 +4751,23 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "The frontend now invokes the exact stable target through the shared Gateway adapter using provider-equivalent request and response transformations.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
         "target_capability": "knowledge.entry.change.apply.atomic.entries_create@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "provider_equivalence": "proven",
+        "request_transform": "record -> entries_create payload",
+        "response_transform": "unwrap CapabilityResultV2 and preserve the legacy {success,data} envelope",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "finding": "An existing owner-domain compatibility adapter invokes this exact stable target and proves the request/result transformation.",
+          "sources": [
+            {
+              "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
+              "sha256": "8f22a4db822c9ff66600e8c0e3ae1ea0593fa0dcb80cca248f821ce4706c6e2a"
+            }
+          ]
+        }
       }
     },
     {
@@ -4596,7 +4807,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "c1804e94ad8a3c4660be6bebb1b010744ed8da6f",
+        "removed_in_frontend_revision": "bf53e888cdb1c06528543c1f22dc5205a8a3b772",
         "retirement_proof": {
           "kind": "sample_template_only",
           "rationale": "The only caller lived in the distributable plugin SDK template and represented placeholder sample data rather than a shipped product route.",
@@ -4654,12 +4865,19 @@
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "base.identity.directory.sync@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "base.identity.directory.sync@1",
+        "reason_code": "provider_equivalence_missing",
+        "finding": "The stable descriptor is registered through an unbound reviewed Base outcome port or lacks an adapter proving the legacy projection and side effects.",
+        "followup": "provider_adapter_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/org.py",
+            "sha256": "3dd9133921d1a0a2d49568350b150aef133b19ccc868ff88e20d61740214b36e"
+          }
+        ]
       }
     },
     {
@@ -4688,12 +4906,19 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "plugin.install@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "plugin.install@1",
+        "reason_code": "contract_shape_mismatch",
+        "finding": "URL installation and unrestricted uninstall are not equivalent to the signed release lifecycle contract and state preconditions.",
+        "followup": "atomic_capability_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/plugins.py",
+            "sha256": "cf0ab10ba195dc67cc42718478fc00a7e133a1fee6fb991eedbf295f19a86395"
+          }
+        ]
       }
     },
     {
@@ -4722,12 +4947,19 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "craft.rule.release.activate@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "craft.rule.release.activate@1",
+        "reason_code": "outcome_mismatch",
+        "finding": "The candidate input/result does not cover the entry audit, release lifecycle, or deviation workflow consumed by the UI.",
+        "followup": "atomic_capability_review",
+        "sources": [
+          {
+            "source_path": "plugins/craft/craft_backend/routers/rules.py",
+            "sha256": "fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365"
+          }
+        ]
       }
     },
     {
@@ -4756,12 +4988,19 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "craft.rule.waiver.create@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "craft.rule.waiver.create@1",
+        "reason_code": "outcome_mismatch",
+        "finding": "The candidate input/result does not cover the entry audit, release lifecycle, or deviation workflow consumed by the UI.",
+        "followup": "atomic_capability_review",
+        "sources": [
+          {
+            "source_path": "plugins/craft/craft_backend/routers/rules.py",
+            "sha256": "fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365"
+          }
+        ]
       }
     },
     {
@@ -4901,12 +5140,19 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "agent.run.change.apply@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "agent.run.change.apply@1",
+        "reason_code": "outcome_mismatch",
+        "finding": "Skill-canvas execute/resume semantics and pause tokens are not Agent run resource changes.",
+        "followup": "atomic_capability_review",
+        "sources": [
+          {
+            "source_path": "plugins/agent/agent_backend/routers/skills_v2.py",
+            "sha256": "0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df"
+          }
+        ]
       }
     },
     {
@@ -4935,12 +5181,19 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "agent.run.change.apply@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "agent.run.change.apply@1",
+        "reason_code": "outcome_mismatch",
+        "finding": "Skill-canvas execute/resume semantics and pause tokens are not Agent run resource changes.",
+        "followup": "atomic_capability_review",
+        "sources": [
+          {
+            "source_path": "plugins/agent/agent_backend/routers/skills_v2.py",
+            "sha256": "0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df"
+          }
+        ]
       }
     },
     {
@@ -4987,7 +5240,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "c1804e94ad8a3c4660be6bebb1b010744ed8da6f",
+        "removed_in_frontend_revision": "bf53e888cdb1c06528543c1f22dc5205a8a3b772",
         "retirement_proof": {
           "kind": "http_410",
           "rationale": "The registered V1 standard-operation clone compatibility endpoint raises HTTP 410 and instructs callers to use the current BOP entry surface.",
@@ -5056,12 +5309,19 @@
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "base.saved_view.change.apply@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "base.saved_view.change.apply@1",
+        "reason_code": "provider_equivalence_missing",
+        "finding": "The stable descriptor is registered through an unbound reviewed Base outcome port or lacks an adapter proving the legacy projection and side effects.",
+        "followup": "provider_adapter_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/views.py",
+            "sha256": "10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f"
+          }
+        ]
       }
     },
     {
@@ -5097,12 +5357,19 @@
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "base.saved_view.change.apply@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "base.saved_view.change.apply@1",
+        "reason_code": "provider_equivalence_missing",
+        "finding": "The stable descriptor is registered through an unbound reviewed Base outcome port or lacks an adapter proving the legacy projection and side effects.",
+        "followup": "provider_adapter_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/views.py",
+            "sha256": "10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f"
+          }
+        ]
       }
     },
     {
@@ -5170,12 +5437,19 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "integration.mapping.update@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "integration.mapping.update@1",
+        "reason_code": "contract_shape_mismatch",
+        "finding": "The legacy UI payload/result uses datasource, mapping, synchronous import, or field-mapping shapes that the stable Integration contract does not accept or return.",
+        "followup": "atomic_capability_review",
+        "sources": [
+          {
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7"
+          }
+        ]
       }
     },
     {
@@ -5215,12 +5489,23 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "The frontend now invokes the exact stable target through the shared Gateway adapter using provider-equivalent request and response transformations.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
         "target_capability": "project.issue.change.apply.atomic.issues_update@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "provider_equivalence": "proven",
+        "request_transform": "issue gid plus changed fields -> atomic {arguments:{gid,updates}}",
+        "response_transform": "unwrap Project atomic data; callers preserve their existing refresh/error behavior",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "finding": "An existing owner-domain compatibility adapter invokes this exact stable target and proves the request/result transformation.",
+          "sources": [
+            {
+              "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+              "sha256": "80656b4bf68a1aae4730e6473e83b859a03922ee1e2e0d0b581b3fa0ad817f6e"
+            }
+          ]
+        }
       }
     },
     {
@@ -5249,12 +5534,23 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "The frontend now invokes the exact stable target through the shared Gateway adapter using provider-equivalent request and response transformations.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
         "target_capability": "knowledge.entry.change.apply.atomic.entries_update@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "provider_equivalence": "proven",
+        "request_transform": "gid + changes -> entries_update {gid,updates}",
+        "response_transform": "unwrap CapabilityResultV2 and preserve the legacy {success,data} envelope",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "finding": "An existing owner-domain compatibility adapter invokes this exact stable target and proves the request/result transformation.",
+          "sources": [
+            {
+              "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
+              "sha256": "8f22a4db822c9ff66600e8c0e3ae1ea0593fa0dcb80cca248f821ce4706c6e2a"
+            }
+          ]
+        }
       }
     },
     {
@@ -5272,7 +5568,7 @@
           "method": "PUT",
           "disposition": "unresolved",
           "occurrence_id": "web/container_card/modes/container_item_detail.js:136:58:PUT:/api/knowledges/{dynamic}",
-          "source_sha256": "afceffd9217b2a420de98f182ccd7c0a775408814759eedb7fa685f68684b247"
+          "source_sha256": "de7b856440c81cc34bdf158e98386d085638543ab2375a2a520360833c4f2e13"
         },
         {
           "source": "web/container_card/modes/mode_field_detail.js",
@@ -5283,7 +5579,7 @@
           "method": "PUT",
           "disposition": "unresolved",
           "occurrence_id": "web/container_card/modes/mode_field_detail.js:46:55:PUT:/api/knowledges/{dynamic}",
-          "source_sha256": "c51f7e2400b9d2a3e2a09e645abbd202e2bd542709cb7014bfd821986f8d84fb"
+          "source_sha256": "9071abd133c291ef105d11964e5e5287021b12078b8544434ded2228d135f9cc"
         }
       ],
       "owner_domain": "knowledge",
@@ -5294,12 +5590,23 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "The frontend now invokes the exact stable target through the shared Gateway adapter using provider-equivalent request and response transformations.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
         "target_capability": "knowledge.entry.change.apply.atomic.entries_update@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "provider_equivalence": "proven",
+        "request_transform": "gid + changes -> entries_update {gid,updates}",
+        "response_transform": "unwrap CapabilityResultV2 and preserve the legacy {success,data} envelope",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "finding": "An existing owner-domain compatibility adapter invokes this exact stable target and proves the request/result transformation.",
+          "sources": [
+            {
+              "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
+              "sha256": "8f22a4db822c9ff66600e8c0e3ae1ea0593fa0dcb80cca248f821ce4706c6e2a"
+            }
+          ]
+        }
       }
     },
     {
@@ -5317,7 +5624,7 @@
           "method": "PUT",
           "disposition": "unresolved",
           "occurrence_id": "web/container_card/modes/container_item_detail.js:137:53:PUT:/api/rules/{dynamic}",
-          "source_sha256": "afceffd9217b2a420de98f182ccd7c0a775408814759eedb7fa685f68684b247"
+          "source_sha256": "de7b856440c81cc34bdf158e98386d085638543ab2375a2a520360833c4f2e13"
         },
         {
           "source": "web/container_card/modes/mode_field_detail.js",
@@ -5328,7 +5635,7 @@
           "method": "PUT",
           "disposition": "unresolved",
           "occurrence_id": "web/container_card/modes/mode_field_detail.js:47:50:PUT:/api/rules/{dynamic}",
-          "source_sha256": "c51f7e2400b9d2a3e2a09e645abbd202e2bd542709cb7014bfd821986f8d84fb"
+          "source_sha256": "9071abd133c291ef105d11964e5e5287021b12078b8544434ded2228d135f9cc"
         }
       ],
       "owner_domain": "craft",
@@ -5339,12 +5646,23 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "The frontend now invokes the exact stable target through the shared Gateway adapter using provider-equivalent request and response transformations.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
         "target_capability": "craft.rule.library.change.apply@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "provider_equivalence": "proven",
+        "request_transform": "rule gid plus changed fields -> {operation:'update',gid,record}",
+        "response_transform": "unwrap Craft rule-library result and preserve the existing promise/error behavior",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "finding": "An existing owner-domain compatibility adapter invokes this exact stable target and proves the request/result transformation.",
+          "sources": [
+            {
+              "source_path": "plugins/craft/craft_backend/routers/rules.py",
+              "sha256": "fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365"
+            }
+          ]
+        }
       }
     },
     {
@@ -5380,12 +5698,19 @@
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
+      "disposition": "existing_capability_reclassified",
       "disposition_details": {
-        "target_capability": "base.annotation.change.apply@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "candidate_target_capability": "base.annotation.change.apply@1",
+        "reason_code": "provider_equivalence_missing",
+        "finding": "The stable descriptor is registered through an unbound reviewed Base outcome port or lacks an adapter proving the legacy projection and side effects.",
+        "followup": "provider_adapter_review",
+        "sources": [
+          {
+            "source_path": "backend/routers/self_annotations.py",
+            "sha256": "4a75270d28bb12c80ced69f16583041f1b9ac3b47b4688622f1461f8addf8e0a"
+          }
+        ]
       }
     },
     {
@@ -5425,12 +5750,23 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "The frontend now invokes the exact stable target through the shared Gateway adapter using provider-equivalent request and response transformations.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
         "target_capability": "project.task.change.apply.atomic.tasks_update@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "provider_equivalence": "proven",
+        "request_transform": "task gid plus changed fields -> atomic {arguments:{gid,updates}}",
+        "response_transform": "unwrap Project atomic data; callers preserve their existing refresh/error behavior",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "finding": "An existing owner-domain compatibility adapter invokes this exact stable target and proves the request/result transformation.",
+          "sources": [
+            {
+              "source_path": "plugins/craft/craft_backend/routers/promotion.py",
+              "sha256": "80656b4bf68a1aae4730e6473e83b859a03922ee1e2e0d0b581b3fa0ad817f6e"
+            }
+          ]
+        }
       }
     },
     {
@@ -5459,12 +5795,23 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution.",
-      "disposition": "existing_capability_migration_required",
+      "lifecycle_conclusion": "The frontend now invokes the exact stable target through the shared Gateway adapter using provider-equivalent request and response transformations.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
         "target_capability": "project.list.change.apply.atomic.item_entries_replace@1",
-        "provider_equivalence": "not_proven",
-        "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration."
+        "provider_equivalence": "proven",
+        "request_transform": "task gid and entries -> atomic {arguments:{item_type:'task',item_gid,entries?}}",
+        "response_transform": "unwrap Project atomic data; GET preserves data as the entries array",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "finding": "An existing owner-domain compatibility adapter invokes this exact stable target and proves the request/result transformation.",
+          "sources": [
+            {
+              "source_path": "plugins/craft/craft_backend/routers/item_entries.py",
+              "sha256": "be4cc14f8dbb494168ac3c0889635cf8b7bc411bc021bae66c55bcad3895ba85"
+            }
+          ]
+        }
       }
     },
     {

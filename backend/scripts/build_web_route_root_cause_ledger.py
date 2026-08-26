@@ -26,9 +26,18 @@ from backend.capability_v2.route_root_cause_ledger import (
     CLASSIFIED_OCCURRENCE_COUNT,
     build_route_definition_evidence,
 )
+from backend.capability_v2.existing_capability_migrations import (
+    load_existing_capability_migrations,
+)
 from backend.scripts.check_web_capability_routes import build_report
 
 DEFAULT_LEDGER = ROOT / "docs/governance/web-route-root-cause-ledger.json"
+MIGRATION_MANIFEST = ROOT / "docs/governance/existing-capability-web-migrations.json"
+
+
+def _migration_decisions():
+    manifest = load_existing_capability_migrations(MIGRATION_MANIFEST)
+    return {(group.method, group.normalized_route): group for group in manifest.groups}
 
 EXISTING = {
     ("GET", "/api/ai/audit-logs"): (
@@ -507,11 +516,21 @@ def _classify(
         }, "The handler selects exactly one branch per request; conditional dispatch is not aggregation and cannot be registered as a BFF."
     target = _migration_target(key)
     if target:
-        return owner, "existing_capability_migration_required", evidence, {
-            "target_capability": target,
-            "provider_equivalence": "not_proven",
-            "required_action": "Migrate the legacy consumer/handler to the exact stable target and prove provider-equivalent execution before Legacy registration.",
-        }, "An exact stable outcome exists, but the reviewed route does not prove provider-equivalent execution."
+        decision = _migration_decisions().get(key)
+        if decision is None or f"{decision.target_capability_id}@{decision.target_major_version}" != target:
+            raise RuntimeError(f"Task 3B.3b migration decision missing or stale: {key}")
+        if decision.decision == "migrate":
+            return owner, "existing_capability_migrated", evidence, {
+                "target_capability": target,
+                "provider_equivalence": "proven",
+                "request_transform": decision.request_transform,
+                "response_transform": decision.response_transform,
+                "equivalence_evidence": decision.equivalence_evidence,
+            }, "The frontend now invokes the exact stable target through the shared Gateway adapter using provider-equivalent request and response transformations."
+        return owner, "existing_capability_reclassified", evidence, {
+            "candidate_target_capability": target,
+            **dict(decision.reclassification or {}),
+        }, "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class."
     return owner, "new_atomic_capability_required", evidence, {
         "proposed_owner_domain": owner,
         "atomic_outcome": ATOMIC_OUTCOMES[key],
@@ -563,13 +582,20 @@ def build_document(web_root: Path) -> dict[str, Any]:
     for raw in final_routes:
         final_grouped[(raw["method"], raw["normalized_route"])].append(raw)
     derived = set(final_grouped) - set(grouped)
-    if derived != DERIVED_KEYS:
+    if not derived <= DERIVED_KEYS:
         raise RuntimeError(f"post-normalization route groups drift: {sorted(derived)}")
 
+    migration_occurrences = {
+        (group.method, group.normalized_route): [dict(raw) for raw in group.occurrences]
+        for group in load_existing_capability_migrations(MIGRATION_MANIFEST).groups
+    }
+    post_normalization_groups = {
+        key: final_grouped.get(key) or migration_occurrences[key]
+        for key in DERIVED_KEYS
+    }
+
     entries: list[dict[str, Any]] = []
-    for scope, groups in (("baseline", grouped), ("post_normalization", {
-        key: final_grouped[key] for key in DERIVED_KEYS
-    })):
+    for scope, groups in (("baseline", grouped), ("post_normalization", post_normalization_groups)):
         for key in sorted(groups):
             values = sorted(groups[key], key=lambda raw: raw["occurrence_id"])
             if scope == "baseline":

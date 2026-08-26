@@ -29,6 +29,8 @@ LEDGER_ARTIFACT_ID = "web-route-root-cause-ledger"
 DISPOSITIONS = {
     "existing_stable_capability",
     "existing_capability_migration_required",
+    "existing_capability_migrated",
+    "existing_capability_reclassified",
     "truthful_bff_required",
     "conditional_dispatch_required",
     "new_atomic_capability_required",
@@ -598,6 +600,39 @@ def audit_route_root_cause_ledger(
                 or not details.get("required_action", "").strip()
             ):
                 issues.append(f"ledger_migration_target_invalid:{context}")
+        elif entry.disposition == "existing_capability_migrated":
+            target = _target(details.get("target_capability"))
+            equivalence = details.get("equivalence_evidence")
+            if (
+                target is None or catalog.get(target) != ("stable", entry.owner_domain)
+                or details.get("provider_equivalence") != "proven"
+                or not isinstance(details.get("request_transform"), str)
+                or not details.get("request_transform", "").strip()
+                or not isinstance(details.get("response_transform"), str)
+                or not details.get("response_transform", "").strip()
+                or not isinstance(equivalence, Mapping)
+                or equivalence.get("proof_kind") != "provider_equivalent_adapter"
+                or not isinstance(equivalence.get("sources"), list)
+                or not equivalence.get("sources")
+            ):
+                issues.append(f"ledger_migrated_target_invalid:{context}")
+        elif entry.disposition == "existing_capability_reclassified":
+            target = _target(details.get("candidate_target_capability"))
+            sources = details.get("sources")
+            if (
+                target is None or catalog.get(target) != ("stable", entry.owner_domain)
+                or details.get("reason_code") not in {
+                    "adapter_side_effect_missing", "contract_shape_mismatch", "outcome_mismatch",
+                    "projection_mismatch", "provider_equivalence_missing", "state_model_mismatch",
+                }
+                or details.get("followup") not in {
+                    "atomic_capability_review", "provider_adapter_review", "bff_review",
+                }
+                or not isinstance(details.get("finding"), str)
+                or len(details.get("finding", "").strip()) < 20
+                or not isinstance(sources, list) or not sources
+            ):
+                issues.append(f"ledger_reclassification_invalid:{context}")
         elif entry.disposition == "truthful_bff_required":
             constituents = details.get("constituent_capabilities")
             parsed = [_target(value) for value in constituents] if isinstance(constituents, list) else []
@@ -685,6 +720,9 @@ def audit_route_root_cause_ledger(
     if not isinstance(final_counts, Mapping) or final_counts.get("unresolved") != expected_final.get("unresolved_count"):
         issues.append("ledger_final_unresolved_count_mismatch:1")
     actual_groups = _final_groups(final_document)
+    for entry in ledger.entries:
+        if entry.disposition == "existing_capability_migrated" and entry.key in actual_groups:
+            issues.append(f"ledger_migrated_frontend_call_remains:{entry.method}:{entry.normalized_route}")
     expected_groups = Counter()
     for raw in ledger.final_unresolved_groups:
         if not isinstance(raw, Mapping) or set(raw) != {
@@ -712,7 +750,16 @@ def audit_route_root_cause_ledger(
         raw for raw in final_unresolved
         if (raw.get("method"), raw.get("normalized_route")) not in baseline_keys
     ]
-    actual_derived = [raw for entry in derived_entries for raw in entry.occurrences if isinstance(raw, Mapping)]
+    expected_derived_keys = {
+        (raw.get("method"), raw.get("normalized_route")) for raw in expected_derived
+    }
+    actual_derived = [
+        raw
+        for entry in derived_entries
+        if entry.key in expected_derived_keys
+        for raw in entry.occurrences
+        if isinstance(raw, Mapping)
+    ]
     derived_mismatches = _occurrence_mismatch_count(expected_derived, actual_derived)
     if derived_mismatches:
         issues.append(f"ledger_post_normalization_occurrence_mismatch:{derived_mismatches}")
