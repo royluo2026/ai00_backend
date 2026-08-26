@@ -21,11 +21,13 @@ if str(REPOSITORY_ROOT) not in sys.path:
     sys.path.insert(0, str(REPOSITORY_ROOT))
 
 from backend.capability_v2.catalog_targets import CatalogTargetIndex
+from backend.capability_v2.atomicity import load_atomicity_dispositions
 
 
 REGISTRY_PATH = REPOSITORY_ROOT / "docs" / "governance" / "user-function-registry.json"
 REVIEW_PATH = REPOSITORY_ROOT / "docs" / "governance" / "capability-coverage-review"
 CATALOG_PATH = REPOSITORY_ROOT / "docs" / "capabilities" / "catalog.v2.json"
+ATOMICITY_PATH = REPOSITORY_ROOT / "docs" / "governance" / "capability-atomicity-dispositions.json"
 DOMAINS = (
     "Base Platform",
     "Agent",
@@ -890,10 +892,17 @@ def main(argv: list[str] | None = None) -> int:
     existing = load_registry()
     discovered = discover_user_functions()
     if args.check or args.strict:
-        catalog_index = (
-            CatalogTargetIndex.from_catalog(json.loads(CATALOG_PATH.read_text(encoding="utf-8")))
-            if args.strict else None
-        )
+        catalog_index = None
+        if args.strict:
+            dispositions = load_atomicity_dispositions(ATOMICITY_PATH)
+            catalog_index = CatalogTargetIndex.from_catalog(
+                json.loads(CATALOG_PATH.read_text(encoding="utf-8")),
+                replacements={
+                    (item.capability_id, item.major_version): item.replacement_capabilities[0]
+                    for item in dispositions.dispositions
+                    if item.replacement_capabilities
+                },
+            )
         errors = registry_errors(
             existing, discovered, include_governance=False, catalog_index=catalog_index,
         )

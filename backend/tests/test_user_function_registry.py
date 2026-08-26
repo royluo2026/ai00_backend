@@ -482,6 +482,39 @@ def test_strict_cli_blocks_non_stable_catalog_targets():
     assert "target_not_stable" in result.stderr
 
 
+def test_strict_cli_blocks_replaced_catalog_target(tmp_path: Path, monkeypatch, capsys):
+    builder = _builder_module()
+    row = {
+        "function_id": "rest:GET:/api/example",
+        "domain": "Craft",
+        "stability": "stable",
+        "current_consumers": ["REST"],
+        "source_paths": ["backend/routers/example.py"],
+        "target_capability": "craft.old.read",
+        "classification": "mapped",
+        "migration_status": "registered",
+    }
+    catalog_path = tmp_path / "catalog.json"
+    catalog_path.write_text(json.dumps({"capabilities": [
+        {"id": "craft.old.read", "major_version": 1, "lifecycle_status": "stable", "owner_domain": "craft"},
+        {"id": "craft.new.read", "major_version": 1, "lifecycle_status": "stable", "owner_domain": "craft"},
+    ]}), encoding="utf-8")
+    atomicity_path = tmp_path / "atomicity.json"
+    atomicity_path.write_text(json.dumps({"dispositions": [{
+        "capability_id": "craft.old.read", "major_version": 1, "disposition": "split",
+        "replacement_capabilities": ["craft.new.read"], "evidence_refs": ["review.md"],
+    }]}), encoding="utf-8")
+    monkeypatch.setattr(builder, "CATALOG_PATH", catalog_path)
+    monkeypatch.setattr(builder, "ATOMICITY_PATH", atomicity_path)
+    monkeypatch.setattr(builder, "REVIEW_PATH", tmp_path / "reviews")
+    monkeypatch.setattr(builder, "load_registry", lambda: {row["function_id"]: row})
+    monkeypatch.setattr(builder, "discover_user_functions", lambda: [row])
+
+    assert builder.main(["--strict"]) == 1
+
+    assert "target_replaced" in capsys.readouterr().err
+
+
 def test_coverage_reviews_ignore_supplemental_atomic_review_file(tmp_path: Path):
     builder = _builder_module()
     (tmp_path / "manifest.json").write_text("{}", encoding="utf-8")
