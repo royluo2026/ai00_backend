@@ -36,7 +36,7 @@
         "plugin_id": "official.base",
         "module": "backend.base.official_provider",
         "version": "1.0.0",
-        "artifact_hash": "sha256:6a3efbd8b7a6b34867ffc4324694c3f9096ff75f49de8c706ff15dfbf326096b"
+        "artifact_hash": "sha256:e1fc3800ddeee80f9b5daff427224cb131ecc31d08ef5279c12bb63bb3499307"
       },
       "artifact_path": "backend/base",
       "allowed_owners": [
@@ -82,7 +82,7 @@
         "plugin_id": "official.craft",
         "module": "craft_backend.capabilities",
         "version": "1.2.0",
-        "artifact_hash": "sha256:5d47893b7deb7c3d620b12e78d78ecb30252c958ed3f5b15c3dbed66c05e346a"
+        "artifact_hash": "sha256:0f5d1960ed73e8597889d33c927d00c66d1702eff077152863a9a7f95cc2003a"
       },
       "artifact_path": "plugins/craft/craft_backend",
       "allowed_owners": [
@@ -190,7 +190,7 @@
         "plugin_id": "official.integration",
         "module": "integration_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:715c89842662fbdd4941613d58c02076cb62c20f1ba35d8d24cdf2d1d8cce713"
+        "artifact_hash": "sha256:a2f23a1f927aaa1540957cf067861396753f4a7118002d88c423796ea4ee17cf"
       },
       "artifact_path": "plugins/integration/integration_backend",
       "allowed_owners": [

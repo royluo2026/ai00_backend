@@ -8,7 +8,7 @@ Execute the governed integration.mapping.get Integration outcome.
 - 不适用：The caller can use an owning domain Capability directly without external integration.
 - 生命周期：`stable`
 - 所属领域：`integration`
-- Catalog Release：`rel_40ed2fbd3abc82881c2856c99c4b200a`
+- Catalog Release：`rel_b6846f0f3faea2788a65130a4a59a5fe`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -87,7 +87,7 @@ Execute the governed integration.mapping.get Integration outcome.
 ```json
 {
   "capability_id": "integration.mapping.get",
-  "catalog_release": "rel_40ed2fbd3abc82881c2856c99c4b200a",
+  "catalog_release": "rel_b6846f0f3faea2788a65130a4a59a5fe",
   "major_version": 1,
   "payload": {
     "gid": "example"

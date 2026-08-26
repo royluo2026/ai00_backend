@@ -8,7 +8,7 @@ Create, update, or delete a BOP fork preset.
 - 不适用：The request forks a BOP version or mutates BOP entries.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_40ed2fbd3abc82881c2856c99c4b200a`
+- Catalog Release：`rel_b6846f0f3faea2788a65130a4a59a5fe`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -132,7 +132,7 @@ Create, update, or delete a BOP fork preset.
 ```json
 {
   "capability_id": "craft.bop.fork_preset.change.apply",
-  "catalog_release": "rel_40ed2fbd3abc82881c2856c99c4b200a",
+  "catalog_release": "rel_b6846f0f3faea2788a65130a4a59a5fe",
   "major_version": 1,
   "payload": {
     "operation": "create"

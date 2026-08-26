@@ -8,7 +8,7 @@ Upload a bounded image asset for BOP picture references.
 - 不适用：The request changes BOP entities, links, or metadata, or uploads non-image artifacts.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_40ed2fbd3abc82881c2856c99c4b200a`
+- Catalog Release：`rel_b6846f0f3faea2788a65130a4a59a5fe`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -97,7 +97,7 @@ Upload a bounded image asset for BOP picture references.
 ```json
 {
   "capability_id": "craft.bop.picture.upload",
-  "catalog_release": "rel_40ed2fbd3abc82881c2856c99c4b200a",
+  "catalog_release": "rel_b6846f0f3faea2788a65130a4a59a5fe",
   "major_version": 1,
   "payload": {
     "data_b64": "example",

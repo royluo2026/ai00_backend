@@ -8,7 +8,7 @@ Apply bounded transactional BOP lifecycle metadata and PBOM diff-queue changes.
 - 不适用：The request changes lifecycle phases, checkpoints, line history, or BOP entities.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_40ed2fbd3abc82881c2856c99c4b200a`
+- Catalog Release：`rel_b6846f0f3faea2788a65130a4a59a5fe`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -144,7 +144,7 @@ Apply bounded transactional BOP lifecycle metadata and PBOM diff-queue changes.
 ```json
 {
   "capability_id": "craft.bop.lifecycle.change.apply",
-  "catalog_release": "rel_40ed2fbd3abc82881c2856c99c4b200a",
+  "catalog_release": "rel_b6846f0f3faea2788a65130a4a59a5fe",
   "major_version": 1,
   "payload": {
     "operation": "pbom_match.update"

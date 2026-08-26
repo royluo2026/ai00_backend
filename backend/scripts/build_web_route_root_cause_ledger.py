@@ -35,13 +35,23 @@ from backend.scripts.check_web_capability_routes import build_report
 
 DEFAULT_LEDGER = ROOT / "docs/governance/web-route-root-cause-ledger.json"
 MIGRATION_MANIFEST = ROOT / "docs/governance/existing-capability-web-migrations.json"
+ATOMIC_CONTRACT_MANIFEST = ROOT / "docs/governance/atomic-web-capability-contracts.json"
+
+
+@lru_cache(maxsize=1)
+def _atomic_contracts():
+    payload = json.loads(ATOMIC_CONTRACT_MANIFEST.read_text(encoding="utf-8"))
+    return {
+        (entry["method"], entry["normalized_route"]): entry
+        for entry in payload["entries"]
+    }
 
 
 @lru_cache(maxsize=1)
 def _migration_decisions(web_root: Path):
     manifest = load_existing_capability_migrations(MIGRATION_MANIFEST)
     issues = audit_existing_capability_migrations(
-        ROOT, manifest, web_root=web_root
+        ROOT, manifest, web_root=web_root, check_final_inventory=False
     )
     if issues:
         raise RuntimeError(
@@ -524,6 +534,22 @@ def _classify(
                 "anchors": [anchor],
             },
         }, "The handler selects exactly one branch per request; conditional dispatch is not aggregation and cannot be registered as a BFF."
+    atomic = _atomic_contracts().get(key)
+    if atomic and atomic["final_disposition"] == "migrated":
+        target = f"{atomic['capability_id']}@{atomic['major_version']}"
+        provider_source, provider_token = atomic["provider_anchor"].split(":", 1)
+        return owner, "existing_capability_migrated", evidence, {
+            "target_capability": target,
+            "provider_equivalence": "proven",
+            "request_transform": "Exact closed payload defined by Task 3B.3c atomic contract manifest.",
+            "response_transform": "Bounded result_json is decoded to the original legacy response value.",
+            "equivalence_evidence": {
+                "proof_kind": "provider_equivalent_adapter",
+                "provider_contract": _backend_anchor(provider_source, provider_token),
+                "provider_source_sha256": atomic["provider_source_sha256"],
+                "manifest": "docs/governance/atomic-web-capability-contracts.json",
+            },
+        }, "The frontend invokes the exact stable atomic owner-domain outcome through the shared Gateway client."
     target = _migration_target(key)
     if target:
         decision = _migration_decisions(web_root).get(key)

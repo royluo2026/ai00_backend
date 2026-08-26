@@ -293,7 +293,7 @@ def test_task3b3a_operations_validator_rejects_weak_candidate() -> None:
     assert "ledger_operations_candidate_invalid:GET:/api/file-store/config" in issues
 
 
-def test_task3b3a_reviewed_disposition_totals_are_exact() -> None:
+def test_task3b3c_reviewed_disposition_totals_are_exact() -> None:
     ledger = _root_cause_ledger()
     groups = Counter(entry.disposition for entry in ledger.entries)
     occurrences = Counter()
@@ -303,24 +303,24 @@ def test_task3b3a_reviewed_disposition_totals_are_exact() -> None:
     assert len(ledger.entries) == 102
     assert sum(entry.occurrence_count for entry in ledger.entries) == 161
     assert groups == Counter({
-        "existing_capability_reclassified": 42,
-        "existing_capability_migrated": 11,
+        "existing_capability_reclassified": 20,
+        "existing_capability_migrated": 34,
         "frontend_retire": 17,
         "frontend_route_normalize": 15,
-        "new_atomic_capability_required": 6,
+        "new_atomic_capability_required": 5,
         "existing_stable_capability": 5,
         "conditional_dispatch_required": 3,
         "truthful_bff_required": 2,
         "operations_candidate": 1,
     })
     assert occurrences == Counter({
-        "existing_capability_reclassified": 64,
-        "existing_capability_migrated": 16,
+        "existing_capability_reclassified": 21,
+        "existing_capability_migrated": 60,
         "frontend_route_normalize": 23,
         "frontend_retire": 21,
         "conditional_dispatch_required": 20,
         "existing_stable_capability": 7,
-        "new_atomic_capability_required": 7,
+        "new_atomic_capability_required": 6,
         "truthful_bff_required": 2,
         "operations_candidate": 1,
     })

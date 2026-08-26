@@ -8,7 +8,7 @@ Preview bounded BOP station auto-link candidates without mutating bindings.
 - 不适用：The consumer confirms, executes, or undoes station auto-link bindings.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_40ed2fbd3abc82881c2856c99c4b200a`
+- Catalog Release：`rel_b6846f0f3faea2788a65130a4a59a5fe`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -98,7 +98,7 @@ Preview bounded BOP station auto-link candidates without mutating bindings.
 ```json
 {
   "capability_id": "craft.gbop.station_autolink.preview",
-  "catalog_release": "rel_40ed2fbd3abc82881c2856c99c4b200a",
+  "catalog_release": "rel_b6846f0f3faea2788a65130a4a59a5fe",
   "major_version": 1,
   "payload": {
     "bop_gid": "example",

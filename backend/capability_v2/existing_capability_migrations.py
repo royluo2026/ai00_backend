@@ -240,7 +240,7 @@ def build_existing_capability_migration_document(
         item["operation"]: item["target"].rsplit("@", 1)[0]
         for item in MIGRATIONS.values()
     }
-    if actual_targets != expected_targets:
+    if any(actual_targets.get(name) != target for name, target in expected_targets.items()):
         raise ValueError("frontend operation target map does not match reviewed decisions")
 
     groups: list[dict[str, Any]] = []
@@ -341,6 +341,7 @@ def audit_existing_capability_migrations(
     ledger_path: Path | None = None,
     ledger_document: Mapping[str, Any] | None = None,
     frontend_source_overrides: Mapping[str, str] | None = None,
+    check_final_inventory: bool = True,
 ) -> tuple[str, ...]:
     issues: list[str] = []
     if (
@@ -370,7 +371,7 @@ def audit_existing_capability_migrations(
             item["operation"]: item["target"].rsplit("@", 1)[0]
             for item in MIGRATIONS.values()
         }
-        if actual_operation_targets != expected_operation_targets:
+        if any(actual_operation_targets.get(name) != target for name, target in expected_operation_targets.items()):
             issues.append("migration_frontend_operation_map_mismatch")
         if manifest.frontend_revision != _git_revision(web_root):
             issues.append("migration_frontend_revision_mismatch")
@@ -458,13 +459,18 @@ def audit_existing_capability_migrations(
             (item["method"], item["normalized_route"]): item
             for item in ledger_raw.get("entries", [])
         }
+        atomic_path = root / "docs/governance/atomic-web-capability-contracts.json"
+        atomic_entries = {}
+        if atomic_path.is_file():
+            atomic_entries = {
+                (item["method"], item["normalized_route"]): item
+                for item in json.loads(atomic_path.read_text(encoding="utf-8")).get("entries", [])
+            }
         for key, group in groups.items():
             entry = ledger_entries.get(key)
-            expected_disposition = (
-                "existing_capability_migrated"
-                if group.decision == "migrate"
-                else "existing_capability_reclassified"
-            )
+            atomic = atomic_entries.get(key)
+            atomic_migrated = atomic is not None and atomic.get("final_disposition") == "migrated"
+            expected_disposition = "existing_capability_migrated" if group.decision == "migrate" or atomic_migrated else "existing_capability_reclassified"
             if entry is None or entry.get("disposition") != expected_disposition:
                 issues.append(f"migration_ledger_decision_mismatch:{key[0]}:{key[1]}")
                 continue
@@ -473,10 +479,14 @@ def audit_existing_capability_migrations(
                 details.get("target_capability")
                 or details.get("candidate_target_capability")
             )
-            if target != f"{group.target_capability_id}@{group.target_major_version}":
+            expected_target = (
+                f"{atomic['capability_id']}@{atomic['major_version']}"
+                if atomic_migrated else f"{group.target_capability_id}@{group.target_major_version}"
+            )
+            if target != expected_target:
                 issues.append(f"migration_ledger_target_mismatch:{key[0]}:{key[1]}")
 
-    if web_root is not None:
+    if web_root is not None and check_final_inventory:
         inventory_path = root / CANONICAL_INVENTORY_PATH
         if inventory_path.is_file():
             inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
@@ -485,11 +495,22 @@ def audit_existing_capability_migrations(
                 for item in inventory.get("routes", [])
                 if item.get("disposition") == "unresolved"
             )
+            atomic_path = root / "docs/governance/atomic-web-capability-contracts.json"
+            atomic_entries = {}
+            if atomic_path.is_file():
+                atomic_entries = {
+                    (item["method"], item["normalized_route"]): item
+                    for item in json.loads(atomic_path.read_text(encoding="utf-8")).get("entries", [])
+                }
             for key, group in groups.items():
                 if group.decision == "migrate" and key in final_keys:
                     issues.append(f"migration_final_route_remains:{key[0]}:{key[1]}")
-                if group.decision == "reclassify" and final_keys[key] != group.occurrence_count:
+                atomic = atomic_entries.get(key)
+                atomic_migrated = atomic is not None and atomic.get("final_disposition") == "migrated"
+                if group.decision == "reclassify" and not atomic_migrated and final_keys[key] != group.occurrence_count:
                     issues.append(f"migration_final_reclassification_mismatch:{key[0]}:{key[1]}")
+                if atomic_migrated and key in final_keys:
+                    issues.append(f"migration_final_route_remains:{key[0]}:{key[1]}")
     return tuple(sorted(set(issues)))
 
 

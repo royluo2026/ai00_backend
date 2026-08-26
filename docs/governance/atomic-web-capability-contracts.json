@@ -1,0 +1,3560 @@
+{
+  "artifact_id": "task-3b3c-atomic-web-contracts",
+  "baseline_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
+  "content_sha256": "sha256:0d86179ef68e9b5d3f63e1575cafa32c6c0267c8448592fb169516bba22a80bc",
+  "counts_by_owner": {
+    "agent": {
+      "groups": 4,
+      "occurrences": 5
+    },
+    "base": {
+      "groups": 24,
+      "occurrences": 44
+    },
+    "craft": {
+      "groups": 7,
+      "occurrences": 9
+    },
+    "integration": {
+      "groups": 12,
+      "occurrences": 12
+    },
+    "project_management": {
+      "groups": 1,
+      "occurrences": 1
+    }
+  },
+  "entries": [
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "agent.write",
+      "baseline_disposition": "new_atomic_capability_required",
+      "capability_id": null,
+      "confirmation_policy": "user",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/agent/agent_backend/routers/flows.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "POST",
+      "normalized_route": "/api/flows/test-node",
+      "occurrences": [
+        {
+          "classification_prefix": "/api/flows",
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 754,
+          "method": "POST",
+          "normalized_route": "/api/flows/test-node",
+          "occurrence_id": "packages/agent-plugin/web/flow_canvas/flow_editor.js:754:36:POST:/api/flows/test-node",
+          "raw_route": "/api/flows/test-node",
+          "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
+          "source_sha256": "9bb1fe5371a15087509924b6de1304199977757f1038a76177e78e490deca049"
+        },
+        {
+          "classification_prefix": "/api/flows",
+          "column": 29,
+          "disposition": "unresolved",
+          "line": 145,
+          "method": "POST",
+          "normalized_route": "/api/flows/test-node",
+          "occurrence_id": "web/canvas/types/flow_type.js:145:29:POST:/api/flows/test-node",
+          "raw_route": "/api/flows/test-node",
+          "source": "web/canvas/types/flow_type.js",
+          "source_sha256": "591904dbc5db76114ccc02ac981ab675147876890bd297d814a2d9024928212f"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "agent",
+      "owner_prefix": "agent",
+      "provider_anchor": "plugins/agent/agent_backend/routers/flows.py",
+      "provider_source_sha256": "sha256:b7451e4b3a5537ec078bad85d9c1131b6ce4e20d608d07b8cde116e159b48ad8",
+      "reclassification_reason": "No node-test handler or runtime service exists in the Agent provider.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "agent:write"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "agent.write",
+      "baseline_disposition": "new_atomic_capability_required",
+      "capability_id": null,
+      "confirmation_policy": "user",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/agent/agent_backend/routers/skills_v2.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "POST",
+      "normalized_route": "/api/skills/canvas-options",
+      "occurrences": [
+        {
+          "column": 35,
+          "disposition": "unresolved",
+          "line": 1599,
+          "method": "POST",
+          "normalized_route": "/api/skills/canvas-options",
+          "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1599:35:POST:/api/skills/canvas-options",
+          "raw_route": "/api/skills/canvas-options",
+          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+          "source_sha256": "c6f654458ff966e9bb4c2f023dd877c682243a6ff70c71ef0646f4acf9c041a7"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "agent",
+      "owner_prefix": "agent",
+      "provider_anchor": "plugins/agent/agent_backend/routers/skills_v2.py",
+      "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
+      "reclassification_reason": "No bounded canvas-option resolver exists in the Agent provider.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "agent:write"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "agent.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": null,
+      "confirmation_policy": "user",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/agent/agent_backend/routers/skills_v2.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "POST",
+      "normalized_route": "/api/skills/execute-canvas",
+      "occurrences": [
+        {
+          "column": 40,
+          "disposition": "unresolved",
+          "line": 2264,
+          "method": "POST",
+          "normalized_route": "/api/skills/execute-canvas",
+          "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2264:40:POST:/api/skills/execute-canvas",
+          "raw_route": "/api/skills/execute-canvas",
+          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+          "source_sha256": "c6f654458ff966e9bb4c2f023dd877c682243a6ff70c71ef0646f4acf9c041a7"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "agent",
+      "owner_prefix": "agent",
+      "provider_anchor": "plugins/agent/agent_backend/routers/skills_v2.py",
+      "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
+      "reclassification_reason": "No canvas execution provider exists; generic run mutation is not provider-equivalent.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "agent:write"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "agent.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": null,
+      "confirmation_policy": "user",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/agent/agent_backend/routers/skills_v2.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "POST",
+      "normalized_route": "/api/skills/resume-canvas",
+      "occurrences": [
+        {
+          "column": 40,
+          "disposition": "unresolved",
+          "line": 1615,
+          "method": "POST",
+          "normalized_route": "/api/skills/resume-canvas",
+          "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1615:40:POST:/api/skills/resume-canvas",
+          "raw_route": "/api/skills/resume-canvas",
+          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+          "source_sha256": "c6f654458ff966e9bb4c2f023dd877c682243a6ff70c71ef0646f4acf9c041a7"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "agent",
+      "owner_prefix": "agent",
+      "provider_anchor": "plugins/agent/agent_backend/routers/skills_v2.py",
+      "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
+      "reclassification_reason": "No pause-token resume provider exists; generic run mutation is not provider-equivalent.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "agent:write"
+      ]
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_policy": "base.read",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": "base.authorization.grant.list",
+      "confirmation_policy": "none",
+      "example_input": {
+        "user_gid": null
+      },
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 85,
+          "method": "GET",
+          "normalized_route": "/api/grants",
+          "sha256": "39fe0c74d7118ea88342bab26f136e63228eaaba419cae198fcf7a891b12ee04",
+          "source_path": "backend/routers/grants.py",
+          "start_line": 56
+        },
+        "source_path": "backend/routers/grants.py"
+      },
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "user_gid": {
+            "maxLength": 512,
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "GET",
+      "normalized_route": "/api/grants",
+      "occurrences": [
+        {
+          "column": 20,
+          "disposition": "unresolved",
+          "line": 348,
+          "method": "GET",
+          "normalized_route": "/api/grants",
+          "occurrence_id": "packages/craft-plugin/web/project/project.js:348:20:GET:/api/grants",
+          "raw_route": "/api/grants",
+          "source": "packages/craft-plugin/web/project/project.js",
+          "source_sha256": "9a0085d95c82fc8d98789c3e9d71f53467b6372152acc448b4643e86239fef03"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "read"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "base.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": "base.authorization.grant.create",
+      "confirmation_policy": "user",
+      "example_input": {
+        "expires_at": null,
+        "grant_type": "team_admin",
+        "grantee_gid": "usr_2",
+        "note": "",
+        "scope_gid": "team_1"
+      },
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 117,
+          "method": "POST",
+          "normalized_route": "/api/grants",
+          "sha256": "d87b44a28cac9d2d1644347aa5944265dbd273426b9cbe75acb9cf350f48fab8",
+          "source_path": "backend/routers/grants.py",
+          "start_line": 88
+        },
+        "source_path": "backend/routers/grants.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "expires_at": {
+            "maxLength": 512,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "grant_type": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "grantee_gid": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "note": {
+            "maxLength": 2000,
+            "type": "string"
+          },
+          "scope_gid": {
+            "maxLength": 512,
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "grantee_gid",
+          "grant_type"
+        ],
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "POST",
+      "normalized_route": "/api/grants",
+      "occurrences": [
+        {
+          "column": 24,
+          "disposition": "unresolved",
+          "line": 256,
+          "method": "POST",
+          "normalized_route": "/api/grants",
+          "occurrence_id": "web/team_space/team_space.js:256:24:POST:/api/grants",
+          "raw_route": "/api/grants",
+          "source": "web/team_space/team_space.js",
+          "source_sha256": "a3d1a2a00447e04711fb077b3c9822003fc5755f88829d71463d0fa88cb77bc5"
+        },
+        {
+          "column": 24,
+          "disposition": "unresolved",
+          "line": 398,
+          "method": "POST",
+          "normalized_route": "/api/grants",
+          "occurrence_id": "web/team_space/team_space.js:398:24:POST:/api/grants",
+          "raw_route": "/api/grants",
+          "source": "web/team_space/team_space.js",
+          "source_sha256": "a3d1a2a00447e04711fb077b3c9822003fc5755f88829d71463d0fa88cb77bc5"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "base:write"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "base.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": "base.authorization.grant.revoke",
+      "confirmation_policy": "user",
+      "example_input": {
+        "gid": "grant_1"
+      },
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 136,
+          "method": "DELETE",
+          "normalized_route": "/api/grants/{dynamic}",
+          "sha256": "482beec0dcb70b8faa7efa8b7b3dfa1cc2a25e3b8dfb5d48ae981873c90e0347",
+          "source_path": "backend/routers/grants.py",
+          "start_line": 120
+        },
+        "source_path": "backend/routers/grants.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "gid"
+        ],
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "DELETE",
+      "normalized_route": "/api/grants/{dynamic}",
+      "occurrences": [
+        {
+          "column": 28,
+          "disposition": "unresolved",
+          "line": 404,
+          "method": "DELETE",
+          "normalized_route": "/api/grants/{dynamic}",
+          "occurrence_id": "web/team_space/team_space.js:404:28:DELETE:/api/grants/{dynamic}",
+          "raw_route": "/api/grants/${encodeURIComponent(ownGrant.gid)}",
+          "source": "web/team_space/team_space.js",
+          "source_sha256": "a3d1a2a00447e04711fb077b3c9822003fc5755f88829d71463d0fa88cb77bc5"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "base:write"
+      ]
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_policy": "base.read",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": "base.notification.preference.atomic.get",
+      "confirmation_policy": "none",
+      "example_input": {},
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 43,
+          "method": "GET",
+          "normalized_route": "/api/notifications/prefs",
+          "sha256": "fbe957c2b5414148af7f6693f90d754ab6552ddf351f098e6ef283c32c6a413a",
+          "source_path": "backend/routers/notifications.py",
+          "start_line": 40
+        },
+        "source_path": "backend/routers/notifications.py"
+      },
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "GET",
+      "normalized_route": "/api/notifications/prefs",
+      "occurrences": [
+        {
+          "column": 35,
+          "disposition": "unresolved",
+          "line": 1436,
+          "method": "GET",
+          "normalized_route": "/api/notifications/prefs",
+          "occurrence_id": "web/settings/settings.js:1436:35:GET:/api/notifications/prefs",
+          "raw_route": "/api/notifications/prefs",
+          "source": "web/settings/settings.js",
+          "source_sha256": "7315fba56b7f88f38265b933ae6615bbfaf2e8f826540f6315d60aa85e0e4a82"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "read"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "base.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": "base.notification.preference.atomic.update",
+      "confirmation_policy": "user",
+      "example_input": {
+        "preferences": {
+          "item_status": true
+        }
+      },
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 49,
+          "method": "PATCH",
+          "normalized_route": "/api/notifications/prefs",
+          "sha256": "fd8d979e60ef98dcbbeb99009d1e25b0b3c728a57a7125e4ded40a42999b497e",
+          "source_path": "backend/routers/notifications.py",
+          "start_line": 46
+        },
+        "source_path": "backend/routers/notifications.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "item_status": {
+                "type": "boolean"
+              },
+              "new_follower": {
+                "type": "boolean"
+              },
+              "scope_approved": {
+                "type": "boolean"
+              },
+              "scope_rejected": {
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "preferences"
+        ],
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "PATCH",
+      "normalized_route": "/api/notifications/prefs",
+      "occurrences": [
+        {
+          "column": 37,
+          "disposition": "unresolved",
+          "line": 1447,
+          "method": "PATCH",
+          "normalized_route": "/api/notifications/prefs",
+          "occurrence_id": "web/settings/settings.js:1447:37:PATCH:/api/notifications/prefs",
+          "raw_route": "/api/notifications/prefs",
+          "source": "web/settings/settings.js",
+          "source_sha256": "7315fba56b7f88f38265b933ae6615bbfaf2e8f826540f6315d60aa85e0e4a82"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "base:write"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "base.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": "base.identity.directory.feishu.sync",
+      "confirmation_policy": "admin",
+      "example_input": {
+        "department_id": null
+      },
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 46,
+          "method": "POST",
+          "normalized_route": "/api/org/sync-from-feishu",
+          "sha256": "648a2317ef000b29a918d664170220bb5bacd3b76fa706e8594a17c8d4f8e049",
+          "source_path": "backend/routers/org.py",
+          "start_line": 31
+        },
+        "source_path": "backend/routers/org.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "department_id": {
+            "maxLength": 512,
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "POST",
+      "normalized_route": "/api/org/sync-from-feishu",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 331,
+          "method": "POST",
+          "normalized_route": "/api/org/sync-from-feishu",
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:331:36:POST:/api/org/sync-from-feishu",
+          "raw_route": "/api/org/sync-from-feishu",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "base:write"
+      ]
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_policy": "base.read",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": "base.team.directory.list",
+      "confirmation_policy": "none",
+      "example_input": {},
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 63,
+          "method": "GET",
+          "normalized_route": "/api/org/teams",
+          "sha256": "7a03ecabdc68676421c1f7833e53de45902cb63d9a08dc5c13f5033ddd4a55ed",
+          "source_path": "backend/routers/org.py",
+          "start_line": 49
+        },
+        "source_path": "backend/routers/org.py"
+      },
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "GET",
+      "normalized_route": "/api/org/teams",
+      "occurrences": [
+        {
+          "column": 19,
+          "disposition": "unresolved",
+          "line": 688,
+          "method": "GET",
+          "normalized_route": "/api/org/teams",
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:688:19:GET:/api/org/teams",
+          "raw_route": "/api/org/teams",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        },
+        {
+          "column": 19,
+          "disposition": "unresolved",
+          "line": 728,
+          "method": "GET",
+          "normalized_route": "/api/org/teams",
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:728:19:GET:/api/org/teams",
+          "raw_route": "/api/org/teams",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        },
+        {
+          "column": 17,
+          "disposition": "unresolved",
+          "line": 92,
+          "method": "GET",
+          "normalized_route": "/api/org/teams",
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:92:17:GET:/api/org/teams",
+          "raw_route": "/api/org/teams",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "read"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "base.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": null,
+      "confirmation_policy": "user",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "backend/routers/plugins.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "POST",
+      "normalized_route": "/api/plugin/install",
+      "occurrences": [
+        {
+          "column": 27,
+          "disposition": "unresolved",
+          "line": 287,
+          "method": "POST",
+          "normalized_route": "/api/plugin/install",
+          "occurrence_id": "web/core/web_compat.js:287:27:POST:/api/plugin/install",
+          "raw_route": "/api/plugin/install",
+          "source": "web/core/web_compat.js",
+          "source_sha256": "ec21b526867d051eb968d8e1b451c535dbbf819251463d42a9f5d82ea870b02c"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/routers/plugins.py",
+      "provider_source_sha256": "sha256:cf0ab10ba195dc67cc42718478fc00a7e133a1fee6fb991eedbf295f19a86395",
+      "reclassification_reason": "The arbitrary-URL installer route has no production handler and is not equivalent to signed marketplace installation.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "base:write"
+      ]
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_policy": "base.read",
+      "baseline_disposition": "new_atomic_capability_required",
+      "capability_id": "base.plugin.installed.list",
+      "confirmation_policy": "none",
+      "example_input": {},
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 27,
+          "method": "GET",
+          "normalized_route": "/api/plugin/list",
+          "sha256": "df76ec9ca36ff1527698820751f7bbd8173c071412ded14f3a5d4a73d4ab2ba5",
+          "source_path": "backend/routers/plugins.py",
+          "start_line": 13
+        },
+        "source_path": "backend/routers/plugins.py"
+      },
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "GET",
+      "normalized_route": "/api/plugin/list",
+      "occurrences": [
+        {
+          "column": 26,
+          "disposition": "unresolved",
+          "line": 281,
+          "method": "GET",
+          "normalized_route": "/api/plugin/list",
+          "occurrence_id": "web/core/web_compat.js:281:26:GET:/api/plugin/list",
+          "raw_route": "/api/plugin/list",
+          "source": "web/core/web_compat.js",
+          "source_sha256": "ec21b526867d051eb968d8e1b451c535dbbf819251463d42a9f5d82ea870b02c"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "read"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "base.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": null,
+      "confirmation_policy": "user",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "backend/routers/plugins.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "DELETE",
+      "normalized_route": "/api/plugin/uninstall/{dynamic}",
+      "occurrences": [
+        {
+          "column": 29,
+          "disposition": "unresolved",
+          "line": 294,
+          "method": "DELETE",
+          "normalized_route": "/api/plugin/uninstall/{dynamic}",
+          "occurrence_id": "web/core/web_compat.js:294:29:DELETE:/api/plugin/uninstall/{dynamic}",
+          "raw_route": "/api/plugin/uninstall/${pluginId}",
+          "source": "web/core/web_compat.js",
+          "source_sha256": "ec21b526867d051eb968d8e1b451c535dbbf819251463d42a9f5d82ea870b02c"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/routers/plugins.py",
+      "provider_source_sha256": "sha256:cf0ab10ba195dc67cc42718478fc00a7e133a1fee6fb991eedbf295f19a86395",
+      "reclassification_reason": "The unrestricted legacy uninstall route has no production handler and cannot bypass marketplace lifecycle controls.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "base:write"
+      ]
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_policy": "base.read",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": "base.annotation.batch.get",
+      "confirmation_policy": "none",
+      "example_input": {
+        "item_gids": [
+          "item_1"
+        ]
+      },
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 66,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/batch",
+          "sha256": "136235af957523ef98af52be4b91b37d107d080a527283f2ce70babc969eb1cd",
+          "source_path": "backend/routers/self_annotations.py",
+          "start_line": 46
+        },
+        "source_path": "backend/routers/self_annotations.py"
+      },
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "item_gids": {
+            "items": {
+              "maxLength": 512,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 500,
+            "type": "array"
+          }
+        },
+        "required": [
+          "item_gids"
+        ],
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "GET",
+      "normalized_route": "/api/self_ann/batch",
+      "occurrences": [
+        {
+          "column": 35,
+          "disposition": "unresolved",
+          "line": 125,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/batch",
+          "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:125:35:GET:/api/self_ann/batch",
+          "raw_route": "/api/self_ann/batch?gids=${chunk.join(',')}",
+          "source": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
+          "source_sha256": "d425d6294546dfb7134b4f41c1fc200af8ddde31b87a8cfb2ed9ef3b2ff1b851"
+        },
+        {
+          "column": 35,
+          "disposition": "unresolved",
+          "line": 394,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/batch",
+          "occurrence_id": "packages/craft-plugin/web/ebom/ebom.js:394:35:GET:/api/self_ann/batch",
+          "raw_route": "/api/self_ann/batch?gids=${chunk.join(',')}",
+          "source": "packages/craft-plugin/web/ebom/ebom.js",
+          "source_sha256": "ed22202d2c34d2a0b320a2bbed1f804a1db2e8b72ac8d4d67a984142cce65321"
+        },
+        {
+          "column": 35,
+          "disposition": "unresolved",
+          "line": 262,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/batch",
+          "occurrence_id": "packages/craft-plugin/web/issue/issue.js:262:35:GET:/api/self_ann/batch",
+          "raw_route": "/api/self_ann/batch?gids=${chunk.join(',')}",
+          "source": "packages/craft-plugin/web/issue/issue.js",
+          "source_sha256": "89c320fb34eb0b058b72b794c2101812d9f8e3bb84d51fb4eb16330fa4cb65e7"
+        },
+        {
+          "column": 35,
+          "disposition": "unresolved",
+          "line": 164,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/batch",
+          "occurrence_id": "packages/craft-plugin/web/task/task.js:164:35:GET:/api/self_ann/batch",
+          "raw_route": "/api/self_ann/batch?gids=${chunk.join(',')}",
+          "source": "packages/craft-plugin/web/task/task.js",
+          "source_sha256": "b8ff99fe7b3e81670be8e0b3100b3f9d685eaa6409475eeba3dd3a7d7eec75f8"
+        },
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 614,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/batch",
+          "occurrence_id": "web/knowledge_hub/knowledge_hub.js:614:36:GET:/api/self_ann/batch",
+          "raw_route": "/api/self_ann/batch?gids=${chunk.join(',')}",
+          "source": "web/knowledge_hub/knowledge_hub.js",
+          "source_sha256": "1f247f6133368b61baa10648243b7fc6659b33b8c342459a9d138afde102d465"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "read"
+      ]
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_policy": "base.read",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": "base.annotation.list",
+      "confirmation_policy": "none",
+      "example_input": {
+        "module": "task"
+      },
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 79,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/list",
+          "sha256": "0e4d958c84b56f440a5e6f398f6ee5d4a5707dbd457ef06cc3ed967795e304cc",
+          "source_path": "backend/routers/self_annotations.py",
+          "start_line": 69
+        },
+        "source_path": "backend/routers/self_annotations.py"
+      },
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "module": {
+            "maxLength": 128,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "GET",
+      "normalized_route": "/api/self_ann/list",
+      "occurrences": [
+        {
+          "column": 27,
+          "disposition": "unresolved",
+          "line": 292,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/list",
+          "occurrence_id": "web/components/self_annotation_panel.js:292:27:GET:/api/self_ann/list",
+          "raw_route": "/api/self_ann/list?module=${encodeURIComponent(_module)}",
+          "source": "web/components/self_annotation_panel.js",
+          "source_sha256": "55c294a99365af52084ce49b89432bf3dee012cfdbad32ec9993b1467b871301"
+        },
+        {
+          "column": 27,
+          "disposition": "unresolved",
+          "line": 293,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/list",
+          "occurrence_id": "web/components/self_annotation_panel.js:293:27:GET:/api/self_ann/list",
+          "raw_route": "/api/self_ann/list",
+          "source": "web/components/self_annotation_panel.js",
+          "source_sha256": "55c294a99365af52084ce49b89432bf3dee012cfdbad32ec9993b1467b871301"
+        },
+        {
+          "column": 42,
+          "disposition": "unresolved",
+          "line": 499,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/list",
+          "occurrence_id": "web/knowledge_hub/knowledge_hub.js:499:42:GET:/api/self_ann/list",
+          "raw_route": "/api/self_ann/list?module=knowledge_hub",
+          "source": "web/knowledge_hub/knowledge_hub.js",
+          "source_sha256": "1f247f6133368b61baa10648243b7fc6659b33b8c342459a9d138afde102d465"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "read"
+      ]
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_policy": "base.read",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": "base.annotation.get",
+      "confirmation_policy": "none",
+      "example_input": {
+        "item_gid": "item_1"
+      },
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 88,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/{dynamic}",
+          "sha256": "8a4e814824a54cd479284be861c6f2d8fc5ca10bfeeefb871e141066a9cd12b0",
+          "source_path": "backend/routers/self_annotations.py",
+          "start_line": 82
+        },
+        "source_path": "backend/routers/self_annotations.py"
+      },
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "item_gid": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_gid"
+        ],
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "GET",
+      "normalized_route": "/api/self_ann/{dynamic}",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 146,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/{dynamic}",
+          "occurrence_id": "web/components/self_annotation_panel.js:146:36:GET:/api/self_ann/{dynamic}",
+          "raw_route": "/api/self_ann/${gid}",
+          "source": "web/components/self_annotation_panel.js",
+          "source_sha256": "55c294a99365af52084ce49b89432bf3dee012cfdbad32ec9993b1467b871301"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "read"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "base.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": "base.annotation.upsert",
+      "confirmation_policy": "user",
+      "example_input": {
+        "annotation": {
+          "item_title": "T",
+          "module": "task",
+          "self_attachments_json": "[]",
+          "self_note": "",
+          "self_schedule": "",
+          "self_status": "todo"
+        },
+        "item_gid": "item_1"
+      },
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 106,
+          "method": "PUT",
+          "normalized_route": "/api/self_ann/{dynamic}",
+          "sha256": "ae71702549cca7ff913a55626fa81dfab7127d760891b646b37ccd73e9b3ae91",
+          "source_path": "backend/routers/self_annotations.py",
+          "start_line": 91
+        },
+        "source_path": "backend/routers/self_annotations.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "annotation": {
+            "additionalProperties": false,
+            "properties": {
+              "item_title": {
+                "maxLength": 512,
+                "type": "string"
+              },
+              "module": {
+                "maxLength": 128,
+                "type": "string"
+              },
+              "self_attachments_json": {
+                "maxLength": 1000000,
+                "type": "string"
+              },
+              "self_note": {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              "self_schedule": {
+                "maxLength": 128,
+                "type": "string"
+              },
+              "self_status": {
+                "maxLength": 64,
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "item_gid": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_gid",
+          "annotation"
+        ],
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "PUT",
+      "normalized_route": "/api/self_ann/{dynamic}",
+      "occurrences": [
+        {
+          "column": 35,
+          "disposition": "unresolved",
+          "line": 175,
+          "method": "PUT",
+          "normalized_route": "/api/self_ann/{dynamic}",
+          "occurrence_id": "web/components/self_annotation_panel.js:175:35:PUT:/api/self_ann/{dynamic}",
+          "raw_route": "/api/self_ann/${_currentGid}",
+          "source": "web/components/self_annotation_panel.js",
+          "source_sha256": "55c294a99365af52084ce49b89432bf3dee012cfdbad32ec9993b1467b871301"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "base:write"
+      ]
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_policy": "base.read",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": "base.team.list",
+      "confirmation_policy": "none",
+      "example_input": {},
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "backend/routers/teams.py"
+      },
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "GET",
+      "normalized_route": "/api/teams",
+      "occurrences": [
+        {
+          "column": 39,
+          "disposition": "unresolved",
+          "line": 76,
+          "method": "GET",
+          "normalized_route": "/api/teams",
+          "occurrence_id": "web/components/visibility_selector.js:76:39:GET:/api/teams",
+          "raw_route": "/api/teams",
+          "source": "web/components/visibility_selector.js",
+          "source_sha256": "5d7d05f49f03ece4b75139ebfcf857deda38f3e52cdb453d47ca018f8313b98e"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "read"
+      ]
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_policy": "base.read",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": "base.identity.user.list",
+      "confirmation_policy": "none",
+      "example_input": {},
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 26,
+          "method": "GET",
+          "normalized_route": "/api/users",
+          "sha256": "87d07b2906530fd8ba12d2c999da027ce0b70bf58dc3a3eca7b9773b6a5267b6",
+          "source_path": "backend/routers/users.py",
+          "start_line": 23
+        },
+        "source_path": "backend/routers/users.py"
+      },
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "GET",
+      "normalized_route": "/api/users",
+      "occurrences": [
+        {
+          "column": 38,
+          "disposition": "unresolved",
+          "line": 396,
+          "method": "GET",
+          "normalized_route": "/api/users",
+          "occurrence_id": "packages/craft-plugin/web/task/task.js:396:38:GET:/api/users",
+          "raw_route": "/api/users",
+          "source": "packages/craft-plugin/web/task/task.js",
+          "source_sha256": "b8ff99fe7b3e81670be8e0b3100b3f9d685eaa6409475eeba3dd3a7d7eec75f8"
+        },
+        {
+          "column": 44,
+          "disposition": "unresolved",
+          "line": 342,
+          "method": "GET",
+          "normalized_route": "/api/users",
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:342:44:GET:/api/users",
+          "raw_route": "/api/users/",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        },
+        {
+          "column": 40,
+          "disposition": "unresolved",
+          "line": 376,
+          "method": "GET",
+          "normalized_route": "/api/users",
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:376:40:GET:/api/users",
+          "raw_route": "/api/users/",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        },
+        {
+          "column": 19,
+          "disposition": "unresolved",
+          "line": 689,
+          "method": "GET",
+          "normalized_route": "/api/users",
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:689:19:GET:/api/users",
+          "raw_route": "/api/users/",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        },
+        {
+          "column": 19,
+          "disposition": "unresolved",
+          "line": 729,
+          "method": "GET",
+          "normalized_route": "/api/users",
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:729:19:GET:/api/users",
+          "raw_route": "/api/users/",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        },
+        {
+          "column": 75,
+          "disposition": "unresolved",
+          "line": 93,
+          "method": "GET",
+          "normalized_route": "/api/users",
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:93:75:GET:/api/users",
+          "raw_route": "/api/users/",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "read"
+      ]
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_policy": "base.read",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": "base.identity.session.get.atomic",
+      "confirmation_policy": "none",
+      "example_input": {},
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 31,
+          "method": "GET",
+          "normalized_route": "/api/users/me",
+          "sha256": "4023696d0886e4aacff7d1175b4dbb8b060dbcf87cbca7bcb8eaa0b61f1a0d80",
+          "source_path": "backend/routers/users.py",
+          "start_line": 29
+        },
+        "source_path": "backend/routers/users.py"
+      },
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "GET",
+      "normalized_route": "/api/users/me",
+      "occurrences": [
+        {
+          "column": 34,
+          "disposition": "unresolved",
+          "line": 511,
+          "method": "GET",
+          "normalized_route": "/api/users/me",
+          "occurrence_id": "packages/craft-plugin/web/lineage_view/lineage.js:511:34:GET:/api/users/me",
+          "raw_route": "/api/users/me",
+          "source": "packages/craft-plugin/web/lineage_view/lineage.js",
+          "source_sha256": "4eded0f1dca13981e7bff65526389f43f71b47cae211dbc00469e6c3f3466d65"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "read"
+      ]
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_policy": "base.read",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": "base.identity.user.search",
+      "confirmation_policy": "none",
+      "example_input": {
+        "limit": 10,
+        "query": ""
+      },
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 46,
+          "method": "GET",
+          "normalized_route": "/api/users/search",
+          "sha256": "29ba580aedc61327adfcd1df6f92ea2d8ae73b1bb941941a970269c916d2c7ee",
+          "source_path": "backend/routers/users.py",
+          "start_line": 34
+        },
+        "source_path": "backend/routers/users.py"
+      },
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "maxLength": 200,
+            "type": "string"
+          }
+        },
+        "required": [
+          "query",
+          "limit"
+        ],
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "GET",
+      "normalized_route": "/api/users/search",
+      "occurrences": [
+        {
+          "column": 37,
+          "disposition": "unresolved",
+          "line": 1010,
+          "method": "GET",
+          "normalized_route": "/api/users/search",
+          "occurrence_id": "web/components/list_sidebar.js:1010:37:GET:/api/users/search",
+          "raw_route": "/api/users/search?q=&limit=20",
+          "source": "web/components/list_sidebar.js",
+          "source_sha256": "21407987333e16b153d0cbf88d0872dc01c6b11b76cd9d26247d6eb63c06f49e"
+        },
+        {
+          "column": 41,
+          "disposition": "unresolved",
+          "line": 998,
+          "method": "GET",
+          "normalized_route": "/api/users/search",
+          "occurrence_id": "web/components/list_sidebar.js:998:41:GET:/api/users/search",
+          "raw_route": "/api/users/search?q=${encodeURIComponent(q)}&limit=10",
+          "source": "web/components/list_sidebar.js",
+          "source_sha256": "21407987333e16b153d0cbf88d0872dc01c6b11b76cd9d26247d6eb63c06f49e"
+        },
+        {
+          "column": 43,
+          "disposition": "unresolved",
+          "line": 247,
+          "method": "GET",
+          "normalized_route": "/api/users/search",
+          "occurrence_id": "web/components/scope_badge.js:247:43:GET:/api/users/search",
+          "raw_route": "/api/users/search?q=${encodeURIComponent(q)}&limit=8",
+          "source": "web/components/scope_badge.js",
+          "source_sha256": "a3b470164443fd82287a2ccf09a4485ff1fece92ac046bf7b44d506bdcb627f8"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "read"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "base.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": "base.identity.user.role.assign",
+      "confirmation_policy": "admin",
+      "example_input": {
+        "external_subtype": null,
+        "new_role": "member",
+        "user_gid": "usr_2"
+      },
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 64,
+          "method": "PATCH",
+          "normalized_route": "/api/users/{dynamic}/role",
+          "sha256": "c2f069674b23cc04bef865b641c7e9a793b993086af1aa61180d5fc2c2207bfa",
+          "source_path": "backend/routers/users.py",
+          "start_line": 49
+        },
+        "source_path": "backend/routers/users.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "external_subtype": {
+            "maxLength": 512,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "new_role": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "user_gid": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_gid",
+          "new_role"
+        ],
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "PATCH",
+      "normalized_route": "/api/users/{dynamic}/role",
+      "occurrences": [
+        {
+          "column": 35,
+          "disposition": "unresolved",
+          "line": 491,
+          "method": "PATCH",
+          "normalized_route": "/api/users/{dynamic}/role",
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:491:35:PATCH:/api/users/{dynamic}/role",
+          "raw_route": "/api/users/${_editingUserId}/role",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        },
+        {
+          "column": 35,
+          "disposition": "unresolved",
+          "line": 1637,
+          "method": "PATCH",
+          "normalized_route": "/api/users/{dynamic}/role",
+          "occurrence_id": "web/settings/settings.js:1637:35:PATCH:/api/users/{dynamic}/role",
+          "raw_route": "/api/users/${userGid}/role",
+          "source": "web/settings/settings.js",
+          "source_sha256": "7315fba56b7f88f38265b933ae6615bbfaf2e8f826540f6315d60aa85e0e4a82"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "base:write"
+      ]
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_policy": "base.read",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": "base.saved_view.list",
+      "confirmation_policy": "none",
+      "example_input": {
+        "list_gid": null,
+        "module": "task"
+      },
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 96,
+          "method": "GET",
+          "normalized_route": "/api/views",
+          "sha256": "a7821ff682ccd637f93459679eed4427b5d387dd4885013046e19c22b17221f4",
+          "source_path": "backend/routers/views.py",
+          "start_line": 54
+        },
+        "source_path": "backend/routers/views.py"
+      },
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "list_gid": {
+            "maxLength": 512,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "module": {
+            "maxLength": 128,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "GET",
+      "normalized_route": "/api/views",
+      "occurrences": [
+        {
+          "column": 26,
+          "disposition": "unresolved",
+          "line": 1068,
+          "method": "GET",
+          "normalized_route": "/api/views",
+          "occurrence_id": "web/admin/task_planning.html:1068:26:GET:/api/views",
+          "raw_route": "/api/views?module=task&list_gid=${listGid}",
+          "source": "web/admin/task_planning.html",
+          "source_sha256": "9458faf6cb26c55b84344d405084358da501c59cae64b8725f18b559fd6b29e7"
+        },
+        {
+          "column": 40,
+          "disposition": "unresolved",
+          "line": 541,
+          "method": "GET",
+          "normalized_route": "/api/views",
+          "occurrence_id": "web/components/view_manager.js:541:40:GET:/api/views",
+          "raw_route": "/api/views?module=${this.moduleId}${listQuery}",
+          "source": "web/components/view_manager.js",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "read"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "base.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": "base.saved_view.create",
+      "confirmation_policy": "user",
+      "example_input": {
+        "config_json": "{}",
+        "is_shared": false,
+        "list_gid": null,
+        "module": "task",
+        "name": "View"
+      },
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 113,
+          "method": "POST",
+          "normalized_route": "/api/views",
+          "sha256": "63172679667ad2f9dfc3a9b406d4e2ac97e734f56abad8becc938d909d81cc73",
+          "source_path": "backend/routers/views.py",
+          "start_line": 99
+        },
+        "source_path": "backend/routers/views.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "config_json": {
+            "maxLength": 1000000,
+            "type": "string"
+          },
+          "is_shared": {
+            "type": "boolean"
+          },
+          "list_gid": {
+            "maxLength": 512,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "module": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 512,
+            "type": "string"
+          }
+        },
+        "required": [
+          "module",
+          "config_json"
+        ],
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "POST",
+      "normalized_route": "/api/views",
+      "occurrences": [
+        {
+          "column": 42,
+          "disposition": "unresolved",
+          "line": 657,
+          "method": "POST",
+          "normalized_route": "/api/views",
+          "occurrence_id": "web/components/view_manager.js:657:42:POST:/api/views",
+          "raw_route": "/api/views",
+          "source": "web/components/view_manager.js",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
+        },
+        {
+          "column": 40,
+          "disposition": "unresolved",
+          "line": 713,
+          "method": "POST",
+          "normalized_route": "/api/views",
+          "occurrence_id": "web/components/view_manager.js:713:40:POST:/api/views",
+          "raw_route": "/api/views",
+          "source": "web/components/view_manager.js",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "base:write"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "base.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": "base.saved_view.delete",
+      "confirmation_policy": "user",
+      "example_input": {
+        "gid": "view_1"
+      },
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 159,
+          "method": "DELETE",
+          "normalized_route": "/api/views/{dynamic}",
+          "sha256": "a9cac5f8e3dc93dc7201a5f25f8f7a97564ed5948c61e97a2bb9fe594c4cc2e3",
+          "source_path": "backend/routers/views.py",
+          "start_line": 147
+        },
+        "source_path": "backend/routers/views.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "gid"
+        ],
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "DELETE",
+      "normalized_route": "/api/views/{dynamic}",
+      "occurrences": [
+        {
+          "column": 28,
+          "disposition": "unresolved",
+          "line": 1002,
+          "method": "DELETE",
+          "normalized_route": "/api/views/{dynamic}",
+          "occurrence_id": "web/components/view_manager.js:1002:28:DELETE:/api/views/{dynamic}",
+          "raw_route": "/api/views/${gid}",
+          "source": "web/components/view_manager.js",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "base:write"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "base.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": "base.saved_view.update",
+      "confirmation_policy": "user",
+      "example_input": {
+        "changes": {
+          "name": "View 2"
+        },
+        "gid": "view_1"
+      },
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 144,
+          "method": "PATCH",
+          "normalized_route": "/api/views/{dynamic}",
+          "sha256": "68654ac19755eee9b4425ca6cb8fdf3aa7f42629b9be96f2b9a20184764bc159",
+          "source_path": "backend/routers/views.py",
+          "start_line": 116
+        },
+        "source_path": "backend/routers/views.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "changes": {
+            "additionalProperties": false,
+            "properties": {
+              "config_json": {
+                "maxLength": 1000000,
+                "type": "string"
+              },
+              "is_shared": {
+                "type": "boolean"
+              },
+              "list_gid": {
+                "maxLength": 512,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "name": {
+                "maxLength": 512,
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "gid": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "gid",
+          "changes"
+        ],
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "PATCH",
+      "normalized_route": "/api/views/{dynamic}",
+      "occurrences": [
+        {
+          "column": 28,
+          "disposition": "unresolved",
+          "line": 1011,
+          "method": "PATCH",
+          "normalized_route": "/api/views/{dynamic}",
+          "occurrence_id": "web/components/view_manager.js:1011:28:PATCH:/api/views/{dynamic}",
+          "raw_route": "/api/views/${gid}",
+          "source": "web/components/view_manager.js",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
+        },
+        {
+          "column": 30,
+          "disposition": "unresolved",
+          "line": 651,
+          "method": "PATCH",
+          "normalized_route": "/api/views/{dynamic}",
+          "occurrence_id": "web/components/view_manager.js:651:30:PATCH:/api/views/{dynamic}",
+          "raw_route": "/api/views/${this._activeViewGid}",
+          "source": "web/components/view_manager.js",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "base:write"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "base.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": "base.saved_view.copy",
+      "confirmation_policy": "user",
+      "example_input": {
+        "gid": "view_1"
+      },
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 180,
+          "method": "POST",
+          "normalized_route": "/api/views/{dynamic}/copy",
+          "sha256": "e3661050f4d7b1902bdad78bb6ee4f4a96054cf7d2e606b6f7331dcb81804fd9",
+          "source_path": "backend/routers/views.py",
+          "start_line": 162
+        },
+        "source_path": "backend/routers/views.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "gid"
+        ],
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "POST",
+      "normalized_route": "/api/views/{dynamic}/copy",
+      "occurrences": [
+        {
+          "column": 42,
+          "disposition": "unresolved",
+          "line": 978,
+          "method": "POST",
+          "normalized_route": "/api/views/{dynamic}/copy",
+          "occurrence_id": "web/components/view_manager.js:978:42:POST:/api/views/{dynamic}/copy",
+          "raw_route": "/api/views/${gid}/copy",
+          "source": "web/components/view_manager.js",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "base",
+      "owner_prefix": "base",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:810e13bb1178dcf445d8be1132d17d843f5338769439be3998a94401829c88da",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "base:write"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "craft.write",
+      "baseline_disposition": "new_atomic_capability_required",
+      "capability_id": null,
+      "confirmation_policy": "user",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/craft/craft_backend/routers/craft_library.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "DELETE",
+      "normalized_route": "/api/craft_lib/equipments/{dynamic}",
+      "occurrences": [
+        {
+          "column": 58,
+          "disposition": "unresolved",
+          "line": 771,
+          "method": "DELETE",
+          "normalized_route": "/api/craft_lib/equipments/{dynamic}",
+          "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:771:58:DELETE:/api/craft_lib/equipments/{dynamic}",
+          "raw_route": "/api/craft_lib/equipments/${gid}",
+          "source": "web/knowledge_hub/pages/gbop_vpps.html",
+          "source_sha256": "db5265ec700318095f663c2571b1e5c734b37d8a51b200bf33aeea3b7c20e2f8"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "craft",
+      "owner_prefix": "craft",
+      "provider_anchor": "plugins/craft/craft_backend/routers/craft_library.py",
+      "provider_source_sha256": "sha256:30c275048c808550f27bbdcf2da96871936a4b6a53f7eda3aefa0ee3d522eed3",
+      "reclassification_reason": "No delete provider exists; the available obsolete transition is a different lifecycle outcome.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "craft:write"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "craft.write",
+      "baseline_disposition": "new_atomic_capability_required",
+      "capability_id": null,
+      "confirmation_policy": "user",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/craft/craft_backend/routers/craft_library.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "DELETE",
+      "normalized_route": "/api/craft_lib/fixtures/{dynamic}",
+      "occurrences": [
+        {
+          "column": 58,
+          "disposition": "unresolved",
+          "line": 714,
+          "method": "DELETE",
+          "normalized_route": "/api/craft_lib/fixtures/{dynamic}",
+          "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:714:58:DELETE:/api/craft_lib/fixtures/{dynamic}",
+          "raw_route": "/api/craft_lib/fixtures/${gid}",
+          "source": "web/knowledge_hub/pages/gbop_vpps.html",
+          "source_sha256": "db5265ec700318095f663c2571b1e5c734b37d8a51b200bf33aeea3b7c20e2f8"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "craft",
+      "owner_prefix": "craft",
+      "provider_anchor": "plugins/craft/craft_backend/routers/craft_library.py",
+      "provider_source_sha256": "sha256:30c275048c808550f27bbdcf2da96871936a4b6a53f7eda3aefa0ee3d522eed3",
+      "reclassification_reason": "No delete provider exists; the available obsolete transition is a different lifecycle outcome.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "craft:write"
+      ]
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_policy": "craft.read",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": null,
+      "confirmation_policy": "none",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/craft/craft_backend/routers/rule_engine.py"
+      },
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "GET",
+      "normalized_route": "/api/rule-engine/check-entry",
+      "occurrences": [
+        {
+          "column": 40,
+          "disposition": "unresolved",
+          "line": 2192,
+          "method": "GET",
+          "normalized_route": "/api/rule-engine/check-entry",
+          "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:2192:40:GET:/api/rule-engine/check-entry",
+          "raw_route": "/api/rule-engine/check-entry?entry_gid=${encodeURIComponent(gid)}",
+          "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+          "source_sha256": "36bb20338757c77fcfe80f4d0f84449f2928df7183989efeb2798adbc9abc00a"
+        },
+        {
+          "column": 40,
+          "disposition": "unresolved",
+          "line": 3524,
+          "method": "GET",
+          "normalized_route": "/api/rule-engine/check-entry",
+          "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:3524:40:GET:/api/rule-engine/check-entry",
+          "raw_route": "/api/rule-engine/check-entry?entry_gid=${encodeURIComponent(gid)}",
+          "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+          "source_sha256": "36bb20338757c77fcfe80f4d0f84449f2928df7183989efeb2798adbc9abc00a"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "craft",
+      "owner_prefix": "craft",
+      "provider_anchor": "plugins/craft/craft_backend/routers/rule_engine.py",
+      "provider_source_sha256": "sha256:ac258d5ffc6531a5da259750f8b637fea6e467c0a50d4f64a379069aa660f86a",
+      "reclassification_reason": "No entry-check provider exists; CEL evaluation and BOP audit are different outcomes.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "read"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "craft.rule.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": "craft.rule.definition.update",
+      "confirmation_policy": "user",
+      "example_input": {
+        "changes_json": "{\"name\":\"Rule\"}",
+        "gid": "rule_1"
+      },
+      "example_output": {
+        "result_json": "{}"
+      },
+      "final_disposition": "migrated",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/craft/craft_backend/routers/rules.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "changes_json": {
+            "maxLength": 1000000,
+            "type": "string"
+          },
+          "gid": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "gid",
+          "changes_json"
+        ],
+        "type": "object"
+      },
+      "major_version": 1,
+      "method": "PUT",
+      "normalized_route": "/api/rules/{dynamic}",
+      "occurrences": [
+        {
+          "column": 53,
+          "disposition": "unresolved",
+          "line": 137,
+          "method": "PUT",
+          "normalized_route": "/api/rules/{dynamic}",
+          "occurrence_id": "web/container_card/modes/container_item_detail.js:137:53:PUT:/api/rules/{dynamic}",
+          "raw_route": "/api/rules/${gid}",
+          "source": "web/container_card/modes/container_item_detail.js",
+          "source_sha256": "80d6527fda0872ecb118a8a06cb11066956feed460b190f257e6b6a3016d530a"
+        },
+        {
+          "column": 50,
+          "disposition": "unresolved",
+          "line": 47,
+          "method": "PUT",
+          "normalized_route": "/api/rules/{dynamic}",
+          "occurrence_id": "web/container_card/modes/mode_field_detail.js:47:50:PUT:/api/rules/{dynamic}",
+          "raw_route": "/api/rules/${gid}",
+          "source": "web/container_card/modes/mode_field_detail.js",
+          "source_sha256": "1751d2f01f071191219fd19cdb59b477f96abd93725905398d9d8a6ddfcc3c99"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "result_json": {
+            "maxLength": 4000000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_json"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "craft",
+      "owner_prefix": "craft",
+      "provider_anchor": "plugins/craft/craft_backend/capabilities/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:6b9feaac14abf395b5c165d9745b3597125623784aa98c2fda371b656d4e37a1",
+      "reclassification_reason": null,
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "craft:write"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "craft.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": null,
+      "confirmation_policy": "user",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/craft/craft_backend/routers/rules.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "POST",
+      "normalized_route": "/api/rules/{dynamic}/activate",
+      "occurrences": [
+        {
+          "column": 26,
+          "disposition": "unresolved",
+          "line": 173,
+          "method": "POST",
+          "normalized_route": "/api/rules/{dynamic}/activate",
+          "occurrence_id": "web/rule_mgmt/rule_mgmt.js:173:26:POST:/api/rules/{dynamic}/activate",
+          "raw_route": "/api/rules/${gid}/activate",
+          "source": "web/rule_mgmt/rule_mgmt.js",
+          "source_sha256": "bd55a892edbaa2a50722415783b68419a52452d6a72f305048935275106a2994"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "craft",
+      "owner_prefix": "craft",
+      "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
+      "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
+      "reclassification_reason": "No mutable-rule activation provider exists; immutable release activation is a different lifecycle.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "craft:write"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "craft.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": null,
+      "confirmation_policy": "user",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/craft/craft_backend/routers/rules.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "POST",
+      "normalized_route": "/api/rules/{dynamic}/deviations",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 214,
+          "method": "POST",
+          "normalized_route": "/api/rules/{dynamic}/deviations",
+          "occurrence_id": "web/rule_mgmt/rule_mgmt.js:214:36:POST:/api/rules/{dynamic}/deviations",
+          "raw_route": "/api/rules/${_devRuleGid}/deviations",
+          "source": "web/rule_mgmt/rule_mgmt.js",
+          "source_sha256": "83b06c82671c9c398d44e7b0692ab24dbc0ef33b707278e86973978c84693cb3"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "craft",
+      "owner_prefix": "craft",
+      "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
+      "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
+      "reclassification_reason": "No legacy deviation provider exists; governed release waiver creation has a different evidence contract.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "craft:write"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "craft.write",
+      "baseline_disposition": "new_atomic_capability_required",
+      "capability_id": null,
+      "confirmation_policy": "user",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/craft/craft_backend/routers/rules.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "POST",
+      "normalized_route": "/api/rules/{dynamic}/suspend",
+      "occurrences": [
+        {
+          "column": 26,
+          "disposition": "unresolved",
+          "line": 175,
+          "method": "POST",
+          "normalized_route": "/api/rules/{dynamic}/suspend",
+          "occurrence_id": "web/rule_mgmt/rule_mgmt.js:175:26:POST:/api/rules/{dynamic}/suspend",
+          "raw_route": "/api/rules/${gid}/suspend",
+          "source": "web/rule_mgmt/rule_mgmt.js",
+          "source_sha256": "bd55a892edbaa2a50722415783b68419a52452d6a72f305048935275106a2994"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "craft",
+      "owner_prefix": "craft",
+      "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
+      "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
+      "reclassification_reason": "No mutable-rule suspension handler or domain service exists.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "craft:write"
+      ]
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_policy": "integration.read",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": null,
+      "confirmation_policy": "none",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "GET",
+      "normalized_route": "/api/ext-datasources",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 148,
+          "method": "GET",
+          "normalized_route": "/api/ext-datasources",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:148:36:GET:/api/ext-datasources",
+          "raw_route": "/api/ext-datasources",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "integration",
+      "owner_prefix": "integration",
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "read"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "integration.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": null,
+      "confirmation_policy": "user",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "POST",
+      "normalized_route": "/api/ext-datasources",
+      "occurrences": [
+        {
+          "column": 28,
+          "disposition": "unresolved",
+          "line": 625,
+          "method": "POST",
+          "normalized_route": "/api/ext-datasources",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:625:28:POST:/api/ext-datasources",
+          "raw_route": "/api/ext-datasources",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "integration",
+      "owner_prefix": "integration",
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "integration:write"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "integration.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": null,
+      "confirmation_policy": "user",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "PATCH",
+      "normalized_route": "/api/ext-datasources/{dynamic}",
+      "occurrences": [
+        {
+          "column": 29,
+          "disposition": "unresolved",
+          "line": 623,
+          "method": "PATCH",
+          "normalized_route": "/api/ext-datasources/{dynamic}",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:623:29:PATCH:/api/ext-datasources/{dynamic}",
+          "raw_route": "/api/ext-datasources/${ds.gid}",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "integration",
+      "owner_prefix": "integration",
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "integration:write"
+      ]
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_policy": "integration.read",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": null,
+      "confirmation_policy": "none",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "GET",
+      "normalized_route": "/api/ext-datasources/{dynamic}/tables",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 640,
+          "method": "GET",
+          "normalized_route": "/api/ext-datasources/{dynamic}/tables",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:640:36:GET:/api/ext-datasources/{dynamic}/tables",
+          "raw_route": "/api/ext-datasources/${_selectedDs.gid}/tables",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "integration",
+      "owner_prefix": "integration",
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "read"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "integration.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": null,
+      "confirmation_policy": "user",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "POST",
+      "normalized_route": "/api/ext-datasources/{dynamic}/test",
+      "occurrences": [
+        {
+          "column": 34,
+          "disposition": "unresolved",
+          "line": 605,
+          "method": "POST",
+          "normalized_route": "/api/ext-datasources/{dynamic}/test",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:605:34:POST:/api/ext-datasources/{dynamic}/test",
+          "raw_route": "/api/ext-datasources/${ds.gid}/test",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "integration",
+      "owner_prefix": "integration",
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "integration:write"
+      ]
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_policy": "integration.read",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": null,
+      "confirmation_policy": "none",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "GET",
+      "normalized_route": "/api/ext-field-mappings",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 349,
+          "method": "GET",
+          "normalized_route": "/api/ext-field-mappings",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:349:36:GET:/api/ext-field-mappings",
+          "raw_route": "/api/ext-field-mappings?mapping_gid=${_selectedMap.gid}",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "integration",
+      "owner_prefix": "integration",
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "read"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "integration.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": null,
+      "confirmation_policy": "user",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "PUT",
+      "normalized_route": "/api/ext-field-mappings/batch",
+      "occurrences": [
+        {
+          "column": 23,
+          "disposition": "unresolved",
+          "line": 457,
+          "method": "PUT",
+          "normalized_route": "/api/ext-field-mappings/batch",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:457:23:PUT:/api/ext-field-mappings/batch",
+          "raw_route": "/api/ext-field-mappings/batch?mapping_gid=${_selectedMap.gid}",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "integration",
+      "owner_prefix": "integration",
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "integration:write"
+      ]
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_policy": "integration.read",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": null,
+      "confirmation_policy": "none",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "GET",
+      "normalized_route": "/api/ext-mappings",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 187,
+          "method": "GET",
+          "normalized_route": "/api/ext-mappings",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:187:36:GET:/api/ext-mappings",
+          "raw_route": "/api/ext-mappings?datasource_gid=${_selectedDs.gid}",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "integration",
+      "owner_prefix": "integration",
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "read"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "integration.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": null,
+      "confirmation_policy": "user",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "POST",
+      "normalized_route": "/api/ext-mappings",
+      "occurrences": [
+        {
+          "column": 26,
+          "disposition": "unresolved",
+          "line": 677,
+          "method": "POST",
+          "normalized_route": "/api/ext-mappings",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:677:26:POST:/api/ext-mappings",
+          "raw_route": "/api/ext-mappings",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "integration",
+      "owner_prefix": "integration",
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "integration:write"
+      ]
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_policy": "integration.read",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": null,
+      "confirmation_policy": "none",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "GET",
+      "normalized_route": "/api/ext-mappings/{dynamic}/columns",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 341,
+          "method": "GET",
+          "normalized_route": "/api/ext-mappings/{dynamic}/columns",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:341:36:GET:/api/ext-mappings/{dynamic}/columns",
+          "raw_route": "/api/ext-mappings/${_selectedMap.gid}/columns",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "integration",
+      "owner_prefix": "integration",
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "read"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "integration.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": null,
+      "confirmation_policy": "user",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "POST",
+      "normalized_route": "/api/ext-mappings/{dynamic}/import",
+      "occurrences": [
+        {
+          "column": 37,
+          "disposition": "unresolved",
+          "line": 549,
+          "method": "POST",
+          "normalized_route": "/api/ext-mappings/{dynamic}/import",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:549:37:POST:/api/ext-mappings/{dynamic}/import",
+          "raw_route": "/api/ext-mappings/${_selectedMap.gid}/import",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "integration",
+      "owner_prefix": "integration",
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "integration:write"
+      ]
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_policy": "integration.read",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": null,
+      "confirmation_policy": "none",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "GET",
+      "normalized_route": "/api/ext-mappings/{dynamic}/preview",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 496,
+          "method": "GET",
+          "normalized_route": "/api/ext-mappings/{dynamic}/preview",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:496:36:GET:/api/ext-mappings/{dynamic}/preview",
+          "raw_route": "/api/ext-mappings/${_selectedMap.gid}/preview?limit=5",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "integration",
+      "owner_prefix": "integration",
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent owned/revisioned contract.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "read"
+      ]
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "project_management.write",
+      "baseline_disposition": "existing_capability_reclassified",
+      "capability_id": null,
+      "confirmation_policy": "user",
+      "example_input": {},
+      "example_output": {},
+      "final_disposition": "domain_design_required",
+      "handler_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/craft/craft_backend/routers/approval.py"
+      },
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "major_version": null,
+      "method": "POST",
+      "normalized_route": "/api/approval/orders/{dynamic}/reject",
+      "occurrences": [
+        {
+          "column": 26,
+          "disposition": "unresolved",
+          "line": 153,
+          "method": "POST",
+          "normalized_route": "/api/approval/orders/{dynamic}/reject",
+          "occurrence_id": "packages/craft-plugin/web/approval/approval.js:153:26:POST:/api/approval/orders/{dynamic}/reject",
+          "raw_route": "/api/approval/orders/${_selected.gid}/reject",
+          "source": "packages/craft-plugin/web/approval/approval.js",
+          "source_sha256": "04495deeced75c275da108fc797af937d194541b597c6186d52faa6d82cf7539"
+        }
+      ],
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "owner_domain": "project_management",
+      "owner_prefix": "project",
+      "provider_anchor": "plugins/craft/craft_backend/routers/approval.py",
+      "provider_source_sha256": "sha256:1b6d618b9562ad4509f81a848234af9c02f75e17392fe26ed9ca203bf1c7569a",
+      "reclassification_reason": "The Project outcome returns a notification side effect that the legacy adapter must publish; a direct atomic invocation would silently omit it and requires BFF or provider redesign.",
+      "review_reference": "task-3b3c:exact-provider-review",
+      "side_effects": [
+        "project_management:write"
+      ]
+    }
+  ],
+  "schema_version": "1.0.0",
+  "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
+  "source_ledger_revision": "5cc460e5ed0aa0227549f7eca3017707777d51a5",
+  "source_ledger_sha256": "sha256:70c95f1e76ccaeb20ffc83d758b1439ccff7f62a196b293dfa258f9476b1a230"
+}

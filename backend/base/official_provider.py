@@ -11,6 +11,7 @@ from backend.base.export_templates import register_export_template_capability
 from backend.base.approval import register_approval_capabilities
 from backend.base.collaboration import register_collaboration_capabilities
 from backend.base.runtime_database_config import register_runtime_database_capabilities
+from backend.base.web_atomic import register_atomic_web_capabilities
 
 def register_capabilities(registry: Any) -> None:
     register_system_shared_capabilities(registry)
@@ -23,6 +24,7 @@ def register_capabilities(registry: Any) -> None:
     register_approval_capabilities(registry)
     register_collaboration_capabilities(registry)
     register_runtime_database_capabilities(registry)
+    register_atomic_web_capabilities(registry)
 
 
 __all__ = ["register_capabilities"]
