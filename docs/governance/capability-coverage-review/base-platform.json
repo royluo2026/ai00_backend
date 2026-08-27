@@ -218,19 +218,6 @@
       "reviewer": "capability-v2-architecture-review",
       "reviewed_at": "2026-08-11"
     },
-    "rest:GET:/api/file-store/config": {
-      "resolution": "excluded",
-      "target_capability": null,
-      "source_paths": [
-        "backend/routers/file_store.py"
-      ],
-      "evidence": "The stable surface rest:GET:/api/file-store/config is implemented at backend/routers/file_store.py.",
-      "reason": "rest:GET:/api/file-store/config is a storage configuration and connectivity diagnostic endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
-      "classification": "operations",
-      "owner": "Base Platform",
-      "reviewer": "capability-v2-architecture-review",
-      "reviewed_at": "2026-08-11"
-    },
     "rest:GET:/api/v1/plugin-marketplace/assets/{token}/{plugin_id}/{version}/{asset_path:path}": {
       "resolution": "excluded",
       "target_capability": null,

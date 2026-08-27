@@ -32,11 +32,14 @@ DISPOSITIONS = {
     "existing_capability_migrated",
     "existing_capability_reclassified",
     "truthful_bff_required",
+    "truthful_bff_registered",
     "conditional_dispatch_required",
+    "conditional_dispatch_migrated",
     "new_atomic_capability_required",
     "frontend_retire",
     "frontend_route_normalize",
     "operations_candidate",
+    "file_store_capability_migrated",
 }
 RETIREMENT_KINDS = {
     "explicit_product_retirement",
@@ -637,7 +640,7 @@ def audit_route_root_cause_ledger(
                 or set(contract_mismatch) != {"input", "output", "side_effects"}
             ):
                 issues.append(f"ledger_reclassification_invalid:{context}")
-        elif entry.disposition == "truthful_bff_required":
+        elif entry.disposition in {"truthful_bff_required", "truthful_bff_registered"}:
             constituents = details.get("constituent_capabilities")
             parsed = [_target(value) for value in constituents] if isinstance(constituents, list) else []
             if len(parsed) < 2 or len(set(parsed)) < 2:
@@ -656,7 +659,7 @@ def audit_route_root_cause_ledger(
             )
             if not valid_aggregation:
                 issues.append(f"ledger_bff_aggregation_invalid:{context}")
-        elif entry.disposition == "conditional_dispatch_required":
+        elif entry.disposition in {"conditional_dispatch_required", "conditional_dispatch_migrated"}:
             branches = details.get("branch_capabilities")
             parsed = [_target(value) for value in branches] if isinstance(branches, list) else []
             dispatch = details.get("dispatch_evidence")
@@ -706,6 +709,15 @@ def audit_route_root_cause_ledger(
                 or details.get("non_business_operation") != "runtime storage configuration read"
             ):
                 issues.append(f"ledger_operations_candidate_invalid:{context}")
+        elif entry.disposition == "file_store_capability_migrated":
+            target = _target(details.get("target_capability"))
+            if (
+                entry.key != ("GET", "/api/file-store/config")
+                or target is None or catalog.get(target) != ("stable", "base")
+                or details.get("public_projection") != "secret_filtered_closed_schema"
+                or details.get("manifest") != "docs/governance/special-web-residual-contracts.json"
+            ):
+                issues.append(f"ledger_file_store_capability_invalid:{context}")
 
     if len(occurrence_ids) != CLASSIFIED_OCCURRENCE_COUNT:
         issues.append(f"ledger_classified_occurrence_count:{len(occurrence_ids)}")
@@ -725,7 +737,10 @@ def audit_route_root_cause_ledger(
         issues.append("ledger_final_unresolved_count_mismatch:1")
     actual_groups = _final_groups(final_document)
     for entry in ledger.entries:
-        if entry.disposition == "existing_capability_migrated" and entry.key in actual_groups:
+        if entry.disposition in {
+            "existing_capability_migrated", "conditional_dispatch_migrated",
+            "file_store_capability_migrated",
+        } and entry.key in actual_groups:
             issues.append(f"ledger_migrated_frontend_call_remains:{entry.method}:{entry.normalized_route}")
     expected_groups = Counter()
     for raw in ledger.final_unresolved_groups:

@@ -38,6 +38,7 @@
     "base-platform/base.authorization.grant.revoke@1.md",
     "base-platform/base.export_template.change.apply@1.md",
     "base-platform/base.export_template.read@1.md",
+    "base-platform/base.file_store.public_config.get@1.md",
     "base-platform/base.identity.directory.feishu.sync@1.md",
     "base-platform/base.identity.directory.sync@1.md",
     "base-platform/base.identity.role.assign@1.md",

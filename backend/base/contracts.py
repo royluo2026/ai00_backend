@@ -57,6 +57,14 @@ NOTIFICATION_ITEM = _object(
     ("notification_id", "subject_ref", "payload", "read_at", "created_at"),
 )
 PREFERENCES = _object({"version": INTEGER, "preferences": ANY_JSON}, ("version", "preferences"))
+FILE_STORE_OIS = _object({
+    "identify": STRING, "env": STRING, "ois3_url": STRING, "region": STRING,
+    "licloud_appid": STRING, "idaas_url": STRING, "idaas_client_id": STRING,
+    "idaas_service_id": STRING, "public_base_url": STRING, "secret_preview": STRING,
+}, (
+    "identify", "env", "ois3_url", "region", "licloud_appid", "idaas_url",
+    "idaas_client_id", "idaas_service_id", "public_base_url", "secret_preview",
+))
 WORKSPACE_TEMPLATE = _object(
     {
         "template_id": STRING, "version": INTEGER, "template": ANY_JSON,
@@ -113,6 +121,7 @@ STABLE_REF = _object({
 }, ("object_ref", "owner"))
 
 INPUT_SCHEMAS = {
+    "base.file_store.public_config.get": _object({}),
     "base.runtime.database_config.get": _object({}),
     "base.runtime.database_config.change.apply": _object(DB_CONFIG, tuple(DB_CONFIG)),
     "base.runtime.database_connection.test": _object(DB_CONFIG, tuple(DB_CONFIG)),
@@ -211,6 +220,12 @@ INPUT_SCHEMAS = {
 }
 
 OUTPUT_SCHEMAS = {
+    "base.file_store.public_config.get": _object({
+        "success": BOOLEAN, "source": STRING, "has_creds": BOOLEAN,
+        "is_admin": BOOLEAN, "ois_enabled": BOOLEAN, "ois_source": STRING,
+        "endpoint": STRING, "bucket": STRING, "public_url": STRING,
+        "key_preview": STRING, "ois": FILE_STORE_OIS,
+    }, ("success", "source", "has_creds", "is_admin", "ois_enabled", "ois_source")),
     "base.runtime.database_config.get": _object({
         "host": STRING, "port": INTEGER, "user": STRING,
         "password_configured": BOOLEAN, "collab_db": STRING, "public_db": STRING,

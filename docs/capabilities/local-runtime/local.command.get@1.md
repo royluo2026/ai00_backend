@@ -8,7 +8,7 @@ Read an owned local operation outcome.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`device`
-- Catalog Release：`rel_5915db601d7c6ce939a106d76a78b90a`
+- Catalog Release：`rel_86c92a7e6e59a987be6d7ec3d2d4c11b`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -87,7 +87,7 @@ Read an owned local operation outcome.
 ```json
 {
   "capability_id": "local.command.get",
-  "catalog_release": "rel_5915db601d7c6ce939a106d76a78b90a",
+  "catalog_release": "rel_86c92a7e6e59a987be6d7ec3d2d4c11b",
   "major_version": 1,
   "payload": {
     "command_id": "example"

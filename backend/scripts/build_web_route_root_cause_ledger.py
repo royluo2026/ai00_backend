@@ -500,11 +500,11 @@ def _classify(
         }, "The baseline scanner ambiguity came from a malformed template or a finite action/item-type interpolation."
     if key == ("GET", "/api/file-store/config"):
         evidence = _backend_evidence(key, "backend/routers/file_store.py")
-        return "platform-runtime", "operations_candidate", evidence, {
-            "approval_status": "not_approved",
-            "approval_needed": True,
-            "non_business_operation": "runtime storage configuration read",
-        }, "This is a bounded runtime configuration read, but no operations exclusion is activated without separate approval."
+        return "base", "file_store_capability_migrated", evidence, {
+            "target_capability": "base.file_store.public_config.get@1",
+            "public_projection": "secret_filtered_closed_schema",
+            "manifest": "docs/governance/special-web-residual-contracts.json",
+        }, "The Web consumer invokes an authenticated, secret-filtered Base capability through Gateway."
     if key in TRUE_BFF:
         evidence = _backend_evidence(key, "backend/routers/workbench_home.py")
         route_definition = evidence["route_definition"]
@@ -512,7 +512,7 @@ def _classify(
             raise RuntimeError(f"BFF handler missing: {key}")
         anchor = _route_anchor(route_definition)
         evidence["anchors"] = [anchor]
-        return owner, "truthful_bff_required", evidence, {
+        return owner, "truthful_bff_registered", evidence, {
             "constituent_capabilities": TRUE_BFF[key],
             "aggregation_evidence": {
                 "kind": "multi_result_merge", "anchors": [anchor],
@@ -527,7 +527,7 @@ def _classify(
             raise RuntimeError(f"conditional handler missing: {key}")
         anchor = _route_anchor(route_definition)
         evidence["anchors"] = [anchor]
-        return owner, "conditional_dispatch_required", evidence, {
+        return owner, "conditional_dispatch_migrated", evidence, {
             "selector": selector, "branch_capabilities": branches,
             "dispatch_evidence": {
                 "kind": "conditional_branch", "aggregation": False,

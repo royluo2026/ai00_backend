@@ -13,11 +13,13 @@ from __future__ import annotations
 import json
 import logging
 from pathlib import Path
+from types import SimpleNamespace
 
 from fastapi import APIRouter, Depends, HTTPException
 
 from backend.routers.deps import get_current_user, require_role
 from backend.db.connection import get_conn
+from backend.base.file_store_public_config import public_file_store_config
 
 router = APIRouter(prefix="/api/file-store", tags=["file_store"])
 _log = logging.getLogger(__name__)
@@ -87,75 +89,8 @@ def _save_db_config(key: str, cfg: dict) -> None:
 
 @router.get("/config")
 def get_config(_user: dict = Depends(get_current_user)):
-    is_admin = (_user.get("org_role") or _user.get("system_role", "")) in (
-        "super_admin", "team_admin"
-    )
-
-    # MinIO
-    db_cfg = _load_db_config("minio_config")
-    if db_cfg and db_cfg.get("endpoint"):
-        cfg, source = db_cfg, "db"
-    else:
-        try:
-            from backend.config import get_settings
-            s = get_settings()
-            if s.minio_enabled:
-                cfg = {"endpoint": s.minio_endpoint, "access_key": s.minio_access_key,
-                       "secret_key": s.minio_secret_key, "bucket": s.minio_bucket,
-                       "public_url": s.minio_public_url}
-                source = "env"
-            else:
-                cfg, source = {}, "none"
-        except Exception:
-            cfg, source = {}, "none"
-
-    # OIS
-    ois_db = _load_db_config("ois_config") or {}
-    try:
-        from backend.config import get_settings
-        s = get_settings()
-        ois_env = {
-            "identify":        s.ois_identify,
-            "env":             s.ois_env,
-            "ois3_url":        s.ois_ois3_url,
-            "region":          s.ois_region,
-            "licloud_appid":   s.ois_licloud_appid,
-            "idaas_url":       s.ois_idaas_url,
-            "idaas_client_id": s.ois_idaas_client_id,
-            "idaas_service_id":s.ois_idaas_service_id,
-            "public_base_url": s.ois_public_base_url,
-        }
-    except Exception:
-        ois_env = {}
-
-    ois_cfg = ois_db if ois_db.get("identify") else ois_env
-
-    result: dict = {
-        "success":    True,
-        "source":     source,
-        "has_creds":  bool(cfg.get("access_key") and cfg.get("secret_key")),
-        "is_admin":   is_admin,
-        "ois_enabled": bool(ois_cfg.get("identify")),
-        "ois_source":  "db" if ois_db.get("identify") else ("env" if ois_env.get("identify") else "none"),
-    }
-    if is_admin:
-        result["endpoint"]    = cfg.get("endpoint", "")
-        result["bucket"]      = cfg.get("bucket", "ai00")
-        result["public_url"]  = cfg.get("public_url", "")
-        result["key_preview"] = _mask_key(cfg.get("access_key", ""))
-        result["ois"] = {
-            "identify":        ois_cfg.get("identify", ""),
-            "env":             ois_cfg.get("env", ""),
-            "ois3_url":        ois_cfg.get("ois3_url") or ois_cfg.get("api_base", ""),
-            "region":          ois_cfg.get("region", ""),
-            "licloud_appid":   ois_cfg.get("licloud_appid", ""),
-            "idaas_url":       ois_cfg.get("idaas_url", ""),
-            "idaas_client_id": ois_cfg.get("idaas_client_id", ""),
-            "idaas_service_id":ois_cfg.get("idaas_service_id", ""),
-            "public_base_url": ois_cfg.get("public_base_url", ""),
-            "secret_preview":  _mask_key(ois_cfg.get("idaas_client_secret", "")),
-        }
-    return result
+    role = str(_user.get("org_role") or _user.get("system_role") or "member")
+    return public_file_store_config({}, SimpleNamespace(active_roles=(role,), user_gid=_user.get("gid")))
 
 
 @router.post("/config")

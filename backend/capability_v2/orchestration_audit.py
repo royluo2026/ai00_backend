@@ -89,23 +89,34 @@ def audit_orchestration_registry(
             invalid.append(label)
             continue
         key = entry.get(key_field)
-        capability_id = entry.get("capability_id")
         owner_domain = entry.get("owner_domain")
-        if not isinstance(key, str) or not key or not isinstance(capability_id, str) or not capability_id or not isinstance(owner_domain, str) or not owner_domain:
+        if not isinstance(key, str) or not key or not isinstance(owner_domain, str) or not owner_domain:
             invalid.append(label)
             continue
         if key in seen:
             duplicates.append(key)
         seen.add(key)
-        major_version = entry.get("major_version", 1)
-        if not isinstance(major_version, int) or major_version < 1:
+        targets = entry.get("constituents") if kind == "bff_capability" else [entry]
+        if not isinstance(targets, list) or not targets:
             invalid.append(label)
             continue
-        resolution = catalog_index.resolve_stable(capability_id, major_version, owner_domain)
-        if resolution.reason_code == "target_missing":
-            missing.append(f"{key}:{capability_id}")
-        if not resolution.ok:
-            target_failures.append(OrchestrationTargetFailure(key, resolution))
+        if kind == "bff_capability" and not all(
+            isinstance(entry.get(field), str) and entry.get(field)
+            for field in ("route_path", "method", "source", "source_sha256", "executor", "partial_failure_policy")
+        ):
+            invalid.append(label)
+            continue
+        for target in targets:
+            capability_id = target.get("capability_id") if isinstance(target, dict) else None
+            major_version = target.get("major_version", 1) if isinstance(target, dict) else None
+            if not isinstance(capability_id, str) or not capability_id or not isinstance(major_version, int) or major_version < 1:
+                invalid.append(label)
+                break
+            resolution = catalog_index.resolve_stable(capability_id, major_version, owner_domain)
+            if resolution.reason_code == "target_missing":
+                missing.append(f"{key}:{capability_id}")
+            if not resolution.ok:
+                target_failures.append(OrchestrationTargetFailure(key, resolution))
     return OrchestrationAudit(
         kind, len(entries), tuple(sorted(invalid)), tuple(sorted(missing)), tuple(sorted(duplicates)),
         tuple(sorted(target_failures, key=lambda item: (item.entry_key, item.reason_code))),

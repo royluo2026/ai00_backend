@@ -86,7 +86,7 @@
     },
     {
       "source": "web/admin/task_planning.html",
-      "source_sha256": "9458faf6cb26c55b84344d405084358da501c59cae64b8725f18b559fd6b29e7",
+      "source_sha256": "97fcb66b1f5ba5f268438404a455ca9ba571270944281252b37aabcf1714bb74",
       "callee": "_cf",
       "signature": {
         "route_argument": 0,
@@ -111,99 +111,91 @@
       "call_sites": [
         {
           "source_path": "web/admin/task_planning.html",
-          "line": 1012,
-          "column": 26,
-          "raw_route": "/api/lists?item_type=task",
-          "normalized_route": "/api/lists",
-          "source_sha256": "9458faf6cb26c55b84344d405084358da501c59cae64b8725f18b559fd6b29e7"
-        },
-        {
-          "source_path": "web/admin/task_planning.html",
-          "line": 1019,
+          "line": 1020,
           "column": 26,
           "raw_route": "/api/tasks?list_gid=${listGid}",
           "normalized_route": "/api/tasks",
-          "source_sha256": "9458faf6cb26c55b84344d405084358da501c59cae64b8725f18b559fd6b29e7"
+          "source_sha256": "97fcb66b1f5ba5f268438404a455ca9ba571270944281252b37aabcf1714bb74"
         },
         {
           "source_path": "web/admin/task_planning.html",
-          "line": 1027,
+          "line": 1028,
           "column": 30,
           "raw_route": "/api/task-dependencies?list_gid=${listGid}",
           "normalized_route": "/api/task-dependencies",
-          "source_sha256": "9458faf6cb26c55b84344d405084358da501c59cae64b8725f18b559fd6b29e7"
+          "source_sha256": "97fcb66b1f5ba5f268438404a455ca9ba571270944281252b37aabcf1714bb74"
         },
         {
           "source_path": "web/admin/task_planning.html",
-          "line": 1032,
+          "line": 1033,
           "column": 24,
           "raw_route": "/api/tasks",
           "normalized_route": "/api/tasks",
-          "source_sha256": "9458faf6cb26c55b84344d405084358da501c59cae64b8725f18b559fd6b29e7"
+          "source_sha256": "97fcb66b1f5ba5f268438404a455ca9ba571270944281252b37aabcf1714bb74"
         },
         {
           "source_path": "web/admin/task_planning.html",
-          "line": 1040,
+          "line": 1041,
           "column": 14,
           "raw_route": "/api/tasks/${gid}",
           "normalized_route": "/api/tasks/{dynamic}",
-          "source_sha256": "9458faf6cb26c55b84344d405084358da501c59cae64b8725f18b559fd6b29e7"
+          "source_sha256": "97fcb66b1f5ba5f268438404a455ca9ba571270944281252b37aabcf1714bb74"
         },
         {
           "source_path": "web/admin/task_planning.html",
-          "line": 1044,
+          "line": 1045,
           "column": 14,
           "raw_route": "/api/tasks/${gid}",
           "normalized_route": "/api/tasks/{dynamic}",
-          "source_sha256": "9458faf6cb26c55b84344d405084358da501c59cae64b8725f18b559fd6b29e7"
+          "source_sha256": "97fcb66b1f5ba5f268438404a455ca9ba571270944281252b37aabcf1714bb74"
         },
         {
           "source_path": "web/admin/task_planning.html",
-          "line": 1048,
+          "line": 1049,
           "column": 14,
           "raw_route": "/api/tasks/${gid}",
           "normalized_route": "/api/tasks/{dynamic}",
-          "source_sha256": "9458faf6cb26c55b84344d405084358da501c59cae64b8725f18b559fd6b29e7"
+          "source_sha256": "97fcb66b1f5ba5f268438404a455ca9ba571270944281252b37aabcf1714bb74"
         },
         {
           "source_path": "web/admin/task_planning.html",
-          "line": 1054,
+          "line": 1055,
           "column": 24,
           "raw_route": "/api/task-dependencies",
           "normalized_route": "/api/task-dependencies",
-          "source_sha256": "9458faf6cb26c55b84344d405084358da501c59cae64b8725f18b559fd6b29e7"
+          "source_sha256": "97fcb66b1f5ba5f268438404a455ca9ba571270944281252b37aabcf1714bb74"
         },
         {
           "source_path": "web/admin/task_planning.html",
-          "line": 1059,
+          "line": 1060,
           "column": 14,
           "raw_route": "/api/task-dependencies/${gid}",
           "normalized_route": "/api/task-dependencies/{dynamic}",
-          "source_sha256": "9458faf6cb26c55b84344d405084358da501c59cae64b8725f18b559fd6b29e7"
+          "source_sha256": "97fcb66b1f5ba5f268438404a455ca9ba571270944281252b37aabcf1714bb74"
         },
         {
           "source_path": "web/admin/task_planning.html",
-          "line": 1063,
+          "line": 1064,
           "column": 14,
           "raw_route": "/api/task-dependencies/${gid}",
           "normalized_route": "/api/task-dependencies/{dynamic}",
-          "source_sha256": "9458faf6cb26c55b84344d405084358da501c59cae64b8725f18b559fd6b29e7"
+          "source_sha256": "97fcb66b1f5ba5f268438404a455ca9ba571270944281252b37aabcf1714bb74"
         },
         {
           "source_path": "web/admin/task_planning.html",
-          "line": 1068,
+          "line": 1069,
           "column": 26,
           "raw_route": "/api/views?module=task&list_gid=${listGid}",
           "normalized_route": "/api/views",
-          "source_sha256": "9458faf6cb26c55b84344d405084358da501c59cae64b8725f18b559fd6b29e7"
+          "source_sha256": "97fcb66b1f5ba5f268438404a455ca9ba571270944281252b37aabcf1714bb74"
         },
         {
           "source_path": "web/admin/task_planning.html",
-          "line": 2923,
+          "line": 2924,
           "column": 26,
           "raw_route": "/api/lists",
           "normalized_route": "/api/lists",
-          "source_sha256": "9458faf6cb26c55b84344d405084358da501c59cae64b8725f18b559fd6b29e7"
+          "source_sha256": "97fcb66b1f5ba5f268438404a455ca9ba571270944281252b37aabcf1714bb74"
         }
       ]
     }

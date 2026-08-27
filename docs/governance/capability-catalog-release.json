@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_5915db601d7c6ce939a106d76a78b90a",
-  "catalog_hash": "sha256:5915db601d7c6ce939a106d76a78b90a98ee54a65d779951dd124558baf64f4f",
+  "release_id": "rel_86c92a7e6e59a987be6d7ec3d2d4c11b",
+  "catalog_hash": "sha256:86c92a7e6e59a987be6d7ec3d2d4c11b4b47c93b0a2cb0ae9d2fa14cbd109e22",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -12478,6 +12478,279 @@
       "provider_ref": "base.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/base.export_template.read:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
+          "result": "pass",
+          "path": "backend/tests/test_capability_v2_contracts.py"
+        }
+      ]
+    },
+    {
+      "id": "base.file_store.public_config.get",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.file_store.public_config.get",
+      "description": "Read the secret-filtered public file-store runtime configuration.",
+      "use_when": "An authenticated web client needs file-store feature availability or administrator-safe display values.",
+      "do_not_use_when": "A caller needs raw storage credentials or intends to mutate configuration.",
+      "business_effect": "Reads a secret-filtered file-store configuration projection without mutation.",
+      "side_effect_level": "read",
+      "side_effects": "Reads a secret-filtered file-store configuration projection without mutation.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "base.v2:authenticated",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "source": {
+            "type": "string"
+          },
+          "has_creds": {
+            "type": "boolean"
+          },
+          "is_admin": {
+            "type": "boolean"
+          },
+          "ois_enabled": {
+            "type": "boolean"
+          },
+          "ois_source": {
+            "type": "string"
+          },
+          "endpoint": {
+            "type": "string"
+          },
+          "bucket": {
+            "type": "string"
+          },
+          "public_url": {
+            "type": "string"
+          },
+          "key_preview": {
+            "type": "string"
+          },
+          "ois": {
+            "type": "object",
+            "properties": {
+              "identify": {
+                "type": "string"
+              },
+              "env": {
+                "type": "string"
+              },
+              "ois3_url": {
+                "type": "string"
+              },
+              "region": {
+                "type": "string"
+              },
+              "licloud_appid": {
+                "type": "string"
+              },
+              "idaas_url": {
+                "type": "string"
+              },
+              "idaas_client_id": {
+                "type": "string"
+              },
+              "idaas_service_id": {
+                "type": "string"
+              },
+              "public_base_url": {
+                "type": "string"
+              },
+              "secret_preview": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "identify",
+              "env",
+              "ois3_url",
+              "region",
+              "licloud_appid",
+              "idaas_url",
+              "idaas_client_id",
+              "idaas_service_id",
+              "public_base_url",
+              "secret_preview"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "source",
+          "has_creds",
+          "is_admin",
+          "ois_enabled",
+          "ois_source"
+        ]
+      },
+      "agent_output_schema": null,
+      "schema_hash": "sha256:aa8e8029590799a8028843f819f87f60d7a02522178983ddcb5e8e25a6ea614d",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_544da4ee72b450ac9b10e1f8",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "base.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/base.file_store.public_config.get:invoke"
       ],
       "test_refs": [
         {
@@ -178247,7 +178520,7 @@
       "plugin_id": "official.base",
       "module": "backend.base.official_provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:e4ab9a0be9e0b466e5837a13b6463040848ce40e1655feaabad78b066dbe25c6"
+      "artifact_hash": "sha256:451d5bd2cbf7727329966ad7a0c746ce23197d8d9a2a0739da698fc843f3a2db"
     },
     {
       "plugin_id": "official.craft",
@@ -178295,7 +178568,7 @@
       "plugin_id": "official.project-management",
       "module": "project_management_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:59c656c05500acbb85da5ecd95a0f100c52d9cb71215e37ba0c47aa818a70086"
+      "artifact_hash": "sha256:a3f08494ad47b6d85270f788c4baff6d280ba2262583b7f3d08a4532046f80bc"
     },
     {
       "plugin_id": "official.simulation",
@@ -178304,5 +178577,5 @@
       "artifact_hash": "sha256:5c1fccaa2219f6833c24237667039685e322cefcffc7ca6f0287d28cfc0a2b39"
     }
   ],
-  "created_at": "2026-08-26T23:35:11.321076Z"
+  "created_at": "2026-08-27T00:54:09.145851Z"
 }

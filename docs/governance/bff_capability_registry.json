@@ -1,1 +1,33 @@
-{"registry_kind":"bff_capability","entries":[{"route_id":"bff.capability.invoke","route_path":"/api/v1/capabilities/{capability_id}:invoke","method":"POST","capability_id":"system.search","owner_domain":"base","source":"backend/routers/capabilities.py"}]}
+{
+  "registry_kind": "bff_capability",
+  "entries": [
+    {
+      "route_id": "bff.workbench.home",
+      "route_path": "/api/workbench/home",
+      "method": "GET",
+      "owner_domain": "project_management",
+      "constituents": [
+        {"capability_id": "project.project.read.atomic.projects_search", "major_version": 1},
+        {"capability_id": "project.follow.read.atomic.follows_list", "major_version": 1}
+      ],
+      "source": "backend/routers/workbench_home.py",
+      "source_sha256": "sha256:b190ef20d69e5af0f58c64405e49924c5db0d15086c16d98b7604d503e7066f8",
+      "executor": "backend.routers.workbench_home:execute_constituents",
+      "partial_failure_policy": "continue_in_declared_order_omit_failed"
+    },
+    {
+      "route_id": "bff.workbench.panel1",
+      "route_path": "/api/workbench/panel1",
+      "method": "GET",
+      "owner_domain": "project_management",
+      "constituents": [
+        {"capability_id": "project.task.read.atomic.tasks_search", "major_version": 1},
+        {"capability_id": "project.issue.read.atomic.issues_search", "major_version": 1}
+      ],
+      "source": "backend/routers/workbench_home.py",
+      "source_sha256": "sha256:b190ef20d69e5af0f58c64405e49924c5db0d15086c16d98b7604d503e7066f8",
+      "executor": "backend.routers.workbench_home:execute_constituents",
+      "partial_failure_policy": "continue_in_declared_order_omit_failed"
+    }
+  ]
+}

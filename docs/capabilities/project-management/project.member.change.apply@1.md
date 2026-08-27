@@ -8,7 +8,7 @@ Execute the reviewed project.member.change.apply project outcome.
 - 不适用：The operation belongs to another domain.
 - 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_5915db601d7c6ce939a106d76a78b90a`
+- Catalog Release：`rel_86c92a7e6e59a987be6d7ec3d2d4c11b`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -340,7 +340,7 @@ Execute the reviewed project.member.change.apply project outcome.
 ```json
 {
   "capability_id": "project.member.change.apply",
-  "catalog_release": "rel_5915db601d7c6ce939a106d76a78b90a",
+  "catalog_release": "rel_86c92a7e6e59a987be6d7ec3d2d4c11b",
   "major_version": 1,
   "payload": {
     "arguments": {},

@@ -15,17 +15,20 @@ import backend.routers.workbench_home as workbench_home
 class RecordingGateway:
     catalog_release = "rel_workbench_test"
 
-    def __init__(self):
+    def __init__(self, fail_ids=()):
         self.envelopes = []
+        self.fail_ids = set(fail_ids)
 
     async def invoke(self, envelope):
         self.envelopes.append(envelope)
+        if envelope.capability_id in self.fail_ids:
+            return SimpleNamespace(ok=False, data=None, error=SimpleNamespace(code="provider_unavailable", model_dump=lambda **_: {"code": "provider_unavailable"}))
         responses = {
-            "project.project.read": {
+            "project.project.read.atomic.projects_search": {
                 "success": True,
                 "data": [{"gid": "project-1", "name": "Alpha"}],
             },
-            "project.follow.read": {
+            "project.follow.read.atomic.follows_list": {
                 "success": True,
                 "data": [
                     {
@@ -38,7 +41,7 @@ class RecordingGateway:
                     }
                 ],
             },
-            "project.task.read": {
+            "project.task.read.atomic.tasks_search": {
                 "success": True,
                 "data": [
                     {
@@ -50,7 +53,7 @@ class RecordingGateway:
                     }
                 ],
             },
-            "project.issue.read": {
+            "project.issue.read.atomic.issues_search": {
                 "success": True,
                 "data": [
                     {
@@ -133,21 +136,17 @@ def test_home_composes_projects_and_follows_through_capability_gateway(monkeypat
         ],
     }
     assert [item.capability_id for item in gateway.envelopes] == [
-        "project.project.read",
-        "project.follow.read",
+        "project.project.read.atomic.projects_search",
+        "project.follow.read.atomic.follows_list",
     ]
     assert gateway.envelopes[0].payload == {
-        "operation": "projects.search",
         "arguments": {
             "include_deleted": False,
             "include_archived": False,
             "scope": scope,
         },
     }
-    assert gateway.envelopes[1].payload == {
-        "operation": "follows.list",
-        "arguments": {"item_type": None},
-    }
+    assert gateway.envelopes[1].payload == {"arguments": {"item_type": None}}
 
 
 def test_panel1_composes_task_and_issue_sources_through_capability_gateway(monkeypatch):
@@ -185,11 +184,10 @@ def test_panel1_composes_task_and_issue_sources_through_capability_gateway(monke
         "total": 2,
     }
     assert [item.capability_id for item in gateway.envelopes] == [
-        "project.task.read",
-        "project.issue.read",
+        "project.task.read.atomic.tasks_search",
+        "project.issue.read.atomic.issues_search",
     ]
     assert gateway.envelopes[0].payload == {
-        "operation": "tasks.search",
         "arguments": {
             "project_gid": None,
             "status": None,
@@ -201,7 +199,6 @@ def test_panel1_composes_task_and_issue_sources_through_capability_gateway(monke
         },
     }
     assert gateway.envelopes[1].payload == {
-        "operation": "issues.search",
         "arguments": {
             "project_gid": None,
             "status": None,
@@ -211,3 +208,19 @@ def test_panel1_composes_task_and_issue_sources_through_capability_gateway(monke
             "scope": scope,
         },
     }
+
+
+def test_bff_continues_in_declared_order_and_omits_only_failed_constituent(monkeypatch):
+    application, gateway, _scope = _client(monkeypatch)
+    gateway.fail_ids.add("project.project.read.atomic.projects_search")
+
+    with TestClient(application) as client:
+        response = client.get("/api/workbench/home")
+
+    assert response.status_code == 200
+    assert response.json()["my_contexts"] == []
+    assert [item["gid"] for item in response.json()["recent_follows"]] == ["follow-1"]
+    assert [item.capability_id for item in gateway.envelopes] == [
+        "project.project.read.atomic.projects_search",
+        "project.follow.read.atomic.follows_list",
+    ]

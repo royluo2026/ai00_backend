@@ -1,4 +1,23 @@
 {
   "inventory_kind": "bff",
-  "entries": []
+  "entries": [
+    {
+      "route_path": "/api/workbench/home",
+      "method": "GET",
+      "owner": "project_management",
+      "migration_target_capability": "project.project.read.atomic.projects_search",
+      "migration_deadline": "2027-08-27",
+      "source": "backend/routers/workbench_home.py",
+      "allowed_consumers": ["web", "rest"]
+    },
+    {
+      "route_path": "/api/workbench/panel1",
+      "method": "GET",
+      "owner": "project_management",
+      "migration_target_capability": "project.task.read.atomic.tasks_search",
+      "migration_deadline": "2027-08-27",
+      "source": "backend/routers/workbench_home.py",
+      "allowed_consumers": ["web", "rest"]
+    }
+  ]
 }

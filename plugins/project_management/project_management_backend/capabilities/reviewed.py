@@ -137,6 +137,32 @@ def _handler(capability_id: str):
     return invoke
 
 
+_SERVER_SCOPED_READS = {
+    ("project.project.read", "projects.search"),
+    ("project.list.read", "lists.search"),
+    ("project.task.read", "tasks.search"),
+    ("project.issue.read", "issues.search"),
+}
+
+
+def _atomic_handler(capability_id: str, operation: str):
+    def invoke(payload: dict[str, Any], context: object) -> dict[str, Any]:
+        arguments = dict(payload.get("arguments", payload) if isinstance(payload, dict) else {})
+        if (capability_id, operation) in _SERVER_SCOPED_READS:
+            roles = set(getattr(context, "active_roles", ()) or ())
+            user = {
+                "gid": str(getattr(context, "user_gid", "") or ""),
+                "team_id": getattr(context, "team_gid", None),
+                "org_role": next((role for role in ("super_admin", "team_admin") if role in roles), "member"),
+            }
+            arguments["scope"] = build_access_scope(user)
+        return {"data": project_outcome_port.invoke(
+            capability_id, {"operation": operation, "arguments": arguments}, context,
+        )}
+
+    return invoke
+
+
 def register_reviewed_capabilities(registry: Any) -> None:
     for capability_id in sorted(PROJECT_CAPABILITY_IDS):
         is_write = capability_id.endswith(".change.apply")
@@ -201,13 +227,7 @@ def register_reviewed_capabilities(registry: Any) -> None:
                     output_schema={"type": "object", "required": ["data"], "properties": {"data": {}}},
                     tags=("project_management", "atomic", operation),
                 ),
-                lambda payload, context, _id=capability_id, _operation=operation: {
-                    "data": project_outcome_port.invoke(
-                        _id,
-                        {"operation": _operation, "arguments": (payload.get("arguments", payload) if isinstance(payload, dict) else {})},
-                        context,
-                    )
-                },
+                _atomic_handler(capability_id, operation),
             )
 
 

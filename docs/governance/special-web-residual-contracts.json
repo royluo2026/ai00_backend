@@ -1,0 +1,356 @@
+{
+  "schema_version": 1,
+  "artifact_id": "task-3b3d-special-web-residual-contracts",
+  "baseline_backend_revision": "5c5c4439a2dd33a1d90afd926f12f53fa5741f8d",
+  "baseline_frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
+  "final_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
+  "counts": {
+    "conditional_dispatch": {
+      "groups": 3,
+      "occurrences": 20
+    },
+    "truthful_bff": {
+      "groups": 2,
+      "occurrences": 2
+    },
+    "file_store_capability": {
+      "groups": 1,
+      "occurrences": 1
+    }
+  },
+  "final_inventory_sha256": "sha256:c999cebeca6cc915934dd523f78cc89ed242ceaf1f5c6ccb21d637abf2d91ec2",
+  "entries": [
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/lists/{dynamic}",
+      "kind": "conditional_dispatch",
+      "baseline_occurrences": [
+        {
+          "source": "packages/craft-plugin/web/bop/bop.js",
+          "line": 703,
+          "column": 26,
+          "raw_route": "/api/lists/${ver.gid}",
+          "normalized_route": "/api/lists/{dynamic}",
+          "method": "DELETE",
+          "disposition": "unresolved",
+          "occurrence_id": "packages/craft-plugin/web/bop/bop.js:703:26:DELETE:/api/lists/{dynamic}",
+          "source_sha256": "c06ab7a41a49a6cbf233155d04eefb14b3d793a908f0e7262ba6d88e78c10819"
+        },
+        {
+          "source": "web/components/list_sidebar.js",
+          "line": 1105,
+          "column": 28,
+          "raw_route": "/api/lists/${gid}",
+          "normalized_route": "/api/lists/{dynamic}",
+          "method": "DELETE",
+          "disposition": "unresolved",
+          "occurrence_id": "web/components/list_sidebar.js:1105:28:DELETE:/api/lists/{dynamic}",
+          "source_sha256": "21407987333e16b153d0cbf88d0872dc01c6b11b76cd9d26247d6eb63c06f49e"
+        }
+      ],
+      "branch_capabilities": [
+        "project.list.change.apply.atomic.lists_delete",
+        "craft.bop.version.archive"
+      ]
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/lists",
+      "kind": "conditional_dispatch",
+      "baseline_occurrences": [
+        {
+          "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
+          "line": 836,
+          "column": 42,
+          "raw_route": "/api/lists?item_type=${filterCfg.itemType}",
+          "normalized_route": "/api/lists",
+          "method": "GET",
+          "disposition": "unresolved",
+          "occurrence_id": "packages/craft-plugin/web/lineage_view/assoc_panel.js:836:42:GET:/api/lists",
+          "source_sha256": "1df0649aea1c9836f3de9ffb2e8e47765fa9f3011e6a303d32acc72de2c5d8d5"
+        },
+        {
+          "source": "web/admin/task_planning.html",
+          "line": 1012,
+          "column": 26,
+          "raw_route": "/api/lists?item_type=task",
+          "normalized_route": "/api/lists",
+          "method": "GET",
+          "disposition": "unresolved",
+          "occurrence_id": "web/admin/task_planning.html:1012:26:GET:/api/lists",
+          "source_sha256": "9458faf6cb26c55b84344d405084358da501c59cae64b8725f18b559fd6b29e7"
+        },
+        {
+          "source": "web/components/list_nav.html",
+          "line": 130,
+          "column": 38,
+          "raw_route": "/api/lists?item_type=${_itemType}",
+          "normalized_route": "/api/lists",
+          "method": "GET",
+          "disposition": "unresolved",
+          "occurrence_id": "web/components/list_nav.html:130:38:GET:/api/lists",
+          "source_sha256": "c73c06958138f87ee70a4b6a8f9dad8e487adf663e14568924daa188533d2443"
+        },
+        {
+          "source": "web/components/list_sidebar.js",
+          "line": 131,
+          "column": 37,
+          "raw_route": "/api/lists?item_type=${this._itemType}",
+          "normalized_route": "/api/lists",
+          "method": "GET",
+          "disposition": "unresolved",
+          "occurrence_id": "web/components/list_sidebar.js:131:37:GET:/api/lists",
+          "source_sha256": "21407987333e16b153d0cbf88d0872dc01c6b11b76cd9d26247d6eb63c06f49e"
+        },
+        {
+          "source": "web/components/list_tree.html",
+          "line": 295,
+          "column": 38,
+          "raw_route": "/api/lists",
+          "normalized_route": "/api/lists",
+          "method": "GET",
+          "disposition": "unresolved",
+          "occurrence_id": "web/components/list_tree.html:295:38:GET:/api/lists",
+          "source_sha256": "bfa8fe3d79f58aae2179e97d056fed8249738b7006985cefa33b2f454010ce71"
+        },
+        {
+          "source": "web/components/quick_list.html",
+          "line": 287,
+          "column": 44,
+          "raw_route": "/api/lists?item_type=${t}",
+          "normalized_route": "/api/lists",
+          "method": "GET",
+          "disposition": "unresolved",
+          "occurrence_id": "web/components/quick_list.html:287:44:GET:/api/lists",
+          "source_sha256": "1b8fbbbfe8f09a87f882fc92c589e24c1a105fc352701770eb881e49e97b8f2e"
+        },
+        {
+          "source": "web/components/quick_list.html",
+          "line": 292,
+          "column": 44,
+          "raw_route": "/api/lists?item_type=${t}",
+          "normalized_route": "/api/lists",
+          "method": "GET",
+          "disposition": "unresolved",
+          "occurrence_id": "web/components/quick_list.html:292:44:GET:/api/lists",
+          "source_sha256": "1b8fbbbfe8f09a87f882fc92c589e24c1a105fc352701770eb881e49e97b8f2e"
+        },
+        {
+          "source": "web/components/quick_list.html",
+          "line": 297,
+          "column": 44,
+          "raw_route": "/api/lists?item_type=${t}",
+          "normalized_route": "/api/lists",
+          "method": "GET",
+          "disposition": "unresolved",
+          "occurrence_id": "web/components/quick_list.html:297:44:GET:/api/lists",
+          "source_sha256": "1b8fbbbfe8f09a87f882fc92c589e24c1a105fc352701770eb881e49e97b8f2e"
+        },
+        {
+          "source": "web/core/global_search.js",
+          "line": 211,
+          "column": 22,
+          "raw_route": "/api/lists?q=${enc}",
+          "normalized_route": "/api/lists",
+          "method": "GET",
+          "disposition": "unresolved",
+          "occurrence_id": "web/core/global_search.js:211:22:GET:/api/lists",
+          "source_sha256": "818504d9c4c7277789c3bb5a066910b92427c267558494a90764a2e5f856abbd"
+        },
+        {
+          "source": "web/team_space/team_space.js",
+          "line": 210,
+          "column": 36,
+          "raw_route": "/api/lists?owner_team_gid=${encodeURIComponent(teamGid)}&read_scope=team",
+          "normalized_route": "/api/lists",
+          "method": "GET",
+          "disposition": "unresolved",
+          "occurrence_id": "web/team_space/team_space.js:210:36:GET:/api/lists",
+          "source_sha256": "a3d1a2a00447e04711fb077b3c9822003fc5755f88829d71463d0fa88cb77bc5"
+        },
+        {
+          "source": "web/workbench/workbench.js",
+          "line": 2039,
+          "column": 38,
+          "raw_route": "/api/lists?item_type=${domain}",
+          "normalized_route": "/api/lists",
+          "method": "GET",
+          "disposition": "unresolved",
+          "occurrence_id": "web/workbench/workbench.js:2039:38:GET:/api/lists",
+          "source_sha256": "b204bf23ef35d7c214b9bd9a07cf230f6c1c7a537cd9ddde436845914e2275d4"
+        },
+        {
+          "source": "web/workbench/workbench.js",
+          "line": 2967,
+          "column": 22,
+          "raw_route": "/api/lists",
+          "normalized_route": "/api/lists",
+          "method": "GET",
+          "disposition": "unresolved",
+          "occurrence_id": "web/workbench/workbench.js:2967:22:GET:/api/lists",
+          "source_sha256": "b204bf23ef35d7c214b9bd9a07cf230f6c1c7a537cd9ddde436845914e2275d4"
+        }
+      ],
+      "branch_capabilities": [
+        "project.list.read.atomic.lists_search",
+        "craft.bop.version.list"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "normalized_route": "/api/lists/{dynamic}",
+      "kind": "conditional_dispatch",
+      "baseline_occurrences": [
+        {
+          "source": "web/components/list_sidebar.js",
+          "line": 1088,
+          "column": 27,
+          "raw_route": "/api/lists/${gid}",
+          "normalized_route": "/api/lists/{dynamic}",
+          "method": "PATCH",
+          "disposition": "unresolved",
+          "occurrence_id": "web/components/list_sidebar.js:1088:27:PATCH:/api/lists/{dynamic}",
+          "source_sha256": "21407987333e16b153d0cbf88d0872dc01c6b11b76cd9d26247d6eb63c06f49e"
+        },
+        {
+          "source": "web/components/list_tree.html",
+          "line": 630,
+          "column": 26,
+          "raw_route": "/api/lists/${list.gid}",
+          "normalized_route": "/api/lists/{dynamic}",
+          "method": "PATCH",
+          "disposition": "unresolved",
+          "occurrence_id": "web/components/list_tree.html:630:26:PATCH:/api/lists/{dynamic}",
+          "source_sha256": "bfa8fe3d79f58aae2179e97d056fed8249738b7006985cefa33b2f454010ce71"
+        },
+        {
+          "source": "web/workbench/workbench.js",
+          "line": 3373,
+          "column": 32,
+          "raw_route": "/api/lists/${item.gid}",
+          "normalized_route": "/api/lists/{dynamic}",
+          "method": "PATCH",
+          "disposition": "unresolved",
+          "occurrence_id": "web/workbench/workbench.js:3373:32:PATCH:/api/lists/{dynamic}",
+          "source_sha256": "b204bf23ef35d7c214b9bd9a07cf230f6c1c7a537cd9ddde436845914e2275d4"
+        },
+        {
+          "source": "web/workbench/workbench.js",
+          "line": 3401,
+          "column": 30,
+          "raw_route": "/api/lists/${list.gid}",
+          "normalized_route": "/api/lists/{dynamic}",
+          "method": "PATCH",
+          "disposition": "unresolved",
+          "occurrence_id": "web/workbench/workbench.js:3401:30:PATCH:/api/lists/{dynamic}",
+          "source_sha256": "b204bf23ef35d7c214b9bd9a07cf230f6c1c7a537cd9ddde436845914e2275d4"
+        },
+        {
+          "source": "web/workbench/workbench.js",
+          "line": 3437,
+          "column": 28,
+          "raw_route": "/api/lists/${list.gid}",
+          "normalized_route": "/api/lists/{dynamic}",
+          "method": "PATCH",
+          "disposition": "unresolved",
+          "occurrence_id": "web/workbench/workbench.js:3437:28:PATCH:/api/lists/{dynamic}",
+          "source_sha256": "b204bf23ef35d7c214b9bd9a07cf230f6c1c7a537cd9ddde436845914e2275d4"
+        },
+        {
+          "source": "web/workbench/workbench.js",
+          "line": 3471,
+          "column": 28,
+          "raw_route": "/api/lists/${list.gid}",
+          "normalized_route": "/api/lists/{dynamic}",
+          "method": "PATCH",
+          "disposition": "unresolved",
+          "occurrence_id": "web/workbench/workbench.js:3471:28:PATCH:/api/lists/{dynamic}",
+          "source_sha256": "b204bf23ef35d7c214b9bd9a07cf230f6c1c7a537cd9ddde436845914e2275d4"
+        }
+      ],
+      "branch_capabilities": [
+        "project.list.change.apply.atomic.lists_update",
+        "project.list.change.apply.atomic.lists_delete"
+      ]
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/workbench/home",
+      "kind": "truthful_bff",
+      "baseline_occurrences": [
+        {
+          "source": "web/workbench/workbench.js",
+          "line": 5007,
+          "column": 39,
+          "raw_route": "/api/workbench/home",
+          "normalized_route": "/api/workbench/home",
+          "method": "GET",
+          "disposition": "unresolved",
+          "occurrence_id": "web/workbench/workbench.js:5007:39:GET:/api/workbench/home",
+          "source_sha256": "b204bf23ef35d7c214b9bd9a07cf230f6c1c7a537cd9ddde436845914e2275d4"
+        }
+      ],
+      "constituents": [
+        {
+          "capability_id": "project.project.read.atomic.projects_search",
+          "major_version": 1
+        },
+        {
+          "capability_id": "project.follow.read.atomic.follows_list",
+          "major_version": 1
+        }
+      ],
+      "bff_registry_source_sha256": "sha256:b190ef20d69e5af0f58c64405e49924c5db0d15086c16d98b7604d503e7066f8"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/workbench/panel1",
+      "kind": "truthful_bff",
+      "baseline_occurrences": [
+        {
+          "source": "web/workbench/workbench.js",
+          "line": 4982,
+          "column": 39,
+          "raw_route": "/api/workbench/panel1?${params}",
+          "normalized_route": "/api/workbench/panel1",
+          "method": "GET",
+          "disposition": "unresolved",
+          "occurrence_id": "web/workbench/workbench.js:4982:39:GET:/api/workbench/panel1",
+          "source_sha256": "b204bf23ef35d7c214b9bd9a07cf230f6c1c7a537cd9ddde436845914e2275d4"
+        }
+      ],
+      "constituents": [
+        {
+          "capability_id": "project.task.read.atomic.tasks_search",
+          "major_version": 1
+        },
+        {
+          "capability_id": "project.issue.read.atomic.issues_search",
+          "major_version": 1
+        }
+      ],
+      "bff_registry_source_sha256": "sha256:b190ef20d69e5af0f58c64405e49924c5db0d15086c16d98b7604d503e7066f8"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/file-store/config",
+      "kind": "file_store_capability",
+      "baseline_occurrences": [
+        {
+          "source": "web/settings/settings.js",
+          "line": 386,
+          "column": 31,
+          "raw_route": "/api/file-store/config",
+          "normalized_route": "/api/file-store/config",
+          "method": "GET",
+          "disposition": "unresolved",
+          "occurrence_id": "web/settings/settings.js:386:31:GET:/api/file-store/config",
+          "source_sha256": "7315fba56b7f88f38265b933ae6615bbfaf2e8f826540f6315d60aa85e0e4a82"
+        }
+      ],
+      "capabilities": [
+        "base.file_store.public_config.get"
+      ]
+    }
+  ]
+}

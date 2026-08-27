@@ -36,17 +36,16 @@ async def _invoke(
     principal: Any,
     gateway: Any,
     capability_id: str,
-    operation: str,
     arguments: dict[str, Any],
 ) -> Any:
     base_request_id = request.headers.get("X-Request-ID") or f"workbench_{uuid4().hex}"
-    request_id = f"{base_request_id}_{operation.replace('.', '_')}"
+    request_id = f"{base_request_id}_{capability_id.replace('.', '_')}"
     result = await invoke_compatibility(
         gateway,
         build_web_compatibility_envelope(
             gateway,
             capability_id=capability_id,
-            payload={"operation": operation, "arguments": arguments},
+            payload={"arguments": arguments},
             current_user=user,
             principal=principal,
             request_id=request_id,
@@ -61,6 +60,23 @@ async def _invoke(
     return result.data["data"]
 
 
+async def execute_constituents(
+    request: Request,
+    user: dict[str, Any],
+    principal: Any,
+    gateway: Any,
+    calls: tuple[tuple[str, dict[str, Any]], ...],
+) -> tuple[Any | None, ...]:
+    """Execute reviewed BFF constituents in order and omit only failed values."""
+    values: list[Any | None] = []
+    for capability_id, arguments in calls:
+        try:
+            values.append(await _invoke(request, user, principal, gateway, capability_id, arguments))
+        except Exception:
+            values.append(None)
+    return tuple(values)
+
+
 @router.get("/home", deprecated=True)
 async def get_workbench_home(
     request: Request,
@@ -69,40 +85,17 @@ async def get_workbench_home(
     gateway=Depends(get_default_gateway),
 ):
     scope = build_access_scope(current_user)
-    projects: list[dict[str, Any]] = []
-    follows: list[dict[str, Any]] = []
-    try:
-        projects = _items(
-            await _invoke(
-                request,
-                current_user,
-                principal,
-                gateway,
-                "project.project.read",
-                "projects.search",
-                {
-                    "include_deleted": False,
-                    "include_archived": False,
-                    "scope": scope,
-                },
-            )
-        )
-    except Exception:
-        projects = []
-    try:
-        follows = _items(
-            await _invoke(
-                request,
-                current_user,
-                principal,
-                gateway,
-                "project.follow.read",
-                "follows.list",
-                {"item_type": None},
-            )
-        )
-    except Exception:
-        follows = []
+    project_value, follow_value = await execute_constituents(
+        request, current_user, principal, gateway,
+        (
+            ("project.project.read.atomic.projects_search", {
+                "include_deleted": False, "include_archived": False, "scope": scope,
+            }),
+            ("project.follow.read.atomic.follows_list", {"item_type": None}),
+        ),
+    )
+    projects = _items(project_value)
+    follows = _items(follow_value)
     role = str(current_user.get("org_role") or current_user.get("system_role") or "member")
     return {
         "today_items": [],
@@ -137,8 +130,7 @@ async def get_workbench_panel1(
     for source in requested:
         if source not in {"task", "issue"}:
             continue
-        capability_id = f"project.{source}.read"
-        operation = f"{source}s.search"
+        capability_id = f"project.{source}.read.atomic.{source}s_search"
         for list_gid in _gids(task_lists if source == "task" else issue_lists):
             arguments = {
                 "project_gid": None,
@@ -150,22 +142,10 @@ async def get_workbench_panel1(
             }
             if source == "task":
                 arguments["scheduled_date_from"] = None
-            try:
-                items.extend(
-                    _items(
-                        await _invoke(
-                            request,
-                            current_user,
-                            principal,
-                            gateway,
-                            capability_id,
-                            operation,
-                            arguments,
-                        )
-                    )
-                )
-            except Exception:
-                continue
+            value, = await execute_constituents(
+                request, current_user, principal, gateway, ((capability_id, arguments),),
+            )
+            items.extend(_items(value))
     unique: dict[tuple[str, str], dict[str, Any]] = {}
     for item in items:
         key = (str(item.get("item_type") or ""), str(item.get("gid") or ""))
@@ -174,4 +154,4 @@ async def get_workbench_panel1(
     return {"items": result, "total": len(result)}
 
 
-__all__ = ["router"]
+__all__ = ["execute_constituents", "router"]

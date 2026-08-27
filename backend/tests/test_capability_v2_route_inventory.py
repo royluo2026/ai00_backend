@@ -96,7 +96,7 @@ def test_task3b3a_bff_requires_real_anchored_multi_capability_aggregation() -> N
     ledger = _root_cause_ledger()
     bff_entries = [
         entry for entry in ledger.entries
-        if entry.disposition == "truthful_bff_required"
+        if entry.disposition == "truthful_bff_registered"
     ]
 
     assert {entry.key for entry in bff_entries} == {
@@ -129,7 +129,7 @@ def test_task3b3a_conditional_dispatch_is_not_bff_aggregation() -> None:
     ledger = _root_cause_ledger()
     lists = _entry(ledger, "GET", "/api/lists")
 
-    assert lists.disposition == "conditional_dispatch_required"
+    assert lists.disposition == "conditional_dispatch_migrated"
     assert lists.disposition_details["selector"] == "item_type"
     assert len(lists.disposition_details["branch_capabilities"]) == 2
 
@@ -252,7 +252,7 @@ def test_task3b3a_handler_evidence_is_existing_and_route_exact() -> None:
     assert "ledger_handler_route_mismatch:GET:/api/plugin/list" in issues
 
 
-def test_task3b3a_operations_candidate_is_exact_and_unapproved() -> None:
+def test_task3b3d_file_store_candidate_is_governed_without_operations_approval() -> None:
     ledger = _root_cause_ledger()
     operations = [
         entry for entry in ledger.entries
@@ -260,29 +260,23 @@ def test_task3b3a_operations_candidate_is_exact_and_unapproved() -> None:
     ]
     flow_test = _entry(ledger, "POST", "/api/flows/test-node")
 
-    assert len(operations) == 1
-    assert operations[0].key == ("GET", "/api/file-store/config")
-    assert operations[0].owner_domain == "platform-runtime"
-    assert operations[0].backend_evidence["source_path"] == "backend/routers/file_store.py"
-    assert operations[0].backend_evidence["handler_status"] == "registered"
-    assert operations[0].disposition_details["approval_needed"] is True
-    assert operations[0].disposition_details["non_business_operation"] == "runtime storage configuration read"
+    file_store = _entry(ledger, "GET", "/api/file-store/config")
+    assert operations == []
+    assert file_store.disposition == "file_store_capability_migrated"
+    assert file_store.owner_domain == "base"
+    assert file_store.disposition_details["target_capability"] == "base.file_store.public_config.get@1"
+    assert file_store.disposition_details["public_projection"] == "secret_filtered_closed_schema"
     assert flow_test.disposition == "new_atomic_capability_required"
     assert flow_test.owner_domain == "agent"
 
 
-def test_task3b3a_operations_validator_rejects_weak_candidate() -> None:
+def test_task3b3d_file_store_validator_rejects_weak_capability_evidence() -> None:
     ledger = _root_cause_ledger()
     original = _entry(ledger, "GET", "/api/file-store/config")
-    evidence = dict(original.backend_evidence)
-    evidence["source_path"] = "backend/routers/not_a_real_handler.py"
     details = dict(original.disposition_details)
-    details["approval_needed"] = False
-    details["non_business_operation"] = ""
+    details["target_capability"] = "base.fake@1"
     weak = replace(
         original,
-        owner_domain="base",
-        backend_evidence=evidence,
         disposition_details=details,
     )
 
@@ -290,7 +284,7 @@ def test_task3b3a_operations_validator_rejects_weak_candidate() -> None:
         ROOT, _replace_ledger_entry(ledger, weak)
     )
 
-    assert "ledger_operations_candidate_invalid:GET:/api/file-store/config" in issues
+    assert "ledger_file_store_capability_invalid:GET:/api/file-store/config" in issues
 
 
 def test_task3b3c_reviewed_disposition_totals_are_exact() -> None:
@@ -309,20 +303,20 @@ def test_task3b3c_reviewed_disposition_totals_are_exact() -> None:
         "frontend_route_normalize": 15,
         "new_atomic_capability_required": 5,
         "existing_stable_capability": 5,
-        "conditional_dispatch_required": 3,
-        "truthful_bff_required": 2,
-        "operations_candidate": 1,
+        "conditional_dispatch_migrated": 3,
+        "truthful_bff_registered": 2,
+        "file_store_capability_migrated": 1,
     })
     assert occurrences == Counter({
         "existing_capability_reclassified": 54,
         "existing_capability_migrated": 27,
         "frontend_route_normalize": 23,
         "frontend_retire": 21,
-        "conditional_dispatch_required": 20,
+        "conditional_dispatch_migrated": 20,
         "existing_stable_capability": 7,
         "new_atomic_capability_required": 6,
-        "truthful_bff_required": 2,
-        "operations_candidate": 1,
+        "truthful_bff_registered": 2,
+        "file_store_capability_migrated": 1,
     })
 
 

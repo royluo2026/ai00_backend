@@ -58,10 +58,10 @@
     "web/workspace/nav_manager.js": "e229fb407361c139cfc265cd438f929a944cd1919c321c4b6a1cf5bf57cfcd7d"
   },
   "final_evidence": {
-    "frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
-    "content_hash": "5b1c2e258eb0b41fb7f3e558578ac18dff02f6f24a5747ef1b640700a9410643",
-    "unresolved_count": 83,
-    "unresolved_group_count": 46
+    "frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
+    "content_hash": "0dcabbdcbd67dfac9fceaa4628ae41411fecc55e6550d93d9a97cde36e82519c",
+    "unresolved_count": 60,
+    "unresolved_group_count": 40
   },
   "final_unresolved_groups": [
     {
@@ -75,12 +75,6 @@
       "normalized_route": "/api/craft_lib/fixtures/{dynamic}",
       "occurrence_count": 1,
       "disposition": "new_atomic_capability_required"
-    },
-    {
-      "method": "DELETE",
-      "normalized_route": "/api/lists/{dynamic}",
-      "occurrence_count": 2,
-      "disposition": "conditional_dispatch_required"
     },
     {
       "method": "DELETE",
@@ -129,18 +123,6 @@
       "normalized_route": "/api/ext-mappings/{dynamic}/preview",
       "occurrence_count": 1,
       "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "GET",
-      "normalized_route": "/api/file-store/config",
-      "occurrence_count": 1,
-      "disposition": "operations_candidate"
-    },
-    {
-      "method": "GET",
-      "normalized_route": "/api/lists",
-      "occurrence_count": 12,
-      "disposition": "conditional_dispatch_required"
     },
     {
       "method": "GET",
@@ -197,28 +179,10 @@
       "disposition": "existing_capability_reclassified"
     },
     {
-      "method": "GET",
-      "normalized_route": "/api/workbench/home",
-      "occurrence_count": 1,
-      "disposition": "truthful_bff_required"
-    },
-    {
-      "method": "GET",
-      "normalized_route": "/api/workbench/panel1",
-      "occurrence_count": 1,
-      "disposition": "truthful_bff_required"
-    },
-    {
       "method": "PATCH",
       "normalized_route": "/api/ext-datasources/{dynamic}",
       "occurrence_count": 1,
       "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "PATCH",
-      "normalized_route": "/api/lists/{dynamic}",
-      "occurrence_count": 6,
-      "disposition": "conditional_dispatch_required"
     },
     {
       "method": "PATCH",
@@ -379,7 +343,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
+        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -631,7 +595,7 @@
         ]
       },
       "lifecycle_conclusion": "The handler selects exactly one branch per request; conditional dispatch is not aggregation and cannot be registered as a BFF.",
-      "disposition": "conditional_dispatch_required",
+      "disposition": "conditional_dispatch_migrated",
       "disposition_details": {
         "selector": "record family existence",
         "branch_capabilities": [
@@ -944,7 +908,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
+        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
         "retirement_proof": {
           "kind": "http_410",
           "rationale": "The registered AI balance compatibility endpoint is permanently gone and returns HTTP 410, so polling it cannot yield a supported outcome.",
@@ -1013,7 +977,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
+        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -1075,7 +1039,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
+        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -1137,7 +1101,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
+        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -1210,7 +1174,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
+        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -1284,7 +1248,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
+        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -1357,7 +1321,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
+        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -1954,7 +1918,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
+        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
         "retirement_proof": {
           "kind": "backend_route_absent",
           "rationale": "The standalone Feishu UI had no matching API-prefixed configuration handler; it now uses a bounded local default configuration.",
@@ -1997,27 +1961,27 @@
           "source_sha256": "7315fba56b7f88f38265b933ae6615bbfaf2e8f826540f6315d60aa85e0e4a82"
         }
       ],
-      "owner_domain": "platform-runtime",
+      "owner_domain": "base",
       "backend_evidence": {
         "handler_status": "registered",
         "source_path": "backend/routers/file_store.py",
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/file_store.py",
-          "start_line": 88,
-          "end_line": 158,
-          "sha256": "e085c607d0720f3d6df653a4b5f2dd6b38ed7b36d863b1ebfcd3431a715a8dae",
+          "start_line": 90,
+          "end_line": 93,
+          "sha256": "67c9bcc853a3f17d1d3794a71b2fdaeb9da38f7a30cdc1962f15874081b385fe",
           "method": "GET",
           "normalized_route": "/api/file-store/config"
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "This is a bounded runtime configuration read, but no operations exclusion is activated without separate approval.",
-      "disposition": "operations_candidate",
+      "lifecycle_conclusion": "The Web consumer invokes an authenticated, secret-filtered Base capability through Gateway.",
+      "disposition": "file_store_capability_migrated",
       "disposition_details": {
-        "approval_status": "not_approved",
-        "approval_needed": true,
-        "non_business_operation": "runtime storage configuration read"
+        "target_capability": "base.file_store.public_config.get@1",
+        "public_projection": "secret_filtered_closed_schema",
+        "manifest": "docs/governance/special-web-residual-contracts.json"
       }
     },
     {
@@ -2125,7 +2089,7 @@
           "method": "GET",
           "disposition": "unresolved",
           "occurrence_id": "web/components/quick_list.html:298:50:GET:/api/knowledge/entries",
-          "source_sha256": "0b5f12cfe1cdfba7f2236a1ace752af95f79e2a38f83ed73a66ce0a0799e3a39"
+          "source_sha256": "a977ef607888216100f6606aecfe82c4aa79bc6c764f5d1df66ecb91514cbd36"
         }
       ],
       "owner_domain": "knowledge",
@@ -2423,7 +2387,7 @@
         ]
       },
       "lifecycle_conclusion": "The handler selects exactly one branch per request; conditional dispatch is not aggregation and cannot be registered as a BFF.",
-      "disposition": "conditional_dispatch_required",
+      "disposition": "conditional_dispatch_migrated",
       "disposition_details": {
         "selector": "item_type",
         "branch_capabilities": [
@@ -2482,7 +2446,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
+        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
         "retirement_proof": {
           "kind": "sample_template_only",
           "rationale": "The only caller lived in the distributable plugin SDK template and represented placeholder sample data rather than a shipped product route.",
@@ -3118,10 +3082,10 @@
           "proof_kind": "provider_equivalent_adapter",
           "provider_contract": {
             "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-            "source_sha256": "499025e424e149ca3c5bc4e00b221b9fa90e390958516931ac85a6ba2ddd9c3c",
-            "start_line": 207,
-            "end_line": 207,
-            "sha256": "4b7b8840eb19e82fbe9f1530b1cc5d8d77f475d6f79c9c5eaa3d3cd12a68d2f4",
+            "source_sha256": "7d3b676ee23cddeb64ed071a611c1730ab027017115366c8a57398c9c8d1c040",
+            "start_line": 150,
+            "end_line": 150,
+            "sha256": "521d0e298f3386b9d55e96c07369fbe02fde966f3967252b2396eee162f3ccd5",
             "needle": "payload.get(\"arguments\", payload)"
           }
         }
@@ -3557,9 +3521,9 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/workbench_home.py",
-          "start_line": 64,
-          "end_line": 121,
-          "sha256": "63411d4553c09781b74aaef78024481601f2ab18b2dc15129bf937629f4a8037",
+          "start_line": 80,
+          "end_line": 114,
+          "sha256": "63218f9452f7c50da11b8d30857ccc9ace4390c06b9b7455701addaace760f71",
           "method": "GET",
           "normalized_route": "/api/workbench/home"
         },
@@ -3567,14 +3531,14 @@
           {
             "repository": "backend",
             "source_path": "backend/routers/workbench_home.py",
-            "start_line": 64,
-            "end_line": 121,
-            "sha256": "63411d4553c09781b74aaef78024481601f2ab18b2dc15129bf937629f4a8037"
+            "start_line": 80,
+            "end_line": 114,
+            "sha256": "63218f9452f7c50da11b8d30857ccc9ace4390c06b9b7455701addaace760f71"
           }
         ]
       },
       "lifecycle_conclusion": "The anchored handler invokes two stable outcomes and merges their results into one reviewed workbench response.",
-      "disposition": "truthful_bff_required",
+      "disposition": "truthful_bff_registered",
       "disposition_details": {
         "constituent_capabilities": [
           "project.project.read.atomic.projects_search@1",
@@ -3586,9 +3550,9 @@
             {
               "repository": "backend",
               "source_path": "backend/routers/workbench_home.py",
-              "start_line": 64,
-              "end_line": 121,
-              "sha256": "63411d4553c09781b74aaef78024481601f2ab18b2dc15129bf937629f4a8037"
+              "start_line": 80,
+              "end_line": 114,
+              "sha256": "63218f9452f7c50da11b8d30857ccc9ace4390c06b9b7455701addaace760f71"
             }
           ],
           "combined_outcomes": [
@@ -3623,9 +3587,9 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/workbench_home.py",
-          "start_line": 124,
-          "end_line": 174,
-          "sha256": "94d41d04d1b4804ad76386ea581621a0f3eebe46abb078c0259b1d9ec6696d26",
+          "start_line": 117,
+          "end_line": 154,
+          "sha256": "916090acf7ce04293cc58dbbaba56e4ccffc2a3db8175f8462423cb311cb3274",
           "method": "GET",
           "normalized_route": "/api/workbench/panel1"
         },
@@ -3633,14 +3597,14 @@
           {
             "repository": "backend",
             "source_path": "backend/routers/workbench_home.py",
-            "start_line": 124,
-            "end_line": 174,
-            "sha256": "94d41d04d1b4804ad76386ea581621a0f3eebe46abb078c0259b1d9ec6696d26"
+            "start_line": 117,
+            "end_line": 154,
+            "sha256": "916090acf7ce04293cc58dbbaba56e4ccffc2a3db8175f8462423cb311cb3274"
           }
         ]
       },
       "lifecycle_conclusion": "The anchored handler invokes two stable outcomes and merges their results into one reviewed workbench response.",
-      "disposition": "truthful_bff_required",
+      "disposition": "truthful_bff_registered",
       "disposition_details": {
         "constituent_capabilities": [
           "project.task.read.atomic.tasks_search@1",
@@ -3652,9 +3616,9 @@
             {
               "repository": "backend",
               "source_path": "backend/routers/workbench_home.py",
-              "start_line": 124,
-              "end_line": 174,
-              "sha256": "94d41d04d1b4804ad76386ea581621a0f3eebe46abb078c0259b1d9ec6696d26"
+              "start_line": 117,
+              "end_line": 154,
+              "sha256": "916090acf7ce04293cc58dbbaba56e4ccffc2a3db8175f8462423cb311cb3274"
             }
           ],
           "combined_outcomes": [
@@ -3986,7 +3950,7 @@
         ]
       },
       "lifecycle_conclusion": "The handler selects exactly one branch per request; conditional dispatch is not aggregation and cannot be registered as a BFF.",
-      "disposition": "conditional_dispatch_required",
+      "disposition": "conditional_dispatch_migrated",
       "disposition_details": {
         "selector": "body.archive",
         "branch_capabilities": [
@@ -4436,7 +4400,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
+        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4498,7 +4462,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
+        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4560,7 +4524,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
+        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4622,7 +4586,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
+        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4684,7 +4648,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
+        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -5287,7 +5251,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
+        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
         "retirement_proof": {
           "kind": "sample_template_only",
           "rationale": "The only caller lived in the distributable plugin SDK template and represented placeholder sample data rather than a shipped product route.",
@@ -5816,7 +5780,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
+        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
         "retirement_proof": {
           "kind": "http_410",
           "rationale": "The registered V1 standard-operation clone compatibility endpoint raises HTTP 410 and instructs callers to use the current BOP entry surface.",
@@ -6134,10 +6098,10 @@
           "proof_kind": "provider_equivalent_adapter",
           "provider_contract": {
             "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-            "source_sha256": "499025e424e149ca3c5bc4e00b221b9fa90e390958516931ac85a6ba2ddd9c3c",
-            "start_line": 207,
-            "end_line": 207,
-            "sha256": "4b7b8840eb19e82fbe9f1530b1cc5d8d77f475d6f79c9c5eaa3d3cd12a68d2f4",
+            "source_sha256": "7d3b676ee23cddeb64ed071a611c1730ab027017115366c8a57398c9c8d1c040",
+            "start_line": 150,
+            "end_line": 150,
+            "sha256": "521d0e298f3386b9d55e96c07369fbe02fde966f3967252b2396eee162f3ccd5",
             "needle": "payload.get(\"arguments\", payload)"
           }
         }
@@ -6432,10 +6396,10 @@
           "proof_kind": "provider_equivalent_adapter",
           "provider_contract": {
             "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-            "source_sha256": "499025e424e149ca3c5bc4e00b221b9fa90e390958516931ac85a6ba2ddd9c3c",
-            "start_line": 207,
-            "end_line": 207,
-            "sha256": "4b7b8840eb19e82fbe9f1530b1cc5d8d77f475d6f79c9c5eaa3d3cd12a68d2f4",
+            "source_sha256": "7d3b676ee23cddeb64ed071a611c1730ab027017115366c8a57398c9c8d1c040",
+            "start_line": 150,
+            "end_line": 150,
+            "sha256": "521d0e298f3386b9d55e96c07369fbe02fde966f3967252b2396eee162f3ccd5",
             "needle": "payload.get(\"arguments\", payload)"
           }
         }
@@ -6478,10 +6442,10 @@
           "proof_kind": "provider_equivalent_adapter",
           "provider_contract": {
             "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-            "source_sha256": "499025e424e149ca3c5bc4e00b221b9fa90e390958516931ac85a6ba2ddd9c3c",
-            "start_line": 207,
-            "end_line": 207,
-            "sha256": "4b7b8840eb19e82fbe9f1530b1cc5d8d77f475d6f79c9c5eaa3d3cd12a68d2f4",
+            "source_sha256": "7d3b676ee23cddeb64ed071a611c1730ab027017115366c8a57398c9c8d1c040",
+            "start_line": 150,
+            "end_line": 150,
+            "sha256": "521d0e298f3386b9d55e96c07369fbe02fde966f3967252b2396eee162f3ccd5",
             "needle": "payload.get(\"arguments\", payload)"
           }
         }

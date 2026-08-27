@@ -69,13 +69,13 @@
     },
     {
       "source": "web/components/list_sidebar.js",
-      "line": 902,
+      "line": 903,
       "column": 14,
       "reason": "Comment describes the adjacent project selector; it is not executable."
     },
     {
       "source": "web/components/list_tree.html",
-      "line": 625,
+      "line": 626,
       "column": 18,
       "reason": "Comment labels the adjacent list binding behavior; it is not executable."
     },
@@ -111,7 +111,7 @@
     },
     {
       "source": "web/workbench/workbench.js",
-      "line": 4956,
+      "line": 4960,
       "column": 18,
       "reason": "Comment describes the adjacent panel loader; it is not executable."
     }

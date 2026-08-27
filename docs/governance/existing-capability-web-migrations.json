@@ -3,7 +3,7 @@
   "artifact_id": "existing-capability-web-migrations",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "baseline_revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-  "frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
+  "frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
   "groups": [
     {
       "method": "DELETE",
@@ -749,10 +749,10 @@
       "frontend_call_sites": [
         {
           "source_path": "web/components/quick_list.html",
-          "line": 307,
+          "line": 310,
           "column": 14,
           "operation": "knowledge.search",
-          "source_sha256": "63c3d8f95a042eccb5499e7733474a7bf6ae9f578c0b9b78ecfaf052127d5549"
+          "source_sha256": "bab547c5eacbeed07f44c4f27c7ba4d2c9bcacd0fccebe461a8eec0ef776634f"
         }
       ],
       "equivalence_evidence": {
@@ -1423,10 +1423,10 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-          "source_sha256": "499025e424e149ca3c5bc4e00b221b9fa90e390958516931ac85a6ba2ddd9c3c",
-          "start_line": 207,
-          "end_line": 207,
-          "sha256": "4b7b8840eb19e82fbe9f1530b1cc5d8d77f475d6f79c9c5eaa3d3cd12a68d2f4",
+          "source_sha256": "7d3b676ee23cddeb64ed071a611c1730ab027017115366c8a57398c9c8d1c040",
+          "start_line": 150,
+          "end_line": 150,
+          "sha256": "521d0e298f3386b9d55e96c07369fbe02fde966f3967252b2396eee162f3ccd5",
           "needle": "payload.get(\"arguments\", payload)"
         }
       },
@@ -3326,27 +3326,27 @@
       "frontend_call_sites": [
         {
           "source_path": "web/components/quick_list.html",
-          "line": 301,
+          "line": 303,
           "column": 16,
           "operation": "project.issue.update",
-          "source_sha256": "63c3d8f95a042eccb5499e7733474a7bf6ae9f578c0b9b78ecfaf052127d5549"
+          "source_sha256": "bab547c5eacbeed07f44c4f27c7ba4d2c9bcacd0fccebe461a8eec0ef776634f"
         },
         {
           "source_path": "web/components/quick_list.html",
-          "line": 784,
+          "line": 787,
           "column": 18,
           "operation": "project.issue.update",
-          "source_sha256": "63c3d8f95a042eccb5499e7733474a7bf6ae9f578c0b9b78ecfaf052127d5549"
+          "source_sha256": "bab547c5eacbeed07f44c4f27c7ba4d2c9bcacd0fccebe461a8eec0ef776634f"
         }
       ],
       "equivalence_evidence": {
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-          "source_sha256": "499025e424e149ca3c5bc4e00b221b9fa90e390958516931ac85a6ba2ddd9c3c",
-          "start_line": 207,
-          "end_line": 207,
-          "sha256": "4b7b8840eb19e82fbe9f1530b1cc5d8d77f475d6f79c9c5eaa3d3cd12a68d2f4",
+          "source_sha256": "7d3b676ee23cddeb64ed071a611c1730ab027017115366c8a57398c9c8d1c040",
+          "start_line": 150,
+          "end_line": 150,
+          "sha256": "521d0e298f3386b9d55e96c07369fbe02fde966f3967252b2396eee162f3ccd5",
           "needle": "payload.get(\"arguments\", payload)"
         }
       },
@@ -3386,10 +3386,10 @@
       "frontend_call_sites": [
         {
           "source_path": "web/components/quick_list.html",
-          "line": 311,
+          "line": 314,
           "column": 16,
           "operation": "knowledge.update",
-          "source_sha256": "63c3d8f95a042eccb5499e7733474a7bf6ae9f578c0b9b78ecfaf052127d5549"
+          "source_sha256": "bab547c5eacbeed07f44c4f27c7ba4d2c9bcacd0fccebe461a8eec0ef776634f"
         }
       ],
       "equivalence_evidence": {
@@ -3667,27 +3667,27 @@
       "frontend_call_sites": [
         {
           "source_path": "web/components/quick_list.html",
-          "line": 292,
+          "line": 293,
           "column": 16,
           "operation": "project.task.update",
-          "source_sha256": "63c3d8f95a042eccb5499e7733474a7bf6ae9f578c0b9b78ecfaf052127d5549"
+          "source_sha256": "bab547c5eacbeed07f44c4f27c7ba4d2c9bcacd0fccebe461a8eec0ef776634f"
         },
         {
           "source_path": "web/components/quick_list.html",
-          "line": 767,
+          "line": 770,
           "column": 18,
           "operation": "project.task.update",
-          "source_sha256": "63c3d8f95a042eccb5499e7733474a7bf6ae9f578c0b9b78ecfaf052127d5549"
+          "source_sha256": "bab547c5eacbeed07f44c4f27c7ba4d2c9bcacd0fccebe461a8eec0ef776634f"
         }
       ],
       "equivalence_evidence": {
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-          "source_sha256": "499025e424e149ca3c5bc4e00b221b9fa90e390958516931ac85a6ba2ddd9c3c",
-          "start_line": 207,
-          "end_line": 207,
-          "sha256": "4b7b8840eb19e82fbe9f1530b1cc5d8d77f475d6f79c9c5eaa3d3cd12a68d2f4",
+          "source_sha256": "7d3b676ee23cddeb64ed071a611c1730ab027017115366c8a57398c9c8d1c040",
+          "start_line": 150,
+          "end_line": 150,
+          "sha256": "521d0e298f3386b9d55e96c07369fbe02fde966f3967252b2396eee162f3ccd5",
           "needle": "payload.get(\"arguments\", payload)"
         }
       },
@@ -3737,10 +3737,10 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-          "source_sha256": "499025e424e149ca3c5bc4e00b221b9fa90e390958516931ac85a6ba2ddd9c3c",
-          "start_line": 207,
-          "end_line": 207,
-          "sha256": "4b7b8840eb19e82fbe9f1530b1cc5d8d77f475d6f79c9c5eaa3d3cd12a68d2f4",
+          "source_sha256": "7d3b676ee23cddeb64ed071a611c1730ab027017115366c8a57398c9c8d1c040",
+          "start_line": 150,
+          "end_line": 150,
+          "sha256": "521d0e298f3386b9d55e96c07369fbe02fde966f3967252b2396eee162f3ccd5",
           "needle": "payload.get(\"arguments\", payload)"
         }
       },

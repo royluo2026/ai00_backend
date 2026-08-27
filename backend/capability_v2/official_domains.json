@@ -36,7 +36,7 @@
         "plugin_id": "official.base",
         "module": "backend.base.official_provider",
         "version": "1.0.0",
-        "artifact_hash": "sha256:e4ab9a0be9e0b466e5837a13b6463040848ce40e1655feaabad78b066dbe25c6"
+        "artifact_hash": "sha256:451d5bd2cbf7727329966ad7a0c746ce23197d8d9a2a0739da698fc843f3a2db"
       },
       "artifact_path": "backend/base",
       "allowed_owners": [
@@ -268,7 +268,7 @@
         "plugin_id": "official.project-management",
         "module": "project_management_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:59c656c05500acbb85da5ecd95a0f100c52d9cb71215e37ba0c47aa818a70086"
+        "artifact_hash": "sha256:a3f08494ad47b6d85270f788c4baff6d280ba2262583b7f3d08a4532046f80bc"
       },
       "artifact_path": "plugins/project_management/project_management_backend",
       "allowed_owners": [

@@ -2716,3 +2716,75 @@ Exact implementation commits:
 No dependency was installed and no push, merge, production database mutation,
 BFF/operations approval, public REST fallback, or cross-domain direct database
 access was performed.
+
+## Task 3B.3d
+
+Task 3B.3d governs exactly six residual groups / 23 baseline frontend
+occurrences as one conserved package: Project list conditional dispatch 3/20,
+truthful workbench BFFs 2/2, and the file-store public configuration read 1/1.
+The independent `special-web-residual-contracts.json` binds every baseline
+occurrence and source hash to the exact final Capability/BFF evidence and final
+canonical inventory; occurrence, source-hash, target, and inventory-hash
+mutations all fail closed.
+
+Finite list dispatch now selects only these reviewed branches through Gateway:
+
+- `project.list.read.atomic.lists_search@1` or
+  `craft.bop.version.list@1` for GET;
+- `project.list.change.apply.atomic.lists_update@1` or
+  `project.list.change.apply.atomic.lists_delete@1` for PATCH;
+- `project.list.change.apply.atomic.lists_delete@1` or
+  `craft.bop.version.archive@1` for DELETE.
+
+Unknown branches reject without REST fallback. Project search scope is replaced
+with a server-derived scope. Write branches use the real Gateway confirmation
+and stable idempotency flow.
+
+The registered BFF `/api/workbench/home` invokes, in order,
+`project.project.read.atomic.projects_search@1` and
+`project.follow.read.atomic.follows_list@1`. `/api/workbench/panel1` invokes
+`project.task.read.atomic.tasks_search@1` and
+`project.issue.read.atomic.issues_search@1`. Both use
+`backend.routers.workbench_home:execute_constituents` and the deterministic
+`continue_in_declared_order_omit_failed` policy; tests cover the failure path.
+
+The new stable authenticated read-only Capability
+`base.file_store.public_config.get@1` calls the public Platform SDK runtime
+configuration boundary and exposes a closed secret-filtered projection. Raw
+access/secret keys, OIS client secrets, and internal paths cannot appear in the
+output. No operations exclusion was added for the GET consumer.
+
+Generated evidence:
+
+- Catalog release `rel_86c92a7e6e59a987be6d7ec3d2d4c11b`: 465
+  descriptors/pages and 449 stable capabilities.
+- Frontend revision `86168958c7441a98dc7556bf5ec0c1c1faf64e6b`, content hash
+  `0dcabbdcbd67dfac9fceaa4628ae41411fecc55e6550d93d9a97cde36e82519c`.
+- Canonical Web inventory: total 430, capability 38, legacy registered 311,
+  BFF registered 2, operations excluded 19, unresolved 60.
+- Root ledger: 102 groups / 161 occurrences; final unresolved 40 groups / 60
+  occurrences. This package contributes `conditional_dispatch_migrated=3/20`,
+  `truthful_bff_registered=2/2`, and `file_store_capability_migrated=1/1`.
+
+Verification evidence:
+
+```text
+GREEN: special manifest/provider/BFF focused suite: 14 passed
+GREEN: consumer/completion/route-proof/BFF broad suite: 153 passed
+GREEN: strict offline acceptance: 3,143/3,143 validated; failed=0; skipped=0
+GREEN: acceptance pytest: 3,154 passed
+GREEN: Catalog/docs/acceptance/provider/atomic/special/domain/root-ledger/Web checks
+GREEN: frontend special/batch/existing/atomic governance tests and changed JS syntax
+ENVIRONMENT LIMIT: full npm test stops when jsdom is unavailable; production
+build stops when cross-env is unavailable. Dependencies were not installed.
+```
+
+Exact implementation commits:
+
+- Frontend `86168958c7441a98dc7556bf5ec0c1c1faf64e6b`
+  (`feat: migrate special web residuals to capabilities`).
+- Backend commit recorded immediately after this report entry.
+
+No dependency was installed, and no push, merge, production database mutation,
+operations approval, private-router import, REST fallback, or cross-domain
+database access was performed.

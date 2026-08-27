@@ -19,6 +19,7 @@ _LIFECYCLE = {
 _STORAGE_WRITES = {"plugin.storage.delete", "plugin.storage.put"}
 _WRITES = _LIFECYCLE | _STORAGE_WRITES | {"system.job.cancel"}
 _ATOMIC_WEB_EFFECTS = {
+    "base.file_store.public_config.get": "Reads a secret-filtered file-store configuration projection without mutation.",
     "base.authorization.grant.list": "Reads active authorization grants from the Base grant store without mutation.",
     "base.authorization.grant.create": "Creates or replaces one scoped authorization grant in the Base grant store.",
     "base.authorization.grant.revoke": "Deletes one existing scoped authorization grant from the Base grant store.",
