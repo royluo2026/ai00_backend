@@ -2953,3 +2953,35 @@ Exact implementation commits:
 No dependency was installed and no push, merge, production database mutation,
 operations approval, BFF, private-router import, or cross-domain database
 access was performed.
+
+## Task 3B.3e-integration
+
+Integration structural remediation reviewed the pinned 12 route groups / 12
+frontend occurrences for external datasources and mappings. Every old route is
+absent from the production backend. Although the Integration plugin exposes
+name-matched candidates, their closed requests/responses are not equivalent to
+the legacy calls; connector discovery/test/preview and mapping import also have
+external effects whose legacy timeout, confirmation, idempotency, and
+outcome-recovery semantics cannot be proved. Therefore all 12 / 12 remain
+explicitly unresolved; no frontend REST call was relabelled as a Gateway
+migration.
+
+The independent manifest pins the Task baseline occurrence/source hashes, the
+absent old-route evidence, candidate provider hash, safe credential statement
+(only a governed `credential_ref`, no credential values), unknown external
+outcomes, and final canonical inventory. Its validator fails closed for target,
+provider-hash, source-occurrence, old-route-evidence, final-inventory, and
+manifest-hash mutations.
+
+Verification evidence:
+
+```text
+GREEN: manifest conservation test (1 passed)
+GREEN: target/provider/final-inventory mutation test (1 passed)
+GREEN: fresh Integration manifest --check: 12 groups / 12 occurrences;
+       migrated=0; unresolved=12
+```
+
+No dependency was installed and no external connector was called. No frontend
+commit was created because every route remains unresolved; backend commit
+records the evidence-only closure package.

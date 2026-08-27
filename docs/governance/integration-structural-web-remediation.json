@@ -1,0 +1,453 @@
+{
+  "artifact_id": "task-3b3e-integration-structural-remediation",
+  "atomic_contract_manifest_sha256": "sha256:ad3e325f3b1912d1fdc672af905605aefa4b7f8ede7803c6c266c90ac8c54a00",
+  "content_sha256": "sha256:122f9fa6566a0f2f6bdf0d684add94be6c052576c83b65d698fb6202515b1cbe",
+  "counts": {
+    "groups": 12,
+    "migrated_groups": 0,
+    "migrated_occurrences": 0,
+    "occurrences": 12,
+    "unresolved_groups": 12,
+    "unresolved_occurrences": 12
+  },
+  "entries": [
+    {
+      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "candidate_capability": "integration.connector.search@1",
+      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
+      "external_outcome": "not_applicable",
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
+      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "method": "GET",
+      "normalized_route": "/api/ext-datasources",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 148,
+          "method": "GET",
+          "normalized_route": "/api/ext-datasources",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:148:36:GET:/api/ext-datasources",
+          "raw_route": "/api/ext-datasources",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+    },
+    {
+      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "candidate_capability": "integration.connector.schema.discover@1",
+      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
+      "external_outcome": "unknown_without_provider_equivalence",
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
+      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "method": "GET",
+      "normalized_route": "/api/ext-datasources/{dynamic}/tables",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 640,
+          "method": "GET",
+          "normalized_route": "/api/ext-datasources/{dynamic}/tables",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:640:36:GET:/api/ext-datasources/{dynamic}/tables",
+          "raw_route": "/api/ext-datasources/${_selectedDs.gid}/tables",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+    },
+    {
+      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "candidate_capability": "integration.mapping.get@1",
+      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
+      "external_outcome": "not_applicable",
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
+      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "method": "GET",
+      "normalized_route": "/api/ext-field-mappings",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 349,
+          "method": "GET",
+          "normalized_route": "/api/ext-field-mappings",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:349:36:GET:/api/ext-field-mappings",
+          "raw_route": "/api/ext-field-mappings?mapping_gid=${_selectedMap.gid}",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+    },
+    {
+      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "candidate_capability": "integration.mapping.search@1",
+      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
+      "external_outcome": "not_applicable",
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
+      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "method": "GET",
+      "normalized_route": "/api/ext-mappings",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 187,
+          "method": "GET",
+          "normalized_route": "/api/ext-mappings",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:187:36:GET:/api/ext-mappings",
+          "raw_route": "/api/ext-mappings?datasource_gid=${_selectedDs.gid}",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+    },
+    {
+      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "candidate_capability": "integration.connector.schema.discover@1",
+      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
+      "external_outcome": "unknown_without_provider_equivalence",
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
+      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "method": "GET",
+      "normalized_route": "/api/ext-mappings/{dynamic}/columns",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 341,
+          "method": "GET",
+          "normalized_route": "/api/ext-mappings/{dynamic}/columns",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:341:36:GET:/api/ext-mappings/{dynamic}/columns",
+          "raw_route": "/api/ext-mappings/${_selectedMap.gid}/columns",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+    },
+    {
+      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "candidate_capability": "integration.mapping.preview@1",
+      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
+      "external_outcome": "unknown_without_provider_equivalence",
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
+      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "method": "GET",
+      "normalized_route": "/api/ext-mappings/{dynamic}/preview",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 496,
+          "method": "GET",
+          "normalized_route": "/api/ext-mappings/{dynamic}/preview",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:496:36:GET:/api/ext-mappings/{dynamic}/preview",
+          "raw_route": "/api/ext-mappings/${_selectedMap.gid}/preview?limit=5",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+    },
+    {
+      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "candidate_capability": "integration.connector.update@1",
+      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
+      "external_outcome": "not_applicable",
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
+      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "method": "PATCH",
+      "normalized_route": "/api/ext-datasources/{dynamic}",
+      "occurrences": [
+        {
+          "column": 29,
+          "disposition": "unresolved",
+          "line": 623,
+          "method": "PATCH",
+          "normalized_route": "/api/ext-datasources/{dynamic}",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:623:29:PATCH:/api/ext-datasources/{dynamic}",
+          "raw_route": "/api/ext-datasources/${ds.gid}",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+    },
+    {
+      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "candidate_capability": "integration.connector.create@1",
+      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
+      "external_outcome": "not_applicable",
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
+      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "method": "POST",
+      "normalized_route": "/api/ext-datasources",
+      "occurrences": [
+        {
+          "column": 28,
+          "disposition": "unresolved",
+          "line": 625,
+          "method": "POST",
+          "normalized_route": "/api/ext-datasources",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:625:28:POST:/api/ext-datasources",
+          "raw_route": "/api/ext-datasources",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+    },
+    {
+      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "candidate_capability": "integration.connector.connection.test@1",
+      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
+      "external_outcome": "unknown_without_provider_equivalence",
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
+      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "method": "POST",
+      "normalized_route": "/api/ext-datasources/{dynamic}/test",
+      "occurrences": [
+        {
+          "column": 34,
+          "disposition": "unresolved",
+          "line": 605,
+          "method": "POST",
+          "normalized_route": "/api/ext-datasources/{dynamic}/test",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:605:34:POST:/api/ext-datasources/{dynamic}/test",
+          "raw_route": "/api/ext-datasources/${ds.gid}/test",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+    },
+    {
+      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "candidate_capability": "integration.mapping.create@1",
+      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
+      "external_outcome": "not_applicable",
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
+      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "method": "POST",
+      "normalized_route": "/api/ext-mappings",
+      "occurrences": [
+        {
+          "column": 26,
+          "disposition": "unresolved",
+          "line": 677,
+          "method": "POST",
+          "normalized_route": "/api/ext-mappings",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:677:26:POST:/api/ext-mappings",
+          "raw_route": "/api/ext-mappings",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+    },
+    {
+      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "candidate_capability": "integration.sync.start@1",
+      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
+      "external_outcome": "unknown_without_provider_equivalence",
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
+      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "method": "POST",
+      "normalized_route": "/api/ext-mappings/{dynamic}/import",
+      "occurrences": [
+        {
+          "column": 37,
+          "disposition": "unresolved",
+          "line": 549,
+          "method": "POST",
+          "normalized_route": "/api/ext-mappings/{dynamic}/import",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:549:37:POST:/api/ext-mappings/{dynamic}/import",
+          "raw_route": "/api/ext-mappings/${_selectedMap.gid}/import",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+    },
+    {
+      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "candidate_capability": "integration.mapping.update@1",
+      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
+      "external_outcome": "not_applicable",
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
+      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "method": "PUT",
+      "normalized_route": "/api/ext-field-mappings/batch",
+      "occurrences": [
+        {
+          "column": 23,
+          "disposition": "unresolved",
+          "line": 457,
+          "method": "PUT",
+          "normalized_route": "/api/ext-field-mappings/batch",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:457:23:PUT:/api/ext-field-mappings/batch",
+          "raw_route": "/api/ext-field-mappings/batch?mapping_gid=${_selectedMap.gid}",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
+      },
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+      "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+    }
+  ],
+  "frontend_content_hash": "6c2d9dd40efff87a5200b668727d7b56b47989b3f65e3796de97c91d83a2affb",
+  "frontend_revision": "6dd62900c9a82173adcbbe277bb38846ab556031",
+  "schema_version": "1.0.0",
+  "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
+  "source_ledger_revision": "ffc281cb141999433c188d4b3b9fb12b9670f8c4",
+  "source_ledger_sha256": "sha256:86402d9ecee4aa2d82a4c328ce2a4262b946e7608e4e1e1161422adad8536a3c"
+}
