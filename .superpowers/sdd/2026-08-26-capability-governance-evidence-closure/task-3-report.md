@@ -4,6 +4,14 @@
 
 **BLOCKED** for governance closure, with the complete scanner, canonical evidence, drift checks, exact inventories, and completion integration implemented. The source scan is complete and assigns exactly one disposition to every discovered occurrence, but 219 occurrences truthfully remain `unresolved`. Closing those occurrences requires source-level method evidence and/or exact stable route registrations that do not exist in the current authoritative inputs. The frontend checkout was not modified.
 
+## Task 3B.3f — Structural owner-service execution plan
+
+- Added the reproducible structural remediation plan in `docs/governance/capability-v2-structural-remediation-plan.{json,md}` and its checker at `backend/scripts/check_structural_remediation_plan.py`.
+- The checker reconciles all three independent remediation manifests to the fresh canonical inventory: exactly 37 root-cause groups and 45 occurrence identities. It also binds source artifact hashes and rejects duplicate/missing groups.
+- Every group is an `owner_service_required` implementation package—never an operations/BFF exemption—and records the owner service, boundary, transaction model, exact proposed capability, scope, contract/security rules, migrations, tests, dependencies, cross-domain links, approval decision, and exit criteria.
+- The plan isolates only material non-inferable decisions: dynamic Base attachment/saved-view/profile projections; marketplace uninstall/install semantics; Integration feature retention, credential and external-network policy; Craft destructive/lifecycle/rule grammar semantics; Agent sandbox and runtime policy; BOP lifecycle; and approval-reject notifications. Routine implementation steps remain sequenced within the 11 packages.
+- TDD evidence: `backend/tests/test_structural_remediation_plan.py` was RED before the checker existed, then GREEN with mutations that remove an occurrence, substitute an owner service, or label a residual route as operations/BFF.
+
 ## Authoritative scan
 
 - Frontend checkout: `E:\Projects\ai00\workmanship-web`

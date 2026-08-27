@@ -1,0 +1,2554 @@
+{
+  "anti_patterns": [
+    "no private-router import",
+    "no direct SQL provider",
+    "no generic JSON contracts",
+    "no secret logging",
+    "no auto-confirm",
+    "no unbounded runtime execution",
+    "no fabricated atomicity",
+    "no silent REST fallback"
+  ],
+  "artifact_id": "capability-v2-structural-remediation-plan",
+  "content_sha256": "sha256:2e4d573b83d88faa2a15b4670dbc803b24cd00203ed1e11f3e9bbd04e3f5ade5",
+  "counts": {
+    "groups": 37,
+    "occurrences": 45
+  },
+  "groups": [
+    {
+      "approval": {
+        "decision": "Product must decide hard-delete versus obsolete/archive behavior because the only existing outcome is obsolete, not delete.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "Craft workspace/object scope",
+        "reference/lifecycle validation",
+        "audit event and revision lock"
+      ],
+      "cross_domain_links": [
+        "Reference checks use typed Craft ports only; no direct reads into other domain tables."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
+        "provider_anchor": "plugins/craft/craft_backend/routers/craft_library.py",
+        "provider_source_sha256": "sha256:30c275048c808550f27bbdcf2da96871936a4b6a53f7eda3aefa0ee3d522eed3",
+        "reason": "No delete provider exists; the available obsolete transition is a different lifecycle outcome."
+      },
+      "dependencies": [
+        "library reference index",
+        "Craft lifecycle audit migration"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "DELETE /api/craft_lib/equipments/{dynamic}",
+      "implementation_disposition": "owner_service_required",
+      "method": "DELETE",
+      "migration_strategy": "Implement approved lifecycle outcome; do not map delete to an unrelated obsolete call.",
+      "normalized_route": "/api/craft_lib/equipments/{dynamic}",
+      "occurrences": [
+        {
+          "column": 58,
+          "disposition": "unresolved",
+          "line": 771,
+          "method": "DELETE",
+          "normalized_route": "/api/craft_lib/equipments/{dynamic}",
+          "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:771:58:DELETE:/api/craft_lib/equipments/{dynamic}",
+          "raw_route": "/api/craft_lib/equipments/${gid}",
+          "source": "web/knowledge_hub/pages/gbop_vpps.html"
+        }
+      ],
+      "owner_domain": "craft",
+      "owner_service": "plugins.craft.craft_backend.application.library_lifecycle_service",
+      "package_id": "craft_library",
+      "permission_object_scope": "Craft workspace/object scope",
+      "service_boundary": "New public Craft library lifecycle service that validates references and performs one lifecycle transition; no route-shaped SQL provider.",
+      "target_capability": "craft.library.equipment.retire@1",
+      "tests": [
+        "referenced/unreferenced delete behavior",
+        "owner/non-owner authorization",
+        "replay and lifecycle conflict"
+      ],
+      "transaction_model": "one Craft library transaction locking item and references plus audit"
+    },
+    {
+      "approval": {
+        "decision": "Product must decide hard-delete versus obsolete/archive behavior because the only existing outcome is obsolete, not delete.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "Craft workspace/object scope",
+        "reference/lifecycle validation",
+        "audit event and revision lock"
+      ],
+      "cross_domain_links": [
+        "Reference checks use typed Craft ports only; no direct reads into other domain tables."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
+        "provider_anchor": "plugins/craft/craft_backend/routers/craft_library.py",
+        "provider_source_sha256": "sha256:30c275048c808550f27bbdcf2da96871936a4b6a53f7eda3aefa0ee3d522eed3",
+        "reason": "No delete provider exists; the available obsolete transition is a different lifecycle outcome."
+      },
+      "dependencies": [
+        "library reference index",
+        "Craft lifecycle audit migration"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "DELETE /api/craft_lib/fixtures/{dynamic}",
+      "implementation_disposition": "owner_service_required",
+      "method": "DELETE",
+      "migration_strategy": "Implement approved lifecycle outcome; do not map delete to an unrelated obsolete call.",
+      "normalized_route": "/api/craft_lib/fixtures/{dynamic}",
+      "occurrences": [
+        {
+          "column": 58,
+          "disposition": "unresolved",
+          "line": 714,
+          "method": "DELETE",
+          "normalized_route": "/api/craft_lib/fixtures/{dynamic}",
+          "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:714:58:DELETE:/api/craft_lib/fixtures/{dynamic}",
+          "raw_route": "/api/craft_lib/fixtures/${gid}",
+          "source": "web/knowledge_hub/pages/gbop_vpps.html"
+        }
+      ],
+      "owner_domain": "craft",
+      "owner_service": "plugins.craft.craft_backend.application.library_lifecycle_service",
+      "package_id": "craft_library",
+      "permission_object_scope": "Craft workspace/object scope",
+      "service_boundary": "New public Craft library lifecycle service that validates references and performs one lifecycle transition; no route-shaped SQL provider.",
+      "target_capability": "craft.library.fixture.retire@1",
+      "tests": [
+        "referenced/unreferenced delete behavior",
+        "owner/non-owner authorization",
+        "replay and lifecycle conflict"
+      ],
+      "transaction_model": "one Craft library transaction locking item and references plus audit"
+    },
+    {
+      "approval": {
+        "decision": "Product must confirm BOP-version archive/delete lifecycle and list projection; these are distinct from Project list semantics.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "Craft version scope and expected revision",
+        "archive lifecycle/audit",
+        "no Project-list relabeling or direct SQL dispatch"
+      ],
+      "cross_domain_links": [
+        "Project compatibility adapter selects item_type=bop_version then invokes Craft; it neither owns nor queries BOP tables."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
+        "provider_anchor": "plugins/craft/craft_backend/routers/lists.py",
+        "provider_source_sha256": "sha256:af843b6c197bf6434836a15bb387068f89910db7c984c1191e96e4e329e1f1a7",
+        "reason": "The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch."
+      },
+      "dependencies": [
+        "BOP version aggregate",
+        "conditional dispatch adapter"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "DELETE /api/lists/{dynamic}",
+      "implementation_disposition": "owner_service_required",
+      "method": "DELETE",
+      "migration_strategy": "Migrate only bop_version conditional branch with expected_revision; preserve Project delete behavior.",
+      "normalized_route": "/api/lists/{dynamic}",
+      "occurrences": [
+        {
+          "column": 12,
+          "disposition": "unresolved",
+          "line": 259,
+          "method": "DELETE",
+          "normalized_route": "/api/lists/{dynamic}",
+          "occurrence_id": "web/core/existing_capability_client.js:259:12:DELETE:/api/lists/{dynamic}",
+          "raw_route": "/api/lists/${encodeURIComponent(gid)}?item_type=bop_version&expected_revision=${revision}",
+          "source": "web/core/existing_capability_client.js"
+        }
+      ],
+      "owner_domain": "craft",
+      "owner_service": "plugins.craft.craft_backend.application.bop_version_lifecycle_service",
+      "package_id": "craft_bop_lifecycle",
+      "permission_object_scope": "Craft version scope and expected revision",
+      "service_boundary": "New public Craft BOP-version lifecycle service selected before Project list dispatch; it owns the conditional bop_version branch only.",
+      "target_capability": "craft.bop.version.archive@1",
+      "tests": [
+        "conditional branch selection",
+        "BOP revision/authorization",
+        "Project list branch remains unchanged"
+      ],
+      "transaction_model": "one Craft BOP-version revision-locked archive transaction with audit"
+    },
+    {
+      "approval": {
+        "decision": "Product/security must decide whether the obsolete arbitrary-URL flows are retired or mapped to signed marketplace acquisition.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "signed publisher release and dependency compatibility",
+        "tenant-scoped installation lock and audit event",
+        "no arbitrary URL or secret logging"
+      ],
+      "cross_domain_links": [
+        "Base identity/tenant context is supplied through the public context port; no router import."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/base-structural-web-remediation.json",
+        "provider_anchor": "backend/routers/plugins.py",
+        "provider_source_sha256": "sha256:bab080093bc16f582378f81ae82d6264d3cd724c2e55d842fad259507c11b2f2",
+        "reason": "The unrestricted legacy uninstall route has no production handler and cannot bypass marketplace lifecycle controls."
+      },
+      "dependencies": [
+        "signed marketplace release registry",
+        "plugin installation migration"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "DELETE /api/plugin/uninstall/{dynamic}",
+      "implementation_disposition": "owner_service_required",
+      "method": "DELETE",
+      "migration_strategy": "Replace only after signed marketplace uninstall contract; otherwise retire the dead browser call.",
+      "normalized_route": "/api/plugin/uninstall/{dynamic}",
+      "occurrences": [
+        {
+          "column": 29,
+          "disposition": "unresolved",
+          "line": 294,
+          "method": "DELETE",
+          "normalized_route": "/api/plugin/uninstall/{dynamic}",
+          "occurrence_id": "web/core/web_compat.js:294:29:DELETE:/api/plugin/uninstall/{dynamic}",
+          "raw_route": "/api/plugin/uninstall/${pluginId}",
+          "source": "web/core/web_compat.js"
+        }
+      ],
+      "owner_domain": "base",
+      "owner_service": "backend.plugin_platform.service",
+      "package_id": "base_plugin_lifecycle",
+      "permission_object_scope": "signed publisher release and dependency compatibility",
+      "service_boundary": "Public marketplace lifecycle service; REST compatibility and Gateway provider call the same signed-release transition API.",
+      "target_capability": "base.plugin.installation.transition.uninstall@1",
+      "tests": [
+        "Gateway permission/tenant allow-deny",
+        "replay/rollback/data-policy boundary",
+        "signature/dependency/audit regression"
+      ],
+      "transaction_model": "one tenant installation transaction with release/data-policy lock and audit event"
+    },
+    {
+      "approval": {
+        "decision": "Product must choose the finite saved-view configuration language and copy/share semantics; current dynamic config cannot be inferred safely.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "owner/team/share visibility",
+        "closed semantic view schema",
+        "optimistic revision and idempotency key for writes"
+      ],
+      "cross_domain_links": [
+        "None; sharing is enforced in the Base aggregate rather than delegated to a router."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/base-structural-web-remediation.json",
+        "provider_anchor": "backend/routers/views.py",
+        "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
+        "reason": "The object-ownership check has no public owner-service boundary independent of dynamic saved-view config."
+      },
+      "dependencies": [
+        "saved-view storage migration",
+        "approved semantic view configuration"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "DELETE /api/views/{dynamic}",
+      "implementation_disposition": "owner_service_required",
+      "method": "DELETE",
+      "migration_strategy": "Use expected revision; migrate after ownership and retention policy are approved.",
+      "normalized_route": "/api/views/{dynamic}",
+      "occurrences": [
+        {
+          "column": 28,
+          "disposition": "unresolved",
+          "line": 1002,
+          "method": "DELETE",
+          "normalized_route": "/api/views/{dynamic}",
+          "occurrence_id": "web/components/view_manager.js:1002:28:DELETE:/api/views/{dynamic}",
+          "raw_route": "/api/views/${gid}",
+          "source": "web/components/view_manager.js"
+        }
+      ],
+      "owner_domain": "base",
+      "owner_service": "base.saved_view_service",
+      "package_id": "base_saved_views",
+      "permission_object_scope": "owner/team/share visibility",
+      "service_boundary": "New public Base saved-view aggregate service, used by Gateway and legacy adapter; it owns view records, sharing, copying, and revisions.",
+      "target_capability": "base.saved_view.delete@1",
+      "tests": [
+        "owner/non-owner/team visibility",
+        "copy/update/delete replay and conflict",
+        "schema rejects arbitrary configuration"
+      ],
+      "transaction_model": "one revision-locked delete transaction with audit"
+    },
+    {
+      "approval": {
+        "decision": "Product/security must decide whether each stale browser connector flow is retained and authorize credential enrolment plus external-network policy.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "opaque credential_ref only",
+        "network allowlist, timeout and bounded discovery",
+        "masked outputs, structured external failure and no secret evidence"
+      ],
+      "cross_domain_links": [
+        "Credential vault and connector runtime are typed ports; credentials never cross into browser/Gateway evidence."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/integration-structural-web-remediation.json",
+        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+      },
+      "dependencies": [
+        "credential-vault write channel",
+        "connector runtime policy",
+        "connector aggregate migration"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "GET /api/ext-datasources",
+      "implementation_disposition": "owner_service_required",
+      "method": "GET",
+      "migration_strategy": "Decide retention, then normalize browser projection to the existing closed connector search contract.",
+      "normalized_route": "/api/ext-datasources",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 148,
+          "method": "GET",
+          "normalized_route": "/api/ext-datasources",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:148:36:GET:/api/ext-datasources",
+          "raw_route": "/api/ext-datasources",
+          "source": "web/ext_datasource/ext_ds.js"
+        }
+      ],
+      "owner_domain": "integration",
+      "owner_service": "plugins.integration.integration_backend.application.service.IntegrationApplication",
+      "package_id": "integration_connector",
+      "permission_object_scope": "opaque credential_ref only",
+      "service_boundary": "Existing public IntegrationApplication with a credential-vault port and connector-runtime port; both legacy adapters and providers invoke that boundary.",
+      "target_capability": "integration.connector.search@1",
+      "tests": [
+        "tenant/cross-workspace Gateway authorization",
+        "credential redaction",
+        "connector-runtime timeout/outcome-unknown and idempotency"
+      ],
+      "transaction_model": "read-only actor/team bound query"
+    },
+    {
+      "approval": {
+        "decision": "Product/security must decide whether each stale browser connector flow is retained and authorize credential enrolment plus external-network policy.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "opaque credential_ref only",
+        "network allowlist, timeout and bounded discovery",
+        "masked outputs, structured external failure and no secret evidence"
+      ],
+      "cross_domain_links": [
+        "Credential vault and connector runtime are typed ports; credentials never cross into browser/Gateway evidence."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/integration-structural-web-remediation.json",
+        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+      },
+      "dependencies": [
+        "credential-vault write channel",
+        "connector runtime policy",
+        "connector aggregate migration"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "GET /api/ext-datasources/{dynamic}/tables",
+      "implementation_disposition": "owner_service_required",
+      "method": "GET",
+      "migration_strategy": "Add timeout/result cap/error policy and return safe schema metadata.",
+      "normalized_route": "/api/ext-datasources/{dynamic}/tables",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 640,
+          "method": "GET",
+          "normalized_route": "/api/ext-datasources/{dynamic}/tables",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:640:36:GET:/api/ext-datasources/{dynamic}/tables",
+          "raw_route": "/api/ext-datasources/${_selectedDs.gid}/tables",
+          "source": "web/ext_datasource/ext_ds.js"
+        }
+      ],
+      "owner_domain": "integration",
+      "owner_service": "plugins.integration.integration_backend.application.service.IntegrationApplication",
+      "package_id": "integration_connector",
+      "permission_object_scope": "opaque credential_ref only",
+      "service_boundary": "Existing public IntegrationApplication with a credential-vault port and connector-runtime port; both legacy adapters and providers invoke that boundary.",
+      "target_capability": "integration.connector.schema.discover@1",
+      "tests": [
+        "tenant/cross-workspace Gateway authorization",
+        "credential redaction",
+        "connector-runtime timeout/outcome-unknown and idempotency"
+      ],
+      "transaction_model": "bounded external read through runtime port; no fabricated atomic DB transaction"
+    },
+    {
+      "approval": {
+        "decision": "Product must decide whether absent legacy mapping routes become supported governed flows or are removed; that intent is not encoded in a provider.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "closed field-mapping grammar and restricted transforms",
+        "owner/team binding",
+        "bounded preview/import and safe external error classes"
+      ],
+      "cross_domain_links": [
+        "Exact stable target capability is resolved through the Catalog target index, never a cross-domain database query."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/integration-structural-web-remediation.json",
+        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+      },
+      "dependencies": [
+        "connector package",
+        "mapping aggregate migration",
+        "target-capability validation"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "GET /api/ext-field-mappings",
+      "implementation_disposition": "owner_service_required",
+      "method": "GET",
+      "migration_strategy": "Define exact field-mapping list projection instead of adapting singular mapping.get.",
+      "normalized_route": "/api/ext-field-mappings",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 349,
+          "method": "GET",
+          "normalized_route": "/api/ext-field-mappings",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:349:36:GET:/api/ext-field-mappings",
+          "raw_route": "/api/ext-field-mappings?mapping_gid=${_selectedMap.gid}",
+          "source": "web/ext_datasource/ext_ds.js"
+        }
+      ],
+      "owner_domain": "integration",
+      "owner_service": "plugins.integration.integration_backend.application.service.IntegrationApplication",
+      "package_id": "integration_mapping",
+      "permission_object_scope": "closed field-mapping grammar and restricted transforms",
+      "service_boundary": "Existing public IntegrationApplication mapping operations backed by Integration repository and connector-runtime ports; no cross-domain database adapter.",
+      "target_capability": "integration.field_mapping.search@1",
+      "tests": [
+        "mapping scope and revision conflict",
+        "transform schema rejection",
+        "preview/import timeout and outcome recovery"
+      ],
+      "transaction_model": "read-only actor/team bound bounded query"
+    },
+    {
+      "approval": {
+        "decision": "Product must decide whether absent legacy mapping routes become supported governed flows or are removed; that intent is not encoded in a provider.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "closed field-mapping grammar and restricted transforms",
+        "owner/team binding",
+        "bounded preview/import and safe external error classes"
+      ],
+      "cross_domain_links": [
+        "Exact stable target capability is resolved through the Catalog target index, never a cross-domain database query."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/integration-structural-web-remediation.json",
+        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+      },
+      "dependencies": [
+        "connector package",
+        "mapping aggregate migration",
+        "target-capability validation"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "GET /api/ext-mappings",
+      "implementation_disposition": "owner_service_required",
+      "method": "GET",
+      "migration_strategy": "Normalize browser projection to closed mapping search after retention decision.",
+      "normalized_route": "/api/ext-mappings",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 187,
+          "method": "GET",
+          "normalized_route": "/api/ext-mappings",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:187:36:GET:/api/ext-mappings",
+          "raw_route": "/api/ext-mappings?datasource_gid=${_selectedDs.gid}",
+          "source": "web/ext_datasource/ext_ds.js"
+        }
+      ],
+      "owner_domain": "integration",
+      "owner_service": "plugins.integration.integration_backend.application.service.IntegrationApplication",
+      "package_id": "integration_mapping",
+      "permission_object_scope": "closed field-mapping grammar and restricted transforms",
+      "service_boundary": "Existing public IntegrationApplication mapping operations backed by Integration repository and connector-runtime ports; no cross-domain database adapter.",
+      "target_capability": "integration.mapping.search@1",
+      "tests": [
+        "mapping scope and revision conflict",
+        "transform schema rejection",
+        "preview/import timeout and outcome recovery"
+      ],
+      "transaction_model": "read-only actor/team bound query"
+    },
+    {
+      "approval": {
+        "decision": "Product must decide whether absent legacy mapping routes become supported governed flows or are removed; that intent is not encoded in a provider.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "closed field-mapping grammar and restricted transforms",
+        "owner/team binding",
+        "bounded preview/import and safe external error classes"
+      ],
+      "cross_domain_links": [
+        "Exact stable target capability is resolved through the Catalog target index, never a cross-domain database query."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/integration-structural-web-remediation.json",
+        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+      },
+      "dependencies": [
+        "connector package",
+        "mapping aggregate migration",
+        "target-capability validation"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "GET /api/ext-mappings/{dynamic}/columns",
+      "implementation_disposition": "owner_service_required",
+      "method": "GET",
+      "migration_strategy": "Bind mapping to connector, cap result and apply runtime timeout policy.",
+      "normalized_route": "/api/ext-mappings/{dynamic}/columns",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 341,
+          "method": "GET",
+          "normalized_route": "/api/ext-mappings/{dynamic}/columns",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:341:36:GET:/api/ext-mappings/{dynamic}/columns",
+          "raw_route": "/api/ext-mappings/${_selectedMap.gid}/columns",
+          "source": "web/ext_datasource/ext_ds.js"
+        }
+      ],
+      "owner_domain": "integration",
+      "owner_service": "plugins.integration.integration_backend.application.service.IntegrationApplication",
+      "package_id": "integration_mapping",
+      "permission_object_scope": "closed field-mapping grammar and restricted transforms",
+      "service_boundary": "Existing public IntegrationApplication mapping operations backed by Integration repository and connector-runtime ports; no cross-domain database adapter.",
+      "target_capability": "integration.mapping.source_columns.discover@1",
+      "tests": [
+        "mapping scope and revision conflict",
+        "transform schema rejection",
+        "preview/import timeout and outcome recovery"
+      ],
+      "transaction_model": "bounded external discovery through connector runtime"
+    },
+    {
+      "approval": {
+        "decision": "Product must decide whether absent legacy mapping routes become supported governed flows or are removed; that intent is not encoded in a provider.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "closed field-mapping grammar and restricted transforms",
+        "owner/team binding",
+        "bounded preview/import and safe external error classes"
+      ],
+      "cross_domain_links": [
+        "Exact stable target capability is resolved through the Catalog target index, never a cross-domain database query."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/integration-structural-web-remediation.json",
+        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+      },
+      "dependencies": [
+        "connector package",
+        "mapping aggregate migration",
+        "target-capability validation"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "GET /api/ext-mappings/{dynamic}/preview",
+      "implementation_disposition": "owner_service_required",
+      "method": "GET",
+      "migration_strategy": "Cap preview rows, redact values and expose structured timeout/outcome status.",
+      "normalized_route": "/api/ext-mappings/{dynamic}/preview",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 496,
+          "method": "GET",
+          "normalized_route": "/api/ext-mappings/{dynamic}/preview",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:496:36:GET:/api/ext-mappings/{dynamic}/preview",
+          "raw_route": "/api/ext-mappings/${_selectedMap.gid}/preview?limit=5",
+          "source": "web/ext_datasource/ext_ds.js"
+        }
+      ],
+      "owner_domain": "integration",
+      "owner_service": "plugins.integration.integration_backend.application.service.IntegrationApplication",
+      "package_id": "integration_mapping",
+      "permission_object_scope": "closed field-mapping grammar and restricted transforms",
+      "service_boundary": "Existing public IntegrationApplication mapping operations backed by Integration repository and connector-runtime ports; no cross-domain database adapter.",
+      "target_capability": "integration.mapping.preview@1",
+      "tests": [
+        "mapping scope and revision conflict",
+        "transform schema rejection",
+        "preview/import timeout and outcome recovery"
+      ],
+      "transaction_model": "bounded external preview through runtime port"
+    },
+    {
+      "approval": {
+        "decision": "Product must confirm BOP-version archive/delete lifecycle and list projection; these are distinct from Project list semantics.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "Craft version scope and expected revision",
+        "archive lifecycle/audit",
+        "no Project-list relabeling or direct SQL dispatch"
+      ],
+      "cross_domain_links": [
+        "Project compatibility adapter selects item_type=bop_version then invokes Craft; it neither owns nor queries BOP tables."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
+        "provider_anchor": "plugins/craft/craft_backend/routers/lists.py",
+        "provider_source_sha256": "sha256:af843b6c197bf6434836a15bb387068f89910db7c984c1191e96e4e329e1f1a7",
+        "reason": "The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch."
+      },
+      "dependencies": [
+        "BOP version aggregate",
+        "conditional dispatch adapter"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "GET /api/lists",
+      "implementation_disposition": "owner_service_required",
+      "method": "GET",
+      "migration_strategy": "Migrate only bop_version conditional branch; preserve Project list behavior.",
+      "normalized_route": "/api/lists",
+      "occurrences": [
+        {
+          "column": 51,
+          "disposition": "unresolved",
+          "line": 254,
+          "method": "GET",
+          "normalized_route": "/api/lists",
+          "occurrence_id": "web/core/existing_capability_client.js:254:51:GET:/api/lists",
+          "raw_route": "/api/lists?item_type=bop_version",
+          "source": "web/core/existing_capability_client.js"
+        }
+      ],
+      "owner_domain": "craft",
+      "owner_service": "plugins.craft.craft_backend.application.bop_version_lifecycle_service",
+      "package_id": "craft_bop_lifecycle",
+      "permission_object_scope": "Craft version scope and expected revision",
+      "service_boundary": "New public Craft BOP-version lifecycle service selected before Project list dispatch; it owns the conditional bop_version branch only.",
+      "target_capability": "craft.bop.version.search@1",
+      "tests": [
+        "conditional branch selection",
+        "BOP revision/authorization",
+        "Project list branch remains unchanged"
+      ],
+      "transaction_model": "read-only Craft BOP-version query selected by item_type before Project dispatch"
+    },
+    {
+      "approval": {
+        "decision": "Product/security must approve the finite rule-definition and mutable lifecycle semantics; existing routes have no equivalent public service.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "workspace rule ownership",
+        "closed rule-definition grammar",
+        "audit, revision lock, explicit confirmation and no generic JSON"
+      ],
+      "cross_domain_links": [
+        "None; rule evaluation remains within Craft's public service boundary."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
+        "provider_anchor": "plugins/craft/craft_backend/routers/rule_engine.py",
+        "provider_source_sha256": "sha256:ac258d5ffc6531a5da259750f8b637fea6e467c0a50d4f64a379069aa660f86a",
+        "reason": "No entry-check provider exists; CEL evaluation and BOP audit are different outcomes."
+      },
+      "dependencies": [
+        "rule aggregate migration",
+        "approved closed rule-definition vocabulary"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "GET /api/rule-engine/check-entry",
+      "implementation_disposition": "owner_service_required",
+      "method": "GET",
+      "migration_strategy": "Implement exact entry-check semantics, not CEL or BOP audit substitution.",
+      "normalized_route": "/api/rule-engine/check-entry",
+      "occurrences": [
+        {
+          "column": 40,
+          "disposition": "unresolved",
+          "line": 2192,
+          "method": "GET",
+          "normalized_route": "/api/rule-engine/check-entry",
+          "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:2192:40:GET:/api/rule-engine/check-entry",
+          "raw_route": "/api/rule-engine/check-entry?entry_gid=${encodeURIComponent(gid)}",
+          "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js"
+        },
+        {
+          "column": 40,
+          "disposition": "unresolved",
+          "line": 3524,
+          "method": "GET",
+          "normalized_route": "/api/rule-engine/check-entry",
+          "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:3524:40:GET:/api/rule-engine/check-entry",
+          "raw_route": "/api/rule-engine/check-entry?entry_gid=${encodeURIComponent(gid)}",
+          "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js"
+        }
+      ],
+      "owner_domain": "craft",
+      "owner_service": "plugins.craft.craft_backend.application.rules.RuleService",
+      "package_id": "craft_rules",
+      "permission_object_scope": "workspace rule ownership",
+      "service_boundary": "Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it.",
+      "target_capability": "craft.rule.entry.evaluate@1",
+      "tests": [
+        "rule lifecycle authorization and revision conflict",
+        "definition/schema rejection",
+        "evaluation/waiver audit and idempotency"
+      ],
+      "transaction_model": "bounded read/evaluation with audit record; no arbitrary executable expression"
+    },
+    {
+      "approval": {
+        "decision": "Product/security must select the closed attachment projection and retention semantics; the existing arbitrary attachment records are not safely inferable.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "self-only user scope",
+        "closed attachment summary/reference schema",
+        "no opaque attachment JSON or secret-derived fields"
+      ],
+      "cross_domain_links": [
+        "Attachment metadata is reached only through a typed Base attachment-reference port."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/base-structural-web-remediation.json",
+        "provider_anchor": "backend/routers/self_annotations.py",
+        "provider_source_sha256": "sha256:7624608452bd2173dacfaac9c77f703da331fc510512cc028857fb7319ca8c52",
+        "reason": "The response contains attachment records without a governed nested attachment contract."
+      },
+      "dependencies": [
+        "annotation aggregate migration",
+        "attachment reference policy"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "GET /api/self_ann/list",
+      "implementation_disposition": "owner_service_required",
+      "method": "GET",
+      "migration_strategy": "Add bounded search/pagination and closed attachment projection before Gateway migration.",
+      "normalized_route": "/api/self_ann/list",
+      "occurrences": [
+        {
+          "column": 27,
+          "disposition": "unresolved",
+          "line": 292,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/list",
+          "occurrence_id": "web/components/self_annotation_panel.js:292:27:GET:/api/self_ann/list",
+          "raw_route": "/api/self_ann/list?module=${encodeURIComponent(_module)}",
+          "source": "web/components/self_annotation_panel.js"
+        },
+        {
+          "column": 27,
+          "disposition": "unresolved",
+          "line": 293,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/list",
+          "occurrence_id": "web/components/self_annotation_panel.js:293:27:GET:/api/self_ann/list",
+          "raw_route": "/api/self_ann/list",
+          "source": "web/components/self_annotation_panel.js"
+        },
+        {
+          "column": 42,
+          "disposition": "unresolved",
+          "line": 499,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/list",
+          "occurrence_id": "web/knowledge_hub/knowledge_hub.js:499:42:GET:/api/self_ann/list",
+          "raw_route": "/api/self_ann/list?module=knowledge_hub",
+          "source": "web/knowledge_hub/knowledge_hub.js"
+        }
+      ],
+      "owner_domain": "base",
+      "owner_service": "base.self_annotation_service",
+      "package_id": "base_annotations",
+      "permission_object_scope": "self-only user scope",
+      "service_boundary": "New public Base self-annotation service, with compatibility handlers and providers delegating to it rather than sharing router SQL.",
+      "target_capability": "base.self_annotation.search@1",
+      "tests": [
+        "self/non-self Gateway authorization",
+        "closed input/output validation",
+        "write replay and attachment-retention boundary"
+      ],
+      "transaction_model": "read-only self-scoped bounded query"
+    },
+    {
+      "approval": {
+        "decision": "Product/security must select the closed attachment projection and retention semantics; the existing arbitrary attachment records are not safely inferable.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "self-only user scope",
+        "closed attachment summary/reference schema",
+        "no opaque attachment JSON or secret-derived fields"
+      ],
+      "cross_domain_links": [
+        "Attachment metadata is reached only through a typed Base attachment-reference port."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/base-structural-web-remediation.json",
+        "provider_anchor": "backend/routers/self_annotations.py",
+        "provider_source_sha256": "sha256:7624608452bd2173dacfaac9c77f703da331fc510512cc028857fb7319ca8c52",
+        "reason": "The response contains attachment records without a governed nested attachment contract."
+      },
+      "dependencies": [
+        "annotation aggregate migration",
+        "attachment reference policy"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "GET /api/self_ann/{dynamic}",
+      "implementation_disposition": "owner_service_required",
+      "method": "GET",
+      "migration_strategy": "Add a closed attachment summary/reference projection and migrate through Gateway.",
+      "normalized_route": "/api/self_ann/{dynamic}",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 146,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/{dynamic}",
+          "occurrence_id": "web/components/self_annotation_panel.js:146:36:GET:/api/self_ann/{dynamic}",
+          "raw_route": "/api/self_ann/${gid}",
+          "source": "web/components/self_annotation_panel.js"
+        }
+      ],
+      "owner_domain": "base",
+      "owner_service": "base.self_annotation_service",
+      "package_id": "base_annotations",
+      "permission_object_scope": "self-only user scope",
+      "service_boundary": "New public Base self-annotation service, with compatibility handlers and providers delegating to it rather than sharing router SQL.",
+      "target_capability": "base.self_annotation.record.get@1",
+      "tests": [
+        "self/non-self Gateway authorization",
+        "closed input/output validation",
+        "write replay and attachment-retention boundary"
+      ],
+      "transaction_model": "read-only self-scoped query"
+    },
+    {
+      "approval": {
+        "decision": "Security/product must approve which profile and effective-grant fields are browser-visible.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "actor-bound self scope",
+        "allowlisted profile/grant projection",
+        "never expose raw grants or permission blobs"
+      ],
+      "cross_domain_links": [
+        "None; this remains a Base-only projection."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/base-structural-web-remediation.json",
+        "provider_anchor": "backend/routers/users.py",
+        "provider_source_sha256": "sha256:d632055fafa2aee6dea74b6c160c8889295a525373e6ee2604e52527d5df2b8f",
+        "reason": "The profile contains dynamic grants and permissions without a closed exact output contract."
+      },
+      "dependencies": [
+        "identity projection contract"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "GET /api/users/me",
+      "implementation_disposition": "owner_service_required",
+      "method": "GET",
+      "migration_strategy": "Create a redacted closed profile projection and migrate the session call.",
+      "normalized_route": "/api/users/me",
+      "occurrences": [
+        {
+          "column": 34,
+          "disposition": "unresolved",
+          "line": 511,
+          "method": "GET",
+          "normalized_route": "/api/users/me",
+          "occurrence_id": "packages/craft-plugin/web/lineage_view/lineage.js:511:34:GET:/api/users/me",
+          "raw_route": "/api/users/me",
+          "source": "packages/craft-plugin/web/lineage_view/lineage.js"
+        }
+      ],
+      "owner_domain": "base",
+      "owner_service": "base.identity_profile_service",
+      "package_id": "base_identity_profile",
+      "permission_object_scope": "actor-bound self scope",
+      "service_boundary": "Public Base identity projection service shared by session compatibility handler and Gateway provider.",
+      "target_capability": "base.identity.session.profile.get@1",
+      "tests": [
+        "anonymous/self/other-user denial",
+        "closed output schema",
+        "redaction of grants and permissions"
+      ],
+      "transaction_model": "read-only actor-bound projection"
+    },
+    {
+      "approval": {
+        "decision": "Product must choose the finite saved-view configuration language and copy/share semantics; current dynamic config cannot be inferred safely.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "owner/team/share visibility",
+        "closed semantic view schema",
+        "optimistic revision and idempotency key for writes"
+      ],
+      "cross_domain_links": [
+        "None; sharing is enforced in the Base aggregate rather than delegated to a router."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/base-structural-web-remediation.json",
+        "provider_anchor": "backend/routers/views.py",
+        "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
+        "reason": "Saved-view config is intentionally dynamic and has no governed closed nested contract."
+      },
+      "dependencies": [
+        "saved-view storage migration",
+        "approved semantic view configuration"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "GET /api/views",
+      "implementation_disposition": "owner_service_required",
+      "method": "GET",
+      "migration_strategy": "Define finite saved-view query/config schema then migrate list callers.",
+      "normalized_route": "/api/views",
+      "occurrences": [
+        {
+          "column": 26,
+          "disposition": "unresolved",
+          "line": 1069,
+          "method": "GET",
+          "normalized_route": "/api/views",
+          "occurrence_id": "web/admin/task_planning.html:1069:26:GET:/api/views",
+          "raw_route": "/api/views?module=task&list_gid=${listGid}",
+          "source": "web/admin/task_planning.html"
+        },
+        {
+          "column": 40,
+          "disposition": "unresolved",
+          "line": 541,
+          "method": "GET",
+          "normalized_route": "/api/views",
+          "occurrence_id": "web/components/view_manager.js:541:40:GET:/api/views",
+          "raw_route": "/api/views?module=${this.moduleId}${listQuery}",
+          "source": "web/components/view_manager.js"
+        }
+      ],
+      "owner_domain": "base",
+      "owner_service": "base.saved_view_service",
+      "package_id": "base_saved_views",
+      "permission_object_scope": "owner/team/share visibility",
+      "service_boundary": "New public Base saved-view aggregate service, used by Gateway and legacy adapter; it owns view records, sharing, copying, and revisions.",
+      "target_capability": "base.saved_view.search@1",
+      "tests": [
+        "owner/non-owner/team visibility",
+        "copy/update/delete replay and conflict",
+        "schema rejects arbitrary configuration"
+      ],
+      "transaction_model": "read-only owner/team/share scoped query"
+    },
+    {
+      "approval": {
+        "decision": "Product/security must decide whether each stale browser connector flow is retained and authorize credential enrolment plus external-network policy.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "opaque credential_ref only",
+        "network allowlist, timeout and bounded discovery",
+        "masked outputs, structured external failure and no secret evidence"
+      ],
+      "cross_domain_links": [
+        "Credential vault and connector runtime are typed ports; credentials never cross into browser/Gateway evidence."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/integration-structural-web-remediation.json",
+        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+      },
+      "dependencies": [
+        "credential-vault write channel",
+        "connector runtime policy",
+        "connector aggregate migration"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "PATCH /api/ext-datasources/{dynamic}",
+      "implementation_disposition": "owner_service_required",
+      "method": "PATCH",
+      "migration_strategy": "Use closed update and credential_ref rotation semantics; no raw config pass-through.",
+      "normalized_route": "/api/ext-datasources/{dynamic}",
+      "occurrences": [
+        {
+          "column": 29,
+          "disposition": "unresolved",
+          "line": 623,
+          "method": "PATCH",
+          "normalized_route": "/api/ext-datasources/{dynamic}",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:623:29:PATCH:/api/ext-datasources/{dynamic}",
+          "raw_route": "/api/ext-datasources/${ds.gid}",
+          "source": "web/ext_datasource/ext_ds.js"
+        }
+      ],
+      "owner_domain": "integration",
+      "owner_service": "plugins.integration.integration_backend.application.service.IntegrationApplication",
+      "package_id": "integration_connector",
+      "permission_object_scope": "opaque credential_ref only",
+      "service_boundary": "Existing public IntegrationApplication with a credential-vault port and connector-runtime port; both legacy adapters and providers invoke that boundary.",
+      "target_capability": "integration.connector.update@1",
+      "tests": [
+        "tenant/cross-workspace Gateway authorization",
+        "credential redaction",
+        "connector-runtime timeout/outcome-unknown and idempotency"
+      ],
+      "transaction_model": "one revision-locked connector aggregate transaction"
+    },
+    {
+      "approval": {
+        "decision": "Product must choose the finite saved-view configuration language and copy/share semantics; current dynamic config cannot be inferred safely.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "owner/team/share visibility",
+        "closed semantic view schema",
+        "optimistic revision and idempotency key for writes"
+      ],
+      "cross_domain_links": [
+        "None; sharing is enforced in the Base aggregate rather than delegated to a router."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/base-structural-web-remediation.json",
+        "provider_anchor": "backend/routers/views.py",
+        "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
+        "reason": "Saved-view config is intentionally dynamic and has no governed closed nested contract."
+      },
+      "dependencies": [
+        "saved-view storage migration",
+        "approved semantic view configuration"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "PATCH /api/views/{dynamic}",
+      "implementation_disposition": "owner_service_required",
+      "method": "PATCH",
+      "migration_strategy": "Use closed patch grammar and expected revision.",
+      "normalized_route": "/api/views/{dynamic}",
+      "occurrences": [
+        {
+          "column": 30,
+          "disposition": "unresolved",
+          "line": 651,
+          "method": "PATCH",
+          "normalized_route": "/api/views/{dynamic}",
+          "occurrence_id": "web/components/view_manager.js:651:30:PATCH:/api/views/{dynamic}",
+          "raw_route": "/api/views/${this._activeViewGid}",
+          "source": "web/components/view_manager.js"
+        },
+        {
+          "column": 28,
+          "disposition": "unresolved",
+          "line": 1011,
+          "method": "PATCH",
+          "normalized_route": "/api/views/{dynamic}",
+          "occurrence_id": "web/components/view_manager.js:1011:28:PATCH:/api/views/{dynamic}",
+          "raw_route": "/api/views/${gid}",
+          "source": "web/components/view_manager.js"
+        }
+      ],
+      "owner_domain": "base",
+      "owner_service": "base.saved_view_service",
+      "package_id": "base_saved_views",
+      "permission_object_scope": "owner/team/share visibility",
+      "service_boundary": "New public Base saved-view aggregate service, used by Gateway and legacy adapter; it owns view records, sharing, copying, and revisions.",
+      "target_capability": "base.saved_view.update@1",
+      "tests": [
+        "owner/non-owner/team visibility",
+        "copy/update/delete replay and conflict",
+        "schema rejects arbitrary configuration"
+      ],
+      "transaction_model": "one revision-locked update transaction with audit"
+    },
+    {
+      "approval": {
+        "decision": "Product must confirm rejection notification recipients/templates because current candidate omits the legacy notification effect.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "tenant/order scope and approver authorization",
+        "revision/idempotency",
+        "transactional audit plus durable notification outbox"
+      ],
+      "cross_domain_links": [
+        "Notifications are emitted through the transactional outbox, not a best-effort cross-domain HTTP call."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
+        "provider_anchor": "plugins/craft/craft_backend/routers/approval.py",
+        "provider_source_sha256": "sha256:1b6d618b9562ad4509f81a848234af9c02f75e17392fe26ed9ca203bf1c7569a",
+        "reason": "The Project outcome omits the legacy notification publication side effect."
+      },
+      "dependencies": [
+        "Project approval aggregate",
+        "notification outbox migration"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "POST /api/approval/orders/{dynamic}/reject",
+      "implementation_disposition": "owner_service_required",
+      "method": "POST",
+      "migration_strategy": "Implement exact reject plus notification semantics; do not use candidate that omits notification.",
+      "normalized_route": "/api/approval/orders/{dynamic}/reject",
+      "occurrences": [
+        {
+          "column": 26,
+          "disposition": "unresolved",
+          "line": 153,
+          "method": "POST",
+          "normalized_route": "/api/approval/orders/{dynamic}/reject",
+          "occurrence_id": "packages/craft-plugin/web/approval/approval.js:153:26:POST:/api/approval/orders/{dynamic}/reject",
+          "raw_route": "/api/approval/orders/${_selected.gid}/reject",
+          "source": "packages/craft-plugin/web/approval/approval.js"
+        }
+      ],
+      "owner_domain": "project_management",
+      "owner_service": "plugins.project.project_backend.application.approval_service",
+      "package_id": "project_approval",
+      "permission_object_scope": "tenant/order scope and approver authorization",
+      "service_boundary": "New public Project approval-order service; it owns transition, notification outbox, audit and idempotency in one transaction.",
+      "target_capability": "project.approval.order.reject@1",
+      "tests": [
+        "approver/non-approver/cross-tenant denial",
+        "rejection replay and notification outbox",
+        "state conflict and outcome recovery"
+      ],
+      "transaction_model": "one Project approval transition transaction with audit and transactional notification outbox"
+    },
+    {
+      "approval": {
+        "decision": "Product/security must decide whether each stale browser connector flow is retained and authorize credential enrolment plus external-network policy.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "opaque credential_ref only",
+        "network allowlist, timeout and bounded discovery",
+        "masked outputs, structured external failure and no secret evidence"
+      ],
+      "cross_domain_links": [
+        "Credential vault and connector runtime are typed ports; credentials never cross into browser/Gateway evidence."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/integration-structural-web-remediation.json",
+        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+      },
+      "dependencies": [
+        "credential-vault write channel",
+        "connector runtime policy",
+        "connector aggregate migration"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "POST /api/ext-datasources",
+      "implementation_disposition": "owner_service_required",
+      "method": "POST",
+      "migration_strategy": "Replace plaintext browser credentials with credential_ref secure enrolment.",
+      "normalized_route": "/api/ext-datasources",
+      "occurrences": [
+        {
+          "column": 28,
+          "disposition": "unresolved",
+          "line": 625,
+          "method": "POST",
+          "normalized_route": "/api/ext-datasources",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:625:28:POST:/api/ext-datasources",
+          "raw_route": "/api/ext-datasources",
+          "source": "web/ext_datasource/ext_ds.js"
+        }
+      ],
+      "owner_domain": "integration",
+      "owner_service": "plugins.integration.integration_backend.application.service.IntegrationApplication",
+      "package_id": "integration_connector",
+      "permission_object_scope": "opaque credential_ref only",
+      "service_boundary": "Existing public IntegrationApplication with a credential-vault port and connector-runtime port; both legacy adapters and providers invoke that boundary.",
+      "target_capability": "integration.connector.create@1",
+      "tests": [
+        "tenant/cross-workspace Gateway authorization",
+        "credential redaction",
+        "connector-runtime timeout/outcome-unknown and idempotency"
+      ],
+      "transaction_model": "one connector aggregate transaction; credential material is written only through vault port"
+    },
+    {
+      "approval": {
+        "decision": "Product/security must decide whether each stale browser connector flow is retained and authorize credential enrolment plus external-network policy.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "opaque credential_ref only",
+        "network allowlist, timeout and bounded discovery",
+        "masked outputs, structured external failure and no secret evidence"
+      ],
+      "cross_domain_links": [
+        "Credential vault and connector runtime are typed ports; credentials never cross into browser/Gateway evidence."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/integration-structural-web-remediation.json",
+        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+      },
+      "dependencies": [
+        "credential-vault write channel",
+        "connector runtime policy",
+        "connector aggregate migration"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "POST /api/ext-datasources/{dynamic}/test",
+      "implementation_disposition": "owner_service_required",
+      "method": "POST",
+      "migration_strategy": "Use runtime port test double in tests and disclose outcome-unknown semantics.",
+      "normalized_route": "/api/ext-datasources/{dynamic}/test",
+      "occurrences": [
+        {
+          "column": 34,
+          "disposition": "unresolved",
+          "line": 605,
+          "method": "POST",
+          "normalized_route": "/api/ext-datasources/{dynamic}/test",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:605:34:POST:/api/ext-datasources/{dynamic}/test",
+          "raw_route": "/api/ext-datasources/${ds.gid}/test",
+          "source": "web/ext_datasource/ext_ds.js"
+        }
+      ],
+      "owner_domain": "integration",
+      "owner_service": "plugins.integration.integration_backend.application.service.IntegrationApplication",
+      "package_id": "integration_connector",
+      "permission_object_scope": "opaque credential_ref only",
+      "service_boundary": "Existing public IntegrationApplication with a credential-vault port and connector-runtime port; both legacy adapters and providers invoke that boundary.",
+      "target_capability": "integration.connector.connection.test@1",
+      "tests": [
+        "tenant/cross-workspace Gateway authorization",
+        "credential redaction",
+        "connector-runtime timeout/outcome-unknown and idempotency"
+      ],
+      "transaction_model": "bounded external probe with durable operation result when outcome is uncertain"
+    },
+    {
+      "approval": {
+        "decision": "Product must decide whether absent legacy mapping routes become supported governed flows or are removed; that intent is not encoded in a provider.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "closed field-mapping grammar and restricted transforms",
+        "owner/team binding",
+        "bounded preview/import and safe external error classes"
+      ],
+      "cross_domain_links": [
+        "Exact stable target capability is resolved through the Catalog target index, never a cross-domain database query."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/integration-structural-web-remediation.json",
+        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+      },
+      "dependencies": [
+        "connector package",
+        "mapping aggregate migration",
+        "target-capability validation"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "POST /api/ext-mappings",
+      "implementation_disposition": "owner_service_required",
+      "method": "POST",
+      "migration_strategy": "Use restricted transform grammar and exact target version validation.",
+      "normalized_route": "/api/ext-mappings",
+      "occurrences": [
+        {
+          "column": 26,
+          "disposition": "unresolved",
+          "line": 677,
+          "method": "POST",
+          "normalized_route": "/api/ext-mappings",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:677:26:POST:/api/ext-mappings",
+          "raw_route": "/api/ext-mappings",
+          "source": "web/ext_datasource/ext_ds.js"
+        }
+      ],
+      "owner_domain": "integration",
+      "owner_service": "plugins.integration.integration_backend.application.service.IntegrationApplication",
+      "package_id": "integration_mapping",
+      "permission_object_scope": "closed field-mapping grammar and restricted transforms",
+      "service_boundary": "Existing public IntegrationApplication mapping operations backed by Integration repository and connector-runtime ports; no cross-domain database adapter.",
+      "target_capability": "integration.mapping.create@1",
+      "tests": [
+        "mapping scope and revision conflict",
+        "transform schema rejection",
+        "preview/import timeout and outcome recovery"
+      ],
+      "transaction_model": "one mapping aggregate transaction with target-capability validation"
+    },
+    {
+      "approval": {
+        "decision": "Product must decide whether absent legacy mapping routes become supported governed flows or are removed; that intent is not encoded in a provider.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "closed field-mapping grammar and restricted transforms",
+        "owner/team binding",
+        "bounded preview/import and safe external error classes"
+      ],
+      "cross_domain_links": [
+        "Exact stable target capability is resolved through the Catalog target index, never a cross-domain database query."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/integration-structural-web-remediation.json",
+        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+      },
+      "dependencies": [
+        "connector package",
+        "mapping aggregate migration",
+        "target-capability validation"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "POST /api/ext-mappings/{dynamic}/import",
+      "implementation_disposition": "owner_service_required",
+      "method": "POST",
+      "migration_strategy": "Replace synthetic sync.start response with a real run/outcome resource.",
+      "normalized_route": "/api/ext-mappings/{dynamic}/import",
+      "occurrences": [
+        {
+          "column": 37,
+          "disposition": "unresolved",
+          "line": 549,
+          "method": "POST",
+          "normalized_route": "/api/ext-mappings/{dynamic}/import",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:549:37:POST:/api/ext-mappings/{dynamic}/import",
+          "raw_route": "/api/ext-mappings/${_selectedMap.gid}/import",
+          "source": "web/ext_datasource/ext_ds.js"
+        }
+      ],
+      "owner_domain": "integration",
+      "owner_service": "plugins.integration.integration_backend.application.service.IntegrationApplication",
+      "package_id": "integration_mapping",
+      "permission_object_scope": "closed field-mapping grammar and restricted transforms",
+      "service_boundary": "Existing public IntegrationApplication mapping operations backed by Integration repository and connector-runtime ports; no cross-domain database adapter.",
+      "target_capability": "integration.mapping.import.start@1",
+      "tests": [
+        "mapping scope and revision conflict",
+        "transform schema rejection",
+        "preview/import timeout and outcome recovery"
+      ],
+      "transaction_model": "durable asynchronous import operation with idempotency and recoverable status"
+    },
+    {
+      "approval": {
+        "decision": "Security/product must approve the executable allowlist, sandbox/resource policy, confirmation policy and recovery behavior before implementation.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "no eval or browser supplied executable config",
+        "authorization, sandbox, timeout and resource limits",
+        "confirmation, pause-token integrity and outcome recovery"
+      ],
+      "cross_domain_links": [
+        "Any Craft/Project data access is a bounded Gateway capability invocation, not direct SQL or imported routers."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
+        "provider_anchor": "plugins/agent/agent_backend/routers/flows.py",
+        "provider_source_sha256": "sha256:b7451e4b3a5537ec078bad85d9c1131b6ce4e20d608d07b8cde116e159b48ad8",
+        "reason": "No node-test handler or runtime service exists in the Agent provider."
+      },
+      "dependencies": [
+        "sandbox runtime",
+        "durable run/pause-token store",
+        "Agent execution audit"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "POST /api/flows/test-node",
+      "implementation_disposition": "owner_service_required",
+      "method": "POST",
+      "migration_strategy": "Route through fixed node allowlist and public runtime service; never arbitrary dispatch.",
+      "normalized_route": "/api/flows/test-node",
+      "occurrences": [
+        {
+          "classification_prefix": "/api/flows",
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 754,
+          "method": "POST",
+          "normalized_route": "/api/flows/test-node",
+          "occurrence_id": "packages/agent-plugin/web/flow_canvas/flow_editor.js:754:36:POST:/api/flows/test-node",
+          "raw_route": "/api/flows/test-node",
+          "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js"
+        },
+        {
+          "classification_prefix": "/api/flows",
+          "column": 29,
+          "disposition": "unresolved",
+          "line": 145,
+          "method": "POST",
+          "normalized_route": "/api/flows/test-node",
+          "occurrence_id": "web/canvas/types/flow_type.js:145:29:POST:/api/flows/test-node",
+          "raw_route": "/api/flows/test-node",
+          "source": "web/canvas/types/flow_type.js"
+        }
+      ],
+      "owner_domain": "agent",
+      "owner_service": "plugins.agent.agent_backend.application.bounded_runtime_service",
+      "package_id": "agent_bounded_runtime",
+      "permission_object_scope": "no eval or browser supplied executable config",
+      "service_boundary": "New public Agent bounded-runtime service with a fixed tool/node allowlist, sandbox executor, durable run records and audit lineage.",
+      "target_capability": "agent.workflow.node.test.execute@1",
+      "tests": [
+        "allowlist/sandbox/timeout/resource limit",
+        "cross-workspace authorization",
+        "resume idempotency and audit lineage"
+      ],
+      "transaction_model": "durable bounded sandbox run with timeout/resource limits and auditable result"
+    },
+    {
+      "approval": {
+        "decision": "Product/security must decide whether the obsolete arbitrary-URL flows are retired or mapped to signed marketplace acquisition.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "signed publisher release and dependency compatibility",
+        "tenant-scoped installation lock and audit event",
+        "no arbitrary URL or secret logging"
+      ],
+      "cross_domain_links": [
+        "Base identity/tenant context is supplied through the public context port; no router import."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/base-structural-web-remediation.json",
+        "provider_anchor": "backend/routers/plugins.py",
+        "provider_source_sha256": "sha256:bab080093bc16f582378f81ae82d6264d3cd724c2e55d842fad259507c11b2f2",
+        "reason": "The arbitrary-URL installer route has no production handler and is not equivalent to signed marketplace installation."
+      },
+      "dependencies": [
+        "signed marketplace release registry",
+        "plugin installation migration"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "POST /api/plugin/install",
+      "implementation_disposition": "owner_service_required",
+      "method": "POST",
+      "migration_strategy": "Replace arbitrary URL input with signed release selection and explicit grants; otherwise retire.",
+      "normalized_route": "/api/plugin/install",
+      "occurrences": [
+        {
+          "column": 27,
+          "disposition": "unresolved",
+          "line": 287,
+          "method": "POST",
+          "normalized_route": "/api/plugin/install",
+          "occurrence_id": "web/core/web_compat.js:287:27:POST:/api/plugin/install",
+          "raw_route": "/api/plugin/install",
+          "source": "web/core/web_compat.js"
+        }
+      ],
+      "owner_domain": "base",
+      "owner_service": "backend.plugin_platform.service",
+      "package_id": "base_plugin_lifecycle",
+      "permission_object_scope": "signed publisher release and dependency compatibility",
+      "service_boundary": "Public marketplace lifecycle service; REST compatibility and Gateway provider call the same signed-release transition API.",
+      "target_capability": "base.plugin.installation.request.create@1",
+      "tests": [
+        "Gateway permission/tenant allow-deny",
+        "replay/rollback/data-policy boundary",
+        "signature/dependency/audit regression"
+      ],
+      "transaction_model": "one tenant installation transaction; release verification and mount activation are explicit lifecycle steps"
+    },
+    {
+      "approval": {
+        "decision": "Product/security must approve the finite rule-definition and mutable lifecycle semantics; existing routes have no equivalent public service.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "workspace rule ownership",
+        "closed rule-definition grammar",
+        "audit, revision lock, explicit confirmation and no generic JSON"
+      ],
+      "cross_domain_links": [
+        "None; rule evaluation remains within Craft's public service boundary."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
+        "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
+        "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
+        "reason": "No mutable-rule activation provider exists; immutable release activation is a different lifecycle outcome."
+      },
+      "dependencies": [
+        "rule aggregate migration",
+        "approved closed rule-definition vocabulary"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "POST /api/rules/{dynamic}/activate",
+      "implementation_disposition": "owner_service_required",
+      "method": "POST",
+      "migration_strategy": "Implement mutable-rule activation only after its distinct lifecycle contract is approved.",
+      "normalized_route": "/api/rules/{dynamic}/activate",
+      "occurrences": [
+        {
+          "column": 26,
+          "disposition": "unresolved",
+          "line": 173,
+          "method": "POST",
+          "normalized_route": "/api/rules/{dynamic}/activate",
+          "occurrence_id": "web/rule_mgmt/rule_mgmt.js:173:26:POST:/api/rules/{dynamic}/activate",
+          "raw_route": "/api/rules/${gid}/activate",
+          "source": "web/rule_mgmt/rule_mgmt.js"
+        }
+      ],
+      "owner_domain": "craft",
+      "owner_service": "plugins.craft.craft_backend.application.rules.RuleService",
+      "package_id": "craft_rules",
+      "permission_object_scope": "workspace rule ownership",
+      "service_boundary": "Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it.",
+      "target_capability": "craft.rule.lifecycle.activate@1",
+      "tests": [
+        "rule lifecycle authorization and revision conflict",
+        "definition/schema rejection",
+        "evaluation/waiver audit and idempotency"
+      ],
+      "transaction_model": "one rule lifecycle transition with audit and expected state"
+    },
+    {
+      "approval": {
+        "decision": "Product/security must approve the finite rule-definition and mutable lifecycle semantics; existing routes have no equivalent public service.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "workspace rule ownership",
+        "closed rule-definition grammar",
+        "audit, revision lock, explicit confirmation and no generic JSON"
+      ],
+      "cross_domain_links": [
+        "None; rule evaluation remains within Craft's public service boundary."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
+        "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
+        "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
+        "reason": "No legacy deviation provider exists; governed release waiver creation has a different evidence contract."
+      },
+      "dependencies": [
+        "rule aggregate migration",
+        "approved closed rule-definition vocabulary"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "POST /api/rules/{dynamic}/deviations",
+      "implementation_disposition": "owner_service_required",
+      "method": "POST",
+      "migration_strategy": "Do not substitute release waiver; model legacy deviation evidence exactly.",
+      "normalized_route": "/api/rules/{dynamic}/deviations",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 220,
+          "method": "POST",
+          "normalized_route": "/api/rules/{dynamic}/deviations",
+          "occurrence_id": "web/rule_mgmt/rule_mgmt.js:220:36:POST:/api/rules/{dynamic}/deviations",
+          "raw_route": "/api/rules/${_devRuleGid}/deviations",
+          "source": "web/rule_mgmt/rule_mgmt.js"
+        }
+      ],
+      "owner_domain": "craft",
+      "owner_service": "plugins.craft.craft_backend.application.rules.RuleService",
+      "package_id": "craft_rules",
+      "permission_object_scope": "workspace rule ownership",
+      "service_boundary": "Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it.",
+      "target_capability": "craft.rule.deviation.create@1",
+      "tests": [
+        "rule lifecycle authorization and revision conflict",
+        "definition/schema rejection",
+        "evaluation/waiver audit and idempotency"
+      ],
+      "transaction_model": "one rule deviation/waiver transaction with evidence and audit"
+    },
+    {
+      "approval": {
+        "decision": "Product/security must approve the finite rule-definition and mutable lifecycle semantics; existing routes have no equivalent public service.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "workspace rule ownership",
+        "closed rule-definition grammar",
+        "audit, revision lock, explicit confirmation and no generic JSON"
+      ],
+      "cross_domain_links": [
+        "None; rule evaluation remains within Craft's public service boundary."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
+        "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
+        "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
+        "reason": "No mutable-rule suspension handler or domain service exists."
+      },
+      "dependencies": [
+        "rule aggregate migration",
+        "approved closed rule-definition vocabulary"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "POST /api/rules/{dynamic}/suspend",
+      "implementation_disposition": "owner_service_required",
+      "method": "POST",
+      "migration_strategy": "Implement a mutable-rule suspension service; no missing-handler adapter.",
+      "normalized_route": "/api/rules/{dynamic}/suspend",
+      "occurrences": [
+        {
+          "column": 26,
+          "disposition": "unresolved",
+          "line": 175,
+          "method": "POST",
+          "normalized_route": "/api/rules/{dynamic}/suspend",
+          "occurrence_id": "web/rule_mgmt/rule_mgmt.js:175:26:POST:/api/rules/{dynamic}/suspend",
+          "raw_route": "/api/rules/${gid}/suspend",
+          "source": "web/rule_mgmt/rule_mgmt.js"
+        }
+      ],
+      "owner_domain": "craft",
+      "owner_service": "plugins.craft.craft_backend.application.rules.RuleService",
+      "package_id": "craft_rules",
+      "permission_object_scope": "workspace rule ownership",
+      "service_boundary": "Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it.",
+      "target_capability": "craft.rule.lifecycle.suspend@1",
+      "tests": [
+        "rule lifecycle authorization and revision conflict",
+        "definition/schema rejection",
+        "evaluation/waiver audit and idempotency"
+      ],
+      "transaction_model": "one rule lifecycle transition with audit and expected state"
+    },
+    {
+      "approval": {
+        "decision": "Security/product must approve the executable allowlist, sandbox/resource policy, confirmation policy and recovery behavior before implementation.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "no eval or browser supplied executable config",
+        "authorization, sandbox, timeout and resource limits",
+        "confirmation, pause-token integrity and outcome recovery"
+      ],
+      "cross_domain_links": [
+        "Any Craft/Project data access is a bounded Gateway capability invocation, not direct SQL or imported routers."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
+        "provider_anchor": "plugins/agent/agent_backend/routers/skills_v2.py",
+        "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
+        "reason": "No bounded canvas-option resolver exists in the Agent provider."
+      },
+      "dependencies": [
+        "sandbox runtime",
+        "durable run/pause-token store",
+        "Agent execution audit"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "POST /api/skills/canvas-options",
+      "implementation_disposition": "owner_service_required",
+      "method": "POST",
+      "migration_strategy": "Expose only approved option resolvers; browser configuration is data, never executable code.",
+      "normalized_route": "/api/skills/canvas-options",
+      "occurrences": [
+        {
+          "column": 35,
+          "disposition": "unresolved",
+          "line": 1599,
+          "method": "POST",
+          "normalized_route": "/api/skills/canvas-options",
+          "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1599:35:POST:/api/skills/canvas-options",
+          "raw_route": "/api/skills/canvas-options",
+          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js"
+        }
+      ],
+      "owner_domain": "agent",
+      "owner_service": "plugins.agent.agent_backend.application.bounded_runtime_service",
+      "package_id": "agent_bounded_runtime",
+      "permission_object_scope": "no eval or browser supplied executable config",
+      "service_boundary": "New public Agent bounded-runtime service with a fixed tool/node allowlist, sandbox executor, durable run records and audit lineage.",
+      "target_capability": "agent.canvas.options.resolve@1",
+      "tests": [
+        "allowlist/sandbox/timeout/resource limit",
+        "cross-workspace authorization",
+        "resume idempotency and audit lineage"
+      ],
+      "transaction_model": "bounded deterministic resolver with actor/workspace audit"
+    },
+    {
+      "approval": {
+        "decision": "Security/product must approve the executable allowlist, sandbox/resource policy, confirmation policy and recovery behavior before implementation.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "no eval or browser supplied executable config",
+        "authorization, sandbox, timeout and resource limits",
+        "confirmation, pause-token integrity and outcome recovery"
+      ],
+      "cross_domain_links": [
+        "Any Craft/Project data access is a bounded Gateway capability invocation, not direct SQL or imported routers."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
+        "provider_anchor": "plugins/agent/agent_backend/routers/skills_v2.py",
+        "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
+        "reason": "No canvas execution provider exists; generic run mutation is not provider-equivalent."
+      },
+      "dependencies": [
+        "sandbox runtime",
+        "durable run/pause-token store",
+        "Agent execution audit"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "POST /api/skills/execute-canvas",
+      "implementation_disposition": "owner_service_required",
+      "method": "POST",
+      "migration_strategy": "Do not substitute generic agent.run mutation; build exact canvas runtime path.",
+      "normalized_route": "/api/skills/execute-canvas",
+      "occurrences": [
+        {
+          "column": 40,
+          "disposition": "unresolved",
+          "line": 2264,
+          "method": "POST",
+          "normalized_route": "/api/skills/execute-canvas",
+          "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2264:40:POST:/api/skills/execute-canvas",
+          "raw_route": "/api/skills/execute-canvas",
+          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js"
+        }
+      ],
+      "owner_domain": "agent",
+      "owner_service": "plugins.agent.agent_backend.application.bounded_runtime_service",
+      "package_id": "agent_bounded_runtime",
+      "permission_object_scope": "no eval or browser supplied executable config",
+      "service_boundary": "New public Agent bounded-runtime service with a fixed tool/node allowlist, sandbox executor, durable run records and audit lineage.",
+      "target_capability": "agent.canvas.execution.start@1",
+      "tests": [
+        "allowlist/sandbox/timeout/resource limit",
+        "cross-workspace authorization",
+        "resume idempotency and audit lineage"
+      ],
+      "transaction_model": "durable sandbox run with confirmation, idempotency, pause token and outcome recovery"
+    },
+    {
+      "approval": {
+        "decision": "Security/product must approve the executable allowlist, sandbox/resource policy, confirmation policy and recovery behavior before implementation.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "no eval or browser supplied executable config",
+        "authorization, sandbox, timeout and resource limits",
+        "confirmation, pause-token integrity and outcome recovery"
+      ],
+      "cross_domain_links": [
+        "Any Craft/Project data access is a bounded Gateway capability invocation, not direct SQL or imported routers."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
+        "provider_anchor": "plugins/agent/agent_backend/routers/skills_v2.py",
+        "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
+        "reason": "No pause-token resume provider exists; generic run mutation is not provider-equivalent."
+      },
+      "dependencies": [
+        "sandbox runtime",
+        "durable run/pause-token store",
+        "Agent execution audit"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "POST /api/skills/resume-canvas",
+      "implementation_disposition": "owner_service_required",
+      "method": "POST",
+      "migration_strategy": "Validate signed pause token, replay behavior and sandbox policy; no generic run mutation.",
+      "normalized_route": "/api/skills/resume-canvas",
+      "occurrences": [
+        {
+          "column": 40,
+          "disposition": "unresolved",
+          "line": 1615,
+          "method": "POST",
+          "normalized_route": "/api/skills/resume-canvas",
+          "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1615:40:POST:/api/skills/resume-canvas",
+          "raw_route": "/api/skills/resume-canvas",
+          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js"
+        }
+      ],
+      "owner_domain": "agent",
+      "owner_service": "plugins.agent.agent_backend.application.bounded_runtime_service",
+      "package_id": "agent_bounded_runtime",
+      "permission_object_scope": "no eval or browser supplied executable config",
+      "service_boundary": "New public Agent bounded-runtime service with a fixed tool/node allowlist, sandbox executor, durable run records and audit lineage.",
+      "target_capability": "agent.canvas.execution.resume@1",
+      "tests": [
+        "allowlist/sandbox/timeout/resource limit",
+        "cross-workspace authorization",
+        "resume idempotency and audit lineage"
+      ],
+      "transaction_model": "durable resume transaction locking validated pause token and run state"
+    },
+    {
+      "approval": {
+        "decision": "Product must choose the finite saved-view configuration language and copy/share semantics; current dynamic config cannot be inferred safely.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "owner/team/share visibility",
+        "closed semantic view schema",
+        "optimistic revision and idempotency key for writes"
+      ],
+      "cross_domain_links": [
+        "None; sharing is enforced in the Base aggregate rather than delegated to a router."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/base-structural-web-remediation.json",
+        "provider_anchor": "backend/routers/views.py",
+        "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
+        "reason": "Saved-view config is intentionally dynamic and has no governed closed nested contract."
+      },
+      "dependencies": [
+        "saved-view storage migration",
+        "approved semantic view configuration"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "POST /api/views",
+      "implementation_disposition": "owner_service_required",
+      "method": "POST",
+      "migration_strategy": "Use closed config, idempotency key and returned revision.",
+      "normalized_route": "/api/views",
+      "occurrences": [
+        {
+          "column": 42,
+          "disposition": "unresolved",
+          "line": 657,
+          "method": "POST",
+          "normalized_route": "/api/views",
+          "occurrence_id": "web/components/view_manager.js:657:42:POST:/api/views",
+          "raw_route": "/api/views",
+          "source": "web/components/view_manager.js"
+        },
+        {
+          "column": 40,
+          "disposition": "unresolved",
+          "line": 713,
+          "method": "POST",
+          "normalized_route": "/api/views",
+          "occurrence_id": "web/components/view_manager.js:713:40:POST:/api/views",
+          "raw_route": "/api/views",
+          "source": "web/components/view_manager.js"
+        }
+      ],
+      "owner_domain": "base",
+      "owner_service": "base.saved_view_service",
+      "package_id": "base_saved_views",
+      "permission_object_scope": "owner/team/share visibility",
+      "service_boundary": "New public Base saved-view aggregate service, used by Gateway and legacy adapter; it owns view records, sharing, copying, and revisions.",
+      "target_capability": "base.saved_view.create@1",
+      "tests": [
+        "owner/non-owner/team visibility",
+        "copy/update/delete replay and conflict",
+        "schema rejects arbitrary configuration"
+      ],
+      "transaction_model": "one saved-view create transaction with owner/share validation"
+    },
+    {
+      "approval": {
+        "decision": "Product must choose the finite saved-view configuration language and copy/share semantics; current dynamic config cannot be inferred safely.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "owner/team/share visibility",
+        "closed semantic view schema",
+        "optimistic revision and idempotency key for writes"
+      ],
+      "cross_domain_links": [
+        "None; sharing is enforced in the Base aggregate rather than delegated to a router."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/base-structural-web-remediation.json",
+        "provider_anchor": "backend/routers/views.py",
+        "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
+        "reason": "The copied result depends on dynamic saved-view config without a governed closed nested contract."
+      },
+      "dependencies": [
+        "saved-view storage migration",
+        "approved semantic view configuration"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "POST /api/views/{dynamic}/copy",
+      "implementation_disposition": "owner_service_required",
+      "method": "POST",
+      "migration_strategy": "Define copy/share/ownership semantics and migrate with an idempotency key.",
+      "normalized_route": "/api/views/{dynamic}/copy",
+      "occurrences": [
+        {
+          "column": 42,
+          "disposition": "unresolved",
+          "line": 978,
+          "method": "POST",
+          "normalized_route": "/api/views/{dynamic}/copy",
+          "occurrence_id": "web/components/view_manager.js:978:42:POST:/api/views/{dynamic}/copy",
+          "raw_route": "/api/views/${gid}/copy",
+          "source": "web/components/view_manager.js"
+        }
+      ],
+      "owner_domain": "base",
+      "owner_service": "base.saved_view_service",
+      "package_id": "base_saved_views",
+      "permission_object_scope": "owner/team/share visibility",
+      "service_boundary": "New public Base saved-view aggregate service, used by Gateway and legacy adapter; it owns view records, sharing, copying, and revisions.",
+      "target_capability": "base.saved_view.copy@1",
+      "tests": [
+        "owner/non-owner/team visibility",
+        "copy/update/delete replay and conflict",
+        "schema rejects arbitrary configuration"
+      ],
+      "transaction_model": "one source-read plus destination-create transaction with idempotency"
+    },
+    {
+      "approval": {
+        "decision": "Product must decide whether absent legacy mapping routes become supported governed flows or are removed; that intent is not encoded in a provider.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "closed field-mapping grammar and restricted transforms",
+        "owner/team binding",
+        "bounded preview/import and safe external error classes"
+      ],
+      "cross_domain_links": [
+        "Exact stable target capability is resolved through the Catalog target index, never a cross-domain database query."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/integration-structural-web-remediation.json",
+        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
+        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
+        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+      },
+      "dependencies": [
+        "connector package",
+        "mapping aggregate migration",
+        "target-capability validation"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "PUT /api/ext-field-mappings/batch",
+      "implementation_disposition": "owner_service_required",
+      "method": "PUT",
+      "migration_strategy": "Define batch limit and all-or-partial success contract; do not relabel generic mapping.update.",
+      "normalized_route": "/api/ext-field-mappings/batch",
+      "occurrences": [
+        {
+          "column": 23,
+          "disposition": "unresolved",
+          "line": 457,
+          "method": "PUT",
+          "normalized_route": "/api/ext-field-mappings/batch",
+          "occurrence_id": "web/ext_datasource/ext_ds.js:457:23:PUT:/api/ext-field-mappings/batch",
+          "raw_route": "/api/ext-field-mappings/batch?mapping_gid=${_selectedMap.gid}",
+          "source": "web/ext_datasource/ext_ds.js"
+        }
+      ],
+      "owner_domain": "integration",
+      "owner_service": "plugins.integration.integration_backend.application.service.IntegrationApplication",
+      "package_id": "integration_mapping",
+      "permission_object_scope": "closed field-mapping grammar and restricted transforms",
+      "service_boundary": "Existing public IntegrationApplication mapping operations backed by Integration repository and connector-runtime ports; no cross-domain database adapter.",
+      "target_capability": "integration.field_mapping.batch.update@1",
+      "tests": [
+        "mapping scope and revision conflict",
+        "transform schema rejection",
+        "preview/import timeout and outcome recovery"
+      ],
+      "transaction_model": "one bounded batch transaction with per-item revision conflicts"
+    },
+    {
+      "approval": {
+        "decision": "Product/security must approve the finite rule-definition and mutable lifecycle semantics; existing routes have no equivalent public service.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "workspace rule ownership",
+        "closed rule-definition grammar",
+        "audit, revision lock, explicit confirmation and no generic JSON"
+      ],
+      "cross_domain_links": [
+        "None; rule evaluation remains within Craft's public service boundary."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
+        "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
+        "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
+        "reason": "Rule definition changes contain dynamic rule_definition data without a governed closed nested contract."
+      },
+      "dependencies": [
+        "rule aggregate migration",
+        "approved closed rule-definition vocabulary"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "PUT /api/rules/{dynamic}",
+      "implementation_disposition": "owner_service_required",
+      "method": "PUT",
+      "migration_strategy": "Define finite rule grammar before migration; reject arbitrary rule_definition JSON.",
+      "normalized_route": "/api/rules/{dynamic}",
+      "occurrences": [
+        {
+          "column": 53,
+          "disposition": "unresolved",
+          "line": 137,
+          "method": "PUT",
+          "normalized_route": "/api/rules/{dynamic}",
+          "occurrence_id": "web/container_card/modes/container_item_detail.js:137:53:PUT:/api/rules/{dynamic}",
+          "raw_route": "/api/rules/${gid}",
+          "source": "web/container_card/modes/container_item_detail.js"
+        },
+        {
+          "column": 50,
+          "disposition": "unresolved",
+          "line": 47,
+          "method": "PUT",
+          "normalized_route": "/api/rules/{dynamic}",
+          "occurrence_id": "web/container_card/modes/mode_field_detail.js:47:50:PUT:/api/rules/{dynamic}",
+          "raw_route": "/api/rules/${gid}",
+          "source": "web/container_card/modes/mode_field_detail.js"
+        }
+      ],
+      "owner_domain": "craft",
+      "owner_service": "plugins.craft.craft_backend.application.rules.RuleService",
+      "package_id": "craft_rules",
+      "permission_object_scope": "workspace rule ownership",
+      "service_boundary": "Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it.",
+      "target_capability": "craft.rule.definition.change.apply@1",
+      "tests": [
+        "rule lifecycle authorization and revision conflict",
+        "definition/schema rejection",
+        "evaluation/waiver audit and idempotency"
+      ],
+      "transaction_model": "one revision-locked rule-definition transaction plus audit"
+    },
+    {
+      "approval": {
+        "decision": "Product/security must select the closed attachment projection and retention semantics; the existing arbitrary attachment records are not safely inferable.",
+        "required": true
+      },
+      "contract_security_rules": [
+        "self-only user scope",
+        "closed attachment summary/reference schema",
+        "no opaque attachment JSON or secret-derived fields"
+      ],
+      "cross_domain_links": [
+        "Attachment metadata is reached only through a typed Base attachment-reference port."
+      ],
+      "current_blocker_evidence": {
+        "manifest_path": "docs/governance/base-structural-web-remediation.json",
+        "provider_anchor": "backend/routers/self_annotations.py",
+        "provider_source_sha256": "sha256:7624608452bd2173dacfaac9c77f703da331fc510512cc028857fb7319ca8c52",
+        "reason": "The request contains attachment records without a governed nested attachment contract."
+      },
+      "dependencies": [
+        "annotation aggregate migration",
+        "attachment reference policy"
+      ],
+      "exit_criteria": [
+        "public owner service and Gateway provider share this boundary",
+        "closed contract and scope tests pass",
+        "fresh canonical occurrence migrates without REST fallback",
+        "no operations/BFF/canonical-disposition relabeling"
+      ],
+      "group_id": "PUT /api/self_ann/{dynamic}",
+      "implementation_disposition": "owner_service_required",
+      "method": "PUT",
+      "migration_strategy": "Use expected revision and idempotency key; migrate only after attachment contract approval.",
+      "normalized_route": "/api/self_ann/{dynamic}",
+      "occurrences": [
+        {
+          "column": 35,
+          "disposition": "unresolved",
+          "line": 175,
+          "method": "PUT",
+          "normalized_route": "/api/self_ann/{dynamic}",
+          "occurrence_id": "web/components/self_annotation_panel.js:175:35:PUT:/api/self_ann/{dynamic}",
+          "raw_route": "/api/self_ann/${_currentGid}",
+          "source": "web/components/self_annotation_panel.js"
+        }
+      ],
+      "owner_domain": "base",
+      "owner_service": "base.self_annotation_service",
+      "package_id": "base_annotations",
+      "permission_object_scope": "self-only user scope",
+      "service_boundary": "New public Base self-annotation service, with compatibility handlers and providers delegating to it rather than sharing router SQL.",
+      "target_capability": "base.self_annotation.change.apply@1",
+      "tests": [
+        "self/non-self Gateway authorization",
+        "closed input/output validation",
+        "write replay and attachment-retention boundary"
+      ],
+      "transaction_model": "one self-annotation revision transaction with attachment reference validation"
+    }
+  ],
+  "packages": [
+    {
+      "approval_gate": "Product/security must decide whether the obsolete arbitrary-URL flows are retired or mapped to signed marketplace acquisition.",
+      "contract_security_rules": [
+        "signed publisher release and dependency compatibility",
+        "tenant-scoped installation lock and audit event",
+        "no arbitrary URL or secret logging"
+      ],
+      "dependencies": [
+        "signed marketplace release registry",
+        "plugin installation migration"
+      ],
+      "owner_domain": "base",
+      "owner_service": "backend.plugin_platform.service",
+      "package_id": "base_plugin_lifecycle",
+      "service_boundary": "Public marketplace lifecycle service; REST compatibility and Gateway provider call the same signed-release transition API.",
+      "tests": [
+        "Gateway permission/tenant allow-deny",
+        "replay/rollback/data-policy boundary",
+        "signature/dependency/audit regression"
+      ]
+    },
+    {
+      "approval_gate": "Product/security must select the closed attachment projection and retention semantics; the existing arbitrary attachment records are not safely inferable.",
+      "contract_security_rules": [
+        "self-only user scope",
+        "closed attachment summary/reference schema",
+        "no opaque attachment JSON or secret-derived fields"
+      ],
+      "dependencies": [
+        "annotation aggregate migration",
+        "attachment reference policy"
+      ],
+      "owner_domain": "base",
+      "owner_service": "base.self_annotation_service",
+      "package_id": "base_annotations",
+      "service_boundary": "New public Base self-annotation service, with compatibility handlers and providers delegating to it rather than sharing router SQL.",
+      "tests": [
+        "self/non-self Gateway authorization",
+        "closed input/output validation",
+        "write replay and attachment-retention boundary"
+      ]
+    },
+    {
+      "approval_gate": "Security/product must approve which profile and effective-grant fields are browser-visible.",
+      "contract_security_rules": [
+        "actor-bound self scope",
+        "allowlisted profile/grant projection",
+        "never expose raw grants or permission blobs"
+      ],
+      "dependencies": [
+        "identity projection contract"
+      ],
+      "owner_domain": "base",
+      "owner_service": "base.identity_profile_service",
+      "package_id": "base_identity_profile",
+      "service_boundary": "Public Base identity projection service shared by session compatibility handler and Gateway provider.",
+      "tests": [
+        "anonymous/self/other-user denial",
+        "closed output schema",
+        "redaction of grants and permissions"
+      ]
+    },
+    {
+      "approval_gate": "Product must choose the finite saved-view configuration language and copy/share semantics; current dynamic config cannot be inferred safely.",
+      "contract_security_rules": [
+        "owner/team/share visibility",
+        "closed semantic view schema",
+        "optimistic revision and idempotency key for writes"
+      ],
+      "dependencies": [
+        "saved-view storage migration",
+        "approved semantic view configuration"
+      ],
+      "owner_domain": "base",
+      "owner_service": "base.saved_view_service",
+      "package_id": "base_saved_views",
+      "service_boundary": "New public Base saved-view aggregate service, used by Gateway and legacy adapter; it owns view records, sharing, copying, and revisions.",
+      "tests": [
+        "owner/non-owner/team visibility",
+        "copy/update/delete replay and conflict",
+        "schema rejects arbitrary configuration"
+      ]
+    },
+    {
+      "approval_gate": "Product/security must decide whether each stale browser connector flow is retained and authorize credential enrolment plus external-network policy.",
+      "contract_security_rules": [
+        "opaque credential_ref only",
+        "network allowlist, timeout and bounded discovery",
+        "masked outputs, structured external failure and no secret evidence"
+      ],
+      "dependencies": [
+        "credential-vault write channel",
+        "connector runtime policy",
+        "connector aggregate migration"
+      ],
+      "owner_domain": "integration",
+      "owner_service": "plugins.integration.integration_backend.application.service.IntegrationApplication",
+      "package_id": "integration_connector",
+      "service_boundary": "Existing public IntegrationApplication with a credential-vault port and connector-runtime port; both legacy adapters and providers invoke that boundary.",
+      "tests": [
+        "tenant/cross-workspace Gateway authorization",
+        "credential redaction",
+        "connector-runtime timeout/outcome-unknown and idempotency"
+      ]
+    },
+    {
+      "approval_gate": "Product must decide whether absent legacy mapping routes become supported governed flows or are removed; that intent is not encoded in a provider.",
+      "contract_security_rules": [
+        "closed field-mapping grammar and restricted transforms",
+        "owner/team binding",
+        "bounded preview/import and safe external error classes"
+      ],
+      "dependencies": [
+        "connector package",
+        "mapping aggregate migration",
+        "target-capability validation"
+      ],
+      "owner_domain": "integration",
+      "owner_service": "plugins.integration.integration_backend.application.service.IntegrationApplication",
+      "package_id": "integration_mapping",
+      "service_boundary": "Existing public IntegrationApplication mapping operations backed by Integration repository and connector-runtime ports; no cross-domain database adapter.",
+      "tests": [
+        "mapping scope and revision conflict",
+        "transform schema rejection",
+        "preview/import timeout and outcome recovery"
+      ]
+    },
+    {
+      "approval_gate": "Product must decide hard-delete versus obsolete/archive behavior because the only existing outcome is obsolete, not delete.",
+      "contract_security_rules": [
+        "Craft workspace/object scope",
+        "reference/lifecycle validation",
+        "audit event and revision lock"
+      ],
+      "dependencies": [
+        "library reference index",
+        "Craft lifecycle audit migration"
+      ],
+      "owner_domain": "craft",
+      "owner_service": "plugins.craft.craft_backend.application.library_lifecycle_service",
+      "package_id": "craft_library",
+      "service_boundary": "New public Craft library lifecycle service that validates references and performs one lifecycle transition; no route-shaped SQL provider.",
+      "tests": [
+        "referenced/unreferenced delete behavior",
+        "owner/non-owner authorization",
+        "replay and lifecycle conflict"
+      ]
+    },
+    {
+      "approval_gate": "Product/security must approve the finite rule-definition and mutable lifecycle semantics; existing routes have no equivalent public service.",
+      "contract_security_rules": [
+        "workspace rule ownership",
+        "closed rule-definition grammar",
+        "audit, revision lock, explicit confirmation and no generic JSON"
+      ],
+      "dependencies": [
+        "rule aggregate migration",
+        "approved closed rule-definition vocabulary"
+      ],
+      "owner_domain": "craft",
+      "owner_service": "plugins.craft.craft_backend.application.rules.RuleService",
+      "package_id": "craft_rules",
+      "service_boundary": "Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it.",
+      "tests": [
+        "rule lifecycle authorization and revision conflict",
+        "definition/schema rejection",
+        "evaluation/waiver audit and idempotency"
+      ]
+    },
+    {
+      "approval_gate": "Product must confirm BOP-version archive/delete lifecycle and list projection; these are distinct from Project list semantics.",
+      "contract_security_rules": [
+        "Craft version scope and expected revision",
+        "archive lifecycle/audit",
+        "no Project-list relabeling or direct SQL dispatch"
+      ],
+      "dependencies": [
+        "BOP version aggregate",
+        "conditional dispatch adapter"
+      ],
+      "owner_domain": "craft",
+      "owner_service": "plugins.craft.craft_backend.application.bop_version_lifecycle_service",
+      "package_id": "craft_bop_lifecycle",
+      "service_boundary": "New public Craft BOP-version lifecycle service selected before Project list dispatch; it owns the conditional bop_version branch only.",
+      "tests": [
+        "conditional branch selection",
+        "BOP revision/authorization",
+        "Project list branch remains unchanged"
+      ]
+    },
+    {
+      "approval_gate": "Security/product must approve the executable allowlist, sandbox/resource policy, confirmation policy and recovery behavior before implementation.",
+      "contract_security_rules": [
+        "no eval or browser supplied executable config",
+        "authorization, sandbox, timeout and resource limits",
+        "confirmation, pause-token integrity and outcome recovery"
+      ],
+      "dependencies": [
+        "sandbox runtime",
+        "durable run/pause-token store",
+        "Agent execution audit"
+      ],
+      "owner_domain": "agent",
+      "owner_service": "plugins.agent.agent_backend.application.bounded_runtime_service",
+      "package_id": "agent_bounded_runtime",
+      "service_boundary": "New public Agent bounded-runtime service with a fixed tool/node allowlist, sandbox executor, durable run records and audit lineage.",
+      "tests": [
+        "allowlist/sandbox/timeout/resource limit",
+        "cross-workspace authorization",
+        "resume idempotency and audit lineage"
+      ]
+    },
+    {
+      "approval_gate": "Product must confirm rejection notification recipients/templates because current candidate omits the legacy notification effect.",
+      "contract_security_rules": [
+        "tenant/order scope and approver authorization",
+        "revision/idempotency",
+        "transactional audit plus durable notification outbox"
+      ],
+      "dependencies": [
+        "Project approval aggregate",
+        "notification outbox migration"
+      ],
+      "owner_domain": "project_management",
+      "owner_service": "plugins.project.project_backend.application.approval_service",
+      "package_id": "project_approval",
+      "service_boundary": "New public Project approval-order service; it owns transition, notification outbox, audit and idempotency in one transaction.",
+      "tests": [
+        "approver/non-approver/cross-tenant denial",
+        "rejection replay and notification outbox",
+        "state conflict and outcome recovery"
+      ]
+    }
+  ],
+  "schema_version": "1.0.0",
+  "source_artifacts": [
+    {
+      "path": "docs/governance/base-structural-web-remediation.json",
+      "sha256": "sha256:f3422520b9a46470c89926f50e261df31c35d9bdd181a5ac1e97b8e6f3ec150b"
+    },
+    {
+      "path": "docs/governance/integration-structural-web-remediation.json",
+      "sha256": "sha256:1df6374133a14c5f953229341e99e2e379d933b8bbd35a940b9ed7e553e3fbed"
+    },
+    {
+      "path": "docs/governance/craft-agent-project-structural-web-remediation.json",
+      "sha256": "sha256:57c913b43ccad96a23fd820d87a5a0d49c798427d64fabc95ba5b8e72976b5e2"
+    },
+    {
+      "path": "docs\\governance\\capability-coverage-review\\generated\\web_route_inventory.json",
+      "sha256": "sha256:f4cd8e71bfad345f6cce52cd4259a8c4cd081ea47def645be3db45cfd899eb32"
+    }
+  ]
+}
