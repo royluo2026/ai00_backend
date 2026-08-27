@@ -7,13 +7,13 @@
       "method": "GET",
       "owner_domain": "project_management",
       "constituents": [
-        {"capability_id": "project.project.read.atomic.projects_search", "major_version": 1},
-        {"capability_id": "project.follow.read.atomic.follows_list", "major_version": 1}
+        {"capability_id": "project.project.read.atomic.projects_search", "major_version": 1, "omittable_error_codes": []},
+        {"capability_id": "project.follow.read.atomic.follows_list", "major_version": 1, "omittable_error_codes": []}
       ],
       "source": "backend/routers/workbench_home.py",
-      "source_sha256": "sha256:b190ef20d69e5af0f58c64405e49924c5db0d15086c16d98b7604d503e7066f8",
+      "source_sha256": "sha256:70360f73721bb13af8be26ee013b23ddd5f47dce666f247bfedbb5ac7104cff6",
       "executor": "backend.routers.workbench_home:execute_constituents",
-      "partial_failure_policy": "continue_in_declared_order_omit_failed"
+      "partial_failure_policy": "fail_closed_except_declared_business_absence"
     },
     {
       "route_id": "bff.workbench.panel1",
@@ -21,13 +21,13 @@
       "method": "GET",
       "owner_domain": "project_management",
       "constituents": [
-        {"capability_id": "project.task.read.atomic.tasks_search", "major_version": 1},
-        {"capability_id": "project.issue.read.atomic.issues_search", "major_version": 1}
+        {"capability_id": "project.task.read.atomic.tasks_search", "major_version": 1, "omittable_error_codes": []},
+        {"capability_id": "project.issue.read.atomic.issues_search", "major_version": 1, "omittable_error_codes": []}
       ],
       "source": "backend/routers/workbench_home.py",
-      "source_sha256": "sha256:b190ef20d69e5af0f58c64405e49924c5db0d15086c16d98b7604d503e7066f8",
+      "source_sha256": "sha256:70360f73721bb13af8be26ee013b23ddd5f47dce666f247bfedbb5ac7104cff6",
       "executor": "backend.routers.workbench_home:execute_constituents",
-      "partial_failure_policy": "continue_in_declared_order_omit_failed"
+      "partial_failure_policy": "fail_closed_except_declared_business_absence"
     }
   ]
 }

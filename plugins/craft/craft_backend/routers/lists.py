@@ -8,7 +8,6 @@ POST   /api/lists          → 创建清单
 PATCH  /api/lists/{gid}    → 更新清单（改名/改色/改排序/转让Owner/设置可见范围）
 DELETE /api/lists/{gid}    → 软删除清单（仅 Owner 或 admin）
 """
-import json
 from typing import Optional
 from uuid import uuid4
 
@@ -17,7 +16,6 @@ from pydantic import BaseModel
 
 from backend.capability_v2.gateway import get_default_gateway
 from backend.platform_sdk.access import build_access_scope
-from ..data.connection import get_conn
 from backend.platform_sdk.auth import get_authenticated_principal, get_current_user
 from backend.platform_sdk.project_management import (
     build_web_compatibility_envelope,
@@ -73,6 +71,24 @@ async def _invoke_project(request, user, principal, gateway, operation, argument
     return result.data["data"]
 
 
+async def _invoke_exact(request, user, principal, gateway, capability_id, payload, *, write=False):
+    request_id = request.headers.get("X-Request-ID") or f"lists_{uuid4().hex}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id=capability_id, payload=payload, current_user=user,
+        principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") if write else None,
+        approval_reference=request.headers.get("X-Capability-Approval") if write else None,
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else ""
+        status = {"bop_version_not_found": 404, "not_found": 404, "forbidden": 403,
+                  "permission_denied": 403, "revision_conflict": 409,
+                  "invalid_input": 400}.get(code, 422)
+        raise HTTPException(status_code=status, detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data["data"]
+
+
 def _row_to_list(r: dict) -> dict:
     return {
         "gid":           r["gid"],
@@ -105,20 +121,21 @@ async def list_cloud_lists(
 ):
     """List visible Craft project lists using a Base-issued access projection."""
     if item_type == "bop_version":
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute("""
-                    SELECT gid, COALESCE(version_tag, '') AS name, maturity, takt_time,
-                           status, created_at, 'cloud' AS storage_scope, 'user' AS owner_type,
-                           '' AS owner_gid, 'bop_version' AS item_type
-                    FROM workmanship_bop_bop_versions ORDER BY created_at DESC
-                """)
-                rows = [dict(row) for row in cur.fetchall()]
+        value = await _invoke_exact(request, current_user, principal, gateway,
+                                    "craft.bop.version.list",
+                                    {"include_archived": False, "page_size": 100})
+        rows = []
         colors = {'concept': '#6c7086', 'planned': '#89b4fa', 'released': '#a6e3a1', 'frozen': '#f9e2af'}
-        for row in rows:
-            row['color'] = colors.get(row.get('maturity'), '#5b8dee')
-            if row.get('created_at') and not isinstance(row['created_at'], str):
-                row['created_at'] = str(row['created_at'])
+        for version in value.get("items", []):
+            rows.append({
+                "gid": version.get("version_gid"),
+                "name": version.get("version_tag") or version.get("version_gid"),
+                "maturity": version.get("maturity"), "takt_time": version.get("takt_time"),
+                "status": version.get("status"), "created_at": version.get("created_at"),
+                "storage_scope": "cloud", "owner_type": "user", "owner_gid": "",
+                "item_type": "bop_version", "revision": version.get("revision"),
+                "color": colors.get(version.get("maturity"), "#5b8dee"),
+            })
         return {"success": True, "data": rows}
 
     scope = build_access_scope(current_user)
@@ -151,15 +168,19 @@ async def update_cloud_list(gid: str, body: ListPatchBody, request: Request,
 
 
 @router.delete("/api/lists/{gid}")
-async def delete_cloud_list(gid: str, request: Request, current_user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            # bop_version 软删除（保留数据，仅标记 deleted_at）
-            cur.execute("SELECT gid FROM workmanship_bop_bop_versions WHERE gid = %s AND deleted_at IS NULL", (gid,))
-            if cur.fetchone():
-                cur.execute("UPDATE workmanship_bop_bop_versions SET deleted_at = NOW() WHERE gid = %s", (gid,))
-                conn.commit()
-                return {"success": True}
+async def delete_cloud_list(gid: str, request: Request,
+                            item_type: Optional[str] = Query(default=None),
+                            expected_revision: Optional[int] = Query(default=None),
+                            current_user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    if item_type == "bop_version":
+        if expected_revision is None:
+            raise HTTPException(status_code=400, detail="expected_revision is required for bop_version")
+        await _invoke_exact(request, current_user, principal, gateway,
+                            "craft.bop.version.archive",
+                            {"version_gid": gid, "expected_revision": expected_revision}, write=True)
+        return {"success": True}
+    if item_type not in (None, "", "project_list"):
+        raise HTTPException(status_code=400, detail=f"unsupported item_type: {item_type}")
     return await _invoke_project(request, current_user, principal, gateway, "lists.delete", {"gid": gid}, write=True)
 
 

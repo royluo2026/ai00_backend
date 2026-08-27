@@ -1,6 +1,6 @@
 {
-  "frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
-  "content_hash": "0dcabbdcbd67dfac9fceaa4628ae41411fecc55e6550d93d9a97cde36e82519c",
+  "frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
+  "content_hash": "c5f0672fb6d101fe5e03be582b61c53224607a19abcae82cb8289fad255f4367",
   "wrapper_contracts_hash": "0ec4f3ca4819c4e9f73d08b9a2871112efa1442e0266fa5606ca4de4e7d99316",
   "scan_roots": [
     "web",
@@ -27,12 +27,12 @@
     "legacy_registered": 311,
     "bff_registered": 2,
     "operations_excluded": 19,
-    "unresolved": 60
+    "unresolved": 62
   },
   "lexical_audit": {
-    "token_count": 449,
-    "token_hash": "8c16063623dbf3b8ef5772dd8c41082c8b98104cf41738607f9aa822a7706210",
-    "mapped_count": 430,
+    "token_count": 451,
+    "token_hash": "9530bf4e9cf6245c8d1a56ae7ea750bb0d423bc043b9457fde3121a2bf6b566d",
+    "mapped_count": 432,
     "reviewed_non_route_count": 19,
     "reviewed_non_route_tokens": [
       "packages/craft-plugin/web/bop_nav/bop_nav.js:12:13:/api/",
@@ -2607,13 +2607,33 @@
     },
     {
       "source": "web/core/existing_capability_client.js",
-      "line": 193,
+      "line": 182,
       "column": 27,
       "raw_route": "/api/v1/capabilities/${capabilityId}:${action}",
       "normalized_route": "/api/v1/capabilities/{dynamic}:{dynamic}",
       "method": "POST",
       "disposition": "capability",
-      "occurrence_id": "web/core/existing_capability_client.js:193:27:POST:/api/v1/capabilities/{dynamic}:{dynamic}"
+      "occurrence_id": "web/core/existing_capability_client.js:182:27:POST:/api/v1/capabilities/{dynamic}:{dynamic}"
+    },
+    {
+      "source": "web/core/existing_capability_client.js",
+      "line": 215,
+      "column": 51,
+      "raw_route": "/api/lists?item_type=bop_version",
+      "normalized_route": "/api/lists",
+      "method": "GET",
+      "disposition": "unresolved",
+      "occurrence_id": "web/core/existing_capability_client.js:215:51:GET:/api/lists"
+    },
+    {
+      "source": "web/core/existing_capability_client.js",
+      "line": 220,
+      "column": 12,
+      "raw_route": "/api/lists/${encodeURIComponent(gid)}?item_type=bop_version&expected_revision=${revision}",
+      "normalized_route": "/api/lists/{dynamic}",
+      "method": "DELETE",
+      "disposition": "unresolved",
+      "occurrence_id": "web/core/existing_capability_client.js:220:12:DELETE:/api/lists/{dynamic}"
     },
     {
       "source": "web/core/global_search.js",
@@ -3967,53 +3987,53 @@
     },
     {
       "source": "web/settings/settings.js",
-      "line": 1376,
+      "line": 1368,
       "column": 41,
       "raw_route": "/api/follows",
       "normalized_route": "/api/follows",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/settings/settings.js:1376:41:GET:/api/follows"
+      "occurrence_id": "web/settings/settings.js:1368:41:GET:/api/follows"
     },
     {
       "source": "web/settings/settings.js",
-      "line": 1385,
+      "line": 1377,
       "column": 44,
       "raw_route": "/api/tasks/${item_gid}",
       "normalized_route": "/api/tasks/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/settings/settings.js:1385:44:GET:/api/tasks/{dynamic}"
+      "occurrence_id": "web/settings/settings.js:1377:44:GET:/api/tasks/{dynamic}"
     },
     {
       "source": "web/settings/settings.js",
-      "line": 1390,
+      "line": 1382,
       "column": 44,
       "raw_route": "/api/issues/${item_gid}",
       "normalized_route": "/api/issues/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/settings/settings.js:1390:44:GET:/api/issues/{dynamic}"
+      "occurrence_id": "web/settings/settings.js:1382:44:GET:/api/issues/{dynamic}"
     },
     {
       "source": "web/settings/settings.js",
-      "line": 1402,
+      "line": 1394,
       "column": 30,
       "raw_route": "/api/follows/${fGid}",
       "normalized_route": "/api/follows/{dynamic}",
       "method": "DELETE",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/settings/settings.js:1402:30:DELETE:/api/follows/{dynamic}"
+      "occurrence_id": "web/settings/settings.js:1394:30:DELETE:/api/follows/{dynamic}"
     },
     {
       "source": "web/settings/settings.js",
-      "line": 1634,
+      "line": 1626,
       "column": 35,
       "raw_route": "/api/users/${userGid}/role",
       "normalized_route": "/api/users/{dynamic}/role",
       "method": "PATCH",
       "disposition": "unresolved",
-      "occurrence_id": "web/settings/settings.js:1634:35:PATCH:/api/users/{dynamic}/role"
+      "occurrence_id": "web/settings/settings.js:1626:35:PATCH:/api/users/{dynamic}/role"
     },
     {
       "source": "web/share/issues.html",

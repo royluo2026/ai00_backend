@@ -1,6 +1,6 @@
 # 插件与 AI 接入规范
 
-目录版本：`rel_86c92a7e6e59a987be6d7ec3d2d4c11b`。
+目录版本：`rel_424d8b0ea1ee7c77776f5822be74abb6`。
 
 1. Host 在安装、挂载或 Agent Run 创建时固定 Catalog Release 与主版本授权。
 2. 消费者提交 payload、幂等键、预期资源版本；不得提交权限或伪造消费者身份。

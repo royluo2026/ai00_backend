@@ -14,13 +14,6 @@ from .provider import descriptor_for
 PUBLIC_CONFIG_CAPABILITY_ID = "base.file_store.public_config.get"
 
 
-def _mask(value: Any) -> str:
-    text = str(value or "")
-    if len(text) > 8:
-        return text[:4] + "••••" + text[-4:]
-    return "•" * len(text)
-
-
 def public_file_store_config(_payload: dict[str, Any], context: object) -> dict[str, Any]:
     raw = file_store_config.read_runtime_file_store_config()
     roles = {str(role) for role in getattr(context, "active_roles", ())}
@@ -39,7 +32,6 @@ def public_file_store_config(_payload: dict[str, Any], context: object) -> dict[
             "endpoint": str(raw.get("endpoint") or ""),
             "bucket": str(raw.get("bucket") or "ai00"),
             "public_url": str(raw.get("public_url") or ""),
-            "key_preview": _mask(raw.get("access_key")),
             "ois": {
                 "identify": str(ois.get("identify") or ""),
                 "env": str(ois.get("env") or ""),
@@ -50,7 +42,6 @@ def public_file_store_config(_payload: dict[str, Any], context: object) -> dict[
                 "idaas_client_id": str(ois.get("idaas_client_id") or ""),
                 "idaas_service_id": str(ois.get("idaas_service_id") or ""),
                 "public_base_url": str(ois.get("public_base_url") or ""),
-                "secret_preview": _mask(ois.get("idaas_client_secret")),
             },
         })
     return result

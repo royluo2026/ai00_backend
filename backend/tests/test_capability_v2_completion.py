@@ -1172,7 +1172,7 @@ def test_frozen_review_exposes_exact_capability_ids() -> None:
     assert "base.annotation.change.apply" in base_ids
     assert "system.worker.outbox.health" not in base_ids
     assert "plugin.upgrade.finish" not in base_ids
-    assert len(base_ids) == 36
+    assert len(base_ids) == 37
 
     integration_ids = review.capability_ids("integration")
     assert "integration.connector.create" in integration_ids

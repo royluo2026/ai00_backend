@@ -13,13 +13,14 @@ from __future__ import annotations
 import json
 import logging
 from pathlib import Path
-from types import SimpleNamespace
+from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
-from backend.routers.deps import get_current_user, require_role
+from backend.capability_v2.gateway import get_default_gateway
+from backend.routers.deps import get_authenticated_principal, get_current_user, require_role
 from backend.db.connection import get_conn
-from backend.base.file_store_public_config import public_file_store_config
+from backend.platform_sdk.project_management import build_web_compatibility_envelope, invoke_compatibility
 
 router = APIRouter(prefix="/api/file-store", tags=["file_store"])
 _log = logging.getLogger(__name__)
@@ -88,9 +89,19 @@ def _save_db_config(key: str, cfg: dict) -> None:
 
 
 @router.get("/config")
-def get_config(_user: dict = Depends(get_current_user)):
-    role = str(_user.get("org_role") or _user.get("system_role") or "member")
-    return public_file_store_config({}, SimpleNamespace(active_roles=(role,), user_gid=_user.get("gid")))
+async def get_config(request: Request, _user: dict = Depends(get_current_user),
+                     principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    request_id = request.headers.get("X-Request-ID") or f"file_store_{uuid4().hex}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="base.file_store.public_config.get", payload={},
+        current_user=_user, principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else ""
+        status = {"unauthenticated": 401, "forbidden": 403, "permission_denied": 403}.get(code, 502)
+        raise HTTPException(status_code=status, detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data["data"]
 
 
 @router.post("/config")

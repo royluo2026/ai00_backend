@@ -37,6 +37,7 @@ async def _invoke(
     gateway: Any,
     capability_id: str,
     arguments: dict[str, Any],
+    omittable_error_codes: frozenset[str],
 ) -> Any:
     base_request_id = request.headers.get("X-Request-ID") or f"workbench_{uuid4().hex}"
     request_id = f"{base_request_id}_{capability_id.replace('.', '_')}"
@@ -54,8 +55,17 @@ async def _invoke(
     )
     if not result.ok:
         code = result.error.code if result.error else ""
-        status = {"not_found": 404, "forbidden": 403, "invalid_input": 400}.get(code, 422)
-        detail = result.error.model_dump(mode="json") if result.error else None
+        if code in omittable_error_codes:
+            return None
+        status = {
+            "unauthenticated": 401, "authentication_required": 401,
+            "forbidden": 403, "permission_denied": 403,
+            "invalid_input": 400, "not_found": 404,
+            "provider_unavailable": 503, "transport_failure": 503,
+            "output_contract_invalid": 502, "contract_invalid": 502,
+        }.get(code, 502)
+        detail = result.error.model_dump(mode="json") if result.error else {"code": "gateway_failure"}
+        detail["constituent_capability_id"] = capability_id
         raise HTTPException(status, detail)
     return result.data["data"]
 
@@ -65,15 +75,15 @@ async def execute_constituents(
     user: dict[str, Any],
     principal: Any,
     gateway: Any,
-    calls: tuple[tuple[str, dict[str, Any]], ...],
+    calls: tuple[tuple[str, dict[str, Any], frozenset[str]], ...],
 ) -> tuple[Any | None, ...]:
-    """Execute reviewed BFF constituents in order and omit only failed values."""
+    """Execute constituents in order; only explicitly declared business absence is omittable."""
     values: list[Any | None] = []
-    for capability_id, arguments in calls:
-        try:
-            values.append(await _invoke(request, user, principal, gateway, capability_id, arguments))
-        except Exception:
-            values.append(None)
+    for capability_id, arguments, omittable_error_codes in calls:
+        values.append(await _invoke(
+            request, user, principal, gateway, capability_id, arguments,
+            omittable_error_codes,
+        ))
     return tuple(values)
 
 
@@ -90,8 +100,8 @@ async def get_workbench_home(
         (
             ("project.project.read.atomic.projects_search", {
                 "include_deleted": False, "include_archived": False, "scope": scope,
-            }),
-            ("project.follow.read.atomic.follows_list", {"item_type": None}),
+            }, frozenset()),
+            ("project.follow.read.atomic.follows_list", {"item_type": None}, frozenset()),
         ),
     )
     projects = _items(project_value)
@@ -143,7 +153,7 @@ async def get_workbench_panel1(
             if source == "task":
                 arguments["scheduled_date_from"] = None
             value, = await execute_constituents(
-                request, current_user, principal, gateway, ((capability_id, arguments),),
+                request, current_user, principal, gateway, ((capability_id, arguments, frozenset()),),
             )
             items.extend(_items(value))
     unique: dict[tuple[str, str], dict[str, Any]] = {}

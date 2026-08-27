@@ -9,10 +9,10 @@ from typing import Any
 
 SCOPED = (
     ("DELETE", "/api/lists/{dynamic}", "conditional_dispatch", (
-        "project.list.change.apply.atomic.lists_delete", "craft.bop.version.archive",
+        "project.list.change.apply.atomic.lists_delete",
     )),
     ("GET", "/api/lists", "conditional_dispatch", (
-        "project.list.read.atomic.lists_search", "craft.bop.version.list",
+        "project.list.read.atomic.lists_search",
     )),
     ("PATCH", "/api/lists/{dynamic}", "conditional_dispatch", (
         "project.list.change.apply.atomic.lists_update", "project.list.change.apply.atomic.lists_delete",
@@ -27,6 +27,15 @@ SCOPED = (
         "base.file_store.public_config.get",
     )),
 )
+
+REST_RECLASSIFIED = {
+    ("GET", "/api/lists"): [
+        {"selector_value": "bop_version", "transport": "GET /api/lists?item_type=bop_version"},
+    ],
+    ("DELETE", "/api/lists/{dynamic}"): [
+        {"selector_value": "bop_version", "transport": "DELETE /api/lists/{gid}?item_type=bop_version&expected_revision={revision}"},
+    ],
+}
 
 
 def _json(path: Path) -> dict[str, Any]:
@@ -64,6 +73,8 @@ def audit_manifest(root: Path, manifest: dict[str, Any]) -> tuple[str, ...]:
         )
         if normalized != targets or any(target not in catalog_ids for target in normalized):
             failures.append(f"target:{key}")
+        if entry.get("reclassified_rest_branches", []) != REST_RECLASSIFIED.get(key, []):
+            failures.append(f"rest_reclassification:{key}")
         baseline = ledger_entries.get(key, {}).get("occurrences", [])
         if entry.get("baseline_occurrences") != baseline:
             failures.append(f"baseline_occurrences:{key}")
@@ -79,6 +90,11 @@ def audit_manifest(root: Path, manifest: dict[str, Any]) -> tuple[str, ...]:
     }
     if counts != expected_counts:
         failures.append("counts")
+    if manifest.get("final_outcomes") != {
+        "fully_governed": {"groups": 4, "baseline_occurrences": 9},
+        "mixed_gateway_and_reclassified_rest": {"groups": 2, "baseline_occurrences": 14},
+    }:
+        failures.append("final_outcomes")
     inventory = root / "docs/governance/capability-coverage-review/generated/web_route_inventory.json"
     if manifest.get("final_inventory_sha256") != _sha(inventory):
         failures.append("final_inventory_sha256")
@@ -99,6 +115,7 @@ def build_manifest(root: Path) -> dict[str, Any]:
         }
         if kind == "conditional_dispatch":
             value["branch_capabilities"] = list(targets)
+            value["reclassified_rest_branches"] = REST_RECLASSIFIED.get((method, route), [])
         elif kind == "truthful_bff":
             value["constituents"] = bff[route]["constituents"]
             value["bff_registry_source_sha256"] = bff[route]["source_sha256"]
@@ -110,11 +127,15 @@ def build_manifest(root: Path) -> dict[str, Any]:
         "artifact_id": "task-3b3d-special-web-residual-contracts",
         "baseline_backend_revision": "5c5c4439a2dd33a1d90afd926f12f53fa5741f8d",
         "baseline_frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
-        "final_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
+        "final_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
         "counts": {
             "conditional_dispatch": {"groups": 3, "occurrences": 20},
             "truthful_bff": {"groups": 2, "occurrences": 2},
             "file_store_capability": {"groups": 1, "occurrences": 1},
+        },
+        "final_outcomes": {
+            "fully_governed": {"groups": 4, "baseline_occurrences": 9},
+            "mixed_gateway_and_reclassified_rest": {"groups": 2, "baseline_occurrences": 14},
         },
         "final_inventory_sha256": _sha(root / "docs/governance/capability-coverage-review/generated/web_route_inventory.json"),
         "entries": entries,

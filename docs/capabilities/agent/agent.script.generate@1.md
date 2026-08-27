@@ -8,7 +8,7 @@ Execute the governed agent.script.generate Agent outcome.
 - 不适用：The outcome belongs to another business domain; invoke that domain Capability instead.
 - 生命周期：`stable`
 - 所属领域：`agent`
-- Catalog Release：`rel_86c92a7e6e59a987be6d7ec3d2d4c11b`
+- Catalog Release：`rel_424d8b0ea1ee7c77776f5822be74abb6`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -98,7 +98,7 @@ Execute the governed agent.script.generate Agent outcome.
 ```json
 {
   "capability_id": "agent.script.generate",
-  "catalog_release": "rel_86c92a7e6e59a987be6d7ec3d2d4c11b",
+  "catalog_release": "rel_424d8b0ea1ee7c77776f5822be74abb6",
   "major_version": 1,
   "payload": {
     "description": "example"

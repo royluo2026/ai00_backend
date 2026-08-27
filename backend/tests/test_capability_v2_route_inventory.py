@@ -129,9 +129,10 @@ def test_task3b3a_conditional_dispatch_is_not_bff_aggregation() -> None:
     ledger = _root_cause_ledger()
     lists = _entry(ledger, "GET", "/api/lists")
 
-    assert lists.disposition == "conditional_dispatch_migrated"
+    assert lists.disposition == "conditional_dispatch_partially_migrated"
     assert lists.disposition_details["selector"] == "item_type"
-    assert len(lists.disposition_details["branch_capabilities"]) == 2
+    assert len(lists.disposition_details["branch_capabilities"]) == 1
+    assert lists.disposition_details["reclassified_rest_branches"][0]["selector_value"] == "bop_version"
 
     fake_bff = replace(
         lists,
@@ -303,7 +304,8 @@ def test_task3b3c_reviewed_disposition_totals_are_exact() -> None:
         "frontend_route_normalize": 15,
         "new_atomic_capability_required": 5,
         "existing_stable_capability": 5,
-        "conditional_dispatch_migrated": 3,
+        "conditional_dispatch_partially_migrated": 2,
+        "conditional_dispatch_migrated": 1,
         "truthful_bff_registered": 2,
         "file_store_capability_migrated": 1,
     })
@@ -312,7 +314,8 @@ def test_task3b3c_reviewed_disposition_totals_are_exact() -> None:
         "existing_capability_migrated": 27,
         "frontend_route_normalize": 23,
         "frontend_retire": 21,
-        "conditional_dispatch_migrated": 20,
+        "conditional_dispatch_partially_migrated": 14,
+        "conditional_dispatch_migrated": 6,
         "existing_stable_capability": 7,
         "new_atomic_capability_required": 6,
         "truthful_bff_registered": 2,

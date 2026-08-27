@@ -60,10 +60,10 @@ PREFERENCES = _object({"version": INTEGER, "preferences": ANY_JSON}, ("version",
 FILE_STORE_OIS = _object({
     "identify": STRING, "env": STRING, "ois3_url": STRING, "region": STRING,
     "licloud_appid": STRING, "idaas_url": STRING, "idaas_client_id": STRING,
-    "idaas_service_id": STRING, "public_base_url": STRING, "secret_preview": STRING,
+    "idaas_service_id": STRING, "public_base_url": STRING,
 }, (
     "identify", "env", "ois3_url", "region", "licloud_appid", "idaas_url",
-    "idaas_client_id", "idaas_service_id", "public_base_url", "secret_preview",
+    "idaas_client_id", "idaas_service_id", "public_base_url",
 ))
 WORKSPACE_TEMPLATE = _object(
     {
@@ -224,7 +224,7 @@ OUTPUT_SCHEMAS = {
         "success": BOOLEAN, "source": STRING, "has_creds": BOOLEAN,
         "is_admin": BOOLEAN, "ois_enabled": BOOLEAN, "ois_source": STRING,
         "endpoint": STRING, "bucket": STRING, "public_url": STRING,
-        "key_preview": STRING, "ois": FILE_STORE_OIS,
+        "ois": FILE_STORE_OIS,
     }, ("success", "source", "has_creds", "is_admin", "ois_enabled", "ois_source")),
     "base.runtime.database_config.get": _object({
         "host": STRING, "port": INTEGER, "user": STRING,

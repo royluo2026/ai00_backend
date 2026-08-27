@@ -58,10 +58,10 @@
     "web/workspace/nav_manager.js": "e229fb407361c139cfc265cd438f929a944cd1919c321c4b6a1cf5bf57cfcd7d"
   },
   "final_evidence": {
-    "frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
-    "content_hash": "0dcabbdcbd67dfac9fceaa4628ae41411fecc55e6550d93d9a97cde36e82519c",
-    "unresolved_count": 60,
-    "unresolved_group_count": 40
+    "frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
+    "content_hash": "c5f0672fb6d101fe5e03be582b61c53224607a19abcae82cb8289fad255f4367",
+    "unresolved_count": 62,
+    "unresolved_group_count": 42
   },
   "final_unresolved_groups": [
     {
@@ -75,6 +75,12 @@
       "normalized_route": "/api/craft_lib/fixtures/{dynamic}",
       "occurrence_count": 1,
       "disposition": "new_atomic_capability_required"
+    },
+    {
+      "method": "DELETE",
+      "normalized_route": "/api/lists/{dynamic}",
+      "occurrence_count": 1,
+      "disposition": "conditional_dispatch_partially_migrated"
     },
     {
       "method": "DELETE",
@@ -123,6 +129,12 @@
       "normalized_route": "/api/ext-mappings/{dynamic}/preview",
       "occurrence_count": 1,
       "disposition": "existing_capability_reclassified"
+    },
+    {
+      "method": "GET",
+      "normalized_route": "/api/lists",
+      "occurrence_count": 1,
+      "disposition": "conditional_dispatch_partially_migrated"
     },
     {
       "method": "GET",
@@ -343,7 +355,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
+        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -578,9 +590,9 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "plugins/craft/craft_backend/routers/lists.py",
-          "start_line": 153,
-          "end_line": 163,
-          "sha256": "f32965a2ed8a6db93acdceed217ba79e7bd634dc8dc47b7d588dc55974ad7bae",
+          "start_line": 170,
+          "end_line": 184,
+          "sha256": "f0e9f064e55e9c52829be374805412d0c698632391f55b767f8977e64bc83327",
           "method": "DELETE",
           "normalized_route": "/api/lists/{dynamic}"
         },
@@ -588,19 +600,24 @@
           {
             "repository": "backend",
             "source_path": "plugins/craft/craft_backend/routers/lists.py",
-            "start_line": 153,
-            "end_line": 163,
-            "sha256": "f32965a2ed8a6db93acdceed217ba79e7bd634dc8dc47b7d588dc55974ad7bae"
+            "start_line": 170,
+            "end_line": 184,
+            "sha256": "f0e9f064e55e9c52829be374805412d0c698632391f55b767f8977e64bc83327"
           }
         ]
       },
-      "lifecycle_conclusion": "The handler selects exactly one branch per request; conditional dispatch is not aggregation and cannot be registered as a BFF.",
-      "disposition": "conditional_dispatch_migrated",
+      "lifecycle_conclusion": "Project-owned branches remain exact Gateway migrations; BOP-version branches are explicitly restored to REST and remain unresolved.",
+      "disposition": "conditional_dispatch_partially_migrated",
       "disposition_details": {
-        "selector": "record family existence",
+        "selector": "item_type",
         "branch_capabilities": [
-          "project.list.change.apply.atomic.lists_delete@1",
-          "craft.bop.version.archive@1"
+          "project.list.change.apply.atomic.lists_delete@1"
+        ],
+        "reclassified_rest_branches": [
+          {
+            "selector_value": "bop_version",
+            "transport": "DELETE /api/lists/{gid}?item_type=bop_version&expected_revision={revision}"
+          }
         ],
         "dispatch_evidence": {
           "kind": "conditional_branch",
@@ -609,9 +626,9 @@
             {
               "repository": "backend",
               "source_path": "plugins/craft/craft_backend/routers/lists.py",
-              "start_line": 153,
-              "end_line": 163,
-              "sha256": "f32965a2ed8a6db93acdceed217ba79e7bd634dc8dc47b7d588dc55974ad7bae"
+              "start_line": 170,
+              "end_line": 184,
+              "sha256": "f0e9f064e55e9c52829be374805412d0c698632391f55b767f8977e64bc83327"
             }
           ]
         }
@@ -908,7 +925,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
+        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
         "retirement_proof": {
           "kind": "http_410",
           "rationale": "The registered AI balance compatibility endpoint is permanently gone and returns HTTP 410, so polling it cannot yield a supported outcome.",
@@ -977,7 +994,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
+        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -1039,7 +1056,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
+        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -1101,7 +1118,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
+        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -1174,7 +1191,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
+        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -1248,7 +1265,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
+        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -1321,7 +1338,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
+        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -1918,7 +1935,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
+        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
         "retirement_proof": {
           "kind": "backend_route_absent",
           "rationale": "The standalone Feishu UI had no matching API-prefixed configuration handler; it now uses a bounded local default configuration.",
@@ -1968,9 +1985,9 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/file_store.py",
-          "start_line": 90,
-          "end_line": 93,
-          "sha256": "67c9bcc853a3f17d1d3794a71b2fdaeb9da38f7a30cdc1962f15874081b385fe",
+          "start_line": 91,
+          "end_line": 104,
+          "sha256": "f5b703537f55ad98238d655d5d02ca32ea17d7ee7db517136d42357a35286b17",
           "method": "GET",
           "normalized_route": "/api/file-store/config"
         },
@@ -2370,9 +2387,9 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "plugins/craft/craft_backend/routers/lists.py",
-          "start_line": 96,
-          "end_line": 127,
-          "sha256": "e0f9f01387340c615543cc4073b14d659ccc770822b6bc3d91a8bf7324f61cb1",
+          "start_line": 112,
+          "end_line": 144,
+          "sha256": "9ef30e5a7ac65f5af4f156afe5e176e3e3ba6f990a7238f477b38253558e5867",
           "method": "GET",
           "normalized_route": "/api/lists"
         },
@@ -2380,19 +2397,24 @@
           {
             "repository": "backend",
             "source_path": "plugins/craft/craft_backend/routers/lists.py",
-            "start_line": 96,
-            "end_line": 127,
-            "sha256": "e0f9f01387340c615543cc4073b14d659ccc770822b6bc3d91a8bf7324f61cb1"
+            "start_line": 112,
+            "end_line": 144,
+            "sha256": "9ef30e5a7ac65f5af4f156afe5e176e3e3ba6f990a7238f477b38253558e5867"
           }
         ]
       },
-      "lifecycle_conclusion": "The handler selects exactly one branch per request; conditional dispatch is not aggregation and cannot be registered as a BFF.",
-      "disposition": "conditional_dispatch_migrated",
+      "lifecycle_conclusion": "Project-owned branches remain exact Gateway migrations; BOP-version branches are explicitly restored to REST and remain unresolved.",
+      "disposition": "conditional_dispatch_partially_migrated",
       "disposition_details": {
         "selector": "item_type",
         "branch_capabilities": [
-          "project.list.read.atomic.lists_search@1",
-          "craft.bop.version.list@1"
+          "project.list.read.atomic.lists_search@1"
+        ],
+        "reclassified_rest_branches": [
+          {
+            "selector_value": "bop_version",
+            "transport": "GET /api/lists?item_type=bop_version"
+          }
         ],
         "dispatch_evidence": {
           "kind": "conditional_branch",
@@ -2401,9 +2423,9 @@
             {
               "repository": "backend",
               "source_path": "plugins/craft/craft_backend/routers/lists.py",
-              "start_line": 96,
-              "end_line": 127,
-              "sha256": "e0f9f01387340c615543cc4073b14d659ccc770822b6bc3d91a8bf7324f61cb1"
+              "start_line": 112,
+              "end_line": 144,
+              "sha256": "9ef30e5a7ac65f5af4f156afe5e176e3e3ba6f990a7238f477b38253558e5867"
             }
           ]
         }
@@ -2446,7 +2468,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
+        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
         "retirement_proof": {
           "kind": "sample_template_only",
           "rationale": "The only caller lived in the distributable plugin SDK template and represented placeholder sample data rather than a shipped product route.",
@@ -3521,9 +3543,9 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/workbench_home.py",
-          "start_line": 80,
-          "end_line": 114,
-          "sha256": "63218f9452f7c50da11b8d30857ccc9ace4390c06b9b7455701addaace760f71",
+          "start_line": 90,
+          "end_line": 124,
+          "sha256": "a960492eddbf393cb374a7bba3386d527d0e8324f74d86579f22e55c62552051",
           "method": "GET",
           "normalized_route": "/api/workbench/home"
         },
@@ -3531,9 +3553,9 @@
           {
             "repository": "backend",
             "source_path": "backend/routers/workbench_home.py",
-            "start_line": 80,
-            "end_line": 114,
-            "sha256": "63218f9452f7c50da11b8d30857ccc9ace4390c06b9b7455701addaace760f71"
+            "start_line": 90,
+            "end_line": 124,
+            "sha256": "a960492eddbf393cb374a7bba3386d527d0e8324f74d86579f22e55c62552051"
           }
         ]
       },
@@ -3550,9 +3572,9 @@
             {
               "repository": "backend",
               "source_path": "backend/routers/workbench_home.py",
-              "start_line": 80,
-              "end_line": 114,
-              "sha256": "63218f9452f7c50da11b8d30857ccc9ace4390c06b9b7455701addaace760f71"
+              "start_line": 90,
+              "end_line": 124,
+              "sha256": "a960492eddbf393cb374a7bba3386d527d0e8324f74d86579f22e55c62552051"
             }
           ],
           "combined_outcomes": [
@@ -3587,9 +3609,9 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/workbench_home.py",
-          "start_line": 117,
-          "end_line": 154,
-          "sha256": "916090acf7ce04293cc58dbbaba56e4ccffc2a3db8175f8462423cb311cb3274",
+          "start_line": 127,
+          "end_line": 164,
+          "sha256": "b8793127a07a43e259897bfed146dc4cfe1bf90765e71ec7dae9153716c86d1d",
           "method": "GET",
           "normalized_route": "/api/workbench/panel1"
         },
@@ -3597,9 +3619,9 @@
           {
             "repository": "backend",
             "source_path": "backend/routers/workbench_home.py",
-            "start_line": 117,
-            "end_line": 154,
-            "sha256": "916090acf7ce04293cc58dbbaba56e4ccffc2a3db8175f8462423cb311cb3274"
+            "start_line": 127,
+            "end_line": 164,
+            "sha256": "b8793127a07a43e259897bfed146dc4cfe1bf90765e71ec7dae9153716c86d1d"
           }
         ]
       },
@@ -3616,9 +3638,9 @@
             {
               "repository": "backend",
               "source_path": "backend/routers/workbench_home.py",
-              "start_line": 117,
-              "end_line": 154,
-              "sha256": "916090acf7ce04293cc58dbbaba56e4ccffc2a3db8175f8462423cb311cb3274"
+              "start_line": 127,
+              "end_line": 164,
+              "sha256": "b8793127a07a43e259897bfed146dc4cfe1bf90765e71ec7dae9153716c86d1d"
             }
           ],
           "combined_outcomes": [
@@ -3933,8 +3955,8 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "plugins/craft/craft_backend/routers/lists.py",
-          "start_line": 143,
-          "end_line": 150,
+          "start_line": 160,
+          "end_line": 167,
           "sha256": "a938eb1b72df31878bfa0a46085659230265459b59b648b98178fa448d689910",
           "method": "PATCH",
           "normalized_route": "/api/lists/{dynamic}"
@@ -3943,8 +3965,8 @@
           {
             "repository": "backend",
             "source_path": "plugins/craft/craft_backend/routers/lists.py",
-            "start_line": 143,
-            "end_line": 150,
+            "start_line": 160,
+            "end_line": 167,
             "sha256": "a938eb1b72df31878bfa0a46085659230265459b59b648b98178fa448d689910"
           }
         ]
@@ -3964,8 +3986,8 @@
             {
               "repository": "backend",
               "source_path": "plugins/craft/craft_backend/routers/lists.py",
-              "start_line": 143,
-              "end_line": 150,
+              "start_line": 160,
+              "end_line": 167,
               "sha256": "a938eb1b72df31878bfa0a46085659230265459b59b648b98178fa448d689910"
             }
           ]
@@ -4400,7 +4422,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
+        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4462,7 +4484,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
+        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4524,7 +4546,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
+        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4586,7 +4608,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
+        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4648,7 +4670,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
+        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -5251,7 +5273,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
+        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
         "retirement_proof": {
           "kind": "sample_template_only",
           "rationale": "The only caller lived in the distributable plugin SDK template and represented placeholder sample data rather than a shipped product route.",
@@ -5780,7 +5802,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
+        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
         "retirement_proof": {
           "kind": "http_410",
           "rationale": "The registered V1 standard-operation clone compatibility endpoint raises HTTP 410 and instructs callers to use the current BOP entry surface.",

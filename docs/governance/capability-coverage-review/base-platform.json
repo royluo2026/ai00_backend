@@ -1417,6 +1417,54 @@
         }
       }
     },
+    "base.file_store.public_config.get": {
+      "kind": "existing",
+      "function_dispositions": {
+        "rest:GET:/api/file-store/config": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/routers/file_store.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The REST adapter invokes base.file_store.public_config.get through the authenticated Capability Gateway and returns the same closed, non-secret projection.",
+          "reviewer": "capability-governance-evidence-closure/task-3b3d/fix-r1",
+          "reviewed_at": "2026-08-27"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "Reviewed Web access uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.file_store.public_config.get"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "The compatibility REST adapter delegates to the same authenticated Gateway capability.",
+          "policy_ref": "base.file_store.public_config.get"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "The runtime configuration projection is not plugin callable.",
+          "policy_ref": "base.file_store.public_config.get"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this runtime projection.",
+          "policy_ref": "base.file_store.public_config.get"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed MCP consumer requires this runtime projection.",
+          "policy_ref": "base.file_store.public_config.get"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local runtime consumer requires this projection.",
+          "policy_ref": "base.file_store.public_config.get"
+        }
+      }
+    },
     "base.identity.directory.sync": {
       "kind": "existing",
       "function_dispositions": {

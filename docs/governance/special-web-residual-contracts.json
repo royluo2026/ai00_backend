@@ -3,7 +3,7 @@
   "artifact_id": "task-3b3d-special-web-residual-contracts",
   "baseline_backend_revision": "5c5c4439a2dd33a1d90afd926f12f53fa5741f8d",
   "baseline_frontend_revision": "af7f8e1f71e11c3f255bcf632d8eb91d8a0f86f1",
-  "final_frontend_revision": "86168958c7441a98dc7556bf5ec0c1c1faf64e6b",
+  "final_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
   "counts": {
     "conditional_dispatch": {
       "groups": 3,
@@ -18,7 +18,17 @@
       "occurrences": 1
     }
   },
-  "final_inventory_sha256": "sha256:c999cebeca6cc915934dd523f78cc89ed242ceaf1f5c6ccb21d637abf2d91ec2",
+  "final_outcomes": {
+    "fully_governed": {
+      "groups": 4,
+      "baseline_occurrences": 9
+    },
+    "mixed_gateway_and_reclassified_rest": {
+      "groups": 2,
+      "baseline_occurrences": 14
+    }
+  },
+  "final_inventory_sha256": "sha256:165c4c7d2e28fda37515a21d05248f22681ebd4f56a377802c83942f2ace76c3",
   "entries": [
     {
       "method": "DELETE",
@@ -49,8 +59,13 @@
         }
       ],
       "branch_capabilities": [
-        "project.list.change.apply.atomic.lists_delete",
-        "craft.bop.version.archive"
+        "project.list.change.apply.atomic.lists_delete"
+      ],
+      "reclassified_rest_branches": [
+        {
+          "selector_value": "bop_version",
+          "transport": "DELETE /api/lists/{gid}?item_type=bop_version&expected_revision={revision}"
+        }
       ]
     },
     {
@@ -192,8 +207,13 @@
         }
       ],
       "branch_capabilities": [
-        "project.list.read.atomic.lists_search",
-        "craft.bop.version.list"
+        "project.list.read.atomic.lists_search"
+      ],
+      "reclassified_rest_branches": [
+        {
+          "selector_value": "bop_version",
+          "transport": "GET /api/lists?item_type=bop_version"
+        }
       ]
     },
     {
@@ -271,7 +291,8 @@
       "branch_capabilities": [
         "project.list.change.apply.atomic.lists_update",
         "project.list.change.apply.atomic.lists_delete"
-      ]
+      ],
+      "reclassified_rest_branches": []
     },
     {
       "method": "GET",
@@ -293,14 +314,16 @@
       "constituents": [
         {
           "capability_id": "project.project.read.atomic.projects_search",
-          "major_version": 1
+          "major_version": 1,
+          "omittable_error_codes": []
         },
         {
           "capability_id": "project.follow.read.atomic.follows_list",
-          "major_version": 1
+          "major_version": 1,
+          "omittable_error_codes": []
         }
       ],
-      "bff_registry_source_sha256": "sha256:b190ef20d69e5af0f58c64405e49924c5db0d15086c16d98b7604d503e7066f8"
+      "bff_registry_source_sha256": "sha256:70360f73721bb13af8be26ee013b23ddd5f47dce666f247bfedbb5ac7104cff6"
     },
     {
       "method": "GET",
@@ -322,14 +345,16 @@
       "constituents": [
         {
           "capability_id": "project.task.read.atomic.tasks_search",
-          "major_version": 1
+          "major_version": 1,
+          "omittable_error_codes": []
         },
         {
           "capability_id": "project.issue.read.atomic.issues_search",
-          "major_version": 1
+          "major_version": 1,
+          "omittable_error_codes": []
         }
       ],
-      "bff_registry_source_sha256": "sha256:b190ef20d69e5af0f58c64405e49924c5db0d15086c16d98b7604d503e7066f8"
+      "bff_registry_source_sha256": "sha256:70360f73721bb13af8be26ee013b23ddd5f47dce666f247bfedbb5ac7104cff6"
     },
     {
       "method": "GET",

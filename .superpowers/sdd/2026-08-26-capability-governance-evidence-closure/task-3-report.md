@@ -2788,3 +2788,65 @@ Exact implementation commits:
 No dependency was installed, and no push, merge, production database mutation,
 operations approval, private-router import, REST fallback, or cross-domain
 database access was performed.
+
+## Task 3B.3d Fix R1
+
+Fix R1 preserves the six-group / 23-occurrence baseline while correcting the
+reviewed overclaims. The Project list branches remain exact Gateway migrations,
+but the BOP-version GET and DELETE branches are restored to explicit REST
+compatibility calls. Their REST handlers contain no SQL or direct database
+mutation: they delegate to `craft.bop.version.list@1` and
+`craft.bop.version.archive@1` through the authenticated Gateway, including the
+real confirmation and idempotency bridge for archive. The independent manifest
+therefore reports 4 groups / 9 baseline occurrences fully governed and 2 groups
+/ 14 baseline occurrences as mixed Gateway plus transparently reclassified
+REST; it does not claim those two groups were eliminated.
+
+`base.file_store.public_config.get@1` and its closed schema now expose no
+`key_preview`, `secret_preview`, raw secret, or other credential-derived value.
+The reachable REST GET invokes that exact Capability through Gateway instead of
+calling the provider directly. The Base coverage review and User Function
+Registry record the REST adapter as the same existing Capability outcome.
+
+The workbench BFF registry defines `omittable_error_codes` independently for
+every constituent (empty for the four search/list outcomes) and uses
+`fail_closed_except_declared_business_absence`. Transport, authorization, and
+output-contract failures now return explicit 503/403/502 responses containing
+the failing constituent Capability ID; the catch-all partial-success path was
+removed.
+
+Generated evidence:
+
+- Catalog release `rel_424d8b0ea1ee7c77776f5822be74abb6`: 465 descriptors/pages
+  and 449 stable capabilities; Catalog was rebuilt once after freezing the new
+  Base provider artifact hash.
+- Frontend revision `3c6ad771d4e20f65ff2fff108ab8b2a3e4680941`.
+- Canonical Web inventory: total 432, capability 38, legacy registered 311,
+  BFF registered 2, operations excluded 19, unresolved 62.
+- Root ledger: 102 baseline-classified groups / 161 occurrences; final
+  unresolved 42 groups / 62 occurrences. Conditional outcomes are 1 fully
+  migrated group / 6 occurrences and 2 partially migrated groups / 14
+  occurrences.
+
+Verification evidence:
+
+```text
+GREEN: focused production Gateway/projection/BFF suite: 16 passed
+GREEN: consumer/completion/route-proof broad suite: 143 passed
+GREEN: strict offline acceptance: 3,143/3,143 validated; failed=0; skipped=0
+GREEN: acceptance pytest: 3,154 passed
+GREEN: Catalog/docs/acceptance/special/domain/root-ledger/Web checks
+KNOWN GLOBAL DRIFT: build_user_function_registry.py --strict still reports the
+pre-existing deprecated/replaced targets; the new file-store reviewed
+disposition is present and no longer appears as a missing disposition.
+```
+
+Exact implementation commits:
+
+- Frontend `3c6ad771d4e20f65ff2fff108ab8b2a3e4680941`
+  (`fix: reclassify BOP list compatibility branches`).
+- Backend commit recorded immediately after this report entry.
+
+No dependency was installed and no push, merge, production database mutation,
+operations approval, private-router import, or cross-domain database access was
+performed.

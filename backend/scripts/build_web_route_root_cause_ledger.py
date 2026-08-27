@@ -150,10 +150,6 @@ TRUE_BFF = {
 }
 
 CONDITIONAL = {
-    ("GET", "/api/lists"): (
-        "item_type",
-        ["project.list.read.atomic.lists_search@1", "craft.bop.version.list@1"],
-    ),
     ("PATCH", "/api/lists/{dynamic}"): (
         "body.archive",
         [
@@ -161,9 +157,16 @@ CONDITIONAL = {
             "project.list.change.apply.atomic.lists_delete@1",
         ],
     ),
+}
+
+PARTIAL_CONDITIONAL = {
+    ("GET", "/api/lists"): (
+        "item_type", ["project.list.read.atomic.lists_search@1"],
+        [{"selector_value": "bop_version", "transport": "GET /api/lists?item_type=bop_version"}],
+    ),
     ("DELETE", "/api/lists/{dynamic}"): (
-        "record family existence",
-        ["project.list.change.apply.atomic.lists_delete@1", "craft.bop.version.archive@1"],
+        "item_type", ["project.list.change.apply.atomic.lists_delete@1"],
+        [{"selector_value": "bop_version", "transport": "DELETE /api/lists/{gid}?item_type=bop_version&expected_revision={revision}"}],
     ),
 }
 
@@ -519,6 +522,16 @@ def _classify(
                 "combined_outcomes": TRUE_BFF[key],
             },
         }, "The anchored handler invokes two stable outcomes and merges their results into one reviewed workbench response."
+    if key in PARTIAL_CONDITIONAL:
+        selector, branches, rest_branches = PARTIAL_CONDITIONAL[key]
+        evidence = _backend_evidence(key, "plugins/craft/craft_backend/routers/lists.py")
+        anchor = _route_anchor(evidence["route_definition"])
+        evidence["anchors"] = [anchor]
+        return owner, "conditional_dispatch_partially_migrated", evidence, {
+            "selector": selector, "branch_capabilities": branches,
+            "reclassified_rest_branches": rest_branches,
+            "dispatch_evidence": {"kind": "conditional_branch", "aggregation": False, "anchors": [anchor]},
+        }, "Project-owned branches remain exact Gateway migrations; BOP-version branches are explicitly restored to REST and remain unresolved."
     if key in CONDITIONAL:
         selector, branches = CONDITIONAL[key]
         evidence = _backend_evidence(key, "plugins/craft/craft_backend/routers/lists.py")

@@ -18717,6 +18717,28 @@
         "backend/routers/feishu_doc.py"
       ]
     },
+    "rest:GET:/api/file-store/config": {
+      "function_id": "rest:GET:/api/file-store/config",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": "base.file_store.public_config.get",
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "confidential",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/file_store.py"
+      ]
+    },
     "rest:POST:/api/file-store/config": {
       "function_id": "rest:POST:/api/file-store/config",
       "domain": "Base Platform",

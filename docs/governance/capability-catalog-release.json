@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_86c92a7e6e59a987be6d7ec3d2d4c11b",
-  "catalog_hash": "sha256:86c92a7e6e59a987be6d7ec3d2d4c11b4b47c93b0a2cb0ae9d2fa14cbd109e22",
+  "release_id": "rel_424d8b0ea1ee7c77776f5822be74abb6",
+  "catalog_hash": "sha256:424d8b0ea1ee7c77776f5822be74abb6cc3a41d917d7130fa3b4eff5deb8b8fc",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -12554,9 +12554,6 @@
           "public_url": {
             "type": "string"
           },
-          "key_preview": {
-            "type": "string"
-          },
           "ois": {
             "type": "object",
             "properties": {
@@ -12586,9 +12583,6 @@
               },
               "public_base_url": {
                 "type": "string"
-              },
-              "secret_preview": {
-                "type": "string"
               }
             },
             "additionalProperties": false,
@@ -12601,8 +12595,7 @@
               "idaas_url",
               "idaas_client_id",
               "idaas_service_id",
-              "public_base_url",
-              "secret_preview"
+              "public_base_url"
             ]
           }
         },
@@ -12617,7 +12610,7 @@
         ]
       },
       "agent_output_schema": null,
-      "schema_hash": "sha256:aa8e8029590799a8028843f819f87f60d7a02522178983ddcb5e8e25a6ea614d",
+      "schema_hash": "sha256:a0c2f796c64c58105d9912fbcc004bcea73ea112880e762b97714b224bfcf2d8",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -178520,13 +178513,13 @@
       "plugin_id": "official.base",
       "module": "backend.base.official_provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:451d5bd2cbf7727329966ad7a0c746ce23197d8d9a2a0739da698fc843f3a2db"
+      "artifact_hash": "sha256:b1a4a797973f28d2beee4852d2b0dd15261bb032f6bce6189bf8224957379bb6"
     },
     {
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
       "version": "1.2.0",
-      "artifact_hash": "sha256:5d47893b7deb7c3d620b12e78d78ecb30252c958ed3f5b15c3dbed66c05e346a"
+      "artifact_hash": "sha256:d683c074af6f7d851f89dace32b8c6d89847547d25fe9346d090bdc82bec01e4"
     },
     {
       "plugin_id": "official.device",
@@ -178577,5 +178570,5 @@
       "artifact_hash": "sha256:5c1fccaa2219f6833c24237667039685e322cefcffc7ca6f0287d28cfc0a2b39"
     }
   ],
-  "created_at": "2026-08-27T00:54:09.145851Z"
+  "created_at": "2026-08-27T01:57:51.407483Z"
 }

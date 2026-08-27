@@ -8,7 +8,7 @@ Read the secret-filtered public file-store runtime configuration.
 - 不适用：A caller needs raw storage credentials or intends to mutate configuration.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_86c92a7e6e59a987be6d7ec3d2d4c11b`
+- Catalog Release：`rel_424d8b0ea1ee7c77776f5822be74abb6`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -79,7 +79,7 @@ Read the secret-filtered public file-store runtime configuration.
 ```json
 {
   "capability_id": "base.file_store.public_config.get",
-  "catalog_release": "rel_86c92a7e6e59a987be6d7ec3d2d4c11b",
+  "catalog_release": "rel_424d8b0ea1ee7c77776f5822be74abb6",
   "major_version": 1,
   "payload": {}
 }
@@ -104,9 +104,6 @@ Read the secret-filtered public file-store runtime configuration.
     },
     "is_admin": {
       "type": "boolean"
-    },
-    "key_preview": {
-      "type": "string"
     },
     "ois": {
       "additionalProperties": false,
@@ -137,9 +134,6 @@ Read the secret-filtered public file-store runtime configuration.
         },
         "region": {
           "type": "string"
-        },
-        "secret_preview": {
-          "type": "string"
         }
       },
       "required": [
@@ -151,8 +145,7 @@ Read the secret-filtered public file-store runtime configuration.
         "idaas_url",
         "idaas_client_id",
         "idaas_service_id",
-        "public_base_url",
-        "secret_preview"
+        "public_base_url"
       ],
       "type": "object"
     },

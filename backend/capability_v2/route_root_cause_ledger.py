@@ -35,6 +35,7 @@ DISPOSITIONS = {
     "truthful_bff_registered",
     "conditional_dispatch_required",
     "conditional_dispatch_migrated",
+    "conditional_dispatch_partially_migrated",
     "new_atomic_capability_required",
     "frontend_retire",
     "frontend_route_normalize",
@@ -659,12 +660,12 @@ def audit_route_root_cause_ledger(
             )
             if not valid_aggregation:
                 issues.append(f"ledger_bff_aggregation_invalid:{context}")
-        elif entry.disposition in {"conditional_dispatch_required", "conditional_dispatch_migrated"}:
+        elif entry.disposition in {"conditional_dispatch_required", "conditional_dispatch_migrated", "conditional_dispatch_partially_migrated"}:
             branches = details.get("branch_capabilities")
             parsed = [_target(value) for value in branches] if isinstance(branches, list) else []
             dispatch = details.get("dispatch_evidence")
             if (
-                len(parsed) < 2
+                len(parsed) < (1 if entry.disposition == "conditional_dispatch_partially_migrated" else 2)
                 or any(value is None or catalog.get(value, (None,))[0] != "stable" for value in parsed)
                 or not isinstance(details.get("selector"), str) or not details.get("selector", "").strip()
                 or not isinstance(dispatch, Mapping) or dispatch.get("aggregation") is not False
@@ -673,6 +674,15 @@ def audit_route_root_cause_ledger(
                 or handler_status != "registered"
             ):
                 issues.append(f"ledger_conditional_dispatch_invalid:{context}")
+            if entry.disposition == "conditional_dispatch_partially_migrated":
+                rest = details.get("reclassified_rest_branches")
+                if not isinstance(rest, list) or not rest or any(
+                    not isinstance(item, Mapping)
+                    or set(item) != {"selector_value", "transport"}
+                    or not all(isinstance(item.get(field), str) and item[field] for field in item)
+                    for item in rest
+                ):
+                    issues.append(f"ledger_conditional_rest_reclassification_invalid:{context}")
         elif entry.disposition == "new_atomic_capability_required":
             required = {
                 "proposed_owner_domain", "atomic_outcome", "provider_or_handler",

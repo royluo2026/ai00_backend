@@ -15,14 +15,16 @@ import backend.routers.workbench_home as workbench_home
 class RecordingGateway:
     catalog_release = "rel_workbench_test"
 
-    def __init__(self, fail_ids=()):
+    def __init__(self, fail_ids=(), failure_code="provider_unavailable"):
         self.envelopes = []
         self.fail_ids = set(fail_ids)
+        self.failure_code = failure_code
 
     async def invoke(self, envelope):
         self.envelopes.append(envelope)
         if envelope.capability_id in self.fail_ids:
-            return SimpleNamespace(ok=False, data=None, error=SimpleNamespace(code="provider_unavailable", model_dump=lambda **_: {"code": "provider_unavailable"}))
+            code = self.failure_code
+            return SimpleNamespace(ok=False, data=None, error=SimpleNamespace(code=code, model_dump=lambda **_: {"code": code}))
         responses = {
             "project.project.read.atomic.projects_search": {
                 "success": True,
@@ -210,17 +212,48 @@ def test_panel1_composes_task_and_issue_sources_through_capability_gateway(monke
     }
 
 
-def test_bff_continues_in_declared_order_and_omits_only_failed_constituent(monkeypatch):
+def test_bff_transport_failure_fails_closed_with_constituent_audit_detail(monkeypatch):
     application, gateway, _scope = _client(monkeypatch)
     gateway.fail_ids.add("project.project.read.atomic.projects_search")
 
     with TestClient(application) as client:
         response = client.get("/api/workbench/home")
 
-    assert response.status_code == 200
-    assert response.json()["my_contexts"] == []
-    assert [item["gid"] for item in response.json()["recent_follows"]] == ["follow-1"]
+    assert response.status_code == 503
+    assert response.json()["detail"] == {
+        "code": "provider_unavailable",
+        "constituent_capability_id": "project.project.read.atomic.projects_search",
+    }
     assert [item.capability_id for item in gateway.envelopes] == [
         "project.project.read.atomic.projects_search",
-        "project.follow.read.atomic.follows_list",
     ]
+
+
+def test_bff_contract_failure_is_not_silently_omitted(monkeypatch):
+    application, gateway, _scope = _client(monkeypatch)
+    gateway.fail_ids.add("project.project.read.atomic.projects_search")
+    gateway.failure_code = "output_contract_invalid"
+
+    with TestClient(application) as client:
+        response = client.get("/api/workbench/home")
+
+    assert response.status_code == 502
+    assert response.json()["detail"] == {
+        "code": "output_contract_invalid",
+        "constituent_capability_id": "project.project.read.atomic.projects_search",
+    }
+
+
+def test_bff_authorization_failure_is_explicit_and_auditable(monkeypatch):
+    application, gateway, _scope = _client(monkeypatch)
+    gateway.fail_ids.add("project.project.read.atomic.projects_search")
+    gateway.failure_code = "permission_denied"
+
+    with TestClient(application) as client:
+        response = client.get("/api/workbench/home")
+
+    assert response.status_code == 403
+    assert response.json()["detail"] == {
+        "code": "permission_denied",
+        "constituent_capability_id": "project.project.read.atomic.projects_search",
+    }
