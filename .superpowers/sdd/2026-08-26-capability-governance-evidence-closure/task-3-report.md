@@ -3007,3 +3007,71 @@ The next step before any migration is a real public Integration owner service
 that implements legacy-compatible connector lifecycle and mapping contracts,
 including bounded external timeouts, confirmation, idempotency, and durable
 outcome recovery. The current name-matched provider is not sufficient.
+
+## Task 3B.3e-craft-agent-project
+
+The final Craft, Agent, and Project package conserves 14 root-cause groups and
+17 final frontend occurrences: Craft 7/9, Agent 4/5, and Project 3/3. No
+provider met the exact public-service, authorization/object-scope, closed
+contract, lifecycle, confirmation/idempotency, and outcome-recovery bar, so
+all 14/17 remain explicitly unresolved. The independent manifest binds the
+pinned root ledger, old handler evidence, provider hashes, contract mismatch,
+and fresh final occurrence ID/path/line/column/source hash.
+
+Agent flow-test and canvas calls remain unresolved because no bounded Agent
+runtime service exists; the manifest cannot relabel them as executable generic
+runs. Rule mutations, entry checks, deviations, equipment/fixture deletion,
+and approval rejection retain their lifecycle/audit/notification gaps. The
+two BOP conditional branches are constrained to their Craft lifecycle outcome,
+not a Project-list capability or direct SQL route. Approval rejection remains
+unresolved because notification publication cannot be proved equivalent.
+
+Verification evidence:
+
+```text
+RED: manifest tests failed before the builder existed (3 failed).
+GREEN: focused scope/count test (1 passed), Agent+BOP boundary test (1 passed),
+       and evidence-tamper test (1 passed).
+GREEN: fresh manifest write and check: 14 groups / 17 occurrences; migrated=0;
+       unresolved=17.
+GREEN: atomic web-contract tests 6 passed; catalog, docs, and domain-dependency
+       checks passed (release rel_a4a5a17ebc77419f6a12eec1f32fcbea).
+GREEN: strict offline acceptance passed: 3,178/3,178 validated; failed=0;
+       skipped=0; acceptance pytest 3,189 passed.
+```
+
+No dependency was installed, runtime/external execution was invoked, frontend
+route changed, or production/operations system was touched. No frontend commit
+is created because every scoped frontend call remains visibly unresolved.
+
+## Task 3B.3e-craft-agent-project Fix R1
+
+The BOP disposition is now evidence-bound rather than a standalone assertion.
+The manifest pins `lists.py` line 123-140 for the `bop_version` selector and
+`craft.bop.version.list`, and line 170-184 for
+`craft.bop.version.archive` plus required `expected_revision`; its write
+envelope also binds approval/idempotency forwarding. Both anchors carry line
+snippet and complete-source hashes. Approval rejection now binds the missing
+route decorator, the compatibility adapter notification publication
+(`approval.py` 44-60), Project's reject operation, and its declared standard
+audit policy. These facts establish why notification/audit delivery cannot be
+claimed as one proved idempotent Project outcome.
+
+The original individual fresh-scan tests were not reported as a complete suite:
+the aggregate command could exceed the tool boundary. The test module now uses
+one module-scoped fresh scan and completes independently. It covers all four
+Agent endpoints (including canvas-options) and rejects mutations of BOP or
+approval anchors, provider/contract evidence, every final occurrence identity
+field (ID, path, line, column, source hash), and pinned ledger revision/hash.
+
+Verification evidence:
+
+```text
+RED: new anchor requirements failed before the evidence fields existed (2 failed).
+GREEN: full independently runnable manifest suite: 3 passed in 20.78s.
+GREEN: fresh manifest write/check: 14 groups / 17 occurrences; migrated=0;
+       unresolved=17.
+GREEN: atomic web contracts 6 passed; catalog/docs/domain checks passed.
+GREEN: strict offline acceptance: 3,178/3,178 validated; failed=0; skipped=0;
+       acceptance pytest 3,189 passed.
+```

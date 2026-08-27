@@ -1,0 +1,1101 @@
+{
+  "artifact_id": "task-3b3e-craft-agent-project-structural-remediation",
+  "atomic_contract_manifest_sha256": "sha256:ad3e325f3b1912d1fdc672af905605aefa4b7f8ede7803c6c266c90ac8c54a00",
+  "content_sha256": "sha256:e3eb3c9fbcc52781e0c4c941c980fb914d509e7b324b82f22d448910590a11bd",
+  "counts": {
+    "groups": 14,
+    "migrated_groups": 0,
+    "migrated_occurrences": 0,
+    "occurrences": 17,
+    "unresolved_groups": 14,
+    "unresolved_occurrences": 17
+  },
+  "entries": [
+    {
+      "approval_reject_evidence": null,
+      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "bop_conditional_branch": false,
+      "candidate_capability": null,
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "final_occurrences": [
+        {
+          "column": 58,
+          "line": 771,
+          "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:771:58:DELETE:/api/craft_lib/equipments/{dynamic}",
+          "source": "web/knowledge_hub/pages/gbop_vpps.html",
+          "source_sha256": "9659421b97c7f769cc5aa1b0f8c486ad4803ca103772c56e7f82ad1aee81dedb"
+        }
+      ],
+      "input_output_contract": {
+        "input": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+        "output": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+        "side_effects": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected."
+      },
+      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "lifecycle_evidence": null,
+      "method": "DELETE",
+      "non_equivalence": {
+        "input": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+        "output": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+        "side_effects": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected."
+      },
+      "normalized_route": "/api/craft_lib/equipments/{dynamic}",
+      "old_occurrences": [
+        {
+          "column": 58,
+          "disposition": "unresolved",
+          "line": 771,
+          "method": "DELETE",
+          "normalized_route": "/api/craft_lib/equipments/{dynamic}",
+          "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:771:58:DELETE:/api/craft_lib/equipments/{dynamic}",
+          "raw_route": "/api/craft_lib/equipments/${gid}",
+          "source": "web/knowledge_hub/pages/gbop_vpps.html",
+          "source_sha256": "db5265ec700318095f663c2571b1e5c734b37d8a51b200bf33aeea3b7c20e2f8"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/craft/craft_backend/routers/craft_library.py"
+      },
+      "owner_domain": "craft",
+      "provider_anchor": "plugins/craft/craft_backend/routers/craft_library.py",
+      "provider_source_sha256": "sha256:30c275048c808550f27bbdcf2da96871936a4b6a53f7eda3aefa0ee3d522eed3",
+      "runtime_execution": "not_applicable",
+      "unresolved_reason": "No delete provider exists; the available obsolete transition is a different lifecycle outcome."
+    },
+    {
+      "approval_reject_evidence": null,
+      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "bop_conditional_branch": false,
+      "candidate_capability": null,
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "final_occurrences": [
+        {
+          "column": 58,
+          "line": 714,
+          "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:714:58:DELETE:/api/craft_lib/fixtures/{dynamic}",
+          "source": "web/knowledge_hub/pages/gbop_vpps.html",
+          "source_sha256": "9659421b97c7f769cc5aa1b0f8c486ad4803ca103772c56e7f82ad1aee81dedb"
+        }
+      ],
+      "input_output_contract": {
+        "input": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+        "output": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+        "side_effects": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected."
+      },
+      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "lifecycle_evidence": null,
+      "method": "DELETE",
+      "non_equivalence": {
+        "input": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+        "output": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+        "side_effects": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected."
+      },
+      "normalized_route": "/api/craft_lib/fixtures/{dynamic}",
+      "old_occurrences": [
+        {
+          "column": 58,
+          "disposition": "unresolved",
+          "line": 714,
+          "method": "DELETE",
+          "normalized_route": "/api/craft_lib/fixtures/{dynamic}",
+          "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:714:58:DELETE:/api/craft_lib/fixtures/{dynamic}",
+          "raw_route": "/api/craft_lib/fixtures/${gid}",
+          "source": "web/knowledge_hub/pages/gbop_vpps.html",
+          "source_sha256": "db5265ec700318095f663c2571b1e5c734b37d8a51b200bf33aeea3b7c20e2f8"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/craft/craft_backend/routers/craft_library.py"
+      },
+      "owner_domain": "craft",
+      "provider_anchor": "plugins/craft/craft_backend/routers/craft_library.py",
+      "provider_source_sha256": "sha256:30c275048c808550f27bbdcf2da96871936a4b6a53f7eda3aefa0ee3d522eed3",
+      "runtime_execution": "not_applicable",
+      "unresolved_reason": "No delete provider exists; the available obsolete transition is a different lifecycle outcome."
+    },
+    {
+      "approval_reject_evidence": null,
+      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "bop_conditional_branch": true,
+      "candidate_capability": null,
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "final_occurrences": [
+        {
+          "column": 12,
+          "line": 259,
+          "occurrence_id": "web/core/existing_capability_client.js:259:12:DELETE:/api/lists/{dynamic}",
+          "source": "web/core/existing_capability_client.js",
+          "source_sha256": "b63965b4c800fed62758fce610913d1e3210fb7432553330958881d74dd8ad7d"
+        }
+      ],
+      "input_output_contract": {
+        "input": "The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch.",
+        "output": "The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch.",
+        "side_effects": "The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch."
+      },
+      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "lifecycle_evidence": {
+        "capability_id": "craft.bop.version.archive",
+        "closed_arguments": {
+          "expected_revision": "required query integer",
+          "version_gid": "route gid"
+        },
+        "direct_sql": false,
+        "expected_revision_required": true,
+        "lifecycle_outcome": "Archive the selected Craft BOP version only with its optimistic-concurrency revision.",
+        "selector": "item_type == \"bop_version\"",
+        "source": {
+          "end_line": 184,
+          "snippet_sha256": "sha256:f0e9f064e55e9c52829be374805412d0c698632391f55b767f8977e64bc83327",
+          "source_path": "plugins/craft/craft_backend/routers/lists.py",
+          "source_sha256": "sha256:af843b6c197bf6434836a15bb387068f89910db7c984c1191e96e4e329e1f1a7",
+          "start_line": 170
+        },
+        "write_envelope": {
+          "end_line": 85,
+          "snippet_sha256": "sha256:59c1bc6b9253a3f6f8df586cb1da41ec1c41b8bb9bb9c1849b03f19561c45508",
+          "source_path": "plugins/craft/craft_backend/routers/lists.py",
+          "source_sha256": "sha256:af843b6c197bf6434836a15bb387068f89910db7c984c1191e96e4e329e1f1a7",
+          "start_line": 70
+        }
+      },
+      "method": "DELETE",
+      "non_equivalence": {
+        "input": "The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch.",
+        "output": "The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch.",
+        "side_effects": "The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch."
+      },
+      "normalized_route": "/api/lists/{dynamic}",
+      "old_occurrences": [
+        {
+          "column": 26,
+          "disposition": "unresolved",
+          "line": 703,
+          "method": "DELETE",
+          "normalized_route": "/api/lists/{dynamic}",
+          "occurrence_id": "packages/craft-plugin/web/bop/bop.js:703:26:DELETE:/api/lists/{dynamic}",
+          "raw_route": "/api/lists/${ver.gid}",
+          "source": "packages/craft-plugin/web/bop/bop.js",
+          "source_sha256": "c06ab7a41a49a6cbf233155d04eefb14b3d793a908f0e7262ba6d88e78c10819"
+        },
+        {
+          "column": 28,
+          "disposition": "unresolved",
+          "line": 1105,
+          "method": "DELETE",
+          "normalized_route": "/api/lists/{dynamic}",
+          "occurrence_id": "web/components/list_sidebar.js:1105:28:DELETE:/api/lists/{dynamic}",
+          "raw_route": "/api/lists/${gid}",
+          "source": "web/components/list_sidebar.js",
+          "source_sha256": "21407987333e16b153d0cbf88d0872dc01c6b11b76cd9d26247d6eb63c06f49e"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [
+          {
+            "end_line": 184,
+            "repository": "backend",
+            "sha256": "f0e9f064e55e9c52829be374805412d0c698632391f55b767f8977e64bc83327",
+            "source_path": "plugins/craft/craft_backend/routers/lists.py",
+            "start_line": 170
+          }
+        ],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 184,
+          "method": "DELETE",
+          "normalized_route": "/api/lists/{dynamic}",
+          "sha256": "f0e9f064e55e9c52829be374805412d0c698632391f55b767f8977e64bc83327",
+          "source_path": "plugins/craft/craft_backend/routers/lists.py",
+          "start_line": 170
+        },
+        "source_path": "plugins/craft/craft_backend/routers/lists.py"
+      },
+      "owner_domain": "project_management",
+      "provider_anchor": "plugins/craft/craft_backend/routers/lists.py",
+      "provider_source_sha256": "sha256:af843b6c197bf6434836a15bb387068f89910db7c984c1191e96e4e329e1f1a7",
+      "runtime_execution": "not_applicable",
+      "unresolved_reason": "The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch."
+    },
+    {
+      "approval_reject_evidence": null,
+      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "bop_conditional_branch": true,
+      "candidate_capability": null,
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "final_occurrences": [
+        {
+          "column": 51,
+          "line": 254,
+          "occurrence_id": "web/core/existing_capability_client.js:254:51:GET:/api/lists",
+          "source": "web/core/existing_capability_client.js",
+          "source_sha256": "b63965b4c800fed62758fce610913d1e3210fb7432553330958881d74dd8ad7d"
+        }
+      ],
+      "input_output_contract": {
+        "input": "The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch.",
+        "output": "The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch.",
+        "side_effects": "The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch."
+      },
+      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "lifecycle_evidence": {
+        "capability_id": "craft.bop.version.list",
+        "closed_arguments": {
+          "include_archived": false,
+          "page_size": 100
+        },
+        "direct_sql": false,
+        "expected_revision_required": false,
+        "lifecycle_outcome": "Read bounded non-archived Craft BOP versions through the exact owner capability.",
+        "selector": "item_type == \"bop_version\"",
+        "source": {
+          "end_line": 140,
+          "snippet_sha256": "sha256:3c25002f07656837ae7ee9b91ad98f4b6be66215aef606ae850913c494414f7f",
+          "source_path": "plugins/craft/craft_backend/routers/lists.py",
+          "source_sha256": "sha256:af843b6c197bf6434836a15bb387068f89910db7c984c1191e96e4e329e1f1a7",
+          "start_line": 123
+        }
+      },
+      "method": "GET",
+      "non_equivalence": {
+        "input": "The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch.",
+        "output": "The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch.",
+        "side_effects": "The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch."
+      },
+      "normalized_route": "/api/lists",
+      "old_occurrences": [
+        {
+          "column": 42,
+          "disposition": "unresolved",
+          "line": 836,
+          "method": "GET",
+          "normalized_route": "/api/lists",
+          "occurrence_id": "packages/craft-plugin/web/lineage_view/assoc_panel.js:836:42:GET:/api/lists",
+          "raw_route": "/api/lists?item_type=${filterCfg.itemType}",
+          "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
+          "source_sha256": "1df0649aea1c9836f3de9ffb2e8e47765fa9f3011e6a303d32acc72de2c5d8d5"
+        },
+        {
+          "column": 26,
+          "disposition": "unresolved",
+          "line": 1012,
+          "method": "GET",
+          "normalized_route": "/api/lists",
+          "occurrence_id": "web/admin/task_planning.html:1012:26:GET:/api/lists",
+          "raw_route": "/api/lists?item_type=task",
+          "source": "web/admin/task_planning.html",
+          "source_sha256": "9458faf6cb26c55b84344d405084358da501c59cae64b8725f18b559fd6b29e7"
+        },
+        {
+          "column": 38,
+          "disposition": "unresolved",
+          "line": 130,
+          "method": "GET",
+          "normalized_route": "/api/lists",
+          "occurrence_id": "web/components/list_nav.html:130:38:GET:/api/lists",
+          "raw_route": "/api/lists?item_type=${_itemType}",
+          "source": "web/components/list_nav.html",
+          "source_sha256": "c73c06958138f87ee70a4b6a8f9dad8e487adf663e14568924daa188533d2443"
+        },
+        {
+          "column": 37,
+          "disposition": "unresolved",
+          "line": 131,
+          "method": "GET",
+          "normalized_route": "/api/lists",
+          "occurrence_id": "web/components/list_sidebar.js:131:37:GET:/api/lists",
+          "raw_route": "/api/lists?item_type=${this._itemType}",
+          "source": "web/components/list_sidebar.js",
+          "source_sha256": "21407987333e16b153d0cbf88d0872dc01c6b11b76cd9d26247d6eb63c06f49e"
+        },
+        {
+          "column": 38,
+          "disposition": "unresolved",
+          "line": 295,
+          "method": "GET",
+          "normalized_route": "/api/lists",
+          "occurrence_id": "web/components/list_tree.html:295:38:GET:/api/lists",
+          "raw_route": "/api/lists",
+          "source": "web/components/list_tree.html",
+          "source_sha256": "bfa8fe3d79f58aae2179e97d056fed8249738b7006985cefa33b2f454010ce71"
+        },
+        {
+          "column": 44,
+          "disposition": "unresolved",
+          "line": 287,
+          "method": "GET",
+          "normalized_route": "/api/lists",
+          "occurrence_id": "web/components/quick_list.html:287:44:GET:/api/lists",
+          "raw_route": "/api/lists?item_type=${t}",
+          "source": "web/components/quick_list.html",
+          "source_sha256": "1b8fbbbfe8f09a87f882fc92c589e24c1a105fc352701770eb881e49e97b8f2e"
+        },
+        {
+          "column": 44,
+          "disposition": "unresolved",
+          "line": 292,
+          "method": "GET",
+          "normalized_route": "/api/lists",
+          "occurrence_id": "web/components/quick_list.html:292:44:GET:/api/lists",
+          "raw_route": "/api/lists?item_type=${t}",
+          "source": "web/components/quick_list.html",
+          "source_sha256": "1b8fbbbfe8f09a87f882fc92c589e24c1a105fc352701770eb881e49e97b8f2e"
+        },
+        {
+          "column": 44,
+          "disposition": "unresolved",
+          "line": 297,
+          "method": "GET",
+          "normalized_route": "/api/lists",
+          "occurrence_id": "web/components/quick_list.html:297:44:GET:/api/lists",
+          "raw_route": "/api/lists?item_type=${t}",
+          "source": "web/components/quick_list.html",
+          "source_sha256": "1b8fbbbfe8f09a87f882fc92c589e24c1a105fc352701770eb881e49e97b8f2e"
+        },
+        {
+          "column": 22,
+          "disposition": "unresolved",
+          "line": 211,
+          "method": "GET",
+          "normalized_route": "/api/lists",
+          "occurrence_id": "web/core/global_search.js:211:22:GET:/api/lists",
+          "raw_route": "/api/lists?q=${enc}",
+          "source": "web/core/global_search.js",
+          "source_sha256": "818504d9c4c7277789c3bb5a066910b92427c267558494a90764a2e5f856abbd"
+        },
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 210,
+          "method": "GET",
+          "normalized_route": "/api/lists",
+          "occurrence_id": "web/team_space/team_space.js:210:36:GET:/api/lists",
+          "raw_route": "/api/lists?owner_team_gid=${encodeURIComponent(teamGid)}&read_scope=team",
+          "source": "web/team_space/team_space.js",
+          "source_sha256": "a3d1a2a00447e04711fb077b3c9822003fc5755f88829d71463d0fa88cb77bc5"
+        },
+        {
+          "column": 38,
+          "disposition": "unresolved",
+          "line": 2039,
+          "method": "GET",
+          "normalized_route": "/api/lists",
+          "occurrence_id": "web/workbench/workbench.js:2039:38:GET:/api/lists",
+          "raw_route": "/api/lists?item_type=${domain}",
+          "source": "web/workbench/workbench.js",
+          "source_sha256": "b204bf23ef35d7c214b9bd9a07cf230f6c1c7a537cd9ddde436845914e2275d4"
+        },
+        {
+          "column": 22,
+          "disposition": "unresolved",
+          "line": 2967,
+          "method": "GET",
+          "normalized_route": "/api/lists",
+          "occurrence_id": "web/workbench/workbench.js:2967:22:GET:/api/lists",
+          "raw_route": "/api/lists",
+          "source": "web/workbench/workbench.js",
+          "source_sha256": "b204bf23ef35d7c214b9bd9a07cf230f6c1c7a537cd9ddde436845914e2275d4"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [
+          {
+            "end_line": 144,
+            "repository": "backend",
+            "sha256": "9ef30e5a7ac65f5af4f156afe5e176e3e3ba6f990a7238f477b38253558e5867",
+            "source_path": "plugins/craft/craft_backend/routers/lists.py",
+            "start_line": 112
+          }
+        ],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 144,
+          "method": "GET",
+          "normalized_route": "/api/lists",
+          "sha256": "9ef30e5a7ac65f5af4f156afe5e176e3e3ba6f990a7238f477b38253558e5867",
+          "source_path": "plugins/craft/craft_backend/routers/lists.py",
+          "start_line": 112
+        },
+        "source_path": "plugins/craft/craft_backend/routers/lists.py"
+      },
+      "owner_domain": "project_management",
+      "provider_anchor": "plugins/craft/craft_backend/routers/lists.py",
+      "provider_source_sha256": "sha256:af843b6c197bf6434836a15bb387068f89910db7c984c1191e96e4e329e1f1a7",
+      "runtime_execution": "not_applicable",
+      "unresolved_reason": "The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch."
+    },
+    {
+      "approval_reject_evidence": null,
+      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "bop_conditional_branch": false,
+      "candidate_capability": "craft.rule.engine.evaluate@1",
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "final_occurrences": [
+        {
+          "column": 40,
+          "line": 2192,
+          "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:2192:40:GET:/api/rule-engine/check-entry",
+          "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+          "source_sha256": "52f36f7634ca6eba793c66cebc7768ee39c2f18ed0bfcf98fc4560338a83964d"
+        },
+        {
+          "column": 40,
+          "line": 3524,
+          "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:3524:40:GET:/api/rule-engine/check-entry",
+          "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+          "source_sha256": "52f36f7634ca6eba793c66cebc7768ee39c2f18ed0bfcf98fc4560338a83964d"
+        }
+      ],
+      "input_output_contract": {
+        "input": "/api/rule-engine/check-entry: REST accepts entry audit query; candidate requires operation plus rule/context or version.",
+        "output": "/api/rule-engine/check-entry: REST returns entry check findings; candidate returns evaluate/audit outcome.",
+        "side_effects": "/api/rule-engine/check-entry: Candidate evaluates CEL or bounded BOP audit, not the legacy entry check."
+      },
+      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "lifecycle_evidence": null,
+      "method": "GET",
+      "non_equivalence": {
+        "input": "/api/rule-engine/check-entry: REST accepts entry audit query; candidate requires operation plus rule/context or version.",
+        "output": "/api/rule-engine/check-entry: REST returns entry check findings; candidate returns evaluate/audit outcome.",
+        "side_effects": "/api/rule-engine/check-entry: Candidate evaluates CEL or bounded BOP audit, not the legacy entry check."
+      },
+      "normalized_route": "/api/rule-engine/check-entry",
+      "old_occurrences": [
+        {
+          "column": 40,
+          "disposition": "unresolved",
+          "line": 2192,
+          "method": "GET",
+          "normalized_route": "/api/rule-engine/check-entry",
+          "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:2192:40:GET:/api/rule-engine/check-entry",
+          "raw_route": "/api/rule-engine/check-entry?entry_gid=${encodeURIComponent(gid)}",
+          "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+          "source_sha256": "36bb20338757c77fcfe80f4d0f84449f2928df7183989efeb2798adbc9abc00a"
+        },
+        {
+          "column": 40,
+          "disposition": "unresolved",
+          "line": 3524,
+          "method": "GET",
+          "normalized_route": "/api/rule-engine/check-entry",
+          "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:3524:40:GET:/api/rule-engine/check-entry",
+          "raw_route": "/api/rule-engine/check-entry?entry_gid=${encodeURIComponent(gid)}",
+          "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+          "source_sha256": "36bb20338757c77fcfe80f4d0f84449f2928df7183989efeb2798adbc9abc00a"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/craft/craft_backend/routers/rule_engine.py"
+      },
+      "owner_domain": "craft",
+      "provider_anchor": "plugins/craft/craft_backend/routers/rule_engine.py",
+      "provider_source_sha256": "sha256:ac258d5ffc6531a5da259750f8b637fea6e467c0a50d4f64a379069aa660f86a",
+      "runtime_execution": "not_applicable",
+      "unresolved_reason": "No entry-check provider exists; CEL evaluation and BOP audit are different outcomes."
+    },
+    {
+      "approval_reject_evidence": {
+        "adapter_notification": {
+          "anchor": {
+            "end_line": 60,
+            "snippet_sha256": "sha256:5b3835ef26dd5342c3b99640d3c4bf6674a930688b4b65fedf5151425b325f0e",
+            "source_path": "plugins/craft/craft_backend/routers/approval.py",
+            "source_sha256": "sha256:1b6d618b9562ad4509f81a848234af9c02f75e17392fe26ed9ca203bf1c7569a",
+            "start_line": 44
+          },
+          "behavior": "The compatibility adapter removes notification from the response and publishes it after the Project result."
+        },
+        "legacy_reject_route_registered": false,
+        "project_audit_policy": {
+          "anchor": {
+            "end_line": 71,
+            "snippet_sha256": "sha256:b8db9f8a6ee5d482a54b5bfa8cfb45fddee10bf6a34195b67fea38992604ec60",
+            "source_path": "plugins/project_management/project_management_backend/capabilities/provider.py",
+            "source_sha256": "sha256:d9a5868fc5faedf1837f62256f722e76e9c5b79503ba789245620f3ca2eb9180",
+            "start_line": 66
+          },
+          "value": "standard"
+        },
+        "project_operation": {
+          "end_line": 148,
+          "snippet_sha256": "sha256:7d0c4ce19b5a7f27f52c026c4f5d643ec320f98e8c445e0e496810063d178963",
+          "source_path": "plugins/project_management/project_management_backend/application/service.py",
+          "source_sha256": "sha256:f79ee2ca70ad2fe56a4fa11f91a5756b63e5f948657e727c08fee34568d6be4c",
+          "start_line": 148
+        },
+        "reject_function": {
+          "end_line": 93,
+          "snippet_sha256": "sha256:b686c9742d8eabe4756e0e2eb461a1e8da174321b2a4255304b04aa9936a0eae",
+          "source_path": "plugins/craft/craft_backend/routers/approval.py",
+          "source_sha256": "sha256:1b6d618b9562ad4509f81a848234af9c02f75e17392fe26ed9ca203bf1c7569a",
+          "start_line": 92
+        },
+        "unresolved_gap": "No registered legacy reject route ties the Project transition, standard audit, and adapter notification delivery into one proved idempotent outcome."
+      },
+      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "bop_conditional_branch": false,
+      "candidate_capability": "project.approval.change.apply.atomic.approval_orders_reject@1",
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "final_occurrences": [
+        {
+          "column": 26,
+          "line": 153,
+          "occurrence_id": "packages/craft-plugin/web/approval/approval.js:153:26:POST:/api/approval/orders/{dynamic}/reject",
+          "source": "packages/craft-plugin/web/approval/approval.js",
+          "source_sha256": "33fb221332f9f502763b07d9956eb7da1ebfd9ebf2fb9f124c0582189873e0ae"
+        }
+      ],
+      "input_output_contract": {
+        "input": "/api/approval/orders/{dynamic}/reject: REST path/body is transformed to approval reject arguments.",
+        "output": "/api/approval/orders/{dynamic}/reject: Both return the rejected order, but REST also consumes notification data.",
+        "side_effects": "/api/approval/orders/{dynamic}/reject: REST adapter publishes the returned applicant notification; direct atomic invocation does not compose that publication."
+      },
+      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "lifecycle_evidence": null,
+      "method": "POST",
+      "non_equivalence": {
+        "input": "/api/approval/orders/{dynamic}/reject: REST path/body is transformed to approval reject arguments.",
+        "output": "/api/approval/orders/{dynamic}/reject: Both return the rejected order, but REST also consumes notification data.",
+        "side_effects": "/api/approval/orders/{dynamic}/reject: REST adapter publishes the returned applicant notification; direct atomic invocation does not compose that publication."
+      },
+      "normalized_route": "/api/approval/orders/{dynamic}/reject",
+      "old_occurrences": [
+        {
+          "column": 26,
+          "disposition": "unresolved",
+          "line": 153,
+          "method": "POST",
+          "normalized_route": "/api/approval/orders/{dynamic}/reject",
+          "occurrence_id": "packages/craft-plugin/web/approval/approval.js:153:26:POST:/api/approval/orders/{dynamic}/reject",
+          "raw_route": "/api/approval/orders/${_selected.gid}/reject",
+          "source": "packages/craft-plugin/web/approval/approval.js",
+          "source_sha256": "04495deeced75c275da108fc797af937d194541b597c6186d52faa6d82cf7539"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/craft/craft_backend/routers/approval.py"
+      },
+      "owner_domain": "project_management",
+      "provider_anchor": "plugins/craft/craft_backend/routers/approval.py",
+      "provider_source_sha256": "sha256:1b6d618b9562ad4509f81a848234af9c02f75e17392fe26ed9ca203bf1c7569a",
+      "runtime_execution": "not_applicable",
+      "unresolved_reason": "The Project outcome omits the legacy notification publication side effect."
+    },
+    {
+      "approval_reject_evidence": null,
+      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "bop_conditional_branch": false,
+      "candidate_capability": null,
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "final_occurrences": [
+        {
+          "column": 36,
+          "line": 754,
+          "occurrence_id": "packages/agent-plugin/web/flow_canvas/flow_editor.js:754:36:POST:/api/flows/test-node",
+          "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
+          "source_sha256": "9bb1fe5371a15087509924b6de1304199977757f1038a76177e78e490deca049"
+        },
+        {
+          "column": 29,
+          "line": 145,
+          "occurrence_id": "web/canvas/types/flow_type.js:145:29:POST:/api/flows/test-node",
+          "source": "web/canvas/types/flow_type.js",
+          "source_sha256": "591904dbc5db76114ccc02ac981ab675147876890bd297d814a2d9024928212f"
+        }
+      ],
+      "input_output_contract": {
+        "input": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+        "output": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+        "side_effects": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected."
+      },
+      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "lifecycle_evidence": null,
+      "method": "POST",
+      "non_equivalence": {
+        "input": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+        "output": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+        "side_effects": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected."
+      },
+      "normalized_route": "/api/flows/test-node",
+      "old_occurrences": [
+        {
+          "classification_prefix": "/api/flows",
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 754,
+          "method": "POST",
+          "normalized_route": "/api/flows/test-node",
+          "occurrence_id": "packages/agent-plugin/web/flow_canvas/flow_editor.js:754:36:POST:/api/flows/test-node",
+          "raw_route": "/api/flows/test-node",
+          "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
+          "source_sha256": "9bb1fe5371a15087509924b6de1304199977757f1038a76177e78e490deca049"
+        },
+        {
+          "classification_prefix": "/api/flows",
+          "column": 29,
+          "disposition": "unresolved",
+          "line": 145,
+          "method": "POST",
+          "normalized_route": "/api/flows/test-node",
+          "occurrence_id": "web/canvas/types/flow_type.js:145:29:POST:/api/flows/test-node",
+          "raw_route": "/api/flows/test-node",
+          "source": "web/canvas/types/flow_type.js",
+          "source_sha256": "591904dbc5db76114ccc02ac981ab675147876890bd297d814a2d9024928212f"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/agent/agent_backend/routers/flows.py"
+      },
+      "owner_domain": "agent",
+      "provider_anchor": "plugins/agent/agent_backend/routers/flows.py",
+      "provider_source_sha256": "sha256:b7451e4b3a5537ec078bad85d9c1131b6ce4e20d608d07b8cde116e159b48ad8",
+      "runtime_execution": "unresolved_no_bounded_runtime_service",
+      "unresolved_reason": "No node-test handler or runtime service exists in the Agent provider."
+    },
+    {
+      "approval_reject_evidence": null,
+      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "bop_conditional_branch": false,
+      "candidate_capability": "craft.rule.release.activate@1",
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "final_occurrences": [
+        {
+          "column": 26,
+          "line": 173,
+          "occurrence_id": "web/rule_mgmt/rule_mgmt.js:173:26:POST:/api/rules/{dynamic}/activate",
+          "source": "web/rule_mgmt/rule_mgmt.js",
+          "source_sha256": "bd55a892edbaa2a50722415783b68419a52452d6a72f305048935275106a2994"
+        }
+      ],
+      "input_output_contract": {
+        "input": "/api/rules/{dynamic}/activate: REST activates mutable rule gid; candidate activates a published immutable release contract.",
+        "output": "/api/rules/{dynamic}/activate: REST returns rule status; candidate returns accepted release outcome.",
+        "side_effects": "/api/rules/{dynamic}/activate: Candidate lifecycle handler does not mutate the legacy rule record."
+      },
+      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "lifecycle_evidence": null,
+      "method": "POST",
+      "non_equivalence": {
+        "input": "/api/rules/{dynamic}/activate: REST activates mutable rule gid; candidate activates a published immutable release contract.",
+        "output": "/api/rules/{dynamic}/activate: REST returns rule status; candidate returns accepted release outcome.",
+        "side_effects": "/api/rules/{dynamic}/activate: Candidate lifecycle handler does not mutate the legacy rule record."
+      },
+      "normalized_route": "/api/rules/{dynamic}/activate",
+      "old_occurrences": [
+        {
+          "column": 26,
+          "disposition": "unresolved",
+          "line": 173,
+          "method": "POST",
+          "normalized_route": "/api/rules/{dynamic}/activate",
+          "occurrence_id": "web/rule_mgmt/rule_mgmt.js:173:26:POST:/api/rules/{dynamic}/activate",
+          "raw_route": "/api/rules/${gid}/activate",
+          "source": "web/rule_mgmt/rule_mgmt.js",
+          "source_sha256": "bd55a892edbaa2a50722415783b68419a52452d6a72f305048935275106a2994"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/craft/craft_backend/routers/rules.py"
+      },
+      "owner_domain": "craft",
+      "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
+      "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
+      "runtime_execution": "not_applicable",
+      "unresolved_reason": "No mutable-rule activation provider exists; immutable release activation is a different lifecycle outcome."
+    },
+    {
+      "approval_reject_evidence": null,
+      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "bop_conditional_branch": false,
+      "candidate_capability": "craft.rule.waiver.create@1",
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "final_occurrences": [
+        {
+          "column": 36,
+          "line": 220,
+          "occurrence_id": "web/rule_mgmt/rule_mgmt.js:220:36:POST:/api/rules/{dynamic}/deviations",
+          "source": "web/rule_mgmt/rule_mgmt.js",
+          "source_sha256": "bd55a892edbaa2a50722415783b68419a52452d6a72f305048935275106a2994"
+        }
+      ],
+      "input_output_contract": {
+        "input": "/api/rules/{dynamic}/deviations: REST deviation body is tied to rule gid; candidate waiver contract expects governed release/evidence fields.",
+        "output": "/api/rules/{dynamic}/deviations: REST returns deviation record; candidate returns accepted waiver outcome.",
+        "side_effects": "/api/rules/{dynamic}/deviations: Candidate does not persist the legacy deviation model."
+      },
+      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "lifecycle_evidence": null,
+      "method": "POST",
+      "non_equivalence": {
+        "input": "/api/rules/{dynamic}/deviations: REST deviation body is tied to rule gid; candidate waiver contract expects governed release/evidence fields.",
+        "output": "/api/rules/{dynamic}/deviations: REST returns deviation record; candidate returns accepted waiver outcome.",
+        "side_effects": "/api/rules/{dynamic}/deviations: Candidate does not persist the legacy deviation model."
+      },
+      "normalized_route": "/api/rules/{dynamic}/deviations",
+      "old_occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 214,
+          "method": "POST",
+          "normalized_route": "/api/rules/{dynamic}/deviations",
+          "occurrence_id": "web/rule_mgmt/rule_mgmt.js:214:36:POST:/api/rules/{dynamic}/deviations",
+          "raw_route": "/api/rules/${_devRuleGid}/deviations",
+          "source": "web/rule_mgmt/rule_mgmt.js",
+          "source_sha256": "83b06c82671c9c398d44e7b0692ab24dbc0ef33b707278e86973978c84693cb3"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/craft/craft_backend/routers/rules.py"
+      },
+      "owner_domain": "craft",
+      "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
+      "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
+      "runtime_execution": "not_applicable",
+      "unresolved_reason": "No legacy deviation provider exists; governed release waiver creation has a different evidence contract."
+    },
+    {
+      "approval_reject_evidence": null,
+      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "bop_conditional_branch": false,
+      "candidate_capability": null,
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "final_occurrences": [
+        {
+          "column": 26,
+          "line": 175,
+          "occurrence_id": "web/rule_mgmt/rule_mgmt.js:175:26:POST:/api/rules/{dynamic}/suspend",
+          "source": "web/rule_mgmt/rule_mgmt.js",
+          "source_sha256": "bd55a892edbaa2a50722415783b68419a52452d6a72f305048935275106a2994"
+        }
+      ],
+      "input_output_contract": {
+        "input": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+        "output": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+        "side_effects": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected."
+      },
+      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "lifecycle_evidence": null,
+      "method": "POST",
+      "non_equivalence": {
+        "input": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+        "output": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+        "side_effects": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected."
+      },
+      "normalized_route": "/api/rules/{dynamic}/suspend",
+      "old_occurrences": [
+        {
+          "column": 26,
+          "disposition": "unresolved",
+          "line": 175,
+          "method": "POST",
+          "normalized_route": "/api/rules/{dynamic}/suspend",
+          "occurrence_id": "web/rule_mgmt/rule_mgmt.js:175:26:POST:/api/rules/{dynamic}/suspend",
+          "raw_route": "/api/rules/${gid}/suspend",
+          "source": "web/rule_mgmt/rule_mgmt.js",
+          "source_sha256": "bd55a892edbaa2a50722415783b68419a52452d6a72f305048935275106a2994"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/craft/craft_backend/routers/rules.py"
+      },
+      "owner_domain": "craft",
+      "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
+      "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
+      "runtime_execution": "not_applicable",
+      "unresolved_reason": "No mutable-rule suspension handler or domain service exists."
+    },
+    {
+      "approval_reject_evidence": null,
+      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "bop_conditional_branch": false,
+      "candidate_capability": null,
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "final_occurrences": [
+        {
+          "column": 35,
+          "line": 1599,
+          "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1599:35:POST:/api/skills/canvas-options",
+          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+          "source_sha256": "c6f654458ff966e9bb4c2f023dd877c682243a6ff70c71ef0646f4acf9c041a7"
+        }
+      ],
+      "input_output_contract": {
+        "input": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+        "output": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+        "side_effects": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected."
+      },
+      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "lifecycle_evidence": null,
+      "method": "POST",
+      "non_equivalence": {
+        "input": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+        "output": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+        "side_effects": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected."
+      },
+      "normalized_route": "/api/skills/canvas-options",
+      "old_occurrences": [
+        {
+          "column": 35,
+          "disposition": "unresolved",
+          "line": 1599,
+          "method": "POST",
+          "normalized_route": "/api/skills/canvas-options",
+          "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1599:35:POST:/api/skills/canvas-options",
+          "raw_route": "/api/skills/canvas-options",
+          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+          "source_sha256": "c6f654458ff966e9bb4c2f023dd877c682243a6ff70c71ef0646f4acf9c041a7"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/agent/agent_backend/routers/skills_v2.py"
+      },
+      "owner_domain": "agent",
+      "provider_anchor": "plugins/agent/agent_backend/routers/skills_v2.py",
+      "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
+      "runtime_execution": "unresolved_no_bounded_runtime_service",
+      "unresolved_reason": "No bounded canvas-option resolver exists in the Agent provider."
+    },
+    {
+      "approval_reject_evidence": null,
+      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "bop_conditional_branch": false,
+      "candidate_capability": "agent.run.change.apply@1",
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "final_occurrences": [
+        {
+          "column": 40,
+          "line": 2264,
+          "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2264:40:POST:/api/skills/execute-canvas",
+          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+          "source_sha256": "c6f654458ff966e9bb4c2f023dd877c682243a6ff70c71ef0646f4acf9c041a7"
+        }
+      ],
+      "input_output_contract": {
+        "input": "/api/skills/execute-canvas: REST accepts canvas/flow inputs and execution mode; candidate run change contract uses run resource operations.",
+        "output": "/api/skills/execute-canvas: REST returns canvas execution and pause token; candidate returns run resource projection.",
+        "side_effects": "/api/skills/execute-canvas: Candidate does not execute the legacy skill canvas orchestration."
+      },
+      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "lifecycle_evidence": null,
+      "method": "POST",
+      "non_equivalence": {
+        "input": "/api/skills/execute-canvas: REST accepts canvas/flow inputs and execution mode; candidate run change contract uses run resource operations.",
+        "output": "/api/skills/execute-canvas: REST returns canvas execution and pause token; candidate returns run resource projection.",
+        "side_effects": "/api/skills/execute-canvas: Candidate does not execute the legacy skill canvas orchestration."
+      },
+      "normalized_route": "/api/skills/execute-canvas",
+      "old_occurrences": [
+        {
+          "column": 40,
+          "disposition": "unresolved",
+          "line": 2264,
+          "method": "POST",
+          "normalized_route": "/api/skills/execute-canvas",
+          "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2264:40:POST:/api/skills/execute-canvas",
+          "raw_route": "/api/skills/execute-canvas",
+          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+          "source_sha256": "c6f654458ff966e9bb4c2f023dd877c682243a6ff70c71ef0646f4acf9c041a7"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/agent/agent_backend/routers/skills_v2.py"
+      },
+      "owner_domain": "agent",
+      "provider_anchor": "plugins/agent/agent_backend/routers/skills_v2.py",
+      "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
+      "runtime_execution": "unresolved_no_bounded_runtime_service",
+      "unresolved_reason": "No canvas execution provider exists; generic run mutation is not provider-equivalent."
+    },
+    {
+      "approval_reject_evidence": null,
+      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "bop_conditional_branch": false,
+      "candidate_capability": "agent.run.change.apply@1",
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "final_occurrences": [
+        {
+          "column": 40,
+          "line": 1615,
+          "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1615:40:POST:/api/skills/resume-canvas",
+          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+          "source_sha256": "c6f654458ff966e9bb4c2f023dd877c682243a6ff70c71ef0646f4acf9c041a7"
+        }
+      ],
+      "input_output_contract": {
+        "input": "/api/skills/resume-canvas: REST accepts pause token/resume inputs; candidate run change contract uses run resource operations.",
+        "output": "/api/skills/resume-canvas: REST returns resumed canvas execution; candidate returns run resource projection.",
+        "side_effects": "/api/skills/resume-canvas: Candidate has no pause-token resume side effect."
+      },
+      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "lifecycle_evidence": null,
+      "method": "POST",
+      "non_equivalence": {
+        "input": "/api/skills/resume-canvas: REST accepts pause token/resume inputs; candidate run change contract uses run resource operations.",
+        "output": "/api/skills/resume-canvas: REST returns resumed canvas execution; candidate returns run resource projection.",
+        "side_effects": "/api/skills/resume-canvas: Candidate has no pause-token resume side effect."
+      },
+      "normalized_route": "/api/skills/resume-canvas",
+      "old_occurrences": [
+        {
+          "column": 40,
+          "disposition": "unresolved",
+          "line": 1615,
+          "method": "POST",
+          "normalized_route": "/api/skills/resume-canvas",
+          "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1615:40:POST:/api/skills/resume-canvas",
+          "raw_route": "/api/skills/resume-canvas",
+          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+          "source_sha256": "c6f654458ff966e9bb4c2f023dd877c682243a6ff70c71ef0646f4acf9c041a7"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/agent/agent_backend/routers/skills_v2.py"
+      },
+      "owner_domain": "agent",
+      "provider_anchor": "plugins/agent/agent_backend/routers/skills_v2.py",
+      "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
+      "runtime_execution": "unresolved_no_bounded_runtime_service",
+      "unresolved_reason": "No pause-token resume provider exists; generic run mutation is not provider-equivalent."
+    },
+    {
+      "approval_reject_evidence": null,
+      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "bop_conditional_branch": false,
+      "candidate_capability": "craft.rule.library.change.apply@1",
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "final_occurrences": [
+        {
+          "column": 53,
+          "line": 137,
+          "occurrence_id": "web/container_card/modes/container_item_detail.js:137:53:PUT:/api/rules/{dynamic}",
+          "source": "web/container_card/modes/container_item_detail.js",
+          "source_sha256": "80d6527fda0872ecb118a8a06cb11066956feed460b190f257e6b6a3016d530a"
+        },
+        {
+          "column": 50,
+          "line": 47,
+          "occurrence_id": "web/container_card/modes/mode_field_detail.js:47:50:PUT:/api/rules/{dynamic}",
+          "source": "web/container_card/modes/mode_field_detail.js",
+          "source_sha256": "1751d2f01f071191219fd19cdb59b477f96abd93725905398d9d8a6ddfcc3c99"
+        }
+      ],
+      "input_output_contract": {
+        "input": "/api/rules/{dynamic}: REST accepts a non-empty update record; the published stable candidate closes record with no allowed properties.",
+        "output": "/api/rules/{dynamic}: REST returns the updated rule projection; the candidate cannot be invoked with any meaningful update record.",
+        "side_effects": "/api/rules/{dynamic}: REST reaches the rule provider with one of its ten supported fields; the Gateway rejects that same non-empty record before provider execution."
+      },
+      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "lifecycle_evidence": null,
+      "method": "PUT",
+      "non_equivalence": {
+        "input": "/api/rules/{dynamic}: REST accepts a non-empty update record; the published stable candidate closes record with no allowed properties.",
+        "output": "/api/rules/{dynamic}: REST returns the updated rule projection; the candidate cannot be invoked with any meaningful update record.",
+        "side_effects": "/api/rules/{dynamic}: REST reaches the rule provider with one of its ten supported fields; the Gateway rejects that same non-empty record before provider execution."
+      },
+      "normalized_route": "/api/rules/{dynamic}",
+      "old_occurrences": [
+        {
+          "column": 53,
+          "disposition": "unresolved",
+          "line": 137,
+          "method": "PUT",
+          "normalized_route": "/api/rules/{dynamic}",
+          "occurrence_id": "web/container_card/modes/container_item_detail.js:137:53:PUT:/api/rules/{dynamic}",
+          "raw_route": "/api/rules/${gid}",
+          "source": "web/container_card/modes/container_item_detail.js",
+          "source_sha256": "80d6527fda0872ecb118a8a06cb11066956feed460b190f257e6b6a3016d530a"
+        },
+        {
+          "column": 50,
+          "disposition": "unresolved",
+          "line": 47,
+          "method": "PUT",
+          "normalized_route": "/api/rules/{dynamic}",
+          "occurrence_id": "web/container_card/modes/mode_field_detail.js:47:50:PUT:/api/rules/{dynamic}",
+          "raw_route": "/api/rules/${gid}",
+          "source": "web/container_card/modes/mode_field_detail.js",
+          "source_sha256": "1751d2f01f071191219fd19cdb59b477f96abd93725905398d9d8a6ddfcc3c99"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "plugins/craft/craft_backend/routers/rules.py"
+      },
+      "owner_domain": "craft",
+      "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
+      "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
+      "runtime_execution": "not_applicable",
+      "unresolved_reason": "Rule definition changes contain dynamic rule_definition data without a governed closed nested contract."
+    }
+  ],
+  "frontend_content_hash": "6c2d9dd40efff87a5200b668727d7b56b47989b3f65e3796de97c91d83a2affb",
+  "frontend_revision": "6dd62900c9a82173adcbbe277bb38846ab556031",
+  "schema_version": "1.0.0",
+  "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
+  "source_ledger_revision": "2db07be4",
+  "source_ledger_sha256": "sha256:86402d9ecee4aa2d82a4c328ce2a4262b946e7608e4e1e1161422adad8536a3c"
+}
