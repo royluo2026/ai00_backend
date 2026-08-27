@@ -2985,3 +2985,25 @@ GREEN: fresh Integration manifest --check: 12 groups / 12 occurrences;
 No dependency was installed and no external connector was called. No frontend
 commit was created because every route remains unresolved; backend commit
 records the evidence-only closure package.
+
+## Task 3B.3e-integration Fix R1
+
+Each unresolved endpoint now binds its precise reviewed migration-decision
+line, public Integration service line, and candidate input/output-contract
+lines, including both line and complete-source hashes. The manifest records
+the route-specific request, response, and side-effect mismatch, actor/team
+scope, candidate confirmation/idempotency policy, and whether the candidate
+would invoke connector runtime or only accept an asynchronous sync. External
+candidate calls are explicitly unresolved because the current public service
+declares no timeout or outcome-recovery semantics that can be matched to the
+absent legacy routes.
+
+The final inventory is now a fresh, exact 12-occurrence reconciliation by
+occurrence ID, source path, line, column, source hash, and count. Validator
+tests mutate decision evidence, service evidence, and a final occurrence line
+to prove that all fail closed.
+
+The next step before any migration is a real public Integration owner service
+that implements legacy-compatible connector lifecycle and mapping contracts,
+including bounded external timeouts, confirmation, idempotency, and durable
+outcome recovery. The current name-matched provider is not sufficient.

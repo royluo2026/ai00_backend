@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3e-integration-structural-remediation",
   "atomic_contract_manifest_sha256": "sha256:ad3e325f3b1912d1fdc672af905605aefa4b7f8ede7803c6c266c90ac8c54a00",
-  "content_sha256": "sha256:122f9fa6566a0f2f6bdf0d684add94be6c052576c83b65d698fb6202515b1cbe",
+  "content_sha256": "sha256:28e74cf959a5bfc526afac70f01a3c4a918256293b5bcccf214b398598ac2f51",
   "counts": {
     "groups": 12,
     "migrated_groups": 0,
@@ -12,16 +12,108 @@
   },
   "entries": [
     {
-      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "authorization_and_scope": "/api/ext-datasources: Candidate applies Integration ownership scoping absent from the legacy projection.",
       "candidate_capability": "integration.connector.search@1",
-      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "candidate_evidence": {
+        "contract": {
+          "input_anchor": {
+            "end_line": 28,
+            "sha256": "a6f1a42ccc084a3f09196a7201590cca213863472f11c960bb9ff3b1b1fcd50c",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 28
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "limit": {
+                "maximum": 200,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "query": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 45,
+            "sha256": "d8371ca52334a0f4b32a2c01f15d81d38324794a09756f37982436ce3e5bb6cc",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 45
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "items": {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "items"
+            ],
+            "type": "object"
+          },
+          "source_sha256": "sha256:4d0b6664e408555a71d1947677e50eca8d5a33a71c8cf1be5d8536297c495041"
+        },
+        "migration_decision": {
+          "anchor": {
+            "end_line": 63,
+            "sha256": "053321082a8cd533b2a7280625f2e48bba6c2781ed2d443e8174fd458a76b20e",
+            "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
+            "start_line": 63
+          },
+          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+        },
+        "service": {
+          "anchor": {
+            "end_line": 46,
+            "sha256": "ab2c27b403a9031af28346979a178de5b571dbab9ad580f0769f8af0fb0ea16a",
+            "source_path": "plugins/integration/integration_backend/application/service.py",
+            "start_line": 46
+          },
+          "source_sha256": "sha256:063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e"
+        }
+      },
+      "candidate_policy": {
+        "authorization_scope": "actor-bound owner_gid and team_gid",
+        "confirmation": "none",
+        "external_side_effect": "none",
+        "idempotency": "none",
+        "outcome_recovery": "not proven equivalent to the absent legacy route",
+        "timeout": "not_applicable"
+      },
+      "confirmation_policy": "unresolved: candidate policy cannot establish legacy confirmation equivalence",
       "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
       "external_outcome": "not_applicable",
       "final_disposition": "unresolved",
       "final_inventory_mapping": "unresolved",
-      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
-      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "final_occurrences": [
+        {
+          "column": 36,
+          "line": 148,
+          "occurrence_id": "web/ext_datasource/ext_ds.js:148:36:GET:/api/ext-datasources",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+        }
+      ],
+      "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
+      "input_output_contract": {
+        "input": "/api/ext-datasources: REST query uses legacy datasource filters; candidate binds actor/team and connector search payload.",
+        "output": "/api/ext-datasources: REST returns datasource rows; candidate returns connector items projection.",
+        "side_effects": "/api/ext-datasources: Candidate applies Integration ownership scoping absent from the legacy projection."
+      },
       "method": "GET",
+      "non_equivalence": {
+        "input": "/api/ext-datasources: REST query uses legacy datasource filters; candidate binds actor/team and connector search payload.",
+        "output": "/api/ext-datasources: REST returns datasource rows; candidate returns connector items projection.",
+        "side_effects": "/api/ext-datasources: Candidate applies Integration ownership scoping absent from the legacy projection."
+      },
       "normalized_route": "/api/ext-datasources",
       "occurrences": [
         {
@@ -48,16 +140,106 @@
       "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
     },
     {
-      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "authorization_and_scope": "/api/ext-datasources/{dynamic}/tables: Candidate performs bounded external discovery and network policy checks.",
       "candidate_capability": "integration.connector.schema.discover@1",
-      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "candidate_evidence": {
+        "contract": {
+          "input_anchor": {
+            "end_line": 30,
+            "sha256": "f19af427280b94b8a2e8921c26f8d6b5fadb8d68e3fdefc5aaec9836de353643",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 30
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "gid"
+            ],
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 47,
+            "sha256": "3350f103bb4479e88b7d6ea5386238e70acec8c19791da2fb4dd1327c12338a7",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 47
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "objects": {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "objects"
+            ],
+            "type": "object"
+          },
+          "source_sha256": "sha256:4d0b6664e408555a71d1947677e50eca8d5a33a71c8cf1be5d8536297c495041"
+        },
+        "migration_decision": {
+          "anchor": {
+            "end_line": 64,
+            "sha256": "2707d0592b739902bca7b9a6d64870e2a49665e2cd815dc5b62ada43af8cb7f5",
+            "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
+            "start_line": 64
+          },
+          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+        },
+        "service": {
+          "anchor": {
+            "end_line": 48,
+            "sha256": "5ce7451c74e389af9f867da9da1b9e3989f7358c28d915c92c8ee7da272c2779",
+            "source_path": "plugins/integration/integration_backend/application/service.py",
+            "start_line": 48
+          },
+          "source_sha256": "sha256:063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e"
+        }
+      },
+      "candidate_policy": {
+        "authorization_scope": "actor-bound owner_gid and team_gid",
+        "confirmation": "none",
+        "external_side_effect": "connector_runtime",
+        "idempotency": "none",
+        "outcome_recovery": "not proven equivalent to the absent legacy route",
+        "timeout": "not declared by the public service"
+      },
+      "confirmation_policy": "unresolved: candidate policy cannot establish legacy confirmation equivalence",
       "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
       "external_outcome": "unknown_without_provider_equivalence",
       "final_disposition": "unresolved",
       "final_inventory_mapping": "unresolved",
-      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
-      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "final_occurrences": [
+        {
+          "column": 36,
+          "line": 640,
+          "occurrence_id": "web/ext_datasource/ext_ds.js:640:36:GET:/api/ext-datasources/{dynamic}/tables",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+        }
+      ],
+      "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
+      "input_output_contract": {
+        "input": "/api/ext-datasources/{dynamic}/tables: REST uses datasource gid and table listing semantics; candidate requires connector gid discovery contract.",
+        "output": "/api/ext-datasources/{dynamic}/tables: REST returns table names; candidate returns connector-runtime schema discovery projection.",
+        "side_effects": "/api/ext-datasources/{dynamic}/tables: Candidate performs bounded external discovery and network policy checks."
+      },
       "method": "GET",
+      "non_equivalence": {
+        "input": "/api/ext-datasources/{dynamic}/tables: REST uses datasource gid and table listing semantics; candidate requires connector gid discovery contract.",
+        "output": "/api/ext-datasources/{dynamic}/tables: REST returns table names; candidate returns connector-runtime schema discovery projection.",
+        "side_effects": "/api/ext-datasources/{dynamic}/tables: Candidate performs bounded external discovery and network policy checks."
+      },
       "normalized_route": "/api/ext-datasources/{dynamic}/tables",
       "occurrences": [
         {
@@ -84,16 +266,139 @@
       "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
     },
     {
-      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "authorization_and_scope": "/api/ext-field-mappings: Candidate enforces actor/team ownership for a single resource.",
       "candidate_capability": "integration.mapping.get@1",
-      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "candidate_evidence": {
+        "contract": {
+          "input_anchor": {
+            "end_line": 34,
+            "sha256": "b03bc7850159ad3ad7f27ce2c2b34d31e35bcbcd69b59803e7afcb3d4a5fdf5c",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 34
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "gid"
+            ],
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 51,
+            "sha256": "beb7844dc8eb73ad4ea9b5fb1f929bfd0526646b96bd5810e276769cfbb2e4b3",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 51
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "field_mappings": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "source_field": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "target_field": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "transform_expression": {
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "source_field",
+                    "target_field"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "revision": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "target_capability_id": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "gid",
+              "revision",
+              "target_capability_id",
+              "field_mappings"
+            ],
+            "type": "object"
+          },
+          "source_sha256": "sha256:4d0b6664e408555a71d1947677e50eca8d5a33a71c8cf1be5d8536297c495041"
+        },
+        "migration_decision": {
+          "anchor": {
+            "end_line": 65,
+            "sha256": "3a7c3cd3f0e53d4708b105436b39fff010307862378150ea4385dba0b1b2ccef",
+            "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
+            "start_line": 65
+          },
+          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+        },
+        "service": {
+          "anchor": {
+            "end_line": 57,
+            "sha256": "f137d0bb608efa11c1b626741729a2db811ab486d848e2300a437af73add860d",
+            "source_path": "plugins/integration/integration_backend/application/service.py",
+            "start_line": 57
+          },
+          "source_sha256": "sha256:063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e"
+        }
+      },
+      "candidate_policy": {
+        "authorization_scope": "actor-bound owner_gid and team_gid",
+        "confirmation": "none",
+        "external_side_effect": "none",
+        "idempotency": "none",
+        "outcome_recovery": "not proven equivalent to the absent legacy route",
+        "timeout": "not_applicable"
+      },
+      "confirmation_policy": "unresolved: candidate policy cannot establish legacy confirmation equivalence",
       "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
       "external_outcome": "not_applicable",
       "final_disposition": "unresolved",
       "final_inventory_mapping": "unresolved",
-      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
-      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "final_occurrences": [
+        {
+          "column": 36,
+          "line": 349,
+          "occurrence_id": "web/ext_datasource/ext_ds.js:349:36:GET:/api/ext-field-mappings",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+        }
+      ],
+      "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
+      "input_output_contract": {
+        "input": "/api/ext-field-mappings: REST lists field mappings by legacy query; candidate requires one mapping gid.",
+        "output": "/api/ext-field-mappings: REST returns a collection; candidate returns one mapping.",
+        "side_effects": "/api/ext-field-mappings: Candidate enforces actor/team ownership for a single resource."
+      },
       "method": "GET",
+      "non_equivalence": {
+        "input": "/api/ext-field-mappings: REST lists field mappings by legacy query; candidate requires one mapping gid.",
+        "output": "/api/ext-field-mappings: REST returns a collection; candidate returns one mapping.",
+        "side_effects": "/api/ext-field-mappings: Candidate enforces actor/team ownership for a single resource."
+      },
       "normalized_route": "/api/ext-field-mappings",
       "occurrences": [
         {
@@ -120,16 +425,108 @@
       "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
     },
     {
-      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "authorization_and_scope": "/api/ext-mappings: Candidate binds actor/team ownership.",
       "candidate_capability": "integration.mapping.search@1",
-      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "candidate_evidence": {
+        "contract": {
+          "input_anchor": {
+            "end_line": 35,
+            "sha256": "66528833d25f81c247ba929457cc406a30a1101cc4a2a3dad107e9f39e1f1001",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 35
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "limit": {
+                "maximum": 200,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "query": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 52,
+            "sha256": "10e4f197c228faf0144e5f033c6fb95ca39a3caac39e4afc7394abd76771e0aa",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 52
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "items": {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "items"
+            ],
+            "type": "object"
+          },
+          "source_sha256": "sha256:4d0b6664e408555a71d1947677e50eca8d5a33a71c8cf1be5d8536297c495041"
+        },
+        "migration_decision": {
+          "anchor": {
+            "end_line": 66,
+            "sha256": "87acc89beddb7ba27996305091d6a5891f845ea382807191b565dc6ccbfa8676",
+            "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
+            "start_line": 66
+          },
+          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+        },
+        "service": {
+          "anchor": {
+            "end_line": 59,
+            "sha256": "5a6c7881ed21e630d9b7604459a9d4509a7d62761f43352edcfedd9fbd9a441c",
+            "source_path": "plugins/integration/integration_backend/application/service.py",
+            "start_line": 59
+          },
+          "source_sha256": "sha256:063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e"
+        }
+      },
+      "candidate_policy": {
+        "authorization_scope": "actor-bound owner_gid and team_gid",
+        "confirmation": "none",
+        "external_side_effect": "none",
+        "idempotency": "none",
+        "outcome_recovery": "not proven equivalent to the absent legacy route",
+        "timeout": "not_applicable"
+      },
+      "confirmation_policy": "unresolved: candidate policy cannot establish legacy confirmation equivalence",
       "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
       "external_outcome": "not_applicable",
       "final_disposition": "unresolved",
       "final_inventory_mapping": "unresolved",
-      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
-      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "final_occurrences": [
+        {
+          "column": 36,
+          "line": 187,
+          "occurrence_id": "web/ext_datasource/ext_ds.js:187:36:GET:/api/ext-mappings",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+        }
+      ],
+      "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
+      "input_output_contract": {
+        "input": "/api/ext-mappings: REST uses legacy datasource/mapping filters; candidate uses bounded owned mapping search.",
+        "output": "/api/ext-mappings: REST returns legacy mapping records; candidate returns Integration mapping items.",
+        "side_effects": "/api/ext-mappings: Candidate binds actor/team ownership."
+      },
       "method": "GET",
+      "non_equivalence": {
+        "input": "/api/ext-mappings: REST uses legacy datasource/mapping filters; candidate uses bounded owned mapping search.",
+        "output": "/api/ext-mappings: REST returns legacy mapping records; candidate returns Integration mapping items.",
+        "side_effects": "/api/ext-mappings: Candidate binds actor/team ownership."
+      },
       "normalized_route": "/api/ext-mappings",
       "occurrences": [
         {
@@ -156,16 +553,106 @@
       "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
     },
     {
-      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "authorization_and_scope": "/api/ext-mappings/{dynamic}/columns: Candidate invokes connector runtime rather than reading mapping columns.",
       "candidate_capability": "integration.connector.schema.discover@1",
-      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "candidate_evidence": {
+        "contract": {
+          "input_anchor": {
+            "end_line": 30,
+            "sha256": "f19af427280b94b8a2e8921c26f8d6b5fadb8d68e3fdefc5aaec9836de353643",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 30
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "gid"
+            ],
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 47,
+            "sha256": "3350f103bb4479e88b7d6ea5386238e70acec8c19791da2fb4dd1327c12338a7",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 47
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "objects": {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "objects"
+            ],
+            "type": "object"
+          },
+          "source_sha256": "sha256:4d0b6664e408555a71d1947677e50eca8d5a33a71c8cf1be5d8536297c495041"
+        },
+        "migration_decision": {
+          "anchor": {
+            "end_line": 67,
+            "sha256": "261444255bac746a6179ec72e6574187f8aed6766ce1dbd356465608113744ac",
+            "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
+            "start_line": 67
+          },
+          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+        },
+        "service": {
+          "anchor": {
+            "end_line": 48,
+            "sha256": "5ce7451c74e389af9f867da9da1b9e3989f7358c28d915c92c8ee7da272c2779",
+            "source_path": "plugins/integration/integration_backend/application/service.py",
+            "start_line": 48
+          },
+          "source_sha256": "sha256:063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e"
+        }
+      },
+      "candidate_policy": {
+        "authorization_scope": "actor-bound owner_gid and team_gid",
+        "confirmation": "none",
+        "external_side_effect": "connector_runtime",
+        "idempotency": "none",
+        "outcome_recovery": "not proven equivalent to the absent legacy route",
+        "timeout": "not declared by the public service"
+      },
+      "confirmation_policy": "unresolved: candidate policy cannot establish legacy confirmation equivalence",
       "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
       "external_outcome": "unknown_without_provider_equivalence",
       "final_disposition": "unresolved",
       "final_inventory_mapping": "unresolved",
-      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
-      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "final_occurrences": [
+        {
+          "column": 36,
+          "line": 341,
+          "occurrence_id": "web/ext_datasource/ext_ds.js:341:36:GET:/api/ext-mappings/{dynamic}/columns",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+        }
+      ],
+      "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
+      "input_output_contract": {
+        "input": "/api/ext-mappings/{dynamic}/columns: REST starts from mapping gid and column semantics; candidate requires connector gid.",
+        "output": "/api/ext-mappings/{dynamic}/columns: REST returns mapped columns; candidate returns connector schema discovery.",
+        "side_effects": "/api/ext-mappings/{dynamic}/columns: Candidate invokes connector runtime rather than reading mapping columns."
+      },
       "method": "GET",
+      "non_equivalence": {
+        "input": "/api/ext-mappings/{dynamic}/columns: REST starts from mapping gid and column semantics; candidate requires connector gid.",
+        "output": "/api/ext-mappings/{dynamic}/columns: REST returns mapped columns; candidate returns connector schema discovery.",
+        "side_effects": "/api/ext-mappings/{dynamic}/columns: Candidate invokes connector runtime rather than reading mapping columns."
+      },
       "normalized_route": "/api/ext-mappings/{dynamic}/columns",
       "occurrences": [
         {
@@ -192,16 +679,115 @@
       "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
     },
     {
-      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "authorization_and_scope": "/api/ext-mappings/{dynamic}/preview: Candidate invokes connector runtime and ownership/network controls.",
       "candidate_capability": "integration.mapping.preview@1",
-      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "candidate_evidence": {
+        "contract": {
+          "input_anchor": {
+            "end_line": 36,
+            "sha256": "01bd9fbf1b3f1bd9ad177a2521da7015a31a17d4291c9e44bf2e849d2af8ffe8",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 36
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "limit": {
+                "maximum": 200,
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "gid"
+            ],
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 53,
+            "sha256": "aeefa5b7f96c6a39e93de080e3d203c6f105048fc7b9b367193378fc41bb6f27",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 53
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "rows": {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "truncated": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "rows",
+              "truncated"
+            ],
+            "type": "object"
+          },
+          "source_sha256": "sha256:4d0b6664e408555a71d1947677e50eca8d5a33a71c8cf1be5d8536297c495041"
+        },
+        "migration_decision": {
+          "anchor": {
+            "end_line": 68,
+            "sha256": "898ed31d9cba282f90d8e25a89eab1abb384478737284fe28a752d8262d12e29",
+            "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
+            "start_line": 68
+          },
+          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+        },
+        "service": {
+          "anchor": {
+            "end_line": 65,
+            "sha256": "211345df50bebfdb4f35289640742d8ada9f198a97a1aa1783f3649d897cf78d",
+            "source_path": "plugins/integration/integration_backend/application/service.py",
+            "start_line": 65
+          },
+          "source_sha256": "sha256:063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e"
+        }
+      },
+      "candidate_policy": {
+        "authorization_scope": "actor-bound owner_gid and team_gid",
+        "confirmation": "none",
+        "external_side_effect": "connector_runtime",
+        "idempotency": "none",
+        "outcome_recovery": "not proven equivalent to the absent legacy route",
+        "timeout": "not declared by the public service"
+      },
+      "confirmation_policy": "unresolved: candidate policy cannot establish legacy confirmation equivalence",
       "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
       "external_outcome": "unknown_without_provider_equivalence",
       "final_disposition": "unresolved",
       "final_inventory_mapping": "unresolved",
-      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
-      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "final_occurrences": [
+        {
+          "column": 36,
+          "line": 496,
+          "occurrence_id": "web/ext_datasource/ext_ds.js:496:36:GET:/api/ext-mappings/{dynamic}/preview",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+        }
+      ],
+      "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
+      "input_output_contract": {
+        "input": "/api/ext-mappings/{dynamic}/preview: REST preview parameters and legacy mapping shape differ from candidate gid contract.",
+        "output": "/api/ext-mappings/{dynamic}/preview: REST returns legacy preview rows; candidate returns runtime preview evidence.",
+        "side_effects": "/api/ext-mappings/{dynamic}/preview: Candidate invokes connector runtime and ownership/network controls."
+      },
       "method": "GET",
+      "non_equivalence": {
+        "input": "/api/ext-mappings/{dynamic}/preview: REST preview parameters and legacy mapping shape differ from candidate gid contract.",
+        "output": "/api/ext-mappings/{dynamic}/preview: REST returns legacy preview rows; candidate returns runtime preview evidence.",
+        "side_effects": "/api/ext-mappings/{dynamic}/preview: Candidate invokes connector runtime and ownership/network controls."
+      },
       "normalized_route": "/api/ext-mappings/{dynamic}/preview",
       "occurrences": [
         {
@@ -228,16 +814,125 @@
       "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
     },
     {
-      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "authorization_and_scope": "/api/ext-datasources/{dynamic}: Candidate validates host/network and optimistic revision.",
       "candidate_capability": "integration.connector.update@1",
-      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "candidate_evidence": {
+        "contract": {
+          "input_anchor": {
+            "end_line": 26,
+            "sha256": "908378d37e0c6dad0f33c6e398042cb2bc3c3e68a94ae357a990a924272496c5",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 26
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "credential_ref": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "expected_revision": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "gid",
+              "expected_revision"
+            ],
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 43,
+            "sha256": "e5135fba2691ef7ef1811788e2b9ca67d5468a4dbd9dca6bef549eabd20444f7",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 43
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "changed": {
+                "type": "boolean"
+              },
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "revision": {
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "gid",
+              "revision",
+              "changed"
+            ],
+            "type": "object"
+          },
+          "source_sha256": "sha256:4d0b6664e408555a71d1947677e50eca8d5a33a71c8cf1be5d8536297c495041"
+        },
+        "migration_decision": {
+          "anchor": {
+            "end_line": 81,
+            "sha256": "2d22f92969d0364dfcade44f62cd747f0c58267950a24a2b7dd3206414968709",
+            "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
+            "start_line": 81
+          },
+          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+        },
+        "service": {
+          "anchor": {
+            "end_line": 42,
+            "sha256": "079ccaecfc7418945962f21d8901ddff906cd3848704aeb3071607b99e793123",
+            "source_path": "plugins/integration/integration_backend/application/service.py",
+            "start_line": 42
+          },
+          "source_sha256": "sha256:063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e"
+        }
+      },
+      "candidate_policy": {
+        "authorization_scope": "actor-bound owner_gid and team_gid",
+        "confirmation": "user",
+        "external_side_effect": "none",
+        "idempotency": "required",
+        "outcome_recovery": "not proven equivalent to the absent legacy route",
+        "timeout": "not_applicable"
+      },
+      "confirmation_policy": "unresolved: candidate policy cannot establish legacy confirmation equivalence",
       "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
       "external_outcome": "not_applicable",
       "final_disposition": "unresolved",
       "final_inventory_mapping": "unresolved",
-      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
-      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "final_occurrences": [
+        {
+          "column": 29,
+          "line": 623,
+          "occurrence_id": "web/ext_datasource/ext_ds.js:623:29:PATCH:/api/ext-datasources/{dynamic}",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+        }
+      ],
+      "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
+      "input_output_contract": {
+        "input": "/api/ext-datasources/{dynamic}: REST patch omits mandatory expected_revision and uses legacy datasource fields.",
+        "output": "/api/ext-datasources/{dynamic}: REST returns patched datasource; candidate returns connector revision projection.",
+        "side_effects": "/api/ext-datasources/{dynamic}: Candidate validates host/network and optimistic revision."
+      },
       "method": "PATCH",
+      "non_equivalence": {
+        "input": "/api/ext-datasources/{dynamic}: REST patch omits mandatory expected_revision and uses legacy datasource fields.",
+        "output": "/api/ext-datasources/{dynamic}: REST returns patched datasource; candidate returns connector revision projection.",
+        "side_effects": "/api/ext-datasources/{dynamic}: Candidate validates host/network and optimistic revision."
+      },
       "normalized_route": "/api/ext-datasources/{dynamic}",
       "occurrences": [
         {
@@ -264,16 +959,144 @@
       "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
     },
     {
-      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "authorization_and_scope": "/api/ext-datasources: Candidate validates network policy and credential reference.",
       "candidate_capability": "integration.connector.create@1",
-      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "candidate_evidence": {
+        "contract": {
+          "input_anchor": {
+            "end_line": 25,
+            "sha256": "1227e74a9740406723fd5ce64fd9529d61e3b1e02f676238e0a2b9d27bd0d64c",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 25
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "connector_type": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "credential_ref": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "database_name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "host": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "port": {
+                "maximum": 65535,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "username": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "connector_type",
+              "host",
+              "port",
+              "database_name",
+              "username",
+              "credential_ref"
+            ],
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 42,
+            "sha256": "6253d1a002d277cc67f349987704f3f383bbe7c58f6faf5427f16884a168faeb",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 42
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "revision": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "status": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "gid",
+              "revision",
+              "status"
+            ],
+            "type": "object"
+          },
+          "source_sha256": "sha256:4d0b6664e408555a71d1947677e50eca8d5a33a71c8cf1be5d8536297c495041"
+        },
+        "migration_decision": {
+          "anchor": {
+            "end_line": 86,
+            "sha256": "0a9a9d64433f5841f81599fb1ec94592477af44d3e7418dcce93e1f76341556f",
+            "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
+            "start_line": 86
+          },
+          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+        },
+        "service": {
+          "anchor": {
+            "end_line": 38,
+            "sha256": "45bd33cb1023303df1f0792d5153e4431375d7ce357fe6609cbb436e5dfc8bc9",
+            "source_path": "plugins/integration/integration_backend/application/service.py",
+            "start_line": 38
+          },
+          "source_sha256": "sha256:063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e"
+        }
+      },
+      "candidate_policy": {
+        "authorization_scope": "actor-bound owner_gid and team_gid",
+        "confirmation": "user",
+        "external_side_effect": "none",
+        "idempotency": "required",
+        "outcome_recovery": "not proven equivalent to the absent legacy route",
+        "timeout": "not_applicable"
+      },
+      "confirmation_policy": "unresolved: candidate policy cannot establish legacy confirmation equivalence",
       "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
       "external_outcome": "not_applicable",
       "final_disposition": "unresolved",
       "final_inventory_mapping": "unresolved",
-      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
-      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "final_occurrences": [
+        {
+          "column": 28,
+          "line": 625,
+          "occurrence_id": "web/ext_datasource/ext_ds.js:625:28:POST:/api/ext-datasources",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+        }
+      ],
+      "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
+      "input_output_contract": {
+        "input": "/api/ext-datasources: REST legacy datasource body differs from required connector_type/host/credential_ref contract.",
+        "output": "/api/ext-datasources: REST returns datasource row; candidate returns owned connector projection.",
+        "side_effects": "/api/ext-datasources: Candidate validates network policy and credential reference."
+      },
       "method": "POST",
+      "non_equivalence": {
+        "input": "/api/ext-datasources: REST legacy datasource body differs from required connector_type/host/credential_ref contract.",
+        "output": "/api/ext-datasources: REST returns datasource row; candidate returns owned connector projection.",
+        "side_effects": "/api/ext-datasources: Candidate validates network policy and credential reference."
+      },
       "normalized_route": "/api/ext-datasources",
       "occurrences": [
         {
@@ -300,16 +1123,105 @@
       "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
     },
     {
-      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "authorization_and_scope": "/api/ext-datasources/{dynamic}/test: Candidate invokes bounded external runtime and network policy.",
       "candidate_capability": "integration.connector.connection.test@1",
-      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "candidate_evidence": {
+        "contract": {
+          "input_anchor": {
+            "end_line": 29,
+            "sha256": "f13fb8594d642ab76195e704706e1e832d5de83318626e05bbe0debf716afbb1",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 29
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "gid"
+            ],
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 46,
+            "sha256": "a1cba80eb96ff398f867efabeefe3c7c22ecc0e5aaf7f0852488befad89dee17",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 46
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "latency_ms": {
+                "type": "integer"
+              },
+              "reachable": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "reachable"
+            ],
+            "type": "object"
+          },
+          "source_sha256": "sha256:4d0b6664e408555a71d1947677e50eca8d5a33a71c8cf1be5d8536297c495041"
+        },
+        "migration_decision": {
+          "anchor": {
+            "end_line": 87,
+            "sha256": "4f66c679cc34b3612231c9c8d55a26e766e3b24caf494e5a0590cf68caf556b1",
+            "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
+            "start_line": 87
+          },
+          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+        },
+        "service": {
+          "anchor": {
+            "end_line": 48,
+            "sha256": "5ce7451c74e389af9f867da9da1b9e3989f7358c28d915c92c8ee7da272c2779",
+            "source_path": "plugins/integration/integration_backend/application/service.py",
+            "start_line": 48
+          },
+          "source_sha256": "sha256:063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e"
+        }
+      },
+      "candidate_policy": {
+        "authorization_scope": "actor-bound owner_gid and team_gid",
+        "confirmation": "none",
+        "external_side_effect": "connector_runtime",
+        "idempotency": "none",
+        "outcome_recovery": "not proven equivalent to the absent legacy route",
+        "timeout": "not declared by the public service"
+      },
+      "confirmation_policy": "unresolved: candidate policy cannot establish legacy confirmation equivalence",
       "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
       "external_outcome": "unknown_without_provider_equivalence",
       "final_disposition": "unresolved",
       "final_inventory_mapping": "unresolved",
-      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
-      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "final_occurrences": [
+        {
+          "column": 34,
+          "line": 605,
+          "occurrence_id": "web/ext_datasource/ext_ds.js:605:34:POST:/api/ext-datasources/{dynamic}/test",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+        }
+      ],
+      "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
+      "input_output_contract": {
+        "input": "/api/ext-datasources/{dynamic}/test: REST test body/path differs from candidate connector gid payload.",
+        "output": "/api/ext-datasources/{dynamic}/test: REST returns legacy connection result; candidate returns connector-runtime evidence.",
+        "side_effects": "/api/ext-datasources/{dynamic}/test: Candidate invokes bounded external runtime and network policy."
+      },
       "method": "POST",
+      "non_equivalence": {
+        "input": "/api/ext-datasources/{dynamic}/test: REST test body/path differs from candidate connector gid payload.",
+        "output": "/api/ext-datasources/{dynamic}/test: REST returns legacy connection result; candidate returns connector-runtime evidence.",
+        "side_effects": "/api/ext-datasources/{dynamic}/test: Candidate invokes bounded external runtime and network policy."
+      },
       "normalized_route": "/api/ext-datasources/{dynamic}/test",
       "occurrences": [
         {
@@ -336,16 +1248,168 @@
       "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
     },
     {
-      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "authorization_and_scope": "/api/ext-mappings: Candidate validates restricted transforms and ownership.",
       "candidate_capability": "integration.mapping.create@1",
-      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "candidate_evidence": {
+        "contract": {
+          "input_anchor": {
+            "end_line": 31,
+            "sha256": "692fe0c67be98807eceb0c125b76ca63430815008c26301718864c3e6ac780e1",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 31
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "datasource_gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "field_mappings": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "source_field": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "target_field": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "transform_expression": {
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "source_field",
+                    "target_field"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "minimum_catalog_release": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "source_object": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "target_capability_id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "target_domain": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "target_major_version": {
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "datasource_gid",
+              "name",
+              "source_object",
+              "target_domain",
+              "target_capability_id",
+              "target_major_version",
+              "minimum_catalog_release"
+            ],
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 48,
+            "sha256": "470b0e349fcc3ce45350e5987830e0e6788fc9be56ee26e22f61c61128e27701",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 48
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "revision": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "status": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "gid",
+              "revision",
+              "status"
+            ],
+            "type": "object"
+          },
+          "source_sha256": "sha256:4d0b6664e408555a71d1947677e50eca8d5a33a71c8cf1be5d8536297c495041"
+        },
+        "migration_decision": {
+          "anchor": {
+            "end_line": 88,
+            "sha256": "8326ab38320bf36b004338bfd1aaceb065de7b3e419028eecb0b8c9e84056088",
+            "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
+            "start_line": 88
+          },
+          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+        },
+        "service": {
+          "anchor": {
+            "end_line": 54,
+            "sha256": "3f0cc731ead8be8ef37b4caea96fb3cb9728459ebebcb4b1eecfd8e22bd85533",
+            "source_path": "plugins/integration/integration_backend/application/service.py",
+            "start_line": 54
+          },
+          "source_sha256": "sha256:063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e"
+        }
+      },
+      "candidate_policy": {
+        "authorization_scope": "actor-bound owner_gid and team_gid",
+        "confirmation": "user",
+        "external_side_effect": "none",
+        "idempotency": "required",
+        "outcome_recovery": "not proven equivalent to the absent legacy route",
+        "timeout": "not_applicable"
+      },
+      "confirmation_policy": "unresolved: candidate policy cannot establish legacy confirmation equivalence",
       "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
       "external_outcome": "not_applicable",
       "final_disposition": "unresolved",
       "final_inventory_mapping": "unresolved",
-      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
-      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "final_occurrences": [
+        {
+          "column": 26,
+          "line": 677,
+          "occurrence_id": "web/ext_datasource/ext_ds.js:677:26:POST:/api/ext-mappings",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+        }
+      ],
+      "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
+      "input_output_contract": {
+        "input": "/api/ext-mappings: REST mapping body omits target capability/catalog fields required by candidate.",
+        "output": "/api/ext-mappings: REST returns legacy mapping row; candidate returns governed mapping projection.",
+        "side_effects": "/api/ext-mappings: Candidate validates restricted transforms and ownership."
+      },
       "method": "POST",
+      "non_equivalence": {
+        "input": "/api/ext-mappings: REST mapping body omits target capability/catalog fields required by candidate.",
+        "output": "/api/ext-mappings: REST returns legacy mapping row; candidate returns governed mapping projection.",
+        "side_effects": "/api/ext-mappings: Candidate validates restricted transforms and ownership."
+      },
       "normalized_route": "/api/ext-mappings",
       "occurrences": [
         {
@@ -372,16 +1436,129 @@
       "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
     },
     {
-      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "authorization_and_scope": "/api/ext-mappings/{dynamic}/import: Candidate starts asynchronous governed sync rather than importing synchronously.",
       "candidate_capability": "integration.sync.start@1",
-      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "candidate_evidence": {
+        "contract": {
+          "input_anchor": {
+            "end_line": 37,
+            "sha256": "38defa583fa03be648e186d019149563b9fba7c542331ea41f2123d85601ee29",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 37
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "mapping_gid": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "mapping_gid"
+            ],
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 54,
+            "sha256": "e888f334fc69d03a439d57426ea14cba7c460a97793c61d16f6606b18d5deb76",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 54
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "operation_ref": {
+                "additionalProperties": false,
+                "properties": {
+                  "operation_id": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "status": {
+                    "enum": [
+                      "accepted"
+                    ],
+                    "type": "string"
+                  },
+                  "version": {
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "operation_id",
+                  "status",
+                  "version"
+                ],
+                "type": "object"
+              },
+              "run_id": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "run_id",
+              "operation_ref"
+            ],
+            "type": "object"
+          },
+          "source_sha256": "sha256:4d0b6664e408555a71d1947677e50eca8d5a33a71c8cf1be5d8536297c495041"
+        },
+        "migration_decision": {
+          "anchor": {
+            "end_line": 89,
+            "sha256": "086bf735fde1710218e98990b044184dd09f6b3d9155e8f34c87d5af3fd0b150",
+            "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
+            "start_line": 89
+          },
+          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+        },
+        "service": {
+          "anchor": {
+            "end_line": 70,
+            "sha256": "ec5ce0b8c48598c9f09956d7961d066e14ffe290c07530fd8fb42634f8f6964e",
+            "source_path": "plugins/integration/integration_backend/application/service.py",
+            "start_line": 70
+          },
+          "source_sha256": "sha256:063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e"
+        }
+      },
+      "candidate_policy": {
+        "authorization_scope": "actor-bound owner_gid and team_gid",
+        "confirmation": "user",
+        "external_side_effect": "asynchronous_sync",
+        "idempotency": "required",
+        "outcome_recovery": "not proven equivalent to the absent legacy route",
+        "timeout": "not declared by the public service"
+      },
+      "confirmation_policy": "unresolved: candidate policy cannot establish legacy confirmation equivalence",
       "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
       "external_outcome": "unknown_without_provider_equivalence",
       "final_disposition": "unresolved",
       "final_inventory_mapping": "unresolved",
-      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
-      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "final_occurrences": [
+        {
+          "column": 37,
+          "line": 549,
+          "occurrence_id": "web/ext_datasource/ext_ds.js:549:37:POST:/api/ext-mappings/{dynamic}/import",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+        }
+      ],
+      "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
+      "input_output_contract": {
+        "input": "/api/ext-mappings/{dynamic}/import: REST performs synchronous import options; candidate accepts mapping_gid asynchronous start.",
+        "output": "/api/ext-mappings/{dynamic}/import: REST returns imported rows/count; candidate returns run_id and operation_ref.",
+        "side_effects": "/api/ext-mappings/{dynamic}/import: Candidate starts asynchronous governed sync rather than importing synchronously."
+      },
       "method": "POST",
+      "non_equivalence": {
+        "input": "/api/ext-mappings/{dynamic}/import: REST performs synchronous import options; candidate accepts mapping_gid asynchronous start.",
+        "output": "/api/ext-mappings/{dynamic}/import: REST returns imported rows/count; candidate returns run_id and operation_ref.",
+        "side_effects": "/api/ext-mappings/{dynamic}/import: Candidate starts asynchronous governed sync rather than importing synchronously."
+      },
       "normalized_route": "/api/ext-mappings/{dynamic}/import",
       "occurrences": [
         {
@@ -408,16 +1585,142 @@
       "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
     },
     {
-      "authorization_and_scope": "not proven equivalent: old handler is absent; provider owner/team scoping cannot be substituted for legacy behavior",
+      "authorization_and_scope": "/api/ext-field-mappings/batch: Candidate validates one mapping transaction and restricted expressions.",
       "candidate_capability": "integration.mapping.update@1",
-      "confirmation_policy": "unresolved: legacy confirmation cannot be proven equivalent",
+      "candidate_evidence": {
+        "contract": {
+          "input_anchor": {
+            "end_line": 32,
+            "sha256": "74afef2ff64b4b42fac10cc7dc06f300914749f8d626839e56628ed9a787dace",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 32
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "expected_revision": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "field_mappings": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "source_field": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "target_field": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "transform_expression": {
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "source_field",
+                    "target_field"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "gid",
+              "expected_revision"
+            ],
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 49,
+            "sha256": "790b5cb27246c23aae63f86792106c39c38a102707fcd2e47154fbd45e13424c",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 49
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "changed": {
+                "type": "boolean"
+              },
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "revision": {
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "gid",
+              "revision",
+              "changed"
+            ],
+            "type": "object"
+          },
+          "source_sha256": "sha256:4d0b6664e408555a71d1947677e50eca8d5a33a71c8cf1be5d8536297c495041"
+        },
+        "migration_decision": {
+          "anchor": {
+            "end_line": 99,
+            "sha256": "371370ba5e8f5f0e6aa838c6ecfc6ccc93902b8c867f67f26d93d4469d49d351",
+            "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
+            "start_line": 99
+          },
+          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+        },
+        "service": {
+          "anchor": {
+            "end_line": 61,
+            "sha256": "19bb982b932421ed1076c0c3bcbe12bdd7ad195febdbb7005ad958764bec0909",
+            "source_path": "plugins/integration/integration_backend/application/service.py",
+            "start_line": 61
+          },
+          "source_sha256": "sha256:063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e"
+        }
+      },
+      "candidate_policy": {
+        "authorization_scope": "actor-bound owner_gid and team_gid",
+        "confirmation": "user",
+        "external_side_effect": "none",
+        "idempotency": "required",
+        "outcome_recovery": "not proven equivalent to the absent legacy route",
+        "timeout": "not_applicable"
+      },
+      "confirmation_policy": "unresolved: candidate policy cannot establish legacy confirmation equivalence",
       "credential_handling": "legacy plaintext credentials are not represented; governed inputs accept only credential_ref",
       "external_outcome": "not_applicable",
       "final_disposition": "unresolved",
       "final_inventory_mapping": "unresolved",
-      "idempotency_policy": "unresolved: legacy replay semantics cannot be proven equivalent",
-      "input_output_contract": "unresolved: legacy route contract is absent and governed closed schema is not response-equivalent",
+      "final_occurrences": [
+        {
+          "column": 23,
+          "line": 457,
+          "occurrence_id": "web/ext_datasource/ext_ds.js:457:23:PUT:/api/ext-field-mappings/batch",
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+        }
+      ],
+      "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
+      "input_output_contract": {
+        "input": "/api/ext-field-mappings/batch: REST batch updates multiple field mappings; candidate requires one gid and expected_revision.",
+        "output": "/api/ext-field-mappings/batch: REST returns batch count/items; candidate returns one mapping revision.",
+        "side_effects": "/api/ext-field-mappings/batch: Candidate validates one mapping transaction and restricted expressions."
+      },
       "method": "PUT",
+      "non_equivalence": {
+        "input": "/api/ext-field-mappings/batch: REST batch updates multiple field mappings; candidate requires one gid and expected_revision.",
+        "output": "/api/ext-field-mappings/batch: REST returns batch count/items; candidate returns one mapping revision.",
+        "side_effects": "/api/ext-field-mappings/batch: Candidate validates one mapping transaction and restricted expressions."
+      },
       "normalized_route": "/api/ext-field-mappings/batch",
       "occurrences": [
         {
