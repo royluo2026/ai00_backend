@@ -5,6 +5,11 @@ from typing import Any
 
 from backend.db.connection import get_conn
 
+SYSTEM_ROLES = {
+    "super_admin", "team_admin", "project_admin", "rule_admin",
+    "knowledge_admin", "member", "external",
+}
+
 
 class StructuralWebError(ValueError):
     code = "provider_failed"
@@ -106,6 +111,14 @@ def _user_summary(row: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _role_to_org_role(system_role: str) -> str:
+    if system_role == "super_admin":
+        return "super_admin"
+    if system_role == "external":
+        return "external"
+    return "member"
+
+
 def list_admin_users(*, actor: dict[str, Any]) -> dict[str, Any]:
     _require_admin(actor)
     with get_conn() as conn:
@@ -119,18 +132,55 @@ def list_admin_users(*, actor: dict[str, Any]) -> dict[str, Any]:
 
 
 def assign_user_role(*, actor: dict[str, Any], user_gid: str, new_role: str, external_subtype: str | None) -> dict[str, Any]:
+    """Assign one role within the Base provider's locked transaction.
+
+    The operator/target lock and active-super-admin lock are both held on the
+    same Base connection until the final protected-invariant check and update
+    have completed.  This is the transaction advertised by the strong atomic
+    capability, rather than a sequence of legacy service connections.
+    """
     _require_admin(actor)
-    from backend.services.user_service import assign_role
-    try:
-        updated = assign_role(
-            operator_gid=str(actor["gid"]), target_gid=user_gid,
-            new_role=new_role, external_subtype=external_subtype,
-        )
-    except (PermissionError, ValueError) as exc:
-        error = StructuralWebError(str(exc))
-        error.code = "permission_denied"
-        raise error from exc
-    return {"success": True, "data": _user_summary(updated)}
+    if new_role not in SYSTEM_ROLES:
+        raise StructuralWebError("未知角色")
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT gid,system_role,is_active FROM workmanship_auth_users "
+                "WHERE gid IN (%s,%s) ORDER BY gid FOR UPDATE",
+                (str(actor["gid"]), user_gid),
+            )
+            users = {str(row["gid"]): dict(row) for row in cur.fetchall()}
+            operator = users.get(str(actor["gid"]))
+            target = users.get(user_gid)
+            if operator is None:
+                raise StructuralWebError("操作者不存在")
+            if target is None:
+                raise StructuralWebError("目标用户不存在")
+            if operator["system_role"] not in {"super_admin", "team_admin"}:
+                raise StructuralWebError("权限不足")
+            if new_role == "super_admin" and operator["system_role"] != "super_admin":
+                raise StructuralWebError("只有超管才能授予超管角色")
+            cur.execute(
+                "SELECT gid FROM workmanship_auth_users "
+                "WHERE system_role='super_admin' AND is_active=TRUE FOR UPDATE"
+            )
+            super_admins = cur.fetchall()
+            if (
+                new_role != "super_admin"
+                and target["system_role"] == "super_admin"
+                and len(super_admins) <= 1
+            ):
+                raise StructuralWebError("系统中至少保留一名超级管理员")
+            cur.execute(
+                "UPDATE workmanship_auth_users SET system_role=%s, external_subtype=%s, "
+                "org_role=%s, updated_at=NOW() WHERE gid=%s",
+                (new_role, external_subtype, _role_to_org_role(new_role), user_gid),
+            )
+            cur.execute("SELECT * FROM workmanship_auth_users WHERE gid=%s", (user_gid,))
+            row = cur.fetchone()
+            if not row:
+                raise StructuralWebError("目标用户不存在")
+            return {"success": True, "data": _user_summary(dict(row))}
 
 
 __all__ = [

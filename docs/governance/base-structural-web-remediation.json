@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3e-base-structural-remediation",
   "atomic_contract_manifest_sha256": "sha256:ad3e325f3b1912d1fdc672af905605aefa4b7f8ede7803c6c266c90ac8c54a00",
-  "content_sha256": "sha256:c0d2a39cb7a9c1a969b49182283aec73d90f42b1ae6bf44d628d2f1daf3727a8",
+  "content_sha256": "sha256:fd43db4c281eb1fd49176d07584716191036d17f240bb42d5ecf1ea207ea7882",
   "counts": {
     "groups": 16,
     "migrated_groups": 5,
@@ -1328,8 +1328,8 @@
       "unresolved_reason": "The request contains attachment records without a governed nested attachment contract."
     }
   ],
-  "frontend_content_hash": "9ecc1ef562fac54c074f87d60eeda53bae0b619622f60d21e8430eaf157ff0c1",
-  "frontend_revision": "f5bcdff9415677440f2dbfe7106d91ce22c1b4e8",
+  "frontend_content_hash": "6c2d9dd40efff87a5200b668727d7b56b47989b3f65e3796de97c91d83a2affb",
+  "frontend_revision": "6dd62900c9a82173adcbbe277bb38846ab556031",
   "schema_version": "1.0.0",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "source_ledger_revision": "8ee5dc2340a9e77c5d84e8f84f733bb5415e9d08",

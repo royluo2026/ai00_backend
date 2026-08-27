@@ -113,40 +113,54 @@ def assign_role(
     new_role: str,
     external_subtype: Optional[str] = None,
 ) -> dict:
-    """分配系统角色，含权限校验"""
+    """Assign a role under one locked Base transaction.
+
+    The target, operator and the active super-admin set are locked before the
+    final invariant check.  This makes two concurrent demotions serialize:
+    the second transaction observes the first committed change and cannot
+    remove the last active super-admin.
+    """
     if new_role not in SYSTEM_ROLES:
         raise ValueError(f"未知角色: {new_role}")
 
-    operator = get_by_gid(operator_gid)
-    if not operator:
-        raise PermissionError("操作者不存在")
-    if operator["system_role"] not in ("super_admin", "team_admin"):
-        raise PermissionError("权限不足")
-    if new_role == "super_admin" and operator["system_role"] != "super_admin":
-        raise PermissionError("只有超管才能授予超管角色")
-
-    # 最后一个超管保护
-    if new_role != "super_admin":
-        target = get_by_gid(target_gid)
-        if target and target["system_role"] == "super_admin":
-            with get_conn() as conn:
-                with conn.cursor() as cur:
-                    cur.execute(
-                        "SELECT COUNT(*) FROM workmanship_auth_users "
-                        "WHERE system_role='super_admin' AND is_active=TRUE"
-                    )
-                    count = cur.fetchone()["count"]
-            if count <= 1:
-                raise ValueError("系统中至少保留一名超级管理员")
-
     with get_conn() as conn:
         with conn.cursor() as cur:
+            cur.execute(
+                "SELECT gid,system_role,is_active FROM workmanship_auth_users "
+                "WHERE gid IN (%s,%s) ORDER BY gid FOR UPDATE",
+                (operator_gid, target_gid),
+            )
+            users = {row["gid"]: dict(row) for row in cur.fetchall()}
+            operator = users.get(operator_gid)
+            target = users.get(target_gid)
+            if not operator:
+                raise PermissionError("操作者不存在")
+            if not target:
+                raise ValueError("目标用户不存在")
+            if operator["system_role"] not in ("super_admin", "team_admin"):
+                raise PermissionError("权限不足")
+            if new_role == "super_admin" and operator["system_role"] != "super_admin":
+                raise PermissionError("只有超管才能授予超管角色")
+
+            # Lock the complete protected set in this same transaction before
+            # evaluating the final-super-admin invariant. MySQL's locking read
+            # serializes overlapping demotions, including distinct targets.
+            cur.execute(
+                "SELECT gid FROM workmanship_auth_users "
+                "WHERE system_role='super_admin' AND is_active=TRUE FOR UPDATE"
+            )
+            super_admins = cur.fetchall()
+            if (
+                new_role != "super_admin"
+                and target["system_role"] == "super_admin"
+                and len(super_admins) <= 1
+            ):
+                raise ValueError("系统中至少保留一名超级管理员")
             cur.execute(
                 "UPDATE workmanship_auth_users SET system_role=%s, external_subtype=%s, "
                 "org_role=%s, updated_at=NOW() WHERE gid=%s",
                 (new_role, external_subtype, _role_to_org_role(new_role), target_gid),
             )
-            conn.commit()
             cur.execute("SELECT * FROM workmanship_auth_users WHERE gid=%s", (target_gid,))
             row = cur.fetchone()
             if not row:

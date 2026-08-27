@@ -8,7 +8,7 @@ Execute exact Base outcome base.identity.directory.feishu.sync.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_11a8ebce1a71ba3cc557b0e7fdffc515`
+- Catalog Release：`rel_a4a5a17ebc77419f6a12eec1f32fcbea`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -87,7 +87,7 @@ Execute exact Base outcome base.identity.directory.feishu.sync.
 ```json
 {
   "capability_id": "base.identity.directory.feishu.sync",
-  "catalog_release": "rel_11a8ebce1a71ba3cc557b0e7fdffc515",
+  "catalog_release": "rel_a4a5a17ebc77419f6a12eec1f32fcbea",
   "major_version": 1,
   "payload": {}
 }

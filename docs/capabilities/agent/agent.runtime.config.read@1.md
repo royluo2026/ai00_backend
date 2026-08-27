@@ -8,7 +8,7 @@ Execute the governed agent.runtime.config.read Agent outcome.
 - 不适用：The outcome belongs to another business domain; invoke that domain Capability instead.
 - 生命周期：`stable`
 - 所属领域：`agent`
-- Catalog Release：`rel_11a8ebce1a71ba3cc557b0e7fdffc515`
+- Catalog Release：`rel_a4a5a17ebc77419f6a12eec1f32fcbea`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -79,7 +79,7 @@ Execute the governed agent.runtime.config.read Agent outcome.
 ```json
 {
   "capability_id": "agent.runtime.config.read",
-  "catalog_release": "rel_11a8ebce1a71ba3cc557b0e7fdffc515",
+  "catalog_release": "rel_a4a5a17ebc77419f6a12eec1f32fcbea",
   "major_version": 1,
   "payload": {}
 }

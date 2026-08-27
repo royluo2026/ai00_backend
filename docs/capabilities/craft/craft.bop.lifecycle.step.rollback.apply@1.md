@@ -8,7 +8,7 @@ Rollback one BOP lifecycle checklist step and its governed data effects.
 - 不适用：The request undoes a history batch, restores a checkpoint, or changes lifecycle phase state.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_11a8ebce1a71ba3cc557b0e7fdffc515`
+- Catalog Release：`rel_a4a5a17ebc77419f6a12eec1f32fcbea`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -104,7 +104,7 @@ Rollback one BOP lifecycle checklist step and its governed data effects.
 ```json
 {
   "capability_id": "craft.bop.lifecycle.step.rollback.apply",
-  "catalog_release": "rel_11a8ebce1a71ba3cc557b0e7fdffc515",
+  "catalog_release": "rel_a4a5a17ebc77419f6a12eec1f32fcbea",
   "major_version": 1,
   "payload": {
     "step_key": "lines_added",

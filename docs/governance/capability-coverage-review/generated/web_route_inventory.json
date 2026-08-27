@@ -1,6 +1,6 @@
 {
-  "frontend_revision": "f5bcdff9415677440f2dbfe7106d91ce22c1b4e8",
-  "content_hash": "9ecc1ef562fac54c074f87d60eeda53bae0b619622f60d21e8430eaf157ff0c1",
+  "frontend_revision": "6dd62900c9a82173adcbbe277bb38846ab556031",
+  "content_hash": "6c2d9dd40efff87a5200b668727d7b56b47989b3f65e3796de97c91d83a2affb",
   "wrapper_contracts_hash": "0ec4f3ca4819c4e9f73d08b9a2871112efa1442e0266fa5606ca4de4e7d99316",
   "scan_roots": [
     "web",
@@ -31,7 +31,7 @@
   },
   "lexical_audit": {
     "token_count": 434,
-    "token_hash": "3663fbe93bf4e6575cc16af0eedc3df5b727bbc239a3f2bf8f18c75e559abf79",
+    "token_hash": "33bbb455ec263deb25093d32892a5782f260ef17672d6db2307d22180fd0ff53",
     "mapped_count": 415,
     "reviewed_non_route_count": 19,
     "reviewed_non_route_tokens": [
@@ -2547,33 +2547,33 @@
     },
     {
       "source": "web/core/existing_capability_client.js",
-      "line": 206,
+      "line": 220,
       "column": 27,
       "raw_route": "/api/v1/capabilities/${capabilityId}:${action}",
       "normalized_route": "/api/v1/capabilities/{dynamic}:{dynamic}",
       "method": "POST",
       "disposition": "capability",
-      "occurrence_id": "web/core/existing_capability_client.js:206:27:POST:/api/v1/capabilities/{dynamic}:{dynamic}"
+      "occurrence_id": "web/core/existing_capability_client.js:220:27:POST:/api/v1/capabilities/{dynamic}:{dynamic}"
     },
     {
       "source": "web/core/existing_capability_client.js",
-      "line": 239,
+      "line": 254,
       "column": 51,
       "raw_route": "/api/lists?item_type=bop_version",
       "normalized_route": "/api/lists",
       "method": "GET",
       "disposition": "unresolved",
-      "occurrence_id": "web/core/existing_capability_client.js:239:51:GET:/api/lists"
+      "occurrence_id": "web/core/existing_capability_client.js:254:51:GET:/api/lists"
     },
     {
       "source": "web/core/existing_capability_client.js",
-      "line": 244,
+      "line": 259,
       "column": 12,
       "raw_route": "/api/lists/${encodeURIComponent(gid)}?item_type=bop_version&expected_revision=${revision}",
       "normalized_route": "/api/lists/{dynamic}",
       "method": "DELETE",
       "disposition": "unresolved",
-      "occurrence_id": "web/core/existing_capability_client.js:244:12:DELETE:/api/lists/{dynamic}"
+      "occurrence_id": "web/core/existing_capability_client.js:259:12:DELETE:/api/lists/{dynamic}"
     },
     {
       "source": "web/core/global_search.js",

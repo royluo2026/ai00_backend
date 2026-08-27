@@ -290,3 +290,27 @@ def test_structural_gateway_enforces_admin_boundary_and_write_confirmation(monke
     assert asyncio.run(gateway.invoke(approved)).ok
     assert asyncio.run(gateway.invoke(approved)).ok
     assert len(calls) == 1
+
+    class FailingCompleteStore(InMemoryOutcomeStore):
+        def complete(self, operation_id, result):
+            raise RuntimeError("outcome store unavailable")
+
+    failing_approvals = ApprovalService(InMemoryApprovalStore())
+    failing_gateway = _gateway(
+        "base.identity.role.assign.atomic", users, approvals=failing_approvals,
+        reliability=ReliabilityCoordinator(FailingCompleteStore(), InMemoryRateLimiter(limit=100)),
+    )
+    failing_pending = _envelope(
+        failing_gateway, "base.identity.role.assign.atomic", "super_admin", payload,
+        key="role-outcome-fail",
+    )
+    failing_challenge = asyncio.run(failing_gateway.request_approval(failing_pending))
+    failing_approved = failing_pending.model_copy(
+        update={"approval_reference": failing_challenge.token}
+    )
+    unknown = asyncio.run(failing_gateway.invoke(failing_approved))
+    replay = asyncio.run(failing_gateway.invoke(failing_approved))
+    assert unknown.status.value == "outcome_unknown"
+    assert unknown.error.code == "outcome_persistence_failed"
+    assert replay.status.value == "outcome_unknown"
+    assert len(calls) == 2

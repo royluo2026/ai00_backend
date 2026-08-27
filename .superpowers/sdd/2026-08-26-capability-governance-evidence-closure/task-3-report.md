@@ -2904,3 +2904,52 @@ Exact implementation commits:
 No dependency was installed and no push, merge, production database mutation,
 operations approval, BFF, private-router import, or cross-domain database
 access was performed.
+
+## Task 3B.3e-base Fix R1
+
+The strong role-assignment Capability now executes its protected mutation in
+the Base provider artifact under one connection and one transaction: it locks
+the operator/target rows in stable order, locks every active super-admin row,
+performs the final-super-admin check, updates, and reads the closed result
+before the transaction commits. The independent concurrent regression uses two
+team administrators attempting to demote separate super administrators and
+proves that exactly one remains. Gateway evidence also covers confirmation,
+idempotent replay, and outcome-persistence failure without a duplicate
+provider side effect.
+
+The shared Web client no longer automatically consumes confirmation tokens.
+Role assignment requires an explicit callback; both role-management surfaces
+present native user confirmation, and cancellation causes no Gateway request.
+After consent the client uses one idempotency key for invoke, Gateway confirm,
+and invoke. Its tests cover cancellation, consent, replay, and the surfaced
+outcome-persistence failure.
+
+Counts remain conserved: Base is 16 groups / 33 occurrences = 5 groups / 17
+migrated + 11 groups / 16 explicit unresolved. Plugin install/uninstall remain
+unresolved. The regenerated catalog/docs release is
+`rel_a4a5a17ebc77419f6a12eec1f32fcbea` (470 descriptors/pages, 454 stable
+acceptance capabilities); canonical Web evidence binds frontend
+`6dd62900c9a82173adcbbe277bb38846ab556031` and reports 415 total, 45
+explicit unresolved, with root-ledger final unresolved groups 37.
+
+Verification evidence:
+
+```text
+GREEN: transaction/concurrency, structural, atomic Gateway, and migration
+       focused suite: 23 passed
+GREEN: frontend role-confirmation and migration test scripts plus syntax checks
+GREEN: frozen provider, atomic/Base/existing migration manifests, ledger, Web
+       canonical, catalog/docs/acceptance, and domain-dependency checks
+GREEN: strict offline acceptance: 3,178/3,178 validated; failed=0; skipped=0;
+       acceptance pytest 3,189 passed
+```
+
+Exact implementation commits:
+
+- Frontend `6dd62900c9a82173adcbbe277bb38846ab556031`
+  (`fix: require explicit role assignment confirmation`).
+- Backend commit recorded immediately after this report entry.
+
+No dependency was installed and no push, merge, production database mutation,
+operations approval, BFF, private-router import, or cross-domain database
+access was performed.

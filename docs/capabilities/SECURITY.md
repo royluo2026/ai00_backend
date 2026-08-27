@@ -1,6 +1,6 @@
 # Capability V2 安全模型
 
-目录版本：`rel_11a8ebce1a71ba3cc557b0e7fdffc515`。
+目录版本：`rel_a4a5a17ebc77419f6a12eec1f32fcbea`。
 
 - 身份：仅 Host/Backend 可签发 Web、Plugin Mount、Agent Delegation、MCP、Worker 与 Local Runtime 身份。
 - 授权：能力权限、资源范围、数据分类和 delegation 取交集；任一缺失均 fail closed。
