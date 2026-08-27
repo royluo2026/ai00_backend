@@ -90,8 +90,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### 11. `project_approval`
 
-- Owner service: `plugins.project.project_backend.application.approval_service` (project_management).
-- Boundary: New public Project approval-order service; it owns transition, notification outbox, audit and idempotency in one transaction.
+- Owner service: `plugins.project_management.project_management_backend.application.service.ProjectManagementApplication` (project_management).
+- Boundary: Existing ProjectManagementApplication approval.orders.reject boundary, extended in-package with notification outbox, audit and idempotency rather than a fabricated Project service.
 - Dependencies: Project approval aggregate, notification outbox migration.
 - Cross-domain links: Notifications are emitted through the transactional outbox, not a best-effort cross-domain HTTP call.
 - Decision gate: Product must confirm rejection notification recipients/templates because current candidate omits the legacy notification effect.
@@ -348,9 +348,9 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 ### `POST /api/approval/orders/{dynamic}/reject`
 
 - Occurrences: packages/craft-plugin/web/approval/approval.js:153:26:POST:/api/approval/orders/{dynamic}/reject
-- Owner/service: `project_management` / `plugins.project.project_backend.application.approval_service`
+- Owner/service: `project_management` / `plugins.project_management.project_management_backend.application.service.ProjectManagementApplication`
 - Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/approval.py`; The Project outcome omits the legacy notification publication side effect.
-- Service boundary and transaction: New public Project approval-order service; it owns transition, notification outbox, audit and idempotency in one transaction. one Project approval transition transaction with audit and transactional notification outbox.
+- Service boundary and transaction: Existing ProjectManagementApplication approval.orders.reject boundary, extended in-package with notification outbox, audit and idempotency rather than a fabricated Project service. one Project approval transition transaction with audit and transactional notification outbox.
 - Target: `project.approval.order.reject@1`. Scope: tenant/order scope and approver authorization.
 - Contract/security: tenant/order scope and approver authorization; revision/idempotency; transactional audit plus durable notification outbox.
 - Migration: Implement exact reject plus notification semantics; do not use candidate that omits notification.

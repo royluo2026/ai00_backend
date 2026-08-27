@@ -46,6 +46,35 @@ def test_plan_validator_rejects_owner_service_substitution():
     assert "owner_service_mismatch" in module.validate_plan(ROOT, mutated)
 
 
+def test_project_owner_service_is_real_and_rejects_a_fabricated_source_path():
+    """Breaks if a plan names a Project service outside the real Project Management package."""
+    module = _module()
+    payload = module.load_plan(ROOT / "docs/governance/capability-v2-structural-remediation-plan.json")
+    project_group = next(
+        group for group in payload["groups"]
+        if group["group_id"] == "POST /api/approval/orders/{dynamic}/reject"
+    )
+
+    assert project_group.get("owner_service") == (
+        "plugins.project_management.project_management_backend.application.service.ProjectManagementApplication"
+    )
+    assert project_group.get("owner_service_source") == (
+        "plugins/project_management/project_management_backend/application/service.py"
+    )
+    assert (ROOT / project_group["owner_service_source"]).is_file()
+
+    mutated = copy.deepcopy(payload)
+    next(group for group in mutated["groups"] if group["group_id"] == project_group["group_id"])["owner_service_source"] = (
+        "plugins/project/project_backend/application/approval_service.py"
+    )
+    assert "owner_service_source_missing" in module.validate_plan(ROOT, mutated)
+
+    next(group for group in mutated["groups"] if group["group_id"] == project_group["group_id"])["owner_service_source"] = (
+        "plugins/craft/craft_backend/application/rules.py"
+    )
+    assert "owner_service_source_mismatch" in module.validate_plan(ROOT, mutated)
+
+
 def test_plan_validator_rejects_operations_or_bff_reclassification():
     """Breaks if an unresolved business route is hidden as an operations or BFF exemption."""
     module = _module()

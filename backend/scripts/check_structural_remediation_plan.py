@@ -21,7 +21,7 @@ MANIFEST_PATHS = (
 PROHIBITED_DISPOSITIONS = {"operations_excluded", "bff", "bff_registered", "operations"}
 REQUIRED_GROUP_FIELDS = {
     "group_id", "package_id", "method", "normalized_route", "occurrences",
-    "owner_domain", "owner_service", "current_blocker_evidence", "service_boundary",
+    "owner_domain", "owner_service", "owner_service_source", "current_blocker_evidence", "service_boundary",
     "transaction_model", "target_capability", "permission_object_scope",
     "contract_security_rules", "migration_strategy", "tests", "dependencies", "cross_domain_links",
     "approval", "exit_criteria", "implementation_disposition",
@@ -31,10 +31,11 @@ REQUIRED_GROUP_FIELDS = {
 def _package(
     *, owner_domain: str, owner_service: str, boundary: str, security: list[str],
     tests: list[str], dependencies: list[str], approval: str | None = None,
+    owner_service_source: str | None = None,
 ) -> dict[str, Any]:
     return {
         "owner_domain": owner_domain, "owner_service": owner_service,
-        "service_boundary": boundary, "contract_security_rules": security,
+        "owner_service_source": owner_service_source, "service_boundary": boundary, "contract_security_rules": security,
         "tests": tests, "dependencies": dependencies, "approval_gate": approval,
     }
 
@@ -121,8 +122,9 @@ PACKAGES: dict[str, dict[str, Any]] = {
         approval="Security/product must approve the executable allowlist, sandbox/resource policy, confirmation policy and recovery behavior before implementation.",
     ),
     "project_approval": _package(
-        owner_domain="project_management", owner_service="plugins.project.project_backend.application.approval_service",
-        boundary="New public Project approval-order service; it owns transition, notification outbox, audit and idempotency in one transaction.",
+        owner_domain="project_management", owner_service="plugins.project_management.project_management_backend.application.service.ProjectManagementApplication",
+        owner_service_source="plugins/project_management/project_management_backend/application/service.py",
+        boundary="Existing ProjectManagementApplication approval.orders.reject boundary, extended in-package with notification outbox, audit and idempotency rather than a fabricated Project service.",
         security=["tenant/order scope and approver authorization", "revision/idempotency", "transactional audit plus durable notification outbox"],
         tests=["approver/non-approver/cross-tenant denial", "rejection replay and notification outbox", "state conflict and outcome recovery"],
         dependencies=["Project approval aggregate", "notification outbox migration"],
@@ -253,7 +255,7 @@ def build_plan(root: Path) -> dict[str, Any]:
         groups.append({
             "group_id": f"{key[0]} {key[1]}", "package_id": spec["package_id"],
             "method": key[0], "normalized_route": key[1], "occurrences": source["occurrences"],
-            "owner_domain": package["owner_domain"], "owner_service": package["owner_service"],
+            "owner_domain": package["owner_domain"], "owner_service": package["owner_service"], "owner_service_source": package["owner_service_source"],
             "current_blocker_evidence": {"manifest_path": source["manifest_path"], "provider_anchor": entry.get("provider_anchor"), "provider_source_sha256": entry.get("provider_source_sha256"), "reason": blocker},
             "service_boundary": package["service_boundary"], "transaction_model": spec["transaction_model"],
             "target_capability": spec["target_capability"], "permission_object_scope": package["contract_security_rules"][0],
@@ -307,6 +309,11 @@ def validate_plan(root: Path, payload: Mapping[str, Any]) -> tuple[str, ...]:
             issues.add("owner_domain_mismatch")
         if group.get("owner_service") != package["owner_service"]:
             issues.add("owner_service_mismatch")
+        if group.get("owner_service_source") != package["owner_service_source"]:
+            issues.add("owner_service_source_mismatch")
+        source_path = group.get("owner_service_source")
+        if source_path is not None and (not isinstance(source_path, str) or not (root / source_path).is_file()):
+            issues.add("owner_service_source_missing")
         if group.get("package_id") != spec["package_id"] or group.get("target_capability") != spec["target_capability"]:
             issues.add("owner_service_mismatch")
         if group.get("implementation_disposition") in PROHIBITED_DISPOSITIONS:

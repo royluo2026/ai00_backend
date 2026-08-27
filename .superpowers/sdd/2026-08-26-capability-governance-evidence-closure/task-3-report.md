@@ -12,6 +12,11 @@
 - The plan isolates only material non-inferable decisions: dynamic Base attachment/saved-view/profile projections; marketplace uninstall/install semantics; Integration feature retention, credential and external-network policy; Craft destructive/lifecycle/rule grammar semantics; Agent sandbox and runtime policy; BOP lifecycle; and approval-reject notifications. Routine implementation steps remain sequenced within the 11 packages.
 - TDD evidence: `backend/tests/test_structural_remediation_plan.py` was RED before the checker existed, then GREEN with mutations that remove an occurrence, substitute an owner service, or label a residual route as operations/BFF.
 
+### Task 3B.3f R1
+
+- Corrected the Project approval owner boundary to the real `plugins/project_management/project_management_backend/application/service.py` `ProjectManagementApplication`, which owns `approval.orders.reject`; no fictitious `plugins/project/...` service remains in the plan.
+- The plan records `owner_service_source` and the checker verifies the reviewed source path exists. Regression mutations reject both an absent Project path and an existing Craft path substituted for the Project boundary.
+
 ## Authoritative scan
 
 - Frontend checkout: `E:\Projects\ai00\workmanship-web`
