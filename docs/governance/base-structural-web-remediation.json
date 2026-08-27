@@ -1,0 +1,1337 @@
+{
+  "artifact_id": "task-3b3e-base-structural-remediation",
+  "atomic_contract_manifest_sha256": "sha256:ad3e325f3b1912d1fdc672af905605aefa4b7f8ede7803c6c266c90ac8c54a00",
+  "content_sha256": "sha256:c0d2a39cb7a9c1a969b49182283aec73d90f42b1ae6bf44d628d2f1daf3727a8",
+  "counts": {
+    "groups": 16,
+    "migrated_groups": 5,
+    "migrated_occurrences": 17,
+    "occurrences": 33,
+    "unresolved_groups": 11,
+    "unresolved_occurrences": 16
+  },
+  "entries": [
+    {
+      "atomicity_class": "read",
+      "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
+      "candidate_capability": null,
+      "confirmation_policy": null,
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": null,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "method": "DELETE",
+      "normalized_route": "/api/plugin/uninstall/{dynamic}",
+      "occurrences": [
+        {
+          "column": 29,
+          "disposition": "unresolved",
+          "line": 294,
+          "method": "DELETE",
+          "normalized_route": "/api/plugin/uninstall/{dynamic}",
+          "occurrence_id": "web/core/web_compat.js:294:29:DELETE:/api/plugin/uninstall/{dynamic}",
+          "raw_route": "/api/plugin/uninstall/${pluginId}",
+          "source": "web/core/web_compat.js",
+          "source_sha256": "ec21b526867d051eb968d8e1b451c535dbbf819251463d42a9f5d82ea870b02c"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "backend/routers/plugins.py"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "provider_anchor": "backend/routers/plugins.py",
+      "provider_source_sha256": "sha256:bab080093bc16f582378f81ae82d6264d3cd724c2e55d842fad259507c11b2f2",
+      "unresolved_reason": "The unrestricted legacy uninstall route has no production handler and cannot bypass marketplace lifecycle controls."
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
+      "candidate_capability": null,
+      "confirmation_policy": null,
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": null,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "method": "DELETE",
+      "normalized_route": "/api/views/{dynamic}",
+      "occurrences": [
+        {
+          "column": 28,
+          "disposition": "unresolved",
+          "line": 1002,
+          "method": "DELETE",
+          "normalized_route": "/api/views/{dynamic}",
+          "occurrence_id": "web/components/view_manager.js:1002:28:DELETE:/api/views/{dynamic}",
+          "raw_route": "/api/views/${gid}",
+          "source": "web/components/view_manager.js",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 159,
+          "method": "DELETE",
+          "normalized_route": "/api/views/{dynamic}",
+          "sha256": "a9cac5f8e3dc93dc7201a5f25f8f7a97564ed5948c61e97a2bb9fe594c4cc2e3",
+          "source_path": "backend/routers/views.py",
+          "start_line": 147
+        },
+        "source_path": "backend/routers/views.py"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "provider_anchor": "backend/routers/views.py",
+      "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
+      "unresolved_reason": "The object-ownership check has no public owner-service boundary independent of dynamic saved-view config."
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_and_scope": "base.v2:authenticated",
+      "candidate_capability": "base.organization.team.directory.list@1",
+      "confirmation_policy": "none",
+      "final_disposition": "migrated",
+      "final_inventory_mapping": "capability",
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "method": "GET",
+      "normalized_route": "/api/org/teams",
+      "occurrences": [
+        {
+          "column": 19,
+          "disposition": "unresolved",
+          "line": 688,
+          "method": "GET",
+          "normalized_route": "/api/org/teams",
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:688:19:GET:/api/org/teams",
+          "raw_route": "/api/org/teams",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        },
+        {
+          "column": 19,
+          "disposition": "unresolved",
+          "line": 728,
+          "method": "GET",
+          "normalized_route": "/api/org/teams",
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:728:19:GET:/api/org/teams",
+          "raw_route": "/api/org/teams",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        },
+        {
+          "column": 17,
+          "disposition": "unresolved",
+          "line": 92,
+          "method": "GET",
+          "normalized_route": "/api/org/teams",
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:92:17:GET:/api/org/teams",
+          "raw_route": "/api/org/teams",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 63,
+          "method": "GET",
+          "normalized_route": "/api/org/teams",
+          "sha256": "7a03ecabdc68676421c1f7833e53de45902cb63d9a08dc5c13f5033ddd4a55ed",
+          "source_path": "backend/routers/org.py",
+          "start_line": 49
+        },
+        "source_path": "backend/routers/org.py"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "teams": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "created_at": {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                "feishu_dept_id": {
+                  "maxLength": 512,
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "gid": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "is_active": {
+                  "type": "boolean"
+                },
+                "name": {
+                  "maxLength": 512,
+                  "type": "string"
+                },
+                "parent_team_gid": {
+                  "maxLength": 512,
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "gid",
+                "name",
+                "is_active",
+                "parent_team_gid",
+                "created_at",
+                "feishu_dept_id"
+              ],
+              "type": "object"
+            },
+            "maxItems": 1000,
+            "type": "array"
+          }
+        },
+        "required": [
+          "teams"
+        ],
+        "type": "object"
+      },
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
+      "unresolved_reason": null
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_and_scope": "base.v2:authenticated",
+      "candidate_capability": "base.self_annotation.batch.get@1",
+      "confirmation_policy": "none",
+      "final_disposition": "migrated",
+      "final_inventory_mapping": "capability",
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "item_gids": {
+            "items": {
+              "maxLength": 512,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "item_gids"
+        ],
+        "type": "object"
+      },
+      "method": "GET",
+      "normalized_route": "/api/self_ann/batch",
+      "occurrences": [
+        {
+          "column": 35,
+          "disposition": "unresolved",
+          "line": 125,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/batch",
+          "occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:125:35:GET:/api/self_ann/batch",
+          "raw_route": "/api/self_ann/batch?gids=${chunk.join(',')}",
+          "source": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
+          "source_sha256": "d425d6294546dfb7134b4f41c1fc200af8ddde31b87a8cfb2ed9ef3b2ff1b851"
+        },
+        {
+          "column": 35,
+          "disposition": "unresolved",
+          "line": 394,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/batch",
+          "occurrence_id": "packages/craft-plugin/web/ebom/ebom.js:394:35:GET:/api/self_ann/batch",
+          "raw_route": "/api/self_ann/batch?gids=${chunk.join(',')}",
+          "source": "packages/craft-plugin/web/ebom/ebom.js",
+          "source_sha256": "ed22202d2c34d2a0b320a2bbed1f804a1db2e8b72ac8d4d67a984142cce65321"
+        },
+        {
+          "column": 35,
+          "disposition": "unresolved",
+          "line": 262,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/batch",
+          "occurrence_id": "packages/craft-plugin/web/issue/issue.js:262:35:GET:/api/self_ann/batch",
+          "raw_route": "/api/self_ann/batch?gids=${chunk.join(',')}",
+          "source": "packages/craft-plugin/web/issue/issue.js",
+          "source_sha256": "89c320fb34eb0b058b72b794c2101812d9f8e3bb84d51fb4eb16330fa4cb65e7"
+        },
+        {
+          "column": 35,
+          "disposition": "unresolved",
+          "line": 164,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/batch",
+          "occurrence_id": "packages/craft-plugin/web/task/task.js:164:35:GET:/api/self_ann/batch",
+          "raw_route": "/api/self_ann/batch?gids=${chunk.join(',')}",
+          "source": "packages/craft-plugin/web/task/task.js",
+          "source_sha256": "b8ff99fe7b3e81670be8e0b3100b3f9d685eaa6409475eeba3dd3a7d7eec75f8"
+        },
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 614,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/batch",
+          "occurrence_id": "web/knowledge_hub/knowledge_hub.js:614:36:GET:/api/self_ann/batch",
+          "raw_route": "/api/self_ann/batch?gids=${chunk.join(',')}",
+          "source": "web/knowledge_hub/knowledge_hub.js",
+          "source_sha256": "1f247f6133368b61baa10648243b7fc6659b33b8c342459a9d138afde102d465"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 66,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/batch",
+          "sha256": "136235af957523ef98af52be4b91b37d107d080a527283f2ce70babc969eb1cd",
+          "source_path": "backend/routers/self_annotations.py",
+          "start_line": 46
+        },
+        "source_path": "backend/routers/self_annotations.py"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "attach_count": {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "has_note": {
+                  "type": "boolean"
+                },
+                "item_gid": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "schedule": {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                "status": {
+                  "maxLength": 64,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "item_gid",
+                "status",
+                "schedule",
+                "has_note",
+                "attach_count"
+              ],
+              "type": "object"
+            },
+            "maxItems": 500,
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "type": "object"
+      },
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
+      "unresolved_reason": null
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
+      "candidate_capability": null,
+      "confirmation_policy": null,
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": null,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "method": "GET",
+      "normalized_route": "/api/self_ann/list",
+      "occurrences": [
+        {
+          "column": 27,
+          "disposition": "unresolved",
+          "line": 292,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/list",
+          "occurrence_id": "web/components/self_annotation_panel.js:292:27:GET:/api/self_ann/list",
+          "raw_route": "/api/self_ann/list?module=${encodeURIComponent(_module)}",
+          "source": "web/components/self_annotation_panel.js",
+          "source_sha256": "55c294a99365af52084ce49b89432bf3dee012cfdbad32ec9993b1467b871301"
+        },
+        {
+          "column": 27,
+          "disposition": "unresolved",
+          "line": 293,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/list",
+          "occurrence_id": "web/components/self_annotation_panel.js:293:27:GET:/api/self_ann/list",
+          "raw_route": "/api/self_ann/list",
+          "source": "web/components/self_annotation_panel.js",
+          "source_sha256": "55c294a99365af52084ce49b89432bf3dee012cfdbad32ec9993b1467b871301"
+        },
+        {
+          "column": 42,
+          "disposition": "unresolved",
+          "line": 499,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/list",
+          "occurrence_id": "web/knowledge_hub/knowledge_hub.js:499:42:GET:/api/self_ann/list",
+          "raw_route": "/api/self_ann/list?module=knowledge_hub",
+          "source": "web/knowledge_hub/knowledge_hub.js",
+          "source_sha256": "1f247f6133368b61baa10648243b7fc6659b33b8c342459a9d138afde102d465"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 79,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/list",
+          "sha256": "0e4d958c84b56f440a5e6f398f6ee5d4a5707dbd457ef06cc3ed967795e304cc",
+          "source_path": "backend/routers/self_annotations.py",
+          "start_line": 69
+        },
+        "source_path": "backend/routers/self_annotations.py"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "provider_anchor": "backend/routers/self_annotations.py",
+      "provider_source_sha256": "sha256:7624608452bd2173dacfaac9c77f703da331fc510512cc028857fb7319ca8c52",
+      "unresolved_reason": "The response contains attachment records without a governed nested attachment contract."
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
+      "candidate_capability": null,
+      "confirmation_policy": null,
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": null,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "method": "GET",
+      "normalized_route": "/api/self_ann/{dynamic}",
+      "occurrences": [
+        {
+          "column": 36,
+          "disposition": "unresolved",
+          "line": 146,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/{dynamic}",
+          "occurrence_id": "web/components/self_annotation_panel.js:146:36:GET:/api/self_ann/{dynamic}",
+          "raw_route": "/api/self_ann/${gid}",
+          "source": "web/components/self_annotation_panel.js",
+          "source_sha256": "55c294a99365af52084ce49b89432bf3dee012cfdbad32ec9993b1467b871301"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 88,
+          "method": "GET",
+          "normalized_route": "/api/self_ann/{dynamic}",
+          "sha256": "8a4e814824a54cd479284be861c6f2d8fc5ca10bfeeefb871e141066a9cd12b0",
+          "source_path": "backend/routers/self_annotations.py",
+          "start_line": 82
+        },
+        "source_path": "backend/routers/self_annotations.py"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "provider_anchor": "backend/routers/self_annotations.py",
+      "provider_source_sha256": "sha256:7624608452bd2173dacfaac9c77f703da331fc510512cc028857fb7319ca8c52",
+      "unresolved_reason": "The response contains attachment records without a governed nested attachment contract."
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_and_scope": "base.v2:authenticated",
+      "candidate_capability": "base.team.directory.list@1",
+      "confirmation_policy": "none",
+      "final_disposition": "migrated",
+      "final_inventory_mapping": "capability",
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "method": "GET",
+      "normalized_route": "/api/teams",
+      "occurrences": [
+        {
+          "column": 39,
+          "disposition": "unresolved",
+          "line": 76,
+          "method": "GET",
+          "normalized_route": "/api/teams",
+          "occurrence_id": "web/components/visibility_selector.js:76:39:GET:/api/teams",
+          "raw_route": "/api/teams",
+          "source": "web/components/visibility_selector.js",
+          "source_sha256": "5d7d05f49f03ece4b75139ebfcf857deda38f3e52cdb453d47ca018f8313b98e"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "backend/routers/teams.py"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "created_at": {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                "gid": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "is_active": {
+                  "type": "boolean"
+                },
+                "name": {
+                  "maxLength": 512,
+                  "type": "string"
+                },
+                "parent_team_gid": {
+                  "maxLength": 512,
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "gid",
+                "name",
+                "is_active",
+                "parent_team_gid",
+                "created_at"
+              ],
+              "type": "object"
+            },
+            "maxItems": 1000,
+            "type": "array"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ],
+        "type": "object"
+      },
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
+      "unresolved_reason": null
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_and_scope": "base.v2:system.user.manage",
+      "candidate_capability": "base.identity.admin_user.list@1",
+      "confirmation_policy": "none",
+      "final_disposition": "migrated",
+      "final_inventory_mapping": "capability",
+      "idempotency_policy": "none",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "method": "GET",
+      "normalized_route": "/api/users",
+      "occurrences": [
+        {
+          "column": 38,
+          "disposition": "unresolved",
+          "line": 396,
+          "method": "GET",
+          "normalized_route": "/api/users",
+          "occurrence_id": "packages/craft-plugin/web/task/task.js:396:38:GET:/api/users",
+          "raw_route": "/api/users",
+          "source": "packages/craft-plugin/web/task/task.js",
+          "source_sha256": "b8ff99fe7b3e81670be8e0b3100b3f9d685eaa6409475eeba3dd3a7d7eec75f8"
+        },
+        {
+          "column": 44,
+          "disposition": "unresolved",
+          "line": 342,
+          "method": "GET",
+          "normalized_route": "/api/users",
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:342:44:GET:/api/users",
+          "raw_route": "/api/users/",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        },
+        {
+          "column": 40,
+          "disposition": "unresolved",
+          "line": 376,
+          "method": "GET",
+          "normalized_route": "/api/users",
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:376:40:GET:/api/users",
+          "raw_route": "/api/users/",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        },
+        {
+          "column": 19,
+          "disposition": "unresolved",
+          "line": 689,
+          "method": "GET",
+          "normalized_route": "/api/users",
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:689:19:GET:/api/users",
+          "raw_route": "/api/users/",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        },
+        {
+          "column": 19,
+          "disposition": "unresolved",
+          "line": 729,
+          "method": "GET",
+          "normalized_route": "/api/users",
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:729:19:GET:/api/users",
+          "raw_route": "/api/users/",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        },
+        {
+          "column": 75,
+          "disposition": "unresolved",
+          "line": 93,
+          "method": "GET",
+          "normalized_route": "/api/users",
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:93:75:GET:/api/users",
+          "raw_route": "/api/users/",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 26,
+          "method": "GET",
+          "normalized_route": "/api/users",
+          "sha256": "87d07b2906530fd8ba12d2c999da027ce0b70bf58dc3a3eca7b9773b6a5267b6",
+          "source_path": "backend/routers/users.py",
+          "start_line": 23
+        },
+        "source_path": "backend/routers/users.py"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "avatar_url": {
+                  "maxLength": 2048,
+                  "type": "string"
+                },
+                "created_at": {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                "email": {
+                  "maxLength": 512,
+                  "type": "string"
+                },
+                "external_subtype": {
+                  "maxLength": 512,
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "gid": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "is_active": {
+                  "type": "boolean"
+                },
+                "name": {
+                  "maxLength": 512,
+                  "type": "string"
+                },
+                "org_role": {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                "system_role": {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                "team_id": {
+                  "maxLength": 512,
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "gid",
+                "name",
+                "email",
+                "avatar_url",
+                "system_role",
+                "org_role",
+                "external_subtype",
+                "team_id",
+                "is_active",
+                "created_at"
+              ],
+              "type": "object"
+            },
+            "maxItems": 1000,
+            "type": "array"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ],
+        "type": "object"
+      },
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
+      "unresolved_reason": null
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
+      "candidate_capability": null,
+      "confirmation_policy": null,
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": null,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "method": "GET",
+      "normalized_route": "/api/users/me",
+      "occurrences": [
+        {
+          "column": 34,
+          "disposition": "unresolved",
+          "line": 511,
+          "method": "GET",
+          "normalized_route": "/api/users/me",
+          "occurrence_id": "packages/craft-plugin/web/lineage_view/lineage.js:511:34:GET:/api/users/me",
+          "raw_route": "/api/users/me",
+          "source": "packages/craft-plugin/web/lineage_view/lineage.js",
+          "source_sha256": "4eded0f1dca13981e7bff65526389f43f71b47cae211dbc00469e6c3f3466d65"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 31,
+          "method": "GET",
+          "normalized_route": "/api/users/me",
+          "sha256": "4023696d0886e4aacff7d1175b4dbb8b060dbcf87cbca7bcb8eaa0b61f1a0d80",
+          "source_path": "backend/routers/users.py",
+          "start_line": 29
+        },
+        "source_path": "backend/routers/users.py"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "provider_anchor": "backend/routers/users.py",
+      "provider_source_sha256": "sha256:d632055fafa2aee6dea74b6c160c8889295a525373e6ee2604e52527d5df2b8f",
+      "unresolved_reason": "The profile contains dynamic grants and permissions without a closed exact output contract."
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
+      "candidate_capability": null,
+      "confirmation_policy": null,
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": null,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "method": "GET",
+      "normalized_route": "/api/views",
+      "occurrences": [
+        {
+          "column": 26,
+          "disposition": "unresolved",
+          "line": 1068,
+          "method": "GET",
+          "normalized_route": "/api/views",
+          "occurrence_id": "web/admin/task_planning.html:1068:26:GET:/api/views",
+          "raw_route": "/api/views?module=task&list_gid=${listGid}",
+          "source": "web/admin/task_planning.html",
+          "source_sha256": "9458faf6cb26c55b84344d405084358da501c59cae64b8725f18b559fd6b29e7"
+        },
+        {
+          "column": 40,
+          "disposition": "unresolved",
+          "line": 541,
+          "method": "GET",
+          "normalized_route": "/api/views",
+          "occurrence_id": "web/components/view_manager.js:541:40:GET:/api/views",
+          "raw_route": "/api/views?module=${this.moduleId}${listQuery}",
+          "source": "web/components/view_manager.js",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 96,
+          "method": "GET",
+          "normalized_route": "/api/views",
+          "sha256": "a7821ff682ccd637f93459679eed4427b5d387dd4885013046e19c22b17221f4",
+          "source_path": "backend/routers/views.py",
+          "start_line": 54
+        },
+        "source_path": "backend/routers/views.py"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "provider_anchor": "backend/routers/views.py",
+      "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
+      "unresolved_reason": "Saved-view config is intentionally dynamic and has no governed closed nested contract."
+    },
+    {
+      "atomicity_class": "single_transaction",
+      "authorization_and_scope": "base.v2:system.user.manage",
+      "candidate_capability": "base.identity.role.assign.atomic@1",
+      "confirmation_policy": "user",
+      "final_disposition": "migrated",
+      "final_inventory_mapping": "capability",
+      "idempotency_policy": "required",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "external_subtype": {
+            "maxLength": 512,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "new_role": {
+            "enum": [
+              "super_admin",
+              "team_admin",
+              "project_admin",
+              "rule_admin",
+              "knowledge_admin",
+              "member",
+              "external"
+            ],
+            "type": "string"
+          },
+          "user_gid": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_gid",
+          "new_role",
+          "external_subtype"
+        ],
+        "type": "object"
+      },
+      "method": "PATCH",
+      "normalized_route": "/api/users/{dynamic}/role",
+      "occurrences": [
+        {
+          "column": 35,
+          "disposition": "unresolved",
+          "line": 491,
+          "method": "PATCH",
+          "normalized_route": "/api/users/{dynamic}/role",
+          "occurrence_id": "web/org_mgmt/org_mgmt.js:491:35:PATCH:/api/users/{dynamic}/role",
+          "raw_route": "/api/users/${_editingUserId}/role",
+          "source": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "54a62f38996e8a936b8b1fda742c6597c2e7c8eb1b1218d1fe22b5348d320e5f"
+        },
+        {
+          "column": 35,
+          "disposition": "unresolved",
+          "line": 1637,
+          "method": "PATCH",
+          "normalized_route": "/api/users/{dynamic}/role",
+          "occurrence_id": "web/settings/settings.js:1637:35:PATCH:/api/users/{dynamic}/role",
+          "raw_route": "/api/users/${userGid}/role",
+          "source": "web/settings/settings.js",
+          "source_sha256": "7315fba56b7f88f38265b933ae6615bbfaf2e8f826540f6315d60aa85e0e4a82"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 64,
+          "method": "PATCH",
+          "normalized_route": "/api/users/{dynamic}/role",
+          "sha256": "c2f069674b23cc04bef865b641c7e9a793b993086af1aa61180d5fc2c2207bfa",
+          "source_path": "backend/routers/users.py",
+          "start_line": 49
+        },
+        "source_path": "backend/routers/users.py"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "additionalProperties": false,
+            "properties": {
+              "avatar_url": {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              "created_at": {
+                "maxLength": 64,
+                "type": "string"
+              },
+              "email": {
+                "maxLength": 512,
+                "type": "string"
+              },
+              "external_subtype": {
+                "maxLength": 512,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "gid": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "is_active": {
+                "type": "boolean"
+              },
+              "name": {
+                "maxLength": 512,
+                "type": "string"
+              },
+              "org_role": {
+                "maxLength": 64,
+                "type": "string"
+              },
+              "system_role": {
+                "maxLength": 64,
+                "type": "string"
+              },
+              "team_id": {
+                "maxLength": 512,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "gid",
+              "name",
+              "email",
+              "avatar_url",
+              "system_role",
+              "org_role",
+              "external_subtype",
+              "team_id",
+              "is_active",
+              "created_at"
+            ],
+            "type": "object"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ],
+        "type": "object"
+      },
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
+      "unresolved_reason": null
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
+      "candidate_capability": null,
+      "confirmation_policy": null,
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": null,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "method": "PATCH",
+      "normalized_route": "/api/views/{dynamic}",
+      "occurrences": [
+        {
+          "column": 28,
+          "disposition": "unresolved",
+          "line": 1011,
+          "method": "PATCH",
+          "normalized_route": "/api/views/{dynamic}",
+          "occurrence_id": "web/components/view_manager.js:1011:28:PATCH:/api/views/{dynamic}",
+          "raw_route": "/api/views/${gid}",
+          "source": "web/components/view_manager.js",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
+        },
+        {
+          "column": 30,
+          "disposition": "unresolved",
+          "line": 651,
+          "method": "PATCH",
+          "normalized_route": "/api/views/{dynamic}",
+          "occurrence_id": "web/components/view_manager.js:651:30:PATCH:/api/views/{dynamic}",
+          "raw_route": "/api/views/${this._activeViewGid}",
+          "source": "web/components/view_manager.js",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 144,
+          "method": "PATCH",
+          "normalized_route": "/api/views/{dynamic}",
+          "sha256": "68654ac19755eee9b4425ca6cb8fdf3aa7f42629b9be96f2b9a20184764bc159",
+          "source_path": "backend/routers/views.py",
+          "start_line": 116
+        },
+        "source_path": "backend/routers/views.py"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "provider_anchor": "backend/routers/views.py",
+      "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
+      "unresolved_reason": "Saved-view config is intentionally dynamic and has no governed closed nested contract."
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
+      "candidate_capability": null,
+      "confirmation_policy": null,
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": null,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "method": "POST",
+      "normalized_route": "/api/plugin/install",
+      "occurrences": [
+        {
+          "column": 27,
+          "disposition": "unresolved",
+          "line": 287,
+          "method": "POST",
+          "normalized_route": "/api/plugin/install",
+          "occurrence_id": "web/core/web_compat.js:287:27:POST:/api/plugin/install",
+          "raw_route": "/api/plugin/install",
+          "source": "web/core/web_compat.js",
+          "source_sha256": "ec21b526867d051eb968d8e1b451c535dbbf819251463d42a9f5d82ea870b02c"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "No exact registered route/method definition exists in this reviewed handler family.",
+        "handler_status": "absent",
+        "route_definition": null,
+        "source_path": "backend/routers/plugins.py"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "provider_anchor": "backend/routers/plugins.py",
+      "provider_source_sha256": "sha256:bab080093bc16f582378f81ae82d6264d3cd724c2e55d842fad259507c11b2f2",
+      "unresolved_reason": "The arbitrary-URL installer route has no production handler and is not equivalent to signed marketplace installation."
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
+      "candidate_capability": null,
+      "confirmation_policy": null,
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": null,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "method": "POST",
+      "normalized_route": "/api/views",
+      "occurrences": [
+        {
+          "column": 42,
+          "disposition": "unresolved",
+          "line": 657,
+          "method": "POST",
+          "normalized_route": "/api/views",
+          "occurrence_id": "web/components/view_manager.js:657:42:POST:/api/views",
+          "raw_route": "/api/views",
+          "source": "web/components/view_manager.js",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
+        },
+        {
+          "column": 40,
+          "disposition": "unresolved",
+          "line": 713,
+          "method": "POST",
+          "normalized_route": "/api/views",
+          "occurrence_id": "web/components/view_manager.js:713:40:POST:/api/views",
+          "raw_route": "/api/views",
+          "source": "web/components/view_manager.js",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 113,
+          "method": "POST",
+          "normalized_route": "/api/views",
+          "sha256": "63172679667ad2f9dfc3a9b406d4e2ac97e734f56abad8becc938d909d81cc73",
+          "source_path": "backend/routers/views.py",
+          "start_line": 99
+        },
+        "source_path": "backend/routers/views.py"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "provider_anchor": "backend/routers/views.py",
+      "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
+      "unresolved_reason": "Saved-view config is intentionally dynamic and has no governed closed nested contract."
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
+      "candidate_capability": null,
+      "confirmation_policy": null,
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": null,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "method": "POST",
+      "normalized_route": "/api/views/{dynamic}/copy",
+      "occurrences": [
+        {
+          "column": 42,
+          "disposition": "unresolved",
+          "line": 978,
+          "method": "POST",
+          "normalized_route": "/api/views/{dynamic}/copy",
+          "occurrence_id": "web/components/view_manager.js:978:42:POST:/api/views/{dynamic}/copy",
+          "raw_route": "/api/views/${gid}/copy",
+          "source": "web/components/view_manager.js",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 180,
+          "method": "POST",
+          "normalized_route": "/api/views/{dynamic}/copy",
+          "sha256": "e3661050f4d7b1902bdad78bb6ee4f4a96054cf7d2e606b6f7331dcb81804fd9",
+          "source_path": "backend/routers/views.py",
+          "start_line": 162
+        },
+        "source_path": "backend/routers/views.py"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "provider_anchor": "backend/routers/views.py",
+      "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
+      "unresolved_reason": "The copied result depends on dynamic saved-view config without a governed closed nested contract."
+    },
+    {
+      "atomicity_class": "read",
+      "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
+      "candidate_capability": null,
+      "confirmation_policy": null,
+      "final_disposition": "unresolved",
+      "final_inventory_mapping": "unresolved",
+      "idempotency_policy": null,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "method": "PUT",
+      "normalized_route": "/api/self_ann/{dynamic}",
+      "occurrences": [
+        {
+          "column": 35,
+          "disposition": "unresolved",
+          "line": 175,
+          "method": "PUT",
+          "normalized_route": "/api/self_ann/{dynamic}",
+          "occurrence_id": "web/components/self_annotation_panel.js:175:35:PUT:/api/self_ann/{dynamic}",
+          "raw_route": "/api/self_ann/${_currentGid}",
+          "source": "web/components/self_annotation_panel.js",
+          "source_sha256": "55c294a99365af52084ce49b89432bf3dee012cfdbad32ec9993b1467b871301"
+        }
+      ],
+      "old_route_evidence": {
+        "anchors": [],
+        "finding": "Exact registered route definition is anchored and machine-checked.",
+        "handler_status": "registered",
+        "route_definition": {
+          "end_line": 106,
+          "method": "PUT",
+          "normalized_route": "/api/self_ann/{dynamic}",
+          "sha256": "ae71702549cca7ff913a55626fa81dfab7127d760891b646b37ccd73e9b3ae91",
+          "source_path": "backend/routers/self_annotations.py",
+          "start_line": 91
+        },
+        "source_path": "backend/routers/self_annotations.py"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "provider_anchor": "backend/routers/self_annotations.py",
+      "provider_source_sha256": "sha256:7624608452bd2173dacfaac9c77f703da331fc510512cc028857fb7319ca8c52",
+      "unresolved_reason": "The request contains attachment records without a governed nested attachment contract."
+    }
+  ],
+  "frontend_content_hash": "9ecc1ef562fac54c074f87d60eeda53bae0b619622f60d21e8430eaf157ff0c1",
+  "frontend_revision": "f5bcdff9415677440f2dbfe7106d91ce22c1b4e8",
+  "schema_version": "1.0.0",
+  "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
+  "source_ledger_revision": "8ee5dc2340a9e77c5d84e8f84f733bb5415e9d08",
+  "source_ledger_sha256": "sha256:8fd041e5e534877ac7cc27642257140bd9d9e0720471957735d82a50d07df565"
+}

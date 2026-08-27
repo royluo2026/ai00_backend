@@ -8,7 +8,7 @@ Read an immutable Simulation parameter set.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`simulation`
-- Catalog Release：`rel_424d8b0ea1ee7c77776f5822be74abb6`
+- Catalog Release：`rel_11a8ebce1a71ba3cc557b0e7fdffc515`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -106,7 +106,7 @@ Read an immutable Simulation parameter set.
 ```json
 {
   "capability_id": "simulation.parameter_set.get",
-  "catalog_release": "rel_424d8b0ea1ee7c77776f5822be74abb6",
+  "catalog_release": "rel_11a8ebce1a71ba3cc557b0e7fdffc515",
   "major_version": 1,
   "payload": {
     "parameter_set_ref": {

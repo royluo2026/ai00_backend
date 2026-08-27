@@ -2850,3 +2850,57 @@ Exact implementation commits:
 No dependency was installed and no push, merge, production database mutation,
 operations approval, private-router import, or cross-domain database access was
 performed.
+
+## Task 3B.3e-base
+
+Base structural Web remediation reviewed 16 route groups / 33 baseline
+occurrences. Five groups / 17 occurrences now invoke owner-domain Gateway
+Capabilities: `base.organization.team.directory.list@1`,
+`base.team.directory.list@1`, `base.self_annotation.batch.get@1`,
+`base.identity.admin_user.list@1`, and
+`base.identity.role.assign.atomic@1`. The role assignment is a strong,
+transactional write and is exercised with Gateway confirmation and idempotent
+replay evidence. The read capabilities retain the legacy authenticated or
+admin-only boundary and return closed projections.
+
+Eleven groups / 16 occurrences remain explicitly unresolved: plugin
+install/uninstall (no equivalent signed publisher, dependency, rollback, and
+audit lifecycle proof), dynamic self-annotation read/write/list, identity
+`/me`, and saved-view routes. None was represented as a Gateway migration.
+
+Generated evidence:
+
+- Base remediation manifest: 16 groups / 33 occurrences; 5 / 17 migrated and
+  11 / 16 unresolved.
+- Atomic manifest: 48 groups / 71 occurrences; 13 migrated and 35
+  reclassified.
+- Catalog/docs release `rel_11a8ebce1a71ba3cc557b0e7fdffc515`: 470 descriptors
+  and pages, with 454 stable acceptance capabilities.
+- Canonical Web inventory at frontend `f5bcdff9415677440f2dbfe7106d91ce22c1b4e8`:
+  415 total, 38 capability, 311 legacy registered, 2 BFF registered, 19
+  operations excluded, and 45 explicit unresolved occurrences. Root ledger
+  records 37 final unresolved groups.
+
+Verification evidence:
+
+```text
+GREEN: Base structural/Gateway/atomic focused suite: 20 passed
+GREEN: existing capability migration manifest suite: 6 passed
+GREEN: frozen Base manifest, atomic, migration, root-ledger, Web canonical,
+       catalog, docs, acceptance manifest, and domain-dependency checks
+GREEN: offline broad and strict acceptance: 3,178/3,178 validated;
+       failed=0; skipped=0; acceptance pytest 3,189 passed
+ENVIRONMENT LIMIT: the independent consumer/completion pytest suite could not
+allocate or enumerate its temporary directories (WinError 5 ACL); this is a
+test-environment failure before test execution, not a product assertion.
+```
+
+Exact implementation commits:
+
+- Frontend `f5bcdff9415677440f2dbfe7106d91ce22c1b4e8`
+  (`feat: migrate safe base structural web outcomes`).
+- Backend commit recorded immediately after this report entry.
+
+No dependency was installed and no push, merge, production database mutation,
+operations approval, BFF, private-router import, or cross-domain database
+access was performed.

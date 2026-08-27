@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 
 from backend.db.connection import get_conn
 from backend.routers.deps import get_current_user
+from backend.base.structural_web import annotation_batch
 
 router = APIRouter(prefix="/api/self_ann", tags=["self_annotations"])
 
@@ -46,24 +47,8 @@ def _row(row: dict) -> dict:
 @router.get("/batch")
 def get_batch(gids: str = Query(""), user: dict = Depends(get_current_user)):
     gid_list = [value.strip() for value in gids.split(",") if value.strip()][:500]
-    if not gid_list:
-        return {}
-    placeholders = ",".join(["%s"] * len(gid_list))
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "SELECT item_gid,self_status,self_schedule,self_note,self_attachments "
-                f"FROM workmanship_base_self_annotations WHERE item_gid IN ({placeholders}) AND user_gid=%s",
-                [*gid_list, user["gid"]],
-            )
-            rows = cur.fetchall()
-    return {
-        row["item_gid"]: {
-            "status": row.get("self_status") or "", "schedule": row.get("self_schedule") or "",
-            "has_note": bool(row.get("self_note")), "attach_count": len(_decode(row.get("self_attachments"))),
-        }
-        for row in rows
-    }
+    result = annotation_batch(actor=user, item_gids=gid_list)
+    return {item.pop("item_gid"): item for item in result["items"]}
 
 
 @router.get("/list")

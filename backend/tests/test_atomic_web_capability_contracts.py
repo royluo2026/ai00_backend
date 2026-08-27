@@ -22,6 +22,11 @@ SAFE_CAPABILITIES = {
     "base.identity.directory.feishu.sync",
     "base.plugin.installed.list",
     "base.identity.user.search",
+    "base.organization.team.directory.list",
+    "base.team.directory.list",
+    "base.self_annotation.batch.get",
+    "base.identity.admin_user.list",
+    "base.identity.role.assign.atomic",
 }
 
 

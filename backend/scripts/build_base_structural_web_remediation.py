@@ -1,0 +1,128 @@
+"""Build the independent Task 3B.3e Base structural remediation manifest."""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+from typing import Any
+
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from backend.scripts.check_web_capability_routes import build_report
+
+
+BASELINE = "8ee5dc2340a9e77c5d84e8f84f733bb5415e9d08"
+LEDGER_PATH = "docs/governance/web-route-root-cause-ledger.json"
+ATOMIC_PATH = ROOT / "docs/governance/atomic-web-capability-contracts.json"
+OUTPUT = ROOT / "docs/governance/base-structural-web-remediation.json"
+SCOPE = {
+    ("GET", "/api/org/teams"), ("GET", "/api/teams"),
+    ("POST", "/api/plugin/install"), ("DELETE", "/api/plugin/uninstall/{dynamic}"),
+    ("GET", "/api/self_ann/{dynamic}"), ("PUT", "/api/self_ann/{dynamic}"),
+    ("GET", "/api/self_ann/batch"), ("GET", "/api/self_ann/list"),
+    ("GET", "/api/users"), ("PATCH", "/api/users/{dynamic}/role"), ("GET", "/api/users/me"),
+    ("GET", "/api/views"), ("POST", "/api/views"), ("DELETE", "/api/views/{dynamic}"),
+    ("PATCH", "/api/views/{dynamic}"), ("POST", "/api/views/{dynamic}/copy"),
+}
+
+
+def _canonical(value: Any) -> str:
+    return json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+
+
+def _baseline() -> tuple[dict[str, Any], bytes]:
+    result = subprocess.run(
+        ["git", "show", f"{BASELINE}:{LEDGER_PATH}"], cwd=ROOT, check=True,
+        capture_output=True,
+    )
+    return json.loads(result.stdout), result.stdout
+
+
+def build_manifest(web_root: Path) -> dict[str, Any]:
+    ledger, ledger_blob = _baseline()
+    atomic = json.loads(ATOMIC_PATH.read_text(encoding="utf-8"))
+    atomic_by_key = {(item["method"], item["normalized_route"]): item for item in atomic["entries"]}
+    report = json.loads(build_report(web_root.resolve()).json())
+    unresolved = {(item["method"], item["normalized_route"]) for item in report["routes"] if item["disposition"] == "unresolved"}
+    baseline_entries = {
+        (item["method"], item["normalized_route"]): item
+        for item in ledger["entries"]
+        if (item["method"], item["normalized_route"]) in SCOPE
+    }
+    if set(baseline_entries) != SCOPE:
+        raise ValueError("pinned Base structural scope drift")
+    entries = []
+    for key in sorted(SCOPE):
+        source = baseline_entries[key]
+        contract = atomic_by_key.get(key)
+        if not contract:
+            raise ValueError(f"atomic contract missing: {key}")
+        migrated = contract["final_disposition"] == "migrated"
+        mapping = "unresolved" if key in unresolved else "capability"
+        if migrated != (mapping == "capability"):
+            raise ValueError(f"final mapping does not match contract: {key}")
+        entry = {
+            "method": key[0],
+            "normalized_route": key[1],
+            "occurrences": source["occurrences"],
+            "old_route_evidence": source["backend_evidence"],
+            "authorization_and_scope": contract.get("authorization_policy") or "legacy route authorization retained; no safe provider contract",
+            "candidate_capability": f"{contract['capability_id']}@{contract['major_version']}" if migrated else None,
+            "provider_anchor": contract["provider_anchor"],
+            "provider_source_sha256": contract["provider_source_sha256"],
+            "input_schema": contract["input_schema"],
+            "output_schema": contract["output_schema"],
+            "confirmation_policy": contract.get("confirmation_policy"),
+            "idempotency_policy": contract.get("idempotency_policy"),
+            "atomicity_class": contract.get("atomicity_class"),
+            "final_disposition": "migrated" if migrated else "unresolved",
+            "unresolved_reason": None if migrated else contract["reclassification_reason"],
+            "final_inventory_mapping": mapping,
+        }
+        entries.append(entry)
+    counts = {
+        "groups": len(entries), "occurrences": sum(len(item["occurrences"]) for item in entries),
+        "migrated_groups": sum(item["final_disposition"] == "migrated" for item in entries),
+        "migrated_occurrences": sum(len(item["occurrences"]) for item in entries if item["final_disposition"] == "migrated"),
+        "unresolved_groups": sum(item["final_disposition"] == "unresolved" for item in entries),
+        "unresolved_occurrences": sum(len(item["occurrences"]) for item in entries if item["final_disposition"] == "unresolved"),
+    }
+    if counts != {"groups": 16, "occurrences": 33, "migrated_groups": 5, "migrated_occurrences": 17, "unresolved_groups": 11, "unresolved_occurrences": 16}:
+        raise ValueError(f"Base structural count drift: {counts}")
+    manifest = {
+        "schema_version": "1.0.0", "artifact_id": "task-3b3e-base-structural-remediation",
+        "source_ledger": LEDGER_PATH, "source_ledger_revision": BASELINE,
+        "source_ledger_sha256": "sha256:" + hashlib.sha256(ledger_blob).hexdigest(),
+        "frontend_revision": report["frontend_revision"], "frontend_content_hash": report["content_hash"],
+        "atomic_contract_manifest_sha256": "sha256:" + hashlib.sha256(ATOMIC_PATH.read_bytes()).hexdigest(),
+        "counts": counts, "entries": entries,
+    }
+    manifest["content_sha256"] = "sha256:" + hashlib.sha256(_canonical(manifest).encode()).hexdigest()
+    return manifest
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--web-root", type=Path, required=True)
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--write", action="store_true")
+    mode.add_argument("--check", action="store_true")
+    args = parser.parse_args()
+    rendered = _canonical(build_manifest(args.web_root))
+    if args.write:
+        OUTPUT.write_text(rendered, encoding="utf-8", newline="\n")
+    if args.check and (not OUTPUT.exists() or OUTPUT.read_text(encoding="utf-8") != rendered):
+        raise SystemExit("Base structural remediation manifest is stale")
+    payload = json.loads(rendered)
+    print(" ".join(f"{key}={value}" for key, value in payload["counts"].items()))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

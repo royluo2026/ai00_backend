@@ -8,7 +8,7 @@ craft.pbom.version.search
 - 不适用：The subject is BOP or GBOP.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_424d8b0ea1ee7c77776f5822be74abb6`
+- Catalog Release：`rel_11a8ebce1a71ba3cc557b0e7fdffc515`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -86,7 +86,7 @@ craft.pbom.version.search
 ```json
 {
   "capability_id": "craft.pbom.version.search",
-  "catalog_release": "rel_424d8b0ea1ee7c77776f5822be74abb6",
+  "catalog_release": "rel_11a8ebce1a71ba3cc557b0e7fdffc515",
   "major_version": 1,
   "payload": {}
 }

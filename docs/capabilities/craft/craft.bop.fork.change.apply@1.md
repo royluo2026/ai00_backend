@@ -8,7 +8,7 @@ Fork, smart-fork, or stage-advance a BOP version with governed copy semantics.
 - 不适用：The request only changes a fork preset, freezes links, or updates an existing version in place.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_424d8b0ea1ee7c77776f5822be74abb6`
+- Catalog Release：`rel_11a8ebce1a71ba3cc557b0e7fdffc515`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -177,7 +177,7 @@ Fork, smart-fork, or stage-advance a BOP version with governed copy semantics.
 ```json
 {
   "capability_id": "craft.bop.fork.change.apply",
-  "catalog_release": "rel_424d8b0ea1ee7c77776f5822be74abb6",
+  "catalog_release": "rel_11a8ebce1a71ba3cc557b0e7fdffc515",
   "major_version": 1,
   "payload": {
     "operation": "fork",

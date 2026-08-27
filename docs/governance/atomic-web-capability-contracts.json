@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3c-atomic-web-contracts",
   "baseline_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
-  "content_sha256": "sha256:96659c615a353da4149f09d1dea8ddd7b2f997770aa927e4022a516efacd2073",
+  "content_sha256": "sha256:0acbb25307fbb57274e128629695463341a46d42441aaeed96f5e88d94b2c13b",
   "counts_by_owner": {
     "agent": {
       "groups": 4,
@@ -392,7 +392,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
+      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -589,7 +589,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
+      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -673,7 +673,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
+      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -777,7 +777,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
+      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -905,7 +905,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
+      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1015,7 +1015,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
+      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
       "reclassification_reason": null,
       "required_permissions": [
         "system.tech_config"
@@ -1027,14 +1027,16 @@
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": null,
+      "authorization_policy": "base.v2:authenticated",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
+      "capability_id": "base.organization.team.directory.list",
+      "confirmation_policy": "none",
+      "consistency_policy": "strong",
       "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "example_output": {
+        "teams": []
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "Exact registered route definition is anchored and machine-checked.",
@@ -1049,13 +1051,13 @@
         },
         "source_path": "backend/routers/org.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "GET",
       "normalized_route": "/api/org/teams",
       "occurrences": [
@@ -1095,17 +1097,71 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "teams": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "created_at": {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                "feishu_dept_id": {
+                  "maxLength": 512,
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "gid": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "is_active": {
+                  "type": "boolean"
+                },
+                "name": {
+                  "maxLength": 512,
+                  "type": "string"
+                },
+                "parent_team_gid": {
+                  "maxLength": 512,
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "gid",
+                "name",
+                "is_active",
+                "parent_team_gid",
+                "created_at",
+                "feishu_dept_id"
+              ],
+              "type": "object"
+            },
+            "maxItems": 1000,
+            "type": "array"
+          }
+        },
+        "required": [
+          "teams"
+        ],
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/routers/org.py",
-      "provider_source_sha256": "sha256:3dd9133921d1a0a2d49568350b150aef133b19ccc868ff88e20d61740214b36e",
-      "reclassification_reason": "The response contains unbounded team config that cannot be published as a closed exact schema.",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
+      "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Reads a closed organization-team directory projection without mutation."
+      ]
     },
     {
       "atomicity_class": "read",
@@ -1265,7 +1321,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
+      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1328,14 +1384,20 @@
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": null,
+      "authorization_policy": "base.v2:authenticated",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
-      "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "capability_id": "base.self_annotation.batch.get",
+      "confirmation_policy": "none",
+      "consistency_policy": "strong",
+      "example_input": {
+        "item_gids": [
+          "item_1"
+        ]
+      },
+      "example_output": {
+        "items": []
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "Exact registered route definition is anchored and machine-checked.",
@@ -1350,13 +1412,27 @@
         },
         "source_path": "backend/routers/self_annotations.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "item_gids": {
+            "items": {
+              "maxLength": 512,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "item_gids"
+        ],
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "GET",
       "normalized_route": "/api/self_ann/batch",
       "occurrences": [
@@ -1418,17 +1494,61 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "attach_count": {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "has_note": {
+                  "type": "boolean"
+                },
+                "item_gid": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "schedule": {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                "status": {
+                  "maxLength": 64,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "item_gid",
+                "status",
+                "schedule",
+                "has_note",
+                "attach_count"
+              ],
+              "type": "object"
+            },
+            "maxItems": 500,
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/routers/self_annotations.py",
-      "provider_source_sha256": "sha256:4a75270d28bb12c80ced69f16583041f1b9ac3b47b4688622f1461f8addf8e0a",
-      "reclassification_reason": "The dynamic item-gid keyed result cannot be represented by the closed production schema validator.",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
+      "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Reads the caller's bounded self-annotation summaries without mutation."
+      ]
     },
     {
       "atomicity_class": "read",
@@ -1506,7 +1626,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/routers/self_annotations.py",
-      "provider_source_sha256": "sha256:4a75270d28bb12c80ced69f16583041f1b9ac3b47b4688622f1461f8addf8e0a",
+      "provider_source_sha256": "sha256:7624608452bd2173dacfaac9c77f703da331fc510512cc028857fb7319ca8c52",
       "reclassification_reason": "The response contains attachment records without a governed nested attachment contract.",
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1566,7 +1686,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/routers/self_annotations.py",
-      "provider_source_sha256": "sha256:4a75270d28bb12c80ced69f16583041f1b9ac3b47b4688622f1461f8addf8e0a",
+      "provider_source_sha256": "sha256:7624608452bd2173dacfaac9c77f703da331fc510512cc028857fb7319ca8c52",
       "reclassification_reason": "The response contains attachment records without a governed nested attachment contract.",
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1626,7 +1746,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/routers/self_annotations.py",
-      "provider_source_sha256": "sha256:4a75270d28bb12c80ced69f16583041f1b9ac3b47b4688622f1461f8addf8e0a",
+      "provider_source_sha256": "sha256:7624608452bd2173dacfaac9c77f703da331fc510512cc028857fb7319ca8c52",
       "reclassification_reason": "The request contains attachment records without a governed nested attachment contract.",
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1634,14 +1754,17 @@
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": null,
+      "authorization_policy": "base.v2:authenticated",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
+      "capability_id": "base.team.directory.list",
+      "confirmation_policy": "none",
+      "consistency_policy": "strong",
       "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "example_output": {
+        "data": [],
+        "success": true
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "No exact registered route/method definition exists in this reviewed handler family.",
@@ -1649,13 +1772,13 @@
         "route_definition": null,
         "source_path": "backend/routers/teams.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "GET",
       "normalized_route": "/api/teams",
       "occurrences": [
@@ -1673,28 +1796,81 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "data": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "created_at": {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                "gid": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "is_active": {
+                  "type": "boolean"
+                },
+                "name": {
+                  "maxLength": 512,
+                  "type": "string"
+                },
+                "parent_team_gid": {
+                  "maxLength": 512,
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "gid",
+                "name",
+                "is_active",
+                "parent_team_gid",
+                "created_at"
+              ],
+              "type": "object"
+            },
+            "maxItems": 1000,
+            "type": "array"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ],
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/routers/teams.py",
-      "provider_source_sha256": "sha256:4e36ea16c386ae5f207cdda5fa747fb857e520acdad66d25f886b208f404b36f",
-      "reclassification_reason": "The response contains unbounded team config that cannot be published as a closed exact schema.",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
+      "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Reads a closed active-team directory projection without mutation."
+      ]
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": null,
+      "authorization_policy": "base.v2:system.user.manage",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
+      "capability_id": "base.identity.admin_user.list",
+      "confirmation_policy": "none",
+      "consistency_policy": "strong",
       "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "example_output": {
+        "data": [],
+        "success": true
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "Exact registered route definition is anchored and machine-checked.",
@@ -1709,13 +1885,13 @@
         },
         "source_path": "backend/routers/users.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "GET",
       "normalized_route": "/api/users",
       "occurrences": [
@@ -1788,17 +1964,97 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "data": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "avatar_url": {
+                  "maxLength": 2048,
+                  "type": "string"
+                },
+                "created_at": {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                "email": {
+                  "maxLength": 512,
+                  "type": "string"
+                },
+                "external_subtype": {
+                  "maxLength": 512,
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "gid": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "is_active": {
+                  "type": "boolean"
+                },
+                "name": {
+                  "maxLength": 512,
+                  "type": "string"
+                },
+                "org_role": {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                "system_role": {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                "team_id": {
+                  "maxLength": 512,
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "gid",
+                "name",
+                "email",
+                "avatar_url",
+                "system_role",
+                "org_role",
+                "external_subtype",
+                "team_id",
+                "is_active",
+                "created_at"
+              ],
+              "type": "object"
+            },
+            "maxItems": 1000,
+            "type": "array"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ],
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/routers/users.py",
-      "provider_source_sha256": "sha256:1447c4ff79a3f9e2382ea6865a9a61f8b3ac595e13e463bf9fb0294a89b8780c",
-      "reclassification_reason": "The legacy service returns unprojected user records including non-public fields; no exact safe output exists.",
-      "required_permissions": [],
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
+      "reclassification_reason": null,
+      "required_permissions": [
+        "system.user.manage"
+      ],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Reads a closed administrator-visible user directory projection without mutation."
+      ]
     },
     {
       "atomicity_class": "read",
@@ -1854,7 +2110,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/routers/users.py",
-      "provider_source_sha256": "sha256:1447c4ff79a3f9e2382ea6865a9a61f8b3ac595e13e463bf9fb0294a89b8780c",
+      "provider_source_sha256": "sha256:d632055fafa2aee6dea74b6c160c8889295a525373e6ee2604e52527d5df2b8f",
       "reclassification_reason": "The profile contains dynamic grants and permissions without a closed exact output contract.",
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1997,7 +2253,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
+      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -2006,15 +2262,33 @@
       ]
     },
     {
-      "atomicity_class": "read",
-      "authorization_policy": null,
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "base.v2:system.user.manage",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
-      "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "capability_id": "base.identity.role.assign.atomic",
+      "confirmation_policy": "user",
+      "consistency_policy": "strong",
+      "example_input": {
+        "external_subtype": null,
+        "new_role": "member",
+        "user_gid": "user_1"
+      },
+      "example_output": {
+        "data": {
+          "avatar_url": "",
+          "created_at": "",
+          "email": "",
+          "external_subtype": null,
+          "gid": "user_1",
+          "is_active": true,
+          "name": "",
+          "org_role": "member",
+          "system_role": "member",
+          "team_id": null
+        },
+        "success": true
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "Exact registered route definition is anchored and machine-checked.",
@@ -2029,13 +2303,43 @@
         },
         "source_path": "backend/routers/users.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "required",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "external_subtype": {
+            "maxLength": 512,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "new_role": {
+            "enum": [
+              "super_admin",
+              "team_admin",
+              "project_admin",
+              "rule_admin",
+              "knowledge_admin",
+              "member",
+              "external"
+            ],
+            "type": "string"
+          },
+          "user_gid": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_gid",
+          "new_role",
+          "external_subtype"
+        ],
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "PATCH",
       "normalized_route": "/api/users/{dynamic}/role",
       "occurrences": [
@@ -2064,17 +2368,93 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "data": {
+            "additionalProperties": false,
+            "properties": {
+              "avatar_url": {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              "created_at": {
+                "maxLength": 64,
+                "type": "string"
+              },
+              "email": {
+                "maxLength": 512,
+                "type": "string"
+              },
+              "external_subtype": {
+                "maxLength": 512,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "gid": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "is_active": {
+                "type": "boolean"
+              },
+              "name": {
+                "maxLength": 512,
+                "type": "string"
+              },
+              "org_role": {
+                "maxLength": 64,
+                "type": "string"
+              },
+              "system_role": {
+                "maxLength": 64,
+                "type": "string"
+              },
+              "team_id": {
+                "maxLength": 512,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "gid",
+              "name",
+              "email",
+              "avatar_url",
+              "system_role",
+              "org_role",
+              "external_subtype",
+              "team_id",
+              "is_active",
+              "created_at"
+            ],
+            "type": "object"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ],
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/routers/users.py",
-      "provider_source_sha256": "sha256:1447c4ff79a3f9e2382ea6865a9a61f8b3ac595e13e463bf9fb0294a89b8780c",
-      "reclassification_reason": "The legacy service returns an unprojected user record; no exact safe output exists without changing REST semantics.",
-      "required_permissions": [],
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
+      "reclassification_reason": null,
+      "required_permissions": [
+        "system.user.manage"
+      ],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Atomically changes one user's role after administrator authorization."
+      ]
     },
     {
       "atomicity_class": "read",

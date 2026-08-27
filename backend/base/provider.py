@@ -28,7 +28,13 @@ _ATOMIC_WEB_EFFECTS = {
     "base.identity.directory.feishu.sync": "Reads the Feishu directory and applies team and user changes to the Base store.",
     "base.plugin.installed.list": "Reads the bounded installed-plugin inventory without mutation.",
     "base.identity.user.search": "Reads and projects matching Base directory users without mutation.",
+    "base.organization.team.directory.list": "Reads a closed organization-team directory projection without mutation.",
+    "base.team.directory.list": "Reads a closed active-team directory projection without mutation.",
+    "base.self_annotation.batch.get": "Reads the caller's bounded self-annotation summaries without mutation.",
+    "base.identity.admin_user.list": "Reads a closed administrator-visible user directory projection without mutation.",
+    "base.identity.role.assign.atomic": "Atomically changes one user's role after administrator authorization.",
 }
+_ATOMIC_WEB_STRONG_WRITES = {"base.identity.role.assign.atomic"}
 _RESOURCE_FIELDS = {
     **{capability_id: ("plugin-installation", "plugin_id") for capability_id in _LIFECYCLE},
     **{capability_id: ("plugin-storage-key", "key") for capability_id in {
@@ -90,6 +96,9 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             "mode": "external" if capability_id == "base.identity.directory.feishu.sync" else "provider",
             "boundary": "owning_domain",
         }
+    if capability_id in _ATOMIC_WEB_STRONG_WRITES:
+        updates["consistency_policy"] = "strong"
+        updates["transaction_policy"] = {"mode": "single_transaction", "boundary": "owning_domain"}
     return CapabilityDescriptorV2.model_validate({**descriptor.model_dump(), **updates})
 
 

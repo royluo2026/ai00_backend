@@ -73,9 +73,57 @@ SYNC_OUTPUT = obj(
     },
     ("ok", "created", "updated", "dept_synced", "departments", "manual_teams_preserved"),
 )
+TEAM_ITEM = obj(
+    {"gid": STRING, "name": {"type": "string", "maxLength": 512}, "is_active": BOOL,
+     "parent_team_gid": OPT_STRING, "created_at": {"type": "string", "maxLength": 64}},
+    ("gid", "name", "is_active", "parent_team_gid", "created_at"),
+)
+ORG_TEAM_ITEM = obj(
+    {**TEAM_ITEM["properties"], "feishu_dept_id": OPT_STRING},
+    ("gid", "name", "is_active", "parent_team_gid", "created_at", "feishu_dept_id"),
+)
+ANNOTATION_SUMMARY = obj(
+    {"item_gid": STRING, "status": {"type": "string", "maxLength": 64},
+     "schedule": {"type": "string", "maxLength": 128}, "has_note": BOOL,
+     "attach_count": {"type": "integer", "minimum": 0, "maximum": 100}},
+    ("item_gid", "status", "schedule", "has_note", "attach_count"),
+)
+ADMIN_USER = obj(
+    {"gid": STRING, "name": {"type": "string", "maxLength": 512},
+     "email": {"type": "string", "maxLength": 512}, "avatar_url": {"type": "string", "maxLength": 2048},
+     "system_role": {"type": "string", "maxLength": 64}, "org_role": {"type": "string", "maxLength": 64},
+     "external_subtype": OPT_STRING, "team_id": OPT_STRING, "is_active": BOOL,
+     "created_at": {"type": "string", "maxLength": 64}},
+    ("gid", "name", "email", "avatar_url", "system_role", "org_role", "external_subtype", "team_id", "is_active", "created_at"),
+)
 
 
 ROUTE_CAPABILITIES: dict[tuple[str, str], dict[str, Any]] = {
+    ("GET", "/api/org/teams"): {
+        "id": "base.organization.team.directory.list",
+        "schema": obj({}),
+        "output_schema": obj({"teams": {"type": "array", "maxItems": 1000, "items": ORG_TEAM_ITEM}}, ("teams",)),
+    },
+    ("GET", "/api/teams"): {
+        "id": "base.team.directory.list",
+        "schema": obj({}),
+        "output_schema": obj({"success": BOOL, "data": {"type": "array", "maxItems": 1000, "items": TEAM_ITEM}}, ("success", "data")),
+    },
+    ("GET", "/api/self_ann/batch"): {
+        "id": "base.self_annotation.batch.get",
+        "schema": obj({"item_gids": {"type": "array", "minItems": 1, "maxItems": 500, "items": STRING}}, ("item_gids",)),
+        "output_schema": obj({"items": {"type": "array", "maxItems": 500, "items": ANNOTATION_SUMMARY}}, ("items",)),
+    },
+    ("GET", "/api/users"): {
+        "id": "base.identity.admin_user.list",
+        "schema": obj({}),
+        "output_schema": obj({"success": BOOL, "data": {"type": "array", "maxItems": 1000, "items": ADMIN_USER}}, ("success", "data")),
+    },
+    ("PATCH", "/api/users/{dynamic}/role"): {
+        "id": "base.identity.role.assign.atomic",
+        "schema": obj({"user_gid": STRING, "new_role": {"type": "string", "enum": ["super_admin", "team_admin", "project_admin", "rule_admin", "knowledge_admin", "member", "external"]}, "external_subtype": OPT_STRING}, ("user_gid", "new_role", "external_subtype")),
+        "output_schema": obj({"success": BOOL, "data": ADMIN_USER}, ("success", "data")),
+    },
     ("GET", "/api/grants"): {
         "id": "base.authorization.grant.list",
         "schema": obj({"user_gid": OPT_STRING}),
@@ -119,6 +167,11 @@ ROUTE_CAPABILITIES: dict[tuple[str, str], dict[str, Any]] = {
 }
 
 EXAMPLES: dict[str, dict[str, Any]] = {
+    "base.organization.team.directory.list": {},
+    "base.team.directory.list": {},
+    "base.self_annotation.batch.get": {"item_gids": ["item_1"]},
+    "base.identity.admin_user.list": {},
+    "base.identity.role.assign.atomic": {"user_gid": "user_1", "new_role": "member", "external_subtype": None},
     "base.authorization.grant.list": {"user_gid": None},
     "base.authorization.grant.create": {"grantee_gid": "usr_2", "grant_type": "team_admin", "scope_gid": "team_1", "expires_at": None, "note": ""},
     "base.authorization.grant.revoke": {"gid": "grant_1"},
@@ -130,6 +183,11 @@ EXAMPLES: dict[str, dict[str, Any]] = {
 }
 
 EXAMPLE_OUTPUTS: dict[str, dict[str, Any]] = {
+    "base.organization.team.directory.list": {"teams": []},
+    "base.team.directory.list": {"success": True, "data": []},
+    "base.self_annotation.batch.get": {"items": []},
+    "base.identity.admin_user.list": {"success": True, "data": []},
+    "base.identity.role.assign.atomic": {"success": True, "data": {"gid": "user_1", "name": "", "email": "", "avatar_url": "", "system_role": "member", "org_role": "member", "external_subtype": None, "team_id": None, "is_active": True, "created_at": ""}},
     "base.authorization.grant.list": {"grants": []},
     "base.authorization.grant.create": {"grant": {"gid": "grant_1", "grantee_gid": "usr_2", "grant_type": "team_admin", "scope_gid": "team_1", "granted_by": "usr_1", "expires_at": None, "note": "", "granted_at": None}},
     "base.authorization.grant.revoke": {"ok": True},
@@ -143,14 +201,9 @@ EXAMPLE_OUTPUTS: dict[str, dict[str, Any]] = {
 UNSAFE_REASONS = {
     ("POST", "/api/plugin/install"): "The arbitrary-URL installer route has no production handler and is not equivalent to signed marketplace installation.",
     ("DELETE", "/api/plugin/uninstall/{dynamic}"): "The unrestricted legacy uninstall route has no production handler and cannot bypass marketplace lifecycle controls.",
-    ("GET", "/api/org/teams"): "The response contains unbounded team config that cannot be published as a closed exact schema.",
     ("GET", "/api/self_ann/{dynamic}"): "The response contains attachment records without a governed nested attachment contract.",
     ("PUT", "/api/self_ann/{dynamic}"): "The request contains attachment records without a governed nested attachment contract.",
-    ("GET", "/api/self_ann/batch"): "The dynamic item-gid keyed result cannot be represented by the closed production schema validator.",
     ("GET", "/api/self_ann/list"): "The response contains attachment records without a governed nested attachment contract.",
-    ("GET", "/api/teams"): "The response contains unbounded team config that cannot be published as a closed exact schema.",
-    ("GET", "/api/users"): "The legacy service returns unprojected user records including non-public fields; no exact safe output exists.",
-    ("PATCH", "/api/users/{dynamic}/role"): "The legacy service returns an unprojected user record; no exact safe output exists without changing REST semantics.",
     ("GET", "/api/users/me"): "The profile contains dynamic grants and permissions without a closed exact output contract.",
     ("GET", "/api/views"): "Saved-view config is intentionally dynamic and has no governed closed nested contract.",
     ("POST", "/api/views"): "Saved-view config is intentionally dynamic and has no governed closed nested contract.",

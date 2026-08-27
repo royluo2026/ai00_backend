@@ -38,6 +38,11 @@ def test_atomic_permissions_reuse_legacy_role_boundaries_not_broad_domain_flags(
         "base.identity.directory.feishu.sync",
         "base.plugin.installed.list",
         "base.identity.user.search",
+        "base.organization.team.directory.list",
+        "base.team.directory.list",
+        "base.self_annotation.batch.get",
+        "base.identity.admin_user.list",
+        "base.identity.role.assign.atomic",
     }
     for capability_id in {
         "base.authorization.grant.list",
@@ -53,8 +58,13 @@ def test_atomic_permissions_reuse_legacy_role_boundaries_not_broad_domain_flags(
         "base.notification.preference.atomic.update",
         "base.plugin.installed.list",
         "base.identity.user.search",
+        "base.organization.team.directory.list",
+        "base.team.directory.list",
+        "base.self_annotation.batch.get",
     }:
         assert specs[capability_id].permissions == ()
+    for capability_id in {"base.identity.admin_user.list", "base.identity.role.assign.atomic"}:
+        assert specs[capability_id].permissions == ("system.user.manage",)
 
 
 def test_build_profile_grants_exact_coarse_role_matrix(monkeypatch):
@@ -238,3 +248,45 @@ def test_external_write_replays_once_and_reports_unknown_after_outcome_failure(m
     assert unknown.status.value == "outcome_unknown"
     assert unknown.error.code == "outcome_persistence_failed"
     assert calls == [{"item_status": False}, {"item_status": False}]
+
+
+def test_structural_gateway_enforces_admin_boundary_and_write_confirmation(monkeypatch):
+    from backend.base import structural_web
+    from backend.routers import deps
+
+    monkeypatch.setattr(deps, "_get_user_grants", lambda _gid: [])
+    monkeypatch.setattr(structural_web, "list_admin_users", lambda *, actor: {
+        "success": True, "data": [],
+    })
+    calls = []
+    monkeypatch.setattr(structural_web, "assign_user_role", lambda **payload: (
+        calls.append(payload) or {"success": True, "data": {
+            "gid": payload["user_gid"], "name": "", "email": "", "avatar_url": "",
+            "system_role": payload["new_role"], "org_role": "member",
+            "external_subtype": None, "team_id": None, "is_active": True, "created_at": "",
+        }}
+    ))
+    users = {
+        role: {"gid": role, "system_role": role, "org_role": "super_admin" if role == "super_admin" else "member", "is_active": True}
+        for role in ("super_admin", "team_admin", "member")
+    }
+    read_gateway = _gateway("base.identity.admin_user.list", users)
+    assert asyncio.run(read_gateway.invoke(_envelope(read_gateway, "base.identity.admin_user.list", "super_admin", {}))).ok
+    assert asyncio.run(read_gateway.invoke(_envelope(read_gateway, "base.identity.admin_user.list", "team_admin", {}))).ok
+    denied = asyncio.run(read_gateway.invoke(_envelope(read_gateway, "base.identity.admin_user.list", "member", {})))
+    assert denied.error.code == "permission_denied"
+    anonymous = asyncio.run(read_gateway.invoke(_envelope(read_gateway, "base.identity.admin_user.list", "member", {}, service=True)))
+    assert anonymous.error.code == "service_authorization_unavailable"
+
+    approvals = ApprovalService(InMemoryApprovalStore())
+    gateway = _gateway(
+        "base.identity.role.assign.atomic", users, approvals=approvals,
+        reliability=ReliabilityCoordinator(InMemoryOutcomeStore(), InMemoryRateLimiter(limit=100)),
+    )
+    payload = {"user_gid": "target", "new_role": "member", "external_subtype": None}
+    pending = _envelope(gateway, "base.identity.role.assign.atomic", "super_admin", payload, key="role-key")
+    challenge = asyncio.run(gateway.request_approval(pending))
+    approved = pending.model_copy(update={"approval_reference": challenge.token})
+    assert asyncio.run(gateway.invoke(approved)).ok
+    assert asyncio.run(gateway.invoke(approved)).ok
+    assert len(calls) == 1

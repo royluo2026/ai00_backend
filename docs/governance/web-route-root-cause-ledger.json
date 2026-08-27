@@ -58,10 +58,10 @@
     "web/workspace/nav_manager.js": "e229fb407361c139cfc265cd438f929a944cd1919c321c4b6a1cf5bf57cfcd7d"
   },
   "final_evidence": {
-    "frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
-    "content_hash": "c5f0672fb6d101fe5e03be582b61c53224607a19abcae82cb8289fad255f4367",
-    "unresolved_count": 62,
-    "unresolved_group_count": 42
+    "frontend_revision": "f5bcdff9415677440f2dbfe7106d91ce22c1b4e8",
+    "content_hash": "9ecc1ef562fac54c074f87d60eeda53bae0b619622f60d21e8430eaf157ff0c1",
+    "unresolved_count": 45,
+    "unresolved_group_count": 37
   },
   "final_unresolved_groups": [
     {
@@ -138,20 +138,8 @@
     },
     {
       "method": "GET",
-      "normalized_route": "/api/org/teams",
-      "occurrence_count": 3,
-      "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "GET",
       "normalized_route": "/api/rule-engine/check-entry",
       "occurrence_count": 2,
-      "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "GET",
-      "normalized_route": "/api/self_ann/batch",
-      "occurrence_count": 5,
       "disposition": "existing_capability_reclassified"
     },
     {
@@ -164,18 +152,6 @@
       "method": "GET",
       "normalized_route": "/api/self_ann/{dynamic}",
       "occurrence_count": 1,
-      "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "GET",
-      "normalized_route": "/api/teams",
-      "occurrence_count": 1,
-      "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "GET",
-      "normalized_route": "/api/users",
-      "occurrence_count": 6,
       "disposition": "existing_capability_reclassified"
     },
     {
@@ -194,12 +170,6 @@
       "method": "PATCH",
       "normalized_route": "/api/ext-datasources/{dynamic}",
       "occurrence_count": 1,
-      "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "PATCH",
-      "normalized_route": "/api/users/{dynamic}/role",
-      "occurrence_count": 2,
       "disposition": "existing_capability_reclassified"
     },
     {
@@ -355,7 +325,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
+        "removed_in_frontend_revision": "f5bcdff9415677440f2dbfe7106d91ce22c1b4e8",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -499,11 +469,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 113,
-            "end_line": 113,
+            "start_line": 160,
+            "end_line": 160,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
+          "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -925,7 +895,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
+        "removed_in_frontend_revision": "f5bcdff9415677440f2dbfe7106d91ce22c1b4e8",
         "retirement_proof": {
           "kind": "http_410",
           "rationale": "The registered AI balance compatibility endpoint is permanently gone and returns HTTP 410, so polling it cannot yield a supported outcome.",
@@ -994,7 +964,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
+        "removed_in_frontend_revision": "f5bcdff9415677440f2dbfe7106d91ce22c1b4e8",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -1056,7 +1026,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
+        "removed_in_frontend_revision": "f5bcdff9415677440f2dbfe7106d91ce22c1b4e8",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -1118,7 +1088,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
+        "removed_in_frontend_revision": "f5bcdff9415677440f2dbfe7106d91ce22c1b4e8",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -1191,7 +1161,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
+        "removed_in_frontend_revision": "f5bcdff9415677440f2dbfe7106d91ce22c1b4e8",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -1265,7 +1235,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
+        "removed_in_frontend_revision": "f5bcdff9415677440f2dbfe7106d91ce22c1b4e8",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -1338,7 +1308,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
+        "removed_in_frontend_revision": "f5bcdff9415677440f2dbfe7106d91ce22c1b4e8",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -1935,7 +1905,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
+        "removed_in_frontend_revision": "f5bcdff9415677440f2dbfe7106d91ce22c1b4e8",
         "retirement_proof": {
           "kind": "backend_route_absent",
           "rationale": "The standalone Feishu UI had no matching API-prefixed configuration handler; it now uses a bounded local default configuration.",
@@ -2046,11 +2016,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 113,
-            "end_line": 113,
+            "start_line": 160,
+            "end_line": 160,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
+          "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -2468,7 +2438,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
+        "removed_in_frontend_revision": "f5bcdff9415677440f2dbfe7106d91ce22c1b4e8",
         "retirement_proof": {
           "kind": "sample_template_only",
           "rationale": "The only caller lived in the distributable plugin SDK template and represented placeholder sample data rather than a shipped product route.",
@@ -2538,11 +2508,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 113,
-            "end_line": 113,
+            "start_line": 160,
+            "end_line": 160,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
+          "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -2594,46 +2564,32 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/org.py",
-          "start_line": 49,
-          "end_line": 63,
-          "sha256": "7a03ecabdc68676421c1f7833e53de45902cb63d9a08dc5c13f5033ddd4a55ed",
+          "start_line": 48,
+          "end_line": 51,
+          "sha256": "85b7928332a9c110eef521d6bf0ae3e25d2f2ee423311668cab260c6babd8804",
           "method": "GET",
           "normalized_route": "/api/org/teams"
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
-      "disposition": "existing_capability_reclassified",
+      "lifecycle_conclusion": "The frontend invokes the exact stable atomic owner-domain outcome through the shared Gateway client.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
-        "candidate_target_capability": "base.team.read@1",
-        "reason_code": "provider_equivalence_missing",
-        "followup": "provider_adapter_review",
-        "finding": "/api/org/teams: REST applies organisation-specific filters; candidate has generic reviewed payload. | /api/org/teams: REST returns organisation team rows; candidate projection is unproved. | /api/org/teams: Candidate BaseOutcomePort is unbound.",
-        "legacy_contract": {
-          "kind": "registered_route_definition",
-          "source_path": "backend/routers/org.py",
-          "start_line": 49,
-          "end_line": 63,
-          "sha256": "7a03ecabdc68676421c1f7833e53de45902cb63d9a08dc5c13f5033ddd4a55ed",
-          "method": "GET",
-          "normalized_route": "/api/org/teams",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "source_sha256": "cc568bd65a390c56889e72e551c917b196adede5274f448395be0ea3094e740e"
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
-            "start_line": 22,
-            "end_line": 22,
-            "sha256": "a72c615c37c0905b63e3a7ac9e656092f9efbe9cbab304f745d475169655eb7b",
-            "needle": "base.team.read"
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/org/teams: REST applies organisation-specific filters; candidate has generic reviewed payload.",
-          "output": "/api/org/teams: REST returns organisation team rows; candidate projection is unproved.",
-          "side_effects": "/api/org/teams: Candidate BaseOutcomePort is unbound."
+        "target_capability": "base.organization.team.directory.list@1",
+        "provider_equivalence": "proven",
+        "request_transform": "Exact closed payload defined by Task 3B.3c atomic contract manifest.",
+        "response_transform": "Bounded result_json is decoded to the original legacy response value.",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "provider_contract": {
+            "repository": "backend",
+            "source_path": "backend/base/web_atomic.py",
+            "start_line": 160,
+            "end_line": 160,
+            "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
+          },
+          "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
+          "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
     },
@@ -2682,11 +2638,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 113,
-            "end_line": 113,
+            "start_line": 160,
+            "end_line": 160,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
+          "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -2830,46 +2786,32 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/self_annotations.py",
-          "start_line": 46,
-          "end_line": 66,
-          "sha256": "136235af957523ef98af52be4b91b37d107d080a527283f2ce70babc969eb1cd",
+          "start_line": 47,
+          "end_line": 51,
+          "sha256": "9177bc8541b4a55756e9eba1e18e291677a960a5f7be56dac8c4ebb52de98388",
           "method": "GET",
           "normalized_route": "/api/self_ann/batch"
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
-      "disposition": "existing_capability_reclassified",
+      "lifecycle_conclusion": "The frontend invokes the exact stable atomic owner-domain outcome through the shared Gateway client.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
-        "candidate_target_capability": "base.annotation.read@1",
-        "reason_code": "provider_equivalence_missing",
-        "followup": "provider_adapter_review",
-        "finding": "/api/self_ann/batch: REST batch reads multiple annotated objects; candidate has generic reviewed payload. | /api/self_ann/batch: REST returns keyed batch annotations; candidate generic result is unproved. | /api/self_ann/batch: Candidate BaseOutcomePort is unbound.",
-        "legacy_contract": {
-          "kind": "registered_route_definition",
-          "source_path": "backend/routers/self_annotations.py",
-          "start_line": 46,
-          "end_line": 66,
-          "sha256": "136235af957523ef98af52be4b91b37d107d080a527283f2ce70babc969eb1cd",
-          "method": "GET",
-          "normalized_route": "/api/self_ann/batch",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "source_sha256": "787edd04d1aaba5b622340b498baf4322cf5fc88dcdcaade394b962dcae93ed6"
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
-            "start_line": 17,
-            "end_line": 17,
-            "sha256": "3d3cecb0574f6e96638c8874790dcbcb5b82e05e923654ccd3e3f97bf01925d7",
-            "needle": "base.annotation.read"
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/self_ann/batch: REST batch reads multiple annotated objects; candidate has generic reviewed payload.",
-          "output": "/api/self_ann/batch: REST returns keyed batch annotations; candidate generic result is unproved.",
-          "side_effects": "/api/self_ann/batch: Candidate BaseOutcomePort is unbound."
+        "target_capability": "base.self_annotation.batch.get@1",
+        "provider_equivalence": "proven",
+        "request_transform": "Exact closed payload defined by Task 3B.3c atomic contract manifest.",
+        "response_transform": "Bounded result_json is decoded to the original legacy response value.",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "provider_contract": {
+            "repository": "backend",
+            "source_path": "backend/base/web_atomic.py",
+            "start_line": 160,
+            "end_line": 160,
+            "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
+          },
+          "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
+          "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
     },
@@ -2920,8 +2862,8 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/self_annotations.py",
-          "start_line": 69,
-          "end_line": 79,
+          "start_line": 54,
+          "end_line": 64,
           "sha256": "0e4d958c84b56f440a5e6f398f6ee5d4a5707dbd457ef06cc3ed967795e304cc",
           "method": "GET",
           "normalized_route": "/api/self_ann/list"
@@ -2988,8 +2930,8 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/self_annotations.py",
-          "start_line": 82,
-          "end_line": 88,
+          "start_line": 67,
+          "end_line": 73,
           "sha256": "8a4e814824a54cd479284be861c6f2d8fc5ca10bfeeefb871e141066a9cd12b0",
           "method": "GET",
           "normalized_route": "/api/self_ann/{dynamic}"
@@ -3139,36 +3081,24 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
-      "disposition": "existing_capability_reclassified",
+      "lifecycle_conclusion": "The frontend invokes the exact stable atomic owner-domain outcome through the shared Gateway client.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
-        "candidate_target_capability": "base.team.read@1",
-        "reason_code": "provider_equivalence_missing",
-        "followup": "provider_adapter_review",
-        "finding": "/api/teams: REST team list query differs from generic candidate payload. | /api/teams: REST returns full team records; candidate projection is unproved. | /api/teams: Candidate BaseOutcomePort is unbound.",
-        "legacy_contract": {
-          "kind": "reviewed_handler_absence",
-          "source_path": "backend/routers/teams.py",
-          "source_sha256": "f5dbb6337f73f061f6d028d7a7a568f7a11f1f5347cf39f4383ea8e61efdfa49",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "method": "GET",
-          "normalized_route": "/api/teams",
-          "finding": "No exact registered route/method definition exists in this reviewed handler family."
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
-            "start_line": 22,
-            "end_line": 22,
-            "sha256": "a72c615c37c0905b63e3a7ac9e656092f9efbe9cbab304f745d475169655eb7b",
-            "needle": "base.team.read"
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/teams: REST team list query differs from generic candidate payload.",
-          "output": "/api/teams: REST returns full team records; candidate projection is unproved.",
-          "side_effects": "/api/teams: Candidate BaseOutcomePort is unbound."
+        "target_capability": "base.team.directory.list@1",
+        "provider_equivalence": "proven",
+        "request_transform": "Exact closed payload defined by Task 3B.3c atomic contract manifest.",
+        "response_transform": "Bounded result_json is decoded to the original legacy response value.",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "provider_contract": {
+            "repository": "backend",
+            "source_path": "backend/base/web_atomic.py",
+            "start_line": 160,
+            "end_line": 160,
+            "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
+          },
+          "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
+          "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
     },
@@ -3252,46 +3182,32 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/users.py",
-          "start_line": 23,
+          "start_line": 24,
           "end_line": 26,
-          "sha256": "87d07b2906530fd8ba12d2c999da027ce0b70bf58dc3a3eca7b9773b6a5267b6",
+          "sha256": "531587e7f1b878933fde17d601cc972c2e91d03bfb0113943e9a83ae1a7349a1",
           "method": "GET",
           "normalized_route": "/api/users"
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
-      "disposition": "existing_capability_reclassified",
+      "lifecycle_conclusion": "The frontend invokes the exact stable atomic owner-domain outcome through the shared Gateway client.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
-        "candidate_target_capability": "identity.principal.search@1",
-        "reason_code": "projection_mismatch",
-        "followup": "atomic_capability_review",
-        "finding": "/api/users: REST admin list supports role/status/paging; candidate accepts query and bounded limit. | /api/users: REST returns full administrative users; candidate returns bounded principal summaries. | /api/users: Candidate composes registered identity providers and truncates at limit.",
-        "legacy_contract": {
-          "kind": "registered_route_definition",
-          "source_path": "backend/routers/users.py",
-          "start_line": 23,
-          "end_line": 26,
-          "sha256": "87d07b2906530fd8ba12d2c999da027ce0b70bf58dc3a3eca7b9773b6a5267b6",
-          "method": "GET",
-          "normalized_route": "/api/users",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "source_sha256": "2b44124fe4937155446ae54c757704d2ff67fe9a55728c6b4fea7101968ea722"
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "backend/capabilities/system_shared_next.py",
-            "source_sha256": "7742c103ac3c4845b43e2f7ef2d5925884b7099d73b3532f5c60266a8280e913",
-            "start_line": 110,
-            "end_line": 110,
-            "sha256": "58f1efe8d4b2e2c354bf1006e72446117b8520be9e3c30424bb2be7d9abdb925",
-            "needle": "\"identity.principal.search\""
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/users: REST admin list supports role/status/paging; candidate accepts query and bounded limit.",
-          "output": "/api/users: REST returns full administrative users; candidate returns bounded principal summaries.",
-          "side_effects": "/api/users: Candidate composes registered identity providers and truncates at limit."
+        "target_capability": "base.identity.admin_user.list@1",
+        "provider_equivalence": "proven",
+        "request_transform": "Exact closed payload defined by Task 3B.3c atomic contract manifest.",
+        "response_transform": "Bounded result_json is decoded to the original legacy response value.",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "provider_contract": {
+            "repository": "backend",
+            "source_path": "backend/base/web_atomic.py",
+            "start_line": 160,
+            "end_line": 160,
+            "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
+          },
+          "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
+          "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
     },
@@ -3430,11 +3346,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 113,
-            "end_line": 113,
+            "start_line": 160,
+            "end_line": 160,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
+          "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -4039,11 +3955,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 113,
-            "end_line": 113,
+            "start_line": 160,
+            "end_line": 160,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
+          "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -4144,45 +4060,31 @@
         "route_definition": {
           "source_path": "backend/routers/users.py",
           "start_line": 49,
-          "end_line": 64,
-          "sha256": "c2f069674b23cc04bef865b641c7e9a793b993086af1aa61180d5fc2c2207bfa",
+          "end_line": 61,
+          "sha256": "e0eba14ece9f3ef3f0469634e827ddb52ffac528b8fe04743d3ccc26baf4ad9b",
           "method": "PATCH",
           "normalized_route": "/api/users/{dynamic}/role"
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
-      "disposition": "existing_capability_reclassified",
+      "lifecycle_conclusion": "The frontend invokes the exact stable atomic owner-domain outcome through the shared Gateway client.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
-        "candidate_target_capability": "base.identity.role.assign@1",
-        "reason_code": "provider_equivalence_missing",
-        "followup": "provider_adapter_review",
-        "finding": "/api/users/{dynamic}/role: REST assigns role to path user gid; candidate generic operation/resource is unproved. | /api/users/{dynamic}/role: REST returns updated user role; candidate generic result is unproved. | /api/users/{dynamic}/role: Candidate BaseOutcomePort is unbound.",
-        "legacy_contract": {
-          "kind": "registered_route_definition",
-          "source_path": "backend/routers/users.py",
-          "start_line": 49,
-          "end_line": 64,
-          "sha256": "c2f069674b23cc04bef865b641c7e9a793b993086af1aa61180d5fc2c2207bfa",
-          "method": "PATCH",
-          "normalized_route": "/api/users/{dynamic}/role",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "source_sha256": "2b44124fe4937155446ae54c757704d2ff67fe9a55728c6b4fea7101968ea722"
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
-            "start_line": 28,
-            "end_line": 28,
-            "sha256": "b4300c57b7896175e14454a538d332b0d0123a3d381ceb99513dc21403a3edb7",
-            "needle": "base.identity.role.assign"
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/users/{dynamic}/role: REST assigns role to path user gid; candidate generic operation/resource is unproved.",
-          "output": "/api/users/{dynamic}/role: REST returns updated user role; candidate generic result is unproved.",
-          "side_effects": "/api/users/{dynamic}/role: Candidate BaseOutcomePort is unbound."
+        "target_capability": "base.identity.role.assign.atomic@1",
+        "provider_equivalence": "proven",
+        "request_transform": "Exact closed payload defined by Task 3B.3c atomic contract manifest.",
+        "response_transform": "Bounded result_json is decoded to the original legacy response value.",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "provider_contract": {
+            "repository": "backend",
+            "source_path": "backend/base/web_atomic.py",
+            "start_line": 160,
+            "end_line": 160,
+            "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
+          },
+          "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
+          "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
     },
@@ -4422,7 +4324,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
+        "removed_in_frontend_revision": "f5bcdff9415677440f2dbfe7106d91ce22c1b4e8",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4484,7 +4386,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
+        "removed_in_frontend_revision": "f5bcdff9415677440f2dbfe7106d91ce22c1b4e8",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4546,7 +4448,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
+        "removed_in_frontend_revision": "f5bcdff9415677440f2dbfe7106d91ce22c1b4e8",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4608,7 +4510,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
+        "removed_in_frontend_revision": "f5bcdff9415677440f2dbfe7106d91ce22c1b4e8",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4670,7 +4572,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
+        "removed_in_frontend_revision": "f5bcdff9415677440f2dbfe7106d91ce22c1b4e8",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -5181,11 +5083,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 113,
-            "end_line": 113,
+            "start_line": 160,
+            "end_line": 160,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
+          "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -5273,7 +5175,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
+        "removed_in_frontend_revision": "f5bcdff9415677440f2dbfe7106d91ce22c1b4e8",
         "retirement_proof": {
           "kind": "sample_template_only",
           "rationale": "The only caller lived in the distributable plugin SDK template and represented placeholder sample data rather than a shipped product route.",
@@ -5323,8 +5225,8 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/org.py",
-          "start_line": 31,
-          "end_line": 46,
+          "start_line": 30,
+          "end_line": 45,
           "sha256": "648a2317ef000b29a918d664170220bb5bacd3b76fa706e8594a17c8d4f8e049",
           "method": "POST",
           "normalized_route": "/api/org/sync-from-feishu"
@@ -5343,11 +5245,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 113,
-            "end_line": 113,
+            "start_line": 160,
+            "end_line": 160,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:ad97b69a0fc5673bf1264662859fdc36f864d5f60bd6b333591a115595fdda2a",
+          "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -5802,7 +5704,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "3c6ad771d4e20f65ff2fff108ab8b2a3e4680941",
+        "removed_in_frontend_revision": "f5bcdff9415677440f2dbfe7106d91ce22c1b4e8",
         "retirement_proof": {
           "kind": "http_410",
           "rationale": "The registered V1 standard-operation clone compatibility endpoint raises HTTP 410 and instructs callers to use the current BOP entry surface.",
@@ -6327,8 +6229,8 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/self_annotations.py",
-          "start_line": 91,
-          "end_line": 106,
+          "start_line": 76,
+          "end_line": 91,
           "sha256": "ae71702549cca7ff913a55626fa81dfab7127d760891b646b37ccd73e9b3ae91",
           "method": "PUT",
           "normalized_route": "/api/self_ann/{dynamic}"

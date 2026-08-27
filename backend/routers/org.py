@@ -7,13 +7,12 @@ backend/routers/org.py
   POST /api/org/sync-from-feishu   全量同步飞书成员+部门（超管触发）
   GET  /api/org/teams              列出全部团队（含飞书部门映射）
 """
-import json
 from fastapi import APIRouter, Depends, HTTPException
 from typing import Optional
 from pydantic import BaseModel
 
 from backend.routers.deps import get_current_user
-from backend.db.connection import get_conn
+from backend.base.structural_web import list_organization_teams
 
 router = APIRouter(prefix="/api/org", tags=["org"])
 
@@ -49,15 +48,4 @@ def sync_from_feishu(
 @router.get("/teams")
 def list_teams(current_user: dict = Depends(get_current_user)):
     """列出全部团队，含飞书部门映射关系。"""
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                """SELECT gid, name, is_active, feishu_dept_id, parent_team_gid,
-                          COALESCE(config, '{}') AS config, created_at
-                   FROM workmanship_auth_teams ORDER BY name"""
-            )
-            rows = cur.fetchall()
-    return [
-        {**dict(r), "config": json.loads(r["config"]) if isinstance(r["config"], str) else (r["config"] or {})}
-        for r in rows
-    ]
+    return list_organization_teams(actor=current_user)["teams"]

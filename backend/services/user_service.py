@@ -146,6 +146,7 @@ def assign_role(
                 "org_role=%s, updated_at=NOW() WHERE gid=%s",
                 (new_role, external_subtype, _role_to_org_role(new_role), target_gid),
             )
+            conn.commit()
             cur.execute("SELECT * FROM workmanship_auth_users WHERE gid=%s", (target_gid,))
             row = cur.fetchone()
             if not row:

@@ -8,7 +8,7 @@ Export bounded Craft datasets to Excel or Feishu Sheets.
 - 不适用：The operation mutates Craft business entities.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_424d8b0ea1ee7c77776f5822be74abb6`
+- Catalog Release：`rel_11a8ebce1a71ba3cc557b0e7fdffc515`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -128,7 +128,7 @@ Export bounded Craft datasets to Excel or Feishu Sheets.
 ```json
 {
   "capability_id": "craft.data_exchange.export",
-  "catalog_release": "rel_424d8b0ea1ee7c77776f5822be74abb6",
+  "catalog_release": "rel_11a8ebce1a71ba3cc557b0e7fdffc515",
   "major_version": 1,
   "payload": {
     "operation": "excel"

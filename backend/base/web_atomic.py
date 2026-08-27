@@ -15,12 +15,15 @@ _WRITES = {
     "base.authorization.grant.revoke",
     "base.notification.preference.atomic.update",
     "base.identity.directory.feishu.sync",
+    "base.identity.role.assign.atomic",
 }
 _PERMISSIONS = {
     "base.authorization.grant.list": ("system.user.manage",),
     "base.authorization.grant.create": ("system.user.manage",),
     "base.authorization.grant.revoke": ("system.user.manage",),
     "base.identity.directory.feishu.sync": ("system.tech_config",),
+    "base.identity.admin_user.list": ("system.user.manage",),
+    "base.identity.role.assign.atomic": ("system.user.manage",),
 }
 
 
@@ -110,6 +113,50 @@ def _search_users(payload: dict[str, Any], _context: object) -> dict[str, Any]:
     ]}
 
 
+def _structural_error(exc: Exception) -> CapabilityBusinessError:
+    return CapabilityBusinessError(getattr(exc, "code", "provider_failed"), str(exc))
+
+
+def _organization_teams(_payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.base.structural_web import StructuralWebError, list_organization_teams
+    try:
+        return list_organization_teams(actor=_actor(context))
+    except StructuralWebError as exc:
+        raise _structural_error(exc) from exc
+
+
+def _teams(_payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.base.structural_web import StructuralWebError, list_teams
+    try:
+        return list_teams(actor=_actor(context))
+    except StructuralWebError as exc:
+        raise _structural_error(exc) from exc
+
+
+def _annotation_batch(payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.base.structural_web import StructuralWebError, annotation_batch
+    try:
+        return annotation_batch(actor=_actor(context), item_gids=payload["item_gids"])
+    except StructuralWebError as exc:
+        raise _structural_error(exc) from exc
+
+
+def _admin_users(_payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.base.structural_web import StructuralWebError, list_admin_users
+    try:
+        return list_admin_users(actor=_actor(context))
+    except StructuralWebError as exc:
+        raise _structural_error(exc) from exc
+
+
+def _assign_role(payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.base.structural_web import StructuralWebError, assign_user_role
+    try:
+        return assign_user_role(actor=_actor(context), **payload)
+    except StructuralWebError as exc:
+        raise _structural_error(exc) from exc
+
+
 HANDLERS: dict[str, Callable[[dict[str, Any], object], dict[str, Any]]] = {
     "base.authorization.grant.list": _list_grants,
     "base.authorization.grant.create": _create_grant,
@@ -119,6 +166,11 @@ HANDLERS: dict[str, Callable[[dict[str, Any], object], dict[str, Any]]] = {
     "base.identity.directory.feishu.sync": _sync_feishu,
     "base.plugin.installed.list": _installed_plugins,
     "base.identity.user.search": _search_users,
+    "base.organization.team.directory.list": _organization_teams,
+    "base.team.directory.list": _teams,
+    "base.self_annotation.batch.get": _annotation_batch,
+    "base.identity.admin_user.list": _admin_users,
+    "base.identity.role.assign.atomic": _assign_role,
 }
 
 
@@ -148,11 +200,10 @@ def register_atomic_web_capabilities(registry: Any) -> None:
             output_schema=output_schema,
             tags=("base", "atomic", "web"),
         )
-        register_capability(
-            registry,
-            spec,
-            lambda payload, context, _id=capability_id: invoke_atomic(_id, payload, context),
-        )
+        handler = lambda payload, context, _id=capability_id: invoke_atomic(_id, payload, context)
+        if capability_id == "base.identity.role.assign.atomic":
+            handler.__capability_transactional__ = True
+        register_capability(registry, spec, handler)
 
 
 __all__ = ["HANDLERS", "invoke_atomic", "register_atomic_web_capabilities"]

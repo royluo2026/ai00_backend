@@ -9,6 +9,7 @@ from pydantic import BaseModel
 
 from backend.services import user_service
 from backend.routers.deps import get_current_user, require_role, build_profile
+from backend.base.structural_web import StructuralWebError, assign_user_role, list_admin_users
 
 router = APIRouter(prefix="/api/users", tags=["users"])
 
@@ -22,8 +23,7 @@ class AssignRoleBody(BaseModel):
 
 @router.get("/")
 def list_users(current_user: dict = Depends(require_role(*_ADMIN_ROLES))):
-    users = user_service.list_users()
-    return {"success": True, "data": users}
+    return list_admin_users(actor=current_user)
 
 
 @router.get("/me")
@@ -53,12 +53,9 @@ def assign_role(
     current_user: dict = Depends(require_role(*_ADMIN_ROLES)),
 ):
     try:
-        updated = user_service.assign_role(
-            operator_gid=current_user["gid"],
-            target_gid=user_gid,
-            new_role=body.new_role,
-            external_subtype=body.external_subtype,
+        return assign_user_role(
+            actor=current_user, user_gid=user_gid,
+            new_role=body.new_role, external_subtype=body.external_subtype,
         )
-        return {"success": True, "data": updated}
-    except (PermissionError, ValueError) as e:
+    except StructuralWebError as e:
         raise HTTPException(status_code=403, detail=str(e))

@@ -22,6 +22,7 @@ from pydantic import BaseModel
 from backend.db.connection import get_conn
 from backend.routers.deps import get_current_user, require_role
 from backend.utils.gid import next_gid
+from backend.base.structural_web import list_teams as list_teams_service
 
 router = APIRouter(prefix="/teams", tags=["teams"])
 
@@ -42,24 +43,7 @@ class UpdateTeamBody(BaseModel):
 
 @router.get("")
 def list_teams(current_user: dict = Depends(get_current_user)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "SELECT gid, name, is_active, config, created_at, parent_team_gid "
-                "FROM workmanship_auth_teams WHERE deleted_at IS NULL ORDER BY created_at"
-            )
-            rows = cur.fetchall()
-    return {"success": True, "data": [
-        {
-            "gid":             r["gid"],
-            "name":            r["name"],
-            "is_active":       r["is_active"],
-            "config":          r["config"] if isinstance(r["config"], dict) else {},
-            "created_at":      str(r["created_at"]),
-            "parent_team_gid": r["parent_team_gid"],
-        }
-        for r in rows
-    ]}
+    return list_teams_service(actor=current_user)
 
 
 @router.post("", status_code=201)
