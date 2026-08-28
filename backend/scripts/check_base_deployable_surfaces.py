@@ -72,6 +72,10 @@ _LS_KEY_CALL = re.compile(r"\bthis\s*\.\s*_lsKey\s*\(\s*\)")
 _FUNCTION_DECLARATION = re.compile(
     r"\bfunction\s+([A-Za-z_$][\w$]*)\s*\([^)]*\)\s*\{",
 )
+_METHOD_DECLARATION = re.compile(
+    r"(?m)^[ \t]*(?:async\s+)?([A-Za-z_$][\w$]*)\s*\([^\n)]*\)\s*\{",
+)
+_NON_METHOD_NAMES = {"if", "for", "while", "switch", "catch", "with"}
 
 
 def _balanced_end(text: str, start: int, opening: str, closing: str) -> int | None:
@@ -131,10 +135,13 @@ def _split_call_arguments(arguments: str) -> list[str]:
 
 def _function_scopes(text: str) -> dict[str, list[tuple[int, int]]]:
     scopes: dict[str, list[tuple[int, int]]] = {}
-    for match in _FUNCTION_DECLARATION.finditer(text):
-        closing = _balanced_end(text, match.end() - 1, "{", "}")
-        if closing is not None:
-            scopes.setdefault(match.group(1), []).append((match.end(), closing))
+    for pattern in (_FUNCTION_DECLARATION, _METHOD_DECLARATION):
+        for match in pattern.finditer(text):
+            name = match.group(1)
+            closing = _balanced_end(text, match.end() - 1, "{", "}")
+            scope = (match.end(), closing) if closing is not None else None
+            if name not in _NON_METHOD_NAMES and scope and scope not in scopes.get(name, ()):
+                scopes.setdefault(name, []).append(scope)
     return scopes
 
 
@@ -164,15 +171,26 @@ def _expression_fragments(
     prefix: str,
     scopes: dict[str, list[tuple[int, int]]],
 ) -> list[str]:
-    """Expand only direct local assignments and named helper bodies, one level."""
+    """Expand direct assignments and uniquely named helpers to a fixed depth."""
     fragments = [expression]
-    identifiers = set(re.findall(r"\b[A-Za-z_$][\w$]*\b", expression))
-    for identifier in identifiers:
-        assigned = _assigned_expression(identifier, prefix)
-        if assigned:
-            fragments.append(assigned)
-        if re.search(rf"\b{re.escape(identifier)}\s*\(", expression):
-            fragments.extend(text[start:end] for start, end in scopes.get(identifier, ()))
+    pending = [expression]
+    for _depth in range(2):
+        discovered: list[str] = []
+        for fragment in pending:
+            identifiers = set(re.findall(r"\b[A-Za-z_$][\w$]*\b", fragment))
+            for identifier in identifiers:
+                assigned = _assigned_expression(identifier, prefix)
+                if assigned and assigned not in fragments:
+                    discovered.append(assigned)
+                if re.search(rf"\b{re.escape(identifier)}\s*\(", fragment):
+                    named_scopes = scopes.get(identifier, ())
+                    if len(named_scopes) == 1:
+                        start, end = named_scopes[0]
+                        body = text[start:end]
+                        if body not in fragments:
+                            discovered.append(body)
+        fragments.extend(discovered)
+        pending = discovered
     return fragments
 
 

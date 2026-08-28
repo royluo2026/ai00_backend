@@ -306,6 +306,88 @@ def test_tls_cfg_detects_direct_and_helper_saved_view_payloads(
     }
 
 
+@pytest.mark.parametrize(
+    "source",
+    [
+        """
+class TreeListShell {
+  _cfgKey() { return `tls_cfg_${this.moduleId}`; }
+  _collectState() { return { vmFilters: [], vmSorts: [], vmGroupBy: null }; }
+  _saveState() {
+    const key = this._cfgKey();
+    localStorage.setItem(key, JSON.stringify(this._collectState()));
+  }
+}
+""",
+        """
+const treeListShell = {
+  _cfgKey() { return `tls_cfg_${this.moduleId}`; },
+  _collectState() { return { vmFilters: [], vmSorts: [], vmGroupBy: null }; },
+  _saveState() {
+    const key = this._cfgKey();
+    localStorage.setItem(key, JSON.stringify(this._collectState()));
+  }
+};
+""",
+    ],
+)
+def test_tls_cfg_detects_method_key_and_saved_view_payload_helpers(
+    tmp_path: Path, source: str,
+) -> None:
+    from backend.scripts.check_base_deployable_surfaces import build_report
+
+    report = build_report(_commit_fixture(tmp_path, {
+        "dist-production/packages/plugin.html": "<main>governed</main>\n",
+        "dist-production/web/components/tree_list_shell.js": source,
+        "packages/core/electron/main.js": "const safe = true;\n",
+    }))
+
+    assert "silent_saved_view_local_authority" in {
+        finding["code"] for finding in report["findings"]
+    }
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        """
+class Preferences {
+  _cfgKey() { return `tls_cfg_${this.moduleId}`; }
+  _collectDensity() { return { density: 'compact' }; }
+  _unrelatedViewPreview() { return { vmFilters: [], vmSorts: [] }; }
+  _saveDensity() {
+    const key = this._cfgKey();
+    localStorage.setItem(key, JSON.stringify(this._collectDensity()));
+  }
+}
+""",
+        """
+const preferences = {
+  _cfgKey() { return `tls_cfg_${this.moduleId}`; },
+  _collectDensity() { return { density: 'compact' }; },
+  _unrelatedViewPreview() { return { vmFilters: [], vmSorts: [] }; },
+  _saveDensity() {
+    const key = this._cfgKey();
+    localStorage.setItem(key, JSON.stringify(this._collectDensity()));
+  }
+};
+""",
+    ],
+)
+def test_tls_cfg_method_density_storage_ignores_unrelated_view_method(
+    tmp_path: Path, source: str,
+) -> None:
+    from backend.scripts.check_base_deployable_surfaces import build_report
+
+    repo = _commit_fixture(tmp_path, {
+        "dist-production/packages/plugin.html": "<main>governed</main>\n",
+        "dist-production/web/preferences.js": source,
+        "packages/core/electron/main.js": "const safe = true;\n",
+    })
+
+    assert build_report(repo)["findings"] == []
+
+
 def test_generic_ls_key_layout_cache_does_not_trigger_saved_view_authority(
     tmp_path: Path,
 ) -> None:
