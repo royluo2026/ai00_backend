@@ -8,7 +8,7 @@ Execute Project Management operation permission_requests.approve.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_7bdb3a7642c429dac2b436e6cf092b6b`
+- Catalog Release：`rel_306e41b762566c4dd7e25507f773e2b5`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -326,7 +326,7 @@ Execute Project Management operation permission_requests.approve.
 ```json
 {
   "capability_id": "project.permission_request.change.apply.atomic.permission_requests_approve",
-  "catalog_release": "rel_7bdb3a7642c429dac2b436e6cf092b6b",
+  "catalog_release": "rel_306e41b762566c4dd7e25507f773e2b5",
   "major_version": 1,
   "payload": {}
 }

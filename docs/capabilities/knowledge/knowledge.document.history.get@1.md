@@ -8,7 +8,7 @@ List immutable revision metadata for a document.
 - 不适用：The exact revision is already known.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_7bdb3a7642c429dac2b436e6cf092b6b`
+- Catalog Release：`rel_306e41b762566c4dd7e25507f773e2b5`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -91,7 +91,7 @@ List immutable revision metadata for a document.
 ```json
 {
   "capability_id": "knowledge.document.history.get",
-  "catalog_release": "rel_7bdb3a7642c429dac2b436e6cf092b6b",
+  "catalog_release": "rel_306e41b762566c4dd7e25507f773e2b5",
   "major_version": 1,
   "payload": {
     "document_gid": "example"

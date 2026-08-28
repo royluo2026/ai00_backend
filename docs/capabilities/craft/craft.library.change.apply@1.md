@@ -8,7 +8,7 @@ Apply bounded, audited changes to Craft manufacturing resource library records.
 - 不适用：The change belongs to BOP, PBOM, GBOP or another domain capability.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_7bdb3a7642c429dac2b436e6cf092b6b`
+- Catalog Release：`rel_306e41b762566c4dd7e25507f773e2b5`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -137,7 +137,7 @@ Apply bounded, audited changes to Craft manufacturing resource library records.
 ```json
 {
   "capability_id": "craft.library.change.apply",
-  "catalog_release": "rel_7bdb3a7642c429dac2b436e6cf092b6b",
+  "catalog_release": "rel_306e41b762566c4dd7e25507f773e2b5",
   "major_version": 1,
   "payload": {
     "operation": "tools.create"
