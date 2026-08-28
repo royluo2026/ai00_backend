@@ -12,6 +12,7 @@ INTEGRATION_CAPABILITY_IDS = (
     "integration.mapping.archive", "integration.mapping.create", "integration.mapping.get",
     "integration.mapping.import.start", "integration.mapping.preview", "integration.mapping.search",
     "integration.mapping.source_columns.discover", "integration.mapping.update",
+    "integration.mapping_target.search",
     "integration.sync.start",
 )
 
@@ -21,7 +22,7 @@ def specs() -> tuple[CapabilitySpec, ...]:
         "integration.connector.search", "integration.connector.schema.discover",
         "integration.field_mapping.search", "integration.mapping.get",
         "integration.mapping.preview", "integration.mapping.search",
-        "integration.mapping.source_columns.discover",
+        "integration.mapping.source_columns.discover", "integration.mapping_target.search",
     }
     result = []
     for capability_id in INTEGRATION_CAPABILITY_IDS:

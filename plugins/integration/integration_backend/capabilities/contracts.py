@@ -115,6 +115,15 @@ INPUT_SCHEMAS = {
     "integration.mapping.search": obj(
         {"datasource_gid": STRING, "query": STRING, "limit": LIMIT}, ("datasource_gid",)
     ),
+    "integration.mapping_target.search": obj(
+        {
+            "ontology_object_gids": {
+                "type": "array", "items": STRING, "minItems": 1, "maxItems": 200,
+                "uniqueItems": True,
+            }
+        },
+        ("ontology_object_gids",),
+    ),
     "integration.field_mapping.search": obj({"mapping_gid": STRING, "limit": LIMIT}, ("mapping_gid",)),
     "integration.mapping.source_columns.discover": obj({"mapping_gid": STRING, "limit": LIMIT}, ("mapping_gid",)),
     "integration.mapping.preview": obj({"gid": STRING, "limit": LIMIT}, ("gid",)),
@@ -149,6 +158,20 @@ PREVIEW_CELL = obj(
     ("field", "value", "redacted"),
 )
 PREVIEW_ROW = obj({"values": {"type": "array", "items": PREVIEW_CELL, "maxItems": 200}}, ("values",))
+MAPPING_TARGET = obj(
+    {
+        "ontology_object_gid": STRING,
+        "binding_id": STRING,
+        "target_domain": STRING,
+        "target_capability_id": STRING,
+        "target_major_version": POSITIVE,
+        "minimum_catalog_release": STRING,
+    },
+    (
+        "ontology_object_gid", "binding_id", "target_domain", "target_capability_id",
+        "target_major_version", "minimum_catalog_release",
+    ),
+)
 
 
 OUTPUT_SCHEMAS = {
@@ -172,6 +195,9 @@ OUTPUT_SCHEMAS = {
     "integration.mapping.archive": obj({"gid": STRING, "archived": {"type": "boolean"}}, ("gid", "archived")),
     "integration.mapping.get": MAPPING_DETAIL,
     "integration.mapping.search": obj({"items": {"type": "array", "items": MAPPING, "maxItems": 200}}, ("items",)),
+    "integration.mapping_target.search": obj(
+        {"items": {"type": "array", "items": MAPPING_TARGET, "maxItems": 200}}, ("items",)
+    ),
     "integration.field_mapping.search": obj({"items": {"type": "array", "items": FIELD_RESULT, "maxItems": 200}}, ("items",)),
     "integration.mapping.source_columns.discover": obj(
         {"columns": {"type": "array", "items": COLUMN_RESULT, "maxItems": 200}, "operation_ref": OPERATION_REF},

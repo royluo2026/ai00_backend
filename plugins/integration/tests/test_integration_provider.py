@@ -31,6 +31,7 @@ CAPABILITY_IDS = {
     "integration.mapping.preview",
     "integration.mapping.search",
     "integration.mapping.source_columns.discover",
+    "integration.mapping_target.search",
     "integration.mapping.import.start",
     "integration.mapping.update",
     "integration.sync.start",
@@ -119,6 +120,11 @@ class ProviderCatalog:
             "resource_gid": "dataset-parts", "expected_version": 7,
         }
 
+    def project_mapping_targets_for_ontology_objects(self, ontology_object_gids):
+        if "concept-part" not in ontology_object_gids:
+            return []
+        return [{**self.resolve_mapping_target("ontology:concept-part"), "ontology_object_gid": "concept-part"}]
+
 
 class ProviderRuntime:
     async def test(self, connector, *, timeout_seconds, result_limit):
@@ -203,7 +209,7 @@ def test_integration_is_an_official_independent_domain():
     assert integration["database"]["migration_path"] == "backend/db/migrations/domains/integration"
 
 
-def test_provider_publishes_seventeen_native_governed_capabilities():
+def test_provider_publishes_eighteen_native_governed_capabilities():
     class Registry:
         def __init__(self):
             self.items = []
@@ -232,6 +238,7 @@ EXACT_TARGETS = {
     "integration.connector.schema.discover",
     "integration.connector.connection.test",
     "integration.mapping.search",
+    "integration.mapping_target.search",
     "integration.field_mapping.search",
     "integration.mapping.source_columns.discover",
     "integration.mapping.preview",
@@ -376,7 +383,7 @@ def test_registered_handlers_use_configured_vault_catalog_and_bounded_runtime(mo
     assert tested["operation_ref"]["status"] == "succeeded"
 
 
-def test_twelve_exact_targets_have_recursively_closed_stable_v1_contracts():
+def test_browser_targets_have_recursively_closed_stable_v1_contracts():
     registrations = _registrations()
     assert EXACT_TARGETS <= registrations.keys()
     for capability_id in EXACT_TARGETS:
@@ -418,6 +425,10 @@ def test_exact_limits_and_secret_or_unknown_input_rejection_are_schema_enforced(
     assert batch["properties"]["items"]["maxItems"] == 200
     field = batch["properties"]["items"]["items"]
     assert set(field["properties"]) == {"source_field", "target_field", "transform_expression"}
+    targets = registrations["integration.mapping_target.search"][0].input_schema[
+        "properties"
+    ]["ontology_object_gids"]
+    assert (targets["minItems"], targets["maxItems"], targets["uniqueItems"]) == (1, 200, True)
 
 
 def test_mapping_writes_require_exact_target_version_release_and_idempotency():

@@ -502,6 +502,11 @@ class MappingRepository(AtomicStore):
 
 
 class AcceptingCatalog:
+    def project_mapping_targets_for_ontology_objects(self, ontology_object_gids):
+        if "concept-part" not in ontology_object_gids:
+            return []
+        return [{**self.resolve_mapping_target("ontology:concept-part"), "ontology_object_gid": "concept-part"}]
+
     def resolve_mapping_target(self, binding_id):
         return {
             "binding_id": binding_id, "target_domain": "knowledge",

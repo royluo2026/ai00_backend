@@ -154,19 +154,31 @@ class IntegrationApplication:
             raise CapabilityBusinessError(
                 "target_binding_unavailable", "The selected ontology target has no governed binding"
             ) from exc
+        return self._validate_target_binding(binding_id, binding)
+
+    def _validate_target_binding(self, binding_id: str, binding: Mapping[str, Any]) -> dict[str, Any]:
         allowed = {
             "binding_id", "target_domain", "target_capability_id", "target_major_version",
             "minimum_catalog_release", "input_contract", "resource_gid", "expected_version",
         }
-        self._closed(binding, allowed)
-        self._require(binding, *allowed)
-        if binding["binding_id"] != binding_id:
-            raise CapabilityBusinessError("target_binding_incompatible", "Target binding identity mismatch")
-        if binding["input_contract"] != "knowledge.reference_dataset.publish.v1":
-            raise CapabilityBusinessError("target_binding_incompatible", "Target input contract is unsupported")
-        self._positive_integer(binding, "target_major_version")
-        self._positive_integer(binding, "expected_version")
-        self._require_target(binding)
+        try:
+            self._closed(binding, allowed)
+            self._require(binding, *allowed)
+            if binding["binding_id"] != binding_id:
+                raise CapabilityBusinessError("target_binding_incompatible", "Target binding identity mismatch")
+            if binding["input_contract"] != "knowledge.reference_dataset.publish.v1":
+                raise CapabilityBusinessError("target_binding_incompatible", "Target input contract is unsupported")
+            self._positive_integer(binding, "target_major_version")
+            self._positive_integer(binding, "expected_version")
+            self._require_target(binding)
+        except CapabilityBusinessError as exc:
+            if exc.code in {
+                "target_binding_incompatible", "target_binding_unavailable", "target_capability_unavailable",
+            }:
+                raise
+            raise CapabilityBusinessError(
+                "target_binding_incompatible", "Target binding metadata is malformed"
+            ) from exc
         return {
             "target_binding_id": str(binding["binding_id"]),
             "target_domain": str(binding["target_domain"]),
@@ -177,6 +189,74 @@ class IntegrationApplication:
             "target_resource_gid": str(binding["resource_gid"]),
             "target_expected_version": int(binding["expected_version"]),
         }
+
+    def _mapping_target_projection(self, raw: dict[str, Any]) -> dict[str, Any]:
+        self._closed(raw, {"ontology_object_gids"})
+        gids = raw.get("ontology_object_gids")
+        if (
+            not isinstance(gids, list) or not 1 <= len(gids) <= MAX_RESULTS
+            or any(not isinstance(gid, str) or not gid.strip() for gid in gids)
+            or len(set(gids)) != len(gids)
+        ):
+            raise CapabilityBusinessError(
+                "invalid_input", "ontology_object_gids requires 1 to 200 unique non-empty identities"
+            )
+        requested = tuple(gids)
+        projector = (
+            getattr(self.catalog, "project_mapping_targets_for_ontology_objects", None)
+            if self.catalog is not None else None
+        )
+        if not callable(projector):
+            raise CapabilityBusinessError(
+                "target_binding_unavailable", "Integration target binding projection is unavailable",
+                retryable=True,
+            )
+        try:
+            rows = list(projector(requested))
+        except Exception as exc:
+            raise CapabilityBusinessError(
+                "target_binding_unavailable", "Integration target binding projection is unavailable",
+                retryable=True,
+            ) from exc
+        if len(rows) > len(requested):
+            raise CapabilityBusinessError("target_binding_incompatible", "Target binding projection is ambiguous")
+        projected = {}
+        binding_ids = set()
+        binding_keys = {
+            "binding_id", "target_domain", "target_capability_id", "target_major_version",
+            "minimum_catalog_release", "input_contract", "resource_gid", "expected_version",
+        }
+        for raw_row in rows:
+            try:
+                row = dict(raw_row)
+            except Exception as exc:
+                raise CapabilityBusinessError(
+                    "target_binding_incompatible", "Target binding projection is malformed"
+                ) from exc
+            try:
+                self._closed(row, binding_keys | {"ontology_object_gid"})
+                self._require(row, *(binding_keys | {"ontology_object_gid"}))
+            except CapabilityBusinessError as exc:
+                raise CapabilityBusinessError(
+                    "target_binding_incompatible", "Target binding projection is malformed"
+                ) from exc
+            gid = str(row["ontology_object_gid"])
+            binding_id = str(row["binding_id"])
+            if gid not in requested or gid in projected or binding_id in binding_ids:
+                raise CapabilityBusinessError("target_binding_incompatible", "Target binding projection is ambiguous")
+            target = self._validate_target_binding(
+                binding_id, {key: row[key] for key in binding_keys}
+            )
+            projected[gid] = {
+                "ontology_object_gid": gid,
+                "binding_id": target["target_binding_id"],
+                "target_domain": target["target_domain"],
+                "target_capability_id": target["target_capability_id"],
+                "target_major_version": target["target_major_version"],
+                "minimum_catalog_release": target["minimum_catalog_release"],
+            }
+            binding_ids.add(binding_id)
+        return {"items": [projected[gid] for gid in requested if gid in projected]}
 
     @staticmethod
     def _target_invocation(mapping: Mapping[str, Any]) -> dict[str, Any]:
@@ -345,6 +425,8 @@ class IntegrationApplication:
     async def invoke(self, capability_id: str, payload: dict, context: CapabilityContext):
         raw = dict(payload)
         data = self._bind(raw, context)
+        if capability_id == "integration.mapping_target.search":
+            return self._mapping_target_projection(raw)
         if capability_id.startswith("integration.connector."):
             return await self._connector_outcome(capability_id, raw, data, context)
         if capability_id in {

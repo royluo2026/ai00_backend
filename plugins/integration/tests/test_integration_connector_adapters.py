@@ -82,6 +82,7 @@ def application(value):
         ),
         ("integration.connector.schema.discover", {"gid": "connector-1", "limit": 200}, True),
         ("integration.connector.connection.test", {"gid": "connector-1"}, True),
+        ("integration.mapping_target.search", {"ontology_object_gids": ["concept-part"]}, False),
     ),
 )
 def test_provider_adapter_matches_owner_service_projection(capability_id, payload, seed):

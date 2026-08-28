@@ -12,6 +12,8 @@ ERRORS = tuple(DomainErrorContract(code=code, meaning=meaning, retryable=retryab
     ("network_policy_rejected", "The connector target violates outbound network policy.", False),
     ("connector_runtime_unavailable", "The bounded external connector runtime is unavailable.", True),
     ("target_capability_unavailable", "The owning target-domain Capability is unavailable.", True),
+    ("target_binding_unavailable", "The selected presentation object has no governed Integration target binding.", False),
+    ("target_binding_incompatible", "The governed Integration target binding is incompatible.", False),
     ("credential_enrollment_unavailable", "The credential enrollment vault is unavailable.", True),
     ("credential_enrollment_invalid", "The one-time credential enrollment handle is invalid or consumed.", False),
     ("idempotency_conflict", "The Integration idempotency key is already bound to another request.", False),

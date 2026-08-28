@@ -19,6 +19,13 @@ class BoundCatalog:
     def __init__(self, binding=None):
         self.binding = binding
         self.stable_calls = []
+        self.projection_calls = []
+
+    def project_mapping_targets_for_ontology_objects(self, ontology_object_gids):
+        self.projection_calls.append(tuple(ontology_object_gids))
+        if self.binding is None or "concept-part" not in ontology_object_gids:
+            return []
+        return [{**self.binding, "ontology_object_gid": "concept-part"}]
 
     def resolve_mapping_target(self, binding_id):
         if binding_id != "ontology:concept-part" or self.binding is None:
@@ -128,6 +135,47 @@ def test_mapping_create_resolves_a_finite_binding_and_import_persists_valid_targ
         },
         "dispatch_state": "awaiting_rows",
     }
+
+
+def test_integration_owned_target_projection_joins_real_ontology_identity_to_exact_binding():
+    catalog = BoundCatalog(VALID_BINDING)
+    application = app(MemoryRepository(), catalog=catalog)
+
+    projected = asyncio.run(application.invoke(
+        "integration.mapping_target.search",
+        {"ontology_object_gids": ["concept-part", "concept-unbound"]},
+        CONTEXT,
+    ))
+
+    assert projected == {"items": [{
+        "ontology_object_gid": "concept-part",
+        "binding_id": "ontology:concept-part",
+        "target_domain": "knowledge",
+        "target_capability_id": "knowledge.reference_data.change.apply",
+        "target_major_version": 1,
+        "minimum_catalog_release": "rel_7803705d3df421f9f4381d37c3500731",
+    }]}
+    assert catalog.projection_calls == [("concept-part", "concept-unbound")]
+    assert catalog.stable_calls == [(
+        "knowledge.reference_data.change.apply", 1, "rel_7803705d3df421f9f4381d37c3500731"
+    )]
+
+
+@pytest.mark.parametrize("binding", [
+    {**VALID_BINDING, "input_contract": "arbitrary.python.v1"},
+    {**VALID_BINDING, "unexpected_execution_rule": "ontology-id-is-code"},
+])
+def test_target_projection_fails_closed_for_incompatible_catalog_binding(binding):
+    catalog = BoundCatalog(binding)
+
+    with pytest.raises(CapabilityBusinessError) as rejected:
+        asyncio.run(app(MemoryRepository(), catalog=catalog).invoke(
+            "integration.mapping_target.search",
+            {"ontology_object_gids": ["concept-part"]},
+            CONTEXT,
+        ))
+
+    assert error_code(rejected) == "target_binding_incompatible"
 
 
 @pytest.mark.parametrize(

@@ -59,7 +59,9 @@ def build_application(adapter_factory: AdapterFactory | None = None) -> Integrat
         raise RuntimeError("Integration adapter factory omitted required adapters: " + ", ".join(missing))
     method_requirements = {
         "credential_enrollment": (adapters.credential_enrollment, ("consume",)),
-        "catalog": (adapters.catalog, ("resolve_mapping_target", "require_stable")),
+        "catalog": (adapters.catalog, (
+            "project_mapping_targets_for_ontology_objects", "resolve_mapping_target", "require_stable",
+        )),
         "connector_runtime": (
             adapters.connector_runtime, ("test", "discover", "source_columns", "preview")
         ),
