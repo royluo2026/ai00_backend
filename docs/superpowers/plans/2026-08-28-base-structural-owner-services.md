@@ -217,60 +217,51 @@ git add backend/plugin_platform/service.py backend/plugin_platform/lifecycle.py 
 git commit -m "feat: govern signed plugin installation lifecycle"
 ```
 
-### Task 4: Base frontend migration and canonical closure
+### Task 4: Base batch consolidation and verification
 
 **Files:**
-- Modify: `E:/Projects/ai00_v3/.worktrees/workmanship-web-capability-governance/web/components/view_manager.js`
-- Modify: `E:/Projects/ai00_v3/.worktrees/workmanship-web-capability-governance/web/components/self_annotation_panel.js`
-- Modify: `E:/Projects/ai00_v3/.worktrees/workmanship-web-capability-governance/web/knowledge_hub/knowledge_hub.js`
-- Modify: `E:/Projects/ai00_v3/.worktrees/workmanship-web-capability-governance/web/admin/task_planning.html`
-- Modify: `E:/Projects/ai00_v3/.worktrees/workmanship-web-capability-governance/web/core/web_compat.js`
-- Modify: `E:/Projects/ai00_v3/.worktrees/workmanship-web-capability-governance/packages/craft-plugin/web/lineage_view/lineage.js`
-- Modify: `docs/governance/base-structural-web-remediation.json`
-- Modify: `docs/governance/web-api-route-inventory.json`
+- Verify: `docs/governance/base-structural-web-remediation.json`
+- Verify: `docs/governance/web-api-route-inventory.json`
+- Verify: `docs/governance/web-route-root-cause-ledger.json`
+- Verify: `docs/governance/capability-v2-structural-remediation-plan.json`
 - Test: `backend/tests/test_base_structural_remediation_manifest.py`
 - Test: `backend/tests/test_web_api_route_inventory.py`
+- Test: `backend/tests/test_base_capability_contracts.py`
 
 **Interfaces:**
-- Consumes: the 11 stable Base `@1` targets created in Tasks 1-3 and the existing frontend Capability Gateway client/confirmation helper.
-- Produces: zero unresolved Base groups/occurrences in a fresh canonical scan without new BFF or operations exclusions.
+- Consumes: the 11 stable Base `@1` targets and frontend Gateway migrations completed by Tasks 1-3.
+- Produces: independently reproduced Base 16/16 groups and 33/33 occurrences migrated, zero unresolved Base occurrences, canonical global remaining 26 groups/29 occurrences, and a conserved historical structural ledger of 37/45.
 
-- [ ] **Step 1: Add/adjust failing inventory expectations**
+- [ ] **Step 1: Reproduce source-derived evidence without writing**
 
-Make the Base structural manifest test require every Base group to carry `implementation_status=implemented`, exact provider/owner-service evidence, frontend callsite evidence, closed-contract evidence, and a stable target. Make the canonical inventory test assert no unresolved occurrence with `owner_domain == "base"` and no `/api/views`, `/api/self_ann`, session-profile, plugin-install, or plugin-uninstall REST call remains in governed frontend sources.
+Run every relevant builder in `--check` mode against backend HEAD and frontend HEAD. Assert the Base manifest pins the exact frontend full SHA, every Base entry has generated owner-service/provider/contract/callsite evidence, and no Base entry has `operations_excluded`, `bff_registered`, or unresolved final disposition.
 
-- [ ] **Step 2: Verify the old frontend fails the new expectations**
-
-Run the manifest and Web inventory tests against frontend commit `6dd62900c9a82173adcbbe277bb38846ab556031` and record the 11 expected failing groups.
-
-- [ ] **Step 3: Migrate callsites as a single frontend batch**
-
-Use the existing client to invoke exact `Capability@1` targets. Supply revisions and idempotency keys on writes; require the existing confirmation flow before invoke/confirm; map returned closed projections to the current UI without a REST fallback. Plugin install UI selects a signed release and explicit grants, never a URL. Preserve the Project branch of mixed list handling.
-
-- [ ] **Step 4: Regenerate evidence from source**
-
-Run the checked-in Base remediation builder and canonical Web inventory builder with the backend and frontend worktree roots. Do not hand-edit generated hashes/counts. Verify the new frontend full SHA and source hashes are stored.
-
-- [ ] **Step 5: Run Base batch acceptance**
+- [ ] **Step 2: Run Base behavior and contract suites**
 
 Run:
 
 ```text
-python -m pytest backend/tests/test_base_saved_view_service.py backend/tests/test_base_self_annotation_service.py backend/tests/test_base_identity_profile_service.py backend/tests/test_base_plugin_lifecycle_capabilities.py backend/tests/test_base_structural_remediation_manifest.py backend/tests/test_web_api_route_inventory.py -q
-python backend/scripts/check_structural_remediation_plan.py
+python -m pytest -q -p no:cacheprovider backend/tests/test_base_saved_view_service.py backend/tests/test_base_self_annotation_service.py backend/tests/test_base_identity_profile_service.py backend/tests/test_plugin_platform_service.py backend/tests/test_plugin_lifecycle_security.py backend/tests/test_base_plugin_lifecycle_capabilities.py backend/tests/test_base_capability_contracts.py backend/tests/test_base_structural_web_capabilities.py
+```
+
+Expected: all tests pass; no frozen-provider expected-set mismatch remains.
+
+- [ ] **Step 3: Run governance consolidation checks**
+
+Run:
+
+```text
+python -m pytest -q -p no:cacheprovider backend/tests/test_base_structural_remediation_manifest.py backend/tests/test_web_api_route_inventory.py backend/tests/test_structural_remediation_plan.py
+python backend/scripts/freeze_official_domains.py --check
 python backend/scripts/build_capability_catalog.py --check
+python backend/scripts/generate_capability_docs.py --check
 python backend/scripts/build_capability_acceptance_manifest.py --check
+python backend/scripts/check_structural_remediation_plan.py --check
 python backend/scripts/run_capability_v2_acceptance.py --mode offline --strict
 ```
 
-Expected: all commands pass; Base unresolved groups/occurrences are zero; overall unresolved counts fall from 37/45 to 26/29 without count-hiding dispositions.
+Expected: all commands pass; strict acceptance has zero failed/skipped cases; Base is 16/16 and 33/33; canonical remaining is exactly 26/29; structural history remains exactly 37/45 with current dispositions.
 
-- [ ] **Step 6: Commit backend evidence and frontend migration separately**
+- [ ] **Step 4: Record verification without product-code churn**
 
-```bash
-git add docs/governance/base-structural-web-remediation.json docs/governance/web-api-route-inventory.json backend/tests/test_base_structural_remediation_manifest.py backend/tests/test_web_api_route_inventory.py
-git commit -m "docs: close Base structural Web governance"
-
-git -C E:/Projects/ai00_v3/.worktrees/workmanship-web-capability-governance add web/components/view_manager.js web/components/self_annotation_panel.js web/knowledge_hub/knowledge_hub.js web/admin/task_planning.html web/core/web_compat.js packages/craft-plugin/web/lineage_view/lineage.js
-git -C E:/Projects/ai00_v3/.worktrees/workmanship-web-capability-governance commit -m "feat: route Base flows through capability gateway"
-```
+Write the commands, exact outputs, backend/frontend commits, Catalog release, acceptance report ID, and any pre-existing non-Base failures to the Task 4 report. If a source-derived artifact is stale, regenerate it using its checked-in builder and commit only that generated correction. If all artifacts are current, make no product or evidence commit.
