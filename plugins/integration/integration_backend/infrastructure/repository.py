@@ -104,7 +104,7 @@ class IntegrationRepository:
                     self._insert_operation(cur, record)
                     self._audit(cur, record)
                     cur.execute(
-                        "SELECT revision FROM workmanship_int_mapping_target_bindings WHERE binding_id=%s "
+                        "SELECT binding_gid,revision FROM workmanship_int_mapping_target_bindings WHERE semantic_key=%s "
                         "AND owner_gid=%s AND team_gid=%s FOR UPDATE",
                         (target["binding_id"], record.owner_gid, record.team_gid),
                     )
@@ -117,11 +117,11 @@ class IntegrationRepository:
                             "UPDATE workmanship_int_mapping_target_bindings SET ontology_object_gid=%s,target_domain=%s,"
                             "target_capability_id=%s,target_major_version=%s,minimum_catalog_release=%s,input_contract=%s,"
                             "resource_gid=%s,expected_version=%s,active=1,revision=%s,last_idempotency_key=%s "
-                            "WHERE binding_id=%s AND owner_gid=%s AND team_gid=%s AND revision=%s",
+                            "WHERE binding_gid=%s AND owner_gid=%s AND team_gid=%s AND revision=%s",
                             (target["ontology_object_gid"], target["target_domain"], target["target_capability_id"],
                              target["target_major_version"], target["minimum_catalog_release"], target["input_contract"],
                              target["resource_gid"], target["expected_version"], revision, record.idempotency_key,
-                             target["binding_id"], record.owner_gid, record.team_gid, expected_revision),
+                             existing["binding_gid"], record.owner_gid, record.team_gid, expected_revision),
                         )
                     else:
                         if expected_revision is not None:
@@ -129,10 +129,11 @@ class IntegrationRepository:
                         revision = 1
                         cur.execute(
                             "INSERT INTO workmanship_int_mapping_target_bindings "
-                            "(binding_id,ontology_object_gid,target_domain,target_capability_id,target_major_version,"
+                            "(binding_gid,semantic_key,binding_id,ontology_object_gid,target_domain,target_capability_id,target_major_version,"
                             "minimum_catalog_release,input_contract,resource_gid,expected_version,owner_gid,team_gid,"
-                            "active,revision,last_idempotency_key) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,1,1,%s)",
-                            (target["binding_id"], target["ontology_object_gid"], target["target_domain"],
+                            "active,revision,last_idempotency_key) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,1,1,%s)",
+                            (str(next_gid()), target["binding_id"], target["binding_id"],
+                             target["ontology_object_gid"], target["target_domain"],
                              target["target_capability_id"], target["target_major_version"], target["minimum_catalog_release"],
                              target["input_contract"], target["resource_gid"], target["expected_version"],
                              record.owner_gid, record.team_gid, record.idempotency_key),
@@ -168,7 +169,7 @@ class IntegrationRepository:
                 raise
             winner = self.find_operation(record.owner_gid, record.capability_id, record.idempotency_key)
             if winner is None:
-                raise RuntimeError("Integration binding idempotency winner could not be reloaded") from exc
+                raise RevisionConflict("target binding") from exc
             return winner, True
         return completed, False
 

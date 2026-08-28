@@ -141,19 +141,41 @@ class ImportDispatcher:
         return result
 
 
+@dataclass(frozen=True)
+class ImportWorkerHealth:
+    status: str
+    consecutive_errors: int
+    last_error_code: str | None
+    retry_delay_seconds: float
+
+
 class IntegrationImportWorker:
     """Lifecycle-managed bounded poller for accepted and reconcilable imports."""
 
-    def __init__(self, dispatcher: ImportDispatcher, *, worker_id: str = "integration-import", idle_seconds: float = 0.25):
+    def __init__(
+        self, dispatcher: ImportDispatcher, *, worker_id: str = "integration-import",
+        idle_seconds: float = 0.25, maximum_backoff_seconds: float = 5.0,
+    ):
         self._dispatcher = dispatcher
         self._worker_id = worker_id
         self._idle_seconds = max(0.05, float(idle_seconds))
+        self._maximum_backoff_seconds = max(self._idle_seconds, float(maximum_backoff_seconds))
         self._task: asyncio.Task | None = None
         self._stopping = asyncio.Event()
+        self._health = ImportWorkerHealth("stopped", 0, None, 0.0)
+
+    @property
+    def health(self) -> ImportWorkerHealth:
+        return self._health
+
+    @property
+    def running(self) -> bool:
+        return self._task is not None and not self._task.done()
 
     async def start(self) -> None:
         if self._task is None:
             self._stopping.clear()
+            self._health = ImportWorkerHealth("starting", 0, self._health.last_error_code, 0.0)
             self._task = asyncio.create_task(self._run(), name=self._worker_id)
 
     async def stop(self) -> None:
@@ -161,12 +183,51 @@ class IntegrationImportWorker:
         task, self._task = self._task, None
         if task is not None:
             task.cancel()
-            with suppress(asyncio.CancelledError):
+            with suppress(asyncio.CancelledError, Exception):
                 await task
+        self._health = ImportWorkerHealth(
+            "stopped", self._health.consecutive_errors, self._health.last_error_code, 0.0,
+        )
+
+    @staticmethod
+    def _is_transient(exc: Exception) -> bool:
+        if isinstance(exc, (ConnectionError, TimeoutError)):
+            return True
+        return (
+            type(exc).__module__.startswith("pymysql.")
+            and type(exc).__name__ in {"InterfaceError", "OperationalError"}
+        )
 
     async def _run(self) -> None:
         while not self._stopping.is_set():
             correlation = CorrelationRef(request_id=f"{self._worker_id}-{id(asyncio.current_task())}")
-            consumed = await self._dispatcher.dispatch_next(worker_id=self._worker_id, correlation=correlation)
+            try:
+                consumed = await self._dispatcher.dispatch_next(
+                    worker_id=self._worker_id, correlation=correlation,
+                )
+            except asyncio.CancelledError:
+                raise
+            except Exception as exc:
+                if not self._is_transient(exc):
+                    self._health = ImportWorkerHealth(
+                        "fatal", self._health.consecutive_errors,
+                        type(exc).__name__, 0.0,
+                    )
+                    raise
+                failures = min(self._health.consecutive_errors + 1, 31)
+                delay = min(
+                    self._maximum_backoff_seconds,
+                    self._idle_seconds * (2 ** min(failures - 1, 10)),
+                )
+                self._health = ImportWorkerHealth(
+                    "degraded", failures, type(exc).__name__, delay,
+                )
+                await asyncio.sleep(delay)
+                continue
+            self._health = ImportWorkerHealth(
+                "healthy", 0, self._health.last_error_code, 0.0,
+            )
             if consumed is None:
                 await asyncio.sleep(self._idle_seconds)
+            else:
+                await asyncio.sleep(0)

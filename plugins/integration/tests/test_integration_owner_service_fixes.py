@@ -3,6 +3,7 @@ import json
 from contextlib import contextmanager
 from dataclasses import replace
 from datetime import UTC, datetime
+from pathlib import Path
 
 import pytest
 
@@ -437,6 +438,104 @@ def test_sql_binding_rebind_crash_rolls_back_then_retry_and_replay_are_byte_equi
     assert json.dumps(first.result, separators=(",", ":"), ensure_ascii=False).encode() == json.dumps(
         second.result, separators=(",", ":"), ensure_ascii=False
     ).encode()
+
+
+def test_sql_binding_same_semantic_key_isolated_by_tenant_with_global_physical_ids(monkeypatch):
+    first_connection = ScriptedConnection(results=(None,))
+    second_connection = ScriptedConnection(results=(None,))
+    connection_sequence(monkeypatch, first_connection, second_connection)
+    repository = IntegrationRepository()
+    target = {
+        "binding_id": "ontology:concept-part", "ontology_object_gid": "concept-part",
+        "target_domain": "knowledge", "target_capability_id": "knowledge.reference_dataset.publish",
+        "target_major_version": 1, "minimum_catalog_release": "rel_20260828",
+        "input_contract": "knowledge.reference_dataset.publish.v1",
+        "resource_gid": "dataset-parts", "expected_version": 7,
+    }
+
+    repository.execute_binding_command(
+        operation(capability_id="integration.mapping_target_binding.upsert", result=None),
+        target, expected_revision=None, mapping_gid=None, mapping_expected_revision=None,
+    )
+    repository.execute_binding_command(
+        operation(
+            operation_id="operation-2", capability_id="integration.mapping_target_binding.upsert",
+            owner_gid="actor-2", team_gid="team-2", idempotency_key="binding-2", result=None,
+        ),
+        target, expected_revision=None, mapping_gid=None, mapping_expected_revision=None,
+    )
+
+    inserts = [
+        next(params for sql, params in connection.statements if sql.startswith(
+            "INSERT INTO workmanship_int_mapping_target_bindings"
+        ))
+        for connection in (first_connection, second_connection)
+    ]
+    assert inserts[0][0] != inserts[1][0]
+    assert inserts[0][1] == inserts[1][1] == "ontology:concept-part"
+
+
+def test_sql_binding_unique_collision_does_not_disclose_another_tenant_owner(monkeypatch):
+    collision = ScriptedConnection(
+        results=(None,), fail_on="INSERT INTO workmanship_int_mapping_target_bindings",
+        failure=DuplicateKey(1062, "duplicate tenant semantic key"),
+    )
+    no_idempotency_winner = ScriptedConnection(results=(None,))
+    connection_sequence(monkeypatch, collision, no_idempotency_winner)
+    target = {
+        "binding_id": "ontology:concept-part", "ontology_object_gid": "concept-part",
+        "target_domain": "knowledge", "target_capability_id": "knowledge.reference_dataset.publish",
+        "target_major_version": 1, "minimum_catalog_release": "rel_20260828",
+        "input_contract": "knowledge.reference_dataset.publish.v1",
+        "resource_gid": "dataset-parts", "expected_version": 7,
+    }
+
+    from plugins.integration.integration_backend.application.ports import RevisionConflict
+
+    with pytest.raises(RevisionConflict, match="target binding"):
+        IntegrationRepository().execute_binding_command(
+            operation(capability_id="integration.mapping_target_binding.upsert", result=None),
+            target, expected_revision=None, mapping_gid=None, mapping_expected_revision=None,
+        )
+
+
+def test_sql_binding_same_tenant_requires_optimistic_revision_before_update(monkeypatch):
+    existing = ScriptedConnection(results=({"binding_gid": "binding-physical-1", "revision": 3},))
+    connection_sequence(monkeypatch, existing)
+    target = {
+        "binding_id": "ontology:concept-part", "ontology_object_gid": "concept-part",
+        "target_domain": "knowledge", "target_capability_id": "knowledge.reference_dataset.publish",
+        "target_major_version": 1, "minimum_catalog_release": "rel_20260828",
+        "input_contract": "knowledge.reference_dataset.publish.v1",
+        "resource_gid": "dataset-parts", "expected_version": 7,
+    }
+
+    from plugins.integration.integration_backend.application.ports import RevisionConflict
+
+    with pytest.raises(RevisionConflict, match="target binding"):
+        IntegrationRepository().execute_binding_command(
+            operation(capability_id="integration.mapping_target_binding.upsert", result=None),
+            target, expected_revision=None, mapping_gid=None, mapping_expected_revision=None,
+        )
+    assert not any(
+        sql.startswith("UPDATE workmanship_int_mapping_target_bindings")
+        for sql, _params in existing.statements
+    )
+
+
+def test_binding_identity_migration_backfills_before_primary_key_switch_and_is_reentrant():
+    migration = Path("backend/db/migrations/domains/integration/0006_integration_binding_tenant_identity.sql").read_text(
+        encoding="utf-8"
+    )
+    assert "ADD COLUMN IF NOT EXISTS `binding_gid`" in migration
+    assert "ADD COLUMN IF NOT EXISTS `semantic_key`" in migration
+    assert "AI00: RESUMABLE BACKFILL" in migration
+    assert migration.index("UPDATE `workmanship_int_mapping_target_bindings`") < migration.index(
+        "DROP PRIMARY KEY"
+    )
+    assert "PRIMARY KEY (`binding_gid`)" in migration
+    assert "CREATE UNIQUE INDEX IF NOT EXISTS `uk_int_target_binding_tenant_semantic`" in migration
+    assert "(`team_gid`, `semantic_key`)" in migration
 
 
 def test_sql_mapping_get_projects_normalized_fields_and_explicit_legacy_binding_disposition(monkeypatch):

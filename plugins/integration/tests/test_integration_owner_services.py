@@ -108,7 +108,8 @@ class MemoryRepository:
         existing_op = self.find_operation(record.owner_gid, record.capability_id, record.idempotency_key)
         if existing_op is not None:
             return existing_op, True
-        current = self.bindings.get(target["binding_id"])
+        binding_key = (record.team_gid, target["binding_id"])
+        current = self.bindings.get(binding_key)
         if current and current["revision"] != expected_revision:
             from plugins.integration.integration_backend.application.ports import RevisionConflict
             raise RevisionConflict("target binding")
@@ -117,7 +118,7 @@ class MemoryRepository:
             "binding_id", "ontology_object_gid", "target_domain", "target_capability_id",
             "target_major_version", "minimum_catalog_release", "resource_gid", "expected_version",
         )} | {"revision": revision}
-        self.bindings[target["binding_id"]] = {**target, "revision": revision, "owner_gid": record.owner_gid, "team_gid": record.team_gid}
+        self.bindings[binding_key] = {**target, "revision": revision, "owner_gid": record.owner_gid, "team_gid": record.team_gid}
         if mapping_gid:
             mapping = self.mappings.get(mapping_gid)
             if not mapping or not self._visible(mapping, {"owner_gid": record.owner_gid, "team_gid": record.team_gid}) or mapping["revision"] != mapping_expected_revision:

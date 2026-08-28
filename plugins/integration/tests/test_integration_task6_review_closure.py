@@ -9,7 +9,9 @@ from backend.capability_v2.contracts import (
     CorrelationRef, TenantIdentity,
 )
 from backend.capability_v2.domain_client import DomainCapabilityClient
-from plugins.integration.integration_backend.application.sync import ImportDispatcher, SyncService
+from plugins.integration.integration_backend.application.sync import (
+    ImportDispatcher, IntegrationImportWorker, SyncService,
+)
 
 
 def identity(owner: str, team: str) -> ConsumerIdentity:
@@ -122,3 +124,50 @@ def test_outcome_unknown_reclaims_exact_invocation_and_idempotency_without_reext
     assert first["status"] == "reconcile_pending" and second["status"] == "succeeded"
     assert client.calls[0][0].idempotency_key == client.calls[1][0].idempotency_key
     assert client.calls[0][0].payload == client.calls[1][0].payload
+
+
+def test_import_worker_survives_transient_claim_failure_then_polls_successfully_and_stops():
+    class FlakyDispatcher:
+        def __init__(self):
+            self.calls = 0
+            self.completed = asyncio.Event()
+
+        async def dispatch_next(self, **_kwargs):
+            self.calls += 1
+            if self.calls == 1:
+                raise ConnectionError("database connection reset")
+            self.completed.set()
+            return {"status": "succeeded"}
+
+    async def exercise():
+        dispatcher = FlakyDispatcher()
+        worker = IntegrationImportWorker(
+            dispatcher, idle_seconds=0.001, maximum_backoff_seconds=0.005,
+        )
+        await worker.start()
+        await asyncio.wait_for(dispatcher.completed.wait(), timeout=0.2)
+        assert worker.running is True
+        assert worker.health.consecutive_errors == 0
+        assert worker.health.last_error_code == "ConnectionError"
+        await worker.stop()
+        assert worker.running is False
+        assert worker.health.status == "stopped"
+
+    asyncio.run(exercise())
+
+
+def test_import_worker_marks_programming_failure_fatal_but_stop_does_not_rethrow_stale_error():
+    class BrokenDispatcher:
+        async def dispatch_next(self, **_kwargs):
+            raise ValueError("invalid worker configuration")
+
+    async def exercise():
+        worker = IntegrationImportWorker(BrokenDispatcher(), idle_seconds=0.001)
+        await worker.start()
+        await asyncio.sleep(0.01)
+        assert worker.running is False
+        assert worker.health.status == "fatal"
+        assert worker.health.last_error_code == "ValueError"
+        await worker.stop()
+
+    asyncio.run(exercise())

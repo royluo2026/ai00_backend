@@ -74,7 +74,7 @@ class IntegrationTargetCatalog:
         sql = (
             "SELECT " + ",".join(_PUBLIC_FIELDS) + " "
             "FROM workmanship_int_mapping_target_bindings "
-            "WHERE binding_id=%s AND active=1 AND owner_gid=%s AND team_gid=%s LIMIT 1"
+            "WHERE semantic_key=%s AND active=1 AND owner_gid=%s AND team_gid=%s LIMIT 1"
         )
         row = self._query(sql, (binding, actor, team), many=False)
         if row is None:

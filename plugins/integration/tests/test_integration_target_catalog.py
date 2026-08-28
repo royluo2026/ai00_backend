@@ -44,7 +44,7 @@ class Cursor:
             row for row in self.rows
             if row["owner_gid"] == actor_gid and row["team_gid"] == team_gid
         ]
-        if "binding_id=%s" in sql:
+        if "semantic_key=%s" in sql:
             eligible = [row for row in eligible if row["binding_id"] == params[0]]
         else:
             requested = set(params[:-2])
