@@ -152,6 +152,10 @@ def _descriptor_document(item: CapabilityDescriptorV2) -> dict:
         document.pop("domain_errors_complete", None)
     if document.get("expected_version_payload_path") is None:
         document.pop("expected_version_payload_path", None)
+    # Releases created before projected synchronous-write replay was introduced
+    # remain content-addressable under the fail-closed metadata-only default.
+    if document.get("replay_data_policy") == "metadata_only":
+        document.pop("replay_data_policy", None)
     # Releases produced before execution budgets were added remain verifiable.
     # A non-default budget is still part of the content-addressed document.
     if item.execution_budget == ExecutionBudget():

@@ -417,7 +417,12 @@ class CapabilityGatewayService:
                     )
                 })
             try:
-                self._reliability.complete(lease, result, transaction=transaction)
+                self._reliability.complete(
+                    lease,
+                    result,
+                    transaction=transaction,
+                    preserve_projected_data=(descriptor.replay_data_policy == "projected"),
+                )
                 if transaction is not None:
                     transaction.commit()
             except Exception:

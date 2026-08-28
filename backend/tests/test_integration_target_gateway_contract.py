@@ -1,22 +1,27 @@
 import asyncio
+import json
+from pathlib import Path
+import subprocess
 from datetime import UTC, datetime
 
 import pytest
 
 from backend.capabilities.registry_next import CapabilityRegistry
-from backend.capability_v2.authorization import AuthorizationDecision
+from backend.capability_v2.authorization import AuthorizationDecision, AuthorizationGrants
 from backend.capability_v2.catalog import CatalogResolver, build_release
 from backend.capability_v2.catalog_store import InMemoryCatalogStore
 from backend.capability_v2.contracts import (
-    ActorIdentity, ConsumerDescriptor, ConsumerIdentity, ConsumerType, CorrelationRef,
+    ActorIdentity, CapabilityStatus, ConsumerDescriptor, ConsumerIdentity, ConsumerType, CorrelationRef,
     InvocationEnvelope, TenantIdentity,
 )
 from backend.capability_v2.domain_client import DomainCapabilityClient
 from backend.capability_v2.gateway import CapabilityGatewayService
-from backend.capability_v2.policies import GatewayPolicyError
+from backend.capability_v2.policies import GatewayPolicyError, LegacyServerGatewayPolicy
 from backend.capability_v2.outcomes import InMemoryOutcomeStore
 from backend.capability_v2.operations import InMemoryOperationStore, OperationService
-from backend.capability_v2.reliability import InMemoryRateLimiter, ReliabilityCoordinator
+from backend.capability_v2.reliability import (
+    ApprovalService, InMemoryApprovalStore, InMemoryRateLimiter, ReliabilityCoordinator,
+)
 from plugins.integration.integration_backend.application.sync import SyncService, TargetAdapter
 from plugins.integration.integration_backend.capabilities.descriptors import specs as integration_specs
 from plugins.integration.integration_backend.capabilities.provider import descriptor_for
@@ -262,9 +267,17 @@ def test_real_connection_test_descriptor_gateway_rejects_missing_confirmation_an
     spec = next(item for item in integration_specs() if item.id == "integration.connector.connection.test")
     descriptor = descriptor_for(spec)
     registry = CapabilityRegistry()
-    registry.register(spec, lambda *_args: {
-        "operation_ref": {"operation_id": "operation-1", "status": "succeeded", "version": 2}
-    }, descriptor=descriptor)
+    provider_calls = 0
+
+    def connection_test(*_args):
+        nonlocal provider_calls
+        provider_calls += 1
+        return {
+            "reachable": True, "latency_ms": 12, "message": "[REDACTED]",
+            "operation_ref": {"operation_id": "operation-1", "status": "succeeded", "version": 2},
+        }
+
+    registry.register(spec, connection_test, descriptor=descriptor)
     release = build_release([descriptor])
     store = InMemoryCatalogStore(); store.publish(release)
 
@@ -301,8 +314,151 @@ def test_real_connection_test_descriptor_gateway_rejects_missing_confirmation_an
     confirmed = asyncio.run(gateway.invoke(envelope(
         {"gid": "connector-1", "idempotency_key": "idem-3"}, "idem-3", "confirm-1"
     )))
+    replay = asyncio.run(gateway.invoke(envelope(
+        {"gid": "connector-1", "idempotency_key": "idem-3"}, "idem-3", "confirm-1"
+    )))
 
     assert missing.error.code == "idempotency_key_mismatch"
     assert mismatch.error.code == "idempotency_key_mismatch"
     assert unconfirmed.error.code == "confirmation_required"
-    assert confirmed.ok is True
+    assert descriptor.operation_policy == "none"
+    assert confirmed.ok is True and confirmed.status is CapabilityStatus.COMPLETED
+    assert confirmed.data == {
+        "reachable": True, "latency_ms": 12, "message": "[REDACTED]",
+        "operation_ref": {"operation_id": "operation-1", "status": "succeeded", "version": 2},
+    }
+    assert confirmed.operation_ref.status.value == "completed"
+    assert replay.model_dump(mode="json") == confirmed.model_dump(mode="json"), (
+        confirmed.model_dump(mode="json"), replay.model_dump(mode="json")
+    )
+    assert provider_calls == 1
+
+
+def test_existing_web_client_uses_actual_gateway_policy_for_terminal_connection_test_and_replay():
+    """Run the shipped browser client against the real policy, approval, and outcome pipeline."""
+    spec = next(item for item in integration_specs() if item.id == "integration.connector.connection.test")
+    descriptor = descriptor_for(spec)
+    registry = CapabilityRegistry()
+    provider_calls = 0
+
+    def connection_test(*_args):
+        nonlocal provider_calls
+        provider_calls += 1
+        return {
+            "reachable": True, "latency_ms": 9, "message": "[REDACTED]",
+            "operation_ref": {"operation_id": "integration-op-1", "status": "succeeded", "version": 2},
+        }
+
+    registry.register(spec, connection_test, descriptor=descriptor)
+    release = build_release([descriptor])
+    catalog = InMemoryCatalogStore(); catalog.publish(release)
+    approvals = ApprovalService(InMemoryApprovalStore())
+    policy = LegacyServerGatewayPolicy(
+        user_loader=lambda user_gid: {"gid": user_gid, "is_active": True},
+        grants_resolver=lambda identity, _user: AuthorizationGrants(
+            permissions=("integration.write",), capability_scopes=("*",),
+            resource_scopes=("*",), data_scopes=("*",),
+            policy_version="integration-web-test", tenant_id=identity.tenant.tenant_id,
+        ),
+        approval_service=approvals,
+    )
+    gateway = CapabilityGatewayService(
+        CatalogResolver(catalog, registry), policy,
+        reliability=ReliabilityCoordinator(InMemoryOutcomeStore(), InMemoryRateLimiter(limit=100)),
+    ).bind_release(release.release_id)
+    principal = ConsumerIdentity(
+        actor=ActorIdentity(user_id="actor-1", authentication_method="session", authenticated_at=datetime.now(UTC)),
+        tenant=TenantIdentity(tenant_id="team-1", membership="member"),
+        consumer=ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="ai00.web"),
+    )
+
+    web_root = Path(__file__).resolve().parents[3] / "workmanship-web-capability-governance"
+    client_path = web_root / "web" / "core" / "existing_capability_client.js"
+    assert client_path.is_file(), f"paired Web worktree is required: {client_path}"
+    node_program = r"""
+const readline = require('readline');
+const { createExistingCapabilityClient } = require(process.argv[1]);
+const lines = readline.createInterface({ input: process.stdin });
+let requestId = 0;
+const waiters = new Map();
+lines.on('line', line => {
+  const message = JSON.parse(line);
+  const waiter = waiters.get(message.id);
+  if (waiter) { waiters.delete(message.id); waiter(message.response); }
+});
+function transport(path, options) {
+  const id = ++requestId;
+  process.stdout.write(JSON.stringify({ id, path, body: JSON.parse(options.body) }) + '\n');
+  return new Promise(resolve => waiters.set(id, resolve));
+}
+(async () => {
+  const client = createExistingCapabilityClient(transport, {
+    idempotencyKeyFactory: () => 'generated-but-not-in-payload',
+  });
+  let unconfirmed;
+  try {
+    await client.invoke('integration.connector.connection.test',
+      { gid: 'connector-1', idempotency_key: 'connection-key-1' },
+      { write: true, idempotencyKey: 'connection-key-1', confirmed: false });
+  } catch (error) { unconfirmed = error.code; }
+  let missingIdempotency;
+  try {
+    await client.invoke('integration.connector.connection.test', { gid: 'connector-1' },
+      { write: true, confirmed: true });
+  } catch (error) { missingIdempotency = error.code; }
+  const payload = { gid: 'connector-1', idempotency_key: 'connection-key-2' };
+  const first = await client.invoke('integration.connector.connection.test', payload,
+    { write: true, idempotencyKey: 'connection-key-2', confirmed: true });
+  const replay = await client.invoke('integration.connector.connection.test', payload,
+    { write: true, idempotencyKey: 'connection-key-2', confirmed: true });
+  process.stdout.write(JSON.stringify({ done: true, unconfirmed, missingIdempotency, first, replay }) + '\n');
+  process.exit(0);
+})().catch(error => {
+  process.stdout.write(JSON.stringify({ done: true, fatal: { code: error.code, message: error.message } }) + '\n');
+  process.exit(1);
+});
+"""
+    process = subprocess.Popen(
+        ["node", "-e", node_program, str(client_path)],
+        stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        text=True, encoding="utf-8", cwd=web_root,
+    )
+    assert process.stdin is not None and process.stdout is not None
+    final = None
+    sequence = 0
+    for line in process.stdout:
+        request = json.loads(line)
+        if request.get("done"):
+            final = request
+            break
+        sequence += 1
+        body = request["body"]
+        envelope = InvocationEnvelope(
+            capability_id=spec.id, major_version=body["version"], catalog_release=release.release_id,
+            payload=body["payload"], identity=principal,
+            idempotency_key=body.get("idempotency_key"),
+            approval_reference=body.get("confirmation_token"),
+            request_id=f"web-request-{sequence}", trace_id="web-connection-test",
+        )
+        if request["path"].endswith(":confirm"):
+            issued = asyncio.run(gateway.request_approval(envelope))
+            response = {"success": True, "data": {"confirmation_token": issued.token}}
+        else:
+            result = asyncio.run(gateway.invoke(envelope))
+            response = {"success": result.ok, "data": result.model_dump(mode="json")}
+        process.stdin.write(json.dumps({"id": request["id"], "response": response}) + "\n")
+        process.stdin.flush()
+    process.stdin.close()
+    return_code = process.wait(timeout=10)
+    stderr = process.stderr.read() if process.stderr is not None else ""
+
+    assert return_code == 0, (final, stderr)
+    assert final is not None and "fatal" not in final
+    assert final["unconfirmed"] == "confirmation_required"
+    assert final["missingIdempotency"] in {"input_schema_invalid", "invalid_input"}
+    assert final["first"] == {
+        "reachable": True, "latency_ms": 9, "message": "[REDACTED]",
+        "operation_ref": {"operation_id": "integration-op-1", "status": "succeeded", "version": 2},
+    }
+    assert final["replay"] == final["first"]
+    assert provider_calls == 1

@@ -50,7 +50,7 @@ class IntegrationTargetCatalog:
     def project_mapping_targets_for_ontology_objects(
         self, ontology_object_gids: Iterable[str], *, actor_gid: str, team_gid: str,
     ) -> list[dict[str, Any]]:
-        actor, team = self._scope(actor_gid, team_gid)
+        _actor, team = self._scope(actor_gid, team_gid)
         gids = tuple(dict.fromkeys(str(value).strip() for value in ontology_object_gids if str(value).strip()))
         if not 1 <= len(gids) <= 200:
             raise ValueError("ontology_object_scope_invalid")
@@ -59,24 +59,24 @@ class IntegrationTargetCatalog:
             "SELECT " + ",".join(_PUBLIC_FIELDS) + " "
             "FROM workmanship_int_mapping_target_bindings "
             f"WHERE ontology_object_gid IN ({placeholders}) AND active=1 "
-            "AND owner_gid=%s AND team_gid=%s ORDER BY ontology_object_gid,binding_id"
+            "AND team_gid=%s ORDER BY ontology_object_gid,binding_id"
         )
-        rows = self._query(sql, (*gids, actor, team), many=True)
+        rows = self._query(sql, (*gids, team), many=True)
         return [self._validated(row) for row in rows]
 
     def resolve_mapping_target(
         self, binding_id: str, *, actor_gid: str, team_gid: str,
     ) -> dict[str, Any] | None:
-        actor, team = self._scope(actor_gid, team_gid)
+        _actor, team = self._scope(actor_gid, team_gid)
         binding = str(binding_id or "").strip()
         if not binding:
             return None
         sql = (
             "SELECT " + ",".join(_PUBLIC_FIELDS) + " "
             "FROM workmanship_int_mapping_target_bindings "
-            "WHERE semantic_key=%s AND active=1 AND owner_gid=%s AND team_gid=%s LIMIT 1"
+            "WHERE semantic_key=%s AND active=1 AND team_gid=%s LIMIT 1"
         )
-        row = self._query(sql, (binding, actor, team), many=False)
+        row = self._query(sql, (binding, team), many=False)
         if row is None:
             return None
         value = self._validated(row)

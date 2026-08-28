@@ -39,15 +39,15 @@ class Cursor:
 
     def execute(self, sql, params):
         self.selected.append((sql, params))
-        actor_gid, team_gid = params[-2:]
+        team_gid = params[-1]
         eligible = [
             row for row in self.rows
-            if row["owner_gid"] == actor_gid and row["team_gid"] == team_gid
+            if row["team_gid"] == team_gid
         ]
         if "semantic_key=%s" in sql:
             eligible = [row for row in eligible if row["binding_id"] == params[0]]
         else:
-            requested = set(params[:-2])
+            requested = set(params[:-1])
             eligible = [row for row in eligible if row["ontology_object_gid"] in requested]
         self.last = eligible
 
@@ -155,9 +155,13 @@ def test_production_target_catalog_uses_real_catalog_resolver_and_scopes_seeded_
     }]
     assert catalog.resolve_mapping_target(
         "ontology:concept-part", actor_gid="actor-2", team_gid="team-1"
+    )["binding_id"] == "ontology:concept-part"
+    assert catalog.resolve_mapping_target(
+        "ontology:concept-part", actor_gid="actor-1", team_gid="team-3"
     ) is None
     catalog.require_stable(TARGET_ID, 1, release.release_id)
-    assert "owner_gid=%s AND team_gid=%s" in connection.cursor_value.selected[0][0]
+    assert "team_gid=%s" in connection.cursor_value.selected[0][0]
+    assert "owner_gid=%s" not in connection.cursor_value.selected[0][0]
 
 
 def test_production_catalog_composes_with_application_projection_create_and_import_reauthorization():

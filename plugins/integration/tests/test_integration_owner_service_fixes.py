@@ -523,6 +523,40 @@ def test_sql_binding_same_tenant_requires_optimistic_revision_before_update(monk
     )
 
 
+def test_sql_binding_same_team_different_actor_rebinds_shared_row_without_changing_mapping_scope(monkeypatch):
+    existing = ScriptedConnection(results=({"binding_gid": "binding-physical-1", "revision": 1},))
+    connection_sequence(monkeypatch, existing)
+    target = {
+        "binding_id": "ontology:concept-part", "ontology_object_gid": "concept-part",
+        "target_domain": "knowledge", "target_capability_id": "knowledge.reference_dataset.publish",
+        "target_major_version": 1, "minimum_catalog_release": "rel_20260828",
+        "input_contract": "knowledge.reference_dataset.publish.v1",
+        "resource_gid": "dataset-parts-v2", "expected_version": 8,
+    }
+    record = operation(
+        operation_id="operation-actor-2", capability_id="integration.mapping_target.upsert",
+        owner_gid="actor-2", team_gid="team-1", idempotency_key="binding-actor-2", result=None,
+    )
+
+    completed, replayed = IntegrationRepository().execute_binding_command(
+        record, target, expected_revision=1, mapping_gid=None, mapping_expected_revision=None,
+    )
+
+    binding_select = next(
+        (sql, params) for sql, params in existing.statements
+        if sql.startswith("SELECT binding_gid,revision FROM workmanship_int_mapping_target_bindings")
+    )
+    binding_update = next(
+        (sql, params) for sql, params in existing.statements
+        if sql.startswith("UPDATE workmanship_int_mapping_target_bindings")
+    )
+    assert binding_select[1] == ("ontology:concept-part", "team-1")
+    assert "owner_gid=%s" not in binding_select[0]
+    assert "owner_gid=%s" not in binding_update[0]
+    assert "team_gid=%s" in binding_update[0]
+    assert completed.result["revision"] == 2 and replayed is False
+
+
 def test_binding_identity_migration_backfills_before_primary_key_switch_and_is_reentrant():
     migration = Path("backend/db/migrations/domains/integration/0006_integration_binding_tenant_identity.sql").read_text(
         encoding="utf-8"

@@ -332,13 +332,23 @@ class ReliabilityCoordinator:
         return InvocationLease(operation_id=operation_id, outcome=actual)
 
     def complete(self, lease: InvocationLease, result: CapabilityResultV2,
-                 transaction=None) -> OutcomeRecord:
+                 transaction=None, *, preserve_projected_data: bool = False) -> OutcomeRecord:
         try:
             if transaction is not None and hasattr(self._store, "complete_in_transaction"):
+                if not preserve_projected_data:
+                    return self._store.complete_in_transaction(
+                        transaction, lease.operation_id, result
+                    )
                 return self._store.complete_in_transaction(
-                    transaction, lease.operation_id, result
+                    transaction, lease.operation_id, result,
+                    preserve_projected_data=preserve_projected_data,
                 )
-            return self._store.complete(lease.operation_id, result)
+            if not preserve_projected_data:
+                return self._store.complete(lease.operation_id, result)
+            return self._store.complete(
+                lease.operation_id, result,
+                preserve_projected_data=preserve_projected_data,
+            )
         except OutcomeConflict as exc:
             raise ReliabilityError(str(exc)) from exc
 

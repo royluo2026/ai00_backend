@@ -11,6 +11,7 @@ from backend.capability_v2.contracts import (
     CorrelationRef, TenantIdentity,
 )
 from backend.capability_v2.domain_client import DomainCapabilityClient
+from backend.capability_v2.provider_contracts import CapabilityContext
 
 from plugins.integration.integration_backend.application.service import IntegrationApplication
 from plugins.integration.integration_backend.capabilities.descriptors import INTEGRATION_CAPABILITY_IDS
@@ -55,8 +56,22 @@ def test_binding_upsert_is_actor_team_scoped_revisioned_and_idempotent():
     first = asyncio.run(application.invoke("integration.mapping_target.upsert", payload, CONTEXT))
     replay = asyncio.run(application.invoke("integration.mapping_target.upsert", payload, CONTEXT))
 
+    actor_two = CapabilityContext(user_gid="actor-2", team_gid="team-1", request_id="request-2")
+    actor_two_payload = {
+        **payload, "resource_gid": "dataset-parts-v2", "target_expected_version": 8,
+        "expected_revision": 1, "idempotency_key": "binding-upsert-actor-2",
+    }
+    rebound = asyncio.run(application.invoke(
+        "integration.mapping_target.upsert", actor_two_payload, actor_two,
+    ))
+    rebound_replay = asyncio.run(application.invoke(
+        "integration.mapping_target.upsert", actor_two_payload, actor_two,
+    ))
+
     assert replay == first
-    assert len(catalog.calls) == 2
+    assert rebound_replay == rebound and rebound["revision"] == 2
+    assert application.repository.bindings[("team-1", "ontology:concept-part")]["owner_gid"] == "actor-1"
+    assert len(catalog.calls) == 4
     assert catalog.calls[0]["target_domain"] == "knowledge"
 
 

@@ -105,8 +105,8 @@ class IntegrationRepository:
                     self._audit(cur, record)
                     cur.execute(
                         "SELECT binding_gid,revision FROM workmanship_int_mapping_target_bindings WHERE semantic_key=%s "
-                        "AND owner_gid=%s AND team_gid=%s FOR UPDATE",
-                        (target["binding_id"], record.owner_gid, record.team_gid),
+                        "AND team_gid=%s FOR UPDATE",
+                        (target["binding_id"], record.team_gid),
                     )
                     existing = cur.fetchone()
                     if existing:
@@ -117,11 +117,11 @@ class IntegrationRepository:
                             "UPDATE workmanship_int_mapping_target_bindings SET ontology_object_gid=%s,target_domain=%s,"
                             "target_capability_id=%s,target_major_version=%s,minimum_catalog_release=%s,input_contract=%s,"
                             "resource_gid=%s,expected_version=%s,active=1,revision=%s,last_idempotency_key=%s "
-                            "WHERE binding_gid=%s AND owner_gid=%s AND team_gid=%s AND revision=%s",
+                            "WHERE binding_gid=%s AND team_gid=%s AND revision=%s",
                             (target["ontology_object_gid"], target["target_domain"], target["target_capability_id"],
                              target["target_major_version"], target["minimum_catalog_release"], target["input_contract"],
                              target["resource_gid"], target["expected_version"], revision, record.idempotency_key,
-                             existing["binding_gid"], record.owner_gid, record.team_gid, expected_revision),
+                             existing["binding_gid"], record.team_gid, expected_revision),
                         )
                     else:
                         if expected_revision is not None:

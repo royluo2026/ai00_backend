@@ -30,7 +30,6 @@ _IDEMPOTENT_WRITES = {
 }
 
 _DURABLE_OPERATIONS = {
-    "integration.connector.connection.test",
     "integration.connector.schema.discover",
     "integration.mapping.source_columns.discover",
     "integration.mapping.preview",
@@ -61,6 +60,9 @@ def descriptor_for(spec) -> CapabilityDescriptorV2:
         "execution_mode": ExecutionMode.CLOUD_ASYNC if async_sync else base.execution_mode,
         "operation_policy": "required" if spec.id in _DURABLE_OPERATIONS else "none",
         "idempotency_policy": "required" if write else "none",
+        "replay_data_policy": (
+            "projected" if spec.id == "integration.connector.connection.test" else "metadata_only"
+        ),
         "consistency_policy": "external" if external else "strong",
         "evidence_policy": "required", "domain_errors": ERRORS, "domain_errors_complete": True,
     })

@@ -45,7 +45,8 @@ class AuditOutboxEvent(FrozenModel):
 
 class OutcomeStore(Protocol):
     def begin(self, record: OutcomeRecord) -> OutcomeRecord: ...
-    def complete(self, operation_id: str, result: CapabilityResultV2) -> OutcomeRecord: ...
+    def complete(self, operation_id: str, result: CapabilityResultV2, *,
+                 preserve_projected_data: bool = False) -> OutcomeRecord: ...
     def get(self, operation_id: str) -> OutcomeRecord: ...
     def find_by_idempotency(self, scope: str) -> OutcomeRecord | None: ...
     def mark_unknown(self, operation_id: str, result: CapabilityResultV2) -> OutcomeRecord: ...
@@ -73,16 +74,21 @@ class InMemoryOutcomeStore:
             self._by_idempotency[record.idempotency_scope] = record.operation_id
             return record
 
-    def complete(self, operation_id: str, result: CapabilityResultV2) -> OutcomeRecord:
+    def complete(self, operation_id: str, result: CapabilityResultV2, *,
+                 preserve_projected_data: bool = False) -> OutcomeRecord:
         with self._lock:
             record = self._records.get(operation_id)
             if record is None:
                 raise OutcomeConflict("outcome_not_found")
             if record.status != "started":
-                if record.result == durable_result(result):
+                if record.result == durable_result(
+                    result, preserve_projected_data=preserve_projected_data
+                ):
                     return record
                 raise OutcomeConflict("outcome_already_final")
-            durable = durable_result(result)
+            durable = durable_result(
+                result, preserve_projected_data=preserve_projected_data
+            )
             status = "completed" if result.ok else "failed"
             completed = record.model_copy(update={
                 "status": status,
@@ -220,12 +226,17 @@ class SqlOutcomeStore:
                 )
                 return record
 
-    def complete(self, operation_id: str, result: CapabilityResultV2) -> OutcomeRecord:
+    def complete(self, operation_id: str, result: CapabilityResultV2, *,
+                 preserve_projected_data: bool = False) -> OutcomeRecord:
         with self._connections() as conn:
-            return self.complete_in_transaction(conn, operation_id, result)
+            return self.complete_in_transaction(
+                conn, operation_id, result,
+                preserve_projected_data=preserve_projected_data,
+            )
 
     def complete_in_transaction(self, conn, operation_id: str,
-                                result: CapabilityResultV2) -> OutcomeRecord:
+                                result: CapabilityResultV2, *,
+                                preserve_projected_data: bool = False) -> OutcomeRecord:
         """Enlist outcome and audit rows in a provider-owned database transaction."""
         with conn.cursor() as cursor:
             cursor.execute(
@@ -237,12 +248,16 @@ class SqlOutcomeStore:
                 raise OutcomeConflict("outcome_not_found")
             record = _record_from_row(row)
             if record.status != "started":
-                if record.result == durable_result(result):
+                if record.result == durable_result(
+                    result, preserve_projected_data=preserve_projected_data
+                ):
                     return record
                 raise OutcomeConflict("outcome_already_final")
             status = "completed" if result.ok else "failed"
             completed_at = self._clock()
-            durable = durable_result(result)
+            durable = durable_result(
+                result, preserve_projected_data=preserve_projected_data
+            )
             result_json = json.dumps(durable.model_dump(mode="json"), ensure_ascii=False)
             cursor.execute(
                     f"UPDATE {self.OUTCOME_TABLE} SET status=%s,result_json=%s,completed_at=%s "
@@ -409,7 +424,8 @@ def _audit_event_from_row(row: Mapping[str, Any]) -> AuditOutboxEvent:
     )
 
 
-def durable_result(result: CapabilityResultV2) -> CapabilityResultV2:
+def durable_result(result: CapabilityResultV2, *,
+                   preserve_projected_data: bool = False) -> CapabilityResultV2:
     """Persist only cross-domain-safe outcome metadata and immutable references."""
     error = result.error
     if error is not None:
@@ -423,7 +439,8 @@ def durable_result(result: CapabilityResultV2) -> CapabilityResultV2:
         and not re.match(r"^[A-Za-z]:[\\/]", item.reference)
     )
     return result.model_copy(update={
-        "data": None, "error": error, "evidence": evidence, "warnings": (),
+        "data": result.data if preserve_projected_data else None,
+        "error": error, "evidence": evidence, "warnings": (),
     })
 
 

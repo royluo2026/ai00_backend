@@ -118,7 +118,11 @@ class MemoryRepository:
             "binding_id", "ontology_object_gid", "target_domain", "target_capability_id",
             "target_major_version", "minimum_catalog_release", "resource_gid", "expected_version",
         )} | {"revision": revision}
-        self.bindings[binding_key] = {**target, "revision": revision, "owner_gid": record.owner_gid, "team_gid": record.team_gid}
+        self.bindings[binding_key] = {
+            **target, "revision": revision,
+            "owner_gid": current["owner_gid"] if current else record.owner_gid,
+            "team_gid": record.team_gid,
+        }
         if mapping_gid:
             mapping = self.mappings.get(mapping_gid)
             if not mapping or not self._visible(mapping, {"owner_gid": record.owner_gid, "team_gid": record.team_gid}) or mapping["revision"] != mapping_expected_revision:

@@ -341,6 +341,9 @@ class CapabilityDescriptorV2(FrozenModel):
     concurrency_policy: Literal["none", "expected_version"] = "none"
     expected_version_payload_path: str | None = Field(default=None, min_length=1, max_length=512)
     idempotency_policy: Literal["none", "optional", "required"] = "none"
+    # Durable outcomes are metadata-only unless a reviewed synchronous capability
+    # explicitly opts into retaining its already projected result for replay.
+    replay_data_policy: Literal["metadata_only", "projected"] = "metadata_only"
     consistency_policy: Literal["strong", "eventual", "external"] = "strong"
     timeout_seconds: int = Field(default=30, ge=1, le=86400)
     rate_limit_cost: int = Field(default=1, ge=1, le=10000)
