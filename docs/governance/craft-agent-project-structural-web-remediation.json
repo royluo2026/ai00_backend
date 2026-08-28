@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3e-craft-agent-project-structural-remediation",
-  "atomic_contract_manifest_sha256": "sha256:ad3e325f3b1912d1fdc672af905605aefa4b7f8ede7803c6c266c90ac8c54a00",
-  "content_sha256": "sha256:e3eb3c9fbcc52781e0c4c941c980fb914d509e7b324b82f22d448910590a11bd",
+  "atomic_contract_manifest_sha256": "sha256:c75d6dbf4612bbc4240c2dbcef55678d6db462767221f4ded99556e8ae703bca",
+  "content_sha256": "sha256:8b9b3316f72a6e23fb502b6873b1836a4ef5396c0279e842e578d7605f9dd99c",
   "counts": {
     "groups": 14,
     "migrated_groups": 0,
@@ -133,10 +133,10 @@
       "final_occurrences": [
         {
           "column": 12,
-          "line": 259,
-          "occurrence_id": "web/core/existing_capability_client.js:259:12:DELETE:/api/lists/{dynamic}",
+          "line": 331,
+          "occurrence_id": "web/core/existing_capability_client.js:331:12:DELETE:/api/lists/{dynamic}",
           "source": "web/core/existing_capability_client.js",
-          "source_sha256": "b63965b4c800fed62758fce610913d1e3210fb7432553330958881d74dd8ad7d"
+          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
         }
       ],
       "input_output_contract": {
@@ -239,10 +239,10 @@
       "final_occurrences": [
         {
           "column": 51,
-          "line": 254,
-          "occurrence_id": "web/core/existing_capability_client.js:254:51:GET:/api/lists",
+          "line": 326,
+          "occurrence_id": "web/core/existing_capability_client.js:326:51:GET:/api/lists",
           "source": "web/core/existing_capability_client.js",
-          "source_sha256": "b63965b4c800fed62758fce610913d1e3210fb7432553330958881d74dd8ad7d"
+          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
         }
       ],
       "input_output_contract": {
@@ -1092,8 +1092,8 @@
       "unresolved_reason": "Rule definition changes contain dynamic rule_definition data without a governed closed nested contract."
     }
   ],
-  "frontend_content_hash": "6c2d9dd40efff87a5200b668727d7b56b47989b3f65e3796de97c91d83a2affb",
-  "frontend_revision": "6dd62900c9a82173adcbbe277bb38846ab556031",
+  "frontend_content_hash": "1458b00910499b0c8b32734c8815507e967839c18a7c16972368d21e1b40852e",
+  "frontend_revision": "5d6dc5cad342d75a4137219ca7bbb5ece71899d2",
   "schema_version": "1.0.0",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "source_ledger_revision": "2db07be4",
