@@ -214,6 +214,98 @@ def test_tls_cfg_ephemeral_ui_preferences_do_not_trigger_saved_view_authority(
     assert build_report(repo)["findings"] == []
 
 
+def test_tls_cfg_ephemeral_storage_ignores_unrelated_saved_view_state(
+    tmp_path: Path,
+) -> None:
+    from backend.scripts.check_base_deployable_surfaces import build_report
+
+    repo = _commit_fixture(tmp_path, {
+        "dist-production/packages/plugin.html": "<main>governed</main>\n",
+        "dist-production/web/preferences.js": (
+            "function saveDensity() { const key = 'tls_cfg_task'; "
+            "localStorage.setItem(key, JSON.stringify({ density: 'compact' })); }\n"
+            "function renderGovernedViews() { const vmFilters = []; return vmFilters; }\n"
+        ),
+        "packages/core/electron/main.js": "const safe = true;\n",
+    })
+
+    assert build_report(repo)["findings"] == []
+
+
+def test_tls_cfg_without_storage_ignores_saved_view_state(tmp_path: Path) -> None:
+    from backend.scripts.check_base_deployable_surfaces import build_report
+
+    repo = _commit_fixture(tmp_path, {
+        "dist-production/packages/plugin.html": "<main>governed</main>\n",
+        "dist-production/web/preferences.js": (
+            "const compatibilityPrefix = 'tls_cfg_';\n"
+            "function renderGovernedViews() { return { vmFilters: [], vmSorts: [] }; }\n"
+        ),
+        "packages/core/electron/main.js": "const safe = true;\n",
+    })
+
+    assert build_report(repo)["findings"] == []
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        (
+            "function loadSavedViews() { const vmFilters = []; "
+            "return localStorage.getItem( this . _lsKey ( ) ); }\n"
+        ),
+        (
+            "function saveSavedViews() { const vmSorts = []; "
+            "localStorage.setItem(\n  this._lsKey( ) ,\n  JSON.stringify({ vmSorts })\n); }\n"
+        ),
+    ],
+)
+def test_generic_ls_key_saved_view_storage_is_whitespace_tolerant(
+    tmp_path: Path, source: str,
+) -> None:
+    from backend.scripts.check_base_deployable_surfaces import build_report
+
+    report = build_report(_commit_fixture(tmp_path, {
+        "dist-production/packages/plugin.html": "<main>governed</main>\n",
+        "dist-production/web/arbitrary/cache.js": source,
+        "packages/core/electron/main.js": "const safe = true;\n",
+    }))
+
+    assert "silent_saved_view_local_authority" in {
+        finding["code"] for finding in report["findings"]
+    }
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        (
+            "function saveViews() { const key = 'tls_cfg_task'; "
+            "localStorage.setItem(key, JSON.stringify({ vmFilters: [], vmSorts: [] })); }\n"
+        ),
+        (
+            "function savedPayload() { return { field_gids: ['title'], filters: [], sort: [] }; }\n"
+            "function storageKey() { return 'tls_cfg_task'; }\n"
+            "function saveViews() { localStorage.setItem(storageKey(), JSON.stringify(savedPayload())); }\n"
+        ),
+    ],
+)
+def test_tls_cfg_detects_direct_and_helper_saved_view_payloads(
+    tmp_path: Path, source: str,
+) -> None:
+    from backend.scripts.check_base_deployable_surfaces import build_report
+
+    report = build_report(_commit_fixture(tmp_path, {
+        "dist-production/packages/plugin.html": "<main>governed</main>\n",
+        "dist-production/web/arbitrary/preferences.js": source,
+        "packages/core/electron/main.js": "const safe = true;\n",
+    }))
+
+    assert "silent_saved_view_local_authority" in {
+        finding["code"] for finding in report["findings"]
+    }
+
+
 def test_generic_ls_key_layout_cache_does_not_trigger_saved_view_authority(
     tmp_path: Path,
 ) -> None:

@@ -10,7 +10,7 @@
     "no silent REST fallback"
   ],
   "artifact_id": "capability-v2-structural-remediation-plan",
-  "content_sha256": "sha256:1a681d735e2eddac68438aea2fd77384f0ed2e0a4bd2ecaef0b5326119451ad5",
+  "content_sha256": "sha256:1e630a1236dd02722a5efab8dcb89ebca5b202330d47736aee86e3fb6e58c2e6",
   "counts": {
     "groups": 37,
     "occurrences": 45
@@ -3424,19 +3424,19 @@
   "source_artifacts": [
     {
       "path": "docs/governance/base-structural-web-remediation.json",
-      "sha256": "sha256:a692b8c4b7be1c945b1e608a4e813eec985c7584d567565d16ba63446b6fb8e3"
+      "sha256": "sha256:4d6614d9465080af611579cfac92b24a4e45739a258ef27d578cc6bc9bec4d96"
     },
     {
       "path": "docs/governance/integration-structural-web-remediation.json",
-      "sha256": "sha256:e911589976e81321ac9246e98478f342ce75980d3b24a8940b7b318876426c8b"
+      "sha256": "sha256:75cbd26bcd110d8954ba68709f823004147e2ba2fd9c7473b1bfda4c251cf0cf"
     },
     {
       "path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-      "sha256": "sha256:2de6997286b86190a7a086452b0b80ba42d6343caa8832607c273aedc2206238"
+      "sha256": "sha256:542024decfc094b87d4cadb7f074130ce0f44e1358eb762b2b8ffdf93e7951d2"
     },
     {
       "path": "docs\\governance\\capability-coverage-review\\generated\\web_route_inventory.json",
-      "sha256": "sha256:319b83221f5d2a582cb03a4cfbb70678e487ac96d3a3cf686d1552abd558cc3f"
+      "sha256": "sha256:b39bbb20755e9b0cf4045339dc82892744dbf9ea4f0a042841c45015cd952457"
     }
   ]
 }
