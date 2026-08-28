@@ -69,16 +69,28 @@ class IntegrationApplication:
             raise CapabilityBusinessError("invalid_input", "limit must be between 1 and 200")
         return value
 
+    @staticmethod
+    def _positive_integer(data: Mapping[str, Any], field: str) -> int:
+        value = data.get(field)
+        if isinstance(value, bool) or not isinstance(value, int) or value < 1:
+            raise CapabilityBusinessError("invalid_input", f"{field} must be a positive integer")
+        return value
+
     @classmethod
     def _validate_mappings(cls, items: list[dict] | tuple[dict, ...]) -> list[dict]:
         if len(items) > MAX_RESULTS:
             raise CapabilityBusinessError("invalid_input", "field mapping batch exceeds 200 items")
         validated = []
+        identities = set()
         for item in items:
             if not isinstance(item, dict):
                 raise CapabilityBusinessError("invalid_input", "field mappings must be objects")
             cls._closed(item, {"source_field", "target_field", "transform_expression"})
             cls._require(item, "source_field", "target_field")
+            identity = (str(item["source_field"]), str(item["target_field"]))
+            if identity in identities:
+                raise CapabilityBusinessError("invalid_input", "field mappings must have unique identities")
+            identities.add(identity)
             try:
                 if item.get("transform_expression"):
                     RestrictedExpression(item["transform_expression"])
@@ -377,6 +389,7 @@ class IntegrationApplication:
                 data, "datasource_gid", "name", "source_object", "target_domain", "target_capability_id",
                 "target_major_version", "minimum_catalog_release", "idempotency_key",
             )
+            self._positive_integer(data, "target_major_version")
             mappings = self._validate_mappings(data.get("field_mappings", []))
 
             def create() -> dict[str, Any]:
@@ -395,6 +408,7 @@ class IntegrationApplication:
         if capability_id == "integration.field_mapping.batch.update":
             self._closed(raw, {"mapping_gid", "expected_revision", "items", "idempotency_key"})
             self._require(data, "mapping_gid", "expected_revision", "idempotency_key")
+            self._positive_integer(data, "expected_revision")
             items = self._validate_mappings(data.get("items", []))
             if not items:
                 raise CapabilityBusinessError("invalid_input", "field mapping batch requires 1 to 200 items")
