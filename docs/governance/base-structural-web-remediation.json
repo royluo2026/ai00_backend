@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3e-base-structural-remediation",
   "atomic_contract_manifest_sha256": "sha256:c75d6dbf4612bbc4240c2dbcef55678d6db462767221f4ded99556e8ae703bca",
-  "content_sha256": "sha256:32e7f7362ecbdac9f4ddbf4f718f1160b450d1edfae50a73a4276f390405415c",
+  "content_sha256": "sha256:36ae12b0a178a0a6e62a4100b1f95740eb2996f01e62a27abffb0462c927deee",
   "counts": {
     "groups": 16,
     "migrated_groups": 16,
@@ -527,18 +527,31 @@
       "final_inventory_mapping": "capability",
       "frontend_call_sites": [
         {
-          "column": 5,
-          "line": 26,
+          "column": 16,
+          "historical_occurrence_id": "web/org_mgmt/org_mgmt.js:688:19:GET:/api/org/teams",
+          "line": 103,
           "operation": "base.orgTeams.list",
-          "source_path": "web/core/existing_capability_client.js",
-          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+          "operation_matcher": "(?:\\.call|_baseCall)\\(\\s*(['\\\"])base\\.orgTeams\\.list\\1",
+          "source_path": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "1549a479b3dd453e8cbd31add5f1dd811e97857a97460e12c63ef6451b61fee2"
         },
         {
-          "column": 5,
-          "line": 151,
+          "column": 18,
+          "historical_occurrence_id": "web/org_mgmt/org_mgmt.js:728:19:GET:/api/org/teams",
+          "line": 700,
           "operation": "base.orgTeams.list",
-          "source_path": "web/core/existing_capability_client.js",
-          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+          "operation_matcher": "(?:\\.call|_baseCall)\\(\\s*(['\\\"])base\\.orgTeams\\.list\\1",
+          "source_path": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "1549a479b3dd453e8cbd31add5f1dd811e97857a97460e12c63ef6451b61fee2"
+        },
+        {
+          "column": 18,
+          "historical_occurrence_id": "web/org_mgmt/org_mgmt.js:92:17:GET:/api/org/teams",
+          "line": 740,
+          "operation": "base.orgTeams.list",
+          "operation_matcher": "(?:\\.call|_baseCall)\\(\\s*(['\\\"])base\\.orgTeams\\.list\\1",
+          "source_path": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "1549a479b3dd453e8cbd31add5f1dd811e97857a97460e12c63ef6451b61fee2"
         }
       ],
       "frontend_operation": "base.orgTeams.list",
@@ -657,8 +670,9 @@
         "type": "object"
       },
       "owner_service_evidence": {
-        "source_path": "backend/base/web_atomic.py",
-        "source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4"
+        "function": "list_organization_teams",
+        "source_path": "backend/base/structural_web.py",
+        "source_sha256": "sha256:8ba5cf480fe8538c8d2c91a08a8309d8a7bf40c572fb39f78d57988a738690c2"
       },
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
       "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
@@ -677,18 +691,49 @@
       "final_inventory_mapping": "capability",
       "frontend_call_sites": [
         {
-          "column": 5,
-          "line": 28,
+          "column": 14,
+          "historical_occurrence_id": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js:125:35:GET:/api/self_ann/batch",
+          "line": 126,
           "operation": "base.annotations.batch",
-          "source_path": "web/core/existing_capability_client.js",
-          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+          "operation_matcher": "(?:\\.call|_baseCall)\\(\\s*(['\\\"])base\\.annotations\\.batch\\1",
+          "source_path": "packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
+          "source_sha256": "fd9b2555940d8811877f04a18333d67134d2d2f86d2c25505fa5b336351e22f6"
         },
         {
-          "column": 5,
-          "line": 156,
+          "column": 14,
+          "historical_occurrence_id": "packages/craft-plugin/web/ebom/ebom.js:394:35:GET:/api/self_ann/batch",
+          "line": 395,
           "operation": "base.annotations.batch",
-          "source_path": "web/core/existing_capability_client.js",
-          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+          "operation_matcher": "(?:\\.call|_baseCall)\\(\\s*(['\\\"])base\\.annotations\\.batch\\1",
+          "source_path": "packages/craft-plugin/web/ebom/ebom.js",
+          "source_sha256": "21fd36b6adc3cd3234ab3cec06e1ca92e74e051db3ca231dd2d5256bbd289704"
+        },
+        {
+          "column": 14,
+          "historical_occurrence_id": "packages/craft-plugin/web/issue/issue.js:262:35:GET:/api/self_ann/batch",
+          "line": 263,
+          "operation": "base.annotations.batch",
+          "operation_matcher": "(?:\\.call|_baseCall)\\(\\s*(['\\\"])base\\.annotations\\.batch\\1",
+          "source_path": "packages/craft-plugin/web/issue/issue.js",
+          "source_sha256": "38fa9bce0fb028772cb274fe364ef98d11047bab13f58e294fa9d99521096ee1"
+        },
+        {
+          "column": 14,
+          "historical_occurrence_id": "packages/craft-plugin/web/task/task.js:164:35:GET:/api/self_ann/batch",
+          "line": 165,
+          "operation": "base.annotations.batch",
+          "operation_matcher": "(?:\\.call|_baseCall)\\(\\s*(['\\\"])base\\.annotations\\.batch\\1",
+          "source_path": "packages/craft-plugin/web/task/task.js",
+          "source_sha256": "81d55a9251852d9d8e5a82e2696943f90a265a6d6008312b420296e7759585e8"
+        },
+        {
+          "column": 14,
+          "historical_occurrence_id": "web/knowledge_hub/knowledge_hub.js:614:36:GET:/api/self_ann/batch",
+          "line": 615,
+          "operation": "base.annotations.batch",
+          "operation_matcher": "(?:\\.call|_baseCall)\\(\\s*(['\\\"])base\\.annotations\\.batch\\1",
+          "source_path": "web/knowledge_hub/knowledge_hub.js",
+          "source_sha256": "c8454bfbb72276b6373ca72cc176dc2b83b5a88a5ade493596379f77d2f2e0de"
         }
       ],
       "frontend_operation": "base.annotations.batch",
@@ -833,8 +878,9 @@
         "type": "object"
       },
       "owner_service_evidence": {
-        "source_path": "backend/base/web_atomic.py",
-        "source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4"
+        "function": "annotation_batch",
+        "source_path": "backend/base/structural_web.py",
+        "source_sha256": "sha256:8ba5cf480fe8538c8d2c91a08a8309d8a7bf40c572fb39f78d57988a738690c2"
       },
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
       "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
@@ -1296,18 +1342,13 @@
       "final_inventory_mapping": "capability",
       "frontend_call_sites": [
         {
-          "column": 5,
-          "line": 27,
+          "column": 39,
+          "historical_occurrence_id": "web/components/visibility_selector.js:76:39:GET:/api/teams",
+          "line": 76,
           "operation": "base.teams.list",
-          "source_path": "web/core/existing_capability_client.js",
-          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
-        },
-        {
-          "column": 5,
-          "line": 155,
-          "operation": "base.teams.list",
-          "source_path": "web/core/existing_capability_client.js",
-          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+          "operation_matcher": "(?:\\.call|_baseCall)\\(\\s*(['\\\"])base\\.teams\\.list\\1",
+          "source_path": "web/components/visibility_selector.js",
+          "source_sha256": "c8c26c85b43501e8a9c121469d5b7990c183dec61a0b5ea7fc9089dbed63ad7d"
         }
       ],
       "frontend_operation": "base.teams.list",
@@ -1393,8 +1434,9 @@
         "type": "object"
       },
       "owner_service_evidence": {
-        "source_path": "backend/base/web_atomic.py",
-        "source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4"
+        "function": "list_teams",
+        "source_path": "backend/base/structural_web.py",
+        "source_sha256": "sha256:8ba5cf480fe8538c8d2c91a08a8309d8a7bf40c572fb39f78d57988a738690c2"
       },
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
       "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
@@ -1413,18 +1455,58 @@
       "final_inventory_mapping": "capability",
       "frontend_call_sites": [
         {
-          "column": 5,
-          "line": 33,
+          "column": 18,
+          "historical_occurrence_id": "packages/craft-plugin/web/task/task.js:396:38:GET:/api/users",
+          "line": 398,
           "operation": "base.users.list",
-          "source_path": "web/core/existing_capability_client.js",
-          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+          "operation_matcher": "(?:\\.call|_baseCall)\\(\\s*(['\\\"])base\\.users\\.list\\1",
+          "source_path": "packages/craft-plugin/web/task/task.js",
+          "source_sha256": "81d55a9251852d9d8e5a82e2696943f90a265a6d6008312b420296e7759585e8"
         },
         {
-          "column": 5,
-          "line": 177,
+          "column": 74,
+          "historical_occurrence_id": "web/org_mgmt/org_mgmt.js:342:44:GET:/api/users",
+          "line": 104,
           "operation": "base.users.list",
-          "source_path": "web/core/existing_capability_client.js",
-          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+          "operation_matcher": "(?:\\.call|_baseCall)\\(\\s*(['\\\"])base\\.users\\.list\\1",
+          "source_path": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "1549a479b3dd453e8cbd31add5f1dd811e97857a97460e12c63ef6451b61fee2"
+        },
+        {
+          "column": 43,
+          "historical_occurrence_id": "web/org_mgmt/org_mgmt.js:376:40:GET:/api/users",
+          "line": 352,
+          "operation": "base.users.list",
+          "operation_matcher": "(?:\\.call|_baseCall)\\(\\s*(['\\\"])base\\.users\\.list\\1",
+          "source_path": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "1549a479b3dd453e8cbd31add5f1dd811e97857a97460e12c63ef6451b61fee2"
+        },
+        {
+          "column": 39,
+          "historical_occurrence_id": "web/org_mgmt/org_mgmt.js:689:19:GET:/api/users",
+          "line": 386,
+          "operation": "base.users.list",
+          "operation_matcher": "(?:\\.call|_baseCall)\\(\\s*(['\\\"])base\\.users\\.list\\1",
+          "source_path": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "1549a479b3dd453e8cbd31add5f1dd811e97857a97460e12c63ef6451b61fee2"
+        },
+        {
+          "column": 18,
+          "historical_occurrence_id": "web/org_mgmt/org_mgmt.js:729:19:GET:/api/users",
+          "line": 701,
+          "operation": "base.users.list",
+          "operation_matcher": "(?:\\.call|_baseCall)\\(\\s*(['\\\"])base\\.users\\.list\\1",
+          "source_path": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "1549a479b3dd453e8cbd31add5f1dd811e97857a97460e12c63ef6451b61fee2"
+        },
+        {
+          "column": 18,
+          "historical_occurrence_id": "web/org_mgmt/org_mgmt.js:93:75:GET:/api/users",
+          "line": 741,
+          "operation": "base.users.list",
+          "operation_matcher": "(?:\\.call|_baseCall)\\(\\s*(['\\\"])base\\.users\\.list\\1",
+          "source_path": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "1549a479b3dd453e8cbd31add5f1dd811e97857a97460e12c63ef6451b61fee2"
         }
       ],
       "frontend_operation": "base.users.list",
@@ -1600,8 +1682,9 @@
         "type": "object"
       },
       "owner_service_evidence": {
-        "source_path": "backend/base/web_atomic.py",
-        "source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4"
+        "function": "list_admin_users",
+        "source_path": "backend/base/structural_web.py",
+        "source_sha256": "sha256:8ba5cf480fe8538c8d2c91a08a8309d8a7bf40c572fb39f78d57988a738690c2"
       },
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
       "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
@@ -2129,18 +2212,22 @@
       "final_inventory_mapping": "capability",
       "frontend_call_sites": [
         {
-          "column": 5,
-          "line": 34,
+          "column": 32,
+          "historical_occurrence_id": "web/org_mgmt/org_mgmt.js:491:35:PATCH:/api/users/{dynamic}/role",
+          "line": 501,
           "operation": "base.users.assignRole",
-          "source_path": "web/core/existing_capability_client.js",
-          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+          "operation_matcher": "(?:\\.call|_baseCall)\\(\\s*(['\\\"])base\\.users\\.assignRole\\1",
+          "source_path": "web/org_mgmt/org_mgmt.js",
+          "source_sha256": "1549a479b3dd453e8cbd31add5f1dd811e97857a97460e12c63ef6451b61fee2"
         },
         {
-          "column": 5,
-          "line": 178,
+          "column": 105,
+          "historical_occurrence_id": "web/settings/settings.js:1637:35:PATCH:/api/users/{dynamic}/role",
+          "line": 1635,
           "operation": "base.users.assignRole",
-          "source_path": "web/core/existing_capability_client.js",
-          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+          "operation_matcher": "(?:\\.call|_baseCall)\\(\\s*(['\\\"])base\\.users\\.assignRole\\1",
+          "source_path": "web/settings/settings.js",
+          "source_sha256": "13f1218a4c25f75c380f9daa6558d6dc2ae6f6846787a929d9ab92cd155752e3"
         }
       ],
       "frontend_operation": "base.users.assignRole",
@@ -2298,8 +2385,9 @@
         "type": "object"
       },
       "owner_service_evidence": {
-        "source_path": "backend/base/web_atomic.py",
-        "source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4"
+        "function": "assign_user_role",
+        "source_path": "backend/base/structural_web.py",
+        "source_sha256": "sha256:8ba5cf480fe8538c8d2c91a08a8309d8a7bf40c572fb39f78d57988a738690c2"
       },
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
       "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",

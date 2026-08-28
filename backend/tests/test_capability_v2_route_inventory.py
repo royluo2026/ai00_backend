@@ -19,11 +19,14 @@ from backend.capability_v2.route_root_cause_ledger import (
     audit_route_root_cause_ledger,
     load_route_root_cause_ledger,
 )
+from backend.scripts.check_web_capability_routes import build_report
 
 
 ROOT = Path(__file__).resolve().parents[2]
 LEDGER_PATH = ROOT / "docs/governance/web-route-root-cause-ledger.json"
 CANONICAL_WEB_INVENTORY = ROOT / "docs/governance/capability-coverage-review/generated/web_route_inventory.json"
+FRONTEND_ROOT = ROOT.parent / "workmanship-web-capability-governance"
+STRUCTURAL_PLAN = ROOT / "docs/governance/capability-v2-structural-remediation-plan.json"
 BASELINE_BACKEND_REVISION = "800ec6ba559db3301221e674b2a5026d354214ff"
 BASELINE_INVENTORY_SHA256 = "55f3de074e060a71dc6acab4bee993d42d7af05026e6acd4c0e8d7f6d06b9694"
 
@@ -56,9 +59,29 @@ def test_canonical_web_inventory_has_no_unknown_method() -> None:
 def test_canonical_web_inventory_truthfully_closes_saved_view_rest_calls() -> None:
     inventory = json.loads(CANONICAL_WEB_INVENTORY.read_text(encoding="utf-8"))
     ledger = _root_cause_ledger()
+    plan = json.loads(STRUCTURAL_PLAN.read_text(encoding="utf-8"))
+    fresh = json.loads(build_report(FRONTEND_ROOT).json())
+
+    assert fresh == inventory
+    assert audit_route_root_cause_ledger(ROOT, ledger, web_root=FRONTEND_ROOT) == ()
 
     assert inventory["counts"]["unresolved"] == 29
     assert inventory["counts"]["unresolved"] == ledger.final_evidence["unresolved_count"]
+    fresh_unresolved = [route for route in fresh["routes"] if route["disposition"] == "unresolved"]
+    assert len(fresh_unresolved) == 29
+    assert Counter((route["method"], route["normalized_route"]) for route in fresh_unresolved) == Counter(
+        (group["method"], group["normalized_route"])
+        for group in ledger.final_unresolved_groups
+        for _ in range(group["occurrence_count"])
+    )
+    assert Counter(
+        (group["method"], group["normalized_route"])
+        for group in plan["groups"]
+        if group["current_disposition"] == "unresolved"
+        for _ in group["occurrences"]
+    ) == Counter(
+        (route["method"], route["normalized_route"]) for route in fresh_unresolved
+    )
     assert not [
         route for route in inventory["routes"]
         if route["disposition"] == "unresolved"

@@ -50,6 +50,32 @@ def test_every_migrated_base_entry_has_generated_owner_contract_and_frontend_evi
         assert all("web/" in site["source_path"] for site in entry["frontend_call_sites"])
 
 
+def test_atomic_base_routes_prove_structural_owner_functions_and_real_consumer_calls():
+    payload = _module().build_manifest(ROOT.parent / "workmanship-web-capability-governance")
+    entries = {(item["method"], item["normalized_route"]): item for item in payload["entries"]}
+    expected = {
+        ("GET", "/api/org/teams"): "list_organization_teams",
+        ("GET", "/api/self_ann/batch"): "annotation_batch",
+        ("GET", "/api/teams"): "list_teams",
+        ("GET", "/api/users"): "list_admin_users",
+        ("PATCH", "/api/users/{dynamic}/role"): "assign_user_role",
+    }
+
+    for key, function in expected.items():
+        entry = entries[key]
+        assert entry["owner_service_evidence"]["source_path"] == "backend/base/structural_web.py"
+        assert entry["owner_service_evidence"]["function"] == function
+        assert entry["contract_evidence"]["source_path"] == "backend/base/web_atomic.py"
+        assert len(entry["frontend_call_sites"]) == len(entry["occurrences"])
+        assert {site["source_path"] for site in entry["frontend_call_sites"]} == {
+            occurrence["source"] for occurrence in entry["occurrences"]
+        }
+        assert all(site["source_path"] != "web/core/existing_capability_client.js" for site in entry["frontend_call_sites"])
+        assert all(site["operation_matcher"] for site in entry["frontend_call_sites"])
+
+    assert sum(len(entry["frontend_call_sites"]) for entry in entries.values()) == 33
+
+
 def test_saved_view_routes_require_shared_service_and_closed_contract_evidence():
     module = _module()
     key = ("POST", "/api/views")

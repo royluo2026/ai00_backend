@@ -5,6 +5,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import re
 import subprocess
 import sys
 from typing import Any
@@ -46,6 +47,11 @@ OWNER_SERVICE_TARGETS = {
     ("GET", "/api/users/me"): "base.identity.session.profile.get",
     ("POST", "/api/plugin/install"): "base.plugin.installation.request.create",
     ("DELETE", "/api/plugin/uninstall/{dynamic}"): "base.plugin.installation.transition.uninstall",
+    ("GET", "/api/org/teams"): "base.organization.team.directory.list",
+    ("GET", "/api/self_ann/batch"): "base.self_annotation.batch.get",
+    ("GET", "/api/teams"): "base.team.directory.list",
+    ("GET", "/api/users"): "base.identity.admin_user.list",
+    ("PATCH", "/api/users/{dynamic}/role"): "base.identity.role.assign.atomic",
 }
 OWNER_SERVICE_EVIDENCE = {
     **{key: ("backend/base/saved_views.py", ("search", "create", "update", "copy", "delete")) for key in SAVED_VIEW_TARGETS},
@@ -55,6 +61,11 @@ OWNER_SERVICE_EVIDENCE = {
     ("GET", "/api/users/me"): ("backend/base/identity_profile.py", ("get_current",)),
     ("POST", "/api/plugin/install"): ("backend/plugin_platform/service.py", ("request_install",)),
     ("DELETE", "/api/plugin/uninstall/{dynamic}"): ("backend/plugin_platform/service.py", ("transition_uninstall",)),
+    ("GET", "/api/org/teams"): ("backend/base/structural_web.py", ("list_organization_teams",)),
+    ("GET", "/api/self_ann/batch"): ("backend/base/structural_web.py", ("annotation_batch",)),
+    ("GET", "/api/teams"): ("backend/base/structural_web.py", ("list_teams",)),
+    ("GET", "/api/users"): ("backend/base/structural_web.py", ("list_admin_users",)),
+    ("PATCH", "/api/users/{dynamic}/role"): ("backend/base/structural_web.py", ("assign_user_role",)),
 }
 PLUGIN_FRONTEND_OPERATIONS = {
     ("POST", "/api/plugin/install"): "base.plugins.install",
@@ -98,12 +109,13 @@ def _owner_service_boundary_ready(key: tuple[str, str], contract: dict[str, Any]
     from backend.base.web_atomic import HANDLERS
     from backend.capability_v2.atomic_web_contracts import ROUTE_CAPABILITIES
     module = __import__(source.removesuffix(".py").replace("/", "."), fromlist=["*"])
-    service = getattr(module, {
+    service_name = {
         "backend/base/self_annotations.py": "SelfAnnotationService",
         "backend/base/identity_profile.py": "IdentityProfileService",
         "backend/base/saved_views.py": "SavedViewService",
         "backend/plugin_platform/service.py": "PluginPlatformService",
-    }[source])
+    }.get(source)
+    service = module if service_name is None else getattr(module, service_name)
     definition = ROUTE_CAPABILITIES.get(key, {})
     return (
         contract.get("capability_id") == expected and contract.get("major_version") == 1
@@ -134,36 +146,62 @@ def _plugin_frontend_evidence(web_root: Path, key: tuple[str, str]) -> dict[str,
 
 
 def _atomic_frontend_evidence(
-    web_root: Path, key: tuple[str, str], contract: dict[str, Any]
+    web_root: Path, key: tuple[str, str], contract: dict[str, Any], occurrences: list[dict[str, Any]]
 ) -> dict[str, Any]:
     operation = ATOMIC_FRONTEND_OPERATIONS[key]
-    relative = "web/core/existing_capability_client.js"
-    source = (web_root / relative).read_text(encoding="utf-8")
     target = contract["capability_id"]
-    target_offset = source.find(f"'{operation}': '{target}'")
-    consumer_offset = source.find(f"'{operation}':", target_offset + 1)
-    if target_offset < 0 or consumer_offset < 0:
-        raise ValueError(f"atomic frontend consumer missing: {operation} -> {target}")
+    matcher = re.compile(rf"(?:\.call|_baseCall)\(\s*(['\"]){re.escape(operation)}\1")
+    by_source: dict[str, list[dict[str, Any]]] = {}
+    for occurrence in occurrences:
+        by_source.setdefault(occurrence["source"], []).append(occurrence)
+    call_sites = []
+    for relative, source_occurrences in by_source.items():
+        source = (web_root / relative).read_text(encoding="utf-8")
+        matches = list(matcher.finditer(source))
+        if len(matches) != len(source_occurrences):
+            raise ValueError(
+                f"atomic frontend consumer count mismatch: {operation} {relative} "
+                f"expected={len(source_occurrences)} actual={len(matches)}"
+            )
+        for occurrence, match in zip(source_occurrences, matches, strict=True):
+            offset = match.start() + match.group().index(operation)
+            call_sites.append(_frontend_call_site(
+                source, relative, offset, operation, matcher.pattern,
+                occurrence["occurrence_id"],
+            ))
 
-    def call_site(offset: int) -> dict[str, Any]:
-        line = source.count("\n", 0, offset) + 1
-        line_start = source.rfind("\n", 0, offset) + 1
-        return {
-            "source_path": relative,
-            "line": line,
-            "column": offset - line_start + 1,
-            "operation": operation,
-            "source_sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
-        }
-
+    if len(call_sites) != len(occurrences):
+        raise ValueError(f"atomic frontend consumer conservation failed: {operation} -> {target}")
     return {
         "decision": "migrate",
         "target_capability_id": target,
         "target_major_version": contract["major_version"],
         "frontend_operation": operation,
-        "frontend_call_sites": [call_site(target_offset), call_site(consumer_offset)],
+        "frontend_call_sites": call_sites,
         "equivalence_evidence": {"provider_contract": _source_evidence("backend/base/web_atomic.py")},
     }
+
+
+def _frontend_call_site(
+    source: str, relative: str, offset: int, operation: str, matcher: str,
+    occurrence_id: str | None = None,
+) -> dict[str, Any]:
+    line = source.count("\n", 0, offset) + 1
+    line_start = source.rfind("\n", 0, offset) + 1
+    evidence = {
+        "source_path": relative,
+        "line": line,
+        "column": offset - line_start + 1,
+        "operation": operation,
+        "source_sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
+    }
+    if matcher:
+        evidence["operation_matcher"] = matcher
+    if occurrence_id is not None:
+        evidence["historical_occurrence_id"] = occurrence_id
+    return evidence
+
+
 def _canonical(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
 
@@ -213,7 +251,7 @@ def build_manifest(web_root: Path) -> dict[str, Any]:
             raise ValueError(f"owner-service boundary evidence missing: {key}")
         owner_evidence = (
             _plugin_frontend_evidence(web_root, key) if key in PLUGIN_FRONTEND_OPERATIONS
-            else _atomic_frontend_evidence(web_root, key, contract) if key in ATOMIC_FRONTEND_OPERATIONS
+            else _atomic_frontend_evidence(web_root, key, contract, source["occurrences"]) if key in ATOMIC_FRONTEND_OPERATIONS
             else migration_by_key.get(key) if key in OWNER_SERVICE_TARGETS else None
         )
         if owner_evidence is not None:
@@ -228,10 +266,11 @@ def build_manifest(web_root: Path) -> dict[str, Any]:
         mapping = "unresolved" if key in unresolved else "capability"
         if migrated != (mapping == "capability"):
             raise ValueError(f"final mapping does not match contract: {key}")
-        owner_source = (
-            OWNER_SERVICE_EVIDENCE[key][0] if key in OWNER_SERVICE_EVIDENCE
-            else "backend/base/web_atomic.py" if key in ATOMIC_FRONTEND_OPERATIONS else None
-        )
+        owner_source = OWNER_SERVICE_EVIDENCE[key][0] if key in OWNER_SERVICE_EVIDENCE else None
+        owner_functions = OWNER_SERVICE_EVIDENCE[key][1] if key in OWNER_SERVICE_EVIDENCE else ()
+        owner_service_evidence = _source_evidence(owner_source) if owner_evidence is not None else None
+        if key in ATOMIC_FRONTEND_OPERATIONS and owner_service_evidence is not None:
+            owner_service_evidence["function"] = owner_functions[0]
         entry = {
             "method": key[0],
             "normalized_route": key[1],
@@ -241,10 +280,7 @@ def build_manifest(web_root: Path) -> dict[str, Any]:
             "candidate_capability": f"{contract['capability_id']}@{contract['major_version']}" if migrated else None,
             "provider_anchor": contract["provider_anchor"],
             "provider_source_sha256": contract["provider_source_sha256"],
-            "owner_service_evidence": (
-                _source_evidence(owner_source)
-                if owner_evidence is not None else None
-            ),
+            "owner_service_evidence": owner_service_evidence,
             "contract_evidence": (
                 owner_evidence["equivalence_evidence"]["provider_contract"]
                 if owner_evidence is not None else None

@@ -10,7 +10,7 @@
     "no silent REST fallback"
   ],
   "artifact_id": "capability-v2-structural-remediation-plan",
-  "content_sha256": "sha256:323ce7f70b98e88b550317959a9098d9005ebeba6fc51c9fbb2e1ea22bd4c623",
+  "content_sha256": "sha256:678c3330a11226fa5d1a16e255760d78c30931fe4fe49c951c01c0b7664dcf72",
   "counts": {
     "groups": 37,
     "occurrences": 45
@@ -3424,7 +3424,7 @@
   "source_artifacts": [
     {
       "path": "docs/governance/base-structural-web-remediation.json",
-      "sha256": "sha256:31f1bb581cd8da2dae84abea7ecd7adfadf4b6f3c03630c9cc014f448deda1b2"
+      "sha256": "sha256:4db590849c8b669ead25969b988b2f45316e1bf24220b59e36dcf0e692295d96"
     },
     {
       "path": "docs/governance/integration-structural-web-remediation.json",
