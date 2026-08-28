@@ -129,7 +129,7 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 
 ### `DELETE /api/lists/{dynamic}`
 
-- Historical occurrences: web/core/existing_capability_client.js:259:12:DELETE:/api/lists/{dynamic}
+- Historical occurrences: web/core/existing_capability_client.js:331:12:DELETE:/api/lists/{dynamic}
 - Current status: `unresolved` (`unresolved`).
 - Owner/service: `craft` / `plugins.craft.craft_backend.application.bop_version_lifecycle_service`
 - Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/lists.py`; The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch.
@@ -255,7 +255,7 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 
 ### `GET /api/lists`
 
-- Historical occurrences: web/core/existing_capability_client.js:254:51:GET:/api/lists
+- Historical occurrences: web/core/existing_capability_client.js:326:51:GET:/api/lists
 - Current status: `unresolved` (`unresolved`).
 - Owner/service: `craft` / `plugins.craft.craft_backend.application.bop_version_lifecycle_service`
 - Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/lists.py`; The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch.
