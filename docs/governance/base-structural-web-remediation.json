@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3e-base-structural-remediation",
   "atomic_contract_manifest_sha256": "sha256:c75d6dbf4612bbc4240c2dbcef55678d6db462767221f4ded99556e8ae703bca",
-  "content_sha256": "sha256:711f57f4d0b4ccff0817051a863892dd19bff5a34593519aa9f7677bc84c4d99",
+  "content_sha256": "sha256:29443b3026fac23c1de3725c898f88949cecb77511da244f34094d46866e3876",
   "counts": {
     "groups": 16,
     "migrated_groups": 16,
@@ -144,7 +144,7 @@
       },
       "owner_service_evidence": {
         "source_path": "backend/plugin_platform/service.py",
-        "source_sha256": "sha256:939c93cfe488910a91a91067e1a8db545c92160dcab28ca3cb1e68c58481edab"
+        "source_sha256": "sha256:c79fd031bcba068b617832bbfbd08ead46d9e655e17c7399d9b213d228f24b39"
       },
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
       "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
@@ -2926,7 +2926,7 @@
       },
       "owner_service_evidence": {
         "source_path": "backend/plugin_platform/service.py",
-        "source_sha256": "sha256:939c93cfe488910a91a91067e1a8db545c92160dcab28ca3cb1e68c58481edab"
+        "source_sha256": "sha256:c79fd031bcba068b617832bbfbd08ead46d9e655e17c7399d9b213d228f24b39"
       },
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
       "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",

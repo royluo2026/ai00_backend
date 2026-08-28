@@ -116,6 +116,38 @@ def test_install_rejects_an_invalid_nonempty_platform_signature():
         )
 
 
+def test_install_accepts_a_legacy_raw_manifest_signature_but_rejects_default_field_injection():
+    """Legacy releases authenticate the exact signed stored payload; injected defaults do not."""
+    from backend.plugin_platform.service import PluginLifecycleError
+    from backend.plugin_platform.signing import canonical_release, sign
+
+    legacy = Repository()
+    raw_manifest = deepcopy(legacy.release_row["manifest"])
+    raw_manifest.pop("plugins")
+    legacy.release_row["manifest"] = raw_manifest
+    legacy.release_row["platform_signature"] = sign(legacy._private_key, canonical_release(raw_manifest, "b" * 64))
+    assert _service(legacy).request_install(
+        actor={"gid": "user_1", "tenant_gid": "tenant_1"}, command={**INSTALL, "plugin_id": "devteam.example.plugin"},
+    )["state"] == "disabled"
+
+    injected = Repository()
+    injected.release_row["manifest"] = raw_manifest | {"plugins": {"required": [], "optional": []}}
+    injected.release_row["platform_signature"] = sign(injected._private_key, canonical_release(raw_manifest, "b" * 64))
+    with pytest.raises(PluginLifecycleError, match="release_not_verified"):
+        _service(injected).request_install(
+            actor={"gid": "user_1", "tenant_gid": "tenant_1"}, command={**INSTALL, "plugin_id": "devteam.example.plugin"},
+        )
+
+
+def test_install_accepts_a_current_normalized_manifest_signature():
+    repository = Repository()
+
+    assert "plugins" in repository.release_row["manifest"]
+    assert _service(repository).request_install(
+        actor={"gid": "user_1", "tenant_gid": "tenant_1"}, command={**INSTALL, "plugin_id": "devteam.example.plugin"},
+    )["state"] == "disabled"
+
+
 def test_install_rejects_a_release_without_a_signed_manifest_dependency_resolution():
     """Fails if absent required dependency evidence is treated as ready."""
     from backend.plugin_platform.service import PluginLifecycleError

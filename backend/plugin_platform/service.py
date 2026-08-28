@@ -377,11 +377,13 @@ class PluginPlatformService:
         if command["release_sha256"] != f"sha256:{actual_hash}":
             raise PluginLifecycleError("release_not_verified", "release hash does not match signed release")
         try:
-            manifest = parse_manifest(_decode(release.get("manifest")))
-            normalized = manifest.model_dump(mode="json")
+            stored_manifest = _decode(release.get("manifest"))
+            if not isinstance(stored_manifest, dict):
+                raise ManifestError("release manifest must be an object")
+            verify(self.platform_public_key_provider(), canonical_release(stored_manifest, actual_hash), str(release["platform_signature"]))
+            manifest = parse_manifest(deepcopy(stored_manifest))
             if manifest.artifact.sha256 != actual_hash:
                 raise PluginLifecycleError("release_not_verified", "release artifact does not match signed manifest")
-            verify(self.platform_public_key_provider(), canonical_release(normalized, actual_hash), str(release["platform_signature"]))
             self.dependency_resolver.resolve(tenant_gid=tenant_gid, manifest=manifest)
         except PluginLifecycleError:
             raise
@@ -472,13 +474,14 @@ def review_release(plugin_id: str, version: str, approved: bool, note: str, acto
                 private_key = os.getenv("AI00_PLUGIN_PLATFORM_ED25519_PRIVATE_KEY", "").replace("\\n", "\n")
                 if not private_key:
                     raise SignatureError("platform signing key is not configured; unsigned release cannot be published")
-                manifest = _decode(row["manifest"])
-                validate_capability_grants(manifest.get("permissions", []))
-                platform_signature = sign(private_key, canonical_release(manifest, row["artifact_sha256"]))
+                manifest = parse_manifest(_decode(row["manifest"]))
+                normalized = manifest.model_dump(mode="json")
+                validate_capability_grants(normalized["permissions"])
+                platform_signature = sign(private_key, canonical_release(normalized, row["artifact_sha256"]))
                 status = "published"
             cur.execute(
-                "UPDATE workmanship_plugin_releases SET status=%s,platform_signature=%s,review_note=%s,reviewed_by=%s,updated_at=NOW() WHERE plugin_id=%s AND version=%s",
-                (status, platform_signature, note[:4000], actor_gid, plugin_id, version),
+                "UPDATE workmanship_plugin_releases SET status=%s,manifest=%s,platform_signature=%s,review_note=%s,reviewed_by=%s,updated_at=NOW() WHERE plugin_id=%s AND version=%s",
+                (status, _json(normalized) if approved else row["manifest"], platform_signature, note[:4000], actor_gid, plugin_id, version),
             )
         conn.commit()
     return {"plugin_id": plugin_id, "version": version, "status": status}
