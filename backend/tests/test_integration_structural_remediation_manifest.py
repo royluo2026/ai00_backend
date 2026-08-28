@@ -18,25 +18,39 @@ def _module():
     return module
 
 
-def test_manifest_conserves_pinned_integration_scope_without_claiming_unsafe_migrations():
-    """Breaks if an absent legacy route or non-equivalent provider is promoted."""
+def test_manifest_closes_exact_integration_scope_from_immutable_frontend_source():
+    """Breaks if one historical occurrence is not replaced by its exact governed call."""
     payload = _module().build_manifest(WEB_ROOT)
 
     assert payload["counts"] == {
         "groups": 12,
         "occurrences": 12,
-        "migrated_groups": 0,
-        "migrated_occurrences": 0,
-        "unresolved_groups": 12,
-        "unresolved_occurrences": 12,
+        "migrated_groups": 12,
+        "migrated_occurrences": 12,
+        "unresolved_groups": 0,
+        "unresolved_occurrences": 0,
     }
+    assert payload["frontend_revision"] == "ff2ccc822e7e45119e37ff9c40d479599104b9aa"
+    assert payload["frontend_source"]["blob"] == "6e7ce68530939c71bf6e6e133d974121bccfefba"
+    assert payload["frontend_source"]["sha256"] == (
+        "sha256:edea26785d8e8c994dee853955bc9f882178b48d1a02feb19e6a47c0d7a5f53c"
+    )
+    assert payload["frontend_dist"]["blob"] == payload["frontend_source"]["blob"]
+    assert payload["frontend_dist"]["sha256"] == payload["frontend_source"]["sha256"]
+    assert payload["canonical_remainder"] == {"groups": 14, "occurrences": 17}
     for entry in payload["entries"]:
-        assert entry["final_disposition"] == "unresolved"
-        assert entry["final_inventory_mapping"] == "unresolved"
+        assert entry["final_disposition"] == "migrated"
+        assert entry["final_inventory_mapping"] == "capability"
         assert entry["old_route_evidence"]["handler_status"] == "absent"
         assert entry["candidate_capability"].startswith("integration.")
-        assert entry["credential_handling"] == "legacy plaintext credentials are not represented; governed inputs accept only credential_ref"
-        assert entry["external_outcome"] in {"not_applicable", "unknown_without_provider_equivalence"}
+        assert entry["frontend_capability_evidence"]["source_path"] == "web/ext_datasource/ext_ds.js"
+        assert entry["provider_anchor"]["source_path"].endswith("capabilities/provider.py")
+        assert entry["service_anchor"]["source_path"].endswith("application/service.py")
+        assert entry["contract_evidence"]["input_schema"]["additionalProperties"] is False
+        assert entry["contract_evidence"]["output_schema"]["additionalProperties"] is False
+        assert entry["legacy_route_absent"] is True
+        assert entry["plaintext_credentials_absent"] is True
+        assert entry["arbitrary_sql_absent"] is True
 
 
 def test_manifest_binds_each_route_to_its_real_candidate_contract_and_service_evidence():
@@ -45,24 +59,19 @@ def test_manifest_binds_each_route_to_its_real_candidate_contract_and_service_ev
     entries = {(item["method"], item["normalized_route"]): item for item in payload["entries"]}
 
     for key, entry in entries.items():
-        evidence = entry["candidate_evidence"]
-        assert evidence["migration_decision"]["anchor"]["source_path"] == "backend/capability_v2/existing_capability_migration_decisions.py"
-        assert evidence["service"]["anchor"]["source_path"] == "plugins/integration/integration_backend/application/service.py"
-        assert evidence["contract"]["input_schema"]["additionalProperties"] is False
-        assert evidence["contract"]["output_schema"]["additionalProperties"] is False
-        assert entry["non_equivalence"]["input"]
-        assert entry["non_equivalence"]["output"]
-        assert entry["non_equivalence"]["side_effects"]
+        evidence = entry["contract_evidence"]
+        assert evidence["input_schema"]["additionalProperties"] is False
+        assert evidence["output_schema"]["additionalProperties"] is False
         assert entry["candidate_policy"]["confirmation"] in {"none", "user"}
         assert entry["candidate_policy"]["idempotency"] in {"none", "required"}
-        assert entry["candidate_policy"]["external_side_effect"] in {"none", "connector_runtime", "asynchronous_sync"}
-        if entry["candidate_policy"]["external_side_effect"] == "none":
+        assert entry["candidate_policy"]["external_side_effect"] in {"none", "connector_runtime", "asynchronous_import"}
+        if entry["candidate_policy"]["external_side_effect"] != "connector_runtime":
             assert entry["candidate_policy"]["timeout"] == "not_applicable"
         else:
-            assert entry["candidate_policy"]["timeout"] == "not declared by the public service"
+            assert entry["candidate_policy"]["timeout"] == "15_seconds"
         assert key in entries
 
-    assert entries[("POST", "/api/ext-mappings/{dynamic}/import")]["candidate_policy"]["external_side_effect"] == "asynchronous_sync"
+    assert entries[("POST", "/api/ext-mappings/{dynamic}/import")]["candidate_policy"]["external_side_effect"] == "asynchronous_import"
     assert entries[("GET", "/api/ext-datasources/{dynamic}/tables")]["candidate_policy"]["external_side_effect"] == "connector_runtime"
 
 
@@ -74,8 +83,7 @@ def test_manifest_validator_rejects_tampered_target_provider_and_final_inventory
 
     for field, value, reason in (
         ("candidate_capability", "base.identity.session.get@1", "candidate_target_mismatch"),
-        ("provider_source_sha256", "sha256:" + "0" * 64, "provider_hash_mismatch"),
-        ("final_inventory_mapping", "capability", "final_inventory_mismatch"),
+        ("final_inventory_mapping", "unresolved", "final_inventory_mismatch"),
     ):
         mutated = {**payload, "entries": [dict(item) for item in payload["entries"]]}
         mutated["entries"][0][field] = value
@@ -88,9 +96,9 @@ def test_manifest_validator_rejects_tampered_route_evidence_and_final_occurrence
     payload = module.build_manifest(WEB_ROOT)
 
     mutations = (
-        ("decision_evidence_mismatch", lambda item: item["candidate_evidence"]["migration_decision"]["anchor"].__setitem__("sha256", "0" * 64)),
-        ("service_evidence_mismatch", lambda item: item["candidate_evidence"]["service"].__setitem__("source_sha256", "sha256:" + "0" * 64)),
-        ("final_occurrence_mismatch", lambda item: item["final_occurrences"][0].__setitem__("line", 999)),
+        ("service_evidence_mismatch", lambda item: item["service_anchor"].__setitem__("sha256", "0" * 64)),
+        ("contract_evidence_mismatch", lambda item: item["contract_evidence"]["input_anchor"].__setitem__("sha256", "0" * 64)),
+        ("frontend_evidence_mismatch", lambda item: item["frontend_capability_evidence"].__setitem__("line", 999)),
     )
     for reason, mutate in mutations:
         changed = json.loads(json.dumps(payload))

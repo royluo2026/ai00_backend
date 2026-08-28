@@ -3,7 +3,7 @@
 This plan preserves the reviewed historical Web source scope while reconciling each group to current canonical unresolved evidence or current generated migrated-capability evidence. It is an implementation sequence, not an operations or BFF exemption.
 
 - Historical scope: **45 occurrences / 37 root-cause groups**.
-- Current progress: **11 migrated groups**; remaining groups are retained rather than erased.
+- Current progress: **23 migrated groups**; remaining groups are retained rather than erased.
 - Implementation disposition for every group: `owner_service_required`.
 - Global prohibitions: no private-router import; no direct SQL provider; no generic JSON contracts; no secret logging; no auto-confirm; no unbounded runtime execution; no fabricated atomicity; no silent REST fallback.
 
@@ -172,9 +172,9 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 ### `GET /api/ext-datasources`
 
 - Historical occurrences: web/ext_datasource/ext_ds.js:148:36:GET:/api/ext-datasources
-- Current status: `unresolved` (`unresolved`).
+- Current status: `migrated` (`migrated`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
-- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
+- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `{'end_line': 42, 'sha256': 'fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d', 'source_path': 'plugins/integration/integration_backend/capabilities/provider.py', 'start_line': 42}`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: Existing public IntegrationApplication with a credential-vault port and connector-runtime port; both legacy adapters and providers invoke that boundary. read-only actor/team bound query.
 - Target: `integration.connector.search@1`. Scope: opaque credential_ref only.
 - Contract/security: opaque credential_ref only; network allowlist, timeout and bounded discovery; masked outputs, structured external failure and no secret evidence.
@@ -186,9 +186,9 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 ### `GET /api/ext-datasources/{dynamic}/tables`
 
 - Historical occurrences: web/ext_datasource/ext_ds.js:640:36:GET:/api/ext-datasources/{dynamic}/tables
-- Current status: `unresolved` (`unresolved`).
+- Current status: `migrated` (`migrated`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
-- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
+- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `{'end_line': 42, 'sha256': 'fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d', 'source_path': 'plugins/integration/integration_backend/capabilities/provider.py', 'start_line': 42}`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: Existing public IntegrationApplication with a credential-vault port and connector-runtime port; both legacy adapters and providers invoke that boundary. bounded external read through runtime port; no fabricated atomic DB transaction.
 - Target: `integration.connector.schema.discover@1`. Scope: opaque credential_ref only.
 - Contract/security: opaque credential_ref only; network allowlist, timeout and bounded discovery; masked outputs, structured external failure and no secret evidence.
@@ -200,9 +200,9 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 ### `GET /api/ext-field-mappings`
 
 - Historical occurrences: web/ext_datasource/ext_ds.js:349:36:GET:/api/ext-field-mappings
-- Current status: `unresolved` (`unresolved`).
+- Current status: `migrated` (`migrated`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
-- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
+- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `{'end_line': 42, 'sha256': 'fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d', 'source_path': 'plugins/integration/integration_backend/capabilities/provider.py', 'start_line': 42}`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: Existing public IntegrationApplication mapping operations backed by Integration repository and connector-runtime ports; no cross-domain database adapter. read-only actor/team bound bounded query.
 - Target: `integration.field_mapping.search@1`. Scope: closed field-mapping grammar and restricted transforms.
 - Contract/security: closed field-mapping grammar and restricted transforms; owner/team binding; bounded preview/import and safe external error classes.
@@ -214,9 +214,9 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 ### `GET /api/ext-mappings`
 
 - Historical occurrences: web/ext_datasource/ext_ds.js:187:36:GET:/api/ext-mappings
-- Current status: `unresolved` (`unresolved`).
+- Current status: `migrated` (`migrated`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
-- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
+- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `{'end_line': 42, 'sha256': 'fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d', 'source_path': 'plugins/integration/integration_backend/capabilities/provider.py', 'start_line': 42}`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: Existing public IntegrationApplication mapping operations backed by Integration repository and connector-runtime ports; no cross-domain database adapter. read-only actor/team bound query.
 - Target: `integration.mapping.search@1`. Scope: closed field-mapping grammar and restricted transforms.
 - Contract/security: closed field-mapping grammar and restricted transforms; owner/team binding; bounded preview/import and safe external error classes.
@@ -228,9 +228,9 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 ### `GET /api/ext-mappings/{dynamic}/columns`
 
 - Historical occurrences: web/ext_datasource/ext_ds.js:341:36:GET:/api/ext-mappings/{dynamic}/columns
-- Current status: `unresolved` (`unresolved`).
+- Current status: `migrated` (`migrated`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
-- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
+- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `{'end_line': 42, 'sha256': 'fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d', 'source_path': 'plugins/integration/integration_backend/capabilities/provider.py', 'start_line': 42}`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: Existing public IntegrationApplication mapping operations backed by Integration repository and connector-runtime ports; no cross-domain database adapter. bounded external discovery through connector runtime.
 - Target: `integration.mapping.source_columns.discover@1`. Scope: closed field-mapping grammar and restricted transforms.
 - Contract/security: closed field-mapping grammar and restricted transforms; owner/team binding; bounded preview/import and safe external error classes.
@@ -242,9 +242,9 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 ### `GET /api/ext-mappings/{dynamic}/preview`
 
 - Historical occurrences: web/ext_datasource/ext_ds.js:496:36:GET:/api/ext-mappings/{dynamic}/preview
-- Current status: `unresolved` (`unresolved`).
+- Current status: `migrated` (`migrated`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
-- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
+- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `{'end_line': 42, 'sha256': 'fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d', 'source_path': 'plugins/integration/integration_backend/capabilities/provider.py', 'start_line': 42}`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: Existing public IntegrationApplication mapping operations backed by Integration repository and connector-runtime ports; no cross-domain database adapter. bounded external preview through runtime port.
 - Target: `integration.mapping.preview@1`. Scope: closed field-mapping grammar and restricted transforms.
 - Contract/security: closed field-mapping grammar and restricted transforms; owner/team binding; bounded preview/import and safe external error classes.
@@ -340,9 +340,9 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 ### `PATCH /api/ext-datasources/{dynamic}`
 
 - Historical occurrences: web/ext_datasource/ext_ds.js:623:29:PATCH:/api/ext-datasources/{dynamic}
-- Current status: `unresolved` (`unresolved`).
+- Current status: `migrated` (`migrated`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
-- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
+- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `{'end_line': 42, 'sha256': 'fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d', 'source_path': 'plugins/integration/integration_backend/capabilities/provider.py', 'start_line': 42}`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: Existing public IntegrationApplication with a credential-vault port and connector-runtime port; both legacy adapters and providers invoke that boundary. one revision-locked connector aggregate transaction.
 - Target: `integration.connector.update@1`. Scope: opaque credential_ref only.
 - Contract/security: opaque credential_ref only; network allowlist, timeout and bounded discovery; masked outputs, structured external failure and no secret evidence.
@@ -382,9 +382,9 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 ### `POST /api/ext-datasources`
 
 - Historical occurrences: web/ext_datasource/ext_ds.js:625:28:POST:/api/ext-datasources
-- Current status: `unresolved` (`unresolved`).
+- Current status: `migrated` (`migrated`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
-- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
+- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `{'end_line': 42, 'sha256': 'fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d', 'source_path': 'plugins/integration/integration_backend/capabilities/provider.py', 'start_line': 42}`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: Existing public IntegrationApplication with a credential-vault port and connector-runtime port; both legacy adapters and providers invoke that boundary. one connector aggregate transaction; credential material is written only through vault port.
 - Target: `integration.connector.create@1`. Scope: opaque credential_ref only.
 - Contract/security: opaque credential_ref only; network allowlist, timeout and bounded discovery; masked outputs, structured external failure and no secret evidence.
@@ -396,9 +396,9 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 ### `POST /api/ext-datasources/{dynamic}/test`
 
 - Historical occurrences: web/ext_datasource/ext_ds.js:605:34:POST:/api/ext-datasources/{dynamic}/test
-- Current status: `unresolved` (`unresolved`).
+- Current status: `migrated` (`migrated`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
-- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
+- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `{'end_line': 42, 'sha256': 'fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d', 'source_path': 'plugins/integration/integration_backend/capabilities/provider.py', 'start_line': 42}`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: Existing public IntegrationApplication with a credential-vault port and connector-runtime port; both legacy adapters and providers invoke that boundary. bounded external probe with durable operation result when outcome is uncertain.
 - Target: `integration.connector.connection.test@1`. Scope: opaque credential_ref only.
 - Contract/security: opaque credential_ref only; network allowlist, timeout and bounded discovery; masked outputs, structured external failure and no secret evidence.
@@ -410,9 +410,9 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 ### `POST /api/ext-mappings`
 
 - Historical occurrences: web/ext_datasource/ext_ds.js:677:26:POST:/api/ext-mappings
-- Current status: `unresolved` (`unresolved`).
+- Current status: `migrated` (`migrated`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
-- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
+- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `{'end_line': 42, 'sha256': 'fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d', 'source_path': 'plugins/integration/integration_backend/capabilities/provider.py', 'start_line': 42}`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: Existing public IntegrationApplication mapping operations backed by Integration repository and connector-runtime ports; no cross-domain database adapter. one mapping aggregate transaction with target-capability validation.
 - Target: `integration.mapping.create@1`. Scope: closed field-mapping grammar and restricted transforms.
 - Contract/security: closed field-mapping grammar and restricted transforms; owner/team binding; bounded preview/import and safe external error classes.
@@ -424,9 +424,9 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 ### `POST /api/ext-mappings/{dynamic}/import`
 
 - Historical occurrences: web/ext_datasource/ext_ds.js:549:37:POST:/api/ext-mappings/{dynamic}/import
-- Current status: `unresolved` (`unresolved`).
+- Current status: `migrated` (`migrated`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
-- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
+- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `{'end_line': 42, 'sha256': 'fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d', 'source_path': 'plugins/integration/integration_backend/capabilities/provider.py', 'start_line': 42}`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: Existing public IntegrationApplication mapping operations backed by Integration repository and connector-runtime ports; no cross-domain database adapter. durable asynchronous import operation with idempotency and recoverable status.
 - Target: `integration.mapping.import.start@1`. Scope: closed field-mapping grammar and restricted transforms.
 - Contract/security: closed field-mapping grammar and restricted transforms; owner/team binding; bounded preview/import and safe external error classes.
@@ -578,9 +578,9 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 ### `PUT /api/ext-field-mappings/batch`
 
 - Historical occurrences: web/ext_datasource/ext_ds.js:457:23:PUT:/api/ext-field-mappings/batch
-- Current status: `unresolved` (`unresolved`).
+- Current status: `migrated` (`migrated`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
-- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
+- Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `{'end_line': 42, 'sha256': 'fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d', 'source_path': 'plugins/integration/integration_backend/capabilities/provider.py', 'start_line': 42}`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: Existing public IntegrationApplication mapping operations backed by Integration repository and connector-runtime ports; no cross-domain database adapter. one bounded batch transaction with per-item revision conflicts.
 - Target: `integration.field_mapping.batch.update@1`. Scope: closed field-mapping grammar and restricted transforms.
 - Contract/security: closed field-mapping grammar and restricted transforms; owner/team binding; bounded preview/import and safe external error classes.

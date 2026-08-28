@@ -3,7 +3,7 @@
   "artifact_id": "existing-capability-web-migrations",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "baseline_revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-  "frontend_revision": "964233cf30aebddfc1167a5ac3eff1252cfc28eb",
+  "frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
   "groups": [
     {
       "method": "DELETE",
@@ -291,11 +291,11 @@
         },
         "candidate_contracts": [
           {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 46,
-            "end_line": 46,
-            "sha256": "ab2c27b403a9031af28346979a178de5b571dbab9ad580f0769f8af0fb0ea16a",
+            "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "start_line": 10,
+            "end_line": 10,
+            "sha256": "67b261904167a24b4eada2398aa9292955ff80bce5f20dbff30d42687e409b33",
             "needle": "\"integration.connector.search\""
           }
         ],
@@ -354,11 +354,11 @@
         },
         "candidate_contracts": [
           {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 48,
-            "end_line": 48,
-            "sha256": "5ce7451c74e389af9f867da9da1b9e3989f7358c28d915c92c8ee7da272c2779",
+            "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "start_line": 9,
+            "end_line": 9,
+            "sha256": "6dc486a5f1ef42a791813b6c31330cae66bad65a0d1a883e3f88eb2940563dd7",
             "needle": "\"integration.connector.schema.discover\""
           }
         ],
@@ -386,7 +386,7 @@
           "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
-      "target_capability_id": "integration.mapping.get",
+      "target_capability_id": "integration.field_mapping.search",
       "target_major_version": 1,
       "owner_domain": "integration",
       "transport_evidence": {
@@ -397,15 +397,15 @@
         "anchors": []
       },
       "decision": "reclassify",
-      "request_transform": "not applied: /api/ext-field-mappings: REST lists field mappings by legacy query; candidate requires one mapping gid.",
-      "response_transform": "not applied: /api/ext-field-mappings: REST returns a collection; candidate returns one mapping.",
+      "request_transform": "not applied: /api/ext-field-mappings: REST lists legacy field mappings; exact candidate requires one owned mapping gid and a bounded limit.",
+      "response_transform": "not applied: /api/ext-field-mappings: Both return a collection; candidate returns closed field identities and revisions.",
       "frontend_operation": null,
       "frontend_call_sites": [],
       "equivalence_evidence": null,
       "reclassification": {
         "reason_code": "contract_shape_mismatch",
         "followup": "atomic_capability_review",
-        "finding": "/api/ext-field-mappings: REST lists field mappings by legacy query; candidate requires one mapping gid. | /api/ext-field-mappings: REST returns a collection; candidate returns one mapping. | /api/ext-field-mappings: Candidate enforces actor/team ownership for a single resource.",
+        "finding": "/api/ext-field-mappings: REST lists legacy field mappings; exact candidate requires one owned mapping gid and a bounded limit. | /api/ext-field-mappings: Both return a collection; candidate returns closed field identities and revisions. | /api/ext-field-mappings: Candidate enforces actor/team ownership through one bounded collection query.",
         "legacy_contract": {
           "kind": "reviewed_handler_absence",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
@@ -417,18 +417,18 @@
         },
         "candidate_contracts": [
           {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 57,
-            "end_line": 57,
-            "sha256": "f137d0bb608efa11c1b626741729a2db811ab486d848e2300a437af73add860d",
-            "needle": "\"integration.mapping.get\""
+            "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "start_line": 11,
+            "end_line": 11,
+            "sha256": "ea7f3b9b8ee8c3ff58a4b894c1fb7bab4f8554540c868fc9ee72e6b6fbeac918",
+            "needle": "\"integration.field_mapping.search\""
           }
         ],
         "contract_mismatch": {
-          "input": "/api/ext-field-mappings: REST lists field mappings by legacy query; candidate requires one mapping gid.",
-          "output": "/api/ext-field-mappings: REST returns a collection; candidate returns one mapping.",
-          "side_effects": "/api/ext-field-mappings: Candidate enforces actor/team ownership for a single resource."
+          "input": "/api/ext-field-mappings: REST lists legacy field mappings; exact candidate requires one owned mapping gid and a bounded limit.",
+          "output": "/api/ext-field-mappings: Both return a collection; candidate returns closed field identities and revisions.",
+          "side_effects": "/api/ext-field-mappings: Candidate enforces actor/team ownership through one bounded collection query."
         }
       }
     },
@@ -480,11 +480,11 @@
         },
         "candidate_contracts": [
           {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 59,
-            "end_line": 59,
-            "sha256": "5a6c7881ed21e630d9b7604459a9d4509a7d62761f43352edcfedd9fbd9a441c",
+            "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "start_line": 13,
+            "end_line": 13,
+            "sha256": "a8142a0f6fc3010c3ff7ddebeb0c30ce810748a8d9ccf4e0b667191e64119fd3",
             "needle": "\"integration.mapping.search\""
           }
         ],
@@ -512,7 +512,7 @@
           "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
-      "target_capability_id": "integration.connector.schema.discover",
+      "target_capability_id": "integration.mapping.source_columns.discover",
       "target_major_version": 1,
       "owner_domain": "integration",
       "transport_evidence": {
@@ -523,15 +523,15 @@
         "anchors": []
       },
       "decision": "reclassify",
-      "request_transform": "not applied: /api/ext-mappings/{dynamic}/columns: REST starts from mapping gid and column semantics; candidate requires connector gid.",
-      "response_transform": "not applied: /api/ext-mappings/{dynamic}/columns: REST returns mapped columns; candidate returns connector schema discovery.",
+      "request_transform": "not applied: /api/ext-mappings/{dynamic}/columns: Both start from a mapping gid; candidate additionally binds its owned connector and caps results.",
+      "response_transform": "not applied: /api/ext-mappings/{dynamic}/columns: Both return source columns; candidate uses a closed bounded projection.",
       "frontend_operation": null,
       "frontend_call_sites": [],
       "equivalence_evidence": null,
       "reclassification": {
         "reason_code": "contract_shape_mismatch",
         "followup": "atomic_capability_review",
-        "finding": "/api/ext-mappings/{dynamic}/columns: REST starts from mapping gid and column semantics; candidate requires connector gid. | /api/ext-mappings/{dynamic}/columns: REST returns mapped columns; candidate returns connector schema discovery. | /api/ext-mappings/{dynamic}/columns: Candidate invokes connector runtime rather than reading mapping columns.",
+        "finding": "/api/ext-mappings/{dynamic}/columns: Both start from a mapping gid; candidate additionally binds its owned connector and caps results. | /api/ext-mappings/{dynamic}/columns: Both return source columns; candidate uses a closed bounded projection. | /api/ext-mappings/{dynamic}/columns: Candidate invokes the bounded connector runtime through the owned mapping.",
         "legacy_contract": {
           "kind": "reviewed_handler_absence",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
@@ -543,18 +543,18 @@
         },
         "candidate_contracts": [
           {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 48,
-            "end_line": 48,
-            "sha256": "5ce7451c74e389af9f867da9da1b9e3989f7358c28d915c92c8ee7da272c2779",
-            "needle": "\"integration.connector.schema.discover\""
+            "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "start_line": 14,
+            "end_line": 14,
+            "sha256": "858fe3be1139880ee0608e8952d4a1bf0647b3974c91216ae3d91696f7b629b0",
+            "needle": "\"integration.mapping.source_columns.discover\""
           }
         ],
         "contract_mismatch": {
-          "input": "/api/ext-mappings/{dynamic}/columns: REST starts from mapping gid and column semantics; candidate requires connector gid.",
-          "output": "/api/ext-mappings/{dynamic}/columns: REST returns mapped columns; candidate returns connector schema discovery.",
-          "side_effects": "/api/ext-mappings/{dynamic}/columns: Candidate invokes connector runtime rather than reading mapping columns."
+          "input": "/api/ext-mappings/{dynamic}/columns: Both start from a mapping gid; candidate additionally binds its owned connector and caps results.",
+          "output": "/api/ext-mappings/{dynamic}/columns: Both return source columns; candidate uses a closed bounded projection.",
+          "side_effects": "/api/ext-mappings/{dynamic}/columns: Candidate invokes the bounded connector runtime through the owned mapping."
         }
       }
     },
@@ -606,11 +606,11 @@
         },
         "candidate_contracts": [
           {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 65,
-            "end_line": 65,
-            "sha256": "211345df50bebfdb4f35289640742d8ada9f198a97a1aa1783f3649d897cf78d",
+            "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "start_line": 13,
+            "end_line": 13,
+            "sha256": "a8142a0f6fc3010c3ff7ddebeb0c30ce810748a8d9ccf4e0b667191e64119fd3",
             "needle": "\"integration.mapping.preview\""
           }
         ],
@@ -1870,11 +1870,11 @@
         },
         "candidate_contracts": [
           {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 42,
-            "end_line": 42,
-            "sha256": "079ccaecfc7418945962f21d8901ddff906cd3848704aeb3071607b99e793123",
+            "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "start_line": 10,
+            "end_line": 10,
+            "sha256": "67b261904167a24b4eada2398aa9292955ff80bce5f20dbff30d42687e409b33",
             "needle": "\"integration.connector.update\""
           }
         ],
@@ -2282,11 +2282,11 @@
         },
         "candidate_contracts": [
           {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 38,
-            "end_line": 38,
-            "sha256": "45bd33cb1023303df1f0792d5153e4431375d7ce357fe6609cbb436e5dfc8bc9",
+            "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "start_line": 9,
+            "end_line": 9,
+            "sha256": "6dc486a5f1ef42a791813b6c31330cae66bad65a0d1a883e3f88eb2940563dd7",
             "needle": "\"integration.connector.create\""
           }
         ],
@@ -2345,11 +2345,11 @@
         },
         "candidate_contracts": [
           {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 48,
-            "end_line": 48,
-            "sha256": "5ce7451c74e389af9f867da9da1b9e3989f7358c28d915c92c8ee7da272c2779",
+            "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "start_line": 8,
+            "end_line": 8,
+            "sha256": "62dfdeab621d02456eeb44ba405ba5c0201139ac5c936f4f28900d046ce80641",
             "needle": "\"integration.connector.connection.test\""
           }
         ],
@@ -2408,11 +2408,11 @@
         },
         "candidate_contracts": [
           {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 54,
-            "end_line": 54,
-            "sha256": "3f0cc731ead8be8ef37b4caea96fb3cb9728459ebebcb4b1eecfd8e22bd85533",
+            "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "start_line": 12,
+            "end_line": 12,
+            "sha256": "a264023a145eee05bdc60969d257465ac48eda20f1abd2c68d63c713357abcfd",
             "needle": "\"integration.mapping.create\""
           }
         ],
@@ -2440,7 +2440,7 @@
           "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
-      "target_capability_id": "integration.sync.start",
+      "target_capability_id": "integration.mapping.import.start",
       "target_major_version": 1,
       "owner_domain": "integration",
       "transport_evidence": {
@@ -2451,15 +2451,15 @@
         "anchors": []
       },
       "decision": "reclassify",
-      "request_transform": "not applied: /api/ext-mappings/{dynamic}/import: REST performs synchronous import options; candidate accepts mapping_gid asynchronous start.",
-      "response_transform": "not applied: /api/ext-mappings/{dynamic}/import: REST returns imported rows/count; candidate returns run_id and operation_ref.",
+      "request_transform": "not applied: /api/ext-mappings/{dynamic}/import: REST performs a synchronous import; exact candidate accepts mapping_gid plus durable idempotency.",
+      "response_transform": "not applied: /api/ext-mappings/{dynamic}/import: Candidate returns a durable run_id and operation_ref instead of synthetic completion.",
       "frontend_operation": null,
       "frontend_call_sites": [],
       "equivalence_evidence": null,
       "reclassification": {
         "reason_code": "contract_shape_mismatch",
         "followup": "atomic_capability_review",
-        "finding": "/api/ext-mappings/{dynamic}/import: REST performs synchronous import options; candidate accepts mapping_gid asynchronous start. | /api/ext-mappings/{dynamic}/import: REST returns imported rows/count; candidate returns run_id and operation_ref. | /api/ext-mappings/{dynamic}/import: Candidate starts asynchronous governed sync rather than importing synchronously.",
+        "finding": "/api/ext-mappings/{dynamic}/import: REST performs a synchronous import; exact candidate accepts mapping_gid plus durable idempotency. | /api/ext-mappings/{dynamic}/import: Candidate returns a durable run_id and operation_ref instead of synthetic completion. | /api/ext-mappings/{dynamic}/import: Candidate records accepted/outcome_unknown and reconciles retries without repeating the side effect.",
         "legacy_contract": {
           "kind": "reviewed_handler_absence",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
@@ -2471,18 +2471,18 @@
         },
         "candidate_contracts": [
           {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 70,
-            "end_line": 70,
-            "sha256": "ec5ce0b8c48598c9f09956d7961d066e14ffe290c07530fd8fb42634f8f6964e",
-            "needle": "\"integration.sync.start\""
+            "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "start_line": 13,
+            "end_line": 13,
+            "sha256": "a8142a0f6fc3010c3ff7ddebeb0c30ce810748a8d9ccf4e0b667191e64119fd3",
+            "needle": "\"integration.mapping.import.start\""
           }
         ],
         "contract_mismatch": {
-          "input": "/api/ext-mappings/{dynamic}/import: REST performs synchronous import options; candidate accepts mapping_gid asynchronous start.",
-          "output": "/api/ext-mappings/{dynamic}/import: REST returns imported rows/count; candidate returns run_id and operation_ref.",
-          "side_effects": "/api/ext-mappings/{dynamic}/import: Candidate starts asynchronous governed sync rather than importing synchronously."
+          "input": "/api/ext-mappings/{dynamic}/import: REST performs a synchronous import; exact candidate accepts mapping_gid plus durable idempotency.",
+          "output": "/api/ext-mappings/{dynamic}/import: Candidate returns a durable run_id and operation_ref instead of synthetic completion.",
+          "side_effects": "/api/ext-mappings/{dynamic}/import: Candidate records accepted/outcome_unknown and reconciles retries without repeating the side effect."
         }
       }
     },
@@ -3154,7 +3154,7 @@
           "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
-      "target_capability_id": "integration.mapping.update",
+      "target_capability_id": "integration.field_mapping.batch.update",
       "target_major_version": 1,
       "owner_domain": "integration",
       "transport_evidence": {
@@ -3165,15 +3165,15 @@
         "anchors": []
       },
       "decision": "reclassify",
-      "request_transform": "not applied: /api/ext-field-mappings/batch: REST batch updates multiple field mappings; candidate requires one gid and expected_revision.",
-      "response_transform": "not applied: /api/ext-field-mappings/batch: REST returns batch count/items; candidate returns one mapping revision.",
+      "request_transform": "not applied: /api/ext-field-mappings/batch: Both batch-update one mapping; exact candidate requires revision, confirmation, and idempotency.",
+      "response_transform": "not applied: /api/ext-field-mappings/batch: Both return batch count/items; candidate returns deterministic field identities and revisions.",
       "frontend_operation": null,
       "frontend_call_sites": [],
       "equivalence_evidence": null,
       "reclassification": {
         "reason_code": "contract_shape_mismatch",
         "followup": "atomic_capability_review",
-        "finding": "/api/ext-field-mappings/batch: REST batch updates multiple field mappings; candidate requires one gid and expected_revision. | /api/ext-field-mappings/batch: REST returns batch count/items; candidate returns one mapping revision. | /api/ext-field-mappings/batch: Candidate validates one mapping transaction and restricted expressions.",
+        "finding": "/api/ext-field-mappings/batch: Both batch-update one mapping; exact candidate requires revision, confirmation, and idempotency. | /api/ext-field-mappings/batch: Both return batch count/items; candidate returns deterministic field identities and revisions. | /api/ext-field-mappings/batch: Candidate commits the all-or-nothing batch with its idempotent result and audit evidence.",
         "legacy_contract": {
           "kind": "reviewed_handler_absence",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
@@ -3185,18 +3185,18 @@
         },
         "candidate_contracts": [
           {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 61,
-            "end_line": 61,
-            "sha256": "19bb982b932421ed1076c0c3bcbe12bdd7ad195febdbb7005ad958764bec0909",
-            "needle": "\"integration.mapping.update\""
+            "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "start_line": 11,
+            "end_line": 11,
+            "sha256": "ea7f3b9b8ee8c3ff58a4b894c1fb7bab4f8554540c868fc9ee72e6b6fbeac918",
+            "needle": "\"integration.field_mapping.batch.update\""
           }
         ],
         "contract_mismatch": {
-          "input": "/api/ext-field-mappings/batch: REST batch updates multiple field mappings; candidate requires one gid and expected_revision.",
-          "output": "/api/ext-field-mappings/batch: REST returns batch count/items; candidate returns one mapping revision.",
-          "side_effects": "/api/ext-field-mappings/batch: Candidate validates one mapping transaction and restricted expressions."
+          "input": "/api/ext-field-mappings/batch: Both batch-update one mapping; exact candidate requires revision, confirmation, and idempotency.",
+          "output": "/api/ext-field-mappings/batch: Both return batch count/items; candidate returns deterministic field identities and revisions.",
+          "side_effects": "/api/ext-field-mappings/batch: Candidate commits the all-or-nothing batch with its idempotent result and audit evidence."
         }
       }
     },

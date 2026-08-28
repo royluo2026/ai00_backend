@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3c-atomic-web-contracts",
   "baseline_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
-  "content_sha256": "sha256:a48340f7b2d3547cb0be23389f6e535a46997d511f0e7a5352b1e7d2504467b9",
+  "content_sha256": "sha256:f30ee1ac33a76ffbba1f96aefb048411134d13eda6f66af0459a03f541a4a55a",
   "counts_by_owner": {
     "agent": {
       "groups": 4,
@@ -5730,14 +5730,16 @@
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": null,
+      "authorization_policy": "integration.v2:integration.read",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
+      "capability_id": "integration.connector.search",
+      "confirmation_policy": "none",
+      "consistency_policy": "strong",
       "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "example_output": {
+        "items": []
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "No exact registered route/method definition exists in this reviewed handler family.",
@@ -5745,13 +5747,23 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "limit": {
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "GET",
       "normalized_route": "/api/ext-datasources",
       "occurrences": [
@@ -5769,28 +5781,113 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "connector_type": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "database_name": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "gid": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "host": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "name": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "port": {
+                  "maximum": 65535,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "revision": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "status": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "username": {
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "gid",
+                "revision",
+                "name",
+                "connector_type",
+                "host",
+                "port",
+                "database_name",
+                "username",
+                "status"
+              ],
+              "type": "object"
+            },
+            "maxItems": 200,
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
         "type": "object"
       },
       "owner_domain": "integration",
       "owner_prefix": "integration",
-      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
-      "required_permissions": [],
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
+      "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+      "reclassification_reason": null,
+      "required_permissions": [
+        "integration.read"
+      ],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Reads domain state without mutation."
+      ]
     },
     {
-      "atomicity_class": "read",
-      "authorization_policy": null,
+      "atomicity_class": "external",
+      "authorization_policy": "integration.v2:integration.write",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
-      "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "capability_id": "integration.connector.create",
+      "confirmation_policy": "user",
+      "consistency_policy": "strong",
+      "example_input": {
+        "connector_type": "example",
+        "credential_enrollment_handle": "example",
+        "database_name": "example",
+        "host": "example",
+        "idempotency_key": "example",
+        "name": "example",
+        "port": 1,
+        "username": "example"
+      },
+      "example_output": {
+        "connector_type": "example",
+        "database_name": "example",
+        "gid": "example",
+        "host": "example",
+        "name": "example",
+        "port": 1,
+        "revision": 1,
+        "status": "example",
+        "username": "example"
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "No exact registered route/method definition exists in this reviewed handler family.",
@@ -5798,13 +5895,83 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "required",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "oneOf": [
+          {
+            "not": {
+              "required": [
+                "credential_ref"
+              ]
+            },
+            "required": [
+              "credential_enrollment_handle"
+            ]
+          },
+          {
+            "not": {
+              "required": [
+                "credential_enrollment_handle"
+              ]
+            },
+            "required": [
+              "credential_ref"
+            ]
+          }
+        ],
+        "properties": {
+          "connector_type": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "credential_enrollment_handle": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "credential_ref": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "database_name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "host": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "idempotency_key": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "port": {
+            "maximum": 65535,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "username": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "connector_type",
+          "host",
+          "port",
+          "database_name",
+          "username",
+          "idempotency_key"
+        ],
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "POST",
       "normalized_route": "/api/ext-datasources",
       "occurrences": [
@@ -5822,28 +5989,95 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "connector_type": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "database_name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "gid": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "host": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "port": {
+            "maximum": 65535,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "revision": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "username": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "gid",
+          "revision",
+          "name",
+          "connector_type",
+          "host",
+          "port",
+          "database_name",
+          "username",
+          "status"
+        ],
         "type": "object"
       },
       "owner_domain": "integration",
       "owner_prefix": "integration",
-      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
-      "required_permissions": [],
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
+      "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+      "reclassification_reason": null,
+      "required_permissions": [
+        "integration.write"
+      ],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Writes domain state through the owning Provider."
+      ]
     },
     {
-      "atomicity_class": "read",
-      "authorization_policy": null,
+      "atomicity_class": "external",
+      "authorization_policy": "integration.v2:integration.write",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
-      "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "capability_id": "integration.connector.update",
+      "confirmation_policy": "user",
+      "consistency_policy": "strong",
+      "example_input": {
+        "expected_revision": 1,
+        "gid": "example",
+        "idempotency_key": "example"
+      },
+      "example_output": {
+        "connector_type": "example",
+        "database_name": "example",
+        "gid": "example",
+        "host": "example",
+        "name": "example",
+        "port": 1,
+        "revision": 1,
+        "status": "example",
+        "username": "example"
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "No exact registered route/method definition exists in this reviewed handler family.",
@@ -5851,13 +6085,71 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "required",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "not": {
+          "required": [
+            "credential_enrollment_handle",
+            "credential_ref"
+          ]
+        },
+        "properties": {
+          "connector_type": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "credential_enrollment_handle": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "credential_ref": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "database_name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "expected_revision": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "gid": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "host": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "idempotency_key": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "port": {
+            "maximum": 65535,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "username": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "gid",
+          "expected_revision",
+          "idempotency_key"
+        ],
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "PATCH",
       "normalized_route": "/api/ext-datasources/{dynamic}",
       "occurrences": [
@@ -5875,28 +6167,90 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "connector_type": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "database_name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "gid": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "host": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "port": {
+            "maximum": 65535,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "revision": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "username": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "gid",
+          "revision",
+          "name",
+          "connector_type",
+          "host",
+          "port",
+          "database_name",
+          "username",
+          "status"
+        ],
         "type": "object"
       },
       "owner_domain": "integration",
       "owner_prefix": "integration",
-      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
-      "required_permissions": [],
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
+      "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+      "reclassification_reason": null,
+      "required_permissions": [
+        "integration.write"
+      ],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Writes domain state through the owning Provider."
+      ]
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": null,
+      "authorization_policy": "integration.v2:integration.read",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
-      "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "capability_id": "integration.connector.schema.discover",
+      "confirmation_policy": "none",
+      "consistency_policy": "external",
+      "example_input": {
+        "gid": "example"
+      },
+      "example_output": {
+        "objects": [],
+        "operation_ref": {
+          "operation_id": "example",
+          "status": "accepted",
+          "version": 1
+        }
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "No exact registered route/method definition exists in this reviewed handler family.",
@@ -5904,13 +6258,26 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "gid": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "limit": {
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "gid"
+        ],
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "GET",
       "normalized_route": "/api/ext-datasources/{dynamic}/tables",
       "occurrences": [
@@ -5928,28 +6295,95 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "objects": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "name": {
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "kind"
+              ],
+              "type": "object"
+            },
+            "maxItems": 200,
+            "type": "array"
+          },
+          "operation_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "operation_id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "accepted",
+                  "succeeded",
+                  "failed",
+                  "outcome_unknown"
+                ],
+                "type": "string"
+              },
+              "version": {
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "objects",
+          "operation_ref"
+        ],
         "type": "object"
       },
       "owner_domain": "integration",
       "owner_prefix": "integration",
-      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
-      "required_permissions": [],
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
+      "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+      "reclassification_reason": null,
+      "required_permissions": [
+        "integration.read"
+      ],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Reads domain state without mutation."
+      ]
     },
     {
-      "atomicity_class": "read",
-      "authorization_policy": null,
+      "atomicity_class": "external",
+      "authorization_policy": "integration.v2:integration.write",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
-      "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "capability_id": "integration.connector.connection.test",
+      "confirmation_policy": "user",
+      "consistency_policy": "external",
+      "example_input": {
+        "gid": "example"
+      },
+      "example_output": {
+        "operation_ref": {
+          "operation_id": "example",
+          "status": "accepted",
+          "version": 1
+        }
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "No exact registered route/method definition exists in this reviewed handler family.",
@@ -5957,13 +6391,21 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "required",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "gid": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "gid"
+        ],
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "POST",
       "normalized_route": "/api/ext-datasources/{dynamic}/test",
       "occurrences": [
@@ -5981,28 +6423,78 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "latency_ms": {
+            "type": "integer"
+          },
+          "message": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "operation_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "operation_id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "accepted",
+                  "succeeded",
+                  "failed",
+                  "outcome_unknown"
+                ],
+                "type": "string"
+              },
+              "version": {
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ],
+            "type": "object"
+          },
+          "reachable": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "operation_ref"
+        ],
         "type": "object"
       },
       "owner_domain": "integration",
       "owner_prefix": "integration",
-      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
-      "required_permissions": [],
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
+      "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+      "reclassification_reason": null,
+      "required_permissions": [
+        "integration.write"
+      ],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Writes domain state through the owning Provider."
+      ]
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": null,
+      "authorization_policy": "integration.v2:integration.read",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
-      "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "capability_id": "integration.field_mapping.search",
+      "confirmation_policy": "none",
+      "consistency_policy": "strong",
+      "example_input": {
+        "mapping_gid": "example"
+      },
+      "example_output": {
+        "items": []
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "No exact registered route/method definition exists in this reviewed handler family.",
@@ -6010,13 +6502,26 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "limit": {
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "mapping_gid": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "mapping_gid"
+        ],
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "GET",
       "normalized_route": "/api/ext-field-mappings",
       "occurrences": [
@@ -6034,28 +6539,94 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "gid": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "revision": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "source_field": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "target_field": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "transform_expression": {
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "gid",
+                "revision",
+                "source_field",
+                "target_field"
+              ],
+              "type": "object"
+            },
+            "maxItems": 200,
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
         "type": "object"
       },
       "owner_domain": "integration",
       "owner_prefix": "integration",
-      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
-      "required_permissions": [],
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
+      "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+      "reclassification_reason": null,
+      "required_permissions": [
+        "integration.read"
+      ],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Reads domain state without mutation."
+      ]
     },
     {
-      "atomicity_class": "read",
-      "authorization_policy": null,
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "integration.v2:integration.write",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
-      "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "capability_id": "integration.field_mapping.batch.update",
+      "confirmation_policy": "user",
+      "consistency_policy": "strong",
+      "example_input": {
+        "expected_revision": 1,
+        "idempotency_key": "example",
+        "items": [
+          {
+            "source_field": "example",
+            "target_field": "example"
+          }
+        ],
+        "mapping_gid": "example"
+      },
+      "example_output": {
+        "items": [
+          {
+            "gid": "example",
+            "revision": 1,
+            "source_field": "example",
+            "target_field": "example"
+          }
+        ],
+        "mapping_gid": "example",
+        "revision": 1,
+        "updated_count": 1
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "No exact registered route/method definition exists in this reviewed handler family.",
@@ -6063,13 +6634,60 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "required",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "expected_revision": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "idempotency_key": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "source_field": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "target_field": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "transform_expression": {
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "source_field",
+                "target_field"
+              ],
+              "type": "object"
+            },
+            "maxItems": 200,
+            "minItems": 1,
+            "type": "array"
+          },
+          "mapping_gid": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "mapping_gid",
+          "expected_revision",
+          "items",
+          "idempotency_key"
+        ],
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "PUT",
       "normalized_route": "/api/ext-field-mappings/batch",
       "occurrences": [
@@ -6087,28 +6705,93 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "gid": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "revision": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "source_field": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "target_field": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "transform_expression": {
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "gid",
+                "revision",
+                "source_field",
+                "target_field"
+              ],
+              "type": "object"
+            },
+            "maxItems": 200,
+            "minItems": 1,
+            "type": "array"
+          },
+          "mapping_gid": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "revision": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "updated_count": {
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "mapping_gid",
+          "revision",
+          "updated_count",
+          "items"
+        ],
         "type": "object"
       },
       "owner_domain": "integration",
       "owner_prefix": "integration",
-      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
-      "required_permissions": [],
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
+      "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+      "reclassification_reason": null,
+      "required_permissions": [
+        "integration.write"
+      ],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Writes domain state through the owning Provider."
+      ]
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": null,
+      "authorization_policy": "integration.v2:integration.read",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
-      "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "capability_id": "integration.mapping.search",
+      "confirmation_policy": "none",
+      "consistency_policy": "strong",
+      "example_input": {
+        "datasource_gid": "example"
+      },
+      "example_output": {
+        "items": []
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "No exact registered route/method definition exists in this reviewed handler family.",
@@ -6116,13 +6799,30 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "datasource_gid": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "limit": {
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "datasource_gid"
+        ],
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "GET",
       "normalized_route": "/api/ext-mappings",
       "occurrences": [
@@ -6140,28 +6840,115 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "datasource_gid": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "gid": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minimum_catalog_release": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "name": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "revision": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "source_object": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "status": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "target_capability_id": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "target_domain": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "target_major_version": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "gid",
+                "revision",
+                "datasource_gid",
+                "name",
+                "source_object",
+                "target_domain",
+                "target_capability_id",
+                "target_major_version",
+                "minimum_catalog_release",
+                "status"
+              ],
+              "type": "object"
+            },
+            "maxItems": 200,
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
         "type": "object"
       },
       "owner_domain": "integration",
       "owner_prefix": "integration",
-      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
-      "required_permissions": [],
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
+      "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+      "reclassification_reason": null,
+      "required_permissions": [
+        "integration.read"
+      ],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Reads domain state without mutation."
+      ]
     },
     {
-      "atomicity_class": "read",
-      "authorization_policy": null,
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "integration.v2:integration.write",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
-      "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "capability_id": "integration.mapping.create",
+      "confirmation_policy": "user",
+      "consistency_policy": "strong",
+      "example_input": {
+        "datasource_gid": "example",
+        "idempotency_key": "example",
+        "name": "example",
+        "source_object": "example",
+        "target_binding_id": "example"
+      },
+      "example_output": {
+        "datasource_gid": "example",
+        "gid": "example",
+        "minimum_catalog_release": "example",
+        "name": "example",
+        "revision": 1,
+        "source_object": "example",
+        "status": "example",
+        "target_capability_id": "example",
+        "target_domain": "example",
+        "target_major_version": 1
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "No exact registered route/method definition exists in this reviewed handler family.",
@@ -6169,13 +6956,68 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "required",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "datasource_gid": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "field_mappings": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "source_field": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "target_field": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "transform_expression": {
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "source_field",
+                "target_field"
+              ],
+              "type": "object"
+            },
+            "maxItems": 200,
+            "type": "array"
+          },
+          "idempotency_key": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "source_object": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "target_binding_id": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "datasource_gid",
+          "name",
+          "source_object",
+          "target_binding_id",
+          "idempotency_key"
+        ],
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "POST",
       "normalized_route": "/api/ext-mappings",
       "occurrences": [
@@ -6193,28 +7035,94 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "datasource_gid": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "gid": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minimum_catalog_release": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "revision": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "source_object": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "status": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "target_capability_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "target_domain": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "target_major_version": {
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "gid",
+          "revision",
+          "datasource_gid",
+          "name",
+          "source_object",
+          "target_domain",
+          "target_capability_id",
+          "target_major_version",
+          "minimum_catalog_release",
+          "status"
+        ],
         "type": "object"
       },
       "owner_domain": "integration",
       "owner_prefix": "integration",
-      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
-      "required_permissions": [],
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
+      "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+      "reclassification_reason": null,
+      "required_permissions": [
+        "integration.write"
+      ],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Writes domain state through the owning Provider."
+      ]
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": null,
+      "authorization_policy": "integration.v2:integration.read",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
-      "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "capability_id": "integration.mapping.source_columns.discover",
+      "confirmation_policy": "none",
+      "consistency_policy": "external",
+      "example_input": {
+        "mapping_gid": "example"
+      },
+      "example_output": {
+        "columns": [],
+        "operation_ref": {
+          "operation_id": "example",
+          "status": "accepted",
+          "version": 1
+        }
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "No exact registered route/method definition exists in this reviewed handler family.",
@@ -6222,13 +7130,26 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "limit": {
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "mapping_gid": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "mapping_gid"
+        ],
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "GET",
       "normalized_route": "/api/ext-mappings/{dynamic}/columns",
       "occurrences": [
@@ -6246,28 +7167,101 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "columns": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "data_type": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "name": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "nullable": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "name",
+                "data_type",
+                "nullable"
+              ],
+              "type": "object"
+            },
+            "maxItems": 200,
+            "type": "array"
+          },
+          "operation_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "operation_id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "accepted",
+                  "succeeded",
+                  "failed",
+                  "outcome_unknown"
+                ],
+                "type": "string"
+              },
+              "version": {
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "columns",
+          "operation_ref"
+        ],
         "type": "object"
       },
       "owner_domain": "integration",
       "owner_prefix": "integration",
-      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
-      "required_permissions": [],
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
+      "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+      "reclassification_reason": null,
+      "required_permissions": [
+        "integration.read"
+      ],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Reads domain state without mutation."
+      ]
     },
     {
-      "atomicity_class": "read",
-      "authorization_policy": null,
+      "atomicity_class": "external",
+      "authorization_policy": "integration.v2:integration.write",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
-      "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "capability_id": "integration.mapping.import.start",
+      "confirmation_policy": "user",
+      "consistency_policy": "external",
+      "example_input": {
+        "idempotency_key": "example",
+        "mapping_gid": "example"
+      },
+      "example_output": {
+        "operation_ref": {
+          "operation_id": "example",
+          "status": "accepted",
+          "version": 1
+        },
+        "run_id": "example"
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "No exact registered route/method definition exists in this reviewed handler family.",
@@ -6275,13 +7269,27 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "required",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "idempotency_key": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "mapping_gid": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "mapping_gid",
+          "idempotency_key"
+        ],
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "POST",
       "normalized_route": "/api/ext-mappings/{dynamic}/import",
       "occurrences": [
@@ -6299,28 +7307,79 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "operation_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "operation_id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "accepted",
+                  "succeeded",
+                  "failed",
+                  "outcome_unknown"
+                ],
+                "type": "string"
+              },
+              "version": {
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ],
+            "type": "object"
+          },
+          "run_id": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "operation_ref"
+        ],
         "type": "object"
       },
       "owner_domain": "integration",
       "owner_prefix": "integration",
-      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
-      "required_permissions": [],
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
+      "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+      "reclassification_reason": null,
+      "required_permissions": [
+        "integration.write"
+      ],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Writes domain state through the owning Provider."
+      ]
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": null,
+      "authorization_policy": "integration.v2:integration.read",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
-      "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "capability_id": "integration.mapping.preview",
+      "confirmation_policy": "none",
+      "consistency_policy": "external",
+      "example_input": {
+        "gid": "example"
+      },
+      "example_output": {
+        "operation_ref": {
+          "operation_id": "example",
+          "status": "accepted",
+          "version": 1
+        },
+        "rows": [],
+        "truncated": false
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "No exact registered route/method definition exists in this reviewed handler family.",
@@ -6328,13 +7387,26 @@
         "route_definition": null,
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "gid": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "limit": {
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "gid"
+        ],
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "GET",
       "normalized_route": "/api/ext-mappings/{dynamic}/preview",
       "occurrences": [
@@ -6352,17 +7424,102 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "operation_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "operation_id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "accepted",
+                  "succeeded",
+                  "failed",
+                  "outcome_unknown"
+                ],
+                "type": "string"
+              },
+              "version": {
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ],
+            "type": "object"
+          },
+          "rows": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "values": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "field": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "redacted": {
+                        "type": "boolean"
+                      },
+                      "value": {
+                        "type": [
+                          "string",
+                          "number",
+                          "integer",
+                          "boolean",
+                          "null"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "field",
+                      "value",
+                      "redacted"
+                    ],
+                    "type": "object"
+                  },
+                  "maxItems": 200,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "values"
+              ],
+              "type": "object"
+            },
+            "maxItems": 200,
+            "type": "array"
+          },
+          "truncated": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "rows",
+          "truncated",
+          "operation_ref"
+        ],
         "type": "object"
       },
       "owner_domain": "integration",
       "owner_prefix": "integration",
-      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-      "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-      "reclassification_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.",
-      "required_permissions": [],
+      "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
+      "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+      "reclassification_reason": null,
+      "required_permissions": [
+        "integration.read"
+      ],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Reads domain state without mutation."
+      ]
     },
     {
       "atomicity_class": "read",

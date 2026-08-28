@@ -86,7 +86,7 @@ def import_row(**changes):
         "mapping_gid": "mapping-1",
         "operation_id": "operation-1",
         "status": "accepted",
-        "target_capability_id": "knowledge.reference_data.change.apply",
+        "target_capability_id": "knowledge.reference_dataset.publish",
         "target_major_version": 1,
         "catalog_release": "rel_20260828",
         "owner_gid": "actor-1",
@@ -278,7 +278,7 @@ def test_sql_mapping_create_persists_one_field_identity_in_json_and_normalized_r
     IntegrationRepository().create_mapping({
         "gid": "mapping-1", "datasource_gid": "connector-1", "name": "Parts",
         "source_object": "parts", "target_domain": "knowledge",
-        "target_capability_id": "knowledge.reference_data.change.apply", "target_major_version": 1,
+        "target_capability_id": "knowledge.reference_dataset.publish", "target_major_version": 1,
         "minimum_catalog_release": "rel_20260828", "owner_gid": "actor-1", "team_gid": "team-1",
         "target_binding_id": "ontology:concept-part",
         "target_input_contract": "knowledge.reference_dataset.publish.v1",
@@ -303,7 +303,7 @@ def _mapping_create_data():
     return {
         "gid": "mapping-1", "datasource_gid": "connector-1", "name": "Parts",
         "source_object": "parts", "target_domain": "knowledge",
-        "target_capability_id": "knowledge.reference_data.change.apply", "target_major_version": 1,
+        "target_capability_id": "knowledge.reference_dataset.publish", "target_major_version": 1,
         "minimum_catalog_release": "rel_20260828", "owner_gid": "actor-1", "team_gid": "team-1",
         "target_binding_id": "ontology:concept-part",
         "target_input_contract": "knowledge.reference_dataset.publish.v1",
@@ -518,7 +518,7 @@ class AcceptingCatalog:
         assert actor_gid == "actor-1" and team_gid == "team-1"
         return {
             "binding_id": binding_id, "target_domain": "knowledge",
-            "target_capability_id": "knowledge.reference_data.change.apply",
+            "target_capability_id": "knowledge.reference_dataset.publish",
             "target_major_version": 1, "minimum_catalog_release": "rel_20260828",
             "input_contract": "knowledge.reference_dataset.publish.v1",
             "resource_gid": "dataset-parts", "expected_version": 7,
@@ -584,7 +584,7 @@ class RuntimeRepository(AtomicStore):
         self.mapping = {
             "gid": "mapping-1", "revision": 1, "datasource_gid": "connector-1", "name": "Parts",
             "source_object": "parts", "target_domain": "knowledge",
-            "target_capability_id": "knowledge.reference_data.change.apply", "target_major_version": 1,
+            "target_capability_id": "knowledge.reference_dataset.publish", "target_major_version": 1,
             "minimum_catalog_release": "rel_20260828", "status": "active",
             "owner_gid": "actor-1", "team_gid": "team-1",
         }

@@ -8,7 +8,7 @@ Restore a BOP line subtree and links from a selected checkpoint snapshot.
 - 不适用：The request creates a checkpoint or undoes/redoes an operation-history batch.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_7803705d3df421f9f4381d37c3500731`
+- Catalog Release：`rel_813658f6043d041ccb8a2f800481a1c8`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -97,7 +97,7 @@ Restore a BOP line subtree and links from a selected checkpoint snapshot.
 ```json
 {
   "capability_id": "craft.bop.lifecycle.checkpoint.rollback.apply",
-  "catalog_release": "rel_7803705d3df421f9f4381d37c3500731",
+  "catalog_release": "rel_813658f6043d041ccb8a2f800481a1c8",
   "major_version": 1,
   "payload": {
     "checkpoint_gid": "example",

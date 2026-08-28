@@ -8,7 +8,7 @@
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_7803705d3df421f9f4381d37c3500731`
+- Catalog Release：`rel_813658f6043d041ccb8a2f800481a1c8`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -103,7 +103,7 @@
 ```json
 {
   "capability_id": "knowledge.propose",
-  "catalog_release": "rel_7803705d3df421f9f4381d37c3500731",
+  "catalog_release": "rel_813658f6043d041ccb8a2f800481a1c8",
   "major_version": 1,
   "payload": {
     "content_md": "example",

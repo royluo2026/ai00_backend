@@ -67,6 +67,7 @@ _COMPLETION_V2_APPROVED = frozenset({
     "knowledge.document.archive", "knowledge.entry.change.apply",
     "knowledge.personalization.change.apply", "knowledge.personalization.read",
     "knowledge.reference_data.change.apply", "knowledge.reference_data.read",
+    "knowledge.reference_dataset.publish",
     "knowledge.space.change.apply", "ontology.mapping.change.apply",
     "ontology.schema.change.apply",
 })

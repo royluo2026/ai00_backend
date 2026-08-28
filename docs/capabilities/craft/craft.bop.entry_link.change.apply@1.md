@@ -8,7 +8,7 @@ Attach or detach a governed BOP entry link.
 - 不适用：The request creates or edits a BOP entry, copies a hierarchy, or changes a version lifecycle.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_7803705d3df421f9f4381d37c3500731`
+- Catalog Release：`rel_813658f6043d041ccb8a2f800481a1c8`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -109,7 +109,7 @@ Attach or detach a governed BOP entry link.
 ```json
 {
   "capability_id": "craft.bop.entry_link.change.apply",
-  "catalog_release": "rel_7803705d3df421f9f4381d37c3500731",
+  "catalog_release": "rel_813658f6043d041ccb8a2f800481a1c8",
   "major_version": 1,
   "payload": {
     "operation": "attach"

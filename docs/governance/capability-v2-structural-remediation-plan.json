@@ -10,7 +10,7 @@
     "no silent REST fallback"
   ],
   "artifact_id": "capability-v2-structural-remediation-plan",
-  "content_sha256": "sha256:1e630a1236dd02722a5efab8dcb89ebca5b202330d47736aee86e3fb6e58c2e6",
+  "content_sha256": "sha256:2ebaf12b71cbb13192807f89fb73a55c280228a0bcd8f218c808ce5e2fe8de88",
   "counts": {
     "groups": 37,
     "occurrences": 45
@@ -439,31 +439,132 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
-        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+        "provider_anchor": {
+          "end_line": 42,
+          "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
+          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+          "start_line": 42
+        },
+        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "migrated",
       "current_evidence": {
-        "canonical_occurrences": [
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "input_anchor": {
+            "end_line": 100,
+            "sha256": "a6f1a42ccc084a3f09196a7201590cca213863472f11c960bb9ff3b1b1fcd50c",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 100
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "limit": {
+                "maximum": 200,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "query": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 181,
+            "sha256": "db4f645b006e42d905c6e9c032ea780603955bde66251d17ea65e146c188bddb",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 181
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "items": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "connector_type": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "database_name": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "gid": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "host": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "name": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "port": {
+                      "maximum": 65535,
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "revision": {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "status": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "username": {
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "gid",
+                    "revision",
+                    "name",
+                    "connector_type",
+                    "host",
+                    "port",
+                    "database_name",
+                    "username",
+                    "status"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 200,
+                "type": "array"
+              }
+            },
+            "required": [
+              "items"
+            ],
+            "type": "object"
+          }
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
           {
-            "column": 36,
-            "disposition": "unresolved",
-            "line": 148,
-            "method": "GET",
-            "normalized_route": "/api/ext-datasources",
-            "occurrence_id": "web/ext_datasource/ext_ds.js:148:36:GET:/api/ext-datasources",
-            "raw_route": "/api/ext-datasources",
-            "source": "web/ext_datasource/ext_ds.js"
+            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
+            "line": 234,
+            "sha256": "c8470f080bb473665549550c47619be3a3ac2c6a83192f6c20132c950cc59839",
+            "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
-        "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
-        "frontend_call_sites": [],
-        "owner_service_evidence": null,
+        "owner_service_evidence": {
+          "end_line": 544,
+          "sha256": "ab2c27b403a9031af28346979a178de5b571dbab9ad580f0769f8af0fb0ea16a",
+          "source_path": "plugins/integration/integration_backend/application/service.py",
+          "start_line": 544
+        },
         "target_capability": "integration.connector.search@1"
       },
-      "current_status": "unresolved",
+      "current_status": "migrated",
       "dependencies": [
         "credential-vault write channel",
         "connector runtime policy",
@@ -483,8 +584,12 @@
       "occurrences": [
         {
           "column": 36,
+          "disposition": "unresolved",
           "line": 148,
+          "method": "GET",
+          "normalized_route": "/api/ext-datasources",
           "occurrence_id": "web/ext_datasource/ext_ds.js:148:36:GET:/api/ext-datasources",
+          "raw_route": "/api/ext-datasources",
           "source": "web/ext_datasource/ext_ds.js",
           "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
@@ -518,31 +623,128 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
-        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+        "provider_anchor": {
+          "end_line": 42,
+          "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
+          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+          "start_line": 42
+        },
+        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "migrated",
       "current_evidence": {
-        "canonical_occurrences": [
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "input_anchor": {
+            "end_line": 102,
+            "sha256": "9537126e9973f1d80bd2913084487a7a806936e557958c8627fe6e8beddc9080",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 102
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "limit": {
+                "maximum": 200,
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "gid"
+            ],
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 186,
+            "sha256": "e220b6305199bbfc9c1b357faf6223bd507c7da3aa3e683a2411d3e9207cdc85",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 186
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "objects": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "name": {
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "kind"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 200,
+                "type": "array"
+              },
+              "operation_ref": {
+                "additionalProperties": false,
+                "properties": {
+                  "operation_id": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "status": {
+                    "enum": [
+                      "accepted",
+                      "succeeded",
+                      "failed",
+                      "outcome_unknown"
+                    ],
+                    "type": "string"
+                  },
+                  "version": {
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "operation_id",
+                  "status",
+                  "version"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "objects",
+              "operation_ref"
+            ],
+            "type": "object"
+          }
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
           {
-            "column": 36,
-            "disposition": "unresolved",
-            "line": 640,
-            "method": "GET",
-            "normalized_route": "/api/ext-datasources/{dynamic}/tables",
-            "occurrence_id": "web/ext_datasource/ext_ds.js:640:36:GET:/api/ext-datasources/{dynamic}/tables",
-            "raw_route": "/api/ext-datasources/${_selectedDs.gid}/tables",
-            "source": "web/ext_datasource/ext_ds.js"
+            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
+            "line": 813,
+            "sha256": "3da0b1f75b902d46d9e0480f8739509a95268391e72bb1b0621730169088e24a",
+            "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
-        "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
-        "frontend_call_sites": [],
-        "owner_service_evidence": null,
+        "owner_service_evidence": {
+          "end_line": 487,
+          "sha256": "e5d0b6c03e0cef11ec178ee65a524f4011cee1ed18777cc504123c0bdbf8e574",
+          "source_path": "plugins/integration/integration_backend/application/service.py",
+          "start_line": 487
+        },
         "target_capability": "integration.connector.schema.discover@1"
       },
-      "current_status": "unresolved",
+      "current_status": "migrated",
       "dependencies": [
         "credential-vault write channel",
         "connector runtime policy",
@@ -562,8 +764,12 @@
       "occurrences": [
         {
           "column": 36,
+          "disposition": "unresolved",
           "line": 640,
+          "method": "GET",
+          "normalized_route": "/api/ext-datasources/{dynamic}/tables",
           "occurrence_id": "web/ext_datasource/ext_ds.js:640:36:GET:/api/ext-datasources/{dynamic}/tables",
+          "raw_route": "/api/ext-datasources/${_selectedDs.gid}/tables",
           "source": "web/ext_datasource/ext_ds.js",
           "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
@@ -597,31 +803,113 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
-        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+        "provider_anchor": {
+          "end_line": 42,
+          "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
+          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+          "start_line": 42
+        },
+        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "migrated",
       "current_evidence": {
-        "canonical_occurrences": [
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "input_anchor": {
+            "end_line": 127,
+            "sha256": "57f66f66d0fef0c42176e90b7dcb6dfd7bc0a5cee5552134d147f0ab47f5d820",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 127
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "limit": {
+                "maximum": 200,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "mapping_gid": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "mapping_gid"
+            ],
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 201,
+            "sha256": "4532e2f34e32776a1e8da16375a364b26e1ac8fbe645e65a0a9730372b22473c",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 201
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "items": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "gid": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "revision": {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "source_field": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "target_field": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "transform_expression": {
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "gid",
+                    "revision",
+                    "source_field",
+                    "target_field"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 200,
+                "type": "array"
+              }
+            },
+            "required": [
+              "items"
+            ],
+            "type": "object"
+          }
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
           {
-            "column": 36,
-            "disposition": "unresolved",
-            "line": 349,
-            "method": "GET",
-            "normalized_route": "/api/ext-field-mappings",
-            "occurrence_id": "web/ext_datasource/ext_ds.js:349:36:GET:/api/ext-field-mappings",
-            "raw_route": "/api/ext-field-mappings?mapping_gid=${_selectedMap.gid}",
-            "source": "web/ext_datasource/ext_ds.js"
+            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
+            "line": 461,
+            "sha256": "5ca981b3024844a029867dda1e6257404145190d294d218018dec33eb0cc887e",
+            "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
-        "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
-        "frontend_call_sites": [],
-        "owner_service_evidence": null,
-        "target_capability": "integration.mapping.get@1"
+        "owner_service_evidence": {
+          "end_line": 474,
+          "sha256": "3abfaffd1e391781ce8c06f882e2a2ffa85f05ba7b1979b3f2c8ffbc0abb5485",
+          "source_path": "plugins/integration/integration_backend/application/service.py",
+          "start_line": 474
+        },
+        "target_capability": "integration.field_mapping.search@1"
       },
-      "current_status": "unresolved",
+      "current_status": "migrated",
       "dependencies": [
         "connector package",
         "mapping aggregate migration",
@@ -641,8 +929,12 @@
       "occurrences": [
         {
           "column": 36,
+          "disposition": "unresolved",
           "line": 349,
+          "method": "GET",
+          "normalized_route": "/api/ext-field-mappings",
           "occurrence_id": "web/ext_datasource/ext_ds.js:349:36:GET:/api/ext-field-mappings",
+          "raw_route": "/api/ext-field-mappings?mapping_gid=${_selectedMap.gid}",
           "source": "web/ext_datasource/ext_ds.js",
           "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
@@ -676,31 +968,143 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
-        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+        "provider_anchor": {
+          "end_line": 42,
+          "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
+          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+          "start_line": 42
+        },
+        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "migrated",
       "current_evidence": {
-        "canonical_occurrences": [
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "input_anchor": {
+            "end_line": 115,
+            "sha256": "68b0c064bd5e3d42e696c160749eee96bdbb9493d3a0cf28c35d6b526a826312",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 115
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "datasource_gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "limit": {
+                "maximum": 200,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "query": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "datasource_gid"
+            ],
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 197,
+            "sha256": "3d469465d7109252c48684f226fd537c01a623802fa93139956cd8567b91cc0f",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 197
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "items": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "datasource_gid": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "gid": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "minimum_catalog_release": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "name": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "revision": {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "source_object": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "status": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "target_capability_id": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "target_domain": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "target_major_version": {
+                      "minimum": 1,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "gid",
+                    "revision",
+                    "datasource_gid",
+                    "name",
+                    "source_object",
+                    "target_domain",
+                    "target_capability_id",
+                    "target_major_version",
+                    "minimum_catalog_release",
+                    "status"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 200,
+                "type": "array"
+              }
+            },
+            "required": [
+              "items"
+            ],
+            "type": "object"
+          }
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
           {
-            "column": 36,
-            "disposition": "unresolved",
-            "line": 187,
-            "method": "GET",
-            "normalized_route": "/api/ext-mappings",
-            "occurrence_id": "web/ext_datasource/ext_ds.js:187:36:GET:/api/ext-mappings",
-            "raw_route": "/api/ext-mappings?datasource_gid=${_selectedDs.gid}",
-            "source": "web/ext_datasource/ext_ds.js"
+            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
+            "line": 285,
+            "sha256": "108a4b45052e8c29e7136137dcd6a049192f708272da822691eb74134f56e06a",
+            "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
-        "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
-        "frontend_call_sites": [],
-        "owner_service_evidence": null,
+        "owner_service_evidence": {
+          "end_line": 474,
+          "sha256": "3abfaffd1e391781ce8c06f882e2a2ffa85f05ba7b1979b3f2c8ffbc0abb5485",
+          "source_path": "plugins/integration/integration_backend/application/service.py",
+          "start_line": 474
+        },
         "target_capability": "integration.mapping.search@1"
       },
-      "current_status": "unresolved",
+      "current_status": "migrated",
       "dependencies": [
         "connector package",
         "mapping aggregate migration",
@@ -720,8 +1124,12 @@
       "occurrences": [
         {
           "column": 36,
+          "disposition": "unresolved",
           "line": 187,
+          "method": "GET",
+          "normalized_route": "/api/ext-mappings",
           "occurrence_id": "web/ext_datasource/ext_ds.js:187:36:GET:/api/ext-mappings",
+          "raw_route": "/api/ext-mappings?datasource_gid=${_selectedDs.gid}",
           "source": "web/ext_datasource/ext_ds.js",
           "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
@@ -755,31 +1163,132 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
-        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+        "provider_anchor": {
+          "end_line": 42,
+          "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
+          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+          "start_line": 42
+        },
+        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "migrated",
       "current_evidence": {
-        "canonical_occurrences": [
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "input_anchor": {
+            "end_line": 128,
+            "sha256": "f5828f020df47ca20fa1804a6b967462641ae7b9e88ccde3735660dcc203b636",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 128
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "limit": {
+                "maximum": 200,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "mapping_gid": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "mapping_gid"
+            ],
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 202,
+            "sha256": "a986aacb305ae464b51e05c0e145ba68ce1e235567a85193d36725325bb02adf",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 202
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "columns": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data_type": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "name": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "nullable": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "data_type",
+                    "nullable"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 200,
+                "type": "array"
+              },
+              "operation_ref": {
+                "additionalProperties": false,
+                "properties": {
+                  "operation_id": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "status": {
+                    "enum": [
+                      "accepted",
+                      "succeeded",
+                      "failed",
+                      "outcome_unknown"
+                    ],
+                    "type": "string"
+                  },
+                  "version": {
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "operation_id",
+                  "status",
+                  "version"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "columns",
+              "operation_ref"
+            ],
+            "type": "object"
+          }
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
           {
-            "column": 36,
-            "disposition": "unresolved",
-            "line": 341,
-            "method": "GET",
-            "normalized_route": "/api/ext-mappings/{dynamic}/columns",
-            "occurrence_id": "web/ext_datasource/ext_ds.js:341:36:GET:/api/ext-mappings/{dynamic}/columns",
-            "raw_route": "/api/ext-mappings/${_selectedMap.gid}/columns",
-            "source": "web/ext_datasource/ext_ds.js"
+            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
+            "line": 441,
+            "sha256": "4190c76f2ca7057b4c6c3cc985b1842fcdb279845f6823058e04a2de0480f688",
+            "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
-        "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
-        "frontend_call_sites": [],
-        "owner_service_evidence": null,
-        "target_capability": "integration.connector.schema.discover@1"
+        "owner_service_evidence": {
+          "end_line": 561,
+          "sha256": "e41c549f68ccd794c6eb80da205b6ed51b9b0f76ceeadb86f7d02a13afc8185c",
+          "source_path": "plugins/integration/integration_backend/application/service.py",
+          "start_line": 561
+        },
+        "target_capability": "integration.mapping.source_columns.discover@1"
       },
-      "current_status": "unresolved",
+      "current_status": "migrated",
       "dependencies": [
         "connector package",
         "mapping aggregate migration",
@@ -799,8 +1308,12 @@
       "occurrences": [
         {
           "column": 36,
+          "disposition": "unresolved",
           "line": 341,
+          "method": "GET",
+          "normalized_route": "/api/ext-mappings/{dynamic}/columns",
           "occurrence_id": "web/ext_datasource/ext_ds.js:341:36:GET:/api/ext-mappings/{dynamic}/columns",
+          "raw_route": "/api/ext-mappings/${_selectedMap.gid}/columns",
           "source": "web/ext_datasource/ext_ds.js",
           "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
@@ -834,31 +1347,154 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
-        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+        "provider_anchor": {
+          "end_line": 42,
+          "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
+          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+          "start_line": 42
+        },
+        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "migrated",
       "current_evidence": {
-        "canonical_occurrences": [
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "input_anchor": {
+            "end_line": 129,
+            "sha256": "24aeb6e79865061c10753a58867f118e2e4c0ab68853db6f04fef19b18cd7525",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 129
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "limit": {
+                "maximum": 200,
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "gid"
+            ],
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 206,
+            "sha256": "0424e87908ff6ed75ca62f30def5bb7fea0b935d2e9d4b551e5f05ce08b955ec",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 206
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "operation_ref": {
+                "additionalProperties": false,
+                "properties": {
+                  "operation_id": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "status": {
+                    "enum": [
+                      "accepted",
+                      "succeeded",
+                      "failed",
+                      "outcome_unknown"
+                    ],
+                    "type": "string"
+                  },
+                  "version": {
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "operation_id",
+                  "status",
+                  "version"
+                ],
+                "type": "object"
+              },
+              "rows": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "values": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "field": {
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "redacted": {
+                            "type": "boolean"
+                          },
+                          "value": {
+                            "type": [
+                              "string",
+                              "number",
+                              "integer",
+                              "boolean",
+                              "null"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "value",
+                          "redacted"
+                        ],
+                        "type": "object"
+                      },
+                      "maxItems": 200,
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "values"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 200,
+                "type": "array"
+              },
+              "truncated": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "rows",
+              "truncated",
+              "operation_ref"
+            ],
+            "type": "object"
+          }
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
           {
-            "column": 36,
-            "disposition": "unresolved",
-            "line": 496,
-            "method": "GET",
-            "normalized_route": "/api/ext-mappings/{dynamic}/preview",
-            "occurrence_id": "web/ext_datasource/ext_ds.js:496:36:GET:/api/ext-mappings/{dynamic}/preview",
-            "raw_route": "/api/ext-mappings/${_selectedMap.gid}/preview?limit=5",
-            "source": "web/ext_datasource/ext_ds.js"
+            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
+            "line": 636,
+            "sha256": "3bc9c2e36be83ca0eb5af4b1648e8b5bbb53e3a8c33f0e90ef17892ab972f494",
+            "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
-        "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
-        "frontend_call_sites": [],
-        "owner_service_evidence": null,
+        "owner_service_evidence": {
+          "end_line": 561,
+          "sha256": "e41c549f68ccd794c6eb80da205b6ed51b9b0f76ceeadb86f7d02a13afc8185c",
+          "source_path": "plugins/integration/integration_backend/application/service.py",
+          "start_line": 561
+        },
         "target_capability": "integration.mapping.preview@1"
       },
-      "current_status": "unresolved",
+      "current_status": "migrated",
       "dependencies": [
         "connector package",
         "mapping aggregate migration",
@@ -878,8 +1514,12 @@
       "occurrences": [
         {
           "column": 36,
+          "disposition": "unresolved",
           "line": 496,
+          "method": "GET",
+          "normalized_route": "/api/ext-mappings/{dynamic}/preview",
           "occurrence_id": "web/ext_datasource/ext_ds.js:496:36:GET:/api/ext-mappings/{dynamic}/preview",
+          "raw_route": "/api/ext-mappings/${_selectedMap.gid}/preview?limit=5",
           "source": "web/ext_datasource/ext_ds.js",
           "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
@@ -1495,31 +2135,167 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
-        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+        "provider_anchor": {
+          "end_line": 42,
+          "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
+          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+          "start_line": 42
+        },
+        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "migrated",
       "current_evidence": {
-        "canonical_occurrences": [
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "input_anchor": {
+            "end_line": 94,
+            "sha256": "3e06ba5fb89ae652b9f99b69750fb0235295e5cc45cefe2353a69767e04265e9",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 94
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "not": {
+              "required": [
+                "credential_enrollment_handle",
+                "credential_ref"
+              ]
+            },
+            "properties": {
+              "connector_type": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "credential_enrollment_handle": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "credential_ref": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "database_name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "expected_revision": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "host": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "idempotency_key": {
+                "maxLength": 255,
+                "minLength": 1,
+                "type": "string"
+              },
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "port": {
+                "maximum": 65535,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "username": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "gid",
+              "expected_revision",
+              "idempotency_key"
+            ],
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 179,
+            "sha256": "78118399541752f44bb7c8a57add5fdeddb420c0ddd7b84a6b17c06c247800d5",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 179
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "connector_type": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "database_name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "host": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "port": {
+                "maximum": 65535,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "revision": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "status": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "username": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "gid",
+              "revision",
+              "name",
+              "connector_type",
+              "host",
+              "port",
+              "database_name",
+              "username",
+              "status"
+            ],
+            "type": "object"
+          }
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
           {
-            "column": 29,
-            "disposition": "unresolved",
-            "line": 623,
-            "method": "PATCH",
-            "normalized_route": "/api/ext-datasources/{dynamic}",
-            "occurrence_id": "web/ext_datasource/ext_ds.js:623:29:PATCH:/api/ext-datasources/{dynamic}",
-            "raw_route": "/api/ext-datasources/${ds.gid}",
-            "source": "web/ext_datasource/ext_ds.js"
+            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
+            "line": 788,
+            "sha256": "ee65a124fe675c750e7047a1158601301ed83794d7e6d832abfb4a8a4fde9f61",
+            "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
-        "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
-        "frontend_call_sites": [],
-        "owner_service_evidence": null,
+        "owner_service_evidence": {
+          "end_line": 513,
+          "sha256": "079ccaecfc7418945962f21d8901ddff906cd3848704aeb3071607b99e793123",
+          "source_path": "plugins/integration/integration_backend/application/service.py",
+          "start_line": 513
+        },
         "target_capability": "integration.connector.update@1"
       },
-      "current_status": "unresolved",
+      "current_status": "migrated",
       "dependencies": [
         "credential-vault write channel",
         "connector runtime policy",
@@ -1539,8 +2315,12 @@
       "occurrences": [
         {
           "column": 29,
+          "disposition": "unresolved",
           "line": 623,
+          "method": "PATCH",
+          "normalized_route": "/api/ext-datasources/{dynamic}",
           "occurrence_id": "web/ext_datasource/ext_ds.js:623:29:PATCH:/api/ext-datasources/{dynamic}",
+          "raw_route": "/api/ext-datasources/${ds.gid}",
           "source": "web/ext_datasource/ext_ds.js",
           "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
@@ -1759,31 +2539,179 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
-        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+        "provider_anchor": {
+          "end_line": 42,
+          "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
+          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+          "start_line": 42
+        },
+        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "migrated",
       "current_evidence": {
-        "canonical_occurrences": [
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "input_anchor": {
+            "end_line": 89,
+            "sha256": "087872605e23483a339fdf1c9b3a001f213722041a4d7e37ddf5e03972a36431",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 89
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "oneOf": [
+              {
+                "not": {
+                  "required": [
+                    "credential_ref"
+                  ]
+                },
+                "required": [
+                  "credential_enrollment_handle"
+                ]
+              },
+              {
+                "not": {
+                  "required": [
+                    "credential_enrollment_handle"
+                  ]
+                },
+                "required": [
+                  "credential_ref"
+                ]
+              }
+            ],
+            "properties": {
+              "connector_type": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "credential_enrollment_handle": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "credential_ref": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "database_name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "host": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "idempotency_key": {
+                "maxLength": 255,
+                "minLength": 1,
+                "type": "string"
+              },
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "port": {
+                "maximum": 65535,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "username": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "connector_type",
+              "host",
+              "port",
+              "database_name",
+              "username",
+              "idempotency_key"
+            ],
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 178,
+            "sha256": "4403928a048a0bcfd79c7c054da8c0eb9b81485a9f57499d5e4576f7879e5ed9",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 178
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "connector_type": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "database_name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "host": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "port": {
+                "maximum": 65535,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "revision": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "status": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "username": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "gid",
+              "revision",
+              "name",
+              "connector_type",
+              "host",
+              "port",
+              "database_name",
+              "username",
+              "status"
+            ],
+            "type": "object"
+          }
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
           {
-            "column": 28,
-            "disposition": "unresolved",
-            "line": 625,
-            "method": "POST",
-            "normalized_route": "/api/ext-datasources",
-            "occurrence_id": "web/ext_datasource/ext_ds.js:625:28:POST:/api/ext-datasources",
-            "raw_route": "/api/ext-datasources",
-            "source": "web/ext_datasource/ext_ds.js"
+            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
+            "line": 794,
+            "sha256": "48940e8f60d2fd646913b2d3a55a131cfa8f00b5d77a8071d88b4f7057ce9a30",
+            "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
-        "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
-        "frontend_call_sites": [],
-        "owner_service_evidence": null,
+        "owner_service_evidence": {
+          "end_line": 490,
+          "sha256": "45bd33cb1023303df1f0792d5153e4431375d7ce357fe6609cbb436e5dfc8bc9",
+          "source_path": "plugins/integration/integration_backend/application/service.py",
+          "start_line": 490
+        },
         "target_capability": "integration.connector.create@1"
       },
-      "current_status": "unresolved",
+      "current_status": "migrated",
       "dependencies": [
         "credential-vault write channel",
         "connector runtime policy",
@@ -1803,8 +2731,12 @@
       "occurrences": [
         {
           "column": 28,
+          "disposition": "unresolved",
           "line": 625,
+          "method": "POST",
+          "normalized_route": "/api/ext-datasources",
           "occurrence_id": "web/ext_datasource/ext_ds.js:625:28:POST:/api/ext-datasources",
+          "raw_route": "/api/ext-datasources",
           "source": "web/ext_datasource/ext_ds.js",
           "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
@@ -1838,31 +2770,110 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
-        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+        "provider_anchor": {
+          "end_line": 42,
+          "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
+          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+          "start_line": 42
+        },
+        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "migrated",
       "current_evidence": {
-        "canonical_occurrences": [
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "input_anchor": {
+            "end_line": 101,
+            "sha256": "f13fb8594d642ab76195e704706e1e832d5de83318626e05bbe0debf716afbb1",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 101
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "gid"
+            ],
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 182,
+            "sha256": "c9cdadc1b161d7c0601610b6b2e9e287f3948189e3364dba9742b35350837a93",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 182
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "latency_ms": {
+                "type": "integer"
+              },
+              "message": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "operation_ref": {
+                "additionalProperties": false,
+                "properties": {
+                  "operation_id": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "status": {
+                    "enum": [
+                      "accepted",
+                      "succeeded",
+                      "failed",
+                      "outcome_unknown"
+                    ],
+                    "type": "string"
+                  },
+                  "version": {
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "operation_id",
+                  "status",
+                  "version"
+                ],
+                "type": "object"
+              },
+              "reachable": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "operation_ref"
+            ],
+            "type": "object"
+          }
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
           {
-            "column": 34,
-            "disposition": "unresolved",
-            "line": 605,
-            "method": "POST",
-            "normalized_route": "/api/ext-datasources/{dynamic}/test",
-            "occurrence_id": "web/ext_datasource/ext_ds.js:605:34:POST:/api/ext-datasources/{dynamic}/test",
-            "raw_route": "/api/ext-datasources/${ds.gid}/test",
-            "source": "web/ext_datasource/ext_ds.js"
+            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
+            "line": 754,
+            "sha256": "d5b1b00104342d0befcf843a4d77c402da9e467fedb85e0ec224245f11ac02e7",
+            "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
-        "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
-        "frontend_call_sites": [],
-        "owner_service_evidence": null,
+        "owner_service_evidence": {
+          "end_line": 487,
+          "sha256": "e5d0b6c03e0cef11ec178ee65a524f4011cee1ed18777cc504123c0bdbf8e574",
+          "source_path": "plugins/integration/integration_backend/application/service.py",
+          "start_line": 487
+        },
         "target_capability": "integration.connector.connection.test@1"
       },
-      "current_status": "unresolved",
+      "current_status": "migrated",
       "dependencies": [
         "credential-vault write channel",
         "connector runtime policy",
@@ -1882,8 +2893,12 @@
       "occurrences": [
         {
           "column": 34,
+          "disposition": "unresolved",
           "line": 605,
+          "method": "POST",
+          "normalized_route": "/api/ext-datasources/{dynamic}/test",
           "occurrence_id": "web/ext_datasource/ext_ds.js:605:34:POST:/api/ext-datasources/{dynamic}/test",
+          "raw_route": "/api/ext-datasources/${ds.gid}/test",
           "source": "web/ext_datasource/ext_ds.js",
           "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
@@ -1917,31 +2932,168 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
-        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+        "provider_anchor": {
+          "end_line": 42,
+          "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
+          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+          "start_line": 42
+        },
+        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "migrated",
       "current_evidence": {
-        "canonical_occurrences": [
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "input_anchor": {
+            "end_line": 103,
+            "sha256": "21a9fca26cf45ea6110738ea4d3e02ca86aa2478c50d17d145d5ff9b13e4d60e",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 103
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "datasource_gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "field_mappings": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "source_field": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "target_field": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "transform_expression": {
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "source_field",
+                    "target_field"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 200,
+                "type": "array"
+              },
+              "idempotency_key": {
+                "maxLength": 255,
+                "minLength": 1,
+                "type": "string"
+              },
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "source_object": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "target_binding_id": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "datasource_gid",
+              "name",
+              "source_object",
+              "target_binding_id",
+              "idempotency_key"
+            ],
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 190,
+            "sha256": "12ca375cf3a39fd7aab8c31994b0cbf2fce3ea76a22b5410cc000f9576a34ad0",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 190
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "datasource_gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "minimum_catalog_release": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "revision": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "source_object": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "status": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "target_capability_id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "target_domain": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "target_major_version": {
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "gid",
+              "revision",
+              "datasource_gid",
+              "name",
+              "source_object",
+              "target_domain",
+              "target_capability_id",
+              "target_major_version",
+              "minimum_catalog_release",
+              "status"
+            ],
+            "type": "object"
+          }
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
           {
-            "column": 26,
-            "disposition": "unresolved",
-            "line": 677,
-            "method": "POST",
-            "normalized_route": "/api/ext-mappings",
-            "occurrence_id": "web/ext_datasource/ext_ds.js:677:26:POST:/api/ext-mappings",
-            "raw_route": "/api/ext-mappings",
-            "source": "web/ext_datasource/ext_ds.js"
+            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
+            "line": 860,
+            "sha256": "c96b15da7f4ce799b463ab0a2f82278f0a9c731b3efd9cf69d930ddc1c19d2bb",
+            "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
-        "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
-        "frontend_call_sites": [],
-        "owner_service_evidence": null,
+        "owner_service_evidence": {
+          "end_line": 479,
+          "sha256": "2db00ad26cb113eda87defb6241a1cfe81a1c3893475fd6f5c18e72732ff9bc8",
+          "source_path": "plugins/integration/integration_backend/application/service.py",
+          "start_line": 479
+        },
         "target_capability": "integration.mapping.create@1"
       },
-      "current_status": "unresolved",
+      "current_status": "migrated",
       "dependencies": [
         "connector package",
         "mapping aggregate migration",
@@ -1961,8 +3113,12 @@
       "occurrences": [
         {
           "column": 26,
+          "disposition": "unresolved",
           "line": 677,
+          "method": "POST",
+          "normalized_route": "/api/ext-mappings",
           "occurrence_id": "web/ext_datasource/ext_ds.js:677:26:POST:/api/ext-mappings",
+          "raw_route": "/api/ext-mappings",
           "source": "web/ext_datasource/ext_ds.js",
           "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
@@ -1996,31 +3152,111 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
-        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+        "provider_anchor": {
+          "end_line": 42,
+          "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
+          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+          "start_line": 42
+        },
+        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "migrated",
       "current_evidence": {
-        "canonical_occurrences": [
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "input_anchor": {
+            "end_line": 139,
+            "sha256": "9c73a820f74afd2895742ff79b4f53f3b6d42733faea1d1db51cc57fb9723d71",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 139
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "idempotency_key": {
+                "maxLength": 255,
+                "minLength": 1,
+                "type": "string"
+              },
+              "mapping_gid": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "mapping_gid",
+              "idempotency_key"
+            ],
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 221,
+            "sha256": "9c73a820f74afd2895742ff79b4f53f3b6d42733faea1d1db51cc57fb9723d71",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 221
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "operation_ref": {
+                "additionalProperties": false,
+                "properties": {
+                  "operation_id": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "status": {
+                    "enum": [
+                      "accepted",
+                      "succeeded",
+                      "failed",
+                      "outcome_unknown"
+                    ],
+                    "type": "string"
+                  },
+                  "version": {
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "operation_id",
+                  "status",
+                  "version"
+                ],
+                "type": "object"
+              },
+              "run_id": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "run_id",
+              "operation_ref"
+            ],
+            "type": "object"
+          }
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
           {
-            "column": 37,
-            "disposition": "unresolved",
-            "line": 549,
-            "method": "POST",
-            "normalized_route": "/api/ext-mappings/{dynamic}/import",
-            "occurrence_id": "web/ext_datasource/ext_ds.js:549:37:POST:/api/ext-mappings/{dynamic}/import",
-            "raw_route": "/api/ext-mappings/${_selectedMap.gid}/import",
-            "source": "web/ext_datasource/ext_ds.js"
+            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
+            "line": 693,
+            "sha256": "8158e1912617583111cd8008db9652ff2308ef7093205803c740758769092fe9",
+            "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
-        "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
-        "frontend_call_sites": [],
-        "owner_service_evidence": null,
-        "target_capability": "integration.sync.start@1"
+        "owner_service_evidence": {
+          "end_line": 483,
+          "sha256": "1b4c98e48aa57428aedca4e8d035a4f977582edae157aec46d589125c55acd99",
+          "source_path": "plugins/integration/integration_backend/application/service.py",
+          "start_line": 483
+        },
+        "target_capability": "integration.mapping.import.start@1"
       },
-      "current_status": "unresolved",
+      "current_status": "migrated",
       "dependencies": [
         "connector package",
         "mapping aggregate migration",
@@ -2040,8 +3276,12 @@
       "occurrences": [
         {
           "column": 37,
+          "disposition": "unresolved",
           "line": 549,
+          "method": "POST",
+          "normalized_route": "/api/ext-mappings/{dynamic}/import",
           "occurrence_id": "web/ext_datasource/ext_ds.js:549:37:POST:/api/ext-mappings/{dynamic}/import",
+          "raw_route": "/api/ext-mappings/${_selectedMap.gid}/import",
           "source": "web/ext_datasource/ext_ds.js",
           "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
@@ -2925,31 +4165,164 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
-        "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py",
-        "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-        "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
+        "provider_anchor": {
+          "end_line": 42,
+          "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
+          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+          "start_line": 42
+        },
+        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "migrated",
       "current_evidence": {
-        "canonical_occurrences": [
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "input_anchor": {
+            "end_line": 130,
+            "sha256": "c87a48cb80232aef37b5495b37515ec0ef6a2269da9ac5dea3a226f199e773f6",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 130
+          },
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "expected_revision": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "idempotency_key": {
+                "maxLength": 255,
+                "minLength": 1,
+                "type": "string"
+              },
+              "items": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "source_field": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "target_field": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "transform_expression": {
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "source_field",
+                    "target_field"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 200,
+                "minItems": 1,
+                "type": "array"
+              },
+              "mapping_gid": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "mapping_gid",
+              "expected_revision",
+              "items",
+              "idempotency_key"
+            ],
+            "type": "object"
+          },
+          "output_anchor": {
+            "end_line": 214,
+            "sha256": "c87a48cb80232aef37b5495b37515ec0ef6a2269da9ac5dea3a226f199e773f6",
+            "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
+            "start_line": 214
+          },
+          "output_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "items": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "gid": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "revision": {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "source_field": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "target_field": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "transform_expression": {
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "gid",
+                    "revision",
+                    "source_field",
+                    "target_field"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 200,
+                "minItems": 1,
+                "type": "array"
+              },
+              "mapping_gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "revision": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "updated_count": {
+                "maximum": 200,
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "mapping_gid",
+              "revision",
+              "updated_count",
+              "items"
+            ],
+            "type": "object"
+          }
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
           {
-            "column": 23,
-            "disposition": "unresolved",
-            "line": 457,
-            "method": "PUT",
-            "normalized_route": "/api/ext-field-mappings/batch",
-            "occurrence_id": "web/ext_datasource/ext_ds.js:457:23:PUT:/api/ext-field-mappings/batch",
-            "raw_route": "/api/ext-field-mappings/batch?mapping_gid=${_selectedMap.gid}",
-            "source": "web/ext_datasource/ext_ds.js"
+            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
+            "line": 594,
+            "sha256": "059ab69325b4740bc02173ae3d9b27eadfb0fd0f23e370be893da0c9545177ec",
+            "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
-        "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
-        "frontend_call_sites": [],
-        "owner_service_evidence": null,
-        "target_capability": "integration.mapping.update@1"
+        "owner_service_evidence": {
+          "end_line": 480,
+          "sha256": "6f65073a924a880015c9426ac4544d5e9e734819ceb80d5b95d0396895d1951e",
+          "source_path": "plugins/integration/integration_backend/application/service.py",
+          "start_line": 480
+        },
+        "target_capability": "integration.field_mapping.batch.update@1"
       },
-      "current_status": "unresolved",
+      "current_status": "migrated",
       "dependencies": [
         "connector package",
         "mapping aggregate migration",
@@ -2969,8 +4342,12 @@
       "occurrences": [
         {
           "column": 23,
+          "disposition": "unresolved",
           "line": 457,
+          "method": "PUT",
+          "normalized_route": "/api/ext-field-mappings/batch",
           "occurrence_id": "web/ext_datasource/ext_ds.js:457:23:PUT:/api/ext-field-mappings/batch",
+          "raw_route": "/api/ext-field-mappings/batch?mapping_gid=${_selectedMap.gid}",
           "source": "web/ext_datasource/ext_ds.js",
           "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
@@ -3424,19 +4801,19 @@
   "source_artifacts": [
     {
       "path": "docs/governance/base-structural-web-remediation.json",
-      "sha256": "sha256:4d6614d9465080af611579cfac92b24a4e45739a258ef27d578cc6bc9bec4d96"
+      "sha256": "sha256:c8d031e04826c288f01863d5878613ee1139f3b9a4fc54bb8046c117a93ccabe"
     },
     {
       "path": "docs/governance/integration-structural-web-remediation.json",
-      "sha256": "sha256:75cbd26bcd110d8954ba68709f823004147e2ba2fd9c7473b1bfda4c251cf0cf"
+      "sha256": "sha256:90778aeba81f7fa53f444594db80a99a76dcd61ac7974fb5adbfa4c50816299e"
     },
     {
       "path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-      "sha256": "sha256:542024decfc094b87d4cadb7f074130ce0f44e1358eb762b2b8ffdf93e7951d2"
+      "sha256": "sha256:a6eda64bdb95cf620842ab6bb46caae6d9d211eca643fdfe323dce5cda5b3738"
     },
     {
       "path": "docs\\governance\\capability-coverage-review\\generated\\web_route_inventory.json",
-      "sha256": "sha256:b39bbb20755e9b0cf4045339dc82892744dbf9ea4f0a042841c45015cd952457"
+      "sha256": "sha256:3b2f8cdb1d80cf7329e4269d7adcd73b99e7af1a870bee56c66c2ee8d30a3c6d"
     }
   ]
 }

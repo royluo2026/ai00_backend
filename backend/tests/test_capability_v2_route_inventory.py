@@ -344,8 +344,8 @@ def test_task3b3c_reviewed_disposition_totals_are_exact() -> None:
     assert len(ledger.entries) == 102
     assert sum(entry.occurrence_count for entry in ledger.entries) == 161
     assert groups == Counter({
-        "existing_capability_reclassified": 19,
-        "existing_capability_migrated": 35,
+        "existing_capability_reclassified": 7,
+        "existing_capability_migrated": 47,
         "frontend_retire": 17,
         "frontend_route_normalize": 15,
         "new_atomic_capability_required": 5,
@@ -356,8 +356,8 @@ def test_task3b3c_reviewed_disposition_totals_are_exact() -> None:
         "file_store_capability_migrated": 1,
     })
     assert occurrences == Counter({
-        "existing_capability_reclassified": 21,
-        "existing_capability_migrated": 60,
+        "existing_capability_reclassified": 9,
+        "existing_capability_migrated": 72,
         "frontend_route_normalize": 23,
         "frontend_retire": 21,
         "conditional_dispatch_partially_migrated": 14,

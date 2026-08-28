@@ -191,7 +191,7 @@
         "plugin_id": "official.integration",
         "module": "integration_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:715c89842662fbdd4941613d58c02076cb62c20f1ba35d8d24cdf2d1d8cce713"
+        "artifact_hash": "sha256:013d18301ea2f33016eafb0434f751c375648fce500d24573e575a95c85c3fed"
       },
       "artifact_path": "plugins/integration/integration_backend",
       "allowed_owners": [
@@ -215,7 +215,7 @@
         "plugin_id": "official.knowledge",
         "module": "knowledge_backend.capabilities",
         "version": "2.0.0",
-        "artifact_hash": "sha256:204e363149456811aebc9ccb7b82a4ed649b140bdd795628815d7dfd9547e68c"
+        "artifact_hash": "sha256:d0e8844007a5def8e471e4628053158737a5890b447fcae1a6a37d7df3906146"
       },
       "artifact_path": "plugins/knowledge/knowledge_backend",
       "allowed_owners": [

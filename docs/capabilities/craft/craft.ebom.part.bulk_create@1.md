@@ -8,7 +8,7 @@ Create a bounded PBOM part batch.
 - 不适用：The request changes a PBOM snapshot or crosses Craft domains.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_7803705d3df421f9f4381d37c3500731`
+- Catalog Release：`rel_813658f6043d041ccb8a2f800481a1c8`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -97,7 +97,7 @@ Create a bounded PBOM part batch.
 ```json
 {
   "capability_id": "craft.ebom.part.bulk_create",
-  "catalog_release": "rel_7803705d3df421f9f4381d37c3500731",
+  "catalog_release": "rel_813658f6043d041ccb8a2f800481a1c8",
   "major_version": 1,
   "payload": {
     "parts": [],

@@ -38,7 +38,7 @@ class MappingRepository:
         self.mapping = {
             "gid": "mapping-1", "revision": 3, "datasource_gid": "connector-1", "name": "Parts",
             "source_object": "parts", "target_domain": "knowledge",
-            "target_capability_id": "knowledge.reference_data.change.apply", "target_major_version": 1,
+            "target_capability_id": "knowledge.reference_dataset.publish", "target_major_version": 1,
             "minimum_catalog_release": "rel_20260828", "status": "active",
             "field_mappings": [{
                 "gid": "field-1", "revision": 3, "source_field": "part_no", "target_field": "code",
@@ -163,7 +163,7 @@ class SqlConnection:
         self.mapping_rows = [{
             "gid": "mapping-1", "revision": 3, "datasource_gid": "connector-1", "name": "Parts",
             "source_object": "parts", "target_domain": "knowledge",
-            "target_capability_id": "knowledge.reference_data.change.apply", "target_major_version": 1,
+            "target_capability_id": "knowledge.reference_dataset.publish", "target_major_version": 1,
             "minimum_catalog_release": "rel_20260828", "status": "active",
         }]
         self.field_rows = [{

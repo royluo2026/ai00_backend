@@ -8,7 +8,7 @@ Read PBOM parts explicitly linked to a BOP and their usage locations.
 - 不适用：The caller is searching PBOM candidate parts.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_7803705d3df421f9f4381d37c3500731`
+- Catalog Release：`rel_813658f6043d041ccb8a2f800481a1c8`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -87,7 +87,7 @@ Read PBOM parts explicitly linked to a BOP and their usage locations.
 ```json
 {
   "capability_id": "craft.bop.linked_parts.get",
-  "catalog_release": "rel_7803705d3df421f9f4381d37c3500731",
+  "catalog_release": "rel_813658f6043d041ccb8a2f800481a1c8",
   "major_version": 1,
   "payload": {
     "version_gid": "example"

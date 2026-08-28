@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS `workmanship_int_mapping_target_bindings` (
+  `binding_id` VARCHAR(255) NOT NULL,
+  `ontology_object_gid` VARCHAR(128) NOT NULL,
+  `target_domain` VARCHAR(128) NOT NULL,
+  `target_capability_id` VARCHAR(255) NOT NULL,
+  `target_major_version` INT NOT NULL,
+  `minimum_catalog_release` VARCHAR(64) NOT NULL,
+  `input_contract` VARCHAR(128) NOT NULL,
+  `resource_gid` VARCHAR(128) NOT NULL,
+  `expected_version` BIGINT NOT NULL,
+  `owner_gid` VARCHAR(64) NOT NULL,
+  `team_gid` VARCHAR(64) NOT NULL,
+  `active` TINYINT(1) NOT NULL DEFAULT 1,
+  `revision` BIGINT NOT NULL DEFAULT 1,
+  `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (`binding_id`),
+  UNIQUE KEY `uk_int_target_binding_scope` (`owner_gid`, `team_gid`, `ontology_object_gid`, `binding_id`),
+  KEY `idx_int_target_binding_projection` (`owner_gid`, `team_gid`, `ontology_object_gid`, `active`)
+);

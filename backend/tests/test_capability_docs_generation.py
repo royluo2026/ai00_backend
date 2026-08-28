@@ -57,6 +57,34 @@ def test_minimal_example_satisfies_sha256_string_patterns():
     validate_payload(schema, example)
 
 
+def test_minimal_example_preserves_typed_object_when_one_of_selects_required_property():
+    schema = {
+        "type": "object",
+        "properties": {
+            "name": {"type": "string"},
+            "credential_enrollment_handle": {"type": "string"},
+            "credential_ref": {"type": "string"},
+        },
+        "required": ["name"],
+        "oneOf": [
+            {
+                "required": ["credential_enrollment_handle"],
+                "not": {"required": ["credential_ref"]},
+            },
+            {
+                "required": ["credential_ref"],
+                "not": {"required": ["credential_enrollment_handle"]},
+            },
+        ],
+        "additionalProperties": False,
+    }
+
+    example = example_for_schema(schema)
+
+    assert example == {"name": "example", "credential_enrollment_handle": "example"}
+    validate_payload(schema, example)
+
+
 def test_deprecated_empty_operation_enum_is_compatibility_unconstrained():
     validate_payload({"type": "string", "enum": []}, "legacy-operation")
 

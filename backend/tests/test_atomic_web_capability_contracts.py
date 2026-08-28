@@ -38,6 +38,18 @@ SAFE_CAPABILITIES = {
     "base.saved_view.update",
     "base.saved_view.copy",
     "base.saved_view.delete",
+    "integration.connector.search",
+    "integration.connector.create",
+    "integration.connector.update",
+    "integration.connector.schema.discover",
+    "integration.connector.connection.test",
+    "integration.field_mapping.search",
+    "integration.field_mapping.batch.update",
+    "integration.mapping.search",
+    "integration.mapping.create",
+    "integration.mapping.source_columns.discover",
+    "integration.mapping.import.start",
+    "integration.mapping.preview",
 }
 
 
@@ -92,19 +104,23 @@ def test_only_service_backed_contracts_remain_migrated_with_typed_outputs():
 
 def test_all_migrated_specs_register_and_use_production_validation():
     from backend.base.web_atomic import register_atomic_web_capabilities as register_base
+    from plugins.integration.integration_backend.capabilities.descriptors import specs as integration_specs
 
     registry = CapabilityRegistry()
     register_base(registry)
+    integration = {item.id: item for item in integration_specs()}
     entries = [entry for entry in _manifest()["entries"] if entry["final_disposition"] == "migrated"]
     for entry in entries:
         if entry["owner_domain"] == "project_management":
             continue
-        item = registry.get(entry["capability_id"])
-        assert item.spec.owner == entry["owner_domain"]
-        validate_payload(dict(item.spec.input_schema), entry["example_input"])
-        validate_payload(dict(item.spec.output_schema), entry["example_output"])
+        spec = integration.get(entry["capability_id"])
+        if spec is None:
+            spec = registry.get(entry["capability_id"]).spec
+        assert spec.owner == entry["owner_domain"]
+        validate_payload(dict(spec.input_schema), entry["example_input"])
+        validate_payload(dict(spec.output_schema), entry["example_output"])
         with pytest.raises(ValueError, match="unknown field"):
-            validate_payload(dict(item.spec.input_schema), {**entry["example_input"], "__unknown": True})
+            validate_payload(dict(spec.input_schema), {**entry["example_input"], "__unknown": True})
 
 
 def test_production_catalog_enforces_atomic_schemas_and_gateway_policies():

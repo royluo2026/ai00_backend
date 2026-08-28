@@ -8,7 +8,7 @@ Execute the governed integration.mapping.create Integration outcome.
 - 不适用：The caller can use an owning domain Capability directly without external integration.
 - 生命周期：`stable`
 - 所属领域：`integration`
-- Catalog Release：`rel_7803705d3df421f9f4381d37c3500731`
+- Catalog Release：`rel_813658f6043d041ccb8a2f800481a1c8`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -47,7 +47,7 @@ Execute the governed integration.mapping.create Integration outcome.
 - 并发：`none`
 - 无预期版本信封要求。
 - 一致性：`strong`
-- Operation：`optional`
+- Operation：`required`
 - Artifact：`none`
 - 审计：`standard`
 - Evidence：`required`
@@ -97,7 +97,70 @@ Execute the governed integration.mapping.create Integration outcome.
         ],
         "type": "object"
       },
+      "maxItems": 200,
       "type": "array"
+    },
+    "idempotency_key": {
+      "maxLength": 255,
+      "minLength": 1,
+      "type": "string"
+    },
+    "name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "source_object": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "target_binding_id": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "datasource_gid",
+    "name",
+    "source_object",
+    "target_binding_id",
+    "idempotency_key"
+  ],
+  "type": "object"
+}
+```
+
+最小结构示例：
+
+```json
+{
+  "capability_id": "integration.mapping.create",
+  "catalog_release": "rel_813658f6043d041ccb8a2f800481a1c8",
+  "major_version": 1,
+  "payload": {
+    "datasource_gid": "example",
+    "idempotency_key": "example",
+    "name": "example",
+    "source_object": "example",
+    "target_binding_id": "example"
+  }
+}
+```
+
+## 输出 Schema
+
+首次调用返回 `status=accepted`、`data=null` 和持久化 `operation_ref`；下列输出 Schema 适用于 Operation 完成后的领域结果。
+
+```json
+{
+  "additionalProperties": false,
+  "properties": {
+    "datasource_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "gid": {
+      "minLength": 1,
+      "type": "string"
     },
     "minimum_catalog_release": {
       "minLength": 1,
@@ -107,7 +170,15 @@ Execute the governed integration.mapping.create Integration outcome.
       "minLength": 1,
       "type": "string"
     },
+    "revision": {
+      "minimum": 1,
+      "type": "integer"
+    },
     "source_object": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "status": {
       "minLength": 1,
       "type": "string"
     },
@@ -125,61 +196,15 @@ Execute the governed integration.mapping.create Integration outcome.
     }
   },
   "required": [
+    "gid",
+    "revision",
     "datasource_gid",
     "name",
     "source_object",
     "target_domain",
     "target_capability_id",
     "target_major_version",
-    "minimum_catalog_release"
-  ],
-  "type": "object"
-}
-```
-
-最小结构示例：
-
-```json
-{
-  "capability_id": "integration.mapping.create",
-  "catalog_release": "rel_7803705d3df421f9f4381d37c3500731",
-  "major_version": 1,
-  "payload": {
-    "datasource_gid": "example",
-    "minimum_catalog_release": "example",
-    "name": "example",
-    "source_object": "example",
-    "target_capability_id": "example",
-    "target_domain": "example",
-    "target_major_version": 1
-  }
-}
-```
-
-## 输出 Schema
-
-领域数据必须符合下列 Schema，并封装在完整 `CapabilityResultV2` 中：
-
-```json
-{
-  "additionalProperties": false,
-  "properties": {
-    "gid": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "revision": {
-      "minimum": 1,
-      "type": "integer"
-    },
-    "status": {
-      "minLength": 1,
-      "type": "string"
-    }
-  },
-  "required": [
-    "gid",
-    "revision",
+    "minimum_catalog_release",
     "status"
   ],
   "type": "object"
@@ -225,7 +250,11 @@ Execute the governed integration.mapping.create Integration outcome.
 - `network_policy_rejected`：The connector target violates outbound network policy.（retryable=false）
 - `connector_runtime_unavailable`：The bounded external connector runtime is unavailable.（retryable=true）
 - `target_capability_unavailable`：The owning target-domain Capability is unavailable.（retryable=true）
-- `idempotency_conflict`：The sync idempotency key is already bound to another request.（retryable=false）
+- `target_binding_unavailable`：The selected presentation object has no governed Integration target binding.（retryable=false）
+- `target_binding_incompatible`：The governed Integration target binding is incompatible.（retryable=false）
+- `credential_enrollment_unavailable`：The credential enrollment vault is unavailable.（retryable=true）
+- `credential_enrollment_invalid`：The one-time credential enrollment handle is invalid or consumed.（retryable=false）
+- `idempotency_conflict`：The Integration idempotency key is already bound to another request.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

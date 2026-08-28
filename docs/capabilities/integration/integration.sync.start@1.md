@@ -8,7 +8,7 @@ Execute the governed integration.sync.start Integration outcome.
 - 不适用：The caller can use an owning domain Capability directly without external integration.
 - 生命周期：`stable`
 - 所属领域：`integration`
-- Catalog Release：`rel_7803705d3df421f9f4381d37c3500731`
+- Catalog Release：`rel_813658f6043d041ccb8a2f800481a1c8`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -87,7 +87,7 @@ Execute the governed integration.sync.start Integration outcome.
 ```json
 {
   "capability_id": "integration.sync.start",
-  "catalog_release": "rel_7803705d3df421f9f4381d37c3500731",
+  "catalog_release": "rel_813658f6043d041ccb8a2f800481a1c8",
   "major_version": 1,
   "payload": {
     "mapping_gid": "example"
@@ -112,7 +112,10 @@ Execute the governed integration.sync.start Integration outcome.
         },
         "status": {
           "enum": [
-            "accepted"
+            "accepted",
+            "succeeded",
+            "failed",
+            "outcome_unknown"
           ],
           "type": "string"
         },
@@ -180,7 +183,11 @@ Execute the governed integration.sync.start Integration outcome.
 - `network_policy_rejected`：The connector target violates outbound network policy.（retryable=false）
 - `connector_runtime_unavailable`：The bounded external connector runtime is unavailable.（retryable=true）
 - `target_capability_unavailable`：The owning target-domain Capability is unavailable.（retryable=true）
-- `idempotency_conflict`：The sync idempotency key is already bound to another request.（retryable=false）
+- `target_binding_unavailable`：The selected presentation object has no governed Integration target binding.（retryable=false）
+- `target_binding_incompatible`：The governed Integration target binding is incompatible.（retryable=false）
+- `credential_enrollment_unavailable`：The credential enrollment vault is unavailable.（retryable=true）
+- `credential_enrollment_invalid`：The one-time credential enrollment handle is invalid or consumed.（retryable=false）
+- `idempotency_conflict`：The Integration idempotency key is already bound to another request.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

@@ -125,7 +125,7 @@ class ProviderCatalog:
             raise LookupError("target binding is outside principal scope")
         return {
             "binding_id": binding_id, "target_domain": "knowledge",
-            "target_capability_id": "knowledge.reference_data.change.apply",
+            "target_capability_id": "knowledge.reference_dataset.publish",
             "target_major_version": 1, "minimum_catalog_release": "rel_20260828",
             "input_contract": "knowledge.reference_dataset.publish.v1",
             "resource_gid": "dataset-parts", "expected_version": 7,
@@ -432,9 +432,9 @@ def test_registered_handlers_use_configured_vault_catalog_and_bounded_runtime(mo
     assert mapping["datasource_gid"] == "connector-1"
     assert projection["items"][0]["binding_id"] == "ontology:concept-part"
     assert adapters.catalog.calls == [
-        ("knowledge.reference_data.change.apply", 1, "rel_20260828"),
-        ("knowledge.reference_data.change.apply", 1, "rel_20260828"),
-        ("knowledge.reference_data.change.apply", 1, "rel_20260828"),
+        ("knowledge.reference_dataset.publish", 1, "rel_20260828"),
+        ("knowledge.reference_dataset.publish", 1, "rel_20260828"),
+        ("knowledge.reference_dataset.publish", 1, "rel_20260828"),
     ]
     assert tested["reachable"] is True
     assert tested["operation_ref"]["status"] == "succeeded"
@@ -460,7 +460,7 @@ def test_registered_gateway_handlers_hide_and_reject_cross_team_bindings():
         "name": "Parts", "source_object": "parts", "status": "active",
         "owner_gid": "actor-1", "team_gid": "team-2", "field_mappings": [],
         "target_binding_id": "ontology:concept-part", "target_domain": "knowledge",
-        "target_capability_id": "knowledge.reference_data.change.apply", "target_major_version": 1,
+        "target_capability_id": "knowledge.reference_dataset.publish", "target_major_version": 1,
         "minimum_catalog_release": "rel_20260828",
         "target_input_contract": "knowledge.reference_dataset.publish.v1",
         "target_resource_gid": "dataset-parts", "target_expected_version": 7,
@@ -575,13 +575,13 @@ def test_mapping_writes_require_exact_target_version_release_and_idempotency():
     } <= set(registrations["integration.mapping.import.start"][0].input_schema["required"])
 
 
-def test_legacy_non_idempotent_writes_publish_their_actual_operation_policy():
+def test_synchronous_mutations_require_gateway_idempotency_without_async_operation():
     registrations = _registrations()
     for capability_id in (
         "integration.connector.archive", "integration.mapping.update", "integration.mapping.archive",
     ):
         descriptor = registrations[capability_id][1]
-        assert descriptor.idempotency_policy == "none", capability_id
+        assert descriptor.idempotency_policy == "required", capability_id
         assert descriptor.operation_policy == "none", capability_id
 
 

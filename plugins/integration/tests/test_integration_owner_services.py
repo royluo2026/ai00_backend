@@ -212,7 +212,7 @@ class Catalog:
         return {
             "binding_id": binding_id,
             "target_domain": "knowledge",
-            "target_capability_id": "knowledge.reference_data.change.apply",
+            "target_capability_id": "knowledge.reference_dataset.publish",
             "target_major_version": 1,
             "minimum_catalog_release": "rel_7803705d3df421f9f4381d37c3500731",
             "input_contract": "knowledge.reference_dataset.publish.v1",
@@ -387,8 +387,8 @@ def test_mapping_create_requires_stable_exact_catalog_target_and_restricted_tran
     application = app(repository, catalog=catalog)
 
     created = asyncio.run(application.invoke("integration.mapping.create", mapping_payload(), CONTEXT))
-    assert created["target_capability_id"] == "knowledge.reference_data.change.apply"
-    assert catalog.calls == [("knowledge.reference_data.change.apply", 1, "rel_7803705d3df421f9f4381d37c3500731")]
+    assert created["target_capability_id"] == "knowledge.reference_dataset.publish"
+    assert catalog.calls == [("knowledge.reference_dataset.publish", 1, "rel_7803705d3df421f9f4381d37c3500731")]
 
     rejecting_repository = MemoryRepository()
     _seed_connector_and_mapping(rejecting_repository)
@@ -420,7 +420,7 @@ def _seed_connector_and_mapping(repository):
     repository.mappings["mapping-1"] = {
         "gid": "mapping-1", "revision": 1, "datasource_gid": "connector-1", "name": "Parts",
         "source_object": "parts", "target_domain": "knowledge",
-        "target_capability_id": "knowledge.reference_data.change.apply", "target_major_version": 1,
+        "target_capability_id": "knowledge.reference_dataset.publish", "target_major_version": 1,
         "minimum_catalog_release": "rel_7803705d3df421f9f4381d37c3500731", "status": "active",
         "target_binding_id": "ontology:concept-part",
         "target_input_contract": "knowledge.reference_dataset.publish.v1",
@@ -487,7 +487,7 @@ def test_field_mapping_batch_is_all_or_nothing_revision_locked_and_idempotent():
     assert first == replay
     assert first["updated_count"] == 1 and first["revision"] == 2
     assert first["items"][0]["gid"].startswith("field_mapping-")
-    assert catalog.calls == [("knowledge.reference_data.change.apply", 1, "rel_7803705d3df421f9f4381d37c3500731")]
+    assert catalog.calls == [("knowledge.reference_dataset.publish", 1, "rel_7803705d3df421f9f4381d37c3500731")]
 
     with pytest.raises(CapabilityBusinessError) as stale:
         asyncio.run(application.invoke(
@@ -510,8 +510,8 @@ def test_import_start_is_durable_accepted_and_replayed_without_duplicate_run():
     assert first == replay
     assert first["operation_ref"]["status"] == "accepted"
     assert len(repository.imports) == 1
-    assert repository.imports[0]["target_capability_id"] == "knowledge.reference_data.change.apply"
-    assert catalog.calls == [("knowledge.reference_data.change.apply", 1, "rel_7803705d3df421f9f4381d37c3500731")]
+    assert repository.imports[0]["target_capability_id"] == "knowledge.reference_dataset.publish"
+    assert catalog.calls == [("knowledge.reference_dataset.publish", 1, "rel_7803705d3df421f9f4381d37c3500731")]
 
 
 def test_import_replay_preserves_run_identity_across_unknown_failed_and_reconciled_states():
@@ -682,7 +682,7 @@ def test_sql_import_run_pins_target_version_release_and_idempotency(monkeypatch)
     )
     IntegrationRepository().claim_import_operation(record, {
         "run_id": "run-1", "mapping_gid": "mapping-1", "operation_id": "operation-1",
-        "status": "accepted", "target_capability_id": "knowledge.reference_data.change.apply",
+        "status": "accepted", "target_capability_id": "knowledge.reference_dataset.publish",
         "target_major_version": 1, "catalog_release": "rel_20260828", "owner_gid": "actor-1",
         "team_gid": "team-1", "idempotency_key": "import-1", "target_invocation": {},
     })

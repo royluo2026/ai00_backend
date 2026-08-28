@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3e-craft-agent-project-structural-remediation",
-  "atomic_contract_manifest_sha256": "sha256:9fb716c0ac5914568d21f9248b1ff3f5d4e8bf6c0a4e343e80309528a5d29cb1",
-  "content_sha256": "sha256:2eace9135f5092da063bf6da5fbc826fb4b6965af7748d913019fbc9169ed4ba",
+  "atomic_contract_manifest_sha256": "sha256:836857a249e0c63ea2ee1f130c6d81f5b2893a1395d30fbf779fb1ed50dcb939",
+  "content_sha256": "sha256:761a9e69a52d14604aa5ef4573c0a7e04e5235515a8047d8de566c717c27c36f",
   "counts": {
     "groups": 14,
     "migrated_groups": 0,
@@ -1092,8 +1092,8 @@
       "unresolved_reason": "Rule definition changes contain dynamic rule_definition data without a governed closed nested contract."
     }
   ],
-  "frontend_content_hash": "e3afdda265a85be039d0e90adf81c1bc5b3a4d5e2e13d11d50fc7d9cadf5811f",
-  "frontend_revision": "964233cf30aebddfc1167a5ac3eff1252cfc28eb",
+  "frontend_content_hash": "0469b3b95231ad836a2376d27355e39d68027e0f86c23b09a606a9d8fa85d07f",
+  "frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
   "schema_version": "1.0.0",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "source_ledger_revision": "2db07be4",

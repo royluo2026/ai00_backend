@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3e-base-structural-remediation",
-  "atomic_contract_manifest_sha256": "sha256:9fb716c0ac5914568d21f9248b1ff3f5d4e8bf6c0a4e343e80309528a5d29cb1",
-  "content_sha256": "sha256:bbfa4c3862ed412525df1bea4a38541e71d03f110dfe4e61beb05d4582ad2573",
+  "atomic_contract_manifest_sha256": "sha256:836857a249e0c63ea2ee1f130c6d81f5b2893a1395d30fbf779fb1ed50dcb939",
+  "content_sha256": "sha256:1b52186c3609ee26e436bbf65e289592220d890a42731436dafaf965795a4b0f",
   "counts": {
     "groups": 16,
     "migrated_groups": 16,
@@ -4022,8 +4022,8 @@
       "unresolved_reason": null
     }
   ],
-  "frontend_content_hash": "e3afdda265a85be039d0e90adf81c1bc5b3a4d5e2e13d11d50fc7d9cadf5811f",
-  "frontend_revision": "964233cf30aebddfc1167a5ac3eff1252cfc28eb",
+  "frontend_content_hash": "0469b3b95231ad836a2376d27355e39d68027e0f86c23b09a606a9d8fa85d07f",
+  "frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
   "schema_version": "1.0.0",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "source_ledger_revision": "8ee5dc2340a9e77c5d84e8f84f733bb5415e9d08",

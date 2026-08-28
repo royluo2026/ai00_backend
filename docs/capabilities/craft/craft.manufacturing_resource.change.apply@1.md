@@ -8,7 +8,7 @@ Execute the reviewed craft.manufacturing_resource.change.apply Craft outcome.
 - 不适用：The operation belongs to another business domain.
 - 生命周期：`deprecated`
 - 所属领域：`craft`
-- Catalog Release：`rel_7803705d3df421f9f4381d37c3500731`
+- Catalog Release：`rel_813658f6043d041ccb8a2f800481a1c8`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -96,7 +96,7 @@ Execute the reviewed craft.manufacturing_resource.change.apply Craft outcome.
 ```json
 {
   "capability_id": "craft.manufacturing_resource.change.apply",
-  "catalog_release": "rel_7803705d3df421f9f4381d37c3500731",
+  "catalog_release": "rel_813658f6043d041ccb8a2f800481a1c8",
   "major_version": 1,
   "payload": {
     "arguments": {},

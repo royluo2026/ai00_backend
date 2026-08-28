@@ -1,6 +1,6 @@
 {
-  "frontend_revision": "964233cf30aebddfc1167a5ac3eff1252cfc28eb",
-  "content_hash": "e3afdda265a85be039d0e90adf81c1bc5b3a4d5e2e13d11d50fc7d9cadf5811f",
+  "frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
+  "content_hash": "0469b3b95231ad836a2376d27355e39d68027e0f86c23b09a606a9d8fa85d07f",
   "wrapper_contracts_hash": "33e0e1b6378d642ab2fb6131a3cd02fde4895615709a5a82aa7ea1a6bffc0db0",
   "scan_roots": [
     "web",
@@ -27,12 +27,12 @@
     "legacy_registered": 311,
     "bff_registered": 2,
     "operations_excluded": 19,
-    "unresolved": 29
+    "unresolved": 17
   },
   "lexical_audit": {
-    "token_count": 417,
-    "token_hash": "8d05c40ebe574a6d4cf1657d2e6ad22b12caf365ef286872d72985e93348a4fc",
-    "mapped_count": 399,
+    "token_count": 405,
+    "token_hash": "6b8c5556c69d04a85ac8f4ee2a85a4f103fdb13233341050366d8803556fd32a",
+    "mapped_count": 387,
     "reviewed_non_route_count": 18,
     "reviewed_non_route_tokens": [
       "packages/craft-plugin/web/bop_nav/bop_nav.js:12:13:/api/",
@@ -2583,126 +2583,6 @@
       "method": "POST",
       "disposition": "capability",
       "occurrence_id": "web/ext_datasource/ext_ds.js:13:39:POST:/api/v1/capabilities/{dynamic}:invoke"
-    },
-    {
-      "source": "web/ext_datasource/ext_ds.js",
-      "line": 148,
-      "column": 36,
-      "raw_route": "/api/ext-datasources",
-      "normalized_route": "/api/ext-datasources",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/ext_datasource/ext_ds.js:148:36:GET:/api/ext-datasources"
-    },
-    {
-      "source": "web/ext_datasource/ext_ds.js",
-      "line": 187,
-      "column": 36,
-      "raw_route": "/api/ext-mappings?datasource_gid=${_selectedDs.gid}",
-      "normalized_route": "/api/ext-mappings",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/ext_datasource/ext_ds.js:187:36:GET:/api/ext-mappings"
-    },
-    {
-      "source": "web/ext_datasource/ext_ds.js",
-      "line": 341,
-      "column": 36,
-      "raw_route": "/api/ext-mappings/${_selectedMap.gid}/columns",
-      "normalized_route": "/api/ext-mappings/{dynamic}/columns",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/ext_datasource/ext_ds.js:341:36:GET:/api/ext-mappings/{dynamic}/columns"
-    },
-    {
-      "source": "web/ext_datasource/ext_ds.js",
-      "line": 349,
-      "column": 36,
-      "raw_route": "/api/ext-field-mappings?mapping_gid=${_selectedMap.gid}",
-      "normalized_route": "/api/ext-field-mappings",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/ext_datasource/ext_ds.js:349:36:GET:/api/ext-field-mappings"
-    },
-    {
-      "source": "web/ext_datasource/ext_ds.js",
-      "line": 457,
-      "column": 23,
-      "raw_route": "/api/ext-field-mappings/batch?mapping_gid=${_selectedMap.gid}",
-      "normalized_route": "/api/ext-field-mappings/batch",
-      "method": "PUT",
-      "disposition": "unresolved",
-      "occurrence_id": "web/ext_datasource/ext_ds.js:457:23:PUT:/api/ext-field-mappings/batch"
-    },
-    {
-      "source": "web/ext_datasource/ext_ds.js",
-      "line": 496,
-      "column": 36,
-      "raw_route": "/api/ext-mappings/${_selectedMap.gid}/preview?limit=5",
-      "normalized_route": "/api/ext-mappings/{dynamic}/preview",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/ext_datasource/ext_ds.js:496:36:GET:/api/ext-mappings/{dynamic}/preview"
-    },
-    {
-      "source": "web/ext_datasource/ext_ds.js",
-      "line": 549,
-      "column": 37,
-      "raw_route": "/api/ext-mappings/${_selectedMap.gid}/import",
-      "normalized_route": "/api/ext-mappings/{dynamic}/import",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "web/ext_datasource/ext_ds.js:549:37:POST:/api/ext-mappings/{dynamic}/import"
-    },
-    {
-      "source": "web/ext_datasource/ext_ds.js",
-      "line": 605,
-      "column": 34,
-      "raw_route": "/api/ext-datasources/${ds.gid}/test",
-      "normalized_route": "/api/ext-datasources/{dynamic}/test",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "web/ext_datasource/ext_ds.js:605:34:POST:/api/ext-datasources/{dynamic}/test"
-    },
-    {
-      "source": "web/ext_datasource/ext_ds.js",
-      "line": 623,
-      "column": 29,
-      "raw_route": "/api/ext-datasources/${ds.gid}",
-      "normalized_route": "/api/ext-datasources/{dynamic}",
-      "method": "PATCH",
-      "disposition": "unresolved",
-      "occurrence_id": "web/ext_datasource/ext_ds.js:623:29:PATCH:/api/ext-datasources/{dynamic}"
-    },
-    {
-      "source": "web/ext_datasource/ext_ds.js",
-      "line": 625,
-      "column": 28,
-      "raw_route": "/api/ext-datasources",
-      "normalized_route": "/api/ext-datasources",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "web/ext_datasource/ext_ds.js:625:28:POST:/api/ext-datasources"
-    },
-    {
-      "source": "web/ext_datasource/ext_ds.js",
-      "line": 640,
-      "column": 36,
-      "raw_route": "/api/ext-datasources/${_selectedDs.gid}/tables",
-      "normalized_route": "/api/ext-datasources/{dynamic}/tables",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/ext_datasource/ext_ds.js:640:36:GET:/api/ext-datasources/{dynamic}/tables"
-    },
-    {
-      "source": "web/ext_datasource/ext_ds.js",
-      "line": 677,
-      "column": 26,
-      "raw_route": "/api/ext-mappings",
-      "normalized_route": "/api/ext-mappings",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "web/ext_datasource/ext_ds.js:677:26:POST:/api/ext-mappings"
     },
     {
       "source": "web/knowledge/knowledge.js",

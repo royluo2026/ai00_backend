@@ -58,10 +58,10 @@
     "web/workspace/nav_manager.js": "e229fb407361c139cfc265cd438f929a944cd1919c321c4b6a1cf5bf57cfcd7d"
   },
   "final_evidence": {
-    "frontend_revision": "964233cf30aebddfc1167a5ac3eff1252cfc28eb",
-    "content_hash": "e3afdda265a85be039d0e90adf81c1bc5b3a4d5e2e13d11d50fc7d9cadf5811f",
-    "unresolved_count": 29,
-    "unresolved_group_count": 26
+    "frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
+    "content_hash": "0469b3b95231ad836a2376d27355e39d68027e0f86c23b09a606a9d8fa85d07f",
+    "unresolved_count": 17,
+    "unresolved_group_count": 14
   },
   "final_unresolved_groups": [
     {
@@ -84,42 +84,6 @@
     },
     {
       "method": "GET",
-      "normalized_route": "/api/ext-datasources",
-      "occurrence_count": 1,
-      "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "GET",
-      "normalized_route": "/api/ext-datasources/{dynamic}/tables",
-      "occurrence_count": 1,
-      "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "GET",
-      "normalized_route": "/api/ext-field-mappings",
-      "occurrence_count": 1,
-      "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "GET",
-      "normalized_route": "/api/ext-mappings",
-      "occurrence_count": 1,
-      "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "GET",
-      "normalized_route": "/api/ext-mappings/{dynamic}/columns",
-      "occurrence_count": 1,
-      "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "GET",
-      "normalized_route": "/api/ext-mappings/{dynamic}/preview",
-      "occurrence_count": 1,
-      "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "GET",
       "normalized_route": "/api/lists",
       "occurrence_count": 1,
       "disposition": "conditional_dispatch_partially_migrated"
@@ -131,38 +95,8 @@
       "disposition": "existing_capability_reclassified"
     },
     {
-      "method": "PATCH",
-      "normalized_route": "/api/ext-datasources/{dynamic}",
-      "occurrence_count": 1,
-      "disposition": "existing_capability_reclassified"
-    },
-    {
       "method": "POST",
       "normalized_route": "/api/approval/orders/{dynamic}/reject",
-      "occurrence_count": 1,
-      "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "POST",
-      "normalized_route": "/api/ext-datasources",
-      "occurrence_count": 1,
-      "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "POST",
-      "normalized_route": "/api/ext-datasources/{dynamic}/test",
-      "occurrence_count": 1,
-      "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "POST",
-      "normalized_route": "/api/ext-mappings",
-      "occurrence_count": 1,
-      "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "POST",
-      "normalized_route": "/api/ext-mappings/{dynamic}/import",
       "occurrence_count": 1,
       "disposition": "existing_capability_reclassified"
     },
@@ -205,12 +139,6 @@
     {
       "method": "POST",
       "normalized_route": "/api/skills/resume-canvas",
-      "occurrence_count": 1,
-      "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "PUT",
-      "normalized_route": "/api/ext-field-mappings/batch",
       "occurrence_count": 1,
       "disposition": "existing_capability_reclassified"
     },
@@ -259,7 +187,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "964233cf30aebddfc1167a5ac3eff1252cfc28eb",
+        "removed_in_frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -810,7 +738,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "964233cf30aebddfc1167a5ac3eff1252cfc28eb",
+        "removed_in_frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
         "retirement_proof": {
           "kind": "http_410",
           "rationale": "The registered AI balance compatibility endpoint is permanently gone and returns HTTP 410, so polling it cannot yield a supported outcome.",
@@ -879,7 +807,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "964233cf30aebddfc1167a5ac3eff1252cfc28eb",
+        "removed_in_frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -941,7 +869,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "964233cf30aebddfc1167a5ac3eff1252cfc28eb",
+        "removed_in_frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -1003,7 +931,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "964233cf30aebddfc1167a5ac3eff1252cfc28eb",
+        "removed_in_frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -1076,7 +1004,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "964233cf30aebddfc1167a5ac3eff1252cfc28eb",
+        "removed_in_frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -1150,7 +1078,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "964233cf30aebddfc1167a5ac3eff1252cfc28eb",
+        "removed_in_frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -1223,7 +1151,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "964233cf30aebddfc1167a5ac3eff1252cfc28eb",
+        "removed_in_frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -1455,36 +1383,24 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
-      "disposition": "existing_capability_reclassified",
+      "lifecycle_conclusion": "The frontend invokes the exact stable atomic owner-domain outcome through the shared Gateway client.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
-        "candidate_target_capability": "integration.connector.search@1",
-        "reason_code": "contract_shape_mismatch",
-        "followup": "atomic_capability_review",
-        "finding": "/api/ext-datasources: REST query uses legacy datasource filters; candidate binds actor/team and connector search payload. | /api/ext-datasources: REST returns datasource rows; candidate returns connector items projection. | /api/ext-datasources: Candidate applies Integration ownership scoping absent from the legacy projection.",
-        "legacy_contract": {
-          "kind": "reviewed_handler_absence",
-          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "source_sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "method": "GET",
-          "normalized_route": "/api/ext-datasources",
-          "finding": "No exact registered route/method definition exists in this reviewed handler family."
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 46,
-            "end_line": 46,
-            "sha256": "ab2c27b403a9031af28346979a178de5b571dbab9ad580f0769f8af0fb0ea16a",
-            "needle": "\"integration.connector.search\""
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/ext-datasources: REST query uses legacy datasource filters; candidate binds actor/team and connector search payload.",
-          "output": "/api/ext-datasources: REST returns datasource rows; candidate returns connector items projection.",
-          "side_effects": "/api/ext-datasources: Candidate applies Integration ownership scoping absent from the legacy projection."
+        "target_capability": "integration.connector.search@1",
+        "provider_equivalence": "proven",
+        "request_transform": "Exact closed payload defined by Task 3B.3c atomic contract manifest.",
+        "response_transform": "Bounded result_json is decoded to the original legacy response value.",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "provider_contract": {
+            "repository": "backend",
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "start_line": 42,
+            "end_line": 42,
+            "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
+          },
+          "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+          "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
     },
@@ -1514,36 +1430,24 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
-      "disposition": "existing_capability_reclassified",
+      "lifecycle_conclusion": "The frontend invokes the exact stable atomic owner-domain outcome through the shared Gateway client.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
-        "candidate_target_capability": "integration.connector.schema.discover@1",
-        "reason_code": "contract_shape_mismatch",
-        "followup": "atomic_capability_review",
-        "finding": "/api/ext-datasources/{dynamic}/tables: REST uses datasource gid and table listing semantics; candidate requires connector gid discovery contract. | /api/ext-datasources/{dynamic}/tables: REST returns table names; candidate returns connector-runtime schema discovery projection. | /api/ext-datasources/{dynamic}/tables: Candidate performs bounded external discovery and network policy checks.",
-        "legacy_contract": {
-          "kind": "reviewed_handler_absence",
-          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "source_sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "method": "GET",
-          "normalized_route": "/api/ext-datasources/{dynamic}/tables",
-          "finding": "No exact registered route/method definition exists in this reviewed handler family."
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 48,
-            "end_line": 48,
-            "sha256": "5ce7451c74e389af9f867da9da1b9e3989f7358c28d915c92c8ee7da272c2779",
-            "needle": "\"integration.connector.schema.discover\""
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/ext-datasources/{dynamic}/tables: REST uses datasource gid and table listing semantics; candidate requires connector gid discovery contract.",
-          "output": "/api/ext-datasources/{dynamic}/tables: REST returns table names; candidate returns connector-runtime schema discovery projection.",
-          "side_effects": "/api/ext-datasources/{dynamic}/tables: Candidate performs bounded external discovery and network policy checks."
+        "target_capability": "integration.connector.schema.discover@1",
+        "provider_equivalence": "proven",
+        "request_transform": "Exact closed payload defined by Task 3B.3c atomic contract manifest.",
+        "response_transform": "Bounded result_json is decoded to the original legacy response value.",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "provider_contract": {
+            "repository": "backend",
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "start_line": 42,
+            "end_line": 42,
+            "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
+          },
+          "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+          "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
     },
@@ -1573,36 +1477,24 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
-      "disposition": "existing_capability_reclassified",
+      "lifecycle_conclusion": "The frontend invokes the exact stable atomic owner-domain outcome through the shared Gateway client.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
-        "candidate_target_capability": "integration.mapping.get@1",
-        "reason_code": "contract_shape_mismatch",
-        "followup": "atomic_capability_review",
-        "finding": "/api/ext-field-mappings: REST lists field mappings by legacy query; candidate requires one mapping gid. | /api/ext-field-mappings: REST returns a collection; candidate returns one mapping. | /api/ext-field-mappings: Candidate enforces actor/team ownership for a single resource.",
-        "legacy_contract": {
-          "kind": "reviewed_handler_absence",
-          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "source_sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "method": "GET",
-          "normalized_route": "/api/ext-field-mappings",
-          "finding": "No exact registered route/method definition exists in this reviewed handler family."
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 57,
-            "end_line": 57,
-            "sha256": "f137d0bb608efa11c1b626741729a2db811ab486d848e2300a437af73add860d",
-            "needle": "\"integration.mapping.get\""
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/ext-field-mappings: REST lists field mappings by legacy query; candidate requires one mapping gid.",
-          "output": "/api/ext-field-mappings: REST returns a collection; candidate returns one mapping.",
-          "side_effects": "/api/ext-field-mappings: Candidate enforces actor/team ownership for a single resource."
+        "target_capability": "integration.field_mapping.search@1",
+        "provider_equivalence": "proven",
+        "request_transform": "Exact closed payload defined by Task 3B.3c atomic contract manifest.",
+        "response_transform": "Bounded result_json is decoded to the original legacy response value.",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "provider_contract": {
+            "repository": "backend",
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "start_line": 42,
+            "end_line": 42,
+            "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
+          },
+          "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+          "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
     },
@@ -1632,36 +1524,24 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
-      "disposition": "existing_capability_reclassified",
+      "lifecycle_conclusion": "The frontend invokes the exact stable atomic owner-domain outcome through the shared Gateway client.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
-        "candidate_target_capability": "integration.mapping.search@1",
-        "reason_code": "contract_shape_mismatch",
-        "followup": "atomic_capability_review",
-        "finding": "/api/ext-mappings: REST uses legacy datasource/mapping filters; candidate uses bounded owned mapping search. | /api/ext-mappings: REST returns legacy mapping records; candidate returns Integration mapping items. | /api/ext-mappings: Candidate binds actor/team ownership.",
-        "legacy_contract": {
-          "kind": "reviewed_handler_absence",
-          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "source_sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "method": "GET",
-          "normalized_route": "/api/ext-mappings",
-          "finding": "No exact registered route/method definition exists in this reviewed handler family."
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 59,
-            "end_line": 59,
-            "sha256": "5a6c7881ed21e630d9b7604459a9d4509a7d62761f43352edcfedd9fbd9a441c",
-            "needle": "\"integration.mapping.search\""
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/ext-mappings: REST uses legacy datasource/mapping filters; candidate uses bounded owned mapping search.",
-          "output": "/api/ext-mappings: REST returns legacy mapping records; candidate returns Integration mapping items.",
-          "side_effects": "/api/ext-mappings: Candidate binds actor/team ownership."
+        "target_capability": "integration.mapping.search@1",
+        "provider_equivalence": "proven",
+        "request_transform": "Exact closed payload defined by Task 3B.3c atomic contract manifest.",
+        "response_transform": "Bounded result_json is decoded to the original legacy response value.",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "provider_contract": {
+            "repository": "backend",
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "start_line": 42,
+            "end_line": 42,
+            "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
+          },
+          "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+          "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
     },
@@ -1691,36 +1571,24 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
-      "disposition": "existing_capability_reclassified",
+      "lifecycle_conclusion": "The frontend invokes the exact stable atomic owner-domain outcome through the shared Gateway client.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
-        "candidate_target_capability": "integration.connector.schema.discover@1",
-        "reason_code": "contract_shape_mismatch",
-        "followup": "atomic_capability_review",
-        "finding": "/api/ext-mappings/{dynamic}/columns: REST starts from mapping gid and column semantics; candidate requires connector gid. | /api/ext-mappings/{dynamic}/columns: REST returns mapped columns; candidate returns connector schema discovery. | /api/ext-mappings/{dynamic}/columns: Candidate invokes connector runtime rather than reading mapping columns.",
-        "legacy_contract": {
-          "kind": "reviewed_handler_absence",
-          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "source_sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "method": "GET",
-          "normalized_route": "/api/ext-mappings/{dynamic}/columns",
-          "finding": "No exact registered route/method definition exists in this reviewed handler family."
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 48,
-            "end_line": 48,
-            "sha256": "5ce7451c74e389af9f867da9da1b9e3989f7358c28d915c92c8ee7da272c2779",
-            "needle": "\"integration.connector.schema.discover\""
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/ext-mappings/{dynamic}/columns: REST starts from mapping gid and column semantics; candidate requires connector gid.",
-          "output": "/api/ext-mappings/{dynamic}/columns: REST returns mapped columns; candidate returns connector schema discovery.",
-          "side_effects": "/api/ext-mappings/{dynamic}/columns: Candidate invokes connector runtime rather than reading mapping columns."
+        "target_capability": "integration.mapping.source_columns.discover@1",
+        "provider_equivalence": "proven",
+        "request_transform": "Exact closed payload defined by Task 3B.3c atomic contract manifest.",
+        "response_transform": "Bounded result_json is decoded to the original legacy response value.",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "provider_contract": {
+            "repository": "backend",
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "start_line": 42,
+            "end_line": 42,
+            "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
+          },
+          "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+          "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
     },
@@ -1750,36 +1618,24 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
-      "disposition": "existing_capability_reclassified",
+      "lifecycle_conclusion": "The frontend invokes the exact stable atomic owner-domain outcome through the shared Gateway client.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
-        "candidate_target_capability": "integration.mapping.preview@1",
-        "reason_code": "contract_shape_mismatch",
-        "followup": "atomic_capability_review",
-        "finding": "/api/ext-mappings/{dynamic}/preview: REST preview parameters and legacy mapping shape differ from candidate gid contract. | /api/ext-mappings/{dynamic}/preview: REST returns legacy preview rows; candidate returns runtime preview evidence. | /api/ext-mappings/{dynamic}/preview: Candidate invokes connector runtime and ownership/network controls.",
-        "legacy_contract": {
-          "kind": "reviewed_handler_absence",
-          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "source_sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "method": "GET",
-          "normalized_route": "/api/ext-mappings/{dynamic}/preview",
-          "finding": "No exact registered route/method definition exists in this reviewed handler family."
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 65,
-            "end_line": 65,
-            "sha256": "211345df50bebfdb4f35289640742d8ada9f198a97a1aa1783f3649d897cf78d",
-            "needle": "\"integration.mapping.preview\""
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/ext-mappings/{dynamic}/preview: REST preview parameters and legacy mapping shape differ from candidate gid contract.",
-          "output": "/api/ext-mappings/{dynamic}/preview: REST returns legacy preview rows; candidate returns runtime preview evidence.",
-          "side_effects": "/api/ext-mappings/{dynamic}/preview: Candidate invokes connector runtime and ownership/network controls."
+        "target_capability": "integration.mapping.preview@1",
+        "provider_equivalence": "proven",
+        "request_transform": "Exact closed payload defined by Task 3B.3c atomic contract manifest.",
+        "response_transform": "Bounded result_json is decoded to the original legacy response value.",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "provider_contract": {
+            "repository": "backend",
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "start_line": 42,
+            "end_line": 42,
+            "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
+          },
+          "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+          "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
     },
@@ -1820,7 +1676,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "964233cf30aebddfc1167a5ac3eff1252cfc28eb",
+        "removed_in_frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
         "retirement_proof": {
           "kind": "backend_route_absent",
           "rationale": "The standalone Feishu UI had no matching API-prefixed configuration handler; it now uses a bounded local default configuration.",
@@ -2353,7 +2209,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "964233cf30aebddfc1167a5ac3eff1252cfc28eb",
+        "removed_in_frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
         "retirement_proof": {
           "kind": "sample_template_only",
           "rationale": "The only caller lived in the distributable plugin SDK template and represented placeholder sample data rather than a shipped product route.",
@@ -3571,36 +3427,24 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
-      "disposition": "existing_capability_reclassified",
+      "lifecycle_conclusion": "The frontend invokes the exact stable atomic owner-domain outcome through the shared Gateway client.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
-        "candidate_target_capability": "integration.connector.update@1",
-        "reason_code": "contract_shape_mismatch",
-        "followup": "atomic_capability_review",
-        "finding": "/api/ext-datasources/{dynamic}: REST patch omits mandatory expected_revision and uses legacy datasource fields. | /api/ext-datasources/{dynamic}: REST returns patched datasource; candidate returns connector revision projection. | /api/ext-datasources/{dynamic}: Candidate validates host/network and optimistic revision.",
-        "legacy_contract": {
-          "kind": "reviewed_handler_absence",
-          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "source_sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "method": "PATCH",
-          "normalized_route": "/api/ext-datasources/{dynamic}",
-          "finding": "No exact registered route/method definition exists in this reviewed handler family."
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
+        "target_capability": "integration.connector.update@1",
+        "provider_equivalence": "proven",
+        "request_transform": "Exact closed payload defined by Task 3B.3c atomic contract manifest.",
+        "response_transform": "Bounded result_json is decoded to the original legacy response value.",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "provider_contract": {
+            "repository": "backend",
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
             "start_line": 42,
             "end_line": 42,
-            "sha256": "079ccaecfc7418945962f21d8901ddff906cd3848704aeb3071607b99e793123",
-            "needle": "\"integration.connector.update\""
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/ext-datasources/{dynamic}: REST patch omits mandatory expected_revision and uses legacy datasource fields.",
-          "output": "/api/ext-datasources/{dynamic}: REST returns patched datasource; candidate returns connector revision projection.",
-          "side_effects": "/api/ext-datasources/{dynamic}: Candidate validates host/network and optimistic revision."
+            "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
+          },
+          "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+          "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
     },
@@ -4169,7 +4013,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "964233cf30aebddfc1167a5ac3eff1252cfc28eb",
+        "removed_in_frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4231,7 +4075,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "964233cf30aebddfc1167a5ac3eff1252cfc28eb",
+        "removed_in_frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4293,7 +4137,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "964233cf30aebddfc1167a5ac3eff1252cfc28eb",
+        "removed_in_frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4355,7 +4199,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "964233cf30aebddfc1167a5ac3eff1252cfc28eb",
+        "removed_in_frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4417,7 +4261,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "964233cf30aebddfc1167a5ac3eff1252cfc28eb",
+        "removed_in_frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -4612,36 +4456,24 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
-      "disposition": "existing_capability_reclassified",
+      "lifecycle_conclusion": "The frontend invokes the exact stable atomic owner-domain outcome through the shared Gateway client.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
-        "candidate_target_capability": "integration.connector.create@1",
-        "reason_code": "contract_shape_mismatch",
-        "followup": "atomic_capability_review",
-        "finding": "/api/ext-datasources: REST legacy datasource body differs from required connector_type/host/credential_ref contract. | /api/ext-datasources: REST returns datasource row; candidate returns owned connector projection. | /api/ext-datasources: Candidate validates network policy and credential reference.",
-        "legacy_contract": {
-          "kind": "reviewed_handler_absence",
-          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "source_sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "method": "POST",
-          "normalized_route": "/api/ext-datasources",
-          "finding": "No exact registered route/method definition exists in this reviewed handler family."
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 38,
-            "end_line": 38,
-            "sha256": "45bd33cb1023303df1f0792d5153e4431375d7ce357fe6609cbb436e5dfc8bc9",
-            "needle": "\"integration.connector.create\""
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/ext-datasources: REST legacy datasource body differs from required connector_type/host/credential_ref contract.",
-          "output": "/api/ext-datasources: REST returns datasource row; candidate returns owned connector projection.",
-          "side_effects": "/api/ext-datasources: Candidate validates network policy and credential reference."
+        "target_capability": "integration.connector.create@1",
+        "provider_equivalence": "proven",
+        "request_transform": "Exact closed payload defined by Task 3B.3c atomic contract manifest.",
+        "response_transform": "Bounded result_json is decoded to the original legacy response value.",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "provider_contract": {
+            "repository": "backend",
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "start_line": 42,
+            "end_line": 42,
+            "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
+          },
+          "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+          "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
     },
@@ -4671,36 +4503,24 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
-      "disposition": "existing_capability_reclassified",
+      "lifecycle_conclusion": "The frontend invokes the exact stable atomic owner-domain outcome through the shared Gateway client.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
-        "candidate_target_capability": "integration.connector.connection.test@1",
-        "reason_code": "contract_shape_mismatch",
-        "followup": "atomic_capability_review",
-        "finding": "/api/ext-datasources/{dynamic}/test: REST test body/path differs from candidate connector gid payload. | /api/ext-datasources/{dynamic}/test: REST returns legacy connection result; candidate returns connector-runtime evidence. | /api/ext-datasources/{dynamic}/test: Candidate invokes bounded external runtime and network policy.",
-        "legacy_contract": {
-          "kind": "reviewed_handler_absence",
-          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "source_sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "method": "POST",
-          "normalized_route": "/api/ext-datasources/{dynamic}/test",
-          "finding": "No exact registered route/method definition exists in this reviewed handler family."
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 48,
-            "end_line": 48,
-            "sha256": "5ce7451c74e389af9f867da9da1b9e3989f7358c28d915c92c8ee7da272c2779",
-            "needle": "\"integration.connector.connection.test\""
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/ext-datasources/{dynamic}/test: REST test body/path differs from candidate connector gid payload.",
-          "output": "/api/ext-datasources/{dynamic}/test: REST returns legacy connection result; candidate returns connector-runtime evidence.",
-          "side_effects": "/api/ext-datasources/{dynamic}/test: Candidate invokes bounded external runtime and network policy."
+        "target_capability": "integration.connector.connection.test@1",
+        "provider_equivalence": "proven",
+        "request_transform": "Exact closed payload defined by Task 3B.3c atomic contract manifest.",
+        "response_transform": "Bounded result_json is decoded to the original legacy response value.",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "provider_contract": {
+            "repository": "backend",
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "start_line": 42,
+            "end_line": 42,
+            "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
+          },
+          "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+          "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
     },
@@ -4730,36 +4550,24 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
-      "disposition": "existing_capability_reclassified",
+      "lifecycle_conclusion": "The frontend invokes the exact stable atomic owner-domain outcome through the shared Gateway client.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
-        "candidate_target_capability": "integration.mapping.create@1",
-        "reason_code": "contract_shape_mismatch",
-        "followup": "atomic_capability_review",
-        "finding": "/api/ext-mappings: REST mapping body omits target capability/catalog fields required by candidate. | /api/ext-mappings: REST returns legacy mapping row; candidate returns governed mapping projection. | /api/ext-mappings: Candidate validates restricted transforms and ownership.",
-        "legacy_contract": {
-          "kind": "reviewed_handler_absence",
-          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "source_sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "method": "POST",
-          "normalized_route": "/api/ext-mappings",
-          "finding": "No exact registered route/method definition exists in this reviewed handler family."
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 54,
-            "end_line": 54,
-            "sha256": "3f0cc731ead8be8ef37b4caea96fb3cb9728459ebebcb4b1eecfd8e22bd85533",
-            "needle": "\"integration.mapping.create\""
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/ext-mappings: REST mapping body omits target capability/catalog fields required by candidate.",
-          "output": "/api/ext-mappings: REST returns legacy mapping row; candidate returns governed mapping projection.",
-          "side_effects": "/api/ext-mappings: Candidate validates restricted transforms and ownership."
+        "target_capability": "integration.mapping.create@1",
+        "provider_equivalence": "proven",
+        "request_transform": "Exact closed payload defined by Task 3B.3c atomic contract manifest.",
+        "response_transform": "Bounded result_json is decoded to the original legacy response value.",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "provider_contract": {
+            "repository": "backend",
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "start_line": 42,
+            "end_line": 42,
+            "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
+          },
+          "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+          "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
     },
@@ -4789,36 +4597,24 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
-      "disposition": "existing_capability_reclassified",
+      "lifecycle_conclusion": "The frontend invokes the exact stable atomic owner-domain outcome through the shared Gateway client.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
-        "candidate_target_capability": "integration.sync.start@1",
-        "reason_code": "contract_shape_mismatch",
-        "followup": "atomic_capability_review",
-        "finding": "/api/ext-mappings/{dynamic}/import: REST performs synchronous import options; candidate accepts mapping_gid asynchronous start. | /api/ext-mappings/{dynamic}/import: REST returns imported rows/count; candidate returns run_id and operation_ref. | /api/ext-mappings/{dynamic}/import: Candidate starts asynchronous governed sync rather than importing synchronously.",
-        "legacy_contract": {
-          "kind": "reviewed_handler_absence",
-          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "source_sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "method": "POST",
-          "normalized_route": "/api/ext-mappings/{dynamic}/import",
-          "finding": "No exact registered route/method definition exists in this reviewed handler family."
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 70,
-            "end_line": 70,
-            "sha256": "ec5ce0b8c48598c9f09956d7961d066e14ffe290c07530fd8fb42634f8f6964e",
-            "needle": "\"integration.sync.start\""
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/ext-mappings/{dynamic}/import: REST performs synchronous import options; candidate accepts mapping_gid asynchronous start.",
-          "output": "/api/ext-mappings/{dynamic}/import: REST returns imported rows/count; candidate returns run_id and operation_ref.",
-          "side_effects": "/api/ext-mappings/{dynamic}/import: Candidate starts asynchronous governed sync rather than importing synchronously."
+        "target_capability": "integration.mapping.import.start@1",
+        "provider_equivalence": "proven",
+        "request_transform": "Exact closed payload defined by Task 3B.3c atomic contract manifest.",
+        "response_transform": "Bounded result_json is decoded to the original legacy response value.",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "provider_contract": {
+            "repository": "backend",
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "start_line": 42,
+            "end_line": 42,
+            "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
+          },
+          "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+          "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
     },
@@ -5020,7 +4816,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "964233cf30aebddfc1167a5ac3eff1252cfc28eb",
+        "removed_in_frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
         "retirement_proof": {
           "kind": "sample_template_only",
           "rationale": "The only caller lived in the distributable plugin SDK template and represented placeholder sample data rather than a shipped product route.",
@@ -5544,7 +5340,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "964233cf30aebddfc1167a5ac3eff1252cfc28eb",
+        "removed_in_frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
         "retirement_proof": {
           "kind": "http_410",
           "rationale": "The registered V1 standard-operation clone compatibility endpoint raises HTTP 410 and instructs callers to use the current BOP entry surface.",
@@ -5753,36 +5549,24 @@
         "route_definition": null,
         "anchors": []
       },
-      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
-      "disposition": "existing_capability_reclassified",
+      "lifecycle_conclusion": "The frontend invokes the exact stable atomic owner-domain outcome through the shared Gateway client.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
-        "candidate_target_capability": "integration.mapping.update@1",
-        "reason_code": "contract_shape_mismatch",
-        "followup": "atomic_capability_review",
-        "finding": "/api/ext-field-mappings/batch: REST batch updates multiple field mappings; candidate requires one gid and expected_revision. | /api/ext-field-mappings/batch: REST returns batch count/items; candidate returns one mapping revision. | /api/ext-field-mappings/batch: Candidate validates one mapping transaction and restricted expressions.",
-        "legacy_contract": {
-          "kind": "reviewed_handler_absence",
-          "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "source_sha256": "43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "method": "PUT",
-          "normalized_route": "/api/ext-field-mappings/batch",
-          "finding": "No exact registered route/method definition exists in this reviewed handler family."
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "plugins/integration/integration_backend/application/service.py",
-            "source_sha256": "063320bba104b8d9400f687f7d1af65d37cd9204f081adf02536ee199f58a33e",
-            "start_line": 61,
-            "end_line": 61,
-            "sha256": "19bb982b932421ed1076c0c3bcbe12bdd7ad195febdbb7005ad958764bec0909",
-            "needle": "\"integration.mapping.update\""
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/ext-field-mappings/batch: REST batch updates multiple field mappings; candidate requires one gid and expected_revision.",
-          "output": "/api/ext-field-mappings/batch: REST returns batch count/items; candidate returns one mapping revision.",
-          "side_effects": "/api/ext-field-mappings/batch: Candidate validates one mapping transaction and restricted expressions."
+        "target_capability": "integration.field_mapping.batch.update@1",
+        "provider_equivalence": "proven",
+        "request_transform": "Exact closed payload defined by Task 3B.3c atomic contract manifest.",
+        "response_transform": "Bounded result_json is decoded to the original legacy response value.",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "provider_contract": {
+            "repository": "backend",
+            "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
+            "start_line": 42,
+            "end_line": 42,
+            "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
+          },
+          "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+          "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
     },

@@ -26,6 +26,7 @@ _RESOURCE_FIELDS = {
     "knowledge.document.create": ("knowledge-space", "space_gid"),
     "knowledge.document.revise": ("knowledge-document", "document_gid"),
     "knowledge.document.restore": ("knowledge-document", "document_gid"),
+    "knowledge.reference_dataset.publish": ("knowledge-reference-dataset", "dataset_gid"),
     "knowledge.proposal.get": ("knowledge-proposal", "proposal_gid"),
     "knowledge.proposal.review": ("knowledge-proposal", "proposal_gid"),
     "knowledge.proposal.outbox.retry": ("knowledge-outbox", "outbox_gid"),
@@ -79,7 +80,9 @@ def descriptor_for(spec):
             plugin=not deprecated,
             agent=not deprecated,
             mcp=not deprecated,
-            worker=spec.id == "knowledge.proposal.outbox.retry",
+            worker=spec.id in {
+                "knowledge.proposal.outbox.retry", "knowledge.reference_dataset.publish",
+            },
         ),
         "exposure_policy_source": "provider_explicit",
         "automation_level": AutomationLevel.A1 if is_write else AutomationLevel.A2,

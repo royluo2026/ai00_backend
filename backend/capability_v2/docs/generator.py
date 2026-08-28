@@ -73,7 +73,7 @@ def example_for_schema(schema: Mapping[str, Any]) -> Any:
         return schema["enum"][0]
     for union in ("oneOf", "anyOf"):
         branches = schema.get(union)
-        if branches:
+        if branches and not schema.get("type"):
             return example_for_schema(branches[0])
     if schema.get("allOf"):
         values = [example_for_schema(branch) for branch in schema["allOf"]]
@@ -90,9 +90,21 @@ def example_for_schema(schema: Mapping[str, Any]) -> Any:
     expected = schema.get("type")
     if expected == "object":
         properties = schema.get("properties") or {}
+        required = list(schema.get("required") or ())
+        selected_branch: Mapping[str, Any] = {}
+        for union in ("oneOf", "anyOf"):
+            branches = schema.get(union)
+            if branches:
+                selected_branch = branches[0]
+                required.extend(
+                    name for name in selected_branch.get("required") or ()
+                    if name not in required
+                )
+                break
+        branch_properties = selected_branch.get("properties") or {}
         return {
-            name: example_for_schema(properties.get(name) or {})
-            for name in schema.get("required") or ()
+            name: example_for_schema(branch_properties.get(name) or properties.get(name) or {})
+            for name in required
         }
     if expected == "array":
         count = max(0, int(schema.get("minItems", 0)))

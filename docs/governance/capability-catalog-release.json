@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_7803705d3df421f9f4381d37c3500731",
-  "catalog_hash": "sha256:7803705d3df421f9f4381d37c3500731900c7f6b1d2f6cd72b1ec2a08982d3b9",
+  "release_id": "rel_813658f6043d041ccb8a2f800481a1c8",
+  "catalog_hash": "sha256:813658f6043d041ccb8a2f800481a1c850888c2740313345c29ea7c643a1b269",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -95063,7 +95063,7 @@
       },
       "schema_hash": "sha256:a20139b4ba84039547c99f4800361400a09da64a7a680a4db66cf403c086dca1",
       "artifact_policy": "none",
-      "operation_policy": "optional",
+      "operation_policy": "none",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
@@ -95128,8 +95128,32 @@
           "is_caller_error": false
         },
         {
+          "code": "target_binding_unavailable",
+          "meaning": "The selected presentation object has no governed Integration target binding.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_incompatible",
+          "meaning": "The governed Integration target binding is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_unavailable",
+          "meaning": "The credential enrollment vault is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_invalid",
+          "meaning": "The one-time credential enrollment handle is invalid or consumed.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
           "code": "idempotency_conflict",
-          "meaning": "The sync idempotency key is already bound to another request.",
+          "meaning": "The Integration idempotency key is already bound to another request.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -95180,8 +95204,32 @@
           "is_caller_error": false
         },
         {
+          "error_code": "target_binding_unavailable",
+          "message_template": "The selected presentation object has no governed Integration target binding.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_incompatible",
+          "message_template": "The governed Integration target binding is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_unavailable",
+          "message_template": "The credential enrollment vault is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_invalid",
+          "message_template": "The one-time credential enrollment handle is invalid or consumed.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
           "error_code": "idempotency_conflict",
-          "message_template": "The sync idempotency key is already bound to another request.",
+          "message_template": "The Integration idempotency key is already bound to another request.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -95257,11 +95305,43 @@
           },
           "latency_ms": {
             "type": "integer"
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1
+          },
+          "operation_ref": {
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "succeeded",
+                  "failed",
+                  "outcome_unknown"
+                ]
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ]
           }
         },
         "additionalProperties": false,
         "required": [
-          "reachable"
+          "operation_ref"
         ]
       },
       "agent_output_schema": {
@@ -95272,16 +95352,48 @@
           },
           "latency_ms": {
             "type": "integer"
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1
+          },
+          "operation_ref": {
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "succeeded",
+                  "failed",
+                  "outcome_unknown"
+                ]
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ]
           }
         },
         "additionalProperties": false,
         "required": [
-          "reachable"
+          "operation_ref"
         ]
       },
-      "schema_hash": "sha256:fbdcb248bd1b6fab3d616386ad607d69fe618f362e18c049573a1eb65e8224bd",
+      "schema_hash": "sha256:3000dde01c0972878bf737201cb9294643c32eb05de369b9d50a5d8894fd7153",
       "artifact_policy": "none",
-      "operation_policy": "optional",
+      "operation_policy": "required",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
@@ -95346,8 +95458,32 @@
           "is_caller_error": false
         },
         {
+          "code": "target_binding_unavailable",
+          "meaning": "The selected presentation object has no governed Integration target binding.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_incompatible",
+          "meaning": "The governed Integration target binding is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_unavailable",
+          "meaning": "The credential enrollment vault is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_invalid",
+          "meaning": "The one-time credential enrollment handle is invalid or consumed.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
           "code": "idempotency_conflict",
-          "meaning": "The sync idempotency key is already bound to another request.",
+          "meaning": "The Integration idempotency key is already bound to another request.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -95398,8 +95534,32 @@
           "is_caller_error": false
         },
         {
+          "error_code": "target_binding_unavailable",
+          "message_template": "The selected presentation object has no governed Integration target binding.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_incompatible",
+          "message_template": "The governed Integration target binding is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_unavailable",
+          "message_template": "The credential enrollment vault is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_invalid",
+          "message_template": "The one-time credential enrollment handle is invalid or consumed.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
           "error_code": "idempotency_conflict",
-          "message_template": "The sync idempotency key is already bound to another request.",
+          "message_template": "The Integration idempotency key is already bound to another request.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -95482,12 +95642,43 @@
             "type": "string",
             "minLength": 1
           },
+          "credential_enrollment_handle": {
+            "type": "string",
+            "minLength": 1
+          },
           "credential_ref": {
             "type": "string",
             "minLength": 1
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
           }
         },
         "additionalProperties": false,
+        "oneOf": [
+          {
+            "required": [
+              "credential_enrollment_handle"
+            ],
+            "not": {
+              "required": [
+                "credential_ref"
+              ]
+            }
+          },
+          {
+            "required": [
+              "credential_ref"
+            ],
+            "not": {
+              "required": [
+                "credential_enrollment_handle"
+              ]
+            }
+          }
+        ],
         "required": [
           "name",
           "connector_type",
@@ -95495,7 +95686,7 @@
           "port",
           "database_name",
           "username",
-          "credential_ref"
+          "idempotency_key"
         ]
       },
       "output_schema": {
@@ -95509,6 +95700,31 @@
             "type": "integer",
             "minimum": 1
           },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "connector_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "host": {
+            "type": "string",
+            "minLength": 1
+          },
+          "port": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535
+          },
+          "database_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "username": {
+            "type": "string",
+            "minLength": 1
+          },
           "status": {
             "type": "string",
             "minLength": 1
@@ -95518,6 +95734,12 @@
         "required": [
           "gid",
           "revision",
+          "name",
+          "connector_type",
+          "host",
+          "port",
+          "database_name",
+          "username",
           "status"
         ]
       },
@@ -95532,6 +95754,31 @@
             "type": "integer",
             "minimum": 1
           },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "connector_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "host": {
+            "type": "string",
+            "minLength": 1
+          },
+          "port": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535
+          },
+          "database_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "username": {
+            "type": "string",
+            "minLength": 1
+          },
           "status": {
             "type": "string",
             "minLength": 1
@@ -95541,12 +95788,18 @@
         "required": [
           "gid",
           "revision",
+          "name",
+          "connector_type",
+          "host",
+          "port",
+          "database_name",
+          "username",
           "status"
         ]
       },
-      "schema_hash": "sha256:13e0cced1ea2792d50776ab38b5a94690c4d42f8d5a1058b3164e15f9e727659",
+      "schema_hash": "sha256:5e61fd5721bdfd813f3cd1841235f1288377ecef753da4d3a781a1a0a22b47c9",
       "artifact_policy": "none",
-      "operation_policy": "optional",
+      "operation_policy": "required",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
@@ -95611,8 +95864,32 @@
           "is_caller_error": false
         },
         {
+          "code": "target_binding_unavailable",
+          "meaning": "The selected presentation object has no governed Integration target binding.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_incompatible",
+          "meaning": "The governed Integration target binding is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_unavailable",
+          "meaning": "The credential enrollment vault is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_invalid",
+          "meaning": "The one-time credential enrollment handle is invalid or consumed.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
           "code": "idempotency_conflict",
-          "meaning": "The sync idempotency key is already bound to another request.",
+          "meaning": "The Integration idempotency key is already bound to another request.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -95663,8 +95940,32 @@
           "is_caller_error": false
         },
         {
+          "error_code": "target_binding_unavailable",
+          "message_template": "The selected presentation object has no governed Integration target binding.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_incompatible",
+          "message_template": "The governed Integration target binding is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_unavailable",
+          "message_template": "The credential enrollment vault is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_invalid",
+          "message_template": "The one-time credential enrollment handle is invalid or consumed.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
           "error_code": "idempotency_conflict",
-          "message_template": "The sync idempotency key is already bound to another request.",
+          "message_template": "The Integration idempotency key is already bound to another request.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -95725,6 +96026,11 @@
           "gid": {
             "type": "string",
             "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
           }
         },
         "additionalProperties": false,
@@ -95739,14 +96045,57 @@
             "type": "array",
             "items": {
               "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "kind": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
               "additionalProperties": false,
-              "properties": {}
-            }
+              "required": [
+                "name",
+                "kind"
+              ]
+            },
+            "maxItems": 200
+          },
+          "operation_ref": {
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "succeeded",
+                  "failed",
+                  "outcome_unknown"
+                ]
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ]
           }
         },
         "additionalProperties": false,
         "required": [
-          "objects"
+          "objects",
+          "operation_ref"
         ]
       },
       "agent_output_schema": {
@@ -95756,19 +96105,62 @@
             "type": "array",
             "items": {
               "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "kind": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
               "additionalProperties": false,
-              "properties": {}
-            }
+              "required": [
+                "name",
+                "kind"
+              ]
+            },
+            "maxItems": 200
+          },
+          "operation_ref": {
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "succeeded",
+                  "failed",
+                  "outcome_unknown"
+                ]
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ]
           }
         },
         "additionalProperties": false,
         "required": [
-          "objects"
+          "objects",
+          "operation_ref"
         ]
       },
-      "schema_hash": "sha256:d45bcb595d652799f72fe0d542301ebe7f547c02dccc90e03b9ce90bd2b2f1cc",
+      "schema_hash": "sha256:ce7784a7c4016002c7c068826d587be71870ff98a3ff48999379a1b96915ab5f",
       "artifact_policy": "none",
-      "operation_policy": "none",
+      "operation_policy": "required",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "none",
@@ -95833,8 +96225,32 @@
           "is_caller_error": false
         },
         {
+          "code": "target_binding_unavailable",
+          "meaning": "The selected presentation object has no governed Integration target binding.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_incompatible",
+          "meaning": "The governed Integration target binding is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_unavailable",
+          "meaning": "The credential enrollment vault is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_invalid",
+          "meaning": "The one-time credential enrollment handle is invalid or consumed.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
           "code": "idempotency_conflict",
-          "meaning": "The sync idempotency key is already bound to another request.",
+          "meaning": "The Integration idempotency key is already bound to another request.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -95885,8 +96301,32 @@
           "is_caller_error": false
         },
         {
+          "error_code": "target_binding_unavailable",
+          "message_template": "The selected presentation object has no governed Integration target binding.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_incompatible",
+          "message_template": "The governed Integration target binding is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_unavailable",
+          "message_template": "The credential enrollment vault is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_invalid",
+          "message_template": "The one-time credential enrollment handle is invalid or consumed.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
           "error_code": "idempotency_conflict",
-          "message_template": "The sync idempotency key is already bound to another request.",
+          "message_template": "The Integration idempotency key is already bound to another request.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -95963,9 +96403,59 @@
             "type": "array",
             "items": {
               "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "connector_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "host": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "port": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 65535
+                },
+                "database_name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "username": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
               "additionalProperties": false,
-              "properties": {}
-            }
+              "required": [
+                "gid",
+                "revision",
+                "name",
+                "connector_type",
+                "host",
+                "port",
+                "database_name",
+                "username",
+                "status"
+              ]
+            },
+            "maxItems": 200
           }
         },
         "additionalProperties": false,
@@ -95980,9 +96470,59 @@
             "type": "array",
             "items": {
               "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "connector_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "host": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "port": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 65535
+                },
+                "database_name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "username": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
               "additionalProperties": false,
-              "properties": {}
-            }
+              "required": [
+                "gid",
+                "revision",
+                "name",
+                "connector_type",
+                "host",
+                "port",
+                "database_name",
+                "username",
+                "status"
+              ]
+            },
+            "maxItems": 200
           }
         },
         "additionalProperties": false,
@@ -95990,7 +96530,7 @@
           "items"
         ]
       },
-      "schema_hash": "sha256:0606824cfbbfaf872b5d45a89ab732c7d6680d30bcddaca2bd39b8afbec3b367",
+      "schema_hash": "sha256:e888c66db44b52ba651af18a2f935aa03dc30e6cb33fdd44d27e9de343a4c914",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -96057,8 +96597,32 @@
           "is_caller_error": false
         },
         {
+          "code": "target_binding_unavailable",
+          "meaning": "The selected presentation object has no governed Integration target binding.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_incompatible",
+          "meaning": "The governed Integration target binding is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_unavailable",
+          "meaning": "The credential enrollment vault is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_invalid",
+          "meaning": "The one-time credential enrollment handle is invalid or consumed.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
           "code": "idempotency_conflict",
-          "meaning": "The sync idempotency key is already bound to another request.",
+          "meaning": "The Integration idempotency key is already bound to another request.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -96109,8 +96673,32 @@
           "is_caller_error": false
         },
         {
+          "error_code": "target_binding_unavailable",
+          "message_template": "The selected presentation object has no governed Integration target binding.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_incompatible",
+          "message_template": "The governed Integration target binding is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_unavailable",
+          "message_template": "The credential enrollment vault is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_invalid",
+          "message_template": "The one-time credential enrollment handle is invalid or consumed.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
           "error_code": "idempotency_conflict",
-          "message_template": "The sync idempotency key is already bound to another request.",
+          "message_template": "The Integration idempotency key is already bound to another request.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -96180,15 +96768,52 @@
             "type": "string",
             "minLength": 1
           },
+          "connector_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "host": {
+            "type": "string",
+            "minLength": 1
+          },
+          "port": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535
+          },
+          "database_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "username": {
+            "type": "string",
+            "minLength": 1
+          },
+          "credential_enrollment_handle": {
+            "type": "string",
+            "minLength": 1
+          },
           "credential_ref": {
             "type": "string",
             "minLength": 1
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
           }
         },
         "additionalProperties": false,
+        "not": {
+          "required": [
+            "credential_enrollment_handle",
+            "credential_ref"
+          ]
+        },
         "required": [
           "gid",
-          "expected_revision"
+          "expected_revision",
+          "idempotency_key"
         ]
       },
       "output_schema": {
@@ -96202,15 +96827,47 @@
             "type": "integer",
             "minimum": 1
           },
-          "changed": {
-            "type": "boolean"
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "connector_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "host": {
+            "type": "string",
+            "minLength": 1
+          },
+          "port": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535
+          },
+          "database_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "username": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
           }
         },
         "additionalProperties": false,
         "required": [
           "gid",
           "revision",
-          "changed"
+          "name",
+          "connector_type",
+          "host",
+          "port",
+          "database_name",
+          "username",
+          "status"
         ]
       },
       "agent_output_schema": {
@@ -96224,20 +96881,52 @@
             "type": "integer",
             "minimum": 1
           },
-          "changed": {
-            "type": "boolean"
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "connector_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "host": {
+            "type": "string",
+            "minLength": 1
+          },
+          "port": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535
+          },
+          "database_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "username": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
           }
         },
         "additionalProperties": false,
         "required": [
           "gid",
           "revision",
-          "changed"
+          "name",
+          "connector_type",
+          "host",
+          "port",
+          "database_name",
+          "username",
+          "status"
         ]
       },
-      "schema_hash": "sha256:bd3ba61f26c0fca117a6cab1311ea0f3c94fcbbb6d619b51e5bda8c0961333eb",
+      "schema_hash": "sha256:8d99447b5cc7c8e07c1c752f67ef2e35f039c99609358f7cf7df364de8088fe3",
       "artifact_policy": "none",
-      "operation_policy": "optional",
+      "operation_policy": "required",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
@@ -96302,8 +96991,32 @@
           "is_caller_error": false
         },
         {
+          "code": "target_binding_unavailable",
+          "meaning": "The selected presentation object has no governed Integration target binding.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_incompatible",
+          "meaning": "The governed Integration target binding is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_unavailable",
+          "meaning": "The credential enrollment vault is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_invalid",
+          "meaning": "The one-time credential enrollment handle is invalid or consumed.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
           "code": "idempotency_conflict",
-          "meaning": "The sync idempotency key is already bound to another request.",
+          "meaning": "The Integration idempotency key is already bound to another request.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -96354,8 +97067,32 @@
           "is_caller_error": false
         },
         {
+          "error_code": "target_binding_unavailable",
+          "message_template": "The selected presentation object has no governed Integration target binding.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_incompatible",
+          "message_template": "The governed Integration target binding is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_unavailable",
+          "message_template": "The credential enrollment vault is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_invalid",
+          "message_template": "The one-time credential enrollment handle is invalid or consumed.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
           "error_code": "idempotency_conflict",
-          "message_template": "The sync idempotency key is already bound to another request.",
+          "message_template": "The Integration idempotency key is already bound to another request.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -96369,6 +97106,736 @@
       "provider_ref": "integration.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/integration.connector.update:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
+          "result": "pass",
+          "path": "backend/tests/test_capability_v2_contracts.py"
+        }
+      ]
+    },
+    {
+      "id": "integration.field_mapping.batch.update",
+      "major_version": 1,
+      "owner_domain": "integration",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "integration.field_mapping.batch.update",
+      "description": "Execute the governed integration.field_mapping.batch.update Integration outcome.",
+      "use_when": "A consumer needs governed external connector, mapping, or sync orchestration.",
+      "do_not_use_when": "The caller can use an owning domain Capability directly without external integration.",
+      "business_effect": "Business outcome: Execute the governed integration.field_mapping.batch.update Integration outcome.",
+      "side_effect_level": "write",
+      "side_effects": "Writes integration domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "integration.v2:integration.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "mapping_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source_field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "transform_expression": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "source_field",
+                "target_field"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 200
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "mapping_gid",
+          "expected_revision",
+          "items",
+          "idempotency_key"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "mapping_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "updated_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "source_field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "transform_expression": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "gid",
+                "revision",
+                "source_field",
+                "target_field"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 200
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "mapping_gid",
+          "revision",
+          "updated_count",
+          "items"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "mapping_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "updated_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "source_field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "transform_expression": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "gid",
+                "revision",
+                "source_field",
+                "target_field"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 200
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "mapping_gid",
+          "revision",
+          "updated_count",
+          "items"
+        ]
+      },
+      "schema_hash": "sha256:d6a3fa01b0a4a1f92ae04bd14a1f75a6393f418f3357ea1f0cb90eb47f875d78",
+      "artifact_policy": "none",
+      "operation_policy": "required",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Integration request is invalid.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Integration resource.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The connector or mapping does not exist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The connector or mapping revision changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "network_policy_rejected",
+          "meaning": "The connector target violates outbound network policy.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "connector_runtime_unavailable",
+          "meaning": "The bounded external connector runtime is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_capability_unavailable",
+          "meaning": "The owning target-domain Capability is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_unavailable",
+          "meaning": "The selected presentation object has no governed Integration target binding.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_incompatible",
+          "meaning": "The governed Integration target binding is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_unavailable",
+          "meaning": "The credential enrollment vault is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_invalid",
+          "meaning": "The one-time credential enrollment handle is invalid or consumed.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The Integration idempotency key is already bound to another request.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_a660abde4bac65958cd6957c",
+      "error_schema": [
+        {
+          "error_code": "invalid_input",
+          "message_template": "The Integration request is invalid.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller cannot access the Integration resource.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The connector or mapping does not exist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The connector or mapping revision changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "network_policy_rejected",
+          "message_template": "The connector target violates outbound network policy.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "connector_runtime_unavailable",
+          "message_template": "The bounded external connector runtime is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_capability_unavailable",
+          "message_template": "The owning target-domain Capability is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_unavailable",
+          "message_template": "The selected presentation object has no governed Integration target binding.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_incompatible",
+          "message_template": "The governed Integration target binding is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_unavailable",
+          "message_template": "The credential enrollment vault is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_invalid",
+          "message_template": "The one-time credential enrollment handle is invalid or consumed.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The Integration idempotency key is already bound to another request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "integration.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/integration.field_mapping.batch.update:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
+          "result": "pass",
+          "path": "backend/tests/test_capability_v2_contracts.py"
+        }
+      ]
+    },
+    {
+      "id": "integration.field_mapping.search",
+      "major_version": 1,
+      "owner_domain": "integration",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "integration.field_mapping.search",
+      "description": "Execute the governed integration.field_mapping.search Integration outcome.",
+      "use_when": "A consumer needs governed external connector, mapping, or sync orchestration.",
+      "do_not_use_when": "The caller can use an owning domain Capability directly without external integration.",
+      "business_effect": "Business outcome: Execute the governed integration.field_mapping.search Integration outcome.",
+      "side_effect_level": "read",
+      "side_effects": "Reads integration domain state; emits no mutation event or external call.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "integration.v2:integration.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "mapping_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "mapping_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "source_field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "transform_expression": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "gid",
+                "revision",
+                "source_field",
+                "target_field"
+              ]
+            },
+            "maxItems": 200
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "source_field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "transform_expression": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "gid",
+                "revision",
+                "source_field",
+                "target_field"
+              ]
+            },
+            "maxItems": 200
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items"
+        ]
+      },
+      "schema_hash": "sha256:038c53dd7457f254db9313984865240b2cc889ce3266fac8f17d0ec6f572a3e4",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Integration request is invalid.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Integration resource.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The connector or mapping does not exist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The connector or mapping revision changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "network_policy_rejected",
+          "meaning": "The connector target violates outbound network policy.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "connector_runtime_unavailable",
+          "meaning": "The bounded external connector runtime is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_capability_unavailable",
+          "meaning": "The owning target-domain Capability is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_unavailable",
+          "meaning": "The selected presentation object has no governed Integration target binding.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_incompatible",
+          "meaning": "The governed Integration target binding is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_unavailable",
+          "meaning": "The credential enrollment vault is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_invalid",
+          "meaning": "The one-time credential enrollment handle is invalid or consumed.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The Integration idempotency key is already bound to another request.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_0df611c3a87f36c0f5a6f996",
+      "error_schema": [
+        {
+          "error_code": "invalid_input",
+          "message_template": "The Integration request is invalid.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller cannot access the Integration resource.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The connector or mapping does not exist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The connector or mapping revision changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "network_policy_rejected",
+          "message_template": "The connector target violates outbound network policy.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "connector_runtime_unavailable",
+          "message_template": "The bounded external connector runtime is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_capability_unavailable",
+          "message_template": "The owning target-domain Capability is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_unavailable",
+          "message_template": "The selected presentation object has no governed Integration target binding.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_incompatible",
+          "message_template": "The governed Integration target binding is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_unavailable",
+          "message_template": "The credential enrollment vault is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_invalid",
+          "message_template": "The one-time credential enrollment handle is invalid or consumed.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The Integration idempotency key is already bound to another request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "integration.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/integration.field_mapping.search:invoke"
       ],
       "test_refs": [
         {
@@ -96464,7 +97931,7 @@
       },
       "schema_hash": "sha256:a20139b4ba84039547c99f4800361400a09da64a7a680a4db66cf403c086dca1",
       "artifact_policy": "none",
-      "operation_policy": "optional",
+      "operation_policy": "none",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
@@ -96529,8 +97996,32 @@
           "is_caller_error": false
         },
         {
+          "code": "target_binding_unavailable",
+          "meaning": "The selected presentation object has no governed Integration target binding.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_incompatible",
+          "meaning": "The governed Integration target binding is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_unavailable",
+          "meaning": "The credential enrollment vault is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_invalid",
+          "meaning": "The one-time credential enrollment handle is invalid or consumed.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
           "code": "idempotency_conflict",
-          "meaning": "The sync idempotency key is already bound to another request.",
+          "meaning": "The Integration idempotency key is already bound to another request.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -96581,8 +98072,32 @@
           "is_caller_error": false
         },
         {
+          "error_code": "target_binding_unavailable",
+          "message_template": "The selected presentation object has no governed Integration target binding.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_incompatible",
+          "message_template": "The governed Integration target binding is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_unavailable",
+          "message_template": "The credential enrollment vault is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_invalid",
+          "message_template": "The one-time credential enrollment handle is invalid or consumed.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
           "error_code": "idempotency_conflict",
-          "message_template": "The sync idempotency key is already bound to another request.",
+          "message_template": "The Integration idempotency key is already bound to another request.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -96652,19 +98167,7 @@
             "type": "string",
             "minLength": 1
           },
-          "target_domain": {
-            "type": "string",
-            "minLength": 1
-          },
-          "target_capability_id": {
-            "type": "string",
-            "minLength": 1
-          },
-          "target_major_version": {
-            "type": "integer",
-            "minimum": 1
-          },
-          "minimum_catalog_release": {
+          "target_binding_id": {
             "type": "string",
             "minLength": 1
           },
@@ -96691,7 +98194,13 @@
                 "source_field",
                 "target_field"
               ]
-            }
+            },
+            "maxItems": 200
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
           }
         },
         "additionalProperties": false,
@@ -96699,10 +98208,8 @@
           "datasource_gid",
           "name",
           "source_object",
-          "target_domain",
-          "target_capability_id",
-          "target_major_version",
-          "minimum_catalog_release"
+          "target_binding_id",
+          "idempotency_key"
         ]
       },
       "output_schema": {
@@ -96716,6 +98223,34 @@
             "type": "integer",
             "minimum": 1
           },
+          "datasource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_object": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_domain": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_capability_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_major_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "minimum_catalog_release": {
+            "type": "string",
+            "minLength": 1
+          },
           "status": {
             "type": "string",
             "minLength": 1
@@ -96725,6 +98260,13 @@
         "required": [
           "gid",
           "revision",
+          "datasource_gid",
+          "name",
+          "source_object",
+          "target_domain",
+          "target_capability_id",
+          "target_major_version",
+          "minimum_catalog_release",
           "status"
         ]
       },
@@ -96739,6 +98281,34 @@
             "type": "integer",
             "minimum": 1
           },
+          "datasource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_object": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_domain": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_capability_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_major_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "minimum_catalog_release": {
+            "type": "string",
+            "minLength": 1
+          },
           "status": {
             "type": "string",
             "minLength": 1
@@ -96748,12 +98318,19 @@
         "required": [
           "gid",
           "revision",
+          "datasource_gid",
+          "name",
+          "source_object",
+          "target_domain",
+          "target_capability_id",
+          "target_major_version",
+          "minimum_catalog_release",
           "status"
         ]
       },
-      "schema_hash": "sha256:69baf268fff75097453cc8d043270e4eda0f7f9b89c461f63563e539f3d916b4",
+      "schema_hash": "sha256:d1494083fd3149a5412972002d43725aedb68cf53d80528c6e904adca2f38abb",
       "artifact_policy": "none",
-      "operation_policy": "optional",
+      "operation_policy": "required",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
@@ -96818,8 +98395,32 @@
           "is_caller_error": false
         },
         {
+          "code": "target_binding_unavailable",
+          "meaning": "The selected presentation object has no governed Integration target binding.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_incompatible",
+          "meaning": "The governed Integration target binding is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_unavailable",
+          "meaning": "The credential enrollment vault is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_invalid",
+          "meaning": "The one-time credential enrollment handle is invalid or consumed.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
           "code": "idempotency_conflict",
-          "meaning": "The sync idempotency key is already bound to another request.",
+          "meaning": "The Integration idempotency key is already bound to another request.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -96870,8 +98471,32 @@
           "is_caller_error": false
         },
         {
+          "error_code": "target_binding_unavailable",
+          "message_template": "The selected presentation object has no governed Integration target binding.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_incompatible",
+          "message_template": "The governed Integration target binding is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_unavailable",
+          "message_template": "The credential enrollment vault is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_invalid",
+          "message_template": "The one-time credential enrollment handle is invalid or consumed.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
           "error_code": "idempotency_conflict",
-          "message_template": "The sync idempotency key is already bound to another request.",
+          "message_template": "The Integration idempotency key is already bound to another request.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -96950,7 +98575,35 @@
             "type": "integer",
             "minimum": 1
           },
+          "datasource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_object": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_domain": {
+            "type": "string",
+            "minLength": 1
+          },
           "target_capability_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_major_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "minimum_catalog_release": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
             "type": "string",
             "minLength": 1
           },
@@ -96959,6 +98612,14 @@
             "items": {
               "type": "object",
               "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
                 "source_field": {
                   "type": "string",
                   "minLength": 1
@@ -96974,17 +98635,27 @@
               },
               "additionalProperties": false,
               "required": [
+                "gid",
+                "revision",
                 "source_field",
                 "target_field"
               ]
-            }
+            },
+            "maxItems": 200
           }
         },
         "additionalProperties": false,
         "required": [
           "gid",
           "revision",
+          "datasource_gid",
+          "name",
+          "source_object",
+          "target_domain",
           "target_capability_id",
+          "target_major_version",
+          "minimum_catalog_release",
+          "status",
           "field_mappings"
         ]
       },
@@ -96999,7 +98670,35 @@
             "type": "integer",
             "minimum": 1
           },
+          "datasource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_object": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_domain": {
+            "type": "string",
+            "minLength": 1
+          },
           "target_capability_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_major_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "minimum_catalog_release": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
             "type": "string",
             "minLength": 1
           },
@@ -97008,6 +98707,14 @@
             "items": {
               "type": "object",
               "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
                 "source_field": {
                   "type": "string",
                   "minLength": 1
@@ -97023,21 +98730,31 @@
               },
               "additionalProperties": false,
               "required": [
+                "gid",
+                "revision",
                 "source_field",
                 "target_field"
               ]
-            }
+            },
+            "maxItems": 200
           }
         },
         "additionalProperties": false,
         "required": [
           "gid",
           "revision",
+          "datasource_gid",
+          "name",
+          "source_object",
+          "target_domain",
           "target_capability_id",
+          "target_major_version",
+          "minimum_catalog_release",
+          "status",
           "field_mappings"
         ]
       },
-      "schema_hash": "sha256:5a97c9b83a136b95a855fb0a4d2d2da6c45036ca332a7423e24ac54fadd56045",
+      "schema_hash": "sha256:978c382982a31015d73f58bb30e4314e2e811f4c2775938e9d69327edf6cc148",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -97104,8 +98821,32 @@
           "is_caller_error": false
         },
         {
+          "code": "target_binding_unavailable",
+          "meaning": "The selected presentation object has no governed Integration target binding.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_incompatible",
+          "meaning": "The governed Integration target binding is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_unavailable",
+          "meaning": "The credential enrollment vault is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_invalid",
+          "meaning": "The one-time credential enrollment handle is invalid or consumed.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
           "code": "idempotency_conflict",
-          "meaning": "The sync idempotency key is already bound to another request.",
+          "meaning": "The Integration idempotency key is already bound to another request.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -97156,8 +98897,32 @@
           "is_caller_error": false
         },
         {
+          "error_code": "target_binding_unavailable",
+          "message_template": "The selected presentation object has no governed Integration target binding.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_incompatible",
+          "message_template": "The governed Integration target binding is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_unavailable",
+          "message_template": "The credential enrollment vault is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_invalid",
+          "message_template": "The one-time credential enrollment handle is invalid or consumed.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
           "error_code": "idempotency_conflict",
-          "message_template": "The sync idempotency key is already bound to another request.",
+          "message_template": "The Integration idempotency key is already bound to another request.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -97171,6 +98936,332 @@
       "provider_ref": "integration.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/integration.mapping.get:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
+          "result": "pass",
+          "path": "backend/tests/test_capability_v2_contracts.py"
+        }
+      ]
+    },
+    {
+      "id": "integration.mapping.import.start",
+      "major_version": 1,
+      "owner_domain": "integration",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "integration.mapping.import.start",
+      "description": "Execute the governed integration.mapping.import.start Integration outcome.",
+      "use_when": "A consumer needs governed external connector, mapping, or sync orchestration.",
+      "do_not_use_when": "The caller can use an owning domain Capability directly without external integration.",
+      "business_effect": "Business outcome: Execute the governed integration.mapping.import.start Integration outcome.",
+      "side_effect_level": "write",
+      "side_effects": "Writes integration domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_async",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "integration.v2:integration.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "mapping_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "mapping_gid",
+          "idempotency_key"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "operation_ref": {
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "succeeded",
+                  "failed",
+                  "outcome_unknown"
+                ]
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "run_id",
+          "operation_ref"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "operation_ref": {
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "succeeded",
+                  "failed",
+                  "outcome_unknown"
+                ]
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "run_id",
+          "operation_ref"
+        ]
+      },
+      "schema_hash": "sha256:c6e2baefaa8916aa1d67f672932cb82a51215842fc8197b95a1d1eae80203360",
+      "artifact_policy": "none",
+      "operation_policy": "required",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Integration request is invalid.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Integration resource.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The connector or mapping does not exist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The connector or mapping revision changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "network_policy_rejected",
+          "meaning": "The connector target violates outbound network policy.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "connector_runtime_unavailable",
+          "meaning": "The bounded external connector runtime is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_capability_unavailable",
+          "meaning": "The owning target-domain Capability is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_unavailable",
+          "meaning": "The selected presentation object has no governed Integration target binding.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_incompatible",
+          "meaning": "The governed Integration target binding is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_unavailable",
+          "meaning": "The credential enrollment vault is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_invalid",
+          "meaning": "The one-time credential enrollment handle is invalid or consumed.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The Integration idempotency key is already bound to another request.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_23974d12f972aa0546347a4a",
+      "error_schema": [
+        {
+          "error_code": "invalid_input",
+          "message_template": "The Integration request is invalid.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller cannot access the Integration resource.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The connector or mapping does not exist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The connector or mapping revision changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "network_policy_rejected",
+          "message_template": "The connector target violates outbound network policy.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "connector_runtime_unavailable",
+          "message_template": "The bounded external connector runtime is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_capability_unavailable",
+          "message_template": "The owning target-domain Capability is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_unavailable",
+          "message_template": "The selected presentation object has no governed Integration target binding.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_incompatible",
+          "message_template": "The governed Integration target binding is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_unavailable",
+          "message_template": "The credential enrollment vault is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_invalid",
+          "message_template": "The one-time credential enrollment handle is invalid or consumed.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The Integration idempotency key is already bound to another request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "integration.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/integration.mapping.import.start:invoke"
       ],
       "test_refs": [
         {
@@ -97237,18 +99328,83 @@
             "type": "array",
             "items": {
               "type": "object",
+              "properties": {
+                "values": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "field": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "value": {
+                        "type": [
+                          "string",
+                          "number",
+                          "integer",
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "redacted": {
+                        "type": "boolean"
+                      }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                      "field",
+                      "value",
+                      "redacted"
+                    ]
+                  },
+                  "maxItems": 200
+                }
+              },
               "additionalProperties": false,
-              "properties": {}
-            }
+              "required": [
+                "values"
+              ]
+            },
+            "maxItems": 200
           },
           "truncated": {
             "type": "boolean"
+          },
+          "operation_ref": {
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "succeeded",
+                  "failed",
+                  "outcome_unknown"
+                ]
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ]
           }
         },
         "additionalProperties": false,
         "required": [
           "rows",
-          "truncated"
+          "truncated",
+          "operation_ref"
         ]
       },
       "agent_output_schema": {
@@ -97258,23 +99414,88 @@
             "type": "array",
             "items": {
               "type": "object",
+              "properties": {
+                "values": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "field": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "value": {
+                        "type": [
+                          "string",
+                          "number",
+                          "integer",
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "redacted": {
+                        "type": "boolean"
+                      }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                      "field",
+                      "value",
+                      "redacted"
+                    ]
+                  },
+                  "maxItems": 200
+                }
+              },
               "additionalProperties": false,
-              "properties": {}
-            }
+              "required": [
+                "values"
+              ]
+            },
+            "maxItems": 200
           },
           "truncated": {
             "type": "boolean"
+          },
+          "operation_ref": {
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "succeeded",
+                  "failed",
+                  "outcome_unknown"
+                ]
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ]
           }
         },
         "additionalProperties": false,
         "required": [
           "rows",
-          "truncated"
+          "truncated",
+          "operation_ref"
         ]
       },
-      "schema_hash": "sha256:1cf9f8cd9817cb25390dbb3b4e97e3dd68fe6de9c360db2e22c5557b001a3130",
+      "schema_hash": "sha256:8953e7ffdc070d72be27df979e4bacadb5923b641fe9f2d4d82ed581909f7a8d",
       "artifact_policy": "none",
-      "operation_policy": "none",
+      "operation_policy": "required",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "none",
@@ -97339,8 +99560,32 @@
           "is_caller_error": false
         },
         {
+          "code": "target_binding_unavailable",
+          "meaning": "The selected presentation object has no governed Integration target binding.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_incompatible",
+          "meaning": "The governed Integration target binding is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_unavailable",
+          "meaning": "The credential enrollment vault is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_invalid",
+          "meaning": "The one-time credential enrollment handle is invalid or consumed.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
           "code": "idempotency_conflict",
-          "meaning": "The sync idempotency key is already bound to another request.",
+          "meaning": "The Integration idempotency key is already bound to another request.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -97391,8 +99636,32 @@
           "is_caller_error": false
         },
         {
+          "error_code": "target_binding_unavailable",
+          "message_template": "The selected presentation object has no governed Integration target binding.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_incompatible",
+          "message_template": "The governed Integration target binding is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_unavailable",
+          "message_template": "The credential enrollment vault is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_invalid",
+          "message_template": "The one-time credential enrollment handle is invalid or consumed.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
           "error_code": "idempotency_conflict",
-          "message_template": "The sync idempotency key is already bound to another request.",
+          "message_template": "The Integration idempotency key is already bound to another request.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -97450,6 +99719,10 @@
       "input_schema": {
         "type": "object",
         "properties": {
+          "datasource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
           "query": {
             "type": "string",
             "minLength": 1
@@ -97460,7 +99733,10 @@
             "maximum": 200
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "datasource_gid"
+        ]
       },
       "output_schema": {
         "type": "object",
@@ -97469,9 +99745,63 @@
             "type": "array",
             "items": {
               "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "datasource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "source_object": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_domain": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_capability_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_major_version": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "minimum_catalog_release": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
               "additionalProperties": false,
-              "properties": {}
-            }
+              "required": [
+                "gid",
+                "revision",
+                "datasource_gid",
+                "name",
+                "source_object",
+                "target_domain",
+                "target_capability_id",
+                "target_major_version",
+                "minimum_catalog_release",
+                "status"
+              ]
+            },
+            "maxItems": 200
           }
         },
         "additionalProperties": false,
@@ -97486,9 +99816,63 @@
             "type": "array",
             "items": {
               "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "datasource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "source_object": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_domain": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_capability_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_major_version": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "minimum_catalog_release": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
               "additionalProperties": false,
-              "properties": {}
-            }
+              "required": [
+                "gid",
+                "revision",
+                "datasource_gid",
+                "name",
+                "source_object",
+                "target_domain",
+                "target_capability_id",
+                "target_major_version",
+                "minimum_catalog_release",
+                "status"
+              ]
+            },
+            "maxItems": 200
           }
         },
         "additionalProperties": false,
@@ -97496,7 +99880,7 @@
           "items"
         ]
       },
-      "schema_hash": "sha256:0606824cfbbfaf872b5d45a89ab732c7d6680d30bcddaca2bd39b8afbec3b367",
+      "schema_hash": "sha256:64a94d70c265998326ceb1055c9a05016c15af1695f6696d3798b8a42b748078",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -97563,8 +99947,32 @@
           "is_caller_error": false
         },
         {
+          "code": "target_binding_unavailable",
+          "meaning": "The selected presentation object has no governed Integration target binding.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_incompatible",
+          "meaning": "The governed Integration target binding is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_unavailable",
+          "meaning": "The credential enrollment vault is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_invalid",
+          "meaning": "The one-time credential enrollment handle is invalid or consumed.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
           "code": "idempotency_conflict",
-          "meaning": "The sync idempotency key is already bound to another request.",
+          "meaning": "The Integration idempotency key is already bound to another request.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -97615,8 +100023,32 @@
           "is_caller_error": false
         },
         {
+          "error_code": "target_binding_unavailable",
+          "message_template": "The selected presentation object has no governed Integration target binding.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_incompatible",
+          "message_template": "The governed Integration target binding is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_unavailable",
+          "message_template": "The credential enrollment vault is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_invalid",
+          "message_template": "The one-time credential enrollment handle is invalid or consumed.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
           "error_code": "idempotency_conflict",
-          "message_template": "The sync idempotency key is already bound to another request.",
+          "message_template": "The Integration idempotency key is already bound to another request.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -97630,6 +100062,375 @@
       "provider_ref": "integration.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/integration.mapping.search:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
+          "result": "pass",
+          "path": "backend/tests/test_capability_v2_contracts.py"
+        }
+      ]
+    },
+    {
+      "id": "integration.mapping.source_columns.discover",
+      "major_version": 1,
+      "owner_domain": "integration",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "integration.mapping.source_columns.discover",
+      "description": "Execute the governed integration.mapping.source_columns.discover Integration outcome.",
+      "use_when": "A consumer needs governed external connector, mapping, or sync orchestration.",
+      "do_not_use_when": "The caller can use an owning domain Capability directly without external integration.",
+      "business_effect": "Business outcome: Execute the governed integration.mapping.source_columns.discover Integration outcome.",
+      "side_effect_level": "read",
+      "side_effects": "Reads integration domain state; emits no mutation event or external call.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "integration.v2:integration.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "mapping_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "mapping_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "columns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "data_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "nullable": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "data_type",
+                "nullable"
+              ]
+            },
+            "maxItems": 200
+          },
+          "operation_ref": {
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "succeeded",
+                  "failed",
+                  "outcome_unknown"
+                ]
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "columns",
+          "operation_ref"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "columns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "data_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "nullable": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "data_type",
+                "nullable"
+              ]
+            },
+            "maxItems": 200
+          },
+          "operation_ref": {
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "succeeded",
+                  "failed",
+                  "outcome_unknown"
+                ]
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "columns",
+          "operation_ref"
+        ]
+      },
+      "schema_hash": "sha256:e925c51bc296f6167d223a8e06906c8e95b48f7e5d7974e2039428172353dc3b",
+      "artifact_policy": "none",
+      "operation_policy": "required",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Integration request is invalid.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Integration resource.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The connector or mapping does not exist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The connector or mapping revision changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "network_policy_rejected",
+          "meaning": "The connector target violates outbound network policy.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "connector_runtime_unavailable",
+          "meaning": "The bounded external connector runtime is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_capability_unavailable",
+          "meaning": "The owning target-domain Capability is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_unavailable",
+          "meaning": "The selected presentation object has no governed Integration target binding.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_incompatible",
+          "meaning": "The governed Integration target binding is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_unavailable",
+          "meaning": "The credential enrollment vault is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_invalid",
+          "meaning": "The one-time credential enrollment handle is invalid or consumed.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The Integration idempotency key is already bound to another request.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_dc9c6278b94cce68d075a913",
+      "error_schema": [
+        {
+          "error_code": "invalid_input",
+          "message_template": "The Integration request is invalid.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller cannot access the Integration resource.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The connector or mapping does not exist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The connector or mapping revision changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "network_policy_rejected",
+          "message_template": "The connector target violates outbound network policy.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "connector_runtime_unavailable",
+          "message_template": "The bounded external connector runtime is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_capability_unavailable",
+          "message_template": "The owning target-domain Capability is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_unavailable",
+          "message_template": "The selected presentation object has no governed Integration target binding.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_incompatible",
+          "message_template": "The governed Integration target binding is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_unavailable",
+          "message_template": "The credential enrollment vault is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_invalid",
+          "message_template": "The one-time credential enrollment handle is invalid or consumed.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The Integration idempotency key is already bound to another request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "integration.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/integration.mapping.source_columns.discover:invoke"
       ],
       "test_refs": [
         {
@@ -97705,7 +100506,8 @@
                 "source_field",
                 "target_field"
               ]
-            }
+            },
+            "maxItems": 200
           }
         },
         "additionalProperties": false,
@@ -97758,9 +100560,9 @@
           "changed"
         ]
       },
-      "schema_hash": "sha256:fcbadc3f4e695127acc831c1cb401ca44cac1adb1d24ecb4694f5268f5e4958c",
+      "schema_hash": "sha256:5b5de7855f8eb38604ce03abe44a6303e582118f75603c5407b04a9697c3c93a",
       "artifact_policy": "none",
-      "operation_policy": "optional",
+      "operation_policy": "none",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
@@ -97825,8 +100627,32 @@
           "is_caller_error": false
         },
         {
+          "code": "target_binding_unavailable",
+          "meaning": "The selected presentation object has no governed Integration target binding.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_incompatible",
+          "meaning": "The governed Integration target binding is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_unavailable",
+          "meaning": "The credential enrollment vault is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_invalid",
+          "meaning": "The one-time credential enrollment handle is invalid or consumed.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
           "code": "idempotency_conflict",
-          "meaning": "The sync idempotency key is already bound to another request.",
+          "meaning": "The Integration idempotency key is already bound to another request.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -97877,8 +100703,32 @@
           "is_caller_error": false
         },
         {
+          "error_code": "target_binding_unavailable",
+          "message_template": "The selected presentation object has no governed Integration target binding.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_incompatible",
+          "message_template": "The governed Integration target binding is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_unavailable",
+          "message_template": "The credential enrollment vault is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_invalid",
+          "message_template": "The one-time credential enrollment handle is invalid or consumed.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
           "error_code": "idempotency_conflict",
-          "message_template": "The sync idempotency key is already bound to another request.",
+          "message_template": "The Integration idempotency key is already bound to another request.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -97892,6 +100742,350 @@
       "provider_ref": "integration.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/integration.mapping.update:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
+          "result": "pass",
+          "path": "backend/tests/test_capability_v2_contracts.py"
+        }
+      ]
+    },
+    {
+      "id": "integration.mapping_target.search",
+      "major_version": 1,
+      "owner_domain": "integration",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "integration.mapping_target.search",
+      "description": "Execute the governed integration.mapping_target.search Integration outcome.",
+      "use_when": "A consumer needs governed external connector, mapping, or sync orchestration.",
+      "do_not_use_when": "The caller can use an owning domain Capability directly without external integration.",
+      "business_effect": "Business outcome: Execute the governed integration.mapping_target.search Integration outcome.",
+      "side_effect_level": "read",
+      "side_effects": "Reads integration domain state; emits no mutation event or external call.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "integration.v2:integration.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "ontology_object_gids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1,
+            "maxItems": 200,
+            "uniqueItems": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "ontology_object_gids"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ontology_object_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "binding_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_domain": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_capability_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_major_version": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "minimum_catalog_release": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "ontology_object_gid",
+                "binding_id",
+                "target_domain",
+                "target_capability_id",
+                "target_major_version",
+                "minimum_catalog_release"
+              ]
+            },
+            "maxItems": 200
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ontology_object_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "binding_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_domain": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_capability_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_major_version": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "minimum_catalog_release": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "ontology_object_gid",
+                "binding_id",
+                "target_domain",
+                "target_capability_id",
+                "target_major_version",
+                "minimum_catalog_release"
+              ]
+            },
+            "maxItems": 200
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items"
+        ]
+      },
+      "schema_hash": "sha256:9fd2c7189f6bc9e1a8088cc740b7171cabc1c2db00e163896145792a0a76d4af",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Integration request is invalid.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Integration resource.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The connector or mapping does not exist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The connector or mapping revision changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "network_policy_rejected",
+          "meaning": "The connector target violates outbound network policy.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "connector_runtime_unavailable",
+          "meaning": "The bounded external connector runtime is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_capability_unavailable",
+          "meaning": "The owning target-domain Capability is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_unavailable",
+          "meaning": "The selected presentation object has no governed Integration target binding.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_incompatible",
+          "meaning": "The governed Integration target binding is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_unavailable",
+          "meaning": "The credential enrollment vault is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_invalid",
+          "meaning": "The one-time credential enrollment handle is invalid or consumed.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The Integration idempotency key is already bound to another request.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_35f7e40d1544f87ac8b09742",
+      "error_schema": [
+        {
+          "error_code": "invalid_input",
+          "message_template": "The Integration request is invalid.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller cannot access the Integration resource.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The connector or mapping does not exist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The connector or mapping revision changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "network_policy_rejected",
+          "message_template": "The connector target violates outbound network policy.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "connector_runtime_unavailable",
+          "message_template": "The bounded external connector runtime is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_capability_unavailable",
+          "message_template": "The owning target-domain Capability is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_unavailable",
+          "message_template": "The selected presentation object has no governed Integration target binding.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_incompatible",
+          "message_template": "The governed Integration target binding is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_unavailable",
+          "message_template": "The credential enrollment vault is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_invalid",
+          "message_template": "The one-time credential enrollment handle is invalid or consumed.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The Integration idempotency key is already bound to another request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "integration.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/integration.mapping_target.search:invoke"
       ],
       "test_refs": [
         {
@@ -97963,7 +101157,10 @@
               "status": {
                 "type": "string",
                 "enum": [
-                  "accepted"
+                  "accepted",
+                  "succeeded",
+                  "failed",
+                  "outcome_unknown"
                 ]
               },
               "version": {
@@ -98002,7 +101199,10 @@
               "status": {
                 "type": "string",
                 "enum": [
-                  "accepted"
+                  "accepted",
+                  "succeeded",
+                  "failed",
+                  "outcome_unknown"
                 ]
               },
               "version": {
@@ -98024,7 +101224,7 @@
           "operation_ref"
         ]
       },
-      "schema_hash": "sha256:65fcb6be65e308d0631acc178581d67fb5f3d5eb9bb166f3f6b9fce1c7ef8fee",
+      "schema_hash": "sha256:dc0753bd029245484ad3e64a8cb36e9b4ffa407b02e439ea96e5efbee0edac44",
       "artifact_policy": "none",
       "operation_policy": "required",
       "concurrency_policy": "none",
@@ -98091,8 +101291,32 @@
           "is_caller_error": false
         },
         {
+          "code": "target_binding_unavailable",
+          "meaning": "The selected presentation object has no governed Integration target binding.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_incompatible",
+          "meaning": "The governed Integration target binding is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_unavailable",
+          "meaning": "The credential enrollment vault is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_invalid",
+          "meaning": "The one-time credential enrollment handle is invalid or consumed.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
           "code": "idempotency_conflict",
-          "meaning": "The sync idempotency key is already bound to another request.",
+          "meaning": "The Integration idempotency key is already bound to another request.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -98143,8 +101367,32 @@
           "is_caller_error": false
         },
         {
+          "error_code": "target_binding_unavailable",
+          "message_template": "The selected presentation object has no governed Integration target binding.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_incompatible",
+          "message_template": "The governed Integration target binding is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_unavailable",
+          "message_template": "The credential enrollment vault is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_invalid",
+          "message_template": "The one-time credential enrollment handle is invalid or consumed.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
           "error_code": "idempotency_conflict",
-          "message_template": "The sync idempotency key is already bound to another request.",
+          "message_template": "The Integration idempotency key is already bound to another request.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -112598,6 +115846,512 @@
       "provider_ref": "knowledge.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/knowledge.reference_data.read:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
+          "result": "pass",
+          "path": "backend/tests/test_capability_v2_contracts.py"
+        }
+      ]
+    },
+    {
+      "id": "knowledge.reference_dataset.publish",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "knowledge.reference_dataset.publish",
+      "description": "Read or publish immutable versioned reference datasets.",
+      "use_when": "Other domains need low-frequency maintained tabular data for reproducible calculations.",
+      "do_not_use_when": "The caller needs mutable operational transactions or cross-domain SQL.",
+      "business_effect": "Business outcome: Read or publish immutable versioned reference datasets.",
+      "side_effect_level": "write",
+      "side_effects": "Writes knowledge domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": true,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "knowledge.v2:knowledge.reference_data.publish",
+      "resource_selectors": [
+        {
+          "resource_type": "knowledge-reference-dataset",
+          "payload_path": "dataset_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "dataset_gid",
+          "expected_version",
+          "schema",
+          "rows"
+        ],
+        "properties": {
+          "dataset_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "schema": {
+            "type": "object",
+            "required": [
+              "fields"
+            ],
+            "properties": {
+              "fields": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "name",
+                    "source_field"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "source_field": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "maxItems": 200
+              }
+            },
+            "additionalProperties": false
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "key",
+                "values"
+              ],
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "values": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "field",
+                      "value"
+                    ],
+                    "properties": {
+                      "field": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "value": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "maxItems": 200
+                }
+              },
+              "additionalProperties": false
+            },
+            "maxItems": 1000
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "required": [
+              "dataset_gid",
+              "version_gid",
+              "version_no",
+              "schema",
+              "rows",
+              "immutable",
+              "dataset_version_ref"
+            ],
+            "properties": {
+              "dataset_gid": {
+                "type": "string"
+              },
+              "version_gid": {
+                "type": "string"
+              },
+              "version_no": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "schema": {
+                "type": "object",
+                "required": [
+                  "fields"
+                ],
+                "properties": {
+                  "fields": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "name",
+                        "source_field"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "source_field": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "maxItems": 200
+                  }
+                },
+                "additionalProperties": false
+              },
+              "rows": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "key",
+                    "values"
+                  ],
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "values": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "field",
+                          "value"
+                        ],
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "value": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "maxItems": 200
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "maxItems": 1000
+              },
+              "immutable": {
+                "type": "boolean"
+              },
+              "dataset_version_ref": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "required": [
+              "dataset_gid",
+              "version_gid",
+              "version_no",
+              "schema",
+              "rows",
+              "immutable",
+              "dataset_version_ref"
+            ],
+            "properties": {
+              "dataset_gid": {
+                "type": "string"
+              },
+              "version_gid": {
+                "type": "string"
+              },
+              "version_no": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "schema": {
+                "type": "object",
+                "required": [
+                  "fields"
+                ],
+                "properties": {
+                  "fields": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "name",
+                        "source_field"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "source_field": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "maxItems": 200
+                  }
+                },
+                "additionalProperties": false
+              },
+              "rows": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "key",
+                    "values"
+                  ],
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "values": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "field",
+                          "value"
+                        ],
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "value": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "maxItems": 200
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "maxItems": 1000
+              },
+              "immutable": {
+                "type": "boolean"
+              },
+              "dataset_version_ref": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:6b6014cb89c8acfeae815bbbc872a0280075901b4a51caddccdf5063f605647c",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The scoped Knowledge resource does not exist or is not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The document head differs from the supplied base revision.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "proposal_state_conflict",
+          "meaning": "The proposal is no longer in a state that accepts this transition.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "knowledge_storage_unavailable",
+          "meaning": "The immutable Knowledge object store is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "publication_in_progress",
+          "meaning": "Another worker owns the current publication lease.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "self_review_forbidden",
+          "meaning": "Proposal creators cannot approve or reject their own proposal.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_a2ac487fdc355f9d5de3b482",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The scoped Knowledge resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "revision_conflict",
+          "message_template": "The document head differs from the supplied base revision.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "proposal_state_conflict",
+          "message_template": "The proposal is no longer in a state that accepts this transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "knowledge_storage_unavailable",
+          "message_template": "The immutable Knowledge object store is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "publication_in_progress",
+          "message_template": "Another worker owns the current publication lease.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "self_review_forbidden",
+          "message_template": "Proposal creators cannot approve or reject their own proposal.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "knowledge.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/knowledge.reference_dataset.publish:invoke"
       ],
       "test_refs": [
         {
@@ -185415,13 +189169,13 @@
       "plugin_id": "official.integration",
       "module": "integration_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:715c89842662fbdd4941613d58c02076cb62c20f1ba35d8d24cdf2d1d8cce713"
+      "artifact_hash": "sha256:013d18301ea2f33016eafb0434f751c375648fce500d24573e575a95c85c3fed"
     },
     {
       "plugin_id": "official.knowledge",
       "module": "knowledge_backend.capabilities",
       "version": "2.0.0",
-      "artifact_hash": "sha256:204e363149456811aebc9ccb7b82a4ed649b140bdd795628815d7dfd9547e68c"
+      "artifact_hash": "sha256:d0e8844007a5def8e471e4628053158737a5890b447fcae1a6a37d7df3906146"
     },
     {
       "plugin_id": "official.ontology",
@@ -185442,5 +189196,5 @@
       "artifact_hash": "sha256:5c1fccaa2219f6833c24237667039685e322cefcffc7ca6f0287d28cfc0a2b39"
     }
   ],
-  "created_at": "2026-08-28T12:04:39.664893Z"
+  "created_at": "2026-08-28T18:06:53.434425Z"
 }

@@ -8,7 +8,7 @@ Execute the governed integration.connector.connection.test Integration outcome.
 - 不适用：The caller can use an owning domain Capability directly without external integration.
 - 生命周期：`stable`
 - 所属领域：`integration`
-- Catalog Release：`rel_7803705d3df421f9f4381d37c3500731`
+- Catalog Release：`rel_813658f6043d041ccb8a2f800481a1c8`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -47,7 +47,7 @@ Execute the governed integration.connector.connection.test Integration outcome.
 - 并发：`none`
 - 无预期版本信封要求。
 - 一致性：`external`
-- Operation：`optional`
+- Operation：`required`
 - Artifact：`none`
 - 审计：`standard`
 - Evidence：`required`
@@ -87,7 +87,7 @@ Execute the governed integration.connector.connection.test Integration outcome.
 ```json
 {
   "capability_id": "integration.connector.connection.test",
-  "catalog_release": "rel_7803705d3df421f9f4381d37c3500731",
+  "catalog_release": "rel_813658f6043d041ccb8a2f800481a1c8",
   "major_version": 1,
   "payload": {
     "gid": "example"
@@ -97,7 +97,7 @@ Execute the governed integration.connector.connection.test Integration outcome.
 
 ## 输出 Schema
 
-领域数据必须符合下列 Schema，并封装在完整 `CapabilityResultV2` 中：
+首次调用返回 `status=accepted`、`data=null` 和持久化 `operation_ref`；下列输出 Schema 适用于 Operation 完成后的领域结果。
 
 ```json
 {
@@ -106,12 +106,44 @@ Execute the governed integration.connector.connection.test Integration outcome.
     "latency_ms": {
       "type": "integer"
     },
+    "message": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "operation_ref": {
+      "additionalProperties": false,
+      "properties": {
+        "operation_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "accepted",
+            "succeeded",
+            "failed",
+            "outcome_unknown"
+          ],
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "operation_id",
+        "status",
+        "version"
+      ],
+      "type": "object"
+    },
     "reachable": {
       "type": "boolean"
     }
   },
   "required": [
-    "reachable"
+    "operation_ref"
   ],
   "type": "object"
 }
@@ -156,7 +188,11 @@ Execute the governed integration.connector.connection.test Integration outcome.
 - `network_policy_rejected`：The connector target violates outbound network policy.（retryable=false）
 - `connector_runtime_unavailable`：The bounded external connector runtime is unavailable.（retryable=true）
 - `target_capability_unavailable`：The owning target-domain Capability is unavailable.（retryable=true）
-- `idempotency_conflict`：The sync idempotency key is already bound to another request.（retryable=false）
+- `target_binding_unavailable`：The selected presentation object has no governed Integration target binding.（retryable=false）
+- `target_binding_incompatible`：The governed Integration target binding is incompatible.（retryable=false）
+- `credential_enrollment_unavailable`：The credential enrollment vault is unavailable.（retryable=true）
+- `credential_enrollment_invalid`：The one-time credential enrollment handle is invalid or consumed.（retryable=false）
+- `idempotency_conflict`：The Integration idempotency key is already bound to another request.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

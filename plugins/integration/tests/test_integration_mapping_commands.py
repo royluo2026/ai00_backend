@@ -49,7 +49,7 @@ class BoundCatalog:
 VALID_BINDING = {
     "binding_id": "ontology:concept-part",
     "target_domain": "knowledge",
-    "target_capability_id": "knowledge.reference_data.change.apply",
+    "target_capability_id": "knowledge.reference_dataset.publish",
     "target_major_version": 1,
     "minimum_catalog_release": "rel_7803705d3df421f9f4381d37c3500731",
     "input_contract": "knowledge.reference_dataset.publish.v1",
@@ -116,14 +116,14 @@ def test_mapping_create_resolves_a_finite_binding_and_import_persists_valid_targ
     created = asyncio.run(application.invoke(
         "integration.mapping.create", bound_mapping_payload(), CONTEXT
     ))
-    assert created["target_capability_id"] == "knowledge.reference_data.change.apply"
+    assert created["target_capability_id"] == "knowledge.reference_dataset.publish"
     stored = repository.mappings[created["gid"]]
     assert stored["target_binding_id"] == "ontology:concept-part"
     assert stored["target_input_contract"] == "knowledge.reference_dataset.publish.v1"
     assert stored["target_resource_gid"] == "dataset-parts"
     assert stored["target_expected_version"] == 7
     assert catalog.stable_calls == [(
-        "knowledge.reference_data.change.apply", 1, "rel_7803705d3df421f9f4381d37c3500731"
+        "knowledge.reference_dataset.publish", 1, "rel_7803705d3df421f9f4381d37c3500731"
     )]
 
     started = asyncio.run(application.invoke(
@@ -134,7 +134,7 @@ def test_mapping_create_resolves_a_finite_binding_and_import_persists_valid_targ
     run = repository.imports[0]
     assert run["run_id"] == started["run_id"]
     assert run["target_invocation"] == {
-        "capability_id": "knowledge.reference_data.change.apply",
+        "capability_id": "knowledge.reference_dataset.publish",
         "major_version": 1,
         "minimum_catalog_release": "rel_7803705d3df421f9f4381d37c3500731",
         "payload": {
@@ -165,13 +165,13 @@ def test_integration_owned_target_projection_joins_real_ontology_identity_to_exa
         "ontology_object_gid": "concept-part",
         "binding_id": "ontology:concept-part",
         "target_domain": "knowledge",
-        "target_capability_id": "knowledge.reference_data.change.apply",
+        "target_capability_id": "knowledge.reference_dataset.publish",
         "target_major_version": 1,
         "minimum_catalog_release": "rel_7803705d3df421f9f4381d37c3500731",
     }]}
     assert catalog.projection_calls == [(("concept-part", "concept-unbound"), "actor-1", "team-1")]
     assert catalog.stable_calls == [(
-        "knowledge.reference_data.change.apply", 1, "rel_7803705d3df421f9f4381d37c3500731"
+        "knowledge.reference_dataset.publish", 1, "rel_7803705d3df421f9f4381d37c3500731"
     )]
 
 

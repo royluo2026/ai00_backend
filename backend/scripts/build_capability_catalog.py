@@ -20,10 +20,12 @@ from backend.capability_v2.catalog import (
     complete_governance_metadata,
     unbounded_collection_paths,
 )
+from backend.capability_v2.catalog_lineage import CatalogLineage
 from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec
 
 
 DEFAULT_OUTPUT = REPOSITORY_ROOT / "docs" / "governance" / "capability-catalog-release.json"
+DEFAULT_LINEAGE = REPOSITORY_ROOT / "docs" / "governance" / "capability-catalog-lineage.json"
 PROVIDERS_PATH = REPOSITORY_ROOT / "backend" / "capability_v2" / "official_domains.json"
 CONTRACT_TEST = REPOSITORY_ROOT / "backend/tests/test_capability_v2_contracts.py"
 
@@ -111,14 +113,39 @@ def current_release() -> CatalogRelease:
     )
 
 
+def next_lineage(
+    current: CatalogLineage | None,
+    previous_release: CatalogRelease,
+    candidate_release: CatalogRelease,
+) -> CatalogLineage:
+    lineage = current or CatalogLineage.from_releases((previous_release,))
+    return lineage.append(previous_release, candidate_release)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--write", action="store_true")
     mode.add_argument("--check", action="store_true")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--lineage", type=Path, default=DEFAULT_LINEAGE)
     parser.add_argument("--previous", type=Path, help="fail on breaking changes from a prior release")
     args = parser.parse_args(argv)
+    previous_release = (
+        CatalogRelease.model_validate_json(args.output.read_text(encoding="utf-8"))
+        if args.output.is_file() else None
+    )
+    lineage = (
+        CatalogLineage.model_validate_json(args.lineage.read_text(encoding="utf-8"))
+        if args.lineage.is_file() else None
+    )
+    if args.check and lineage is None:
+        print(f"Catalog lineage missing: {args.lineage}")
+        return 1
+    if args.write and lineage is None and previous_release is not None:
+        lineage = CatalogLineage.from_releases((previous_release,))
+        args.lineage.parent.mkdir(parents=True, exist_ok=True)
+        args.lineage.write_text(lineage.model_dump_json(indent=2) + "\n", encoding="utf-8")
     release = current_release()
     if args.previous:
         previous = CatalogRelease.model_validate_json(args.previous.read_text(encoding="utf-8"))
@@ -139,10 +166,24 @@ def main(argv: list[str] | None = None) -> int:
                 f"actual {release.release_id}/{release.catalog_hash}"
             )
             return 1
+        assert lineage is not None
+        latest = lineage.entries[-1]
+        if latest.release_id != expected.release_id or latest.catalog_hash != expected.catalog_hash:
+            print(
+                f"Catalog lineage drift: latest {latest.release_id}/{latest.catalog_hash}, "
+                f"catalog {expected.release_id}/{expected.catalog_hash}"
+            )
+            return 1
         print(f"Catalog release check passed: {expected.release_id}, {len(expected.descriptors)} descriptors")
         return 0
     args.output.parent.mkdir(parents=True, exist_ok=True)
+    if previous_release is None:
+        lineage = CatalogLineage.from_releases((release,))
+    else:
+        lineage = next_lineage(lineage, previous_release, release)
     args.output.write_text(release.model_dump_json(indent=2) + "\n", encoding="utf-8")
+    args.lineage.parent.mkdir(parents=True, exist_ok=True)
+    args.lineage.write_text(lineage.model_dump_json(indent=2) + "\n", encoding="utf-8")
     print(f"Catalog release written: {release.release_id}, {len(release.descriptors)} descriptors")
     return 0
 
