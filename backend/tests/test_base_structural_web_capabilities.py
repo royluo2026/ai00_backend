@@ -58,7 +58,7 @@ def test_saved_view_capabilities_register_closed_contracts_and_strong_writes():
         "presentation": "table",
     }
     expected = {
-        "base.saved_view.search": {"module": "", "list_gid": None, "limit": 500, "offset": 0},
+        "base.saved_view.search": {"module": "", "list_gid": None, "limit": 200, "offset": 0},
         "base.saved_view.create": {
             "name": "Open", "module": "", "list_gid": None, "config": config,
             "share_scope": "private", "idempotency_key": "idem-1",
@@ -76,6 +76,14 @@ def test_saved_view_capabilities_register_closed_contracts_and_strong_writes():
         validate_payload(dict(item.spec.input_schema), payload)
         with __import__("pytest").raises(ValueError, match="unknown field"):
             validate_payload(dict(item.spec.input_schema), {**payload, "unexpected": True})
+    search_schema = dict(registry.get("base.saved_view.search").spec.input_schema)
+    config_schema = dict(registry.get("base.saved_view.create").spec.input_schema)
+    validate_payload(search_schema, {"module": "", "list_gid": None, "limit": 200, "offset": 0})
+    validate_payload(config_schema, {**expected["base.saved_view.create"], "config": {**config, "page_size": 200}})
+    with __import__("pytest").raises(ValueError):
+        validate_payload(search_schema, {"module": "", "list_gid": None, "limit": 201, "offset": 0})
+    with __import__("pytest").raises(ValueError):
+        validate_payload(config_schema, {**expected["base.saved_view.create"], "config": {**config, "page_size": 201}})
     validate_payload(dict(registry.get("base.saved_view.search").spec.output_schema), {
         "views": [], "next_offset": None,
     })
@@ -92,6 +100,17 @@ def test_saved_view_gateway_actor_preserves_team_identity():
     context = type("Context", (), {"user_gid": "user_1", "team_gid": "team_1", "active_roles": ("member",)})()
 
     assert _actor(context)["team_gids"] == ["team_1"]
+
+
+def test_saved_view_rest_search_limit_is_closed_to_200():
+    from backend.routers.views import router
+
+    route = next(route for route in router.routes if route.path == "/api/views" and "GET" in route.methods)
+    limit = next(parameter for parameter in route.dependant.query_params if parameter.name == "limit")
+
+    assert limit.default == 200
+    assert [constraint.ge for constraint in limit.field_info.metadata if hasattr(constraint, "ge")] == [1]
+    assert [constraint.le for constraint in limit.field_info.metadata if hasattr(constraint, "le")] == [200]
 
 
 def test_annotation_and_identity_capabilities_use_closed_contracts_and_strong_confirmed_write():

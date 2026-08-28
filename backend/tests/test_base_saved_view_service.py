@@ -350,7 +350,7 @@ def test_saved_view_replay_is_tenant_and_command_digest_bound(service):
 
 
 def test_search_is_deterministically_bounded_and_paged(service):
-    for index in range(501):
+    for index in range(401):
         service.repository.rows[("tenant_a", f"view_{index:03d}")] = {
             "gid": f"view_{index:03d}", "tenant_gid": "tenant_a", "name": str(index),
             "module": "", "list_gid": None, "owner_gid": TENANT_A_OWNER["gid"],
@@ -359,13 +359,26 @@ def test_search_is_deterministically_bounded_and_paged(service):
             "_legacy_status": "current",
         }
 
-    first = service.search(actor=TENANT_A_OWNER, query={"limit": 500, "offset": 0})
-    second = service.search(actor=TENANT_A_OWNER, query={"limit": 500, "offset": first["next_offset"]})
+    first = service.search(actor=TENANT_A_OWNER, query={"limit": 200, "offset": 0})
+    second = service.search(actor=TENANT_A_OWNER, query={"limit": 200, "offset": first["next_offset"]})
 
-    assert len(first["views"]) == 500
-    assert first["next_offset"] == 500
-    assert len(second["views"]) == 1
-    assert second["next_offset"] is None
+    assert len(first["views"]) == 200
+    assert first["next_offset"] == 200
+    assert len(second["views"]) == 200
+    assert second["next_offset"] == 400
+
+
+def test_saved_view_config_and_search_reject_values_above_200(service):
+    assert service.create(actor=TENANT_A_OWNER, command={**CREATE, "config": {**VALID_CONFIG, "page_size": 200}})["view"]["config"]["page_size"] == 200
+    assert len(service.search(actor=TENANT_A_OWNER, query={"limit": 200})["views"]) == 1
+
+    with pytest.raises(Exception) as config_error:
+        service.create(actor=TENANT_A_OWNER, command={**CREATE, "idempotency_key": "page-size-201", "config": {**VALID_CONFIG, "page_size": 201}})
+    assert config_error.value.code == "invalid_input"
+
+    with pytest.raises(Exception) as search_error:
+        service.search(actor=TENANT_A_OWNER, query={"limit": 201})
+    assert search_error.value.code == "invalid_input"
 
 
 def test_approved_saved_view_grammar_is_conjunction_only_and_has_page_size(service):

@@ -1,9 +1,9 @@
 """Compatibility REST adapter for the Base saved-view aggregate service."""
 from __future__ import annotations
 
-from typing import Literal
+from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, ConfigDict
 
 from backend.base.saved_views import SavedViewError, SavedViewService
@@ -52,9 +52,10 @@ def _body(body: BaseModel) -> dict:
 
 
 @router.get("")
-def list_views(module: str = "", list_gid: str | None = None, user=Depends(_READ)):
+def list_views(module: str = "", list_gid: str | None = None,
+               limit: Annotated[int, Query(ge=1, le=200)] = 200, user=Depends(_READ)):
     try:
-        return {"success": True, "data": SavedViewService().search(actor=user, query={"module": module, "list_gid": list_gid})["views"]}
+        return {"success": True, "data": SavedViewService().search(actor=user, query={"module": module, "list_gid": list_gid, "limit": limit})["views"]}
     except SavedViewError as exc:
         raise _service_error(exc) from exc
 

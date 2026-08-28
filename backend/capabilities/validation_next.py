@@ -39,6 +39,12 @@ def _validate(schema: dict[str, Any], payload: Any, label: str) -> None:
         if "pattern" in schema and re.search(str(schema["pattern"]), payload) is None:
             raise ValueError(f"{label} does not match the required pattern")
 
+    if isinstance(payload, (int, float)) and not isinstance(payload, bool):
+        if "minimum" in schema and payload < schema["minimum"]:
+            raise ValueError(f"{label} is below minimum")
+        if "maximum" in schema and payload > schema["maximum"]:
+            raise ValueError(f"{label} exceeds maximum")
+
     if isinstance(payload, list):
         if len(payload) < int(schema.get("minItems", 0)):
             raise ValueError(f"{label} has fewer items than allowed")

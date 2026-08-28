@@ -133,7 +133,7 @@ SAVED_VIEW_CONFIG = obj(
         "field_gids": {"type": "array", "maxItems": 200, "uniqueItems": True, "items": STRING},
         "filters": {"type": "array", "maxItems": 50, "items": obj({"field_gid": STRING, "operator": {"type": "string", "enum": ["contains", "not_contains", "eq", "not_eq", "empty", "not_empty", "gt", "gte", "lt", "lte"]}, "value": FILTER_VALUE}, ("field_gid", "operator", "value"))},
         "sort": {"type": "array", "maxItems": 20, "items": obj({"field_gid": STRING, "direction": {"type": "string", "enum": ["asc", "desc"]}}, ("field_gid", "direction"))},
-        "page_size": {"type": "integer", "minimum": 1, "maximum": 500},
+        "page_size": {"type": "integer", "minimum": 1, "maximum": 200},
         "presentation": {"type": "string", "enum": ["table", "list"]},
     },
     ("field_gids", "filters", "sort", "page_size", "presentation"),
@@ -173,8 +173,8 @@ ROUTE_CAPABILITIES: dict[tuple[str, str], dict[str, Any]] = {
     },
     ("GET", "/api/views"): {
         "id": "base.saved_view.search",
-        "schema": obj({"module": {"type": "string", "maxLength": 255}, "list_gid": OPT_STRING, "limit": {"type": "integer", "minimum": 1, "maximum": 500}, "offset": {"type": "integer", "minimum": 0, "maximum": 10000000}}),
-        "output_schema": obj({"views": {"type": "array", "maxItems": 500, "items": SAVED_VIEW}, "next_offset": {"type": ["integer", "null"], "minimum": 0}}, ("views", "next_offset")),
+        "schema": obj({"module": {"type": "string", "maxLength": 255}, "list_gid": OPT_STRING, "limit": {"type": "integer", "minimum": 1, "maximum": 200}, "offset": {"type": "integer", "minimum": 0, "maximum": 10000000}}),
+        "output_schema": obj({"views": {"type": "array", "maxItems": 200, "items": SAVED_VIEW}, "next_offset": {"type": ["integer", "null"], "minimum": 0}}, ("views", "next_offset")),
     },
     ("POST", "/api/views"): {
         "id": "base.saved_view.create",
@@ -289,7 +289,7 @@ SAVED_CONFIG_EXAMPLE = {"field_gids": ["field_1"], "filters": [{"field_gid": "fi
 EXAMPLES: dict[str, dict[str, Any]] = {
     "base.plugin.installation.request.create": {"plugin_id": "plugin.example", "release_version": "1.2.3", "release_sha256": "sha256:" + "b" * 64, "requested_grants": ["project.read"], "idempotency_key": "idem-plugin-1"},
     "base.plugin.installation.transition.uninstall": {"plugin_id": "plugin.example", "expected_revision": 3, "retain_tenant_data": True, "idempotency_key": "idem-plugin-2"},
-    "base.saved_view.search": {"module": "", "list_gid": None, "limit": 500, "offset": 0},
+    "base.saved_view.search": {"module": "", "list_gid": None, "limit": 200, "offset": 0},
     "base.saved_view.create": {"name": "Open", "config": SAVED_CONFIG_EXAMPLE, "share_scope": "private", "idempotency_key": "idem-1"},
     "base.saved_view.update": {"view_gid": "view_1", "expected_revision": 1, "name": "Open", "config": SAVED_CONFIG_EXAMPLE, "idempotency_key": "idem-2"},
     "base.saved_view.copy": {"view_gid": "view_1", "name": "Copy", "idempotency_key": "idem-3"},

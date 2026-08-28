@@ -86,7 +86,7 @@ def _config(value: Any) -> dict[str, Any]:
         if clause["operator"] not in _OPERATORS:
             _invalid("filters.operator 无效")
         _filter_value(clause["value"])
-    _integer(config["page_size"], label="page_size", minimum=1, maximum=500)
+    _integer(config["page_size"], label="page_size", minimum=1, maximum=200)
     if config["presentation"] not in {"table", "list"}:
         _invalid("presentation 无效")
     return deepcopy(config)
@@ -282,7 +282,7 @@ class SavedViewService:
         has_module = "module" in query
         module = (_text(query.get("module"), label="module", required=False) or "") if has_module else None
         list_gid = _text(query.get("list_gid"), label="list_gid", required=False) if query.get("list_gid") is not None else None
-        limit = _integer(query.get("limit", 500), label="limit", minimum=1, maximum=500)
+        limit = _integer(query.get("limit", 200), label="limit", minimum=1, maximum=200)
         offset = _integer(query.get("offset", 0), label="offset", minimum=0, maximum=10_000_000)
         tenant_gid = _tenant_gid(actor)
         with self.repository.transaction():
