@@ -148,7 +148,9 @@ def test_import_worker_survives_transient_claim_failure_then_polls_successfully_
         await asyncio.wait_for(dispatcher.completed.wait(), timeout=0.2)
         assert worker.running is True
         assert worker.health.consecutive_errors == 0
-        assert worker.health.last_error_code == "ConnectionError"
+        assert worker.health.last_error_code is None
+        assert worker.health.last_success_at is not None
+        assert worker.health.next_retry_at is None
         await worker.stop()
         assert worker.running is False
         assert worker.health.status == "stopped"

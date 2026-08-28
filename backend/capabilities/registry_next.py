@@ -1,8 +1,10 @@
 """Capability registry for the next migration slice."""
 from __future__ import annotations
 import inspect
+from collections import deque
 from dataclasses import dataclass
-from typing import Any, Awaitable, Callable
+from types import MappingProxyType
+from typing import Any, Awaitable, Callable, Mapping
 from .models_next import CapabilityContext, CapabilityHandler, CapabilityOutput, CapabilityResult, CapabilitySpec
 from .validation_next import validate_payload
 from backend.plugin_platform.metrics import record_usage
@@ -26,6 +28,8 @@ class CapabilityRegistry:
     def __init__(self) -> None:
         self._items: dict[tuple[str, int], RegisteredCapability] = {}
         self._lifecycles: dict[str, tuple[Callable[[], Awaitable[None]], Callable[[], Awaitable[None]]]] = {}
+        self._lifecycle_health: dict[str, Callable[[], Mapping[str, Any]]] = {}
+        self._lifecycle_signals: dict[str, deque[dict[str, Any]]] = {}
     def register(self, spec: CapabilitySpec, handler: CapabilityHandler, *, descriptor: Any | None = None) -> None:
         key = (spec.id, spec.version)
         if key in self._items: raise ValueError(f"Capability already registered: {spec.id}@{spec.version}")
@@ -56,12 +60,31 @@ class CapabilityRegistry:
     def keys(self) -> tuple[tuple[str, int], ...]:
         """Return stable public identities without exposing registry storage."""
         return tuple(sorted(self._items))
-    def register_lifecycle(self, name: str, start: Callable[[], Awaitable[None]], stop: Callable[[], Awaitable[None]]) -> None:
+    def register_lifecycle(
+        self, name: str, start: Callable[[], Awaitable[None]], stop: Callable[[], Awaitable[None]],
+        *, health: Callable[[], Mapping[str, Any]] | None = None,
+    ) -> None:
         if name in self._lifecycles:
             raise ValueError(f"Capability lifecycle already registered: {name}")
         self._lifecycles[name] = (start, stop)
+        if health is not None:
+            self._lifecycle_health[name] = health
+        self._lifecycle_signals[name] = deque(maxlen=100)
     def lifecycle_names(self) -> tuple[str, ...]:
         return tuple(sorted(self._lifecycles))
+    def lifecycle_health(self, name: str) -> Mapping[str, Any]:
+        provider = self._lifecycle_health.get(name)
+        if provider is None:
+            raise KeyError(f"Lifecycle health is not registered: {name}")
+        return MappingProxyType(dict(provider()))
+    def publish_lifecycle_signal(self, name: str, signal: Mapping[str, Any]) -> None:
+        if name not in self._lifecycles:
+            raise KeyError(f"Unknown capability lifecycle: {name}")
+        self._lifecycle_signals[name].append(dict(signal))
+    def lifecycle_signals(self, name: str) -> tuple[Mapping[str, Any], ...]:
+        if name not in self._lifecycles:
+            raise KeyError(f"Unknown capability lifecycle: {name}")
+        return tuple(MappingProxyType(dict(item)) for item in self._lifecycle_signals[name])
     async def start_lifecycles(self) -> None:
         for name in self.lifecycle_names():
             await self._lifecycles[name][0]()

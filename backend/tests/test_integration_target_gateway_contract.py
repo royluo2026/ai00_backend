@@ -1,6 +1,8 @@
 import asyncio
 from datetime import UTC, datetime
 
+import pytest
+
 from backend.capabilities.registry_next import CapabilityRegistry
 from backend.capability_v2.authorization import AuthorizationDecision
 from backend.capability_v2.catalog import CatalogResolver, build_release
@@ -103,6 +105,93 @@ def test_production_registry_registration_installs_startable_and_safely_stoppabl
     async def exercise():
         await registry.start_lifecycles()
         await asyncio.sleep(0)
+        await registry.stop_lifecycles()
+
+    asyncio.run(exercise())
+
+
+def test_production_registry_exposes_fatal_import_worker_health_and_supervision_signal_before_shutdown(caplog):
+    repository = ProviderRepository()
+
+    def fail_claim(_worker):
+        raise ValueError("secret tenant-7 configuration")
+
+    repository.claim_next_import_run = fail_claim
+    registry = CapabilityRegistry()
+    register_capabilities(registry, adapter_factory=lambda: IntegrationProviderAdapters(
+        repository=repository, credential_enrollment=ProviderVault(), catalog=ProviderCatalog(),
+        connector_runtime=ProviderRuntime(), target_client=DomainCapabilityClient(object()),
+        worker_identity_factory=lambda run: _identity(),
+    ))
+
+    async def exercise():
+        await registry.start_lifecycles()
+        for _ in range(20):
+            if registry.lifecycle_health("integration.import-worker")["status"] == "fatal":
+                break
+            await asyncio.sleep(0.005)
+        health = registry.lifecycle_health("integration.import-worker")
+        signals = registry.lifecycle_signals("integration.import-worker")
+        assert health["status"] == "fatal"
+        assert health["consecutive_errors"] == 0
+        assert health["last_error_code"] == "ValueError"
+        assert health["last_poll_at"] is not None
+        assert health["last_success_at"] is None
+        assert health["next_retry_at"] is None
+        assert signals[-1]["event"] == "lifecycle_worker_failed"
+        assert signals[-1]["error_code"] == "ValueError"
+        assert "secret" not in repr((health, signals))
+        with pytest.raises(TypeError):
+            health["status"] = "healthy"
+        records = [record for record in caplog.records if record.getMessage() == "integration_import_worker_fatal"]
+        assert records[-1].event_type == "lifecycle_worker_failed"
+        assert records[-1].error_code == "ValueError"
+        assert "secret" not in records[-1].getMessage()
+        await registry.stop_lifecycles()
+
+    asyncio.run(exercise())
+
+
+def test_production_registry_keeps_transient_health_visible_then_clears_it_after_recovery():
+    repository = ProviderRepository()
+    calls = 0
+
+    def transient_then_idle(_worker):
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            raise ConnectionError("password=not-public")
+        return None
+
+    repository.claim_next_import_run = transient_then_idle
+    registry = CapabilityRegistry()
+    register_capabilities(registry, adapter_factory=lambda: IntegrationProviderAdapters(
+        repository=repository, credential_enrollment=ProviderVault(), catalog=ProviderCatalog(),
+        connector_runtime=ProviderRuntime(), target_client=DomainCapabilityClient(object()),
+        worker_identity_factory=lambda run: _identity(),
+    ))
+
+    async def exercise():
+        await registry.start_lifecycles()
+        for _ in range(20):
+            degraded = registry.lifecycle_health("integration.import-worker")
+            if degraded["status"] == "degraded":
+                break
+            await asyncio.sleep(0.005)
+        assert degraded["consecutive_errors"] == 1
+        assert degraded["last_error_code"] == "ConnectionError"
+        assert degraded["last_poll_at"] is not None
+        assert degraded["next_retry_at"] is not None
+        assert "password" not in repr(degraded)
+        for _ in range(80):
+            recovered = registry.lifecycle_health("integration.import-worker")
+            if recovered["status"] == "healthy":
+                break
+            await asyncio.sleep(0.005)
+        assert recovered["consecutive_errors"] == 0
+        assert recovered["last_error_code"] is None
+        assert recovered["last_success_at"] is not None
+        assert recovered["next_retry_at"] is None
         await registry.stop_lifecycles()
 
     asyncio.run(exercise())

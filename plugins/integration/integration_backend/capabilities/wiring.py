@@ -4,7 +4,7 @@ from __future__ import annotations
 import importlib
 import inspect
 import os
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Any, Callable, Mapping
 
 from backend.capability_v2.contracts import ConsumerIdentity
@@ -134,10 +134,23 @@ def build_import_dispatcher(adapter_factory: AdapterFactory | None = None) -> Im
 
 
 def register_import_worker_lifecycle(registry, adapter_factory: AdapterFactory | None = None) -> None:
-    state: dict[str, IntegrationImportWorker] = {}
+    state: dict[str, Any] = {"last_health": {
+        "status": "stopped", "consecutive_errors": 0, "last_error_code": None,
+        "retry_delay_seconds": 0.0, "last_poll_at": None, "last_success_at": None,
+        "next_retry_at": None,
+    }}
+
+    def health() -> Mapping[str, Any]:
+        worker = state.get("worker")
+        return asdict(worker.health) if worker is not None else dict(state["last_health"])
+
+    def supervise(signal: Mapping[str, Any]) -> None:
+        registry.publish_lifecycle_signal("integration.import-worker", signal)
 
     async def start() -> None:
-        worker = IntegrationImportWorker(build_import_dispatcher(adapter_factory))
+        worker = IntegrationImportWorker(
+            build_import_dispatcher(adapter_factory), supervision_signal=supervise,
+        )
         state["worker"] = worker
         await worker.start()
 
@@ -145,8 +158,9 @@ def register_import_worker_lifecycle(registry, adapter_factory: AdapterFactory |
         worker = state.pop("worker", None)
         if worker is not None:
             await worker.stop()
+            state["last_health"] = asdict(worker.health)
 
-    registry.register_lifecycle("integration.import-worker", start, stop)
+    registry.register_lifecycle("integration.import-worker", start, stop, health=health)
 
 
 __all__ = ["AdapterFactory", "IntegrationProviderAdapters", "build_application", "build_import_dispatcher", "register_import_worker_lifecycle"]

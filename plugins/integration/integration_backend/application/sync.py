@@ -3,13 +3,18 @@ from __future__ import annotations
 from dataclasses import dataclass
 import asyncio
 from contextlib import suppress
-from typing import Any, Mapping
+from datetime import UTC, datetime, timedelta
+import logging
+from typing import Any, Callable, Mapping
 
 from backend.capability_v2.contracts import ConsumerIdentity, CorrelationRef
 from backend.capability_v2.domain_client import DomainCapabilityClient, DomainInvocation
 from backend.capability_v2.contracts import CapabilityStatus
 
 from .transform import RestrictedExpression
+
+
+_log = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -147,6 +152,9 @@ class ImportWorkerHealth:
     consecutive_errors: int
     last_error_code: str | None
     retry_delay_seconds: float
+    last_poll_at: str | None
+    last_success_at: str | None
+    next_retry_at: str | None
 
 
 class IntegrationImportWorker:
@@ -155,14 +163,16 @@ class IntegrationImportWorker:
     def __init__(
         self, dispatcher: ImportDispatcher, *, worker_id: str = "integration-import",
         idle_seconds: float = 0.25, maximum_backoff_seconds: float = 5.0,
+        supervision_signal: Callable[[Mapping[str, Any]], None] | None = None,
     ):
         self._dispatcher = dispatcher
         self._worker_id = worker_id
         self._idle_seconds = max(0.05, float(idle_seconds))
         self._maximum_backoff_seconds = max(self._idle_seconds, float(maximum_backoff_seconds))
+        self._supervision_signal = supervision_signal
         self._task: asyncio.Task | None = None
         self._stopping = asyncio.Event()
-        self._health = ImportWorkerHealth("stopped", 0, None, 0.0)
+        self._health = ImportWorkerHealth("stopped", 0, None, 0.0, None, None, None)
 
     @property
     def health(self) -> ImportWorkerHealth:
@@ -175,8 +185,12 @@ class IntegrationImportWorker:
     async def start(self) -> None:
         if self._task is None:
             self._stopping.clear()
-            self._health = ImportWorkerHealth("starting", 0, self._health.last_error_code, 0.0)
+            self._health = ImportWorkerHealth(
+                "starting", 0, None, 0.0, self._health.last_poll_at,
+                self._health.last_success_at, None,
+            )
             self._task = asyncio.create_task(self._run(), name=self._worker_id)
+            self._task.add_done_callback(self._observe_completion)
 
     async def stop(self) -> None:
         self._stopping.set()
@@ -185,9 +199,24 @@ class IntegrationImportWorker:
             task.cancel()
             with suppress(asyncio.CancelledError, Exception):
                 await task
-        self._health = ImportWorkerHealth(
-            "stopped", self._health.consecutive_errors, self._health.last_error_code, 0.0,
-        )
+        if self._health.status != "fatal":
+            self._health = ImportWorkerHealth(
+                "stopped", self._health.consecutive_errors, self._health.last_error_code, 0.0,
+                self._health.last_poll_at, self._health.last_success_at, None,
+            )
+
+    def _observe_completion(self, task: asyncio.Task) -> None:
+        if task.cancelled():
+            return
+        exc = task.exception()
+        if exc is None or self._supervision_signal is None:
+            return
+        self._supervision_signal({
+            "event": "lifecycle_worker_failed",
+            "status": "fatal",
+            "error_code": type(exc).__name__,
+            "observed_at": datetime.now(UTC).isoformat(),
+        })
 
     @staticmethod
     def _is_transient(exc: Exception) -> bool:
@@ -201,6 +230,7 @@ class IntegrationImportWorker:
     async def _run(self) -> None:
         while not self._stopping.is_set():
             correlation = CorrelationRef(request_id=f"{self._worker_id}-{id(asyncio.current_task())}")
+            polled_at = datetime.now(UTC)
             try:
                 consumed = await self._dispatcher.dispatch_next(
                     worker_id=self._worker_id, correlation=correlation,
@@ -211,7 +241,13 @@ class IntegrationImportWorker:
                 if not self._is_transient(exc):
                     self._health = ImportWorkerHealth(
                         "fatal", self._health.consecutive_errors,
-                        type(exc).__name__, 0.0,
+                        type(exc).__name__, 0.0, polled_at.isoformat(),
+                        self._health.last_success_at, None,
+                    )
+                    _log.error(
+                        "integration_import_worker_fatal",
+                        extra={"event_type": "lifecycle_worker_failed", "worker_status": "fatal",
+                               "error_code": type(exc).__name__},
                     )
                     raise
                 failures = min(self._health.consecutive_errors + 1, 31)
@@ -220,12 +256,15 @@ class IntegrationImportWorker:
                     self._idle_seconds * (2 ** min(failures - 1, 10)),
                 )
                 self._health = ImportWorkerHealth(
-                    "degraded", failures, type(exc).__name__, delay,
+                    "degraded", failures, type(exc).__name__, delay, polled_at.isoformat(),
+                    self._health.last_success_at,
+                    (polled_at + timedelta(seconds=delay)).isoformat(),
                 )
                 await asyncio.sleep(delay)
                 continue
             self._health = ImportWorkerHealth(
-                "healthy", 0, self._health.last_error_code, 0.0,
+                "healthy", 0, None, 0.0, polled_at.isoformat(),
+                datetime.now(UTC).isoformat(), None,
             )
             if consumed is None:
                 await asyncio.sleep(self._idle_seconds)
