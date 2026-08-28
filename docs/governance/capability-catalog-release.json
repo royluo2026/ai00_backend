@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_813658f6043d041ccb8a2f800481a1c8",
-  "catalog_hash": "sha256:813658f6043d041ccb8a2f800481a1c850888c2740313345c29ea7c643a1b269",
+  "release_id": "rel_bc7b6984f9f83f336f60b60bd489f268",
+  "catalog_hash": "sha256:bc7b6984f9f83f336f60b60bd489f26898d109584160e0b5a984d39a0472deb8",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -95290,11 +95290,17 @@
           "gid": {
             "type": "string",
             "minLength": 1
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
           }
         },
         "additionalProperties": false,
         "required": [
-          "gid"
+          "gid",
+          "idempotency_key"
         ]
       },
       "output_schema": {
@@ -95391,7 +95397,7 @@
           "operation_ref"
         ]
       },
-      "schema_hash": "sha256:3000dde01c0972878bf737201cb9294643c32eb05de369b9d50a5d8894fd7153",
+      "schema_hash": "sha256:5e6fa8f7d7f8b20760c19bf9ecd4bb393b3deaeb9ff04793073d3fffa21fafcc",
       "artifact_policy": "none",
       "operation_policy": "required",
       "concurrency_policy": "none",
@@ -101086,6 +101092,398 @@
       "provider_ref": "integration.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/integration.mapping_target.search:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
+          "result": "pass",
+          "path": "backend/tests/test_capability_v2_contracts.py"
+        }
+      ]
+    },
+    {
+      "id": "integration.mapping_target.upsert",
+      "major_version": 1,
+      "owner_domain": "integration",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "integration.mapping_target.upsert",
+      "description": "Execute the governed integration.mapping_target.upsert Integration outcome.",
+      "use_when": "A consumer needs governed external connector, mapping, or sync orchestration.",
+      "do_not_use_when": "The caller can use an owning domain Capability directly without external integration.",
+      "business_effect": "Business outcome: Execute the governed integration.mapping_target.upsert Integration outcome.",
+      "side_effect_level": "write",
+      "side_effects": "Writes integration domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "integration.v2:integration.admin",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "binding_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "ontology_object_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_domain": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_capability_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_major_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "minimum_catalog_release": {
+            "type": "string",
+            "minLength": 1
+          },
+          "input_contract": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_expected_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "binding_id",
+          "ontology_object_gid",
+          "target_domain",
+          "target_capability_id",
+          "target_major_version",
+          "minimum_catalog_release",
+          "input_contract",
+          "resource_gid",
+          "target_expected_version",
+          "idempotency_key"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "ontology_object_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "binding_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_domain": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_capability_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_major_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "minimum_catalog_release": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "ontology_object_gid",
+          "binding_id",
+          "target_domain",
+          "target_capability_id",
+          "target_major_version",
+          "minimum_catalog_release",
+          "resource_gid",
+          "expected_version",
+          "revision"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "ontology_object_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "binding_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_domain": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_capability_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_major_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "minimum_catalog_release": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "ontology_object_gid",
+          "binding_id",
+          "target_domain",
+          "target_capability_id",
+          "target_major_version",
+          "minimum_catalog_release",
+          "resource_gid",
+          "expected_version",
+          "revision"
+        ]
+      },
+      "schema_hash": "sha256:d083086949ffb84d3f841ebf3b0a9b826d093a9ceddc6ea7c331e449e9c99f2c",
+      "artifact_policy": "none",
+      "operation_policy": "required",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "admin",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Integration request is invalid.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Integration resource.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The connector or mapping does not exist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The connector or mapping revision changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "network_policy_rejected",
+          "meaning": "The connector target violates outbound network policy.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "connector_runtime_unavailable",
+          "meaning": "The bounded external connector runtime is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_capability_unavailable",
+          "meaning": "The owning target-domain Capability is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_unavailable",
+          "meaning": "The selected presentation object has no governed Integration target binding.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "target_binding_incompatible",
+          "meaning": "The governed Integration target binding is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_unavailable",
+          "meaning": "The credential enrollment vault is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "credential_enrollment_invalid",
+          "meaning": "The one-time credential enrollment handle is invalid or consumed.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The Integration idempotency key is already bound to another request.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_d7511a0aba728a0d81a9937a",
+      "error_schema": [
+        {
+          "error_code": "invalid_input",
+          "message_template": "The Integration request is invalid.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller cannot access the Integration resource.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The connector or mapping does not exist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The connector or mapping revision changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "network_policy_rejected",
+          "message_template": "The connector target violates outbound network policy.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "connector_runtime_unavailable",
+          "message_template": "The bounded external connector runtime is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_capability_unavailable",
+          "message_template": "The owning target-domain Capability is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_unavailable",
+          "message_template": "The selected presentation object has no governed Integration target binding.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "target_binding_incompatible",
+          "message_template": "The governed Integration target binding is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_unavailable",
+          "message_template": "The credential enrollment vault is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "credential_enrollment_invalid",
+          "message_template": "The one-time credential enrollment handle is invalid or consumed.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The Integration idempotency key is already bound to another request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "integration.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/integration.mapping_target.upsert:invoke"
       ],
       "test_refs": [
         {
@@ -189169,7 +189567,7 @@
       "plugin_id": "official.integration",
       "module": "integration_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:013d18301ea2f33016eafb0434f751c375648fce500d24573e575a95c85c3fed"
+      "artifact_hash": "sha256:71b10444815943aa6bc46f60e333b133f03b7132e4662d61f5067190c3f423a4"
     },
     {
       "plugin_id": "official.knowledge",
@@ -189196,5 +189594,5 @@
       "artifact_hash": "sha256:5c1fccaa2219f6833c24237667039685e322cefcffc7ca6f0287d28cfc0a2b39"
     }
   ],
-  "created_at": "2026-08-28T18:06:53.434425Z"
+  "created_at": "2026-08-28T19:06:53.845281Z"
 }

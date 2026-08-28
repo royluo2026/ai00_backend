@@ -8,7 +8,7 @@ Execute the governed agent.memory.read Agent outcome.
 - 不适用：The outcome belongs to another business domain; invoke that domain Capability instead.
 - 生命周期：`stable`
 - 所属领域：`agent`
-- Catalog Release：`rel_813658f6043d041ccb8a2f800481a1c8`
+- Catalog Release：`rel_bc7b6984f9f83f336f60b60bd489f268`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -207,7 +207,7 @@ Execute the governed agent.memory.read Agent outcome.
 ```json
 {
   "capability_id": "agent.memory.read",
-  "catalog_release": "rel_813658f6043d041ccb8a2f800481a1c8",
+  "catalog_release": "rel_bc7b6984f9f83f336f60b60bd489f268",
   "major_version": 1,
   "payload": {}
 }

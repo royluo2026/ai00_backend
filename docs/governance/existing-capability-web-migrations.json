@@ -3,7 +3,7 @@
   "artifact_id": "existing-capability-web-migrations",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "baseline_revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-  "frontend_revision": "ff2ccc822e7e45119e37ff9c40d479599104b9aa",
+  "frontend_revision": "a39751ec8e0f17b31dfa4244088b7a14ab3fa1eb",
   "groups": [
     {
       "method": "DELETE",
@@ -292,7 +292,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
             "start_line": 10,
             "end_line": 10,
             "sha256": "67b261904167a24b4eada2398aa9292955ff80bce5f20dbff30d42687e409b33",
@@ -355,7 +355,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
             "start_line": 9,
             "end_line": 9,
             "sha256": "6dc486a5f1ef42a791813b6c31330cae66bad65a0d1a883e3f88eb2940563dd7",
@@ -418,7 +418,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
             "start_line": 11,
             "end_line": 11,
             "sha256": "ea7f3b9b8ee8c3ff58a4b894c1fb7bab4f8554540c868fc9ee72e6b6fbeac918",
@@ -481,7 +481,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
             "start_line": 13,
             "end_line": 13,
             "sha256": "a8142a0f6fc3010c3ff7ddebeb0c30ce810748a8d9ccf4e0b667191e64119fd3",
@@ -544,7 +544,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
             "start_line": 14,
             "end_line": 14,
             "sha256": "858fe3be1139880ee0608e8952d4a1bf0647b3974c91216ae3d91696f7b629b0",
@@ -607,7 +607,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
             "start_line": 13,
             "end_line": 13,
             "sha256": "a8142a0f6fc3010c3ff7ddebeb0c30ce810748a8d9ccf4e0b667191e64119fd3",
@@ -1871,7 +1871,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
             "start_line": 10,
             "end_line": 10,
             "sha256": "67b261904167a24b4eada2398aa9292955ff80bce5f20dbff30d42687e409b33",
@@ -2283,7 +2283,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
             "start_line": 9,
             "end_line": 9,
             "sha256": "6dc486a5f1ef42a791813b6c31330cae66bad65a0d1a883e3f88eb2940563dd7",
@@ -2346,7 +2346,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
             "start_line": 8,
             "end_line": 8,
             "sha256": "62dfdeab621d02456eeb44ba405ba5c0201139ac5c936f4f28900d046ce80641",
@@ -2409,7 +2409,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
             "start_line": 12,
             "end_line": 12,
             "sha256": "a264023a145eee05bdc60969d257465ac48eda20f1abd2c68d63c713357abcfd",
@@ -2472,7 +2472,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
             "start_line": 13,
             "end_line": 13,
             "sha256": "a8142a0f6fc3010c3ff7ddebeb0c30ce810748a8d9ccf4e0b667191e64119fd3",
@@ -3186,7 +3186,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "0311cb4a399791073066a321576cf9f67fa88a227e1ce86cc2c2369d633b5b2f",
+            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
             "start_line": 11,
             "end_line": 11,
             "sha256": "ea7f3b9b8ee8c3ff58a4b894c1fb7bab4f8554540c868fc9ee72e6b6fbeac918",

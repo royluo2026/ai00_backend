@@ -30,10 +30,10 @@ def test_manifest_closes_exact_integration_scope_from_immutable_frontend_source(
         "unresolved_groups": 0,
         "unresolved_occurrences": 0,
     }
-    assert payload["frontend_revision"] == "ff2ccc822e7e45119e37ff9c40d479599104b9aa"
-    assert payload["frontend_source"]["blob"] == "6e7ce68530939c71bf6e6e133d974121bccfefba"
+    assert payload["frontend_revision"] == "a39751ec8e0f17b31dfa4244088b7a14ab3fa1eb"
+    assert payload["frontend_source"]["blob"] == "4c95a998bb2f1048183d063587526eb76238be53"
     assert payload["frontend_source"]["sha256"] == (
-        "sha256:edea26785d8e8c994dee853955bc9f882178b48d1a02feb19e6a47c0d7a5f53c"
+        "sha256:bf95202bca72d6c844864ef2c3ca285a4ee288770f3538c4bc63717ec0c2ee0f"
     )
     assert payload["frontend_dist"]["blob"] == payload["frontend_source"]["blob"]
     assert payload["frontend_dist"]["sha256"] == payload["frontend_source"]["sha256"]

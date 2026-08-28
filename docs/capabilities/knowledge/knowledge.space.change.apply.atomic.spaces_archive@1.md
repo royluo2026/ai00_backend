@@ -8,7 +8,7 @@ Execute Knowledge operation spaces.archive.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_813658f6043d041ccb8a2f800481a1c8`
+- Catalog Release：`rel_bc7b6984f9f83f336f60b60bd489f268`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -95,7 +95,7 @@ Execute Knowledge operation spaces.archive.
 ```json
 {
   "capability_id": "knowledge.space.change.apply.atomic.spaces_archive",
-  "catalog_release": "rel_813658f6043d041ccb8a2f800481a1c8",
+  "catalog_release": "rel_bc7b6984f9f83f336f60b60bd489f268",
   "major_version": 1,
   "payload": {}
 }

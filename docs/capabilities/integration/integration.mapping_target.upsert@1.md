@@ -1,13 +1,13 @@
-# system.job.cancel@1
+# integration.mapping_target.upsert@1
 
-Request job cancellation without claiming rollback.
+Execute the governed integration.mapping_target.upsert Integration outcome.
 
 ## 使用判断
 
-- 适用：A bounded shared-system composition is required.
-- 不适用：A domain-specific stable ref is already known.
+- 适用：A consumer needs governed external connector, mapping, or sync orchestration.
+- 不适用：The caller can use an owning domain Capability directly without external integration.
 - 生命周期：`stable`
-- 所属领域：`base`
+- 所属领域：`integration`
 - Catalog Release：`rel_bc7b6984f9f83f336f60b60bd489f268`
 - Schema 精度：`typed`
 - 暂未开放原因：无
@@ -28,29 +28,29 @@ Request job cancellation without claiming rollback.
 
 ## 授权与数据边界
 
-- 授权策略：`base.v2:authenticated`
+- 授权策略：`integration.v2:integration.admin`
 - 自动化等级：`A1`
 - 数据分类：`confidential`
 - Delegation：`scoped`
 - 认证新鲜度：0 秒
 
 资源选择器：
-- `system-job` ← `job_gid`（必填）
+- 无资源选择器；仍受租户、身份与权限策略约束。
 
 ## 执行与可靠性
 
 - 副作用：`write`
 - 执行模式：`cloud_sync`
 - 超时：30 秒
-- 审批：`user`
+- 审批：`admin`
 - 幂等：`required`
 - 并发：`none`
 - 无预期版本信封要求。
-- 一致性：`external`
-- Operation：`optional`
+- 一致性：`strong`
+- Operation：`required`
 - Artifact：`none`
 - 审计：`standard`
-- Evidence：`optional`
+- Evidence：`required`
 - 配额成本：1
 
 资源预算：
@@ -70,16 +70,63 @@ Request job cancellation without claiming rollback.
 {
   "additionalProperties": false,
   "properties": {
-    "job_gid": {
+    "binding_id": {
+      "minLength": 1,
       "type": "string"
     },
-    "owner": {
+    "expected_revision": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "idempotency_key": {
+      "maxLength": 255,
+      "minLength": 1,
       "type": "string"
+    },
+    "input_contract": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "minimum_catalog_release": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "ontology_object_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "resource_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "target_capability_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "target_domain": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "target_expected_version": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "target_major_version": {
+      "minimum": 1,
+      "type": "integer"
     }
   },
   "required": [
-    "job_gid",
-    "owner"
+    "binding_id",
+    "ontology_object_gid",
+    "target_domain",
+    "target_capability_id",
+    "target_major_version",
+    "minimum_catalog_release",
+    "input_contract",
+    "resource_gid",
+    "target_expected_version",
+    "idempotency_key"
   ],
   "type": "object"
 }
@@ -89,42 +136,79 @@ Request job cancellation without claiming rollback.
 
 ```json
 {
-  "capability_id": "system.job.cancel",
+  "capability_id": "integration.mapping_target.upsert",
   "catalog_release": "rel_bc7b6984f9f83f336f60b60bd489f268",
   "major_version": 1,
   "payload": {
-    "job_gid": "example",
-    "owner": "example"
+    "binding_id": "example",
+    "idempotency_key": "example",
+    "input_contract": "example",
+    "minimum_catalog_release": "example",
+    "ontology_object_gid": "example",
+    "resource_gid": "example",
+    "target_capability_id": "example",
+    "target_domain": "example",
+    "target_expected_version": 1,
+    "target_major_version": 1
   }
 }
 ```
 
 ## 输出 Schema
 
-领域数据必须符合下列 Schema，并封装在完整 `CapabilityResultV2` 中：
+首次调用返回 `status=accepted`、`data=null` 和持久化 `operation_ref`；下列输出 Schema 适用于 Operation 完成后的领域结果。
 
 ```json
 {
   "additionalProperties": false,
   "properties": {
-    "job_gid": {
+    "binding_id": {
+      "minLength": 1,
       "type": "string"
     },
-    "owner": {
+    "expected_version": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "minimum_catalog_release": {
+      "minLength": 1,
       "type": "string"
     },
-    "rolled_back": {
-      "type": "boolean"
-    },
-    "status": {
+    "ontology_object_gid": {
+      "minLength": 1,
       "type": "string"
+    },
+    "resource_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "revision": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "target_capability_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "target_domain": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "target_major_version": {
+      "minimum": 1,
+      "type": "integer"
     }
   },
   "required": [
-    "job_gid",
-    "status",
-    "owner",
-    "rolled_back"
+    "ontology_object_gid",
+    "binding_id",
+    "target_domain",
+    "target_capability_id",
+    "target_major_version",
+    "minimum_catalog_release",
+    "resource_gid",
+    "expected_version",
+    "revision"
   ],
   "type": "object"
 }
@@ -162,14 +246,18 @@ Request job cancellation without claiming rollback.
 
 领域错误：
 
-- `resource_not_found`：The requested Base resource does not exist or is not visible.（retryable=false）
-- `permission_denied`：The caller lacks a required Base Platform permission.（retryable=false）
-- `approval_required`：The governed operation requires a valid approval.（retryable=false）
-- `authentication_stale`：The caller must authenticate again before this high-risk operation.（retryable=false）
-- `idempotency_conflict`：The idempotency key is bound to a different request.（retryable=false）
-- `version_conflict`：The resource version differs from the expected version.（retryable=false）
-- `provider_unavailable`：A required domain provider is not registered.（retryable=true）
-- `plugin_state_conflict`：The plugin installation cannot perform this lifecycle transition.（retryable=false）
+- `invalid_input`：The Integration request is invalid.（retryable=false）
+- `permission_denied`：The caller cannot access the Integration resource.（retryable=false）
+- `resource_not_found`：The connector or mapping does not exist.（retryable=false）
+- `version_conflict`：The connector or mapping revision changed concurrently.（retryable=false）
+- `network_policy_rejected`：The connector target violates outbound network policy.（retryable=false）
+- `connector_runtime_unavailable`：The bounded external connector runtime is unavailable.（retryable=true）
+- `target_capability_unavailable`：The owning target-domain Capability is unavailable.（retryable=true）
+- `target_binding_unavailable`：The selected presentation object has no governed Integration target binding.（retryable=false）
+- `target_binding_incompatible`：The governed Integration target binding is incompatible.（retryable=false）
+- `credential_enrollment_unavailable`：The credential enrollment vault is unavailable.（retryable=true）
+- `credential_enrollment_invalid`：The one-time credential enrollment handle is invalid or consumed.（retryable=false）
+- `idempotency_conflict`：The Integration idempotency key is already bound to another request.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

@@ -275,6 +275,7 @@
     "integration/integration.mapping.source_columns.discover@1.md",
     "integration/integration.mapping.update@1.md",
     "integration/integration.mapping_target.search@1.md",
+    "integration/integration.mapping_target.upsert@1.md",
     "integration/integration.sync.start@1.md",
     "knowledge/knowledge.context.retrieve@1.md",
     "knowledge/knowledge.document.acl.grant@1.md",

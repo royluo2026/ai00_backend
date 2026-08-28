@@ -10,7 +10,7 @@
     "no silent REST fallback"
   ],
   "artifact_id": "capability-v2-structural-remediation-plan",
-  "content_sha256": "sha256:2ebaf12b71cbb13192807f89fb73a55c280228a0bcd8f218c808ce5e2fe8de88",
+  "content_sha256": "sha256:97d7890d5769ae4e9119eb62de681d41470e4ad5c5ddc59eda39637dd26a6bf4",
   "counts": {
     "groups": 37,
     "occurrences": 45
@@ -440,12 +440,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 42,
+          "end_line": 43,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 42
+          "start_line": 43
         },
-        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -474,10 +474,10 @@
             "type": "object"
           },
           "output_anchor": {
-            "end_line": 181,
+            "end_line": 198,
             "sha256": "db4f645b006e42d905c6e9c032ea780603955bde66251d17ea65e146c188bddb",
             "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-            "start_line": 181
+            "start_line": 198
           },
           "output_schema": {
             "additionalProperties": false,
@@ -550,17 +550,17 @@
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
           {
-            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
+            "blob": "4c95a998bb2f1048183d063587526eb76238be53",
             "line": 234,
             "sha256": "c8470f080bb473665549550c47619be3a3ac2c6a83192f6c20132c950cc59839",
             "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
         "owner_service_evidence": {
-          "end_line": 544,
+          "end_line": 570,
           "sha256": "ab2c27b403a9031af28346979a178de5b571dbab9ad580f0769f8af0fb0ea16a",
           "source_path": "plugins/integration/integration_backend/application/service.py",
-          "start_line": 544
+          "start_line": 570
         },
         "target_capability": "integration.connector.search@1"
       },
@@ -624,12 +624,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 42,
+          "end_line": 43,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 42
+          "start_line": 43
         },
-        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -637,10 +637,10 @@
         "canonical_occurrences": [],
         "contract_evidence": {
           "input_anchor": {
-            "end_line": 102,
+            "end_line": 104,
             "sha256": "9537126e9973f1d80bd2913084487a7a806936e557958c8627fe6e8beddc9080",
             "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-            "start_line": 102
+            "start_line": 104
           },
           "input_schema": {
             "additionalProperties": false,
@@ -661,10 +661,10 @@
             "type": "object"
           },
           "output_anchor": {
-            "end_line": 186,
+            "end_line": 203,
             "sha256": "e220b6305199bbfc9c1b357faf6223bd507c7da3aa3e683a2411d3e9207cdc85",
             "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-            "start_line": 186
+            "start_line": 203
           },
           "output_schema": {
             "additionalProperties": false,
@@ -730,17 +730,17 @@
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
           {
-            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
-            "line": 813,
+            "blob": "4c95a998bb2f1048183d063587526eb76238be53",
+            "line": 817,
             "sha256": "3da0b1f75b902d46d9e0480f8739509a95268391e72bb1b0621730169088e24a",
             "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
         "owner_service_evidence": {
-          "end_line": 487,
+          "end_line": 513,
           "sha256": "e5d0b6c03e0cef11ec178ee65a524f4011cee1ed18777cc504123c0bdbf8e574",
           "source_path": "plugins/integration/integration_backend/application/service.py",
-          "start_line": 487
+          "start_line": 513
         },
         "target_capability": "integration.connector.schema.discover@1"
       },
@@ -804,12 +804,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 42,
+          "end_line": 43,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 42
+          "start_line": 43
         },
-        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -817,10 +817,10 @@
         "canonical_occurrences": [],
         "contract_evidence": {
           "input_anchor": {
-            "end_line": 127,
+            "end_line": 144,
             "sha256": "57f66f66d0fef0c42176e90b7dcb6dfd7bc0a5cee5552134d147f0ab47f5d820",
             "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-            "start_line": 127
+            "start_line": 144
           },
           "input_schema": {
             "additionalProperties": false,
@@ -841,10 +841,10 @@
             "type": "object"
           },
           "output_anchor": {
-            "end_line": 201,
+            "end_line": 222,
             "sha256": "4532e2f34e32776a1e8da16375a364b26e1ac8fbe645e65a0a9730372b22473c",
             "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-            "start_line": 201
+            "start_line": 222
           },
           "output_schema": {
             "additionalProperties": false,
@@ -895,17 +895,17 @@
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
           {
-            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
+            "blob": "4c95a998bb2f1048183d063587526eb76238be53",
             "line": 461,
             "sha256": "5ca981b3024844a029867dda1e6257404145190d294d218018dec33eb0cc887e",
             "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
         "owner_service_evidence": {
-          "end_line": 474,
+          "end_line": 500,
           "sha256": "3abfaffd1e391781ce8c06f882e2a2ffa85f05ba7b1979b3f2c8ffbc0abb5485",
           "source_path": "plugins/integration/integration_backend/application/service.py",
-          "start_line": 474
+          "start_line": 500
         },
         "target_capability": "integration.field_mapping.search@1"
       },
@@ -969,12 +969,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 42,
+          "end_line": 43,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 42
+          "start_line": 43
         },
-        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -982,10 +982,10 @@
         "canonical_occurrences": [],
         "contract_evidence": {
           "input_anchor": {
-            "end_line": 115,
+            "end_line": 117,
             "sha256": "68b0c064bd5e3d42e696c160749eee96bdbb9493d3a0cf28c35d6b526a826312",
             "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-            "start_line": 115
+            "start_line": 117
           },
           "input_schema": {
             "additionalProperties": false,
@@ -1010,10 +1010,10 @@
             "type": "object"
           },
           "output_anchor": {
-            "end_line": 197,
+            "end_line": 214,
             "sha256": "3d469465d7109252c48684f226fd537c01a623802fa93139956cd8567b91cc0f",
             "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-            "start_line": 197
+            "start_line": 214
           },
           "output_schema": {
             "additionalProperties": false,
@@ -1090,17 +1090,17 @@
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
           {
-            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
+            "blob": "4c95a998bb2f1048183d063587526eb76238be53",
             "line": 285,
             "sha256": "108a4b45052e8c29e7136137dcd6a049192f708272da822691eb74134f56e06a",
             "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
         "owner_service_evidence": {
-          "end_line": 474,
+          "end_line": 500,
           "sha256": "3abfaffd1e391781ce8c06f882e2a2ffa85f05ba7b1979b3f2c8ffbc0abb5485",
           "source_path": "plugins/integration/integration_backend/application/service.py",
-          "start_line": 474
+          "start_line": 500
         },
         "target_capability": "integration.mapping.search@1"
       },
@@ -1164,12 +1164,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 42,
+          "end_line": 43,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 42
+          "start_line": 43
         },
-        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -1177,10 +1177,10 @@
         "canonical_occurrences": [],
         "contract_evidence": {
           "input_anchor": {
-            "end_line": 128,
+            "end_line": 145,
             "sha256": "f5828f020df47ca20fa1804a6b967462641ae7b9e88ccde3735660dcc203b636",
             "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-            "start_line": 128
+            "start_line": 145
           },
           "input_schema": {
             "additionalProperties": false,
@@ -1201,10 +1201,10 @@
             "type": "object"
           },
           "output_anchor": {
-            "end_line": 202,
+            "end_line": 223,
             "sha256": "a986aacb305ae464b51e05c0e145ba68ce1e235567a85193d36725325bb02adf",
             "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-            "start_line": 202
+            "start_line": 223
           },
           "output_schema": {
             "additionalProperties": false,
@@ -1274,17 +1274,17 @@
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
           {
-            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
+            "blob": "4c95a998bb2f1048183d063587526eb76238be53",
             "line": 441,
             "sha256": "4190c76f2ca7057b4c6c3cc985b1842fcdb279845f6823058e04a2de0480f688",
             "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
         "owner_service_evidence": {
-          "end_line": 561,
+          "end_line": 592,
           "sha256": "e41c549f68ccd794c6eb80da205b6ed51b9b0f76ceeadb86f7d02a13afc8185c",
           "source_path": "plugins/integration/integration_backend/application/service.py",
-          "start_line": 561
+          "start_line": 592
         },
         "target_capability": "integration.mapping.source_columns.discover@1"
       },
@@ -1348,12 +1348,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 42,
+          "end_line": 43,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 42
+          "start_line": 43
         },
-        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -1361,10 +1361,10 @@
         "canonical_occurrences": [],
         "contract_evidence": {
           "input_anchor": {
-            "end_line": 129,
+            "end_line": 146,
             "sha256": "24aeb6e79865061c10753a58867f118e2e4c0ab68853db6f04fef19b18cd7525",
             "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-            "start_line": 129
+            "start_line": 146
           },
           "input_schema": {
             "additionalProperties": false,
@@ -1385,10 +1385,10 @@
             "type": "object"
           },
           "output_anchor": {
-            "end_line": 206,
+            "end_line": 227,
             "sha256": "0424e87908ff6ed75ca62f30def5bb7fea0b935d2e9d4b551e5f05ce08b955ec",
             "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-            "start_line": 206
+            "start_line": 227
           },
           "output_schema": {
             "additionalProperties": false,
@@ -1480,17 +1480,17 @@
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
           {
-            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
+            "blob": "4c95a998bb2f1048183d063587526eb76238be53",
             "line": 636,
             "sha256": "3bc9c2e36be83ca0eb5af4b1648e8b5bbb53e3a8c33f0e90ef17892ab972f494",
             "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
         "owner_service_evidence": {
-          "end_line": 561,
+          "end_line": 592,
           "sha256": "e41c549f68ccd794c6eb80da205b6ed51b9b0f76ceeadb86f7d02a13afc8185c",
           "source_path": "plugins/integration/integration_backend/application/service.py",
-          "start_line": 561
+          "start_line": 592
         },
         "target_capability": "integration.mapping.preview@1"
       },
@@ -2136,12 +2136,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 42,
+          "end_line": 43,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 42
+          "start_line": 43
         },
-        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -2218,10 +2218,10 @@
             "type": "object"
           },
           "output_anchor": {
-            "end_line": 179,
+            "end_line": 196,
             "sha256": "78118399541752f44bb7c8a57add5fdeddb420c0ddd7b84a6b17c06c247800d5",
             "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-            "start_line": 179
+            "start_line": 196
           },
           "output_schema": {
             "additionalProperties": false,
@@ -2281,17 +2281,17 @@
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
           {
-            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
-            "line": 788,
+            "blob": "4c95a998bb2f1048183d063587526eb76238be53",
+            "line": 792,
             "sha256": "ee65a124fe675c750e7047a1158601301ed83794d7e6d832abfb4a8a4fde9f61",
             "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
         "owner_service_evidence": {
-          "end_line": 513,
+          "end_line": 539,
           "sha256": "079ccaecfc7418945962f21d8901ddff906cd3848704aeb3071607b99e793123",
           "source_path": "plugins/integration/integration_backend/application/service.py",
-          "start_line": 513
+          "start_line": 539
         },
         "target_capability": "integration.connector.update@1"
       },
@@ -2540,12 +2540,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 42,
+          "end_line": 43,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 42
+          "start_line": 43
         },
-        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -2634,10 +2634,10 @@
             "type": "object"
           },
           "output_anchor": {
-            "end_line": 178,
+            "end_line": 195,
             "sha256": "4403928a048a0bcfd79c7c054da8c0eb9b81485a9f57499d5e4576f7879e5ed9",
             "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-            "start_line": 178
+            "start_line": 195
           },
           "output_schema": {
             "additionalProperties": false,
@@ -2697,17 +2697,17 @@
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
           {
-            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
-            "line": 794,
+            "blob": "4c95a998bb2f1048183d063587526eb76238be53",
+            "line": 798,
             "sha256": "48940e8f60d2fd646913b2d3a55a131cfa8f00b5d77a8071d88b4f7057ce9a30",
             "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
         "owner_service_evidence": {
-          "end_line": 490,
+          "end_line": 516,
           "sha256": "45bd33cb1023303df1f0792d5153e4431375d7ce357fe6609cbb436e5dfc8bc9",
           "source_path": "plugins/integration/integration_backend/application/service.py",
-          "start_line": 490
+          "start_line": 516
         },
         "target_capability": "integration.connector.create@1"
       },
@@ -2771,12 +2771,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 42,
+          "end_line": 43,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 42
+          "start_line": 43
         },
-        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -2785,7 +2785,7 @@
         "contract_evidence": {
           "input_anchor": {
             "end_line": 101,
-            "sha256": "f13fb8594d642ab76195e704706e1e832d5de83318626e05bbe0debf716afbb1",
+            "sha256": "c9cdadc1b161d7c0601610b6b2e9e287f3948189e3364dba9742b35350837a93",
             "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
             "start_line": 101
           },
@@ -2795,18 +2795,24 @@
               "gid": {
                 "minLength": 1,
                 "type": "string"
+              },
+              "idempotency_key": {
+                "maxLength": 255,
+                "minLength": 1,
+                "type": "string"
               }
             },
             "required": [
-              "gid"
+              "gid",
+              "idempotency_key"
             ],
             "type": "object"
           },
           "output_anchor": {
-            "end_line": 182,
+            "end_line": 199,
             "sha256": "c9cdadc1b161d7c0601610b6b2e9e287f3948189e3364dba9742b35350837a93",
             "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-            "start_line": 182
+            "start_line": 199
           },
           "output_schema": {
             "additionalProperties": false,
@@ -2859,17 +2865,17 @@
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
           {
-            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
-            "line": 754,
-            "sha256": "d5b1b00104342d0befcf843a4d77c402da9e467fedb85e0ec224245f11ac02e7",
+            "blob": "4c95a998bb2f1048183d063587526eb76238be53",
+            "line": 755,
+            "sha256": "73878ada2099b7ed5d3f1ff9ba9b9c278f6f2a278f9e49d7c6348225b09a6478",
             "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
         "owner_service_evidence": {
-          "end_line": 487,
+          "end_line": 513,
           "sha256": "e5d0b6c03e0cef11ec178ee65a524f4011cee1ed18777cc504123c0bdbf8e574",
           "source_path": "plugins/integration/integration_backend/application/service.py",
-          "start_line": 487
+          "start_line": 513
         },
         "target_capability": "integration.connector.connection.test@1"
       },
@@ -2933,12 +2939,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 42,
+          "end_line": 43,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 42
+          "start_line": 43
         },
-        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -2946,10 +2952,10 @@
         "canonical_occurrences": [],
         "contract_evidence": {
           "input_anchor": {
-            "end_line": 103,
+            "end_line": 105,
             "sha256": "21a9fca26cf45ea6110738ea4d3e02ca86aa2478c50d17d145d5ff9b13e4d60e",
             "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-            "start_line": 103
+            "start_line": 105
           },
           "input_schema": {
             "additionalProperties": false,
@@ -3012,10 +3018,10 @@
             "type": "object"
           },
           "output_anchor": {
-            "end_line": 190,
+            "end_line": 207,
             "sha256": "12ca375cf3a39fd7aab8c31994b0cbf2fce3ea76a22b5410cc000f9576a34ad0",
             "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-            "start_line": 190
+            "start_line": 207
           },
           "output_schema": {
             "additionalProperties": false,
@@ -3079,17 +3085,17 @@
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
           {
-            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
-            "line": 860,
+            "blob": "4c95a998bb2f1048183d063587526eb76238be53",
+            "line": 864,
             "sha256": "c96b15da7f4ce799b463ab0a2f82278f0a9c731b3efd9cf69d930ddc1c19d2bb",
             "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
         "owner_service_evidence": {
-          "end_line": 479,
+          "end_line": 505,
           "sha256": "2db00ad26cb113eda87defb6241a1cfe81a1c3893475fd6f5c18e72732ff9bc8",
           "source_path": "plugins/integration/integration_backend/application/service.py",
-          "start_line": 479
+          "start_line": 505
         },
         "target_capability": "integration.mapping.create@1"
       },
@@ -3153,12 +3159,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 42,
+          "end_line": 43,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 42
+          "start_line": 43
         },
-        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -3166,10 +3172,10 @@
         "canonical_occurrences": [],
         "contract_evidence": {
           "input_anchor": {
-            "end_line": 139,
+            "end_line": 156,
             "sha256": "9c73a820f74afd2895742ff79b4f53f3b6d42733faea1d1db51cc57fb9723d71",
             "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-            "start_line": 139
+            "start_line": 156
           },
           "input_schema": {
             "additionalProperties": false,
@@ -3191,10 +3197,10 @@
             "type": "object"
           },
           "output_anchor": {
-            "end_line": 221,
+            "end_line": 242,
             "sha256": "9c73a820f74afd2895742ff79b4f53f3b6d42733faea1d1db51cc57fb9723d71",
             "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-            "start_line": 221
+            "start_line": 242
           },
           "output_schema": {
             "additionalProperties": false,
@@ -3242,17 +3248,17 @@
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
           {
-            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
+            "blob": "4c95a998bb2f1048183d063587526eb76238be53",
             "line": 693,
             "sha256": "8158e1912617583111cd8008db9652ff2308ef7093205803c740758769092fe9",
             "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
         "owner_service_evidence": {
-          "end_line": 483,
+          "end_line": 509,
           "sha256": "1b4c98e48aa57428aedca4e8d035a4f977582edae157aec46d589125c55acd99",
           "source_path": "plugins/integration/integration_backend/application/service.py",
-          "start_line": 483
+          "start_line": 509
         },
         "target_capability": "integration.mapping.import.start@1"
       },
@@ -4166,12 +4172,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 42,
+          "end_line": 43,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 42
+          "start_line": 43
         },
-        "provider_source_sha256": "sha256:1ccdda8734d14a98898da3e751c82231bdbe23f14d2e3ef08af6b853b2e8dee0",
+        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -4179,10 +4185,10 @@
         "canonical_occurrences": [],
         "contract_evidence": {
           "input_anchor": {
-            "end_line": 130,
+            "end_line": 147,
             "sha256": "c87a48cb80232aef37b5495b37515ec0ef6a2269da9ac5dea3a226f199e773f6",
             "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-            "start_line": 130
+            "start_line": 147
           },
           "input_schema": {
             "additionalProperties": false,
@@ -4237,10 +4243,10 @@
             "type": "object"
           },
           "output_anchor": {
-            "end_line": 214,
+            "end_line": 235,
             "sha256": "c87a48cb80232aef37b5495b37515ec0ef6a2269da9ac5dea3a226f199e773f6",
             "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-            "start_line": 214
+            "start_line": 235
           },
           "output_schema": {
             "additionalProperties": false,
@@ -4308,17 +4314,17 @@
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
           {
-            "blob": "6e7ce68530939c71bf6e6e133d974121bccfefba",
+            "blob": "4c95a998bb2f1048183d063587526eb76238be53",
             "line": 594,
             "sha256": "059ab69325b4740bc02173ae3d9b27eadfb0fd0f23e370be893da0c9545177ec",
             "source_path": "web/ext_datasource/ext_ds.js"
           }
         ],
         "owner_service_evidence": {
-          "end_line": 480,
+          "end_line": 506,
           "sha256": "6f65073a924a880015c9426ac4544d5e9e734819ceb80d5b95d0396895d1951e",
           "source_path": "plugins/integration/integration_backend/application/service.py",
-          "start_line": 480
+          "start_line": 506
         },
         "target_capability": "integration.field_mapping.batch.update@1"
       },
@@ -4805,7 +4811,7 @@
     },
     {
       "path": "docs/governance/integration-structural-web-remediation.json",
-      "sha256": "sha256:90778aeba81f7fa53f444594db80a99a76dcd61ac7974fb5adbfa4c50816299e"
+      "sha256": "sha256:ef7608f040ff9ec632fffa18749226b7a69f5f9faed36517f30bc34098dbbfb2"
     },
     {
       "path": "docs/governance/craft-agent-project-structural-web-remediation.json",
@@ -4813,7 +4819,7 @@
     },
     {
       "path": "docs\\governance\\capability-coverage-review\\generated\\web_route_inventory.json",
-      "sha256": "sha256:3b2f8cdb1d80cf7329e4269d7adcd73b99e7af1a870bee56c66c2ee8d30a3c6d"
+      "sha256": "sha256:e8f066a1e82bb68499b15f1865d34aff1e9e81fb9f3eb3212633f873cc5268d9"
     }
   ]
 }
