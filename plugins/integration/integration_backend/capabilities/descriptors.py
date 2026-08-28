@@ -8,14 +8,21 @@ INTEGRATION_CAPABILITY_IDS = (
     "integration.connector.archive", "integration.connector.connection.test",
     "integration.connector.create", "integration.connector.schema.discover",
     "integration.connector.search", "integration.connector.update",
+    "integration.field_mapping.batch.update", "integration.field_mapping.search",
     "integration.mapping.archive", "integration.mapping.create", "integration.mapping.get",
-    "integration.mapping.preview", "integration.mapping.search", "integration.mapping.update",
+    "integration.mapping.import.start", "integration.mapping.preview", "integration.mapping.search",
+    "integration.mapping.source_columns.discover", "integration.mapping.update",
     "integration.sync.start",
 )
 
 
 def specs() -> tuple[CapabilitySpec, ...]:
-    reads = {"integration.connector.search", "integration.connector.schema.discover", "integration.mapping.get", "integration.mapping.preview", "integration.mapping.search"}
+    reads = {
+        "integration.connector.search", "integration.connector.schema.discover",
+        "integration.field_mapping.search", "integration.mapping.get",
+        "integration.mapping.preview", "integration.mapping.search",
+        "integration.mapping.source_columns.discover",
+    }
     result = []
     for capability_id in INTEGRATION_CAPABILITY_IDS:
         read = capability_id in reads

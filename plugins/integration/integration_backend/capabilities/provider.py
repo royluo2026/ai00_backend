@@ -12,14 +12,21 @@ ERRORS = tuple(DomainErrorContract(code=code, meaning=meaning, retryable=retryab
     ("network_policy_rejected", "The connector target violates outbound network policy.", False),
     ("connector_runtime_unavailable", "The bounded external connector runtime is unavailable.", True),
     ("target_capability_unavailable", "The owning target-domain Capability is unavailable.", True),
-    ("idempotency_conflict", "The sync idempotency key is already bound to another request.", False),
+    ("credential_enrollment_unavailable", "The credential enrollment vault is unavailable.", True),
+    ("credential_enrollment_invalid", "The one-time credential enrollment handle is invalid or consumed.", False),
+    ("idempotency_conflict", "The Integration idempotency key is already bound to another request.", False),
 ))
 
 
 def descriptor_for(spec) -> CapabilityDescriptorV2:
     base = descriptor_from_provider_spec(spec)
     write = base.side_effect_level is not SideEffectLevel.READ
-    async_sync = spec.id == "integration.sync.start"
+    async_sync = spec.id in {"integration.mapping.import.start", "integration.sync.start"}
+    external = spec.id in {
+        "integration.connector.connection.test", "integration.connector.schema.discover",
+        "integration.mapping.source_columns.discover", "integration.mapping.preview",
+        "integration.mapping.import.start", "integration.sync.start",
+    }
     return CapabilityDescriptorV2.model_validate({
         **base.model_dump(), "owner_domain": "integration",
         "lifecycle_status": LifecycleStatus.STABLE,
@@ -30,9 +37,9 @@ def descriptor_for(spec) -> CapabilityDescriptorV2:
         "data_classification": "confidential", "delegation_policy": "scoped",
         "agent_output_schema": base.output_schema,
         "execution_mode": ExecutionMode.CLOUD_ASYNC if async_sync else base.execution_mode,
-        "operation_policy": "required" if async_sync else ("optional" if write else "none"),
+        "operation_policy": "required" if external else ("optional" if write else "none"),
         "idempotency_policy": "required" if write else "none",
-        "consistency_policy": "external" if spec.id.endswith(("connection.test", "schema.discover", "preview", "sync.start")) else "strong",
+        "consistency_policy": "external" if external else "strong",
         "evidence_policy": "required", "domain_errors": ERRORS, "domain_errors_complete": True,
     })
 
