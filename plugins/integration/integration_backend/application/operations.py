@@ -68,6 +68,31 @@ class IntegrationOperations:
         winner, replayed = self._store.claim_operation(record)
         return self._validated_claim(record, winner, replayed)
 
+    def prepare(
+        self, *, capability_id: str, payload: Mapping[str, Any], owner_gid: str,
+        team_gid: str | None, idempotency_key: str,
+    ) -> IntegrationOperation:
+        return self._candidate(
+            capability_id=capability_id, payload=payload, owner_gid=owner_gid,
+            team_gid=team_gid, idempotency_key=idempotency_key, result=None,
+        )
+
+    def completed_record(
+        self, record: IntegrationOperation, result: Mapping[str, Any]
+    ) -> IntegrationOperation:
+        return replace(
+            record,
+            status="succeeded",
+            version=record.version + 1,
+            result=dict(result),
+            updated_at=self._identity.now(),
+        )
+
+    def validate_claim(
+        self, candidate: IntegrationOperation, winner: IntegrationOperation, replayed: bool
+    ) -> OperationClaim:
+        return self._validated_claim(candidate, winner, replayed)
+
     def replay_import(
         self, *, capability_id: str, payload: Mapping[str, Any], owner_gid: str,
         team_gid: str | None, idempotency_key: str,
@@ -86,6 +111,16 @@ class IntegrationOperations:
             team_gid=team_gid,
             payload_hash=self._payload_hash(payload),
         )
+        return self._validated_claim(candidate, existing, True)
+
+    def replay(
+        self, *, capability_id: str, payload: Mapping[str, Any], owner_gid: str,
+        team_gid: str | None, idempotency_key: str,
+    ) -> OperationClaim | None:
+        existing = self._store.find_operation(owner_gid, capability_id, self._key(idempotency_key))
+        if existing is None:
+            return None
+        candidate = replace(existing, team_gid=team_gid, payload_hash=self._payload_hash(payload))
         return self._validated_claim(candidate, existing, True)
 
     def start_import(

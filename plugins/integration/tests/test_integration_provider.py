@@ -60,6 +60,19 @@ class ProviderRepository:
         self.mappings[row["gid"]] = row
         return dict(row)
 
+    def find_operation(self, owner_gid, capability_id, idempotency_key):
+        return self.operations.get(self.scopes.get((owner_gid, capability_id, idempotency_key)))
+
+    def execute_mapping_command(self, record, completed, command, data):
+        existing = self.find_operation(record.owner_gid, record.capability_id, record.idempotency_key)
+        if existing is not None:
+            return existing, True
+        assert command == "create"
+        self.create_mapping(dict(data))
+        self.operations[completed.operation_id] = completed
+        self.scopes[(completed.owner_gid, completed.capability_id, completed.idempotency_key)] = completed.operation_id
+        return completed, False
+
     def claim_operation(self, record):
         scope = (record.owner_gid, record.capability_id, record.idempotency_key)
         existing = self.operations.get(self.scopes.get(scope))
@@ -96,6 +109,15 @@ class ProviderCatalog:
 
     def require_stable(self, capability_id, major_version, minimum_release):
         self.calls.append((capability_id, major_version, minimum_release))
+
+    def resolve_mapping_target(self, binding_id):
+        return {
+            "binding_id": binding_id, "target_domain": "knowledge",
+            "target_capability_id": "knowledge.reference_data.change.apply",
+            "target_major_version": 1, "minimum_catalog_release": "rel_20260828",
+            "input_contract": "knowledge.reference_dataset.publish.v1",
+            "resource_gid": "dataset-parts", "expected_version": 7,
+        }
 
 
 class ProviderRuntime:
@@ -337,8 +359,7 @@ def test_registered_handlers_use_configured_vault_catalog_and_bounded_runtime(mo
     }, context))
     mapping = asyncio.run(registry.handlers["integration.mapping.create"]({
         "datasource_gid": connector["gid"], "name": "Parts", "source_object": "parts",
-        "target_domain": "knowledge", "target_capability_id": "knowledge.reference_data.change.apply",
-        "target_major_version": 1, "minimum_catalog_release": "rel_20260828",
+        "target_binding_id": "ontology:concept-part",
         "field_mappings": [{"source_field": "part_no", "target_field": "code"}],
         "idempotency_key": "mapping-create-1",
     }, context))
@@ -402,9 +423,8 @@ def test_exact_limits_and_secret_or_unknown_input_rejection_are_schema_enforced(
 def test_mapping_writes_require_exact_target_version_release_and_idempotency():
     registrations = _registrations()
     create = registrations["integration.mapping.create"][0].input_schema
-    assert {
-        "target_capability_id", "target_major_version", "minimum_catalog_release", "idempotency_key"
-    } <= set(create["required"])
+    assert {"target_binding_id", "idempotency_key"} <= set(create["required"])
+    assert not ({"target_capability_id", "target_major_version", "minimum_catalog_release"} & set(create["properties"]))
     assert "filter_sql" not in create["properties"] and "config" not in create["properties"]
     assert {
         "mapping_gid", "expected_revision", "items", "idempotency_key"

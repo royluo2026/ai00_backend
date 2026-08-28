@@ -63,10 +63,7 @@ MAPPING_INPUT = {
     "datasource_gid": STRING,
     "name": STRING,
     "source_object": STRING,
-    "target_domain": STRING,
-    "target_capability_id": STRING,
-    "target_major_version": POSITIVE,
-    "minimum_catalog_release": STRING,
+    "target_binding_id": STRING,
     "field_mappings": {"type": "array", "items": FIELD, "maxItems": 200},
     "idempotency_key": IDEMPOTENCY,
 }
@@ -106,8 +103,7 @@ INPUT_SCHEMAS = {
     "integration.mapping.create": obj(
         MAPPING_INPUT,
         (
-            "datasource_gid", "name", "source_object", "target_domain", "target_capability_id",
-            "target_major_version", "minimum_catalog_release", "idempotency_key",
+            "datasource_gid", "name", "source_object", "target_binding_id", "idempotency_key",
         ),
     ),
     "integration.mapping.update": obj(

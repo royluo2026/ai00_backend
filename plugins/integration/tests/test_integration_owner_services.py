@@ -90,6 +90,19 @@ class MemoryRepository:
         self.field_mappings[data["mapping_gid"]] = items
         return {"mapping_gid": data["mapping_gid"], "revision": row["revision"], "updated_count": len(items), "items": items}
 
+    def execute_mapping_command(self, record, completed, command, data):
+        existing = self.find_operation(record.owner_gid, record.capability_id, record.idempotency_key)
+        if existing is not None:
+            return existing, True
+        if command == "create":
+            self.create_mapping(dict(data))
+        elif command == "replace_fields":
+            self.replace_field_mappings(dict(data))
+        else:
+            raise AssertionError(command)
+        self._create_operation(completed)
+        return completed, False
+
     def update_mapping(self, data):
         from plugins.integration.integration_backend.application.ports import ResourceNotFound, RevisionConflict
 
@@ -191,6 +204,20 @@ class Catalog:
         if self.reject:
             raise ValueError("target is not a stable Catalog entry")
 
+    def resolve_mapping_target(self, binding_id):
+        if binding_id != "ontology:concept-part":
+            raise ValueError("target binding is unavailable")
+        return {
+            "binding_id": binding_id,
+            "target_domain": "knowledge",
+            "target_capability_id": "knowledge.reference_data.change.apply",
+            "target_major_version": 1,
+            "minimum_catalog_release": "rel_7803705d3df421f9f4381d37c3500731",
+            "input_contract": "knowledge.reference_dataset.publish.v1",
+            "resource_gid": "dataset-parts",
+            "expected_version": 7,
+        }
+
 
 class Runtime:
     def __init__(self, failure=None):
@@ -257,10 +284,7 @@ def mapping_payload(**changes):
         "datasource_gid": "connector-1",
         "name": "Parts",
         "source_object": "parts",
-        "target_domain": "knowledge",
-        "target_capability_id": "knowledge.reference_data.change.apply",
-        "target_major_version": 1,
-        "minimum_catalog_release": "rel_20260828",
+        "target_binding_id": "ontology:concept-part",
         "field_mappings": [{"source_field": "part_no", "target_field": "code", "transform_expression": "upper(source.part_no)"}],
         "idempotency_key": "mapping-create-1",
     }
@@ -348,7 +372,7 @@ def test_mapping_create_requires_stable_exact_catalog_target_and_restricted_tran
 
     created = asyncio.run(application.invoke("integration.mapping.create", mapping_payload(), CONTEXT))
     assert created["target_capability_id"] == "knowledge.reference_data.change.apply"
-    assert catalog.calls == [("knowledge.reference_data.change.apply", 1, "rel_20260828")]
+    assert catalog.calls == [("knowledge.reference_data.change.apply", 1, "rel_7803705d3df421f9f4381d37c3500731")]
 
     rejecting_repository = MemoryRepository()
     _seed_connector_and_mapping(rejecting_repository)
@@ -381,7 +405,10 @@ def _seed_connector_and_mapping(repository):
         "gid": "mapping-1", "revision": 1, "datasource_gid": "connector-1", "name": "Parts",
         "source_object": "parts", "target_domain": "knowledge",
         "target_capability_id": "knowledge.reference_data.change.apply", "target_major_version": 1,
-        "minimum_catalog_release": "rel_20260828", "status": "active",
+        "minimum_catalog_release": "rel_7803705d3df421f9f4381d37c3500731", "status": "active",
+        "target_binding_id": "ontology:concept-part",
+        "target_input_contract": "knowledge.reference_dataset.publish.v1",
+        "target_resource_gid": "dataset-parts", "target_expected_version": 7,
         "owner_gid": "actor-1", "team_gid": "team-1",
     }
 
@@ -444,7 +471,7 @@ def test_field_mapping_batch_is_all_or_nothing_revision_locked_and_idempotent():
     assert first == replay
     assert first["updated_count"] == 1 and first["revision"] == 2
     assert first["items"][0]["gid"].startswith("field_mapping-")
-    assert catalog.calls == [("knowledge.reference_data.change.apply", 1, "rel_20260828")]
+    assert catalog.calls == [("knowledge.reference_data.change.apply", 1, "rel_7803705d3df421f9f4381d37c3500731")]
 
     with pytest.raises(CapabilityBusinessError) as stale:
         asyncio.run(application.invoke(
@@ -468,7 +495,7 @@ def test_import_start_is_durable_accepted_and_replayed_without_duplicate_run():
     assert first["operation_ref"]["status"] == "accepted"
     assert len(repository.imports) == 1
     assert repository.imports[0]["target_capability_id"] == "knowledge.reference_data.change.apply"
-    assert catalog.calls == [("knowledge.reference_data.change.apply", 1, "rel_20260828")]
+    assert catalog.calls == [("knowledge.reference_data.change.apply", 1, "rel_7803705d3df421f9f4381d37c3500731")]
 
 
 def test_import_replay_preserves_run_identity_across_unknown_failed_and_reconciled_states():
@@ -641,7 +668,7 @@ def test_sql_import_run_pins_target_version_release_and_idempotency(monkeypatch)
         "run_id": "run-1", "mapping_gid": "mapping-1", "operation_id": "operation-1",
         "status": "accepted", "target_capability_id": "knowledge.reference_data.change.apply",
         "target_major_version": 1, "catalog_release": "rel_20260828", "owner_gid": "actor-1",
-        "team_gid": "team-1", "idempotency_key": "import-1",
+        "team_gid": "team-1", "idempotency_key": "import-1", "target_invocation": {},
     })
 
     sql, params = connection.statements[-1]

@@ -63,20 +63,84 @@ class IntegrationRepository:
         field_mappings = [dict(item, revision=1) for item in data.get("field_mappings", ())]
         with get_integration_conn() as conn:
             with conn.cursor() as cur:
-                cur.execute(
-                    "INSERT INTO workmanship_int_ext_mappings "
-                    "(gid,datasource_gid,name,source_object,target_domain,target_capability_id,target_major_version,"
-                    "minimum_catalog_release,field_mappings_json,owner_gid,team_gid) "
-                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-                    (
-                        gid, data["datasource_gid"], data["name"], data["source_object"],
-                        data["target_domain"], data["target_capability_id"], data["target_major_version"],
-                        data["minimum_catalog_release"], json.dumps(field_mappings),
-                        data["owner_gid"], data.get("team_gid"),
-                    ),
-                )
-                self._insert_field_mappings(cur, gid, field_mappings, 1)
+                self._insert_mapping(cur, {**data, "gid": gid, "field_mappings": field_mappings})
         return {**data, "gid": gid, "field_mappings": field_mappings, "revision": 1, "status": "active"}
+
+    def execute_mapping_command(
+        self, record: IntegrationOperation, completed: IntegrationOperation,
+        command: str, data: Mapping[str, Any],
+    ) -> tuple[IntegrationOperation, bool]:
+        try:
+            with get_integration_conn() as conn:
+                with conn.cursor() as cur:
+                    self._insert_operation(cur, record)
+                    self._audit(cur, record)
+                    if command == "create":
+                        self._insert_mapping(cur, data)
+                    elif command == "replace_fields":
+                        self._replace_field_mappings(cur, data)
+                    else:
+                        raise ValueError(f"Unsupported Integration mapping command: {command}")
+                    self._complete_operation(cur, record, completed)
+                    self._audit(cur, completed)
+        except Exception as exc:
+            if not self._is_duplicate_key(exc):
+                raise
+            winner = self.find_operation(record.owner_gid, record.capability_id, record.idempotency_key)
+            if winner is None:
+                raise RuntimeError("Integration idempotency winner could not be reloaded") from exc
+            return winner, True
+        return completed, False
+
+    @classmethod
+    def _insert_mapping(cls, cur, data: Mapping[str, Any]) -> None:
+        field_mappings = [dict(item, revision=1) for item in data.get("field_mappings", ())]
+        cur.execute(
+            "INSERT INTO workmanship_int_ext_mappings "
+            "(gid,datasource_gid,name,source_object,target_domain,target_capability_id,target_major_version,"
+            "minimum_catalog_release,target_binding_id,target_input_contract,target_resource_gid,"
+            "target_expected_version,field_mappings_json,owner_gid,team_gid) "
+            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+            (
+                data["gid"], data["datasource_gid"], data["name"], data["source_object"],
+                data["target_domain"], data["target_capability_id"], data["target_major_version"],
+                data["minimum_catalog_release"], data["target_binding_id"],
+                data["target_input_contract"], data["target_resource_gid"],
+                data["target_expected_version"], json.dumps(field_mappings),
+                data["owner_gid"], data.get("team_gid"),
+            ),
+        )
+        cls._insert_field_mappings(cur, str(data["gid"]), field_mappings, 1)
+
+    @classmethod
+    def _replace_field_mappings(cls, cur, data: Mapping[str, Any]) -> None:
+        scope, scope_values = cls._scope(data)
+        revision = int(data["expected_revision"]) + 1
+        cur.execute(
+            "UPDATE workmanship_int_ext_mappings SET field_mappings_json=%s,revision=revision+1 "
+            f"WHERE gid=%s AND revision=%s AND {scope} AND archived_at IS NULL",
+            (json.dumps(data["items"]), data["mapping_gid"], data["expected_revision"], *scope_values),
+        )
+        if cur.rowcount != 1:
+            cls._raise_miss(cur, "workmanship_int_ext_mappings", {**data, "gid": data["mapping_gid"]})
+        cur.execute(
+            "DELETE FROM workmanship_int_ext_field_mappings WHERE mapping_gid=%s",
+            (data["mapping_gid"],),
+        )
+        cls._insert_field_mappings(cur, str(data["mapping_gid"]), list(data["items"]), revision)
+
+    @staticmethod
+    def _complete_operation(cur, record: IntegrationOperation, completed: IntegrationOperation) -> None:
+        cur.execute(
+            "UPDATE workmanship_int_operations SET status=%s,operation_version=%s,result_json=%s,"
+            "error_code=%s,updated_at=%s WHERE operation_id=%s AND operation_version=%s",
+            (
+                completed.status, completed.version, json.dumps(completed.result), completed.error_code,
+                completed.updated_at, record.operation_id, record.version,
+            ),
+        )
+        if cur.rowcount != 1:
+            raise RevisionConflict("operation")
 
     def get_mapping(self, data: dict) -> dict | None:
         scope, scope_values = self._scope(data)
@@ -161,22 +225,10 @@ class IntegrationRepository:
         return [] if rows[0]["gid"] is None else rows
 
     def replace_field_mappings(self, data: dict) -> dict:
-        scope, scope_values = self._scope(data)
         revision = int(data["expected_revision"]) + 1
         with get_integration_conn() as conn:
             with conn.cursor() as cur:
-                cur.execute(
-                    "UPDATE workmanship_int_ext_mappings SET field_mappings_json=%s,revision=revision+1 "
-                    f"WHERE gid=%s AND revision=%s AND {scope} AND archived_at IS NULL",
-                    (json.dumps(data["items"]), data["mapping_gid"], data["expected_revision"], *scope_values),
-                )
-                if cur.rowcount != 1:
-                    self._raise_miss(cur, "workmanship_int_ext_mappings", {**data, "gid": data["mapping_gid"]})
-                cur.execute(
-                    "DELETE FROM workmanship_int_ext_field_mappings WHERE mapping_gid=%s",
-                    (data["mapping_gid"],),
-                )
-                self._insert_field_mappings(cur, data["mapping_gid"], data["items"], revision)
+                self._replace_field_mappings(cur, data)
         return {
             "mapping_gid": data["mapping_gid"],
             "revision": revision,
@@ -304,12 +356,13 @@ class IntegrationRepository:
         cur.execute(
             "INSERT INTO workmanship_int_sync_runs "
             "(run_id,mapping_gid,operation_id,status,target_capability_id,target_major_version,"
-            "catalog_release,owner_gid,team_gid,idempotency_key) "
-            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+            "catalog_release,target_invocation_json,owner_gid,team_gid,idempotency_key) "
+            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
             (
                 data["run_id"], data["mapping_gid"], data["operation_id"], data["status"],
                 data["target_capability_id"], data["target_major_version"], data["catalog_release"],
-                data["owner_gid"], data.get("team_gid"), data["idempotency_key"],
+                json.dumps(data["target_invocation"]), data["owner_gid"], data.get("team_gid"),
+                data["idempotency_key"],
             ),
         )
 

@@ -142,6 +142,65 @@ class IntegrationApplication:
                 "target_capability_unavailable", "Target Capability is not stable at the required Catalog release"
             ) from exc
 
+    def _resolve_target_binding(self, binding_id: str) -> dict[str, Any]:
+        resolver = getattr(self.catalog, "resolve_mapping_target", None) if self.catalog is not None else None
+        if not callable(resolver):
+            raise CapabilityBusinessError(
+                "target_binding_unavailable", "Integration target binding Catalog is unavailable", retryable=True
+            )
+        try:
+            binding = dict(resolver(binding_id))
+        except Exception as exc:
+            raise CapabilityBusinessError(
+                "target_binding_unavailable", "The selected ontology target has no governed binding"
+            ) from exc
+        allowed = {
+            "binding_id", "target_domain", "target_capability_id", "target_major_version",
+            "minimum_catalog_release", "input_contract", "resource_gid", "expected_version",
+        }
+        self._closed(binding, allowed)
+        self._require(binding, *allowed)
+        if binding["binding_id"] != binding_id:
+            raise CapabilityBusinessError("target_binding_incompatible", "Target binding identity mismatch")
+        if binding["input_contract"] != "knowledge.reference_dataset.publish.v1":
+            raise CapabilityBusinessError("target_binding_incompatible", "Target input contract is unsupported")
+        self._positive_integer(binding, "target_major_version")
+        self._positive_integer(binding, "expected_version")
+        self._require_target(binding)
+        return {
+            "target_binding_id": str(binding["binding_id"]),
+            "target_domain": str(binding["target_domain"]),
+            "target_capability_id": str(binding["target_capability_id"]),
+            "target_major_version": int(binding["target_major_version"]),
+            "minimum_catalog_release": str(binding["minimum_catalog_release"]),
+            "target_input_contract": str(binding["input_contract"]),
+            "target_resource_gid": str(binding["resource_gid"]),
+            "target_expected_version": int(binding["expected_version"]),
+        }
+
+    @staticmethod
+    def _target_invocation(mapping: Mapping[str, Any]) -> dict[str, Any]:
+        if mapping.get("target_input_contract") != "knowledge.reference_dataset.publish.v1":
+            raise CapabilityBusinessError(
+                "target_binding_incompatible", "Mapping target input binding is unavailable or unsupported"
+            )
+        fields = [
+            {"name": str(item["target_field"]), "source_field": str(item["source_field"])}
+            for item in mapping.get("field_mappings", ())
+        ]
+        return {
+            "capability_id": str(mapping["target_capability_id"]),
+            "major_version": int(mapping["target_major_version"]),
+            "minimum_catalog_release": str(mapping["minimum_catalog_release"]),
+            "payload": {
+                "dataset_gid": str(mapping["target_resource_gid"]),
+                "expected_version": int(mapping["target_expected_version"]),
+                "schema": {"fields": fields},
+                "rows": [],
+            },
+            "dispatch_state": "awaiting_rows",
+        }
+
     def _validate_network(self, host: str) -> None:
         try:
             self.network_policy.validate_host(host)
@@ -237,6 +296,51 @@ class IntegrationApplication:
             raise
         self.operations.succeeded(claim.record, result)
         return result
+
+    def _atomic_mapping_command(
+        self, capability_id: str, data: dict[str, Any], command: str,
+        mutation: dict[str, Any], result: dict[str, Any],
+    ) -> dict[str, Any]:
+        payload = {key: value for key, value in data.items() if key not in {"owner_gid", "team_gid"}}
+        candidate = self.operations.prepare(
+            capability_id=capability_id,
+            payload=payload,
+            owner_gid=data["owner_gid"],
+            team_gid=data.get("team_gid"),
+            idempotency_key=str(data["idempotency_key"]),
+        )
+        completed = self.operations.completed_record(candidate, result)
+        try:
+            winner, replayed = self.repository.execute_mapping_command(
+                candidate, completed, command, mutation
+            )
+        except (ResourceNotFound, RevisionConflict) as exc:
+            raise self._translate_repository(exc) from exc
+        claim = self.operations.validate_claim(candidate, winner, replayed)
+        if claim.record.status != "succeeded" or claim.record.result is None:
+            raise CapabilityBusinessError(
+                "idempotency_conflict", f"Previous Integration request is {claim.record.status}"
+            )
+        return dict(claim.record.result)
+
+    def _atomic_mapping_replay(
+        self, capability_id: str, data: Mapping[str, Any]
+    ) -> dict[str, Any] | None:
+        payload = {key: value for key, value in data.items() if key not in {"owner_gid", "team_gid"}}
+        claim = self.operations.replay(
+            capability_id=capability_id,
+            payload=payload,
+            owner_gid=str(data["owner_gid"]),
+            team_gid=data.get("team_gid"),
+            idempotency_key=str(data["idempotency_key"]),
+        )
+        if claim is None:
+            return None
+        if claim.record.status != "succeeded" or claim.record.result is None:
+            raise CapabilityBusinessError(
+                "idempotency_conflict", f"Previous Integration request is {claim.record.status}"
+            )
+        return dict(claim.record.result)
 
     async def invoke(self, capability_id: str, payload: dict, context: CapabilityContext):
         raw = dict(payload)
@@ -381,29 +485,29 @@ class IntegrationApplication:
     ) -> dict[str, Any]:
         if capability_id == "integration.mapping.create":
             allowed = {
-                "datasource_gid", "name", "source_object", "target_domain", "target_capability_id",
-                "target_major_version", "minimum_catalog_release", "field_mappings", "idempotency_key",
+                "datasource_gid", "name", "source_object", "target_binding_id", "field_mappings", "idempotency_key",
             }
             self._closed(raw, allowed)
             self._require(
-                data, "datasource_gid", "name", "source_object", "target_domain", "target_capability_id",
-                "target_major_version", "minimum_catalog_release", "idempotency_key",
+                data, "datasource_gid", "name", "source_object", "target_binding_id", "idempotency_key",
             )
-            self._positive_integer(data, "target_major_version")
             mappings = self._validate_mappings(data.get("field_mappings", []))
+            replay = self._atomic_mapping_replay(capability_id, data)
+            if replay is not None:
+                return replay
 
-            def create() -> dict[str, Any]:
-                self._get_connector({**data, "gid": str(data["datasource_gid"])})
-                self._require_target(data)
-                mapping_gid = self.operations.new_id("mapping")
-                stored = {key: value for key, value in data.items() if key != "idempotency_key"}
-                stored["gid"] = mapping_gid
-                stored["field_mappings"] = [
-                    self._field(mapping_gid, item, 1) for item in mappings
-                ]
-                return self._mapping(self.repository.create_mapping(stored))
-
-            return self._write(capability_id, data, create)
+            self._get_connector({**data, "gid": str(data["datasource_gid"])})
+            target = self._resolve_target_binding(str(data["target_binding_id"]))
+            mapping_gid = self.operations.new_id("mapping")
+            stored = {
+                key: value for key, value in data.items()
+                if key not in {"idempotency_key", "target_binding_id"}
+            }
+            stored.update(target)
+            stored["gid"] = mapping_gid
+            stored["field_mappings"] = [self._field(mapping_gid, item, 1) for item in mappings]
+            result = self._mapping({**stored, "revision": 1, "status": "active"})
+            return self._atomic_mapping_command(capability_id, data, "create", stored, result)
 
         if capability_id == "integration.field_mapping.batch.update":
             self._closed(raw, {"mapping_gid", "expected_revision", "items", "idempotency_key"})
@@ -412,16 +516,24 @@ class IntegrationApplication:
             items = self._validate_mappings(data.get("items", []))
             if not items:
                 raise CapabilityBusinessError("invalid_input", "field mapping batch requires 1 to 200 items")
+            replay = self._atomic_mapping_replay(capability_id, data)
+            if replay is not None:
+                return replay
 
-            def replace_batch() -> dict[str, Any]:
-                mapping = self._get_mapping(data, str(data["mapping_gid"]))
-                self._require_target(mapping)
-                stored_items = [self._field(str(mapping["gid"]), item, int(data["expected_revision"]) + 1) for item in items]
-                return self.repository.replace_field_mappings({
-                    **data, "items": stored_items,
-                })
-
-            return self._write(capability_id, data, replace_batch)
+            mapping = self._get_mapping(data, str(data["mapping_gid"]))
+            self._require_target(mapping)
+            revision = int(data["expected_revision"]) + 1
+            stored_items = [self._field(str(mapping["gid"]), item, revision) for item in items]
+            mutation = {**data, "items": stored_items}
+            result = {
+                "mapping_gid": str(data["mapping_gid"]),
+                "revision": revision,
+                "updated_count": len(stored_items),
+                "items": stored_items,
+            }
+            return self._atomic_mapping_command(
+                capability_id, data, "replace_fields", mutation, result
+            )
 
         if capability_id == "integration.mapping.update":
             self._closed(raw, {"gid", "expected_revision", "field_mappings"})
@@ -473,6 +585,7 @@ class IntegrationApplication:
             return {"run_id": run_id, "operation_ref": operation_ref(replay.record)}
         mapping = self._get_mapping(data, str(data["mapping_gid"]))
         self._require_target(mapping)
+        target_invocation = self._target_invocation(mapping)
         run_id = self.operations.new_id("run")
         claim = self.operations.start_import(
             capability_id=capability_id,
@@ -489,6 +602,7 @@ class IntegrationApplication:
                 "owner_gid": data["owner_gid"],
                 "team_gid": data.get("team_gid"),
                 "idempotency_key": data["idempotency_key"],
+                "target_invocation": target_invocation,
             },
         )
         run_id = str((claim.record.result or {}).get("run_id") or "")

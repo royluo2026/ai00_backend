@@ -22,6 +22,8 @@ class CredentialEnrollmentPort(Protocol):
 
 
 class CatalogResolverPort(Protocol):
+    def resolve_mapping_target(self, binding_id: str) -> Mapping[str, Any]: ...
+
     def require_stable(
         self, capability_id: str, major_version: int, minimum_release: str
     ) -> None: ...

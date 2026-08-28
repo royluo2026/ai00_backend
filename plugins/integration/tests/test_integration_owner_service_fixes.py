@@ -92,6 +92,7 @@ def import_row(**changes):
         "owner_gid": "actor-1",
         "team_gid": "team-1",
         "idempotency_key": "import-1",
+        "target_invocation": {},
     }
     values.update(changes)
     return values
@@ -279,6 +280,9 @@ def test_sql_mapping_create_persists_one_field_identity_in_json_and_normalized_r
         "source_object": "parts", "target_domain": "knowledge",
         "target_capability_id": "knowledge.reference_data.change.apply", "target_major_version": 1,
         "minimum_catalog_release": "rel_20260828", "owner_gid": "actor-1", "team_gid": "team-1",
+        "target_binding_id": "ontology:concept-part",
+        "target_input_contract": "knowledge.reference_dataset.publish.v1",
+        "target_resource_gid": "dataset-parts", "target_expected_version": 7,
         "field_mappings": [{
             "gid": "field-1", "revision": 1, "source_field": "part_no", "target_field": "code"
         }],
@@ -286,8 +290,88 @@ def test_sql_mapping_create_persists_one_field_identity_in_json_and_normalized_r
 
     mapping_params = connection.statements[0][1]
     field_params = connection.statements[1][1]
-    assert json.loads(mapping_params[8])[0]["gid"] == "field-1"
+    assert json.loads(mapping_params[12])[0]["gid"] == "field-1"
     assert field_params[:3] == ("field-1", "mapping-1", 1)
+
+
+def _completed_mapping_operation(capability_id, result):
+    accepted = operation(capability_id=capability_id, idempotency_key="mapping-command-1", result=None)
+    return accepted, replace(accepted, status="succeeded", version=2, result=result)
+
+
+def _mapping_create_data():
+    return {
+        "gid": "mapping-1", "datasource_gid": "connector-1", "name": "Parts",
+        "source_object": "parts", "target_domain": "knowledge",
+        "target_capability_id": "knowledge.reference_data.change.apply", "target_major_version": 1,
+        "minimum_catalog_release": "rel_20260828", "owner_gid": "actor-1", "team_gid": "team-1",
+        "target_binding_id": "ontology:concept-part",
+        "target_input_contract": "knowledge.reference_dataset.publish.v1",
+        "target_resource_gid": "dataset-parts", "target_expected_version": 7,
+        "field_mappings": [{
+            "gid": "field-1", "source_field": "part_no", "target_field": "code"
+        }],
+    }
+
+
+@pytest.mark.parametrize(
+    ("capability_id", "command", "data", "mutation_sql", "result"),
+    (
+        (
+            "integration.mapping.create", "create", _mapping_create_data(),
+            "INSERT INTO workmanship_int_ext_mappings",
+            {"gid": "mapping-1", "revision": 1, "status": "active"},
+        ),
+        (
+            "integration.field_mapping.batch.update", "replace_fields",
+            {
+                "mapping_gid": "mapping-1", "expected_revision": 1,
+                "owner_gid": "actor-1", "team_gid": "team-1",
+                "items": [{"gid": "field-1", "source_field": "part_no", "target_field": "code"}],
+            },
+            "UPDATE workmanship_int_ext_mappings SET field_mappings_json",
+            {"mapping_gid": "mapping-1", "revision": 2, "updated_count": 1},
+        ),
+    ),
+)
+def test_sql_mapping_command_crash_rolls_back_then_retry_and_replay_are_byte_equivalent(
+    monkeypatch, capability_id, command, data, mutation_sql, result,
+):
+    accepted, completed = _completed_mapping_operation(capability_id, result)
+    crash = ScriptedConnection(
+        fail_on="UPDATE workmanship_int_operations SET status",
+        failure=RuntimeError("crash before idempotent outcome"),
+    )
+    retry = ScriptedConnection()
+    duplicate = ScriptedConnection(
+        fail_on="INSERT INTO workmanship_int_operations",
+        failure=DuplicateKey(1062, "duplicate idempotency scope"),
+    )
+    reload = ScriptedConnection(results=(operation_db_row(
+        capability_id=capability_id,
+        idempotency_key="mapping-command-1",
+        status="succeeded",
+        operation_version=2,
+        result_json=json.dumps(result, separators=(",", ":")),
+    ),))
+    connection_sequence(monkeypatch, crash, retry, duplicate, reload)
+    repository = IntegrationRepository()
+
+    with pytest.raises(RuntimeError, match="crash before idempotent outcome"):
+        repository.execute_mapping_command(accepted, completed, command, data)
+
+    first, replayed = repository.execute_mapping_command(accepted, completed, command, data)
+    second, replayed_again = repository.execute_mapping_command(accepted, completed, command, data)
+
+    crash_sql = "\n".join(statement for statement, _ in crash.statements)
+    assert mutation_sql in crash_sql
+    assert "UPDATE workmanship_int_operations SET status" in crash_sql
+    assert crash.rollbacks == 1 and crash.commits == 0
+    assert retry.commits == 1 and replayed is False
+    assert duplicate.rollbacks == 1 and reload.commits == 1 and replayed_again is True
+    assert json.dumps(first.result, separators=(",", ":"), ensure_ascii=False).encode() == json.dumps(
+        second.result, separators=(",", ":"), ensure_ascii=False
+    ).encode()
 
 
 def test_sql_mapping_get_projects_normalized_fields_not_legacy_json(monkeypatch):
@@ -380,6 +464,25 @@ class MappingRepository(AtomicStore):
         self.mapping = {**data, "revision": 1, "status": "active"}
         return dict(self.mapping)
 
+    def find_operation(self, owner_gid, capability_id, idempotency_key):
+        if (
+            self.record is not None
+            and self.record.owner_gid == owner_gid
+            and self.record.capability_id == capability_id
+            and self.record.idempotency_key == idempotency_key
+        ):
+            return self.record
+        return None
+
+    def execute_mapping_command(self, record, completed, command, data):
+        existing = self.find_operation(record.owner_gid, record.capability_id, record.idempotency_key)
+        if existing is not None:
+            return existing, True
+        assert command == "create"
+        self.create_mapping(dict(data))
+        self.record = completed
+        return completed, False
+
     def get_mapping(self, data):
         if not self.mapping:
             return None
@@ -399,6 +502,15 @@ class MappingRepository(AtomicStore):
 
 
 class AcceptingCatalog:
+    def resolve_mapping_target(self, binding_id):
+        return {
+            "binding_id": binding_id, "target_domain": "knowledge",
+            "target_capability_id": "knowledge.reference_data.change.apply",
+            "target_major_version": 1, "minimum_catalog_release": "rel_20260828",
+            "input_contract": "knowledge.reference_dataset.publish.v1",
+            "resource_gid": "dataset-parts", "expected_version": 7,
+        }
+
     def require_stable(self, *_args):
         pass
 
@@ -406,8 +518,7 @@ class AcceptingCatalog:
 def mapping_payload(**changes):
     payload = {
         "datasource_gid": "connector-1", "name": "Parts", "source_object": "parts",
-        "target_domain": "knowledge", "target_capability_id": "knowledge.reference_data.change.apply",
-        "target_major_version": 1, "minimum_catalog_release": "rel_20260828",
+        "target_binding_id": "ontology:concept-part",
         "field_mappings": [{"source_field": "part_no", "target_field": "code"}],
         "idempotency_key": "mapping-create-1",
     }
