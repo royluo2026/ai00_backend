@@ -8,7 +8,7 @@ Compare current and parent PBOM snapshots for a BOP version.
 - 不适用：The request mutates a PBOM or compares unrelated versions.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_d524fd558ea4d3012d906ce1aaf5be69`
+- Catalog Release：`rel_7bdb3a7642c429dac2b436e6cf092b6b`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -94,7 +94,7 @@ Compare current and parent PBOM snapshots for a BOP version.
 ```json
 {
   "capability_id": "craft.bop.pbom.change_point.get",
-  "catalog_release": "rel_d524fd558ea4d3012d906ce1aaf5be69",
+  "catalog_release": "rel_7bdb3a7642c429dac2b436e6cf092b6b",
   "major_version": 1,
   "payload": {
     "operation": "get",

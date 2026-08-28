@@ -8,7 +8,7 @@ Run the bounded four-rule VPPS validation projection for a PBOM snapshot.
 - 不适用：The request mutates PBOM data, changes concessions, or publishes a validation policy.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_d524fd558ea4d3012d906ce1aaf5be69`
+- Catalog Release：`rel_7bdb3a7642c429dac2b436e6cf092b6b`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -94,7 +94,7 @@ Run the bounded four-rule VPPS validation projection for a PBOM snapshot.
 ```json
 {
   "capability_id": "craft.ebom.vpps_check.read",
-  "catalog_release": "rel_d524fd558ea4d3012d906ce1aaf5be69",
+  "catalog_release": "rel_7bdb3a7642c429dac2b436e6cf092b6b",
   "major_version": 1,
   "payload": {
     "operation": "check",

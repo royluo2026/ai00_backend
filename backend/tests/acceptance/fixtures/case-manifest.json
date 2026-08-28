@@ -4249,7 +4249,7 @@
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[vismockup.visibility@1]"
     }
   },
-  "catalog_release": "rel_d524fd558ea4d3012d906ce1aaf5be69",
+  "catalog_release": "rel_7bdb3a7642c429dac2b436e6cf092b6b",
   "mandatory_cases": [
     "success",
     "invalid_input",

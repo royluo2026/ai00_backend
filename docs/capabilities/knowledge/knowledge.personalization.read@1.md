@@ -8,7 +8,7 @@ Execute knowledge.personalization.read.
 - 不适用：The resource belongs to another domain.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_d524fd558ea4d3012d906ce1aaf5be69`
+- Catalog Release：`rel_7bdb3a7642c429dac2b436e6cf092b6b`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -102,7 +102,7 @@ Execute knowledge.personalization.read.
 ```json
 {
   "capability_id": "knowledge.personalization.read",
-  "catalog_release": "rel_d524fd558ea4d3012d906ce1aaf5be69",
+  "catalog_release": "rel_7bdb3a7642c429dac2b436e6cf092b6b",
   "major_version": 1,
   "payload": {
     "arguments": {},
