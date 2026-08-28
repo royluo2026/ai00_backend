@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import importlib
+import inspect
 import os
 from dataclasses import dataclass
 from typing import Any, Callable
@@ -63,13 +64,18 @@ def build_application(adapter_factory: AdapterFactory | None = None) -> Integrat
             adapters.connector_runtime, ("test", "discover", "source_columns", "preview")
         ),
     }
-    invalid = sorted(
+    invalid = {
         name
         for name, (adapter, methods) in method_requirements.items()
         if any(not callable(getattr(adapter, method, None)) for method in methods)
-    )
+    }
+    if any(
+        not inspect.iscoroutinefunction(getattr(adapters.connector_runtime, method, None))
+        for method in ("test", "discover", "source_columns", "preview")
+    ):
+        invalid.add("connector_runtime")
     if invalid:
-        raise RuntimeError("Integration adapter factory returned invalid adapters: " + ", ".join(invalid))
+        raise RuntimeError("Integration adapter factory returned invalid adapters: " + ", ".join(sorted(invalid)))
     return IntegrationApplication(
         repository,
         connector_runtime=adapters.connector_runtime,

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import inspect
 from typing import Any, Callable, Mapping
 
 from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext
@@ -17,7 +18,7 @@ MAX_RESULTS = 200
 REDACTED = "[REDACTED]"
 _SENSITIVE_KEYS = (
     "password", "secret", "credential", "authorization", "api_key", "apikey",
-    "access_token", "refresh_token", "auth_token",
+    "token", "session", "cookie", "private_key", "privatekey",
 )
 _SENSITIVE_VALUE_MARKERS = (
     "authorization:", "bearer ", "basic ", "api_key=", "apikey=", "password=", "token=", "vault://",
@@ -487,7 +488,7 @@ class IntegrationApplication:
         projector: Callable[[Mapping[str, Any], int], dict[str, Any]],
         unknown_result: dict[str, Any],
     ) -> dict[str, Any]:
-        if method is None:
+        if method is None or not inspect.iscoroutinefunction(method):
             raise CapabilityBusinessError(
                 "connector_runtime_unavailable", "External connector runtime is unavailable", retryable=True
             )

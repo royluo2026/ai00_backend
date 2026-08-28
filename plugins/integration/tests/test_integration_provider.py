@@ -114,6 +114,41 @@ class ProviderRuntime:
         return {"rows": [], "truncated": False}
 
 
+class SyncProviderRuntime:
+    def __init__(self):
+        self.called = False
+
+    def _result(self):
+        self.called = True
+        return {}
+
+    def test(self, *_args, **_kwargs):
+        return self._result()
+
+    def discover(self, *_args, **_kwargs):
+        return self._result()
+
+    def source_columns(self, *_args, **_kwargs):
+        return self._result()
+
+    def preview(self, *_args, **_kwargs):
+        return self._result()
+
+
+class SlowProviderRuntime(ProviderRuntime):
+    def __init__(self):
+        self.arguments = None
+        self.cancelled = False
+
+    async def test(self, connector, *, timeout_seconds, result_limit):
+        self.arguments = (connector["gid"], timeout_seconds, result_limit)
+        try:
+            await asyncio.Event().wait()
+        except asyncio.CancelledError:
+            self.cancelled = True
+            raise
+
+
 class ProviderIdentity:
     def __init__(self):
         self.value = 0
@@ -216,6 +251,64 @@ def test_provider_fails_startup_when_required_adapter_factory_is_unavailable(mon
     monkeypatch.delenv("AI00_INTEGRATION_ADAPTER_FACTORY", raising=False)
     with pytest.raises(RuntimeError, match="AI00_INTEGRATION_ADAPTER_FACTORY"):
         register_capabilities(Registry())
+
+
+def test_provider_rejects_synchronous_runtime_before_handler_publication():
+    class Registry:
+        def __init__(self):
+            self.registered = 0
+
+        def register(self, *_args, **_kwargs):
+            self.registered += 1
+
+    runtime = SyncProviderRuntime()
+    adapters = IntegrationProviderAdapters(
+        repository=ProviderRepository(), credential_enrollment=ProviderVault(),
+        catalog=ProviderCatalog(), connector_runtime=runtime, operation_identity=ProviderIdentity(),
+    )
+    registry = Registry()
+
+    with pytest.raises(RuntimeError, match="connector_runtime"):
+        register_capabilities(registry, adapter_factory=lambda: adapters)
+
+    assert registry.registered == 0
+    assert runtime.called is False
+
+
+def test_provider_accepts_async_runtime_and_bounds_registered_execution(monkeypatch):
+    class Registry:
+        def __init__(self):
+            self.handlers = {}
+
+        def register(self, spec, handler, *, descriptor=None):
+            self.handlers[spec.id] = handler
+
+    repository = ProviderRepository()
+    repository.connectors["connector-1"] = {
+        "gid": "connector-1", "revision": 1, "name": "ERP", "connector_type": "postgresql",
+        "host": "8.8.8.8", "port": 5432, "database_name": "erp", "username": "reader",
+        "credential_ref": "vault://integration/enrolled-1", "status": "untested",
+        "owner_gid": "actor-1", "team_gid": "team-1",
+    }
+    runtime = SlowProviderRuntime()
+    adapters = IntegrationProviderAdapters(
+        repository=repository, credential_enrollment=ProviderVault(), catalog=ProviderCatalog(),
+        connector_runtime=runtime, operation_identity=ProviderIdentity(),
+    )
+    monkeypatch.setattr(
+        "plugins.integration.integration_backend.application.service.RUNTIME_TIMEOUT_SECONDS", 0.01
+    )
+    registry = Registry()
+    register_capabilities(registry, adapter_factory=lambda: adapters)
+
+    result = asyncio.run(registry.handlers["integration.connector.connection.test"](
+        {"gid": "connector-1"},
+        CapabilityContext(user_gid="actor-1", team_gid="team-1", request_id="bounded-runtime"),
+    ))
+
+    assert result["operation_ref"]["status"] == "outcome_unknown"
+    assert runtime.arguments == ("connector-1", 0.01, 1)
+    assert runtime.cancelled is True
 
 
 def test_registered_handlers_use_configured_vault_catalog_and_bounded_runtime(monkeypatch):

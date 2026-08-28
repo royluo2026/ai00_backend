@@ -491,12 +491,43 @@ class SecretRuntime:
 
     async def preview(self, *_args, **_kwargs):
         return {
-            "rows": [{"part": "P-1", "metadata": {"authorization": "Bearer nested-secret"}}],
+            "rows": [{
+                "part": "P-1",
+                "metadata": {"authorization": "Bearer nested-secret"},
+                "session_token": "opaque-session-value",
+                "cookie": "opaque-cookie-value",
+                "private_key": "opaque-private-key-value",
+            }],
             "truncated": False,
         }
 
 
-def test_runtime_results_are_recursively_redacted_before_return_and_persistence():
+class BlockingSyncRuntime:
+    def __init__(self):
+        self.called = False
+
+    def test(self, *_args, **_kwargs):
+        self.called = True
+        return {"reachable": True}
+
+
+def test_runtime_boundary_rejects_sync_method_without_invoking_it():
+    repository = RuntimeRepository()
+    runtime = BlockingSyncRuntime()
+    application = IntegrationApplication(
+        repository, connector_runtime=runtime, operation_identity=Identity()
+    )
+
+    with pytest.raises(CapabilityBusinessError) as unavailable:
+        asyncio.run(application.invoke(
+            "integration.connector.connection.test", {"gid": "connector-1"}, CONTEXT
+        ))
+
+    assert unavailable.value.code == "connector_runtime_unavailable"
+    assert runtime.called is False
+
+
+def test_runtime_results_are_recursively_redacted_before_return_and_persistence(monkeypatch):
     repository = RuntimeRepository()
     application = IntegrationApplication(
         repository, connector_runtime=SecretRuntime(), operation_identity=Identity()
@@ -513,7 +544,29 @@ def test_runtime_results_are_recursively_redacted_before_return_and_persistence(
     ))
     metadata = next(cell for cell in previewed["rows"][0]["values"] if cell["field"] == "metadata")
     assert metadata == {"field": "metadata", "value": "[REDACTED]", "redacted": True}
+    for field in ("session_token", "cookie", "private_key"):
+        cell = next(item for item in previewed["rows"][0]["values"] if item["field"] == field)
+        assert cell == {"field": field, "value": "[REDACTED]", "redacted": True}
     assert "top-secret" not in str(repository.record.result)
+    assert "opaque-" not in str(repository.record.result)
+
+    sql_connection = ScriptedConnection()
+    connection_sequence(monkeypatch, sql_connection)
+    persisted_record = repository.record
+    IntegrationRepository().transition_operation(
+        persisted_record.operation_id,
+        persisted_record.version - 1,
+        persisted_record,
+        persisted_record.owner_gid,
+        persisted_record.team_gid,
+    )
+    result_json = json.loads(sql_connection.statements[0][1][2])
+    assert "opaque-" not in str(result_json)
+    assert all(
+        cell["value"] == "[REDACTED]"
+        for cell in result_json["rows"][0]["values"]
+        if cell["field"] in {"session_token", "cookie", "private_key"}
+    )
 
     repository.record = None
     discovered = asyncio.run(application.invoke(
