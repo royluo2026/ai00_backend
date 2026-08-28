@@ -374,7 +374,7 @@ def test_sql_mapping_command_crash_rolls_back_then_retry_and_replay_are_byte_equ
     ).encode()
 
 
-def test_sql_mapping_get_projects_normalized_fields_not_legacy_json(monkeypatch):
+def test_sql_mapping_get_projects_normalized_fields_and_explicit_legacy_binding_disposition(monkeypatch):
     mapping = {
         "gid": "mapping-1", "owner_gid": "actor-1", "team_gid": "team-1",
         "field_mappings_json": '[{"gid":"legacy-wrong"}]',
@@ -391,6 +391,7 @@ def test_sql_mapping_get_projects_normalized_fields_not_legacy_json(monkeypatch)
     })
 
     assert result["field_mappings"] == fields
+    assert result["status"] == "binding_required"
     assert "workmanship_int_ext_field_mappings" in connection.statements[1][0]
 
 

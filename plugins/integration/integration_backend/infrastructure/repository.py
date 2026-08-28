@@ -156,6 +156,8 @@ class IntegrationRepository:
                 if row is None:
                     return None
                 result = dict(row)
+                if not result.get("target_binding_id"):
+                    result["status"] = "binding_required"
                 result["field_mappings"] = self._field_rows(cur, data["gid"], 200)
                 return result
 
@@ -197,7 +199,8 @@ class IntegrationRepository:
             with conn.cursor() as cur:
                 cur.execute(
                     "SELECT gid,revision,datasource_gid,name,source_object,target_domain,target_capability_id,"
-                    "target_major_version,minimum_catalog_release,status "
+                    "target_major_version,minimum_catalog_release,"
+                    "CASE WHEN target_binding_id IS NULL THEN 'binding_required' ELSE status END AS status "
                     f"FROM workmanship_int_ext_mappings WHERE {' AND '.join(clauses)} "
                     "ORDER BY updated_at DESC LIMIT %s",
                     (*params, limit),
