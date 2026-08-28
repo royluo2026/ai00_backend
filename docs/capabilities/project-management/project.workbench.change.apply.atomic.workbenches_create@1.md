@@ -8,7 +8,7 @@ Execute Project Management operation workbenches.create.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_7ff1698de921ab4fe38979bd5e9ec734`
+- Catalog Release：`rel_37018ca4060a969eecca08519ba359d5`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -326,7 +326,7 @@ Execute Project Management operation workbenches.create.
 ```json
 {
   "capability_id": "project.workbench.change.apply.atomic.workbenches_create",
-  "catalog_release": "rel_7ff1698de921ab4fe38979bd5e9ec734",
+  "catalog_release": "rel_37018ca4060a969eecca08519ba359d5",
   "major_version": 1,
   "payload": {}
 }

@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3c-atomic-web-contracts",
   "baseline_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
-  "content_sha256": "sha256:41562cf513b95034a60b91f5dd2940f380de84e333c6ec39f35a881b0a1c3baf",
+  "content_sha256": "sha256:a98407a9cfbc13430586c65a38d39bd9e138cc3e371a68e11d3be65faca82003",
   "counts_by_owner": {
     "agent": {
       "groups": 4,
@@ -1559,6 +1559,7 @@
       "consistency_policy": "strong",
       "example_input": {
         "limit": 200,
+        "module": null,
         "status": null
       },
       "example_output": {
@@ -1587,6 +1588,13 @@
             "maximum": 200,
             "minimum": 1,
             "type": "integer"
+          },
+          "module": {
+            "maxLength": 128,
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "status": {
             "maxLength": 512,

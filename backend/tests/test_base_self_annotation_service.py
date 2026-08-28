@@ -55,15 +55,26 @@ class FakeAnnotationRepository:
     def audit(self, event: dict) -> None:
         self.audits.append(deepcopy(event))
 
-    def attachment_visible(self, *, actor: dict, attachment_gid: str) -> bool:
-        return attachment_gid in actor.get("visible_attachment_gids", [])
+
+class FakeAttachmentVisibilityPort:
+    def __init__(self, allowed: set[tuple[str, str, str]] = set()) -> None:
+        self.allowed = allowed
+        self.calls: list[tuple[str, str, str]] = []
+
+    def new_reference_visible(self, *, actor: dict, reference: dict) -> bool:
+        key = (str(actor["gid"]), str(actor.get("tenant_gid", actor.get("team_id"))), reference["attachment_gid"])
+        self.calls.append(key)
+        return key in self.allowed
 
 
 @pytest.fixture
 def service():
     from backend.base.self_annotations import SelfAnnotationService
 
-    return SelfAnnotationService(repository=FakeAnnotationRepository())
+    return SelfAnnotationService(
+        repository=FakeAnnotationRepository(),
+        visibility_port=FakeAttachmentVisibilityPort({("user_owner", "tenant_1", "att_1"), ("user_other", "tenant_1", "att_1")} ),
+    )
 
 
 def test_get_and_search_are_actor_bound_and_search_is_bounded(service):
@@ -76,6 +87,22 @@ def test_get_and_search_are_actor_bound_and_search_is_bounded(service):
     ]
     with pytest.raises(Exception) as caught:
         service.search(actor=OWNER, query={"limit": 201})
+    assert caught.value.code == "invalid_input"
+
+
+def test_search_honors_the_bounded_actor_scoped_module_filter(service):
+    service.repository.rows[(OWNER["gid"], "item_1") ] = {
+        "item_gid": "item_1", "actor_gid": OWNER["gid"], "module": "craft",
+        "status": "open", "schedule": None, "note": "", "attachments": [], "revision": 1, "deleted": False, "restore": None,
+    }
+    service.repository.rows[(OWNER["gid"], "item_2")] = {
+        "item_gid": "item_2", "actor_gid": OWNER["gid"], "module": "knowledge",
+        "status": "open", "schedule": None, "note": "", "attachments": [], "revision": 1, "deleted": False, "restore": None,
+    }
+
+    assert [item["item_gid"] for item in service.search(actor=OWNER, query={"module": "craft"})["items"]] == ["item_1"]
+    with pytest.raises(Exception) as caught:
+        service.search(actor=OWNER, query={"module": "x" * 129})
     assert caught.value.code == "invalid_input"
 
 
@@ -101,6 +128,24 @@ def test_write_rejects_unknown_keys_and_invisible_or_opaque_attachments(service)
         with pytest.raises(Exception) as caught:
             service.apply_change(actor=OWNER, command=command)
         assert caught.value.code in {"invalid_input", "attachment_not_visible"}
+
+
+def test_attachment_visibility_uses_actor_tenant_registry_and_preserves_exact_existing_reference(service):
+    from backend.base.self_annotations import SelfAnnotationService
+
+    repository = FakeAnnotationRepository()
+    port = FakeAttachmentVisibilityPort({("user_owner", "tenant_1", "att_1")})
+    svc = SelfAnnotationService(repository=repository, visibility_port=port)
+    first = svc.apply_change(actor=OWNER, command=CHANGE)
+    assert first["annotation"]["attachments"] == [ATTACHMENT]
+    assert port.calls == [("user_owner", "tenant_1", "att_1")]
+
+    port.allowed.clear()
+    preserved = svc.apply_change(actor=OWNER, command={**CHANGE, "expected_revision": 2, "idempotency_key": "idem-ann-2"})
+    assert preserved["annotation"]["attachments"] == [ATTACHMENT]
+    with pytest.raises(Exception) as caught:
+        svc.apply_change(actor=OTHER, command={**CHANGE, "idempotency_key": "other-denied"})
+    assert caught.value.code == "attachment_not_visible"
 
 
 def test_explicit_empty_deleted_change_is_a_recoverable_tombstone(service):

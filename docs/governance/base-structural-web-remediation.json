@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3e-base-structural-remediation",
-  "atomic_contract_manifest_sha256": "sha256:689fd93f1f11ea989803c9a17e32f926689f299ef112bd51b89f96d8cce3b76e",
-  "content_sha256": "sha256:0c1ee3109c518b05e658d5b6b63df5055afad82e083e9768d69415476835861f",
+  "atomic_contract_manifest_sha256": "sha256:89d8445b0b396d378fd321505a556b4dfd04db2bcad85420ea36eee9c3249278",
+  "content_sha256": "sha256:fbec7f39673970f8d2189bc413467892c87173243a51ef167b6973d964090921",
   "counts": {
     "groups": 16,
     "migrated_groups": 14,
@@ -728,14 +728,14 @@
           "line": 293,
           "operation": "base.annotations.search",
           "source_path": "web/components/self_annotation_panel.js",
-          "source_sha256": "8b49958cf9b62cf44e8ac76f442a715ca2942e3973c53116eee60e44f75c26e1"
+          "source_sha256": "e5641d767398182ba7c409feed65e157c17db3434ed47dddb59265e43a9dd7be"
         },
         {
           "column": 31,
           "line": 294,
           "operation": "base.annotations.search",
           "source_path": "web/components/self_annotation_panel.js",
-          "source_sha256": "8b49958cf9b62cf44e8ac76f442a715ca2942e3973c53116eee60e44f75c26e1"
+          "source_sha256": "e5641d767398182ba7c409feed65e157c17db3434ed47dddb59265e43a9dd7be"
         },
         {
           "column": 41,
@@ -754,6 +754,13 @@
             "maximum": 200,
             "minimum": 1,
             "type": "integer"
+          },
+          "module": {
+            "maxLength": 128,
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "status": {
             "maxLength": 512,
@@ -941,7 +948,7 @@
       },
       "owner_service_evidence": {
         "source_path": "backend/base/self_annotations.py",
-        "source_sha256": "sha256:56483c161e9f4e84981b3ff5761be74dc6ba4d85b437e9c199906f245823104a"
+        "source_sha256": "sha256:a38d6ec2bb507a94e4b61c9c084df8ac527b6dfb51dd0fdeb21ed37ce1238c63"
       },
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
       "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
@@ -968,7 +975,7 @@
           "line": 157,
           "operation": "base.annotations.get",
           "source_path": "web/components/self_annotation_panel.js",
-          "source_sha256": "8b49958cf9b62cf44e8ac76f442a715ca2942e3973c53116eee60e44f75c26e1"
+          "source_sha256": "e5641d767398182ba7c409feed65e157c17db3434ed47dddb59265e43a9dd7be"
         }
       ],
       "frontend_operation": "base.annotations.get",
@@ -1137,7 +1144,7 @@
       },
       "owner_service_evidence": {
         "source_path": "backend/base/self_annotations.py",
-        "source_sha256": "sha256:56483c161e9f4e84981b3ff5761be74dc6ba4d85b437e9c199906f245823104a"
+        "source_sha256": "sha256:a38d6ec2bb507a94e4b61c9c084df8ac527b6dfb51dd0fdeb21ed37ce1238c63"
       },
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
       "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
@@ -3686,7 +3693,7 @@
           "line": 177,
           "operation": "base.annotations.apply",
           "source_path": "web/components/self_annotation_panel.js",
-          "source_sha256": "8b49958cf9b62cf44e8ac76f442a715ca2942e3973c53116eee60e44f75c26e1"
+          "source_sha256": "e5641d767398182ba7c409feed65e157c17db3434ed47dddb59265e43a9dd7be"
         }
       ],
       "frontend_operation": "base.annotations.apply",
@@ -3927,15 +3934,15 @@
       },
       "owner_service_evidence": {
         "source_path": "backend/base/self_annotations.py",
-        "source_sha256": "sha256:56483c161e9f4e84981b3ff5761be74dc6ba4d85b437e9c199906f245823104a"
+        "source_sha256": "sha256:a38d6ec2bb507a94e4b61c9c084df8ac527b6dfb51dd0fdeb21ed37ce1238c63"
       },
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
       "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "unresolved_reason": null
     }
   ],
-  "frontend_content_hash": "0ee27f554329872a1d223d8cef8a1a23b880170eff366192388e23ef8786aae2",
-  "frontend_revision": "2b283c64fbe69b15779f9fec08d384174ab0c3a5",
+  "frontend_content_hash": "2f4df39a9ee0402386eef0072ef8ad289167f6069d1d803c51ec9ae1bece8609",
+  "frontend_revision": "ca1afbf4c169b4d7d95dec460c1cd64af21915fd",
   "schema_version": "1.0.0",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "source_ledger_revision": "8ee5dc2340a9e77c5d84e8f84f733bb5415e9d08",

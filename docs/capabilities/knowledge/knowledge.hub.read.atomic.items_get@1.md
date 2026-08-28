@@ -8,7 +8,7 @@ Execute Knowledge operation items.get.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_7ff1698de921ab4fe38979bd5e9ec734`
+- Catalog Release：`rel_37018ca4060a969eecca08519ba359d5`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -103,7 +103,7 @@ Execute Knowledge operation items.get.
 ```json
 {
   "capability_id": "knowledge.hub.read.atomic.items_get",
-  "catalog_release": "rel_7ff1698de921ab4fe38979bd5e9ec734",
+  "catalog_release": "rel_37018ca4060a969eecca08519ba359d5",
   "major_version": 1,
   "payload": {}
 }

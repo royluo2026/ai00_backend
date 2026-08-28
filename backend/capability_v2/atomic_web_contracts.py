@@ -190,7 +190,7 @@ ROUTE_CAPABILITIES: dict[tuple[str, str], dict[str, Any]] = {
     },
     ("GET", "/api/self_ann/list"): {
         "id": "base.self_annotation.search",
-        "schema": obj({"limit": {"type": "integer", "minimum": 1, "maximum": 200}, "status": OPT_STRING}),
+        "schema": obj({"limit": {"type": "integer", "minimum": 1, "maximum": 200}, "status": OPT_STRING, "module": {"type": ["string", "null"], "maxLength": 128}}),
         "output_schema": obj({"items": {"type": "array", "maxItems": 200, "items": SELF_ANNOTATION}}, ("items",)),
     },
     ("PUT", "/api/self_ann/{dynamic}"): {
@@ -265,7 +265,7 @@ EXAMPLES: dict[str, dict[str, Any]] = {
     "base.team.directory.list": {},
     "base.self_annotation.batch.get": {"item_gids": ["item_1"]},
     "base.self_annotation.record.get": {"item_gid": "item_1"},
-    "base.self_annotation.search": {"limit": 200, "status": None},
+    "base.self_annotation.search": {"limit": 200, "status": None, "module": None},
     "base.self_annotation.change.apply": {"item_gid": "item_1", "expected_revision": 1, "status": "open", "schedule": "2026-08-28", "note": "note", "attachments": [{"attachment_gid": "att_1", "media_type": "image/png", "display_name": "photo.png", "size": 42, "checksum": "sha256:" + "a" * 64}], "idempotency_key": "idem-ann-1"},
     "base.identity.session.profile.get": {},
     "base.identity.admin_user.list": {},

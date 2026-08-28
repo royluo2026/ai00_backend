@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, StrictInt, StrictStr
 
 from backend.base.self_annotations import SelfAnnotationError, SelfAnnotationService
 from backend.routers.deps import get_current_user
@@ -11,13 +11,23 @@ from backend.routers.deps import get_current_user
 router = APIRouter(prefix="/api/self_ann", tags=["self_annotations"])
 
 
+class SelfAnnotationAttachmentBody(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    attachment_gid: StrictStr
+    media_type: StrictStr
+    display_name: StrictStr
+    size: StrictInt
+    checksum: StrictStr
+
+
 class SelfAnnotationChangeBody(BaseModel):
-    expected_revision: int
-    status: str
-    schedule: str | None = None
-    note: str = ""
-    attachments: list[dict] = []
-    idempotency_key: str
+    model_config = ConfigDict(extra="forbid", strict=True)
+    expected_revision: StrictInt
+    status: StrictStr
+    schedule: StrictStr | None = None
+    note: StrictStr = ""
+    attachments: list[SelfAnnotationAttachmentBody] = []
+    idempotency_key: StrictStr
 
 
 def _service() -> SelfAnnotationService:
@@ -37,9 +47,9 @@ def get_batch(gids: str = Query(""), user: dict = Depends(get_current_user)):
 
 
 @router.get("/list")
-def get_list(limit: int = Query(200, ge=1, le=200), status: str | None = Query(None), user: dict = Depends(get_current_user)):
+def get_list(limit: int = Query(200, ge=1, le=200), status: str | None = Query(None), module: str | None = Query(None, max_length=128), user: dict = Depends(get_current_user)):
     try:
-        return _service().search(actor=user, query={"limit": limit, "status": status})
+        return _service().search(actor=user, query={"limit": limit, "status": status, "module": module})
     except SelfAnnotationError as exc:
         raise _http(exc) from exc
 

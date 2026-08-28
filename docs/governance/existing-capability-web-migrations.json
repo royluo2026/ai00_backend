@@ -3,7 +3,7 @@
   "artifact_id": "existing-capability-web-migrations",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "baseline_revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-  "frontend_revision": "2b283c64fbe69b15779f9fec08d384174ab0c3a5",
+  "frontend_revision": "ca1afbf4c169b4d7d95dec460c1cd64af21915fd",
   "groups": [
     {
       "method": "DELETE",
@@ -1267,14 +1267,14 @@
           "line": 293,
           "column": 31,
           "operation": "base.annotations.search",
-          "source_sha256": "8b49958cf9b62cf44e8ac76f442a715ca2942e3973c53116eee60e44f75c26e1"
+          "source_sha256": "e5641d767398182ba7c409feed65e157c17db3434ed47dddb59265e43a9dd7be"
         },
         {
           "source_path": "web/components/self_annotation_panel.js",
           "line": 294,
           "column": 31,
           "operation": "base.annotations.search",
-          "source_sha256": "8b49958cf9b62cf44e8ac76f442a715ca2942e3973c53116eee60e44f75c26e1"
+          "source_sha256": "e5641d767398182ba7c409feed65e157c17db3434ed47dddb59265e43a9dd7be"
         },
         {
           "source_path": "web/knowledge_hub/knowledge_hub.js",
@@ -1341,7 +1341,7 @@
           "line": 157,
           "column": 40,
           "operation": "base.annotations.get",
-          "source_sha256": "8b49958cf9b62cf44e8ac76f442a715ca2942e3973c53116eee60e44f75c26e1"
+          "source_sha256": "e5641d767398182ba7c409feed65e157c17db3434ed47dddb59265e43a9dd7be"
         }
       ],
       "equivalence_evidence": {
@@ -3533,7 +3533,7 @@
           "line": 177,
           "column": 39,
           "operation": "base.annotations.apply",
-          "source_sha256": "8b49958cf9b62cf44e8ac76f442a715ca2942e3973c53116eee60e44f75c26e1"
+          "source_sha256": "e5641d767398182ba7c409feed65e157c17db3434ed47dddb59265e43a9dd7be"
         }
       ],
       "equivalence_evidence": {

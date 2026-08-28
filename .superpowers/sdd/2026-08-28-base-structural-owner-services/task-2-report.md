@@ -113,3 +113,54 @@ Frontend migration (separate worktree/commit):
   eventual attachment/asset owner integration.
 - Backend commit: `feat: govern Base annotations and identity profile`.
   Frontend commit: `feat: route Base annotations and identity through capability gateway`.
+
+## Fix Round 1/5
+
+### Review findings closed
+
+- Added the real Base `AttachmentVisibilityPort` backed by the checked-in
+  `workmanship_base_attachment_references` registry. It checks the authenticated
+  actor, tenant, and every immutable typed reference field inside the owner
+  transaction; no REST or Gateway caller can pass visibility identifiers.
+- New references require a registry row. Existing exact typed references on
+  the same actor's annotation are preserved, which is the bounded legacy
+  backfill path. A missing registry entry rejects the new reference safely.
+- Replaced the REST `list[dict]` boundary with strict, closed Pydantic command
+  and attachment models (`extra="forbid"`, strict scalars), with route tests
+  for unknown top-level and nested fields.
+- Added actor-scoped, bounded `module` search input (maximum 128 characters)
+  and restored the UI's module-specific search payload.
+- Migrated the five delivered `/api/self_ann/batch` consumers to
+  `base.self_annotation.batch.get@1`, then rebuilt all evidence after frontend
+  commit `ca1afbf4c169b4d7d95dec460c1cd64af21915fd`. The remediation artifact
+  now pins that exact revision and contains no remaining batch REST occurrence.
+
+### Fix tests and checks
+
+```text
+RED
+python -m pytest backend/tests/test_base_self_annotation_service.py backend/tests/test_base_self_annotation_routes.py -q
+1 failed, 6 errors
+TypeError: SelfAnnotationService.__init__() got an unexpected keyword argument 'visibility_port'
+REST unknown fields reached the database instead of returning 422.
+
+GREEN
+python -m pytest backend/tests/test_base_self_annotation_service.py backend/tests/test_base_self_annotation_routes.py backend/tests/test_base_structural_web_capabilities.py backend/tests/test_atomic_web_capability_contracts.py backend/tests/test_atomic_web_gateway_policy.py -q
+27 passed in 6.04s
+
+python -m pytest backend/tests/test_mysql_migration.py -q
+38 passed in 0.74s
+```
+
+The REST and Gateway tests exercise both registry allow and deny with the
+same realistic actor/tenant-bound fake port. Atomic contracts, frozen domains,
+catalog/docs, migration evidence, route inventory, root-cause ledger, and
+Base structural remediation checks all passed.
+
+### Fix commits and counts
+
+- Frontend: `702ec5d fix: route self annotation batch consumers through gateway`
+- Frontend: `ca1afbf fix: preserve module-scoped annotation search`
+- Backend: pending `fix: close Base annotation attachment and evidence gaps`
+- Counts remain truthfully `14/16` Base groups and `31/33` occurrences migrated;
+  the only unresolved two occurrences are the explicit plugin lifecycle groups.

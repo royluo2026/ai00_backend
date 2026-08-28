@@ -8,7 +8,7 @@ Apply or undo governed station auto-link changes for a BOP version.
 - 不适用：The request only previews candidates.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_7ff1698de921ab4fe38979bd5e9ec734`
+- Catalog Release：`rel_37018ca4060a969eecca08519ba359d5`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -118,7 +118,7 @@ Apply or undo governed station auto-link changes for a BOP version.
 ```json
 {
   "capability_id": "craft.gbop.station_autolink.change.apply",
-  "catalog_release": "rel_7ff1698de921ab4fe38979bd5e9ec734",
+  "catalog_release": "rel_37018ca4060a969eecca08519ba359d5",
   "major_version": 1,
   "payload": {
     "bop_gid": "example",

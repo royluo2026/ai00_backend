@@ -8,7 +8,7 @@ Execute exact Base outcome base.self_annotation.search.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_7ff1698de921ab4fe38979bd5e9ec734`
+- Catalog Release：`rel_37018ca4060a969eecca08519ba359d5`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -75,6 +75,13 @@ Execute exact Base outcome base.self_annotation.search.
       "minimum": 1,
       "type": "integer"
     },
+    "module": {
+      "maxLength": 128,
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "status": {
       "maxLength": 512,
       "type": [
@@ -92,7 +99,7 @@ Execute exact Base outcome base.self_annotation.search.
 ```json
 {
   "capability_id": "base.self_annotation.search",
-  "catalog_release": "rel_7ff1698de921ab4fe38979bd5e9ec734",
+  "catalog_release": "rel_37018ca4060a969eecca08519ba359d5",
   "major_version": 1,
   "payload": {}
 }

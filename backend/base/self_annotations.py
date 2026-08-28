@@ -4,7 +4,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 from copy import deepcopy
 import json
-from typing import Any, Iterator
+from typing import Any, Iterator, Protocol
 
 from backend.db.connection import get_conn
 from backend.utils.gid import next_gid
@@ -36,6 +36,13 @@ def _actor_gid(actor: dict[str, Any]) -> str:
     value = _text(actor.get("gid"), label="actor.gid", maximum=128)
     if not value:
         _invalid("actor.gid 无效")
+    return value
+
+
+def _tenant_gid(actor: dict[str, Any]) -> str:
+    value = _text(actor.get("tenant_gid", actor.get("team_id")), label="actor.tenant_gid", maximum=128)
+    if not value:
+        _invalid("actor.tenant_gid 无效")
     return value
 
 
@@ -111,6 +118,16 @@ class SqlSelfAnnotationRepository:
             rows = cur.fetchall()
         return [_decode(dict(row)) for row in rows]
 
+    def attachment_reference_registered(self, *, actor: dict[str, Any], reference: dict[str, Any]) -> bool:
+        with self._cursor() as cur:
+            cur.execute(
+                "SELECT 1 FROM workmanship_base_attachment_references WHERE attachment_gid=%s AND actor_gid=%s AND tenant_gid=%s "
+                "AND media_type=%s AND display_name=%s AND size=%s AND checksum=%s LIMIT 1",
+                (reference["attachment_gid"], _actor_gid(actor), _tenant_gid(actor), reference["media_type"],
+                 reference["display_name"], reference["size"], reference["checksum"]),
+            )
+            return cur.fetchone() is not None
+
     def save(self, row: dict[str, Any]) -> None:
         with self._cursor() as cur:
             cur.execute(
@@ -161,15 +178,24 @@ class SqlSelfAnnotationRepository:
                  event["status"], json.dumps(event["details"], ensure_ascii=False)),
             )
 
-    def attachment_visible(self, *, actor: dict[str, Any], attachment_gid: str) -> bool:
-        # No storage credentials or arbitrary URLs enter this boundary. A caller
-        # must provide the attachment-reference validator's visible ids.
-        return attachment_gid in set(actor.get("visible_attachment_gids") or ())
+
+class AttachmentVisibilityPort(Protocol):
+    def new_reference_visible(self, *, actor: dict[str, Any], reference: dict[str, Any]) -> bool: ...
+
+
+class SqlAttachmentVisibilityPort:
+    """Base-owned registry adapter; caller payload never controls visibility."""
+    def __init__(self, repository: SqlSelfAnnotationRepository) -> None:
+        self.repository = repository
+
+    def new_reference_visible(self, *, actor: dict[str, Any], reference: dict[str, Any]) -> bool:
+        return self.repository.attachment_reference_registered(actor=actor, reference=reference)
 
 
 def _decode(row: dict[str, Any]) -> dict[str, Any]:
     return {
         "item_gid": str(row["item_gid"]), "actor_gid": str(row.get("user_gid") or ""),
+        "module": str(row.get("module") or ""),
         "status": str(row.get("self_status") or ""), "schedule": str(row.get("self_schedule") or "") or None,
         "note": str(row.get("self_note") or ""), "attachments": _json(row.get("self_attachments"), []),
         "revision": int(row.get("revision") or 1), "deleted": bool(row.get("deleted")),
@@ -178,8 +204,9 @@ def _decode(row: dict[str, Any]) -> dict[str, Any]:
 
 
 class SelfAnnotationService:
-    def __init__(self, *, repository: Any | None = None) -> None:
+    def __init__(self, *, repository: Any | None = None, visibility_port: AttachmentVisibilityPort | None = None) -> None:
         self.repository = repository or SqlSelfAnnotationRepository()
+        self.visibility_port = visibility_port or SqlAttachmentVisibilityPort(self.repository)
 
     def get(self, *, actor: dict, item_gid: str) -> dict:
         gid = _text(item_gid, label="item_gid", maximum=128)
@@ -188,16 +215,19 @@ class SelfAnnotationService:
             return {"annotation": self._project(row or self._empty(actor, gid or ""))}
 
     def search(self, *, actor: dict, query: dict) -> dict:
-        if not isinstance(query, dict) or set(query) - {"limit", "status"}:
+        if not isinstance(query, dict) or set(query) - {"limit", "status", "module"}:
             _invalid()
         limit = query.get("limit", 200)
         if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 200:
             _invalid("limit 无效")
         status = _text(query["status"], label="status", maximum=64, nullable=True) if "status" in query else None
+        module = _text(query["module"], label="module", maximum=128, nullable=True) if "module" in query else None
         with self.repository.transaction():
             rows = [row for row in self.repository.list(actor_gid=_actor_gid(actor)) if not row["deleted"]]
         if status is not None:
             rows = [row for row in rows if row["status"] == status]
+        if module is not None:
+            rows = [row for row in rows if row["module"] == module]
         return {"items": [self._project(row) for row in rows[:limit]]}
 
     def apply_change(self, *, actor: dict, command: dict) -> dict:
@@ -217,10 +247,8 @@ class SelfAnnotationService:
         attachments = [_attachment(value) for value in attachments_raw]
         if len({item["attachment_gid"] for item in attachments}) != len(attachments):
             _invalid("attachments 无效")
-        for reference in attachments:
-            if not self.repository.attachment_visible(actor=actor, attachment_gid=reference["attachment_gid"]):
-                raise SelfAnnotationError("attachment_not_visible", "附件不可见")
         actor_gid = _actor_gid(actor)
+        _tenant_gid(actor)
         with self.repository.transaction():
             replay = self.repository.claim(actor_gid=actor_gid, operation="change.apply", idempotency_key=key)
             if replay is not None:
@@ -228,6 +256,10 @@ class SelfAnnotationService:
             row = self.repository.get(actor_gid=actor_gid, item_gid=item_gid, lock=True) or self._empty(actor, item_gid)
             if row["revision"] != expected:
                 raise SelfAnnotationError("revision_conflict", "标注版本已变化")
+            existing = {_reference_key(_attachment(value)) for value in row["attachments"]}
+            for reference in attachments:
+                if _reference_key(reference) not in existing and not self.visibility_port.new_reference_visible(actor=actor, reference=reference):
+                    raise SelfAnnotationError("attachment_not_visible", "附件不可见或尚未登记")
             deleted = status == "deleted" and schedule is None and note == "" and not attachments
             row.update({"status": status, "schedule": schedule, "note": note, "attachments": attachments,
                         "revision": row["revision"] + 1, "deleted": deleted,
@@ -241,7 +273,7 @@ class SelfAnnotationService:
 
     @staticmethod
     def _empty(actor: dict, item_gid: str) -> dict:
-        return {"item_gid": item_gid, "actor_gid": _actor_gid(actor), "status": "", "schedule": None,
+        return {"item_gid": item_gid, "actor_gid": _actor_gid(actor), "module": "", "status": "", "schedule": None,
                 "note": "", "attachments": [], "revision": 1, "deleted": False, "restore": None}
 
     @staticmethod
@@ -249,4 +281,8 @@ class SelfAnnotationService:
         return {key: deepcopy(row[key]) for key in ("item_gid", "status", "schedule", "note", "attachments", "revision", "deleted", "restore")}
 
 
-__all__ = ["SelfAnnotationError", "SelfAnnotationService", "SqlSelfAnnotationRepository"]
+def _reference_key(reference: dict[str, Any]) -> tuple[Any, ...]:
+    return tuple(reference[key] for key in ("attachment_gid", "media_type", "display_name", "size", "checksum"))
+
+
+__all__ = ["AttachmentVisibilityPort", "SelfAnnotationError", "SelfAnnotationService", "SqlAttachmentVisibilityPort", "SqlSelfAnnotationRepository"]
