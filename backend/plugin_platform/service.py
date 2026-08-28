@@ -5,7 +5,9 @@ import json
 import os
 import re
 import secrets
-from typing import Any
+from contextlib import contextmanager
+from copy import deepcopy
+from typing import Any, Iterator
 
 from backend.capability_v2.contracts import ConsumerIdentity, ConsumerType
 from backend.domain_ports.resource_authorization import resource_authorizers
@@ -71,6 +73,268 @@ def validate_capability_grants(values: Any) -> tuple[str, ...]:
         if not spec.plugin_callable:
             raise ValueError(f"capability is not exposed to plugins: {capability_id}")
     return grants
+
+
+class PluginLifecycleError(ValueError):
+    """Closed marketplace installation lifecycle failure."""
+
+    def __init__(self, code: str, message: str | None = None) -> None:
+        super().__init__(f"{code}: {message or code}")
+        self.code = code
+
+
+_INSTALL_COMMAND_KEYS = {"plugin_id", "release_version", "release_sha256", "requested_grants", "idempotency_key"}
+_UNINSTALL_COMMAND_KEYS = {"plugin_id", "expected_revision", "retain_tenant_data", "idempotency_key"}
+
+
+def _lifecycle_invalid(message: str = "invalid_input") -> None:
+    raise PluginLifecycleError("invalid_input", message)
+
+
+def _lifecycle_text(value: Any, *, maximum: int = 512) -> str:
+    if not isinstance(value, str) or not value.strip() or len(value) > maximum:
+        _lifecycle_invalid()
+    return value.strip()
+
+
+def _lifecycle_actor(actor: dict[str, Any]) -> tuple[str, str]:
+    if not isinstance(actor, dict):
+        _lifecycle_invalid("invalid_actor")
+    return _lifecycle_text(actor.get("gid"), maximum=128), _lifecycle_text(actor.get("tenant_gid"), maximum=128)
+
+
+class SqlPluginLifecycleRepository:
+    """Existing marketplace schema adapter with Base-owned lifecycle evidence."""
+
+    def __init__(self) -> None:
+        self._conn: Any | None = None
+
+    @contextmanager
+    def transaction(self) -> Iterator["SqlPluginLifecycleRepository"]:
+        from backend.db.connection import get_conn
+
+        with get_conn() as conn:
+            self._conn = conn
+            try:
+                yield self
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
+            finally:
+                self._conn = None
+
+    def _cursor(self) -> Any:
+        if self._conn is None:
+            raise RuntimeError("plugin lifecycle repository used outside a transaction")
+        return self._conn.cursor()
+
+    def release(self, plugin_id: str, version: str, *, lock: bool = False) -> dict[str, Any] | None:
+        with self._cursor() as cur:
+            cur.execute(
+                "SELECT * FROM workmanship_plugin_releases WHERE plugin_id=%s AND version=%s" + (" FOR UPDATE" if lock else ""),
+                (plugin_id, version),
+            )
+            row = cur.fetchone()
+        return dict(row) if row else None
+
+    def installation(self, tenant_gid: str, plugin_id: str, *, lock: bool = False) -> dict[str, Any] | None:
+        with self._cursor() as cur:
+            cur.execute(
+                "SELECT * FROM workmanship_plugin_installations WHERE tenant_gid=%s AND plugin_id=%s" + (" FOR UPDATE" if lock else ""),
+                (tenant_gid, plugin_id),
+            )
+            row = cur.fetchone()
+        return self._row(dict(row)) if row else None
+
+    def save_installation(self, row: dict[str, Any]) -> None:
+        with self._cursor() as cur:
+            cur.execute(
+                "INSERT INTO workmanship_plugin_installations "
+                "(tenant_gid,plugin_id,current_version,previous_version,state,granted_capabilities,installed_by,installation_id,mount_revocation_version,revision) "
+                "VALUES (%s,%s,%s,NULL,%s,%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE "
+                "current_version=VALUES(current_version),previous_version=NULL,state=VALUES(state),"
+                "granted_capabilities=VALUES(granted_capabilities),installed_by=VALUES(installed_by),"
+                "installation_id=VALUES(installation_id),mount_revocation_version=VALUES(mount_revocation_version),revision=VALUES(revision),updated_at=NOW()",
+                (row["tenant_gid"], row["plugin_id"], row["release_version"], row["state"],
+                 _json(row["granted_capabilities"]), row["installed_by"], row["installation_id"],
+                 row["mount_revocation_version"], row["revision"]),
+            )
+
+    def claim(self, *, actor_gid: str, operation: str, idempotency_key: str) -> dict[str, Any] | None:
+        with self._cursor() as cur:
+            cur.execute(
+                "INSERT INTO workmanship_base_plugin_lifecycle_idempotency "
+                "(actor_gid,operation,idempotency_key,status) VALUES (%s,%s,%s,'pending') "
+                "ON DUPLICATE KEY UPDATE actor_gid=VALUES(actor_gid)",
+                (actor_gid, operation, idempotency_key),
+            )
+            cur.execute(
+                "SELECT status,result_json FROM workmanship_base_plugin_lifecycle_idempotency "
+                "WHERE actor_gid=%s AND operation=%s AND idempotency_key=%s FOR UPDATE",
+                (actor_gid, operation, idempotency_key),
+            )
+            row = cur.fetchone()
+        return _decode(row.get("result_json")) if row and row.get("status") == "completed" else None
+
+    def complete(self, *, actor_gid: str, operation: str, idempotency_key: str, result: dict[str, Any]) -> None:
+        with self._cursor() as cur:
+            cur.execute(
+                "UPDATE workmanship_base_plugin_lifecycle_idempotency SET status='completed',result_json=%s,completed_at=CURRENT_TIMESTAMP(6) "
+                "WHERE actor_gid=%s AND operation=%s AND idempotency_key=%s",
+                (_json(result), actor_gid, operation, idempotency_key),
+            )
+
+    def revoke_mounts(self, *, tenant_gid: str, plugin_id: str, installation_id: str, new_revision: int) -> None:
+        with self._cursor() as cur:
+            cur.execute(
+                "UPDATE workmanship_plugin_mount_sessions SET status='revoked',revoked_at=UTC_TIMESTAMP(6) "
+                "WHERE tenant_id=%s AND plugin_id=%s AND installation_id=%s AND status='active'",
+                (tenant_gid, plugin_id, installation_id),
+            )
+
+    def preserve_tenant_data(self, *, tenant_gid: str, plugin_id: str, retain: bool) -> None:
+        if not retain:
+            _lifecycle_invalid("uninstall never purges tenant data")
+        with self._cursor() as cur:
+            # Lock policy/data rows in the same transaction; uninstall is recoverable and never deletes them.
+            cur.execute(
+                "SELECT plugin_id FROM workmanship_plugin_namespace_kv WHERE tenant_gid=%s AND plugin_id=%s FOR UPDATE",
+                (tenant_gid, plugin_id),
+            )
+
+    def audit(self, event: dict[str, Any]) -> None:
+        with self._cursor() as cur:
+            cur.execute(
+                "INSERT INTO workmanship_plugin_lifecycle_events "
+                "(gid,tenant_gid,plugin_id,from_state,to_state,version,actor_gid,detail) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                (f"ple_{secrets.token_hex(16)}", event["tenant_gid"], event["plugin_id"], event.get("from_state"),
+                 event["to_state"], event["release_version"], event["actor_gid"], _json(event["details"])),
+            )
+
+    @staticmethod
+    def _row(row: dict[str, Any]) -> dict[str, Any]:
+        return {
+            "tenant_gid": str(row["tenant_gid"]), "plugin_id": str(row["plugin_id"]),
+            "release_version": str(row["current_version"]), "state": str(row["state"]),
+            "granted_capabilities": list(_decode(row.get("granted_capabilities") or [])),
+            "installed_by": str(row["installed_by"]), "installation_id": str(row.get("installation_id") or ""),
+            "mount_revocation_version": int(row.get("mount_revocation_version") or 1),
+            "revision": int(row.get("revision") or 1),
+        }
+
+
+class PluginPlatformService:
+    """The sole owner of browser install/uninstall transitions."""
+
+    def __init__(self, *, repository: Any | None = None) -> None:
+        self.repository = repository or SqlPluginLifecycleRepository()
+
+    def request_install(self, *, actor: dict, command: dict) -> dict:
+        command = self._install_command(command)
+        actor_gid, tenant_gid = _lifecycle_actor(actor)
+        with self.repository.transaction():
+            replay = self.repository.claim(actor_gid=actor_gid, operation="request.create", idempotency_key=command["idempotency_key"])
+            if replay is not None:
+                return replay
+            release = self.repository.release(command["plugin_id"], command["release_version"], lock=True)
+            self._verified_release(release, command)
+            existing = self.repository.installation(tenant_gid, command["plugin_id"], lock=True)
+            if existing is not None and existing["state"] != "uninstalled":
+                raise PluginLifecycleError("already_installed", "plugin is already installed")
+            revision = (existing["revision"] + 1) if existing else 1
+            row = {
+                "tenant_gid": tenant_gid, "plugin_id": command["plugin_id"], "release_version": command["release_version"],
+                "state": "disabled", "granted_capabilities": command["requested_grants"], "installed_by": actor_gid,
+                "installation_id": f"installation_{secrets.token_hex(16)}", "mount_revocation_version": (existing or {}).get("mount_revocation_version", 0) + 1,
+                "revision": revision,
+            }
+            self.repository.save_installation(row)
+            result = self._result(row)
+            self.repository.complete(actor_gid=actor_gid, operation="request.create", idempotency_key=command["idempotency_key"], result=result)
+            self.repository.audit({"tenant_gid": tenant_gid, "plugin_id": row["plugin_id"], "from_state": existing["state"] if existing else None,
+                                   "to_state": "disabled", "release_version": row["release_version"], "actor_gid": actor_gid,
+                                   "operation": "request.create", "details": {"operation": "request.create", "grants": row["granted_capabilities"], "revision": revision}})
+            return result
+
+    def transition_uninstall(self, *, actor: dict, command: dict) -> dict:
+        command = self._uninstall_command(command)
+        actor_gid, tenant_gid = _lifecycle_actor(actor)
+        with self.repository.transaction():
+            replay = self.repository.claim(actor_gid=actor_gid, operation="transition.uninstall", idempotency_key=command["idempotency_key"])
+            if replay is not None:
+                return replay
+            row = self.repository.installation(tenant_gid, command["plugin_id"], lock=True)
+            if row is None:
+                raise PluginLifecycleError("resource_not_found", "plugin installation not found")
+            if row["revision"] != command["expected_revision"]:
+                raise PluginLifecycleError("revision_conflict", "plugin installation changed")
+            try:
+                require_transition(row["state"], "uninstalled")
+            except ValueError as exc:
+                raise PluginLifecycleError("invalid_transition", str(exc)) from exc
+            # The release and plugin namespace are locked before any state changes.
+            if self.repository.release(row["plugin_id"], row["release_version"], lock=True) is None:
+                raise PluginLifecycleError("release_not_verified", "installed release is unavailable")
+            new_row = {**row, "state": "uninstalled", "granted_capabilities": [], "revision": row["revision"] + 1,
+                       "mount_revocation_version": row["mount_revocation_version"] + 1}
+            self.repository.revoke_mounts(tenant_gid=tenant_gid, plugin_id=row["plugin_id"], installation_id=row["installation_id"], new_revision=new_row["mount_revocation_version"])
+            self.repository.preserve_tenant_data(tenant_gid=tenant_gid, plugin_id=row["plugin_id"], retain=command["retain_tenant_data"])
+            self.repository.save_installation(new_row)
+            result = self._result(new_row)
+            self.repository.complete(actor_gid=actor_gid, operation="transition.uninstall", idempotency_key=command["idempotency_key"], result=result)
+            self.repository.audit({"tenant_gid": tenant_gid, "plugin_id": row["plugin_id"], "from_state": row["state"], "to_state": "uninstalled",
+                                   "release_version": row["release_version"], "actor_gid": actor_gid,
+                                   "operation": "transition.uninstall", "details": {"operation": "transition.uninstall", "grants_revoked": row["granted_capabilities"], "data_retained": True, "revision": new_row["revision"]}})
+            return result
+
+    @staticmethod
+    def _install_command(value: Any) -> dict[str, Any]:
+        if not isinstance(value, dict) or set(value) != _INSTALL_COMMAND_KEYS:
+            _lifecycle_invalid()
+        command = deepcopy(value)
+        command["plugin_id"] = _lifecycle_text(command["plugin_id"], maximum=255)
+        command["release_version"] = _lifecycle_text(command["release_version"], maximum=64)
+        command["idempotency_key"] = _lifecycle_text(command["idempotency_key"])
+        if not isinstance(command["release_sha256"], str) or not re.fullmatch(r"sha256:[0-9a-f]{64}", command["release_sha256"]):
+            _lifecycle_invalid()
+        if not isinstance(command["requested_grants"], list):
+            _lifecycle_invalid()
+        if (not all(isinstance(item, str) and re.fullmatch(r"[a-z][a-z0-9_.-]{2,127}", item) for item in command["requested_grants"])
+                or command["requested_grants"] != sorted(set(command["requested_grants"]))):
+            _lifecycle_invalid()
+        return command
+
+    @staticmethod
+    def _uninstall_command(value: Any) -> dict[str, Any]:
+        if not isinstance(value, dict) or set(value) != _UNINSTALL_COMMAND_KEYS:
+            _lifecycle_invalid()
+        command = deepcopy(value)
+        command["plugin_id"] = _lifecycle_text(command["plugin_id"], maximum=255)
+        command["idempotency_key"] = _lifecycle_text(command["idempotency_key"])
+        if isinstance(command["expected_revision"], bool) or not isinstance(command["expected_revision"], int) or command["expected_revision"] < 1:
+            _lifecycle_invalid()
+        if command["retain_tenant_data"] is not True:
+            _lifecycle_invalid("uninstall never purges tenant data")
+        return command
+
+    @staticmethod
+    def _verified_release(release: dict[str, Any] | None, command: dict[str, Any]) -> None:
+        if not release or release.get("status") != "published" or not release.get("platform_signature"):
+            raise PluginLifecycleError("release_not_verified", "release is not published and platform-signed")
+        actual_hash = str(release.get("artifact_sha256") or "")
+        if command["release_sha256"] != f"sha256:{actual_hash}":
+            raise PluginLifecycleError("release_not_verified", "release hash does not match signed release")
+        if release.get("dependencies_ready") is False:
+            raise PluginLifecycleError("release_not_verified", "release dependencies are unavailable")
+        allowed = list(release.get("permissions") or _decode(release.get("manifest") or {}).get("permissions") or [])
+        if sorted(command["requested_grants"]) != sorted(allowed):
+            raise PluginLifecycleError("invalid_input", "requested grants must exactly match signed release grants")
+
+    @staticmethod
+    def _result(row: dict[str, Any]) -> dict[str, Any]:
+        return {"plugin_id": row["plugin_id"], "release_version": row["release_version"], "state": row["state"],
+                "revision": row["revision"], "granted_capabilities": list(row["granted_capabilities"]), "tenant_gid": row["tenant_gid"]}
 
 
 def _event(cur, tenant: str, plugin_id: str, old: str | None, new: str, version: str, actor: str, detail: dict | None = None) -> None:

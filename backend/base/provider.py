@@ -15,6 +15,7 @@ from .contracts import INPUT_SCHEMAS, OUTPUT_SCHEMAS
 _LIFECYCLE = {
     "plugin.disable", "plugin.enable", "plugin.install", "plugin.revoke",
     "plugin.rollback", "plugin.uninstall", "plugin.upgrade", "plugin.upgrade.finish",
+    "base.plugin.installation.request.create", "base.plugin.installation.transition.uninstall",
 }
 _STORAGE_WRITES = {"plugin.storage.delete", "plugin.storage.put"}
 _WRITES = _LIFECYCLE | _STORAGE_WRITES | {"system.job.cancel"}
@@ -27,6 +28,8 @@ _ATOMIC_WEB_EFFECTS = {
     "base.notification.preference.atomic.update": "Updates the caller's notification preferences in the Base store.",
     "base.identity.directory.feishu.sync": "Reads the Feishu directory and applies team and user changes to the Base store.",
     "base.plugin.installed.list": "Reads the bounded installed-plugin inventory without mutation.",
+    "base.plugin.installation.request.create": "Verifies one signed published marketplace release and creates a tenant-bound disabled installation with explicit grants.",
+    "base.plugin.installation.transition.uninstall": "Atomically revokes mounts and grants, preserves tenant data, and records a recoverable uninstall transition.",
     "base.identity.user.search": "Reads and projects matching Base directory users without mutation.",
     "base.organization.team.directory.list": "Reads a closed organization-team directory projection without mutation.",
     "base.team.directory.list": "Reads a closed active-team directory projection without mutation.",
@@ -46,6 +49,7 @@ _ATOMIC_WEB_EFFECTS = {
 _ATOMIC_WEB_STRONG_WRITES = {
     "base.identity.role.assign.atomic", "base.saved_view.create", "base.saved_view.update",
     "base.saved_view.copy", "base.saved_view.delete", "base.self_annotation.change.apply",
+    "base.plugin.installation.request.create", "base.plugin.installation.transition.uninstall",
 }
 _RESOURCE_FIELDS = {
     **{capability_id: ("plugin-installation", "plugin_id") for capability_id in _LIFECYCLE},

@@ -53,6 +53,16 @@ PLUGIN_ITEM = obj(
     },
     ("plugin_id", "name", "version", "category", "enabled", "builtin"),
 )
+PLUGIN_INSTALLATION = obj(
+    {
+        "plugin_id": STRING, "release_version": {"type": "string", "minLength": 1, "maxLength": 64},
+        "state": {"type": "string", "enum": ["disabled", "uninstalled"]},
+        "revision": {"type": "integer", "minimum": 1},
+        "granted_capabilities": {"type": "array", "maxItems": 200, "items": STRING},
+        "tenant_gid": STRING,
+    },
+    ("plugin_id", "release_version", "state", "revision", "granted_capabilities", "tenant_gid"),
+)
 USER_SEARCH_ITEM = obj(
     {
         "gid": STRING,
@@ -143,6 +153,26 @@ SAVED_VIEW = obj(
 
 
 ROUTE_CAPABILITIES: dict[tuple[str, str], dict[str, Any]] = {
+    ("POST", "/api/plugin/install"): {
+        "id": "base.plugin.installation.request.create",
+        "schema": obj({
+            "plugin_id": {"type": "string", "minLength": 1, "maxLength": 255},
+            "release_version": {"type": "string", "minLength": 1, "maxLength": 64},
+            "release_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            "requested_grants": {"type": "array", "maxItems": 200, "uniqueItems": True, "items": STRING},
+            "idempotency_key": STRING,
+        }, ("plugin_id", "release_version", "release_sha256", "requested_grants", "idempotency_key")),
+        "output_schema": obj({"installation": PLUGIN_INSTALLATION}, ("installation",)),
+    },
+    ("DELETE", "/api/plugin/uninstall/{dynamic}"): {
+        "id": "base.plugin.installation.transition.uninstall",
+        "schema": obj({
+            "plugin_id": {"type": "string", "minLength": 1, "maxLength": 255},
+            "expected_revision": {"type": "integer", "minimum": 1},
+            "retain_tenant_data": {"const": True}, "idempotency_key": STRING,
+        }, ("plugin_id", "expected_revision", "retain_tenant_data", "idempotency_key")),
+        "output_schema": obj({"installation": PLUGIN_INSTALLATION}, ("installation",)),
+    },
     ("GET", "/api/views"): {
         "id": "base.saved_view.search",
         "schema": obj({"module": {"type": "string", "maxLength": 255}, "list_gid": OPT_STRING}),
@@ -256,6 +286,8 @@ ROUTE_CAPABILITIES: dict[tuple[str, str], dict[str, Any]] = {
 }
 
 EXAMPLES: dict[str, dict[str, Any]] = {
+    "base.plugin.installation.request.create": {"plugin_id": "plugin.example", "release_version": "1.2.3", "release_sha256": "sha256:" + "b" * 64, "requested_grants": ["project.read"], "idempotency_key": "idem-plugin-1"},
+    "base.plugin.installation.transition.uninstall": {"plugin_id": "plugin.example", "expected_revision": 3, "retain_tenant_data": True, "idempotency_key": "idem-plugin-2"},
     "base.saved_view.search": {"module": "", "list_gid": None},
     "base.saved_view.create": {"name": "Open", "config": {"columns": [{"key": "field_1", "visible": True, "order": 0, "width": 120}], "filters": [{"id": "filter_1", "field": "field_1", "op": "eq", "value": "open"}], "filterMode": "and", "sorts": [{"field": "field_1", "dir": "asc"}], "groupBy": None, "viewType": "grid", "treeParentField": None}, "share_scope": "private", "idempotency_key": "idem-1"},
     "base.saved_view.update": {"view_gid": "view_1", "expected_revision": 1, "name": "Open", "config": {"columns": [{"key": "field_1", "visible": True, "order": 0, "width": 120}], "filters": [{"id": "filter_1", "field": "field_1", "op": "eq", "value": "open"}], "filterMode": "and", "sorts": [{"field": "field_1", "dir": "asc"}], "groupBy": None, "viewType": "grid", "treeParentField": None}, "idempotency_key": "idem-2"},
@@ -281,6 +313,8 @@ EXAMPLES: dict[str, dict[str, Any]] = {
 }
 
 EXAMPLE_OUTPUTS: dict[str, dict[str, Any]] = {
+    "base.plugin.installation.request.create": {"installation": {"plugin_id": "plugin.example", "release_version": "1.2.3", "state": "disabled", "revision": 1, "granted_capabilities": ["project.read"], "tenant_gid": "tenant_1"}},
+    "base.plugin.installation.transition.uninstall": {"installation": {"plugin_id": "plugin.example", "release_version": "1.2.3", "state": "uninstalled", "revision": 4, "granted_capabilities": [], "tenant_gid": "tenant_1"}},
     "base.saved_view.search": {"views": []},
     "base.saved_view.create": {"view": {"gid": "view_1", "name": "Open", "module": "", "list_gid": None, "owner_gid": "user_1", "config": {"columns": [{"key": "field_1", "visible": True, "order": 0, "width": 120}], "filters": [{"id": "filter_1", "field": "field_1", "op": "eq", "value": "open"}], "filterMode": "and", "sorts": [{"field": "field_1", "dir": "asc"}], "groupBy": None, "viewType": "grid", "treeParentField": None}, "revision": 1, "deleted": False, "share_scope": "private", "grants": [], "restore": None}},
     "base.saved_view.update": {"view": {"gid": "view_1", "name": "Open", "module": "", "list_gid": None, "owner_gid": "user_1", "config": {"columns": [{"key": "field_1", "visible": True, "order": 0, "width": 120}], "filters": [{"id": "filter_1", "field": "field_1", "op": "eq", "value": "open"}], "filterMode": "and", "sorts": [{"field": "field_1", "dir": "asc"}], "groupBy": None, "viewType": "grid", "treeParentField": None}, "revision": 2, "deleted": False, "share_scope": "private", "grants": [], "restore": None}},
@@ -306,8 +340,6 @@ EXAMPLE_OUTPUTS: dict[str, dict[str, Any]] = {
 }
 
 UNSAFE_REASONS = {
-    ("POST", "/api/plugin/install"): "The arbitrary-URL installer route has no production handler and is not equivalent to signed marketplace installation.",
-    ("DELETE", "/api/plugin/uninstall/{dynamic}"): "The unrestricted legacy uninstall route has no production handler and cannot bypass marketplace lifecycle controls.",
     ("PUT", "/api/rules/{dynamic}"): "Rule definition changes contain dynamic rule_definition data without a governed closed nested contract.",
     ("DELETE", "/api/craft_lib/equipments/{dynamic}"): "No delete provider exists; the available obsolete transition is a different lifecycle outcome.",
     ("DELETE", "/api/craft_lib/fixtures/{dynamic}"): "No delete provider exists; the available obsolete transition is a different lifecycle outcome.",

@@ -16,17 +16,22 @@ def _module():
     return module
 
 
-def test_manifest_conserves_pinned_base_scope_and_keeps_only_plugins_unresolved():
+def test_manifest_conserves_pinned_base_scope_and_closes_the_signed_plugin_lifecycle():
     payload = _module().build_manifest(ROOT.parent / "workmanship-web-capability-governance")
-    assert payload["counts"] == {"groups": 16, "occurrences": 33, "migrated_groups": 14, "migrated_occurrences": 31, "unresolved_groups": 2, "unresolved_occurrences": 2}
+    assert payload["counts"] == {"groups": 16, "occurrences": 33, "migrated_groups": 16, "migrated_occurrences": 33, "unresolved_groups": 0, "unresolved_occurrences": 0}
     entries = {(item["method"], item["normalized_route"]): item for item in payload["entries"]}
     for key in (("POST", "/api/plugin/install"), ("DELETE", "/api/plugin/uninstall/{dynamic}")):
-        assert entries[key]["final_disposition"] == "unresolved"
-        assert "signed" in entries[key]["unresolved_reason"] or "lifecycle" in entries[key]["unresolved_reason"]
+        assert entries[key]["final_disposition"] == "migrated"
+        assert entries[key]["candidate_capability"] in {
+            "base.plugin.installation.request.create@1",
+            "base.plugin.installation.transition.uninstall@1",
+        }
+        assert entries[key]["owner_service_evidence"]["source_path"] == "backend/plugin_platform/service.py"
+        assert entries[key]["frontend_call_sites"]
     for entry in entries.values():
         assert entry["occurrences"]
         assert entry["old_route_evidence"]["source_path"]
-        assert entry["final_inventory_mapping"] in {"capability", "unresolved"}
+        assert entry["final_inventory_mapping"] == "capability"
 
 
 def test_saved_view_routes_require_shared_service_and_closed_contract_evidence():

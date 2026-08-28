@@ -86,12 +86,6 @@
       "reason": "Comment explains upload transport choice; it is not executable."
     },
     {
-      "source": "web/core/web_compat.js",
-      "line": 331,
-      "column": 47,
-      "reason": "Comment names the upload route owned by another component; it is not executable."
-    },
-    {
       "source": "web/handbook/index.html",
       "line": 477,
       "column": 58,

@@ -44,6 +44,8 @@ OWNER_SERVICE_TARGETS = {
     ("GET", "/api/self_ann/list"): "base.self_annotation.search",
     ("PUT", "/api/self_ann/{dynamic}"): "base.self_annotation.change.apply",
     ("GET", "/api/users/me"): "base.identity.session.profile.get",
+    ("POST", "/api/plugin/install"): "base.plugin.installation.request.create",
+    ("DELETE", "/api/plugin/uninstall/{dynamic}"): "base.plugin.installation.transition.uninstall",
 }
 OWNER_SERVICE_EVIDENCE = {
     **{key: ("backend/base/saved_views.py", ("search", "create", "update", "copy", "delete")) for key in SAVED_VIEW_TARGETS},
@@ -51,6 +53,12 @@ OWNER_SERVICE_EVIDENCE = {
     ("GET", "/api/self_ann/list"): ("backend/base/self_annotations.py", ("search",)),
     ("PUT", "/api/self_ann/{dynamic}"): ("backend/base/self_annotations.py", ("apply_change",)),
     ("GET", "/api/users/me"): ("backend/base/identity_profile.py", ("get_current",)),
+    ("POST", "/api/plugin/install"): ("backend/plugin_platform/service.py", ("request_install",)),
+    ("DELETE", "/api/plugin/uninstall/{dynamic}"): ("backend/plugin_platform/service.py", ("transition_uninstall",)),
+}
+PLUGIN_FRONTEND_OPERATIONS = {
+    ("POST", "/api/plugin/install"): "base.plugins.install",
+    ("DELETE", "/api/plugin/uninstall/{dynamic}"): "base.plugins.uninstall",
 }
 
 
@@ -87,6 +95,7 @@ def _owner_service_boundary_ready(key: tuple[str, str], contract: dict[str, Any]
         "backend/base/self_annotations.py": "SelfAnnotationService",
         "backend/base/identity_profile.py": "IdentityProfileService",
         "backend/base/saved_views.py": "SavedViewService",
+        "backend/plugin_platform/service.py": "PluginPlatformService",
     }[source])
     definition = ROUTE_CAPABILITIES.get(key, {})
     return (
@@ -96,6 +105,25 @@ def _owner_service_boundary_ready(key: tuple[str, str], contract: dict[str, Any]
         and definition.get("schema", {}).get("additionalProperties") is False
         and definition.get("output_schema", {}).get("additionalProperties") is False
     )
+
+
+def _plugin_frontend_evidence(web_root: Path, key: tuple[str, str]) -> dict[str, Any]:
+    operation = PLUGIN_FRONTEND_OPERATIONS[key]
+    relative = "web/core/web_compat.js"
+    source = (web_root / relative).read_text(encoding="utf-8")
+    needle = f".call('{operation}'"
+    offset = source.find(needle)
+    if offset < 0:
+        raise ValueError(f"plugin lifecycle frontend call missing: {operation}")
+    line = source.count("\n", 0, offset) + 1
+    line_start = source.rfind("\n", 0, offset) + 1
+    return {
+        "decision": "migrate", "target_capability_id": OWNER_SERVICE_TARGETS[key], "target_major_version": 1,
+        "frontend_operation": operation,
+        "frontend_call_sites": [{"source_path": relative, "line": line, "column": offset - line_start + 1,
+                                   "operation": operation, "source_sha256": hashlib.sha256(source.encode("utf-8")).hexdigest()}],
+        "equivalence_evidence": {"provider_contract": _source_evidence("backend/base/web_atomic.py")},
+    }
 def _canonical(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
 
@@ -143,7 +171,10 @@ def build_manifest(web_root: Path) -> dict[str, Any]:
         migrated = contract["final_disposition"] == "migrated"
         if migrated and not _owner_service_boundary_ready(key, contract):
             raise ValueError(f"owner-service boundary evidence missing: {key}")
-        owner_evidence = migration_by_key.get(key) if key in OWNER_SERVICE_TARGETS else None
+        owner_evidence = (
+            _plugin_frontend_evidence(web_root, key) if key in PLUGIN_FRONTEND_OPERATIONS
+            else migration_by_key.get(key) if key in OWNER_SERVICE_TARGETS else None
+        )
         if owner_evidence is not None:
             expected_target = OWNER_SERVICE_TARGETS[key]
             if (
@@ -198,7 +229,7 @@ def build_manifest(web_root: Path) -> dict[str, Any]:
         "unresolved_groups": sum(item["final_disposition"] == "unresolved" for item in entries),
         "unresolved_occurrences": sum(len(item["occurrences"]) for item in entries if item["final_disposition"] == "unresolved"),
     }
-    if counts != {"groups": 16, "occurrences": 33, "migrated_groups": 14, "migrated_occurrences": 31, "unresolved_groups": 2, "unresolved_occurrences": 2}:
+    if counts != {"groups": 16, "occurrences": 33, "migrated_groups": 16, "migrated_occurrences": 33, "unresolved_groups": 0, "unresolved_occurrences": 0}:
         raise ValueError(f"Base structural count drift: {counts}")
     manifest = {
         "schema_version": "1.0.0", "artifact_id": "task-3b3e-base-structural-remediation",

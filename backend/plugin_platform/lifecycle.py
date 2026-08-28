@@ -10,10 +10,10 @@ class LifecycleError(ValueError):
 
 TRANSITIONS = {
     "disabled": frozenset({"enabled", "upgrading", "uninstalled", "revoked"}),
-    "enabled": frozenset({"disabled", "upgrading", "revoked"}),
+    "enabled": frozenset({"disabled", "upgrading", "uninstalled", "revoked"}),
     "upgrading": frozenset({"enabled", "failed", "rolled_back", "revoked"}),
-    "failed": frozenset({"disabled", "rolled_back", "revoked"}),
-    "rolled_back": frozenset({"enabled", "disabled", "upgrading", "revoked"}),
+    "failed": frozenset({"disabled", "rolled_back", "uninstalled", "revoked"}),
+    "rolled_back": frozenset({"enabled", "disabled", "upgrading", "uninstalled", "revoked"}),
     "revoked": frozenset({"uninstalled"}),
     "uninstalled": frozenset(),
 }

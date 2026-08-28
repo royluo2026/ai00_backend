@@ -36,12 +36,13 @@ def test_structural_base_capabilities_are_registered_with_closed_contracts():
     assert getattr(role.handler, "__capability_transactional__", False) is True
 
 
-def test_plugins_remain_explicitly_unresolved_without_marketplace_lifecycle_proof():
+def test_plugins_register_signed_lifecycle_contracts_without_a_url_fallback():
     from backend.capability_v2.atomic_web_contracts import ROUTE_CAPABILITIES, UNSAFE_REASONS
 
-    for key in (("POST", "/api/plugin/install"), ("DELETE", "/api/plugin/uninstall/{dynamic}")):
-        assert key not in ROUTE_CAPABILITIES
-        assert "signed" in UNSAFE_REASONS[key] or "lifecycle" in UNSAFE_REASONS[key]
+    assert ("POST", "/api/plugin/install") in ROUTE_CAPABILITIES
+    assert ("DELETE", "/api/plugin/uninstall/{dynamic}") in ROUTE_CAPABILITIES
+    assert ("POST", "/api/plugin/install") not in UNSAFE_REASONS
+    assert ("DELETE", "/api/plugin/uninstall/{dynamic}") not in UNSAFE_REASONS
 
 
 def test_saved_view_capabilities_register_closed_contracts_and_strong_writes():

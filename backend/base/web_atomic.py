@@ -21,6 +21,8 @@ _WRITES = {
     "base.saved_view.copy",
     "base.saved_view.delete",
     "base.self_annotation.change.apply",
+    "base.plugin.installation.request.create",
+    "base.plugin.installation.transition.uninstall",
 }
 _PERMISSIONS = {
     "base.authorization.grant.list": ("system.user.manage",),
@@ -29,6 +31,8 @@ _PERMISSIONS = {
     "base.identity.directory.feishu.sync": ("system.tech_config",),
     "base.identity.admin_user.list": ("system.user.manage",),
     "base.identity.role.assign.atomic": ("system.user.manage",),
+    "base.plugin.installation.request.create": ("system.plugin.manage",),
+    "base.plugin.installation.transition.uninstall": ("system.plugin.manage",),
 }
 
 
@@ -105,6 +109,22 @@ def _sync_feishu(payload: dict[str, Any], context: object) -> dict[str, Any]:
 def _installed_plugins(_payload: dict[str, Any], _context: object) -> dict[str, Any]:
     from backend.base.plugin_inventory import list_installed_plugins
     return list_installed_plugins()
+
+
+def _plugin_install(payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.plugin_platform.service import PluginLifecycleError, PluginPlatformService
+    try:
+        return {"installation": PluginPlatformService().request_install(actor=_actor(context), command=payload)}
+    except PluginLifecycleError as exc:
+        raise _structural_error(exc) from exc
+
+
+def _plugin_uninstall(payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.plugin_platform.service import PluginLifecycleError, PluginPlatformService
+    try:
+        return {"installation": PluginPlatformService().transition_uninstall(actor=_actor(context), command=payload)}
+    except PluginLifecycleError as exc:
+        raise _structural_error(exc) from exc
 
 
 def _search_users(payload: dict[str, Any], _context: object) -> dict[str, Any]:
@@ -245,6 +265,8 @@ HANDLERS: dict[str, Callable[[dict[str, Any], object], dict[str, Any]]] = {
     "base.notification.preference.atomic.update": _update_preferences,
     "base.identity.directory.feishu.sync": _sync_feishu,
     "base.plugin.installed.list": _installed_plugins,
+    "base.plugin.installation.request.create": _plugin_install,
+    "base.plugin.installation.transition.uninstall": _plugin_uninstall,
     "base.identity.user.search": _search_users,
     "base.organization.team.directory.list": _organization_teams,
     "base.team.directory.list": _teams,
@@ -290,7 +312,7 @@ def register_atomic_web_capabilities(registry: Any) -> None:
             tags=("base", "atomic", "web"),
         )
         handler = lambda payload, context, _id=capability_id: invoke_atomic(_id, payload, context)
-        if capability_id in {"base.identity.role.assign.atomic", "base.saved_view.create", "base.saved_view.update", "base.saved_view.copy", "base.saved_view.delete", "base.self_annotation.change.apply"}:
+        if capability_id in {"base.identity.role.assign.atomic", "base.saved_view.create", "base.saved_view.update", "base.saved_view.copy", "base.saved_view.delete", "base.self_annotation.change.apply", "base.plugin.installation.request.create", "base.plugin.installation.transition.uninstall"}:
             handler.__capability_transactional__ = True
         register_capability(registry, spec, handler)
 
