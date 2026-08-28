@@ -69,6 +69,27 @@ _DOMAIN_ERRORS = tuple(DomainErrorContract(code=code, meaning=meaning, retryable
     ("provider_unavailable", "A required domain provider is not registered.", True),
     ("plugin_state_conflict", "The plugin installation cannot perform this lifecycle transition.", False),
 ))
+_STRUCTURAL_ERROR_CODES = {
+    "base.saved_view.search": {"invalid_input"},
+    "base.saved_view.create": {"invalid_input", "idempotency_conflict"},
+    "base.saved_view.update": {"invalid_input", "idempotency_conflict", "legacy_config_unsupported", "permission_denied", "resource_not_found", "revision_conflict"},
+    "base.saved_view.copy": {"invalid_input", "idempotency_conflict", "legacy_config_unsupported", "resource_not_found"},
+    "base.saved_view.delete": {"invalid_input", "idempotency_conflict", "legacy_config_unsupported", "permission_denied", "resource_not_found", "revision_conflict"},
+    "base.self_annotation.batch.get": {"invalid_input"},
+    "base.self_annotation.record.get": {"invalid_input"},
+    "base.self_annotation.search": {"invalid_input"},
+    "base.self_annotation.change.apply": {"attachment_not_visible", "idempotency_conflict", "invalid_input", "revision_conflict"},
+    "base.identity.session.profile.get": {"identity_not_found", "invalid_input", "tenant_mismatch"},
+    "base.plugin.installation.request.create": {"already_installed", "idempotency_conflict", "invalid_input", "release_not_verified"},
+    "base.plugin.installation.transition.uninstall": {"idempotency_conflict", "invalid_input", "invalid_transition", "release_not_verified", "resource_not_found", "revision_conflict"},
+}
+
+
+def _domain_errors(capability_id: str) -> tuple[DomainErrorContract, ...]:
+    codes = _STRUCTURAL_ERROR_CODES.get(capability_id)
+    if codes is None:
+        return _DOMAIN_ERRORS
+    return tuple(DomainErrorContract(code=code, meaning=f"{capability_id} can return {code}.", retryable=False) for code in sorted(codes))
 
 
 def _governed_spec(spec: Any) -> Any:
@@ -102,7 +123,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         "consistency_policy": "external" if is_write else "strong",
         "evidence_policy": "optional",
         "audit_policy": "high_risk" if capability_id in _LIFECYCLE else "standard",
-        "domain_errors": _DOMAIN_ERRORS,
+        "domain_errors": _domain_errors(capability_id),
         "domain_errors_complete": True,
     }
     if capability_id in _ATOMIC_WEB_EFFECTS:

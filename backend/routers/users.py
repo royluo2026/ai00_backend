@@ -10,7 +10,7 @@ from pydantic import BaseModel
 from backend.services import user_service
 from backend.routers.deps import get_current_user, require_role
 from backend.base.structural_web import StructuralWebError, assign_user_role, list_admin_users
-from backend.base.identity_profile import IdentityProfileService
+from backend.base.identity_profile import IdentityProfileError, IdentityProfileService
 
 router = APIRouter(prefix="/api/users", tags=["users"])
 
@@ -29,7 +29,11 @@ def list_users(current_user: dict = Depends(require_role(*_ADMIN_ROLES))):
 
 @router.get("/me")
 def get_me(current_user: dict = Depends(get_current_user)):
-    return IdentityProfileService().get_current(actor=current_user)
+    try:
+        return IdentityProfileService().get_current(actor=current_user)
+    except IdentityProfileError as exc:
+        status_code = 404 if exc.code == "identity_not_found" else 403 if exc.code == "tenant_mismatch" else 422
+        raise HTTPException(status_code=status_code, detail={"code": exc.code, "message": str(exc)}) from exc
 
 
 @router.get("/search")

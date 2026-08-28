@@ -56,3 +56,27 @@ def test_gateway_annotation_attachment_registry_allows_owner_and_denies_unregist
     with __import__("pytest").raises(CapabilityBusinessError) as caught:
         web_atomic._annotation_change({**command, "idempotency_key": "idem-gateway-denied"}, context)
     assert caught.value.code == "attachment_not_visible"
+
+
+def test_rest_and_gateway_batch_delegate_to_the_same_owner_service_method(monkeypatch):
+    from backend.base import web_atomic
+    from backend.routers import self_annotations as routes
+
+    calls = []
+
+    class BatchService:
+        def batch(self, *, actor, item_gids):
+            calls.append((actor["gid"], tuple(item_gids)))
+            return {"items": [{"item_gid": "item_1", "status": "open", "schedule": "", "has_note": False, "attach_count": 0}]}
+
+    service = BatchService()
+    monkeypatch.setattr(routes, "_service", lambda: service)
+    monkeypatch.setattr("backend.base.self_annotations.SelfAnnotationService", lambda: service)
+
+    rest = routes.get_batch(gids="item_1", user={"gid": "user_owner", "team_id": "tenant_1"})
+    context = type("Context", (), {"user_gid": "user_owner", "team_gid": "tenant_1", "active_roles": ("member",)})()
+    gateway = web_atomic._annotation_batch({"item_gids": ["item_1"]}, context)
+
+    assert rest == {"item_1": {"status": "open", "schedule": "", "has_note": False, "attach_count": 0}}
+    assert gateway == {"items": [{"item_gid": "item_1", "status": "open", "schedule": "", "has_note": False, "attach_count": 0}]}
+    assert calls == [("user_owner", ("item_1",)), ("user_owner", ("item_1",))]

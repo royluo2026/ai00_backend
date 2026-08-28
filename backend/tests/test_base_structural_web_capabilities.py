@@ -50,23 +50,22 @@ def test_saved_view_capabilities_register_closed_contracts_and_strong_writes():
 
     registry = CapabilityRegistry()
     register_atomic_web_capabilities(registry)
+    config = {
+        "field_gids": ["field_1"],
+        "sort": [{"field_gid": "field_1", "direction": "asc"}],
+        "filters": [{"field_gid": "field_1", "operator": "eq", "value": "open"}],
+        "page_size": 50,
+        "presentation": "table",
+    }
     expected = {
-        "base.saved_view.search": {"module": "", "list_gid": None},
+        "base.saved_view.search": {"module": "", "list_gid": None, "limit": 500, "offset": 0},
         "base.saved_view.create": {
-            "name": "Open", "module": "", "list_gid": None, "config": {
-                "columns": [{"key": "field_1", "visible": True, "order": 0, "width": 120}],
-                "filters": [{"id": "filter_1", "field": "field_1", "op": "eq", "value": "open"}],
-                "filterMode": "and", "sorts": [{"field": "field_1", "dir": "asc"}],
-                "groupBy": None, "viewType": "grid", "treeParentField": None,
-            }, "share_scope": "private", "idempotency_key": "idem-1",
+            "name": "Open", "module": "", "list_gid": None, "config": config,
+            "share_scope": "private", "idempotency_key": "idem-1",
         },
         "base.saved_view.update": {
-            "view_gid": "view_1", "expected_revision": 1, "name": "Open", "config": {
-                "columns": [{"key": "field_1", "visible": True, "order": 0, "width": 120}],
-                "filters": [{"id": "filter_1", "field": "field_1", "op": "eq", "value": "open"}],
-                "filterMode": "and", "sorts": [{"field": "field_1", "dir": "asc"}],
-                "groupBy": None, "viewType": "grid", "treeParentField": None,
-            }, "idempotency_key": "idem-2",
+            "view_gid": "view_1", "expected_revision": 1, "name": "Open", "config": config,
+            "idempotency_key": "idem-2",
         },
         "base.saved_view.copy": {"view_gid": "view_1", "name": "Copy", "idempotency_key": "idem-3"},
         "base.saved_view.delete": {"view_gid": "view_1", "expected_revision": 2, "idempotency_key": "idem-4"},
@@ -77,6 +76,9 @@ def test_saved_view_capabilities_register_closed_contracts_and_strong_writes():
         validate_payload(dict(item.spec.input_schema), payload)
         with __import__("pytest").raises(ValueError, match="unknown field"):
             validate_payload(dict(item.spec.input_schema), {**payload, "unexpected": True})
+    validate_payload(dict(registry.get("base.saved_view.search").spec.output_schema), {
+        "views": [], "next_offset": None,
+    })
     for capability_id in set(expected) - {"base.saved_view.search"}:
         item = registry.get(capability_id)
         assert item.descriptor.consistency_policy == "strong"

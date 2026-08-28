@@ -1,6 +1,6 @@
 {
   "registry_version": 1,
-  "table_count": 226,
+  "table_count": 234,
   "tables": [
     {
       "table": "workmanship_agent_capability_resources",
@@ -178,7 +178,22 @@
       "runtime_domain": "base"
     },
     {
+      "table": "workmanship_base_attachment_references",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_analysis_runs",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
       "table": "workmanship_base_capability_approvals",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_audit_events",
       "owner": "base",
       "runtime_domain": "base"
     },
@@ -193,27 +208,12 @@
       "runtime_domain": "base"
     },
     {
-      "table": "workmanship_base_capability_catalog_releases",
-      "owner": "base",
-      "runtime_domain": "base"
-    },
-    {
-      "table": "workmanship_base_capability_analysis_runs",
-      "owner": "base",
-      "runtime_domain": "base"
-    },
-    {
-      "table": "workmanship_base_capability_audit_events",
-      "owner": "base",
-      "runtime_domain": "base"
-    },
-    {
-      "table": "workmanship_base_capability_worker_leases",
-      "owner": "base",
-      "runtime_domain": "base"
-    },
-    {
       "table": "workmanship_base_capability_bindings",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_catalog_releases",
       "owner": "base",
       "runtime_domain": "base"
     },
@@ -263,6 +263,21 @@
       "runtime_domain": "base"
     },
     {
+      "table": "workmanship_base_capability_operations",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_outcomes",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_rate_windows",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
       "table": "workmanship_base_capability_release_reports",
       "owner": "base",
       "runtime_domain": "base"
@@ -308,17 +323,7 @@
       "runtime_domain": "base"
     },
     {
-      "table": "workmanship_base_capability_operations",
-      "owner": "base",
-      "runtime_domain": "base"
-    },
-    {
-      "table": "workmanship_base_capability_outcomes",
-      "owner": "base",
-      "runtime_domain": "base"
-    },
-    {
-      "table": "workmanship_base_capability_rate_windows",
+      "table": "workmanship_base_capability_worker_leases",
       "owner": "base",
       "runtime_domain": "base"
     },
@@ -378,6 +383,11 @@
       "runtime_domain": "base"
     },
     {
+      "table": "workmanship_base_plugin_lifecycle_idempotency",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
       "table": "workmanship_base_revision_branches",
       "owner": "base",
       "runtime_domain": "base"
@@ -418,12 +428,42 @@
       "runtime_domain": "base"
     },
     {
+      "table": "workmanship_base_saved_view_audit_events",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_saved_view_idempotency",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_saved_view_states",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
       "table": "workmanship_base_schema_migrations",
       "owner": "base",
       "runtime_domain": "base"
     },
     {
       "table": "workmanship_base_search_projection",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_self_annotation_audit_events",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_self_annotation_idempotency",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_self_annotation_states",
       "owner": "base",
       "runtime_domain": "base"
     },

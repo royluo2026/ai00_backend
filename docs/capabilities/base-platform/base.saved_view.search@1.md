@@ -8,7 +8,7 @@ Execute exact Base outcome base.saved_view.search.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_9f169ceddb4f7eb3e6c30f63861e655b`
+- Catalog Release：`rel_9618bda183d820aa83b56a9e47500f2b`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -70,6 +70,11 @@ Execute exact Base outcome base.saved_view.search.
 {
   "additionalProperties": false,
   "properties": {
+    "limit": {
+      "maximum": 500,
+      "minimum": 1,
+      "type": "integer"
+    },
     "list_gid": {
       "maxLength": 512,
       "type": [
@@ -80,6 +85,11 @@ Execute exact Base outcome base.saved_view.search.
     "module": {
       "maxLength": 255,
       "type": "string"
+    },
+    "offset": {
+      "maximum": 10000000,
+      "minimum": 0,
+      "type": "integer"
     }
   },
   "type": "object"
@@ -91,7 +101,7 @@ Execute exact Base outcome base.saved_view.search.
 ```json
 {
   "capability_id": "base.saved_view.search",
-  "catalog_release": "rel_9f169ceddb4f7eb3e6c30f63861e655b",
+  "catalog_release": "rel_9618bda183d820aa83b56a9e47500f2b",
   "major_version": 1,
   "payload": {}
 }
@@ -105,6 +115,13 @@ Execute exact Base outcome base.saved_view.search.
 {
   "additionalProperties": false,
   "properties": {
+    "next_offset": {
+      "minimum": 0,
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
     "views": {
       "items": {
         "additionalProperties": false,
@@ -112,61 +129,26 @@ Execute exact Base outcome base.saved_view.search.
           "config": {
             "additionalProperties": false,
             "properties": {
-              "columns": {
+              "field_gids": {
                 "items": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "key": {
-                      "maxLength": 512,
-                      "minLength": 1,
-                      "type": "string"
-                    },
-                    "order": {
-                      "minimum": 0,
-                      "type": "integer"
-                    },
-                    "visible": {
-                      "type": "boolean"
-                    },
-                    "width": {
-                      "maximum": 2000,
-                      "minimum": 40,
-                      "type": "integer"
-                    }
-                  },
-                  "required": [
-                    "key",
-                    "visible",
-                    "order",
-                    "width"
-                  ],
-                  "type": "object"
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
                 },
                 "maxItems": 200,
-                "type": "array"
-              },
-              "filterMode": {
-                "enum": [
-                  "and",
-                  "or"
-                ],
-                "type": "string"
+                "type": "array",
+                "uniqueItems": true
               },
               "filters": {
                 "items": {
                   "additionalProperties": false,
                   "properties": {
-                    "field": {
+                    "field_gid": {
                       "maxLength": 512,
                       "minLength": 1,
                       "type": "string"
                     },
-                    "id": {
-                      "maxLength": 512,
-                      "minLength": 1,
-                      "type": "string"
-                    },
-                    "op": {
+                    "operator": {
                       "enum": [
                         "contains",
                         "not_contains",
@@ -212,9 +194,8 @@ Execute exact Base outcome base.saved_view.search.
                     }
                   },
                   "required": [
-                    "id",
-                    "field",
-                    "op",
+                    "field_gid",
+                    "operator",
                     "value"
                   ],
                   "type": "object"
@@ -222,62 +203,51 @@ Execute exact Base outcome base.saved_view.search.
                 "maxItems": 50,
                 "type": "array"
               },
-              "groupBy": {
-                "maxLength": 512,
-                "type": [
-                  "string",
-                  "null"
-                ]
+              "page_size": {
+                "maximum": 500,
+                "minimum": 1,
+                "type": "integer"
               },
-              "sorts": {
+              "presentation": {
+                "enum": [
+                  "table",
+                  "list"
+                ],
+                "type": "string"
+              },
+              "sort": {
                 "items": {
                   "additionalProperties": false,
                   "properties": {
-                    "dir": {
+                    "direction": {
                       "enum": [
                         "asc",
                         "desc"
                       ],
                       "type": "string"
                     },
-                    "field": {
+                    "field_gid": {
                       "maxLength": 512,
                       "minLength": 1,
                       "type": "string"
                     }
                   },
                   "required": [
-                    "field",
-                    "dir"
+                    "field_gid",
+                    "direction"
                   ],
                   "type": "object"
                 },
                 "maxItems": 20,
                 "type": "array"
-              },
-              "treeParentField": {
-                "maxLength": 512,
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "viewType": {
-                "enum": [
-                  "grid",
-                  "tree"
-                ],
-                "type": "string"
               }
             },
             "required": [
-              "columns",
+              "field_gids",
               "filters",
-              "filterMode",
-              "sorts",
-              "groupBy",
-              "viewType",
-              "treeParentField"
+              "sort",
+              "page_size",
+              "presentation"
             ],
             "type": "object"
           },
@@ -378,7 +348,8 @@ Execute exact Base outcome base.saved_view.search.
     }
   },
   "required": [
-    "views"
+    "views",
+    "next_offset"
   ],
   "type": "object"
 }
@@ -416,14 +387,7 @@ Execute exact Base outcome base.saved_view.search.
 
 领域错误：
 
-- `resource_not_found`：The requested Base resource does not exist or is not visible.（retryable=false）
-- `permission_denied`：The caller lacks a required Base Platform permission.（retryable=false）
-- `approval_required`：The governed operation requires a valid approval.（retryable=false）
-- `authentication_stale`：The caller must authenticate again before this high-risk operation.（retryable=false）
-- `idempotency_conflict`：The idempotency key is bound to a different request.（retryable=false）
-- `version_conflict`：The resource version differs from the expected version.（retryable=false）
-- `provider_unavailable`：A required domain provider is not registered.（retryable=true）
-- `plugin_state_conflict`：The plugin installation cannot perform this lifecycle transition.（retryable=false）
+- `invalid_input`：base.saved_view.search can return invalid_input.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

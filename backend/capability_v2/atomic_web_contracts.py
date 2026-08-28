@@ -56,7 +56,7 @@ PLUGIN_ITEM = obj(
 PLUGIN_INSTALLATION = obj(
     {
         "plugin_id": STRING, "release_version": {"type": "string", "minLength": 1, "maxLength": 64},
-        "state": {"type": "string", "enum": ["disabled", "uninstalled"]},
+        "state": {"type": "string", "enum": ["disabled", "enabled", "rolled_back", "uninstalled"]},
         "revision": {"type": "integer", "minimum": 1},
         "granted_capabilities": {"type": "array", "maxItems": 200, "items": STRING},
         "tenant_gid": STRING,
@@ -130,15 +130,13 @@ ADMIN_USER = obj(
 FILTER_VALUE = {"anyOf": [{"type": "string", "maxLength": 2000}, {"type": "number"}, {"type": "boolean"}, {"type": "null"}, {"type": "array", "maxItems": 100, "items": {"type": ["string", "number", "boolean", "null"]}}]}
 SAVED_VIEW_CONFIG = obj(
     {
-        "columns": {"type": "array", "maxItems": 200, "items": obj({"key": STRING, "visible": BOOL, "order": {"type": "integer", "minimum": 0}, "width": {"type": "integer", "minimum": 40, "maximum": 2000}}, ("key", "visible", "order", "width"))},
-        "filters": {"type": "array", "maxItems": 50, "items": obj({"id": STRING, "field": STRING, "op": {"type": "string", "enum": ["contains", "not_contains", "eq", "not_eq", "empty", "not_empty", "gt", "gte", "lt", "lte"]}, "value": FILTER_VALUE}, ("id", "field", "op", "value"))},
-        "filterMode": {"type": "string", "enum": ["and", "or"]},
-        "sorts": {"type": "array", "maxItems": 20, "items": obj({"field": STRING, "dir": {"type": "string", "enum": ["asc", "desc"]}}, ("field", "dir"))},
-        "groupBy": OPT_STRING,
-        "viewType": {"type": "string", "enum": ["grid", "tree"]},
-        "treeParentField": OPT_STRING,
+        "field_gids": {"type": "array", "maxItems": 200, "uniqueItems": True, "items": STRING},
+        "filters": {"type": "array", "maxItems": 50, "items": obj({"field_gid": STRING, "operator": {"type": "string", "enum": ["contains", "not_contains", "eq", "not_eq", "empty", "not_empty", "gt", "gte", "lt", "lte"]}, "value": FILTER_VALUE}, ("field_gid", "operator", "value"))},
+        "sort": {"type": "array", "maxItems": 20, "items": obj({"field_gid": STRING, "direction": {"type": "string", "enum": ["asc", "desc"]}}, ("field_gid", "direction"))},
+        "page_size": {"type": "integer", "minimum": 1, "maximum": 500},
+        "presentation": {"type": "string", "enum": ["table", "list"]},
     },
-    ("columns", "filters", "filterMode", "sorts", "groupBy", "viewType", "treeParentField"),
+    ("field_gids", "filters", "sort", "page_size", "presentation"),
 )
 RESTORE = obj({"available": BOOL, "deleted_by": STRING, "deleted_at": {"type": "string", "maxLength": 64}}, ("available", "deleted_by", "deleted_at"))
 SAVED_VIEW = obj(
@@ -175,8 +173,8 @@ ROUTE_CAPABILITIES: dict[tuple[str, str], dict[str, Any]] = {
     },
     ("GET", "/api/views"): {
         "id": "base.saved_view.search",
-        "schema": obj({"module": {"type": "string", "maxLength": 255}, "list_gid": OPT_STRING}),
-        "output_schema": obj({"views": {"type": "array", "maxItems": 500, "items": SAVED_VIEW}}, ("views",)),
+        "schema": obj({"module": {"type": "string", "maxLength": 255}, "list_gid": OPT_STRING, "limit": {"type": "integer", "minimum": 1, "maximum": 500}, "offset": {"type": "integer", "minimum": 0, "maximum": 10000000}}),
+        "output_schema": obj({"views": {"type": "array", "maxItems": 500, "items": SAVED_VIEW}, "next_offset": {"type": ["integer", "null"], "minimum": 0}}, ("views", "next_offset")),
     },
     ("POST", "/api/views"): {
         "id": "base.saved_view.create",
@@ -276,7 +274,7 @@ ROUTE_CAPABILITIES: dict[tuple[str, str], dict[str, Any]] = {
     ("GET", "/api/plugin/list"): {
         "id": "base.plugin.installed.list",
         "schema": obj({}),
-        "output_schema": obj({"success": BOOL, "data": {"type": "array", "maxItems": 500, "items": PLUGIN_ITEM}}, ("success", "data")),
+        "output_schema": obj({"installations": {"type": "array", "maxItems": 500, "items": PLUGIN_INSTALLATION}}, ("installations",)),
     },
     ("GET", "/api/users/search"): {
         "id": "base.identity.user.search",
@@ -285,12 +283,15 @@ ROUTE_CAPABILITIES: dict[tuple[str, str], dict[str, Any]] = {
     },
 }
 
+SAVED_CONFIG_EXAMPLE = {"field_gids": ["field_1"], "filters": [{"field_gid": "field_1", "operator": "eq", "value": "open"}], "sort": [{"field_gid": "field_1", "direction": "asc"}], "page_size": 200, "presentation": "table"}
+
+
 EXAMPLES: dict[str, dict[str, Any]] = {
     "base.plugin.installation.request.create": {"plugin_id": "plugin.example", "release_version": "1.2.3", "release_sha256": "sha256:" + "b" * 64, "requested_grants": ["project.read"], "idempotency_key": "idem-plugin-1"},
     "base.plugin.installation.transition.uninstall": {"plugin_id": "plugin.example", "expected_revision": 3, "retain_tenant_data": True, "idempotency_key": "idem-plugin-2"},
-    "base.saved_view.search": {"module": "", "list_gid": None},
-    "base.saved_view.create": {"name": "Open", "config": {"columns": [{"key": "field_1", "visible": True, "order": 0, "width": 120}], "filters": [{"id": "filter_1", "field": "field_1", "op": "eq", "value": "open"}], "filterMode": "and", "sorts": [{"field": "field_1", "dir": "asc"}], "groupBy": None, "viewType": "grid", "treeParentField": None}, "share_scope": "private", "idempotency_key": "idem-1"},
-    "base.saved_view.update": {"view_gid": "view_1", "expected_revision": 1, "name": "Open", "config": {"columns": [{"key": "field_1", "visible": True, "order": 0, "width": 120}], "filters": [{"id": "filter_1", "field": "field_1", "op": "eq", "value": "open"}], "filterMode": "and", "sorts": [{"field": "field_1", "dir": "asc"}], "groupBy": None, "viewType": "grid", "treeParentField": None}, "idempotency_key": "idem-2"},
+    "base.saved_view.search": {"module": "", "list_gid": None, "limit": 500, "offset": 0},
+    "base.saved_view.create": {"name": "Open", "config": SAVED_CONFIG_EXAMPLE, "share_scope": "private", "idempotency_key": "idem-1"},
+    "base.saved_view.update": {"view_gid": "view_1", "expected_revision": 1, "name": "Open", "config": SAVED_CONFIG_EXAMPLE, "idempotency_key": "idem-2"},
     "base.saved_view.copy": {"view_gid": "view_1", "name": "Copy", "idempotency_key": "idem-3"},
     "base.saved_view.delete": {"view_gid": "view_1", "expected_revision": 1, "idempotency_key": "idem-4"},
     "base.organization.team.directory.list": {},
@@ -315,11 +316,11 @@ EXAMPLES: dict[str, dict[str, Any]] = {
 EXAMPLE_OUTPUTS: dict[str, dict[str, Any]] = {
     "base.plugin.installation.request.create": {"installation": {"plugin_id": "plugin.example", "release_version": "1.2.3", "state": "disabled", "revision": 1, "granted_capabilities": ["project.read"], "tenant_gid": "tenant_1"}},
     "base.plugin.installation.transition.uninstall": {"installation": {"plugin_id": "plugin.example", "release_version": "1.2.3", "state": "uninstalled", "revision": 4, "granted_capabilities": [], "tenant_gid": "tenant_1"}},
-    "base.saved_view.search": {"views": []},
-    "base.saved_view.create": {"view": {"gid": "view_1", "name": "Open", "module": "", "list_gid": None, "owner_gid": "user_1", "config": {"columns": [{"key": "field_1", "visible": True, "order": 0, "width": 120}], "filters": [{"id": "filter_1", "field": "field_1", "op": "eq", "value": "open"}], "filterMode": "and", "sorts": [{"field": "field_1", "dir": "asc"}], "groupBy": None, "viewType": "grid", "treeParentField": None}, "revision": 1, "deleted": False, "share_scope": "private", "grants": [], "restore": None}},
-    "base.saved_view.update": {"view": {"gid": "view_1", "name": "Open", "module": "", "list_gid": None, "owner_gid": "user_1", "config": {"columns": [{"key": "field_1", "visible": True, "order": 0, "width": 120}], "filters": [{"id": "filter_1", "field": "field_1", "op": "eq", "value": "open"}], "filterMode": "and", "sorts": [{"field": "field_1", "dir": "asc"}], "groupBy": None, "viewType": "grid", "treeParentField": None}, "revision": 2, "deleted": False, "share_scope": "private", "grants": [], "restore": None}},
-    "base.saved_view.copy": {"view": {"gid": "view_2", "name": "Copy", "module": "", "list_gid": None, "owner_gid": "user_1", "config": {"columns": [{"key": "field_1", "visible": True, "order": 0, "width": 120}], "filters": [{"id": "filter_1", "field": "field_1", "op": "eq", "value": "open"}], "filterMode": "and", "sorts": [{"field": "field_1", "dir": "asc"}], "groupBy": None, "viewType": "grid", "treeParentField": None}, "revision": 1, "deleted": False, "share_scope": "private", "grants": [], "restore": None}},
-    "base.saved_view.delete": {"view": {"gid": "view_1", "name": "Open", "module": "", "list_gid": None, "owner_gid": "user_1", "config": {"columns": [{"key": "field_1", "visible": True, "order": 0, "width": 120}], "filters": [{"id": "filter_1", "field": "field_1", "op": "eq", "value": "open"}], "filterMode": "and", "sorts": [{"field": "field_1", "dir": "asc"}], "groupBy": None, "viewType": "grid", "treeParentField": None}, "revision": 2, "deleted": True, "share_scope": "private", "grants": [], "restore": {"available": True, "deleted_by": "user_1", "deleted_at": "transaction"}}},
+    "base.saved_view.search": {"views": [], "next_offset": None},
+    "base.saved_view.create": {"view": {"gid": "view_1", "name": "Open", "module": "", "list_gid": None, "owner_gid": "user_1", "config": SAVED_CONFIG_EXAMPLE, "revision": 1, "deleted": False, "share_scope": "private", "grants": [], "restore": None}},
+    "base.saved_view.update": {"view": {"gid": "view_1", "name": "Open", "module": "", "list_gid": None, "owner_gid": "user_1", "config": SAVED_CONFIG_EXAMPLE, "revision": 2, "deleted": False, "share_scope": "private", "grants": [], "restore": None}},
+    "base.saved_view.copy": {"view": {"gid": "view_2", "name": "Copy", "module": "", "list_gid": None, "owner_gid": "user_1", "config": SAVED_CONFIG_EXAMPLE, "revision": 1, "deleted": False, "share_scope": "private", "grants": [], "restore": None}},
+    "base.saved_view.delete": {"view": {"gid": "view_1", "name": "Open", "module": "", "list_gid": None, "owner_gid": "user_1", "config": SAVED_CONFIG_EXAMPLE, "revision": 2, "deleted": True, "share_scope": "private", "grants": [], "restore": {"available": True, "deleted_by": "user_1", "deleted_at": "2026-08-28T00:00:00+00:00"}}},
     "base.organization.team.directory.list": {"teams": []},
     "base.team.directory.list": {"success": True, "data": []},
     "base.self_annotation.batch.get": {"items": []},
@@ -335,7 +336,7 @@ EXAMPLE_OUTPUTS: dict[str, dict[str, Any]] = {
     "base.notification.preference.atomic.get": {"success": True, "data": {"scope_approved": True, "scope_rejected": True, "item_status": True, "new_follower": True}},
     "base.notification.preference.atomic.update": {"success": True, "data": {"scope_approved": True, "scope_rejected": True, "item_status": True, "new_follower": True}},
     "base.identity.directory.feishu.sync": {"ok": True, "created": 0, "updated": 0, "dept_synced": 0, "departments": 0, "manual_teams_preserved": True},
-    "base.plugin.installed.list": {"success": True, "data": []},
+    "base.plugin.installed.list": {"installations": []},
     "base.identity.user.search": {"success": True, "data": []},
 }
 

@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3c-atomic-web-contracts",
   "baseline_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
-  "content_sha256": "sha256:9a3551299cb234694b2c98771fc171905da73a409824718dcb866f35d4e88560",
+  "content_sha256": "sha256:7cbe05bfbf1314c41edba16d0956e224536937ca3cbbbd1ebb9eb0b192b52a78",
   "counts_by_owner": {
     "agent": {
       "groups": 4,
@@ -392,7 +392,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -589,7 +589,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -673,7 +673,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -777,7 +777,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -905,7 +905,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1015,7 +1015,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [
         "system.tech_config"
@@ -1155,7 +1155,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1290,6 +1290,8 @@
               "state": {
                 "enum": [
                   "disabled",
+                  "enabled",
+                  "rolled_back",
                   "uninstalled"
                 ],
                 "type": "string"
@@ -1319,7 +1321,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [
         "system.plugin.manage"
@@ -1338,8 +1340,7 @@
       "consistency_policy": "strong",
       "example_input": {},
       "example_output": {
-        "data": [],
-        "success": true
+        "installations": []
       },
       "final_disposition": "migrated",
       "handler_evidence": {
@@ -1381,60 +1382,71 @@
       "output_schema": {
         "additionalProperties": false,
         "properties": {
-          "data": {
+          "installations": {
             "items": {
               "additionalProperties": false,
               "properties": {
-                "builtin": {
-                  "type": "boolean"
-                },
-                "category": {
-                  "maxLength": 128,
-                  "type": "string"
-                },
-                "enabled": {
-                  "type": "boolean"
-                },
-                "name": {
-                  "maxLength": 512,
-                  "type": "string"
+                "granted_capabilities": {
+                  "items": {
+                    "maxLength": 512,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "maxItems": 200,
+                  "type": "array"
                 },
                 "plugin_id": {
-                  "maxLength": 256,
+                  "maxLength": 512,
+                  "minLength": 1,
                   "type": "string"
                 },
-                "version": {
-                  "maxLength": 128,
+                "release_version": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "revision": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "state": {
+                  "enum": [
+                    "disabled",
+                    "enabled",
+                    "rolled_back",
+                    "uninstalled"
+                  ],
+                  "type": "string"
+                },
+                "tenant_gid": {
+                  "maxLength": 512,
+                  "minLength": 1,
                   "type": "string"
                 }
               },
               "required": [
                 "plugin_id",
-                "name",
-                "version",
-                "category",
-                "enabled",
-                "builtin"
+                "release_version",
+                "state",
+                "revision",
+                "granted_capabilities",
+                "tenant_gid"
               ],
               "type": "object"
             },
             "maxItems": 500,
             "type": "array"
-          },
-          "success": {
-            "type": "boolean"
           }
         },
         "required": [
-          "success",
-          "data"
+          "installations"
         ],
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1551,6 +1563,8 @@
               "state": {
                 "enum": [
                   "disabled",
+                  "enabled",
+                  "rolled_back",
                   "uninstalled"
                 ],
                 "type": "string"
@@ -1580,7 +1594,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [
         "system.plugin.manage"
@@ -1750,7 +1764,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1978,7 +1992,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -2176,7 +2190,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -2468,7 +2482,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -2574,7 +2588,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -2770,7 +2784,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -2902,7 +2916,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -3047,7 +3061,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -3240,7 +3254,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -3258,10 +3272,13 @@
       "confirmation_policy": "none",
       "consistency_policy": "strong",
       "example_input": {
+        "limit": 500,
         "list_gid": null,
-        "module": ""
+        "module": "",
+        "offset": 0
       },
       "example_output": {
+        "next_offset": null,
         "views": []
       },
       "final_disposition": "migrated",
@@ -3283,6 +3300,11 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "limit": {
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+          },
           "list_gid": {
             "maxLength": 512,
             "type": [
@@ -3293,6 +3315,11 @@
           "module": {
             "maxLength": 255,
             "type": "string"
+          },
+          "offset": {
+            "maximum": 10000000,
+            "minimum": 0,
+            "type": "integer"
           }
         },
         "type": "object"
@@ -3327,6 +3354,13 @@
       "output_schema": {
         "additionalProperties": false,
         "properties": {
+          "next_offset": {
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
           "views": {
             "items": {
               "additionalProperties": false,
@@ -3334,61 +3368,26 @@
                 "config": {
                   "additionalProperties": false,
                   "properties": {
-                    "columns": {
+                    "field_gids": {
                       "items": {
-                        "additionalProperties": false,
-                        "properties": {
-                          "key": {
-                            "maxLength": 512,
-                            "minLength": 1,
-                            "type": "string"
-                          },
-                          "order": {
-                            "minimum": 0,
-                            "type": "integer"
-                          },
-                          "visible": {
-                            "type": "boolean"
-                          },
-                          "width": {
-                            "maximum": 2000,
-                            "minimum": 40,
-                            "type": "integer"
-                          }
-                        },
-                        "required": [
-                          "key",
-                          "visible",
-                          "order",
-                          "width"
-                        ],
-                        "type": "object"
+                        "maxLength": 512,
+                        "minLength": 1,
+                        "type": "string"
                       },
                       "maxItems": 200,
-                      "type": "array"
-                    },
-                    "filterMode": {
-                      "enum": [
-                        "and",
-                        "or"
-                      ],
-                      "type": "string"
+                      "type": "array",
+                      "uniqueItems": true
                     },
                     "filters": {
                       "items": {
                         "additionalProperties": false,
                         "properties": {
-                          "field": {
+                          "field_gid": {
                             "maxLength": 512,
                             "minLength": 1,
                             "type": "string"
                           },
-                          "id": {
-                            "maxLength": 512,
-                            "minLength": 1,
-                            "type": "string"
-                          },
-                          "op": {
+                          "operator": {
                             "enum": [
                               "contains",
                               "not_contains",
@@ -3434,9 +3433,8 @@
                           }
                         },
                         "required": [
-                          "id",
-                          "field",
-                          "op",
+                          "field_gid",
+                          "operator",
                           "value"
                         ],
                         "type": "object"
@@ -3444,62 +3442,51 @@
                       "maxItems": 50,
                       "type": "array"
                     },
-                    "groupBy": {
-                      "maxLength": 512,
-                      "type": [
-                        "string",
-                        "null"
-                      ]
+                    "page_size": {
+                      "maximum": 500,
+                      "minimum": 1,
+                      "type": "integer"
                     },
-                    "sorts": {
+                    "presentation": {
+                      "enum": [
+                        "table",
+                        "list"
+                      ],
+                      "type": "string"
+                    },
+                    "sort": {
                       "items": {
                         "additionalProperties": false,
                         "properties": {
-                          "dir": {
+                          "direction": {
                             "enum": [
                               "asc",
                               "desc"
                             ],
                             "type": "string"
                           },
-                          "field": {
+                          "field_gid": {
                             "maxLength": 512,
                             "minLength": 1,
                             "type": "string"
                           }
                         },
                         "required": [
-                          "field",
-                          "dir"
+                          "field_gid",
+                          "direction"
                         ],
                         "type": "object"
                       },
                       "maxItems": 20,
                       "type": "array"
-                    },
-                    "treeParentField": {
-                      "maxLength": 512,
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    },
-                    "viewType": {
-                      "enum": [
-                        "grid",
-                        "tree"
-                      ],
-                      "type": "string"
                     }
                   },
                   "required": [
-                    "columns",
+                    "field_gids",
                     "filters",
-                    "filterMode",
-                    "sorts",
-                    "groupBy",
-                    "viewType",
-                    "treeParentField"
+                    "sort",
+                    "page_size",
+                    "presentation"
                   ],
                   "type": "object"
                 },
@@ -3600,14 +3587,15 @@
           }
         },
         "required": [
-          "views"
+          "views",
+          "next_offset"
         ],
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -3624,32 +3612,24 @@
       "consistency_policy": "strong",
       "example_input": {
         "config": {
-          "columns": [
-            {
-              "key": "field_1",
-              "order": 0,
-              "visible": true,
-              "width": 120
-            }
+          "field_gids": [
+            "field_1"
           ],
-          "filterMode": "and",
           "filters": [
             {
-              "field": "field_1",
-              "id": "filter_1",
-              "op": "eq",
+              "field_gid": "field_1",
+              "operator": "eq",
               "value": "open"
             }
           ],
-          "groupBy": null,
-          "sorts": [
+          "page_size": 200,
+          "presentation": "table",
+          "sort": [
             {
-              "dir": "asc",
-              "field": "field_1"
+              "direction": "asc",
+              "field_gid": "field_1"
             }
-          ],
-          "treeParentField": null,
-          "viewType": "grid"
+          ]
         },
         "idempotency_key": "idem-1",
         "name": "Open",
@@ -3658,32 +3638,24 @@
       "example_output": {
         "view": {
           "config": {
-            "columns": [
-              {
-                "key": "field_1",
-                "order": 0,
-                "visible": true,
-                "width": 120
-              }
+            "field_gids": [
+              "field_1"
             ],
-            "filterMode": "and",
             "filters": [
               {
-                "field": "field_1",
-                "id": "filter_1",
-                "op": "eq",
+                "field_gid": "field_1",
+                "operator": "eq",
                 "value": "open"
               }
             ],
-            "groupBy": null,
-            "sorts": [
+            "page_size": 200,
+            "presentation": "table",
+            "sort": [
               {
-                "dir": "asc",
-                "field": "field_1"
+                "direction": "asc",
+                "field_gid": "field_1"
               }
-            ],
-            "treeParentField": null,
-            "viewType": "grid"
+            ]
           },
           "deleted": false,
           "gid": "view_1",
@@ -3719,61 +3691,26 @@
           "config": {
             "additionalProperties": false,
             "properties": {
-              "columns": {
+              "field_gids": {
                 "items": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "key": {
-                      "maxLength": 512,
-                      "minLength": 1,
-                      "type": "string"
-                    },
-                    "order": {
-                      "minimum": 0,
-                      "type": "integer"
-                    },
-                    "visible": {
-                      "type": "boolean"
-                    },
-                    "width": {
-                      "maximum": 2000,
-                      "minimum": 40,
-                      "type": "integer"
-                    }
-                  },
-                  "required": [
-                    "key",
-                    "visible",
-                    "order",
-                    "width"
-                  ],
-                  "type": "object"
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
                 },
                 "maxItems": 200,
-                "type": "array"
-              },
-              "filterMode": {
-                "enum": [
-                  "and",
-                  "or"
-                ],
-                "type": "string"
+                "type": "array",
+                "uniqueItems": true
               },
               "filters": {
                 "items": {
                   "additionalProperties": false,
                   "properties": {
-                    "field": {
+                    "field_gid": {
                       "maxLength": 512,
                       "minLength": 1,
                       "type": "string"
                     },
-                    "id": {
-                      "maxLength": 512,
-                      "minLength": 1,
-                      "type": "string"
-                    },
-                    "op": {
+                    "operator": {
                       "enum": [
                         "contains",
                         "not_contains",
@@ -3819,9 +3756,8 @@
                     }
                   },
                   "required": [
-                    "id",
-                    "field",
-                    "op",
+                    "field_gid",
+                    "operator",
                     "value"
                   ],
                   "type": "object"
@@ -3829,62 +3765,51 @@
                 "maxItems": 50,
                 "type": "array"
               },
-              "groupBy": {
-                "maxLength": 512,
-                "type": [
-                  "string",
-                  "null"
-                ]
+              "page_size": {
+                "maximum": 500,
+                "minimum": 1,
+                "type": "integer"
               },
-              "sorts": {
+              "presentation": {
+                "enum": [
+                  "table",
+                  "list"
+                ],
+                "type": "string"
+              },
+              "sort": {
                 "items": {
                   "additionalProperties": false,
                   "properties": {
-                    "dir": {
+                    "direction": {
                       "enum": [
                         "asc",
                         "desc"
                       ],
                       "type": "string"
                     },
-                    "field": {
+                    "field_gid": {
                       "maxLength": 512,
                       "minLength": 1,
                       "type": "string"
                     }
                   },
                   "required": [
-                    "field",
-                    "dir"
+                    "field_gid",
+                    "direction"
                   ],
                   "type": "object"
                 },
                 "maxItems": 20,
                 "type": "array"
-              },
-              "treeParentField": {
-                "maxLength": 512,
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "viewType": {
-                "enum": [
-                  "grid",
-                  "tree"
-                ],
-                "type": "string"
               }
             },
             "required": [
-              "columns",
+              "field_gids",
               "filters",
-              "filterMode",
-              "sorts",
-              "groupBy",
-              "viewType",
-              "treeParentField"
+              "sort",
+              "page_size",
+              "presentation"
             ],
             "type": "object"
           },
@@ -3962,61 +3887,26 @@
               "config": {
                 "additionalProperties": false,
                 "properties": {
-                  "columns": {
+                  "field_gids": {
                     "items": {
-                      "additionalProperties": false,
-                      "properties": {
-                        "key": {
-                          "maxLength": 512,
-                          "minLength": 1,
-                          "type": "string"
-                        },
-                        "order": {
-                          "minimum": 0,
-                          "type": "integer"
-                        },
-                        "visible": {
-                          "type": "boolean"
-                        },
-                        "width": {
-                          "maximum": 2000,
-                          "minimum": 40,
-                          "type": "integer"
-                        }
-                      },
-                      "required": [
-                        "key",
-                        "visible",
-                        "order",
-                        "width"
-                      ],
-                      "type": "object"
+                      "maxLength": 512,
+                      "minLength": 1,
+                      "type": "string"
                     },
                     "maxItems": 200,
-                    "type": "array"
-                  },
-                  "filterMode": {
-                    "enum": [
-                      "and",
-                      "or"
-                    ],
-                    "type": "string"
+                    "type": "array",
+                    "uniqueItems": true
                   },
                   "filters": {
                     "items": {
                       "additionalProperties": false,
                       "properties": {
-                        "field": {
+                        "field_gid": {
                           "maxLength": 512,
                           "minLength": 1,
                           "type": "string"
                         },
-                        "id": {
-                          "maxLength": 512,
-                          "minLength": 1,
-                          "type": "string"
-                        },
-                        "op": {
+                        "operator": {
                           "enum": [
                             "contains",
                             "not_contains",
@@ -4062,9 +3952,8 @@
                         }
                       },
                       "required": [
-                        "id",
-                        "field",
-                        "op",
+                        "field_gid",
+                        "operator",
                         "value"
                       ],
                       "type": "object"
@@ -4072,62 +3961,51 @@
                     "maxItems": 50,
                     "type": "array"
                   },
-                  "groupBy": {
-                    "maxLength": 512,
-                    "type": [
-                      "string",
-                      "null"
-                    ]
+                  "page_size": {
+                    "maximum": 500,
+                    "minimum": 1,
+                    "type": "integer"
                   },
-                  "sorts": {
+                  "presentation": {
+                    "enum": [
+                      "table",
+                      "list"
+                    ],
+                    "type": "string"
+                  },
+                  "sort": {
                     "items": {
                       "additionalProperties": false,
                       "properties": {
-                        "dir": {
+                        "direction": {
                           "enum": [
                             "asc",
                             "desc"
                           ],
                           "type": "string"
                         },
-                        "field": {
+                        "field_gid": {
                           "maxLength": 512,
                           "minLength": 1,
                           "type": "string"
                         }
                       },
                       "required": [
-                        "field",
-                        "dir"
+                        "field_gid",
+                        "direction"
                       ],
                       "type": "object"
                     },
                     "maxItems": 20,
                     "type": "array"
-                  },
-                  "treeParentField": {
-                    "maxLength": 512,
-                    "type": [
-                      "string",
-                      "null"
-                    ]
-                  },
-                  "viewType": {
-                    "enum": [
-                      "grid",
-                      "tree"
-                    ],
-                    "type": "string"
                   }
                 },
                 "required": [
-                  "columns",
+                  "field_gids",
                   "filters",
-                  "filterMode",
-                  "sorts",
-                  "groupBy",
-                  "viewType",
-                  "treeParentField"
+                  "sort",
+                  "page_size",
+                  "presentation"
                 ],
                 "type": "object"
               },
@@ -4232,7 +4110,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -4255,32 +4133,24 @@
       "example_output": {
         "view": {
           "config": {
-            "columns": [
-              {
-                "key": "field_1",
-                "order": 0,
-                "visible": true,
-                "width": 120
-              }
+            "field_gids": [
+              "field_1"
             ],
-            "filterMode": "and",
             "filters": [
               {
-                "field": "field_1",
-                "id": "filter_1",
-                "op": "eq",
+                "field_gid": "field_1",
+                "operator": "eq",
                 "value": "open"
               }
             ],
-            "groupBy": null,
-            "sorts": [
+            "page_size": 200,
+            "presentation": "table",
+            "sort": [
               {
-                "dir": "asc",
-                "field": "field_1"
+                "direction": "asc",
+                "field_gid": "field_1"
               }
-            ],
-            "treeParentField": null,
-            "viewType": "grid"
+            ]
           },
           "deleted": true,
           "gid": "view_1",
@@ -4291,7 +4161,7 @@
           "owner_gid": "user_1",
           "restore": {
             "available": true,
-            "deleted_at": "transaction",
+            "deleted_at": "2026-08-28T00:00:00+00:00",
             "deleted_by": "user_1"
           },
           "revision": 2,
@@ -4364,61 +4234,26 @@
               "config": {
                 "additionalProperties": false,
                 "properties": {
-                  "columns": {
+                  "field_gids": {
                     "items": {
-                      "additionalProperties": false,
-                      "properties": {
-                        "key": {
-                          "maxLength": 512,
-                          "minLength": 1,
-                          "type": "string"
-                        },
-                        "order": {
-                          "minimum": 0,
-                          "type": "integer"
-                        },
-                        "visible": {
-                          "type": "boolean"
-                        },
-                        "width": {
-                          "maximum": 2000,
-                          "minimum": 40,
-                          "type": "integer"
-                        }
-                      },
-                      "required": [
-                        "key",
-                        "visible",
-                        "order",
-                        "width"
-                      ],
-                      "type": "object"
+                      "maxLength": 512,
+                      "minLength": 1,
+                      "type": "string"
                     },
                     "maxItems": 200,
-                    "type": "array"
-                  },
-                  "filterMode": {
-                    "enum": [
-                      "and",
-                      "or"
-                    ],
-                    "type": "string"
+                    "type": "array",
+                    "uniqueItems": true
                   },
                   "filters": {
                     "items": {
                       "additionalProperties": false,
                       "properties": {
-                        "field": {
+                        "field_gid": {
                           "maxLength": 512,
                           "minLength": 1,
                           "type": "string"
                         },
-                        "id": {
-                          "maxLength": 512,
-                          "minLength": 1,
-                          "type": "string"
-                        },
-                        "op": {
+                        "operator": {
                           "enum": [
                             "contains",
                             "not_contains",
@@ -4464,9 +4299,8 @@
                         }
                       },
                       "required": [
-                        "id",
-                        "field",
-                        "op",
+                        "field_gid",
+                        "operator",
                         "value"
                       ],
                       "type": "object"
@@ -4474,62 +4308,51 @@
                     "maxItems": 50,
                     "type": "array"
                   },
-                  "groupBy": {
-                    "maxLength": 512,
-                    "type": [
-                      "string",
-                      "null"
-                    ]
+                  "page_size": {
+                    "maximum": 500,
+                    "minimum": 1,
+                    "type": "integer"
                   },
-                  "sorts": {
+                  "presentation": {
+                    "enum": [
+                      "table",
+                      "list"
+                    ],
+                    "type": "string"
+                  },
+                  "sort": {
                     "items": {
                       "additionalProperties": false,
                       "properties": {
-                        "dir": {
+                        "direction": {
                           "enum": [
                             "asc",
                             "desc"
                           ],
                           "type": "string"
                         },
-                        "field": {
+                        "field_gid": {
                           "maxLength": 512,
                           "minLength": 1,
                           "type": "string"
                         }
                       },
                       "required": [
-                        "field",
-                        "dir"
+                        "field_gid",
+                        "direction"
                       ],
                       "type": "object"
                     },
                     "maxItems": 20,
                     "type": "array"
-                  },
-                  "treeParentField": {
-                    "maxLength": 512,
-                    "type": [
-                      "string",
-                      "null"
-                    ]
-                  },
-                  "viewType": {
-                    "enum": [
-                      "grid",
-                      "tree"
-                    ],
-                    "type": "string"
                   }
                 },
                 "required": [
-                  "columns",
+                  "field_gids",
                   "filters",
-                  "filterMode",
-                  "sorts",
-                  "groupBy",
-                  "viewType",
-                  "treeParentField"
+                  "sort",
+                  "page_size",
+                  "presentation"
                 ],
                 "type": "object"
               },
@@ -4634,7 +4457,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -4651,32 +4474,24 @@
       "consistency_policy": "strong",
       "example_input": {
         "config": {
-          "columns": [
-            {
-              "key": "field_1",
-              "order": 0,
-              "visible": true,
-              "width": 120
-            }
+          "field_gids": [
+            "field_1"
           ],
-          "filterMode": "and",
           "filters": [
             {
-              "field": "field_1",
-              "id": "filter_1",
-              "op": "eq",
+              "field_gid": "field_1",
+              "operator": "eq",
               "value": "open"
             }
           ],
-          "groupBy": null,
-          "sorts": [
+          "page_size": 200,
+          "presentation": "table",
+          "sort": [
             {
-              "dir": "asc",
-              "field": "field_1"
+              "direction": "asc",
+              "field_gid": "field_1"
             }
-          ],
-          "treeParentField": null,
-          "viewType": "grid"
+          ]
         },
         "expected_revision": 1,
         "idempotency_key": "idem-2",
@@ -4686,32 +4501,24 @@
       "example_output": {
         "view": {
           "config": {
-            "columns": [
-              {
-                "key": "field_1",
-                "order": 0,
-                "visible": true,
-                "width": 120
-              }
+            "field_gids": [
+              "field_1"
             ],
-            "filterMode": "and",
             "filters": [
               {
-                "field": "field_1",
-                "id": "filter_1",
-                "op": "eq",
+                "field_gid": "field_1",
+                "operator": "eq",
                 "value": "open"
               }
             ],
-            "groupBy": null,
-            "sorts": [
+            "page_size": 200,
+            "presentation": "table",
+            "sort": [
               {
-                "dir": "asc",
-                "field": "field_1"
+                "direction": "asc",
+                "field_gid": "field_1"
               }
-            ],
-            "treeParentField": null,
-            "viewType": "grid"
+            ]
           },
           "deleted": false,
           "gid": "view_1",
@@ -4747,61 +4554,26 @@
           "config": {
             "additionalProperties": false,
             "properties": {
-              "columns": {
+              "field_gids": {
                 "items": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "key": {
-                      "maxLength": 512,
-                      "minLength": 1,
-                      "type": "string"
-                    },
-                    "order": {
-                      "minimum": 0,
-                      "type": "integer"
-                    },
-                    "visible": {
-                      "type": "boolean"
-                    },
-                    "width": {
-                      "maximum": 2000,
-                      "minimum": 40,
-                      "type": "integer"
-                    }
-                  },
-                  "required": [
-                    "key",
-                    "visible",
-                    "order",
-                    "width"
-                  ],
-                  "type": "object"
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
                 },
                 "maxItems": 200,
-                "type": "array"
-              },
-              "filterMode": {
-                "enum": [
-                  "and",
-                  "or"
-                ],
-                "type": "string"
+                "type": "array",
+                "uniqueItems": true
               },
               "filters": {
                 "items": {
                   "additionalProperties": false,
                   "properties": {
-                    "field": {
+                    "field_gid": {
                       "maxLength": 512,
                       "minLength": 1,
                       "type": "string"
                     },
-                    "id": {
-                      "maxLength": 512,
-                      "minLength": 1,
-                      "type": "string"
-                    },
-                    "op": {
+                    "operator": {
                       "enum": [
                         "contains",
                         "not_contains",
@@ -4847,9 +4619,8 @@
                     }
                   },
                   "required": [
-                    "id",
-                    "field",
-                    "op",
+                    "field_gid",
+                    "operator",
                     "value"
                   ],
                   "type": "object"
@@ -4857,62 +4628,51 @@
                 "maxItems": 50,
                 "type": "array"
               },
-              "groupBy": {
-                "maxLength": 512,
-                "type": [
-                  "string",
-                  "null"
-                ]
+              "page_size": {
+                "maximum": 500,
+                "minimum": 1,
+                "type": "integer"
               },
-              "sorts": {
+              "presentation": {
+                "enum": [
+                  "table",
+                  "list"
+                ],
+                "type": "string"
+              },
+              "sort": {
                 "items": {
                   "additionalProperties": false,
                   "properties": {
-                    "dir": {
+                    "direction": {
                       "enum": [
                         "asc",
                         "desc"
                       ],
                       "type": "string"
                     },
-                    "field": {
+                    "field_gid": {
                       "maxLength": 512,
                       "minLength": 1,
                       "type": "string"
                     }
                   },
                   "required": [
-                    "field",
-                    "dir"
+                    "field_gid",
+                    "direction"
                   ],
                   "type": "object"
                 },
                 "maxItems": 20,
                 "type": "array"
-              },
-              "treeParentField": {
-                "maxLength": 512,
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "viewType": {
-                "enum": [
-                  "grid",
-                  "tree"
-                ],
-                "type": "string"
               }
             },
             "required": [
-              "columns",
+              "field_gids",
               "filters",
-              "filterMode",
-              "sorts",
-              "groupBy",
-              "viewType",
-              "treeParentField"
+              "sort",
+              "page_size",
+              "presentation"
             ],
             "type": "object"
           },
@@ -5000,61 +4760,26 @@
               "config": {
                 "additionalProperties": false,
                 "properties": {
-                  "columns": {
+                  "field_gids": {
                     "items": {
-                      "additionalProperties": false,
-                      "properties": {
-                        "key": {
-                          "maxLength": 512,
-                          "minLength": 1,
-                          "type": "string"
-                        },
-                        "order": {
-                          "minimum": 0,
-                          "type": "integer"
-                        },
-                        "visible": {
-                          "type": "boolean"
-                        },
-                        "width": {
-                          "maximum": 2000,
-                          "minimum": 40,
-                          "type": "integer"
-                        }
-                      },
-                      "required": [
-                        "key",
-                        "visible",
-                        "order",
-                        "width"
-                      ],
-                      "type": "object"
+                      "maxLength": 512,
+                      "minLength": 1,
+                      "type": "string"
                     },
                     "maxItems": 200,
-                    "type": "array"
-                  },
-                  "filterMode": {
-                    "enum": [
-                      "and",
-                      "or"
-                    ],
-                    "type": "string"
+                    "type": "array",
+                    "uniqueItems": true
                   },
                   "filters": {
                     "items": {
                       "additionalProperties": false,
                       "properties": {
-                        "field": {
+                        "field_gid": {
                           "maxLength": 512,
                           "minLength": 1,
                           "type": "string"
                         },
-                        "id": {
-                          "maxLength": 512,
-                          "minLength": 1,
-                          "type": "string"
-                        },
-                        "op": {
+                        "operator": {
                           "enum": [
                             "contains",
                             "not_contains",
@@ -5100,9 +4825,8 @@
                         }
                       },
                       "required": [
-                        "id",
-                        "field",
-                        "op",
+                        "field_gid",
+                        "operator",
                         "value"
                       ],
                       "type": "object"
@@ -5110,62 +4834,51 @@
                     "maxItems": 50,
                     "type": "array"
                   },
-                  "groupBy": {
-                    "maxLength": 512,
-                    "type": [
-                      "string",
-                      "null"
-                    ]
+                  "page_size": {
+                    "maximum": 500,
+                    "minimum": 1,
+                    "type": "integer"
                   },
-                  "sorts": {
+                  "presentation": {
+                    "enum": [
+                      "table",
+                      "list"
+                    ],
+                    "type": "string"
+                  },
+                  "sort": {
                     "items": {
                       "additionalProperties": false,
                       "properties": {
-                        "dir": {
+                        "direction": {
                           "enum": [
                             "asc",
                             "desc"
                           ],
                           "type": "string"
                         },
-                        "field": {
+                        "field_gid": {
                           "maxLength": 512,
                           "minLength": 1,
                           "type": "string"
                         }
                       },
                       "required": [
-                        "field",
-                        "dir"
+                        "field_gid",
+                        "direction"
                       ],
                       "type": "object"
                     },
                     "maxItems": 20,
                     "type": "array"
-                  },
-                  "treeParentField": {
-                    "maxLength": 512,
-                    "type": [
-                      "string",
-                      "null"
-                    ]
-                  },
-                  "viewType": {
-                    "enum": [
-                      "grid",
-                      "tree"
-                    ],
-                    "type": "string"
                   }
                 },
                 "required": [
-                  "columns",
+                  "field_gids",
                   "filters",
-                  "filterMode",
-                  "sorts",
-                  "groupBy",
-                  "viewType",
-                  "treeParentField"
+                  "sort",
+                  "page_size",
+                  "presentation"
                 ],
                 "type": "object"
               },
@@ -5270,7 +4983,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -5293,32 +5006,24 @@
       "example_output": {
         "view": {
           "config": {
-            "columns": [
-              {
-                "key": "field_1",
-                "order": 0,
-                "visible": true,
-                "width": 120
-              }
+            "field_gids": [
+              "field_1"
             ],
-            "filterMode": "and",
             "filters": [
               {
-                "field": "field_1",
-                "id": "filter_1",
-                "op": "eq",
+                "field_gid": "field_1",
+                "operator": "eq",
                 "value": "open"
               }
             ],
-            "groupBy": null,
-            "sorts": [
+            "page_size": 200,
+            "presentation": "table",
+            "sort": [
               {
-                "dir": "asc",
-                "field": "field_1"
+                "direction": "asc",
+                "field_gid": "field_1"
               }
-            ],
-            "treeParentField": null,
-            "viewType": "grid"
+            ]
           },
           "deleted": false,
           "gid": "view_2",
@@ -5399,61 +5104,26 @@
               "config": {
                 "additionalProperties": false,
                 "properties": {
-                  "columns": {
+                  "field_gids": {
                     "items": {
-                      "additionalProperties": false,
-                      "properties": {
-                        "key": {
-                          "maxLength": 512,
-                          "minLength": 1,
-                          "type": "string"
-                        },
-                        "order": {
-                          "minimum": 0,
-                          "type": "integer"
-                        },
-                        "visible": {
-                          "type": "boolean"
-                        },
-                        "width": {
-                          "maximum": 2000,
-                          "minimum": 40,
-                          "type": "integer"
-                        }
-                      },
-                      "required": [
-                        "key",
-                        "visible",
-                        "order",
-                        "width"
-                      ],
-                      "type": "object"
+                      "maxLength": 512,
+                      "minLength": 1,
+                      "type": "string"
                     },
                     "maxItems": 200,
-                    "type": "array"
-                  },
-                  "filterMode": {
-                    "enum": [
-                      "and",
-                      "or"
-                    ],
-                    "type": "string"
+                    "type": "array",
+                    "uniqueItems": true
                   },
                   "filters": {
                     "items": {
                       "additionalProperties": false,
                       "properties": {
-                        "field": {
+                        "field_gid": {
                           "maxLength": 512,
                           "minLength": 1,
                           "type": "string"
                         },
-                        "id": {
-                          "maxLength": 512,
-                          "minLength": 1,
-                          "type": "string"
-                        },
-                        "op": {
+                        "operator": {
                           "enum": [
                             "contains",
                             "not_contains",
@@ -5499,9 +5169,8 @@
                         }
                       },
                       "required": [
-                        "id",
-                        "field",
-                        "op",
+                        "field_gid",
+                        "operator",
                         "value"
                       ],
                       "type": "object"
@@ -5509,62 +5178,51 @@
                     "maxItems": 50,
                     "type": "array"
                   },
-                  "groupBy": {
-                    "maxLength": 512,
-                    "type": [
-                      "string",
-                      "null"
-                    ]
+                  "page_size": {
+                    "maximum": 500,
+                    "minimum": 1,
+                    "type": "integer"
                   },
-                  "sorts": {
+                  "presentation": {
+                    "enum": [
+                      "table",
+                      "list"
+                    ],
+                    "type": "string"
+                  },
+                  "sort": {
                     "items": {
                       "additionalProperties": false,
                       "properties": {
-                        "dir": {
+                        "direction": {
                           "enum": [
                             "asc",
                             "desc"
                           ],
                           "type": "string"
                         },
-                        "field": {
+                        "field_gid": {
                           "maxLength": 512,
                           "minLength": 1,
                           "type": "string"
                         }
                       },
                       "required": [
-                        "field",
-                        "dir"
+                        "field_gid",
+                        "direction"
                       ],
                       "type": "object"
                     },
                     "maxItems": 20,
                     "type": "array"
-                  },
-                  "treeParentField": {
-                    "maxLength": 512,
-                    "type": [
-                      "string",
-                      "null"
-                    ]
-                  },
-                  "viewType": {
-                    "enum": [
-                      "grid",
-                      "tree"
-                    ],
-                    "type": "string"
                   }
                 },
                 "required": [
-                  "columns",
+                  "field_gids",
                   "filters",
-                  "filterMode",
-                  "sorts",
-                  "groupBy",
-                  "viewType",
-                  "treeParentField"
+                  "sort",
+                  "page_size",
+                  "presentation"
                 ],
                 "type": "object"
               },
@@ -5669,7 +5327,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",

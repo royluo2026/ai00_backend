@@ -158,3 +158,58 @@ def test_uninstall_rejects_stale_revision_and_cross_tenant_access():
         lifecycle.transition_uninstall(actor=ACTOR, command={**UNINSTALL, "expected_revision": 3})
     with pytest.raises(PluginLifecycleError, match="resource_not_found"):
         lifecycle.transition_uninstall(actor={"gid": "user_2", "tenant_gid": "tenant_2"}, command={**UNINSTALL, "expected_revision": 1})
+
+
+def test_catalog_dependency_resolver_uses_active_immutable_release_exact_major_and_stable_plugin_exposure():
+    from types import SimpleNamespace
+
+    from backend.plugin_platform.manifest import parse_manifest
+    from backend.plugin_platform.service import CatalogDependencyResolver, PluginLifecycleError
+
+    manifest = deepcopy(MemoryPluginLifecycleRepository().releases[("devteam.example.plugin", "1.2.3")]["manifest"])
+    manifest["capabilities"] = {"required": [{"id": "project.read", "major": 1}], "optional": []}
+    parsed = parse_manifest(manifest)
+
+    class CatalogReleasePort:
+        def __init__(self, descriptor):
+            self.descriptor = descriptor
+            self.calls = []
+
+        def resolve(self, capability_id, major):
+            self.calls.append((capability_id, major))
+            return self.descriptor
+
+    stable = SimpleNamespace(lifecycle_status="stable", exposure=SimpleNamespace(plugin=True))
+    port = CatalogReleasePort(stable)
+    resolver = CatalogDependencyResolver(MemoryPluginLifecycleRepository(), catalog_release_port=port)
+    resolver.resolve(tenant_gid="tenant_1", manifest=parsed)
+    assert port.calls == [("project.read", 1)]
+
+    for descriptor in (
+        SimpleNamespace(lifecycle_status="experimental", exposure=SimpleNamespace(plugin=True)),
+        SimpleNamespace(lifecycle_status="stable", exposure=SimpleNamespace(plugin=False)),
+        None,
+    ):
+        with pytest.raises(PluginLifecycleError, match="release_not_verified"):
+            CatalogDependencyResolver(
+                MemoryPluginLifecycleRepository(),
+                catalog_release_port=CatalogReleasePort(descriptor),
+            ).resolve(tenant_gid="tenant_1", manifest=parsed)
+
+    class MissingCatalogReleasePort:
+        def resolve(self, _capability_id, _major):
+            raise KeyError("missing")
+
+    with pytest.raises(PluginLifecycleError, match="release_not_verified"):
+        CatalogDependencyResolver(
+            MemoryPluginLifecycleRepository(),
+            catalog_release_port=MissingCatalogReleasePort(),
+        ).resolve(tenant_gid="tenant_1", manifest=parsed)
+
+
+def test_installed_projection_carries_tenant_bound_revision():
+    lifecycle, repository = service()
+    installed = lifecycle.request_install(actor=ACTOR, command=INSTALL)
+    repository.list_installations = lambda tenant_gid: [deepcopy(repository.installations[(tenant_gid, INSTALL["plugin_id"])])]
+
+    assert lifecycle.list_installed(actor=ACTOR) == {"installations": [installed]}

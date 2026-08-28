@@ -3,7 +3,7 @@
   "artifact_id": "existing-capability-web-migrations",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "baseline_revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-  "frontend_revision": "5d6dc5cad342d75a4137219ca7bbb5ece71899d2",
+  "frontend_revision": "0647ee87ab48c8e6fb4092e5fa708d675767b41c",
   "groups": [
     {
       "method": "DELETE",
@@ -167,16 +167,16 @@
           "line": 307,
           "column": 27,
           "operation": "base.plugins.uninstall",
-          "source_sha256": "0f43f54421116086204e0eb5e36792d96efa1136d2398e77074999a342473f99"
+          "source_sha256": "b755c18b31f170d74b1b703524e2cfc3bed14f8fc7e6119af57edb43f8b73d9b"
         }
       ],
       "equivalence_evidence": {
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
-          "start_line": 269,
-          "end_line": 269,
+          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "start_line": 272,
+          "end_line": 272,
           "sha256": "f7bcbf43257471c7a2821fbe4e1c9fddf6f1a87ff8ad68f6bd38c1f8cc363568",
           "needle": "\"base.plugin.installation.transition.uninstall\": _plugin_uninstall"
         }
@@ -224,19 +224,19 @@
       "frontend_call_sites": [
         {
           "source_path": "web/components/view_manager.js",
-          "line": 1005,
-          "column": 28,
+          "line": 951,
+          "column": 26,
           "operation": "base.savedViews.delete",
-          "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+          "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
         }
       ],
       "equivalence_evidence": {
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
-          "start_line": 284,
-          "end_line": 284,
+          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "start_line": 287,
+          "end_line": 287,
           "sha256": "56229834691651b93ee38d67bb2fa715d321afba6c0af79b064497283f1a380b",
           "needle": "\"base.saved_view.delete\": _saved_view_delete"
         }
@@ -1278,9 +1278,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
-          "start_line": 275,
-          "end_line": 275,
+          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "start_line": 278,
+          "end_line": 278,
           "sha256": "ba8c659ed3eed4912fc0cdeaab4c3f0466d25eb1a92fb775b6c28571cdb5c0f7",
           "needle": "\"base.self_annotation.search\": _annotation_search"
         }
@@ -1338,9 +1338,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
-          "start_line": 274,
-          "end_line": 274,
+          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "start_line": 277,
+          "end_line": 277,
           "sha256": "0edcb0661f98ef845497594383b300542dd04c2746eb0498cc25acc8537588df",
           "needle": "\"base.self_annotation.record.get\": _annotation_get"
         }
@@ -1641,9 +1641,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
-          "start_line": 277,
-          "end_line": 277,
+          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "start_line": 280,
+          "end_line": 280,
           "sha256": "d9e31fd15b3fc655e44c4700447418464354287cd1311a4e883ab8f44bad72d0",
           "needle": "\"base.identity.session.profile.get\": _identity_profile"
         }
@@ -1803,19 +1803,19 @@
         },
         {
           "source_path": "web/components/view_manager.js",
-          "line": 538,
+          "line": 539,
           "column": 40,
           "operation": "base.savedViews.search",
-          "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+          "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
         }
       ],
       "equivalence_evidence": {
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
-          "start_line": 280,
-          "end_line": 280,
+          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "start_line": 283,
+          "end_line": 283,
           "sha256": "21e5f4f93bdc09b1ba703dc17a13307584bfc738466d3a1b71e4a491ef61c806",
           "needle": "\"base.saved_view.search\": _saved_view_search"
         }
@@ -2145,26 +2145,26 @@
       "frontend_call_sites": [
         {
           "source_path": "web/components/view_manager.js",
-          "line": 644,
+          "line": 629,
           "column": 44,
           "operation": "base.savedViews.update",
-          "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+          "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
         },
         {
           "source_path": "web/components/view_manager.js",
-          "line": 1016,
-          "column": 42,
+          "line": 969,
+          "column": 38,
           "operation": "base.savedViews.update",
-          "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+          "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
         }
       ],
       "equivalence_evidence": {
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
-          "start_line": 282,
-          "end_line": 282,
+          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "start_line": 285,
+          "end_line": 285,
           "sha256": "799823cab800457fc52e02ea377c4efecaf3f4fb565b0f2a67b8e1ec6425e8e4",
           "needle": "\"base.saved_view.update\": _saved_view_update"
         }
@@ -2731,16 +2731,16 @@
           "line": 290,
           "column": 27,
           "operation": "base.plugins.install",
-          "source_sha256": "0f43f54421116086204e0eb5e36792d96efa1136d2398e77074999a342473f99"
+          "source_sha256": "b755c18b31f170d74b1b703524e2cfc3bed14f8fc7e6119af57edb43f8b73d9b"
         }
       ],
       "equivalence_evidence": {
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
-          "start_line": 268,
-          "end_line": 268,
+          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "start_line": 271,
+          "end_line": 271,
           "sha256": "34c9a56b6eb9924d2918aa691ef9ad3c25d95766958763f767d47eb52a5b8c07",
           "needle": "\"base.plugin.installation.request.create\": _plugin_install"
         }
@@ -3051,26 +3051,26 @@
       "frontend_call_sites": [
         {
           "source_path": "web/components/view_manager.js",
-          "line": 653,
+          "line": 638,
           "column": 44,
           "operation": "base.savedViews.create",
-          "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+          "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
         },
         {
           "source_path": "web/components/view_manager.js",
-          "line": 712,
-          "column": 42,
+          "line": 677,
+          "column": 44,
           "operation": "base.savedViews.create",
-          "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+          "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
         }
       ],
       "equivalence_evidence": {
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
-          "start_line": 281,
-          "end_line": 281,
+          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "start_line": 284,
+          "end_line": 284,
           "sha256": "9d9ed3d4a5619754b9c0df361a0b2b4c01d1052d00d57414e9a50f40e172840c",
           "needle": "\"base.saved_view.create\": _saved_view_create"
         }
@@ -3118,19 +3118,19 @@
       "frontend_call_sites": [
         {
           "source_path": "web/components/view_manager.js",
-          "line": 978,
-          "column": 44,
+          "line": 933,
+          "column": 40,
           "operation": "base.savedViews.copy",
-          "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+          "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
         }
       ],
       "equivalence_evidence": {
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
-          "start_line": 283,
-          "end_line": 283,
+          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "start_line": 286,
+          "end_line": 286,
           "sha256": "c68df23c39cb7979116bd209087170259a02fc5ec888ee1020a0dfd92f6c6848",
           "needle": "\"base.saved_view.copy\": _saved_view_copy"
         }
@@ -3520,9 +3520,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
-          "start_line": 276,
-          "end_line": 276,
+          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "start_line": 279,
+          "end_line": 279,
           "sha256": "c3860599d5ff529f59467bb49216cb62b04152c559aa2d9587ebff1871e8965e",
           "needle": "\"base.self_annotation.change.apply\": _annotation_change"
         }

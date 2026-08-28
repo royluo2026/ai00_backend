@@ -6,6 +6,7 @@ import json
 import threading
 import uuid
 from datetime import UTC, datetime, timedelta
+from pathlib import PurePosixPath
 from typing import BinaryIO, Callable, Literal, Protocol
 
 from .contracts import ArtifactRef, ConsumerIdentity, FrozenModel
@@ -275,6 +276,15 @@ class SqlArtifactStore:
                         json.dumps(record.resource_refs), record.created_at,
                     ),
                 )
+                if ref.byte_size <= 50 * 1024 * 1024 and (ref.media_type.startswith(("image/", "text/")) or ref.media_type == "application/pdf"):
+                    cursor.execute(
+                        "INSERT INTO workmanship_base_attachment_references "
+                        "(attachment_gid,actor_gid,tenant_gid,media_type,display_name,size,checksum) "
+                        "VALUES (%s,%s,%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE "
+                        "media_type=VALUES(media_type),display_name=VALUES(display_name),size=VALUES(size),checksum=VALUES(checksum)",
+                        (ref.artifact_id, record.actor_id, record.tenant_id, ref.media_type,
+                         PurePosixPath(record.object_key).name, ref.byte_size, f"sha256:{ref.sha256}"),
+                    )
                 cursor.execute(
                     f"UPDATE {self.UPLOAD_TABLE} SET status='completed',artifact_id=%s "
                     "WHERE upload_id=%s AND status='uploaded'",

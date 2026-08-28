@@ -8,7 +8,7 @@ Execute exact Base outcome base.identity.session.profile.get.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_9f169ceddb4f7eb3e6c30f63861e655b`
+- Catalog Release：`rel_9618bda183d820aa83b56a9e47500f2b`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -79,7 +79,7 @@ Execute exact Base outcome base.identity.session.profile.get.
 ```json
 {
   "capability_id": "base.identity.session.profile.get",
-  "catalog_release": "rel_9f169ceddb4f7eb3e6c30f63861e655b",
+  "catalog_release": "rel_9618bda183d820aa83b56a9e47500f2b",
   "major_version": 1,
   "payload": {}
 }
@@ -187,14 +187,9 @@ Execute exact Base outcome base.identity.session.profile.get.
 
 领域错误：
 
-- `resource_not_found`：The requested Base resource does not exist or is not visible.（retryable=false）
-- `permission_denied`：The caller lacks a required Base Platform permission.（retryable=false）
-- `approval_required`：The governed operation requires a valid approval.（retryable=false）
-- `authentication_stale`：The caller must authenticate again before this high-risk operation.（retryable=false）
-- `idempotency_conflict`：The idempotency key is bound to a different request.（retryable=false）
-- `version_conflict`：The resource version differs from the expected version.（retryable=false）
-- `provider_unavailable`：A required domain provider is not registered.（retryable=true）
-- `plugin_state_conflict`：The plugin installation cannot perform this lifecycle transition.（retryable=false）
+- `identity_not_found`：base.identity.session.profile.get can return identity_not_found.（retryable=false）
+- `invalid_input`：base.identity.session.profile.get can return invalid_input.（retryable=false）
+- `tenant_mismatch`：base.identity.session.profile.get can return tenant_mismatch.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

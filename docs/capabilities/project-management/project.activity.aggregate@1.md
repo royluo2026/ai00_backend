@@ -8,7 +8,7 @@ Execute the reviewed project.activity.aggregate project outcome.
 - 不适用：The operation belongs to another domain.
 - 生命周期：`deprecated`
 - 所属领域：`project_management`
-- Catalog Release：`rel_9f169ceddb4f7eb3e6c30f63861e655b`
+- Catalog Release：`rel_9618bda183d820aa83b56a9e47500f2b`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -93,7 +93,7 @@ Execute the reviewed project.activity.aggregate project outcome.
 ```json
 {
   "capability_id": "project.activity.aggregate",
-  "catalog_release": "rel_9f169ceddb4f7eb3e6c30f63861e655b",
+  "catalog_release": "rel_9618bda183d820aa83b56a9e47500f2b",
   "major_version": 1,
   "payload": {
     "arguments": {},

@@ -42,8 +42,8 @@ def _http(exc: SelfAnnotationError) -> HTTPException:
 @router.get("/batch")
 def get_batch(gids: str = Query(""), user: dict = Depends(get_current_user)):
     values = [value.strip() for value in gids.split(",") if value.strip()][:200]
-    records = [_service().get(actor=user, item_gid=value)["annotation"] for value in values]
-    return {item["item_gid"]: {"status": item["status"], "schedule": item["schedule"] or "", "has_note": bool(item["note"]), "attach_count": len(item["attachments"])} for item in records if not item["deleted"]}
+    records = _service().batch(actor=user, item_gids=values)["items"]
+    return {item["item_gid"]: {key: item[key] for key in ("status", "schedule", "has_note", "attach_count")} for item in records}
 
 
 @router.get("/list")

@@ -8,7 +8,7 @@ Execute the reviewed craft.rule.change.apply Craft outcome.
 - 不适用：The operation belongs to another business domain.
 - 生命周期：`deprecated`
 - 所属领域：`craft`
-- Catalog Release：`rel_9f169ceddb4f7eb3e6c30f63861e655b`
+- Catalog Release：`rel_9618bda183d820aa83b56a9e47500f2b`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -96,7 +96,7 @@ Execute the reviewed craft.rule.change.apply Craft outcome.
 ```json
 {
   "capability_id": "craft.rule.change.apply",
-  "catalog_release": "rel_9f169ceddb4f7eb3e6c30f63861e655b",
+  "catalog_release": "rel_9618bda183d820aa83b56a9e47500f2b",
   "major_version": 1,
   "payload": {
     "arguments": {},

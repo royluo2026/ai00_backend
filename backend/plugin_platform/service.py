@@ -120,23 +120,31 @@ class DependencyResolver(Protocol):
     def resolve(self, *, tenant_gid: str, manifest: PluginManifestV2) -> None: ...
 
 
+class ActiveCatalogReleasePort:
+    """Resolve from the immutable Catalog release currently bound to the gateway."""
+    def resolve(self, capability_id: str, major: int) -> Any:
+        from backend.capability_v2.gateway import get_default_gateway
+        return get_default_gateway().catalog().descriptor(capability_id, major)
+
+
 class CatalogDependencyResolver:
     """Resolve signed dependencies through the stable Catalog and tenant installation port."""
 
-    def __init__(self, installations: Any) -> None:
+    def __init__(self, installations: Any, *, catalog_release_port: Any | None = None) -> None:
         self.installations = installations
+        self.catalog_release_port = catalog_release_port or ActiveCatalogReleasePort()
 
     def resolve(self, *, tenant_gid: str, manifest: PluginManifestV2) -> None:
-        from backend.capability_v2.bootstrap import get_capability_registry
-
-        registry = get_capability_registry()
         for requirement in manifest.capabilities.required:
             try:
-                capability = registry.get(requirement.id, requirement.major).spec
+                capability = self.catalog_release_port.resolve(requirement.id, requirement.major)
             except KeyError as exc:
-                raise PluginLifecycleError("release_not_verified", "required capability dependency is unavailable") from exc
-            if not capability.plugin_callable:
-                raise PluginLifecycleError("release_not_verified", "required capability dependency is not plugin-callable")
+                raise PluginLifecycleError(
+                    "release_not_verified", "required stable plugin capability dependency is unavailable"
+                ) from exc
+            lifecycle = getattr(getattr(capability, "lifecycle_status", None), "value", getattr(capability, "lifecycle_status", None))
+            if capability is None or lifecycle != "stable" or not bool(getattr(getattr(capability, "exposure", None), "plugin", False)):
+                raise PluginLifecycleError("release_not_verified", "required stable plugin capability dependency is unavailable")
         for requirement in manifest.plugins.required:
             installation = self.installations.installation(tenant_gid, requirement.plugin_id, lock=True)
             if installation is None or installation.get("state") == "uninstalled" or installation.get("release_version") != requirement.version:
@@ -186,6 +194,12 @@ class SqlPluginLifecycleRepository:
             )
             row = cur.fetchone()
         return self._row(dict(row)) if row else None
+
+    def list_installations(self, tenant_gid: str) -> list[dict[str, Any]]:
+        with self._cursor() as cur:
+            cur.execute("SELECT * FROM workmanship_plugin_installations WHERE tenant_gid=%s ORDER BY plugin_id", (tenant_gid,))
+            rows = cur.fetchall()
+        return [self._row(dict(row)) for row in rows]
 
     def save_installation(self, row: dict[str, Any]) -> None:
         with self._cursor() as cur:
@@ -279,6 +293,12 @@ class PluginPlatformService:
         self.repository = repository or SqlPluginLifecycleRepository()
         self.platform_public_key_provider = platform_public_key_provider or platform_public_key
         self.dependency_resolver = dependency_resolver or CatalogDependencyResolver(self.repository)
+
+    def list_installed(self, *, actor: dict) -> dict[str, Any]:
+        _actor_gid, tenant_gid = _lifecycle_actor(actor)
+        with self.repository.transaction():
+            rows = self.repository.list_installations(tenant_gid)
+        return {"installations": [self._result(row) for row in rows]}
 
     def request_install(self, *, actor: dict, command: dict) -> dict:
         command = self._install_command(command)

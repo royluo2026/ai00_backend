@@ -15,12 +15,14 @@ from backend.capability_v2.contracts import (
 )
 from backend.capability_v2.artifacts import (
     ArtifactAuthorizationError,
+    ArtifactRecord,
     ArtifactIntegrityError,
     ArtifactService,
     InMemoryArtifactStore,
     InMemoryObjectStorage,
     SqlArtifactStore,
 )
+from backend.capability_v2.contracts import ArtifactRef
 from backend.capability_v2.operations import (
     InMemoryOperationStore,
     OperationAuthorizationError,
@@ -293,6 +295,38 @@ def test_artifact_operation_migration_is_base_owned_and_contains_required_indexe
     assert "workmanship_base_capability_operations" in sql
     assert "unique key uq_base_artifact_object" in sql
     assert "operation_version" in sql
+
+
+def test_sql_artifact_finalization_registers_a_typed_annotation_attachment_reference():
+    now = datetime.now(UTC)
+
+    class FinalizeCursor(_Cursor):
+        def fetchone(self):
+            return {
+                "upload_id": "upload-1", "tenant_id": "tenant-a", "actor_id": "user-1",
+                "object_key": "uploads/photo.png", "media_type": "image/png",
+                "expected_sha256": "a" * 64, "expected_byte_size": 42,
+                "resource_refs_json": "[]", "status": "uploaded",
+                "uploaded_sha256": "a" * 64, "uploaded_byte_size": 42,
+                "artifact_id": None, "created_at": now, "expires_at": now + timedelta(minutes=5),
+            }
+
+    cursor = FinalizeCursor()
+    store = SqlArtifactStore(_connections(cursor))
+    record = ArtifactRecord(
+        artifact_ref=ArtifactRef(
+            artifact_id="artifact-1", media_type="image/png", sha256="a" * 64,
+            byte_size=42, version=1,
+        ),
+        tenant_id="tenant-a", actor_id="user-1", object_key="uploads/photo.png", created_at=now,
+    )
+
+    store.finalize("upload-1", record)
+
+    registration = next(sql for sql, _params in cursor.statements if "workmanship_base_attachment_references" in sql)
+    params = next(params for sql, params in cursor.statements if "workmanship_base_attachment_references" in sql)
+    assert registration.startswith("INSERT")
+    assert params[:7] == ("artifact-1", "user-1", "tenant-a", "image/png", "photo.png", 42, "sha256:" + "a" * 64)
 
 
 def test_artifact_and_operation_http_adapters_expose_only_governed_routes():

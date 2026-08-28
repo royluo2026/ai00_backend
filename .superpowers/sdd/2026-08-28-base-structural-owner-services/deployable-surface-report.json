@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "frontend_revision": "0647ee87ab48c8e6fb4092e5fa708d675767b41c",
+  "roots": [
+    "dist-production/packages",
+    "dist-production/web",
+    "packages/core/electron"
+  ],
+  "scanned_files": 220,
+  "findings": []
+}

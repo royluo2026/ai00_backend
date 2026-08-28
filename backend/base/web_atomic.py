@@ -106,9 +106,9 @@ def _sync_feishu(payload: dict[str, Any], context: object) -> dict[str, Any]:
     return {"ok": True, **sync_all_from_feishu(root_dept_id=payload.get("department_id"))}
 
 
-def _installed_plugins(_payload: dict[str, Any], _context: object) -> dict[str, Any]:
-    from backend.base.plugin_inventory import list_installed_plugins
-    return list_installed_plugins()
+def _installed_plugins(_payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.plugin_platform.service import PluginPlatformService
+    return PluginPlatformService().list_installed(actor=_actor(context))
 
 
 def _plugin_install(payload: dict[str, Any], context: object) -> dict[str, Any]:
@@ -162,10 +162,10 @@ def _teams(_payload: dict[str, Any], context: object) -> dict[str, Any]:
 
 
 def _annotation_batch(payload: dict[str, Any], context: object) -> dict[str, Any]:
-    from backend.base.structural_web import StructuralWebError, annotation_batch
+    from backend.base.self_annotations import SelfAnnotationError, SelfAnnotationService
     try:
-        return annotation_batch(actor=_actor(context), item_gids=payload["item_gids"])
-    except StructuralWebError as exc:
+        return SelfAnnotationService().batch(actor=_actor(context), item_gids=payload["item_gids"])
+    except SelfAnnotationError as exc:
         raise _structural_error(exc) from exc
 
 
@@ -194,8 +194,11 @@ def _annotation_change(payload: dict[str, Any], context: object) -> dict[str, An
 
 
 def _identity_profile(_payload: dict[str, Any], context: object) -> dict[str, Any]:
-    from backend.base.identity_profile import IdentityProfileService
-    return IdentityProfileService().get_current(actor=_actor(context))
+    from backend.base.identity_profile import IdentityProfileError, IdentityProfileService
+    try:
+        return IdentityProfileService().get_current(actor=_actor(context))
+    except IdentityProfileError as exc:
+        raise _structural_error(exc) from exc
 
 
 def _admin_users(_payload: dict[str, Any], context: object) -> dict[str, Any]:

@@ -40,3 +40,34 @@ def test_cross_domain_foreign_key_is_rejected_even_in_one_database():
     )
 
     assert [item.category for item in violations] == ["cross_domain_foreign_key"]
+
+
+def test_every_base_structural_migration_table_is_registered_to_base():
+    registry = load_registry()
+    expected = {
+        "workmanship_base_saved_view_states",
+        "workmanship_base_saved_view_idempotency",
+        "workmanship_base_saved_view_audit_events",
+        "workmanship_base_self_annotation_states",
+        "workmanship_base_self_annotation_idempotency",
+        "workmanship_base_self_annotation_audit_events",
+        "workmanship_base_attachment_references",
+        "workmanship_base_plugin_lifecycle_idempotency",
+    }
+
+    exact = json.loads(TABLE_OWNERSHIP.read_text(encoding="utf-8"))
+    owned = {row["table"]: row["owner"] for row in exact["tables"]}
+    assert {table: owned.get(table) for table in expected} == {table: "base" for table in expected}
+    assert all(registry.table_owner(table).owner == "base" for table in expected)
+
+
+def test_base_structural_hardening_migration_backfills_before_fail_closed_constraints():
+    migration = ROOT / "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+    sql = migration.read_text(encoding="utf-8").lower()
+
+    assert "tenant_gid" in sql and "command_digest" in sql
+    assert "workmanship_app_view_configs" in sql
+    assert "workmanship_base_self_annotations" in sql
+    assert "workmanship_base_artifacts" in sql and "workmanship_base_attachment_references" in sql
+    assert sql.index("update workmanship_app_view_configs") < sql.index("modify column tenant_gid")
+    assert "drop table" not in sql and "delete from" not in sql

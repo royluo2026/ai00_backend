@@ -10,7 +10,7 @@
     "no silent REST fallback"
   ],
   "artifact_id": "capability-v2-structural-remediation-plan",
-  "content_sha256": "sha256:678c3330a11226fa5d1a16e255760d78c30931fe4fe49c951c01c0b7664dcf72",
+  "content_sha256": "sha256:5898f3e3abc2714394b913e800b11fdef74dfee15d361aca8a4a8f46f499ee5d",
   "counts": {
     "groups": 37,
     "occurrences": 45
@@ -266,7 +266,7 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/base-structural-web-remediation.json",
         "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-        "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+        "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -274,7 +274,7 @@
         "canonical_occurrences": [],
         "contract_evidence": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4"
+          "source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad"
         },
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
@@ -283,12 +283,12 @@
             "line": 307,
             "operation": "base.plugins.uninstall",
             "source_path": "web/core/web_compat.js",
-            "source_sha256": "0f43f54421116086204e0eb5e36792d96efa1136d2398e77074999a342473f99"
+            "source_sha256": "b755c18b31f170d74b1b703524e2cfc3bed14f8fc7e6119af57edb43f8b73d9b"
           }
         ],
         "owner_service_evidence": {
           "source_path": "backend/plugin_platform/service.py",
-          "source_sha256": "sha256:c79fd031bcba068b617832bbfbd08ead46d9e655e17c7399d9b213d228f24b39"
+          "source_sha256": "sha256:eabb70ac683ad61b7464e1c7001f95c41da840beb7caef24461e64c3cd6ab361"
         },
         "target_capability": "base.plugin.installation.transition.uninstall@1"
       },
@@ -351,33 +351,33 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/base-structural-web-remediation.json",
         "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-        "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+        "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
       "current_evidence": {
         "canonical_occurrences": [],
         "contract_evidence": {
-          "end_line": 284,
+          "end_line": 287,
           "needle": "\"base.saved_view.delete\": _saved_view_delete",
           "sha256": "56229834691651b93ee38d67bb2fa715d321afba6c0af79b064497283f1a380b",
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
-          "start_line": 284
+          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "start_line": 287
         },
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
           {
-            "column": 28,
-            "line": 1005,
+            "column": 26,
+            "line": 951,
             "operation": "base.savedViews.delete",
             "source_path": "web/components/view_manager.js",
-            "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+            "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
           }
         ],
         "owner_service_evidence": {
           "source_path": "backend/base/saved_views.py",
-          "source_sha256": "sha256:0eb5da7a3e4ea2a8273cd90390110257b43630b4091e06e63429b650c5c1dc35"
+          "source_sha256": "sha256:92a308c9175bbea086a769bf903501c69f2e2e83f6db5efbc12377fddf37fcdf"
         },
         "target_capability": "base.saved_view.delete@1"
       },
@@ -1087,19 +1087,19 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/base-structural-web-remediation.json",
         "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-        "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+        "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
       "current_evidence": {
         "canonical_occurrences": [],
         "contract_evidence": {
-          "end_line": 275,
+          "end_line": 278,
           "needle": "\"base.self_annotation.search\": _annotation_search",
           "sha256": "ba8c659ed3eed4912fc0cdeaab4c3f0466d25eb1a92fb775b6c28571cdb5c0f7",
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
-          "start_line": 275
+          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "start_line": 278
         },
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
@@ -1127,7 +1127,7 @@
         ],
         "owner_service_evidence": {
           "source_path": "backend/base/self_annotations.py",
-          "source_sha256": "sha256:a38d6ec2bb507a94e4b61c9c084df8ac527b6dfb51dd0fdeb21ed37ce1238c63"
+          "source_sha256": "sha256:9dfb0e4634090f49cdcd175b5b2ac1d8fbad64bfcd96949e25064ad4fc037455"
         },
         "target_capability": "base.self_annotation.search@1"
       },
@@ -1212,19 +1212,19 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/base-structural-web-remediation.json",
         "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-        "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+        "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
       "current_evidence": {
         "canonical_occurrences": [],
         "contract_evidence": {
-          "end_line": 274,
+          "end_line": 277,
           "needle": "\"base.self_annotation.record.get\": _annotation_get",
           "sha256": "0edcb0661f98ef845497594383b300542dd04c2746eb0498cc25acc8537588df",
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
-          "start_line": 274
+          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "start_line": 277
         },
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
@@ -1238,7 +1238,7 @@
         ],
         "owner_service_evidence": {
           "source_path": "backend/base/self_annotations.py",
-          "source_sha256": "sha256:a38d6ec2bb507a94e4b61c9c084df8ac527b6dfb51dd0fdeb21ed37ce1238c63"
+          "source_sha256": "sha256:9dfb0e4634090f49cdcd175b5b2ac1d8fbad64bfcd96949e25064ad4fc037455"
         },
         "target_capability": "base.self_annotation.record.get@1"
       },
@@ -1301,19 +1301,19 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/base-structural-web-remediation.json",
         "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-        "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+        "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
       "current_evidence": {
         "canonical_occurrences": [],
         "contract_evidence": {
-          "end_line": 277,
+          "end_line": 280,
           "needle": "\"base.identity.session.profile.get\": _identity_profile",
           "sha256": "d9e31fd15b3fc655e44c4700447418464354287cd1311a4e883ab8f44bad72d0",
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
-          "start_line": 277
+          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "start_line": 280
         },
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
@@ -1327,7 +1327,7 @@
         ],
         "owner_service_evidence": {
           "source_path": "backend/base/identity_profile.py",
-          "source_sha256": "sha256:bfcbf889e895d830076c67edd18d7b3688d5b1666ebb3e65daba188f778e50e7"
+          "source_sha256": "sha256:f5e9642582f52dad57e41eee87cf3371dff9593c9251ce7a471b3e84f741055a"
         },
         "target_capability": "base.identity.session.profile.get@1"
       },
@@ -1389,19 +1389,19 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/base-structural-web-remediation.json",
         "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-        "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+        "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
       "current_evidence": {
         "canonical_occurrences": [],
         "contract_evidence": {
-          "end_line": 280,
+          "end_line": 283,
           "needle": "\"base.saved_view.search\": _saved_view_search",
           "sha256": "21e5f4f93bdc09b1ba703dc17a13307584bfc738466d3a1b71e4a491ef61c806",
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
-          "start_line": 280
+          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "start_line": 283
         },
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
@@ -1414,15 +1414,15 @@
           },
           {
             "column": 40,
-            "line": 538,
+            "line": 539,
             "operation": "base.savedViews.search",
             "source_path": "web/components/view_manager.js",
-            "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+            "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
           }
         ],
         "owner_service_evidence": {
           "source_path": "backend/base/saved_views.py",
-          "source_sha256": "sha256:0eb5da7a3e4ea2a8273cd90390110257b43630b4091e06e63429b650c5c1dc35"
+          "source_sha256": "sha256:92a308c9175bbea086a769bf903501c69f2e2e83f6db5efbc12377fddf37fcdf"
         },
         "target_capability": "base.saved_view.search@1"
       },
@@ -1575,40 +1575,40 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/base-structural-web-remediation.json",
         "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-        "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+        "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
       "current_evidence": {
         "canonical_occurrences": [],
         "contract_evidence": {
-          "end_line": 282,
+          "end_line": 285,
           "needle": "\"base.saved_view.update\": _saved_view_update",
           "sha256": "799823cab800457fc52e02ea377c4efecaf3f4fb565b0f2a67b8e1ec6425e8e4",
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
-          "start_line": 282
+          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "start_line": 285
         },
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
           {
             "column": 44,
-            "line": 644,
+            "line": 629,
             "operation": "base.savedViews.update",
             "source_path": "web/components/view_manager.js",
-            "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+            "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
           },
           {
-            "column": 42,
-            "line": 1016,
+            "column": 38,
+            "line": 969,
             "operation": "base.savedViews.update",
             "source_path": "web/components/view_manager.js",
-            "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+            "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
           }
         ],
         "owner_service_evidence": {
           "source_path": "backend/base/saved_views.py",
-          "source_sha256": "sha256:0eb5da7a3e4ea2a8273cd90390110257b43630b4091e06e63429b650c5c1dc35"
+          "source_sha256": "sha256:92a308c9175bbea086a769bf903501c69f2e2e83f6db5efbc12377fddf37fcdf"
         },
         "target_capability": "base.saved_view.update@1"
       },
@@ -2174,7 +2174,7 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/base-structural-web-remediation.json",
         "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-        "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+        "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -2182,7 +2182,7 @@
         "canonical_occurrences": [],
         "contract_evidence": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4"
+          "source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad"
         },
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
@@ -2191,12 +2191,12 @@
             "line": 290,
             "operation": "base.plugins.install",
             "source_path": "web/core/web_compat.js",
-            "source_sha256": "0f43f54421116086204e0eb5e36792d96efa1136d2398e77074999a342473f99"
+            "source_sha256": "b755c18b31f170d74b1b703524e2cfc3bed14f8fc7e6119af57edb43f8b73d9b"
           }
         ],
         "owner_service_evidence": {
           "source_path": "backend/plugin_platform/service.py",
-          "source_sha256": "sha256:c79fd031bcba068b617832bbfbd08ead46d9e655e17c7399d9b213d228f24b39"
+          "source_sha256": "sha256:eabb70ac683ad61b7464e1c7001f95c41da840beb7caef24461e64c3cd6ab361"
         },
         "target_capability": "base.plugin.installation.request.create@1"
       },
@@ -2730,40 +2730,40 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/base-structural-web-remediation.json",
         "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-        "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+        "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
       "current_evidence": {
         "canonical_occurrences": [],
         "contract_evidence": {
-          "end_line": 281,
+          "end_line": 284,
           "needle": "\"base.saved_view.create\": _saved_view_create",
           "sha256": "9d9ed3d4a5619754b9c0df361a0b2b4c01d1052d00d57414e9a50f40e172840c",
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
-          "start_line": 281
+          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "start_line": 284
         },
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
           {
             "column": 44,
-            "line": 653,
+            "line": 638,
             "operation": "base.savedViews.create",
             "source_path": "web/components/view_manager.js",
-            "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+            "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
           },
           {
-            "column": 42,
-            "line": 712,
+            "column": 44,
+            "line": 677,
             "operation": "base.savedViews.create",
             "source_path": "web/components/view_manager.js",
-            "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+            "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
           }
         ],
         "owner_service_evidence": {
           "source_path": "backend/base/saved_views.py",
-          "source_sha256": "sha256:0eb5da7a3e4ea2a8273cd90390110257b43630b4091e06e63429b650c5c1dc35"
+          "source_sha256": "sha256:92a308c9175bbea086a769bf903501c69f2e2e83f6db5efbc12377fddf37fcdf"
         },
         "target_capability": "base.saved_view.create@1"
       },
@@ -2837,33 +2837,33 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/base-structural-web-remediation.json",
         "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-        "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+        "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
       "current_evidence": {
         "canonical_occurrences": [],
         "contract_evidence": {
-          "end_line": 283,
+          "end_line": 286,
           "needle": "\"base.saved_view.copy\": _saved_view_copy",
           "sha256": "c68df23c39cb7979116bd209087170259a02fc5ec888ee1020a0dfd92f6c6848",
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
-          "start_line": 283
+          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "start_line": 286
         },
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
           {
-            "column": 44,
-            "line": 978,
+            "column": 40,
+            "line": 933,
             "operation": "base.savedViews.copy",
             "source_path": "web/components/view_manager.js",
-            "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+            "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
           }
         ],
         "owner_service_evidence": {
           "source_path": "backend/base/saved_views.py",
-          "source_sha256": "sha256:0eb5da7a3e4ea2a8273cd90390110257b43630b4091e06e63429b650c5c1dc35"
+          "source_sha256": "sha256:92a308c9175bbea086a769bf903501c69f2e2e83f6db5efbc12377fddf37fcdf"
         },
         "target_capability": "base.saved_view.copy@1"
       },
@@ -3100,19 +3100,19 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/base-structural-web-remediation.json",
         "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-        "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+        "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
       "current_evidence": {
         "canonical_occurrences": [],
         "contract_evidence": {
-          "end_line": 276,
+          "end_line": 279,
           "needle": "\"base.self_annotation.change.apply\": _annotation_change",
           "sha256": "c3860599d5ff529f59467bb49216cb62b04152c559aa2d9587ebff1871e8965e",
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
-          "start_line": 276
+          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "start_line": 279
         },
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
@@ -3126,7 +3126,7 @@
         ],
         "owner_service_evidence": {
           "source_path": "backend/base/self_annotations.py",
-          "source_sha256": "sha256:a38d6ec2bb507a94e4b61c9c084df8ac527b6dfb51dd0fdeb21ed37ce1238c63"
+          "source_sha256": "sha256:9dfb0e4634090f49cdcd175b5b2ac1d8fbad64bfcd96949e25064ad4fc037455"
         },
         "target_capability": "base.self_annotation.change.apply@1"
       },
@@ -3424,7 +3424,7 @@
   "source_artifacts": [
     {
       "path": "docs/governance/base-structural-web-remediation.json",
-      "sha256": "sha256:4db590849c8b669ead25969b988b2f45316e1bf24220b59e36dcf0e692295d96"
+      "sha256": "sha256:15df472b0e2f467d5ceb58bbca5baa9fd74a91ee5f1335dc9f7d56a113683bc4"
     },
     {
       "path": "docs/governance/integration-structural-web-remediation.json",
@@ -3436,7 +3436,7 @@
     },
     {
       "path": "docs\\governance\\capability-coverage-review\\generated\\web_route_inventory.json",
-      "sha256": "sha256:17abf0e7015484abe956851e6fa27b64b09458c007192d1fb3626c1f0e83653d"
+      "sha256": "sha256:0eecb36d5946e9e367266c0fde4a414c66ef6600d20e588ea212c7ca82037efd"
     }
   ]
 }

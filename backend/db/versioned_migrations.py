@@ -239,6 +239,7 @@ def strip_sql_comments(statement: str) -> str:
 def is_resumable_ddl(statement: str) -> bool:
     """Return whether an OceanBase implicit-commit DDL is safe to replay."""
     normalized = " ".join(strip_sql_comments(statement).split()).upper()
+    marked_backfill = "AI00: RESUMABLE BACKFILL" in statement.upper()
     return bool(
         re.match(r"^CREATE TABLE IF NOT EXISTS\b", normalized)
         or re.match(r"^CREATE (?:UNIQUE )?INDEX IF NOT EXISTS\b", normalized)
@@ -246,6 +247,16 @@ def is_resumable_ddl(statement: str) -> bool:
             r"^ALTER TABLE\s+`?[A-Z0-9_]+`?\s+ADD COLUMN IF NOT EXISTS\b",
             normalized,
         )
+        or re.match(
+            r"^ALTER TABLE\s+`?[A-Z0-9_]+`?\s+MODIFY COLUMN\s+`?[A-Z0-9_]+`?.*\bNOT NULL\b",
+            normalized,
+        )
+        or re.match(
+            r"^ALTER TABLE\s+`?[A-Z0-9_]+`?\s+DROP PRIMARY KEY\s*,\s*ADD PRIMARY KEY\s*\(",
+            normalized,
+        )
+        or (marked_backfill and re.match(r"^UPDATE\b", normalized))
+        or (marked_backfill and re.match(r"^INSERT\b.*\bON DUPLICATE KEY UPDATE\b", normalized))
     )
 
 
@@ -289,6 +300,50 @@ def prepare_resumable_statement(conn, statement: str) -> str | None:
             return None
         return re.sub(r"\bINDEX\s+IF\s+NOT\s+EXISTS\b", "INDEX", statement, count=1, flags=re.I)
 
+    modify_not_null = re.search(
+        r"\bALTER\s+TABLE\s+`?([A-Za-z0-9_]+)`?\s+MODIFY\s+COLUMN\s+"
+        r"`?([A-Za-z0-9_]+)`?.*\bNOT\s+NULL\b",
+        strip_sql_comments(statement),
+        re.I | re.S,
+    )
+    if modify_not_null:
+        table, column = modify_not_null.groups()
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT IS_NULLABLE FROM information_schema.COLUMNS "
+                "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s AND COLUMN_NAME=%s",
+                (table, column),
+            )
+            row = cur.fetchone()
+        if row is not None and str(row["IS_NULLABLE"] if isinstance(row, dict) else row[0]).upper() == "NO":
+            return None
+        return statement
+
+    primary_key_change = re.search(
+        r"\bALTER\s+TABLE\s+`?([A-Za-z0-9_]+)`?\s+DROP\s+PRIMARY\s+KEY\s*,\s*"
+        r"ADD\s+PRIMARY\s+KEY\s*\(([^)]+)\)",
+        strip_sql_comments(statement),
+        re.I | re.S,
+    )
+    if primary_key_change:
+        table, raw_columns = primary_key_change.groups()
+        desired = tuple(item.strip().strip("`").lower() for item in raw_columns.split(","))
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT COLUMN_NAME FROM information_schema.STATISTICS "
+                "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s AND INDEX_NAME='PRIMARY' "
+                "ORDER BY SEQ_IN_INDEX",
+                (table,),
+            )
+            rows = cur.fetchall()
+        current = tuple(
+            str(row["COLUMN_NAME"] if isinstance(row, dict) else row[0]).lower()
+            for row in rows
+        )
+        if current == desired:
+            return None
+        return statement
+
     return statement
 
 def assert_oceanbase_ddl_policy(path: Path, sql: str) -> None:
@@ -306,7 +361,7 @@ def assert_oceanbase_ddl_policy(path: Path, sql: str) -> None:
         normalized = strip_sql_comments(statement)
         if not normalized:
             continue
-        if not is_resumable_ddl(normalized):
+        if not is_resumable_ddl(statement):
             head = " ".join(normalized.split())[:120]
             raise MigrationError(
                 f"{path.name} contains non-resumable migration SQL: {head}"

@@ -8,7 +8,7 @@ Execute exact Base outcome base.plugin.installation.transition.uninstall.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_9f169ceddb4f7eb3e6c30f63861e655b`
+- Catalog Release：`rel_9618bda183d820aa83b56a9e47500f2b`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -103,7 +103,7 @@ Execute exact Base outcome base.plugin.installation.transition.uninstall.
 ```json
 {
   "capability_id": "base.plugin.installation.transition.uninstall",
-  "catalog_release": "rel_9f169ceddb4f7eb3e6c30f63861e655b",
+  "catalog_release": "rel_9618bda183d820aa83b56a9e47500f2b",
   "major_version": 1,
   "payload": {
     "expected_revision": 1,
@@ -151,6 +151,8 @@ Execute exact Base outcome base.plugin.installation.transition.uninstall.
         "state": {
           "enum": [
             "disabled",
+            "enabled",
+            "rolled_back",
             "uninstalled"
           ],
           "type": "string"
@@ -211,14 +213,12 @@ Execute exact Base outcome base.plugin.installation.transition.uninstall.
 
 领域错误：
 
-- `resource_not_found`：The requested Base resource does not exist or is not visible.（retryable=false）
-- `permission_denied`：The caller lacks a required Base Platform permission.（retryable=false）
-- `approval_required`：The governed operation requires a valid approval.（retryable=false）
-- `authentication_stale`：The caller must authenticate again before this high-risk operation.（retryable=false）
-- `idempotency_conflict`：The idempotency key is bound to a different request.（retryable=false）
-- `version_conflict`：The resource version differs from the expected version.（retryable=false）
-- `provider_unavailable`：A required domain provider is not registered.（retryable=true）
-- `plugin_state_conflict`：The plugin installation cannot perform this lifecycle transition.（retryable=false）
+- `idempotency_conflict`：base.plugin.installation.transition.uninstall can return idempotency_conflict.（retryable=false）
+- `invalid_input`：base.plugin.installation.transition.uninstall can return invalid_input.（retryable=false）
+- `invalid_transition`：base.plugin.installation.transition.uninstall can return invalid_transition.（retryable=false）
+- `release_not_verified`：base.plugin.installation.transition.uninstall can return release_not_verified.（retryable=false）
+- `resource_not_found`：base.plugin.installation.transition.uninstall can return resource_not_found.（retryable=false）
+- `revision_conflict`：base.plugin.installation.transition.uninstall can return revision_conflict.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

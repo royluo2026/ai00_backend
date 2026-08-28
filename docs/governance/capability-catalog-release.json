@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_9f169ceddb4f7eb3e6c30f63861e655b",
-  "catalog_hash": "sha256:9f169ceddb4f7eb3e6c30f63861e655bcb0b555e89c76cdb91f92fed6e8f8d37",
+  "release_id": "rel_9618bda183d820aa83b56a9e47500f2b",
+  "catalog_hash": "sha256:9618bda183d820aa83b56a9e47500f2b7c4142f0f7252d680461fa0eae4193e0",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -14621,50 +14621,20 @@
       "deprecation_message": null,
       "domain_errors": [
         {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
+          "code": "identity_not_found",
+          "meaning": "base.identity.session.profile.get can return identity_not_found.",
           "retryable": false,
           "is_caller_error": false
         },
         {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
+          "code": "invalid_input",
+          "meaning": "base.identity.session.profile.get can return invalid_input.",
           "retryable": false,
           "is_caller_error": false
         },
         {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "code": "tenant_mismatch",
+          "meaning": "base.identity.session.profile.get can return tenant_mismatch.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -14673,50 +14643,20 @@
       "capability_version_gid": "cv2_4499ba05a02a58d4613d224f",
       "error_schema": [
         {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
+          "error_code": "identity_not_found",
+          "message_template": "base.identity.session.profile.get can return identity_not_found.",
           "is_retryable": false,
           "is_caller_error": false
         },
         {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
+          "error_code": "invalid_input",
+          "message_template": "base.identity.session.profile.get can return invalid_input.",
           "is_retryable": false,
           "is_caller_error": false
         },
         {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "error_code": "tenant_mismatch",
+          "message_template": "base.identity.session.profile.get can return tenant_mismatch.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -16982,6 +16922,8 @@
                 "type": "string",
                 "enum": [
                   "disabled",
+                  "enabled",
+                  "rolled_back",
                   "uninstalled"
                 ]
               },
@@ -17040,6 +16982,8 @@
                 "type": "string",
                 "enum": [
                   "disabled",
+                  "enabled",
+                  "rolled_back",
                   "uninstalled"
                 ]
               },
@@ -17078,7 +17022,7 @@
           "installation"
         ]
       },
-      "schema_hash": "sha256:91d7bf71d7501379d9d08ac91938c081593e2f82f69a35caf954515391b074a2",
+      "schema_hash": "sha256:f03f529cb023f0cf09b1ff0cfa9ce8c5974f969e5a7c7dbb7fd74681e363a47e",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -17103,50 +17047,26 @@
       "deprecation_message": null,
       "domain_errors": [
         {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "code": "already_installed",
+          "meaning": "base.plugin.installation.request.create can return already_installed.",
           "retryable": false,
           "is_caller_error": false
         },
         {
           "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
+          "meaning": "base.plugin.installation.request.create can return idempotency_conflict.",
           "retryable": false,
           "is_caller_error": false
         },
         {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
+          "code": "invalid_input",
+          "meaning": "base.plugin.installation.request.create can return invalid_input.",
           "retryable": false,
           "is_caller_error": false
         },
         {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "code": "release_not_verified",
+          "meaning": "base.plugin.installation.request.create can return release_not_verified.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -17155,50 +17075,26 @@
       "capability_version_gid": "cv2_96a411616dc66c13a40a58e1",
       "error_schema": [
         {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "error_code": "already_installed",
+          "message_template": "base.plugin.installation.request.create can return already_installed.",
           "is_retryable": false,
           "is_caller_error": false
         },
         {
           "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
+          "message_template": "base.plugin.installation.request.create can return idempotency_conflict.",
           "is_retryable": false,
           "is_caller_error": false
         },
         {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
+          "error_code": "invalid_input",
+          "message_template": "base.plugin.installation.request.create can return invalid_input.",
           "is_retryable": false,
           "is_caller_error": false
         },
         {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "error_code": "release_not_verified",
+          "message_template": "base.plugin.installation.request.create can return release_not_verified.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -17308,6 +17204,8 @@
                 "type": "string",
                 "enum": [
                   "disabled",
+                  "enabled",
+                  "rolled_back",
                   "uninstalled"
                 ]
               },
@@ -17366,6 +17264,8 @@
                 "type": "string",
                 "enum": [
                   "disabled",
+                  "enabled",
+                  "rolled_back",
                   "uninstalled"
                 ]
               },
@@ -17404,7 +17304,7 @@
           "installation"
         ]
       },
-      "schema_hash": "sha256:73ae1bf913c4951a21b85c0e8f1ba1c0205a45098c306d50c8f44b5bf6c1b26f",
+      "schema_hash": "sha256:500bf1f4b3086b15807c9f0cb600c68ac6f4b450d66085b2dfb2c7c354b94fd4",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -17429,50 +17329,38 @@
       "deprecation_message": null,
       "domain_errors": [
         {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
           "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
+          "meaning": "base.plugin.installation.transition.uninstall can return idempotency_conflict.",
           "retryable": false,
           "is_caller_error": false
         },
         {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
+          "code": "invalid_input",
+          "meaning": "base.plugin.installation.transition.uninstall can return invalid_input.",
           "retryable": false,
           "is_caller_error": false
         },
         {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
+          "code": "invalid_transition",
+          "meaning": "base.plugin.installation.transition.uninstall can return invalid_transition.",
+          "retryable": false,
           "is_caller_error": false
         },
         {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "code": "release_not_verified",
+          "meaning": "base.plugin.installation.transition.uninstall can return release_not_verified.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "base.plugin.installation.transition.uninstall can return resource_not_found.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "base.plugin.installation.transition.uninstall can return revision_conflict.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -17481,50 +17369,38 @@
       "capability_version_gid": "cv2_ff4456f5df6151d5f1a7fc54",
       "error_schema": [
         {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
           "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
+          "message_template": "base.plugin.installation.transition.uninstall can return idempotency_conflict.",
           "is_retryable": false,
           "is_caller_error": false
         },
         {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
+          "error_code": "invalid_input",
+          "message_template": "base.plugin.installation.transition.uninstall can return invalid_input.",
           "is_retryable": false,
           "is_caller_error": false
         },
         {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
+          "error_code": "invalid_transition",
+          "message_template": "base.plugin.installation.transition.uninstall can return invalid_transition.",
+          "is_retryable": false,
           "is_caller_error": false
         },
         {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "error_code": "release_not_verified",
+          "message_template": "base.plugin.installation.transition.uninstall can return release_not_verified.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_not_found",
+          "message_template": "base.plugin.installation.transition.uninstall can return resource_not_found.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "revision_conflict",
+          "message_template": "base.plugin.installation.transition.uninstall can return revision_conflict.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -17587,10 +17463,7 @@
       "output_schema": {
         "type": "object",
         "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "data": {
+          "installations": {
             "type": "array",
             "maxItems": 500,
             "items": {
@@ -17598,52 +17471,63 @@
               "properties": {
                 "plugin_id": {
                   "type": "string",
-                  "maxLength": 256
-                },
-                "name": {
-                  "type": "string",
+                  "minLength": 1,
                   "maxLength": 512
                 },
-                "version": {
+                "release_version": {
                   "type": "string",
-                  "maxLength": 128
+                  "minLength": 1,
+                  "maxLength": 64
                 },
-                "category": {
+                "state": {
                   "type": "string",
-                  "maxLength": 128
+                  "enum": [
+                    "disabled",
+                    "enabled",
+                    "rolled_back",
+                    "uninstalled"
+                  ]
                 },
-                "enabled": {
-                  "type": "boolean"
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
                 },
-                "builtin": {
-                  "type": "boolean"
+                "granted_capabilities": {
+                  "type": "array",
+                  "maxItems": 200,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  }
+                },
+                "tenant_gid": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
                 }
               },
               "additionalProperties": false,
               "required": [
                 "plugin_id",
-                "name",
-                "version",
-                "category",
-                "enabled",
-                "builtin"
+                "release_version",
+                "state",
+                "revision",
+                "granted_capabilities",
+                "tenant_gid"
               ]
             }
           }
         },
         "additionalProperties": false,
         "required": [
-          "success",
-          "data"
+          "installations"
         ]
       },
       "agent_output_schema": {
         "type": "object",
         "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "data": {
+          "installations": {
             "type": "array",
             "maxItems": 500,
             "items": {
@@ -17651,46 +17535,60 @@
               "properties": {
                 "plugin_id": {
                   "type": "string",
-                  "maxLength": 256
-                },
-                "name": {
-                  "type": "string",
+                  "minLength": 1,
                   "maxLength": 512
                 },
-                "version": {
+                "release_version": {
                   "type": "string",
-                  "maxLength": 128
+                  "minLength": 1,
+                  "maxLength": 64
                 },
-                "category": {
+                "state": {
                   "type": "string",
-                  "maxLength": 128
+                  "enum": [
+                    "disabled",
+                    "enabled",
+                    "rolled_back",
+                    "uninstalled"
+                  ]
                 },
-                "enabled": {
-                  "type": "boolean"
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
                 },
-                "builtin": {
-                  "type": "boolean"
+                "granted_capabilities": {
+                  "type": "array",
+                  "maxItems": 200,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  }
+                },
+                "tenant_gid": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
                 }
               },
               "additionalProperties": false,
               "required": [
                 "plugin_id",
-                "name",
-                "version",
-                "category",
-                "enabled",
-                "builtin"
+                "release_version",
+                "state",
+                "revision",
+                "granted_capabilities",
+                "tenant_gid"
               ]
             }
           }
         },
         "additionalProperties": false,
         "required": [
-          "success",
-          "data"
+          "installations"
         ]
       },
-      "schema_hash": "sha256:cd88ebafa6cf641676f2905bef713fa893b9eb0353c8dbef84466b402e9b92ba",
+      "schema_hash": "sha256:3f9db0cc9a89958568eed236484324990fa2577a7c72a18ffbf11f0ceda9a253",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -19796,37 +19694,14 @@
               "config": {
                 "type": "object",
                 "properties": {
-                  "columns": {
+                  "field_gids": {
                     "type": "array",
                     "maxItems": 200,
+                    "uniqueItems": true,
                     "items": {
-                      "type": "object",
-                      "properties": {
-                        "key": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 512
-                        },
-                        "visible": {
-                          "type": "boolean"
-                        },
-                        "order": {
-                          "type": "integer",
-                          "minimum": 0
-                        },
-                        "width": {
-                          "type": "integer",
-                          "minimum": 40,
-                          "maximum": 2000
-                        }
-                      },
-                      "additionalProperties": false,
-                      "required": [
-                        "key",
-                        "visible",
-                        "order",
-                        "width"
-                      ]
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
                     }
                   },
                   "filters": {
@@ -19835,17 +19710,12 @@
                     "items": {
                       "type": "object",
                       "properties": {
-                        "id": {
+                        "field_gid": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 512
                         },
-                        "field": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 512
-                        },
-                        "op": {
+                        "operator": {
                           "type": "string",
                           "enum": [
                             "contains",
@@ -19892,32 +19762,24 @@
                       },
                       "additionalProperties": false,
                       "required": [
-                        "id",
-                        "field",
-                        "op",
+                        "field_gid",
+                        "operator",
                         "value"
                       ]
                     }
                   },
-                  "filterMode": {
-                    "type": "string",
-                    "enum": [
-                      "and",
-                      "or"
-                    ]
-                  },
-                  "sorts": {
+                  "sort": {
                     "type": "array",
                     "maxItems": 20,
                     "items": {
                       "type": "object",
                       "properties": {
-                        "field": {
+                        "field_gid": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 512
                         },
-                        "dir": {
+                        "direction": {
                           "type": "string",
                           "enum": [
                             "asc",
@@ -19927,42 +19789,31 @@
                       },
                       "additionalProperties": false,
                       "required": [
-                        "field",
-                        "dir"
+                        "field_gid",
+                        "direction"
                       ]
                     }
                   },
-                  "groupBy": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 512
+                  "page_size": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 500
                   },
-                  "viewType": {
+                  "presentation": {
                     "type": "string",
                     "enum": [
-                      "grid",
-                      "tree"
+                      "table",
+                      "list"
                     ]
-                  },
-                  "treeParentField": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 512
                   }
                 },
                 "additionalProperties": false,
                 "required": [
-                  "columns",
+                  "field_gids",
                   "filters",
-                  "filterMode",
-                  "sorts",
-                  "groupBy",
-                  "viewType",
-                  "treeParentField"
+                  "sort",
+                  "page_size",
+                  "presentation"
                 ]
               },
               "revision": {
@@ -20072,37 +19923,14 @@
               "config": {
                 "type": "object",
                 "properties": {
-                  "columns": {
+                  "field_gids": {
                     "type": "array",
                     "maxItems": 200,
+                    "uniqueItems": true,
                     "items": {
-                      "type": "object",
-                      "properties": {
-                        "key": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 512
-                        },
-                        "visible": {
-                          "type": "boolean"
-                        },
-                        "order": {
-                          "type": "integer",
-                          "minimum": 0
-                        },
-                        "width": {
-                          "type": "integer",
-                          "minimum": 40,
-                          "maximum": 2000
-                        }
-                      },
-                      "additionalProperties": false,
-                      "required": [
-                        "key",
-                        "visible",
-                        "order",
-                        "width"
-                      ]
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
                     }
                   },
                   "filters": {
@@ -20111,17 +19939,12 @@
                     "items": {
                       "type": "object",
                       "properties": {
-                        "id": {
+                        "field_gid": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 512
                         },
-                        "field": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 512
-                        },
-                        "op": {
+                        "operator": {
                           "type": "string",
                           "enum": [
                             "contains",
@@ -20168,32 +19991,24 @@
                       },
                       "additionalProperties": false,
                       "required": [
-                        "id",
-                        "field",
-                        "op",
+                        "field_gid",
+                        "operator",
                         "value"
                       ]
                     }
                   },
-                  "filterMode": {
-                    "type": "string",
-                    "enum": [
-                      "and",
-                      "or"
-                    ]
-                  },
-                  "sorts": {
+                  "sort": {
                     "type": "array",
                     "maxItems": 20,
                     "items": {
                       "type": "object",
                       "properties": {
-                        "field": {
+                        "field_gid": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 512
                         },
-                        "dir": {
+                        "direction": {
                           "type": "string",
                           "enum": [
                             "asc",
@@ -20203,42 +20018,31 @@
                       },
                       "additionalProperties": false,
                       "required": [
-                        "field",
-                        "dir"
+                        "field_gid",
+                        "direction"
                       ]
                     }
                   },
-                  "groupBy": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 512
+                  "page_size": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 500
                   },
-                  "viewType": {
+                  "presentation": {
                     "type": "string",
                     "enum": [
-                      "grid",
-                      "tree"
+                      "table",
+                      "list"
                     ]
-                  },
-                  "treeParentField": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 512
                   }
                 },
                 "additionalProperties": false,
                 "required": [
-                  "columns",
+                  "field_gids",
                   "filters",
-                  "filterMode",
-                  "sorts",
-                  "groupBy",
-                  "viewType",
-                  "treeParentField"
+                  "sort",
+                  "page_size",
+                  "presentation"
                 ]
               },
               "revision": {
@@ -20313,7 +20117,7 @@
           "view"
         ]
       },
-      "schema_hash": "sha256:8dced263b64bd89ebe3b1d05d0d56596efdca38ffee98679f0c47a0db8991ae4",
+      "schema_hash": "sha256:28fd6b6eeb706e15fefc31b587efbd35450a2d4b3639f1852913fd741fef6e29",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -20338,50 +20142,26 @@
       "deprecation_message": null,
       "domain_errors": [
         {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
           "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
+          "meaning": "base.saved_view.copy can return idempotency_conflict.",
           "retryable": false,
           "is_caller_error": false
         },
         {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
+          "code": "invalid_input",
+          "meaning": "base.saved_view.copy can return invalid_input.",
           "retryable": false,
           "is_caller_error": false
         },
         {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
+          "code": "legacy_config_unsupported",
+          "meaning": "base.saved_view.copy can return legacy_config_unsupported.",
+          "retryable": false,
           "is_caller_error": false
         },
         {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "code": "resource_not_found",
+          "meaning": "base.saved_view.copy can return resource_not_found.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -20390,50 +20170,26 @@
       "capability_version_gid": "cv2_78a34f79d69453add8bf8b6a",
       "error_schema": [
         {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
           "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
+          "message_template": "base.saved_view.copy can return idempotency_conflict.",
           "is_retryable": false,
           "is_caller_error": false
         },
         {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
+          "error_code": "invalid_input",
+          "message_template": "base.saved_view.copy can return invalid_input.",
           "is_retryable": false,
           "is_caller_error": false
         },
         {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
+          "error_code": "legacy_config_unsupported",
+          "message_template": "base.saved_view.copy can return legacy_config_unsupported.",
+          "is_retryable": false,
           "is_caller_error": false
         },
         {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "error_code": "resource_not_found",
+          "message_template": "base.saved_view.copy can return resource_not_found.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -20510,37 +20266,14 @@
           "config": {
             "type": "object",
             "properties": {
-              "columns": {
+              "field_gids": {
                 "type": "array",
                 "maxItems": 200,
+                "uniqueItems": true,
                 "items": {
-                  "type": "object",
-                  "properties": {
-                    "key": {
-                      "type": "string",
-                      "minLength": 1,
-                      "maxLength": 512
-                    },
-                    "visible": {
-                      "type": "boolean"
-                    },
-                    "order": {
-                      "type": "integer",
-                      "minimum": 0
-                    },
-                    "width": {
-                      "type": "integer",
-                      "minimum": 40,
-                      "maximum": 2000
-                    }
-                  },
-                  "additionalProperties": false,
-                  "required": [
-                    "key",
-                    "visible",
-                    "order",
-                    "width"
-                  ]
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
                 }
               },
               "filters": {
@@ -20549,17 +20282,12 @@
                 "items": {
                   "type": "object",
                   "properties": {
-                    "id": {
+                    "field_gid": {
                       "type": "string",
                       "minLength": 1,
                       "maxLength": 512
                     },
-                    "field": {
-                      "type": "string",
-                      "minLength": 1,
-                      "maxLength": 512
-                    },
-                    "op": {
+                    "operator": {
                       "type": "string",
                       "enum": [
                         "contains",
@@ -20606,32 +20334,24 @@
                   },
                   "additionalProperties": false,
                   "required": [
-                    "id",
-                    "field",
-                    "op",
+                    "field_gid",
+                    "operator",
                     "value"
                   ]
                 }
               },
-              "filterMode": {
-                "type": "string",
-                "enum": [
-                  "and",
-                  "or"
-                ]
-              },
-              "sorts": {
+              "sort": {
                 "type": "array",
                 "maxItems": 20,
                 "items": {
                   "type": "object",
                   "properties": {
-                    "field": {
+                    "field_gid": {
                       "type": "string",
                       "minLength": 1,
                       "maxLength": 512
                     },
-                    "dir": {
+                    "direction": {
                       "type": "string",
                       "enum": [
                         "asc",
@@ -20641,42 +20361,31 @@
                   },
                   "additionalProperties": false,
                   "required": [
-                    "field",
-                    "dir"
+                    "field_gid",
+                    "direction"
                   ]
                 }
               },
-              "groupBy": {
-                "type": [
-                  "string",
-                  "null"
-                ],
-                "maxLength": 512
+              "page_size": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 500
               },
-              "viewType": {
+              "presentation": {
                 "type": "string",
                 "enum": [
-                  "grid",
-                  "tree"
+                  "table",
+                  "list"
                 ]
-              },
-              "treeParentField": {
-                "type": [
-                  "string",
-                  "null"
-                ],
-                "maxLength": 512
               }
             },
             "additionalProperties": false,
             "required": [
-              "columns",
+              "field_gids",
               "filters",
-              "filterMode",
-              "sorts",
-              "groupBy",
-              "viewType",
-              "treeParentField"
+              "sort",
+              "page_size",
+              "presentation"
             ]
           },
           "share_scope": {
@@ -20736,37 +20445,14 @@
               "config": {
                 "type": "object",
                 "properties": {
-                  "columns": {
+                  "field_gids": {
                     "type": "array",
                     "maxItems": 200,
+                    "uniqueItems": true,
                     "items": {
-                      "type": "object",
-                      "properties": {
-                        "key": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 512
-                        },
-                        "visible": {
-                          "type": "boolean"
-                        },
-                        "order": {
-                          "type": "integer",
-                          "minimum": 0
-                        },
-                        "width": {
-                          "type": "integer",
-                          "minimum": 40,
-                          "maximum": 2000
-                        }
-                      },
-                      "additionalProperties": false,
-                      "required": [
-                        "key",
-                        "visible",
-                        "order",
-                        "width"
-                      ]
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
                     }
                   },
                   "filters": {
@@ -20775,17 +20461,12 @@
                     "items": {
                       "type": "object",
                       "properties": {
-                        "id": {
+                        "field_gid": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 512
                         },
-                        "field": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 512
-                        },
-                        "op": {
+                        "operator": {
                           "type": "string",
                           "enum": [
                             "contains",
@@ -20832,32 +20513,24 @@
                       },
                       "additionalProperties": false,
                       "required": [
-                        "id",
-                        "field",
-                        "op",
+                        "field_gid",
+                        "operator",
                         "value"
                       ]
                     }
                   },
-                  "filterMode": {
-                    "type": "string",
-                    "enum": [
-                      "and",
-                      "or"
-                    ]
-                  },
-                  "sorts": {
+                  "sort": {
                     "type": "array",
                     "maxItems": 20,
                     "items": {
                       "type": "object",
                       "properties": {
-                        "field": {
+                        "field_gid": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 512
                         },
-                        "dir": {
+                        "direction": {
                           "type": "string",
                           "enum": [
                             "asc",
@@ -20867,42 +20540,31 @@
                       },
                       "additionalProperties": false,
                       "required": [
-                        "field",
-                        "dir"
+                        "field_gid",
+                        "direction"
                       ]
                     }
                   },
-                  "groupBy": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 512
+                  "page_size": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 500
                   },
-                  "viewType": {
+                  "presentation": {
                     "type": "string",
                     "enum": [
-                      "grid",
-                      "tree"
+                      "table",
+                      "list"
                     ]
-                  },
-                  "treeParentField": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 512
                   }
                 },
                 "additionalProperties": false,
                 "required": [
-                  "columns",
+                  "field_gids",
                   "filters",
-                  "filterMode",
-                  "sorts",
-                  "groupBy",
-                  "viewType",
-                  "treeParentField"
+                  "sort",
+                  "page_size",
+                  "presentation"
                 ]
               },
               "revision": {
@@ -21012,37 +20674,14 @@
               "config": {
                 "type": "object",
                 "properties": {
-                  "columns": {
+                  "field_gids": {
                     "type": "array",
                     "maxItems": 200,
+                    "uniqueItems": true,
                     "items": {
-                      "type": "object",
-                      "properties": {
-                        "key": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 512
-                        },
-                        "visible": {
-                          "type": "boolean"
-                        },
-                        "order": {
-                          "type": "integer",
-                          "minimum": 0
-                        },
-                        "width": {
-                          "type": "integer",
-                          "minimum": 40,
-                          "maximum": 2000
-                        }
-                      },
-                      "additionalProperties": false,
-                      "required": [
-                        "key",
-                        "visible",
-                        "order",
-                        "width"
-                      ]
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
                     }
                   },
                   "filters": {
@@ -21051,17 +20690,12 @@
                     "items": {
                       "type": "object",
                       "properties": {
-                        "id": {
+                        "field_gid": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 512
                         },
-                        "field": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 512
-                        },
-                        "op": {
+                        "operator": {
                           "type": "string",
                           "enum": [
                             "contains",
@@ -21108,32 +20742,24 @@
                       },
                       "additionalProperties": false,
                       "required": [
-                        "id",
-                        "field",
-                        "op",
+                        "field_gid",
+                        "operator",
                         "value"
                       ]
                     }
                   },
-                  "filterMode": {
-                    "type": "string",
-                    "enum": [
-                      "and",
-                      "or"
-                    ]
-                  },
-                  "sorts": {
+                  "sort": {
                     "type": "array",
                     "maxItems": 20,
                     "items": {
                       "type": "object",
                       "properties": {
-                        "field": {
+                        "field_gid": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 512
                         },
-                        "dir": {
+                        "direction": {
                           "type": "string",
                           "enum": [
                             "asc",
@@ -21143,42 +20769,31 @@
                       },
                       "additionalProperties": false,
                       "required": [
-                        "field",
-                        "dir"
+                        "field_gid",
+                        "direction"
                       ]
                     }
                   },
-                  "groupBy": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 512
+                  "page_size": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 500
                   },
-                  "viewType": {
+                  "presentation": {
                     "type": "string",
                     "enum": [
-                      "grid",
-                      "tree"
+                      "table",
+                      "list"
                     ]
-                  },
-                  "treeParentField": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 512
                   }
                 },
                 "additionalProperties": false,
                 "required": [
-                  "columns",
+                  "field_gids",
                   "filters",
-                  "filterMode",
-                  "sorts",
-                  "groupBy",
-                  "viewType",
-                  "treeParentField"
+                  "sort",
+                  "page_size",
+                  "presentation"
                 ]
               },
               "revision": {
@@ -21253,7 +20868,7 @@
           "view"
         ]
       },
-      "schema_hash": "sha256:79d8e30394f15a8a64d0a180c85e51abe555c7b87942defecfe0334dcd8375bc",
+      "schema_hash": "sha256:7506454da50c575858c54ebb5cae357311de6f733b5c211eef73fadf127b4ea4",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -21278,50 +20893,14 @@
       "deprecation_message": null,
       "domain_errors": [
         {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
           "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
+          "meaning": "base.saved_view.create can return idempotency_conflict.",
           "retryable": false,
           "is_caller_error": false
         },
         {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "code": "invalid_input",
+          "meaning": "base.saved_view.create can return invalid_input.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -21330,50 +20909,14 @@
       "capability_version_gid": "cv2_c11e958a8729c753c2b6ee41",
       "error_schema": [
         {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
           "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
+          "message_template": "base.saved_view.create can return idempotency_conflict.",
           "is_retryable": false,
           "is_caller_error": false
         },
         {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "error_code": "invalid_input",
+          "message_template": "base.saved_view.create can return invalid_input.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -21488,37 +21031,14 @@
               "config": {
                 "type": "object",
                 "properties": {
-                  "columns": {
+                  "field_gids": {
                     "type": "array",
                     "maxItems": 200,
+                    "uniqueItems": true,
                     "items": {
-                      "type": "object",
-                      "properties": {
-                        "key": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 512
-                        },
-                        "visible": {
-                          "type": "boolean"
-                        },
-                        "order": {
-                          "type": "integer",
-                          "minimum": 0
-                        },
-                        "width": {
-                          "type": "integer",
-                          "minimum": 40,
-                          "maximum": 2000
-                        }
-                      },
-                      "additionalProperties": false,
-                      "required": [
-                        "key",
-                        "visible",
-                        "order",
-                        "width"
-                      ]
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
                     }
                   },
                   "filters": {
@@ -21527,17 +21047,12 @@
                     "items": {
                       "type": "object",
                       "properties": {
-                        "id": {
+                        "field_gid": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 512
                         },
-                        "field": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 512
-                        },
-                        "op": {
+                        "operator": {
                           "type": "string",
                           "enum": [
                             "contains",
@@ -21584,32 +21099,24 @@
                       },
                       "additionalProperties": false,
                       "required": [
-                        "id",
-                        "field",
-                        "op",
+                        "field_gid",
+                        "operator",
                         "value"
                       ]
                     }
                   },
-                  "filterMode": {
-                    "type": "string",
-                    "enum": [
-                      "and",
-                      "or"
-                    ]
-                  },
-                  "sorts": {
+                  "sort": {
                     "type": "array",
                     "maxItems": 20,
                     "items": {
                       "type": "object",
                       "properties": {
-                        "field": {
+                        "field_gid": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 512
                         },
-                        "dir": {
+                        "direction": {
                           "type": "string",
                           "enum": [
                             "asc",
@@ -21619,42 +21126,31 @@
                       },
                       "additionalProperties": false,
                       "required": [
-                        "field",
-                        "dir"
+                        "field_gid",
+                        "direction"
                       ]
                     }
                   },
-                  "groupBy": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 512
+                  "page_size": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 500
                   },
-                  "viewType": {
+                  "presentation": {
                     "type": "string",
                     "enum": [
-                      "grid",
-                      "tree"
+                      "table",
+                      "list"
                     ]
-                  },
-                  "treeParentField": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 512
                   }
                 },
                 "additionalProperties": false,
                 "required": [
-                  "columns",
+                  "field_gids",
                   "filters",
-                  "filterMode",
-                  "sorts",
-                  "groupBy",
-                  "viewType",
-                  "treeParentField"
+                  "sort",
+                  "page_size",
+                  "presentation"
                 ]
               },
               "revision": {
@@ -21764,37 +21260,14 @@
               "config": {
                 "type": "object",
                 "properties": {
-                  "columns": {
+                  "field_gids": {
                     "type": "array",
                     "maxItems": 200,
+                    "uniqueItems": true,
                     "items": {
-                      "type": "object",
-                      "properties": {
-                        "key": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 512
-                        },
-                        "visible": {
-                          "type": "boolean"
-                        },
-                        "order": {
-                          "type": "integer",
-                          "minimum": 0
-                        },
-                        "width": {
-                          "type": "integer",
-                          "minimum": 40,
-                          "maximum": 2000
-                        }
-                      },
-                      "additionalProperties": false,
-                      "required": [
-                        "key",
-                        "visible",
-                        "order",
-                        "width"
-                      ]
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
                     }
                   },
                   "filters": {
@@ -21803,17 +21276,12 @@
                     "items": {
                       "type": "object",
                       "properties": {
-                        "id": {
+                        "field_gid": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 512
                         },
-                        "field": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 512
-                        },
-                        "op": {
+                        "operator": {
                           "type": "string",
                           "enum": [
                             "contains",
@@ -21860,32 +21328,24 @@
                       },
                       "additionalProperties": false,
                       "required": [
-                        "id",
-                        "field",
-                        "op",
+                        "field_gid",
+                        "operator",
                         "value"
                       ]
                     }
                   },
-                  "filterMode": {
-                    "type": "string",
-                    "enum": [
-                      "and",
-                      "or"
-                    ]
-                  },
-                  "sorts": {
+                  "sort": {
                     "type": "array",
                     "maxItems": 20,
                     "items": {
                       "type": "object",
                       "properties": {
-                        "field": {
+                        "field_gid": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 512
                         },
-                        "dir": {
+                        "direction": {
                           "type": "string",
                           "enum": [
                             "asc",
@@ -21895,42 +21355,31 @@
                       },
                       "additionalProperties": false,
                       "required": [
-                        "field",
-                        "dir"
+                        "field_gid",
+                        "direction"
                       ]
                     }
                   },
-                  "groupBy": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 512
+                  "page_size": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 500
                   },
-                  "viewType": {
+                  "presentation": {
                     "type": "string",
                     "enum": [
-                      "grid",
-                      "tree"
+                      "table",
+                      "list"
                     ]
-                  },
-                  "treeParentField": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 512
                   }
                 },
                 "additionalProperties": false,
                 "required": [
-                  "columns",
+                  "field_gids",
                   "filters",
-                  "filterMode",
-                  "sorts",
-                  "groupBy",
-                  "viewType",
-                  "treeParentField"
+                  "sort",
+                  "page_size",
+                  "presentation"
                 ]
               },
               "revision": {
@@ -22005,7 +21454,7 @@
           "view"
         ]
       },
-      "schema_hash": "sha256:854892570e9fb0fb15b0ae3de98b76d1094d298b3d314d2a8c29cb5b22e6990c",
+      "schema_hash": "sha256:6602b8b443e1731f09fcf2aeeec6b1f9881510ef8b6604f328bebab631ca4fce",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -22030,50 +21479,38 @@
       "deprecation_message": null,
       "domain_errors": [
         {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
+          "code": "idempotency_conflict",
+          "meaning": "base.saved_view.delete can return idempotency_conflict.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "invalid_input",
+          "meaning": "base.saved_view.delete can return invalid_input.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "legacy_config_unsupported",
+          "meaning": "base.saved_view.delete can return legacy_config_unsupported.",
           "retryable": false,
           "is_caller_error": false
         },
         {
           "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
+          "meaning": "base.saved_view.delete can return permission_denied.",
           "retryable": false,
           "is_caller_error": false
         },
         {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
+          "code": "resource_not_found",
+          "meaning": "base.saved_view.delete can return resource_not_found.",
           "retryable": false,
           "is_caller_error": false
         },
         {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "code": "revision_conflict",
+          "meaning": "base.saved_view.delete can return revision_conflict.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -22082,50 +21519,38 @@
       "capability_version_gid": "cv2_ab46575ba75993dacd95597d",
       "error_schema": [
         {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
+          "error_code": "idempotency_conflict",
+          "message_template": "base.saved_view.delete can return idempotency_conflict.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "invalid_input",
+          "message_template": "base.saved_view.delete can return invalid_input.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "legacy_config_unsupported",
+          "message_template": "base.saved_view.delete can return legacy_config_unsupported.",
           "is_retryable": false,
           "is_caller_error": false
         },
         {
           "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
+          "message_template": "base.saved_view.delete can return permission_denied.",
           "is_retryable": false,
           "is_caller_error": false
         },
         {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
+          "error_code": "resource_not_found",
+          "message_template": "base.saved_view.delete can return resource_not_found.",
           "is_retryable": false,
           "is_caller_error": false
         },
         {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "error_code": "revision_conflict",
+          "message_template": "base.saved_view.delete can return revision_conflict.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -22431,6 +21856,16 @@
               "null"
             ],
             "maxLength": 512
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000000
           }
         },
         "additionalProperties": false
@@ -22473,37 +21908,14 @@
                 "config": {
                   "type": "object",
                   "properties": {
-                    "columns": {
+                    "field_gids": {
                       "type": "array",
                       "maxItems": 200,
+                      "uniqueItems": true,
                       "items": {
-                        "type": "object",
-                        "properties": {
-                          "key": {
-                            "type": "string",
-                            "minLength": 1,
-                            "maxLength": 512
-                          },
-                          "visible": {
-                            "type": "boolean"
-                          },
-                          "order": {
-                            "type": "integer",
-                            "minimum": 0
-                          },
-                          "width": {
-                            "type": "integer",
-                            "minimum": 40,
-                            "maximum": 2000
-                          }
-                        },
-                        "additionalProperties": false,
-                        "required": [
-                          "key",
-                          "visible",
-                          "order",
-                          "width"
-                        ]
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 512
                       }
                     },
                     "filters": {
@@ -22512,17 +21924,12 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "id": {
+                          "field_gid": {
                             "type": "string",
                             "minLength": 1,
                             "maxLength": 512
                           },
-                          "field": {
-                            "type": "string",
-                            "minLength": 1,
-                            "maxLength": 512
-                          },
-                          "op": {
+                          "operator": {
                             "type": "string",
                             "enum": [
                               "contains",
@@ -22569,32 +21976,24 @@
                         },
                         "additionalProperties": false,
                         "required": [
-                          "id",
-                          "field",
-                          "op",
+                          "field_gid",
+                          "operator",
                           "value"
                         ]
                       }
                     },
-                    "filterMode": {
-                      "type": "string",
-                      "enum": [
-                        "and",
-                        "or"
-                      ]
-                    },
-                    "sorts": {
+                    "sort": {
                       "type": "array",
                       "maxItems": 20,
                       "items": {
                         "type": "object",
                         "properties": {
-                          "field": {
+                          "field_gid": {
                             "type": "string",
                             "minLength": 1,
                             "maxLength": 512
                           },
-                          "dir": {
+                          "direction": {
                             "type": "string",
                             "enum": [
                               "asc",
@@ -22604,42 +22003,31 @@
                         },
                         "additionalProperties": false,
                         "required": [
-                          "field",
-                          "dir"
+                          "field_gid",
+                          "direction"
                         ]
                       }
                     },
-                    "groupBy": {
-                      "type": [
-                        "string",
-                        "null"
-                      ],
-                      "maxLength": 512
+                    "page_size": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 500
                     },
-                    "viewType": {
+                    "presentation": {
                       "type": "string",
                       "enum": [
-                        "grid",
-                        "tree"
+                        "table",
+                        "list"
                       ]
-                    },
-                    "treeParentField": {
-                      "type": [
-                        "string",
-                        "null"
-                      ],
-                      "maxLength": 512
                     }
                   },
                   "additionalProperties": false,
                   "required": [
-                    "columns",
+                    "field_gids",
                     "filters",
-                    "filterMode",
-                    "sorts",
-                    "groupBy",
-                    "viewType",
-                    "treeParentField"
+                    "sort",
+                    "page_size",
+                    "presentation"
                   ]
                 },
                 "revision": {
@@ -22708,11 +22096,19 @@
                 "restore"
               ]
             }
+          },
+          "next_offset": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
           }
         },
         "additionalProperties": false,
         "required": [
-          "views"
+          "views",
+          "next_offset"
         ]
       },
       "agent_output_schema": {
@@ -22753,37 +22149,14 @@
                 "config": {
                   "type": "object",
                   "properties": {
-                    "columns": {
+                    "field_gids": {
                       "type": "array",
                       "maxItems": 200,
+                      "uniqueItems": true,
                       "items": {
-                        "type": "object",
-                        "properties": {
-                          "key": {
-                            "type": "string",
-                            "minLength": 1,
-                            "maxLength": 512
-                          },
-                          "visible": {
-                            "type": "boolean"
-                          },
-                          "order": {
-                            "type": "integer",
-                            "minimum": 0
-                          },
-                          "width": {
-                            "type": "integer",
-                            "minimum": 40,
-                            "maximum": 2000
-                          }
-                        },
-                        "additionalProperties": false,
-                        "required": [
-                          "key",
-                          "visible",
-                          "order",
-                          "width"
-                        ]
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 512
                       }
                     },
                     "filters": {
@@ -22792,17 +22165,12 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "id": {
+                          "field_gid": {
                             "type": "string",
                             "minLength": 1,
                             "maxLength": 512
                           },
-                          "field": {
-                            "type": "string",
-                            "minLength": 1,
-                            "maxLength": 512
-                          },
-                          "op": {
+                          "operator": {
                             "type": "string",
                             "enum": [
                               "contains",
@@ -22849,32 +22217,24 @@
                         },
                         "additionalProperties": false,
                         "required": [
-                          "id",
-                          "field",
-                          "op",
+                          "field_gid",
+                          "operator",
                           "value"
                         ]
                       }
                     },
-                    "filterMode": {
-                      "type": "string",
-                      "enum": [
-                        "and",
-                        "or"
-                      ]
-                    },
-                    "sorts": {
+                    "sort": {
                       "type": "array",
                       "maxItems": 20,
                       "items": {
                         "type": "object",
                         "properties": {
-                          "field": {
+                          "field_gid": {
                             "type": "string",
                             "minLength": 1,
                             "maxLength": 512
                           },
-                          "dir": {
+                          "direction": {
                             "type": "string",
                             "enum": [
                               "asc",
@@ -22884,42 +22244,31 @@
                         },
                         "additionalProperties": false,
                         "required": [
-                          "field",
-                          "dir"
+                          "field_gid",
+                          "direction"
                         ]
                       }
                     },
-                    "groupBy": {
-                      "type": [
-                        "string",
-                        "null"
-                      ],
-                      "maxLength": 512
+                    "page_size": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 500
                     },
-                    "viewType": {
+                    "presentation": {
                       "type": "string",
                       "enum": [
-                        "grid",
-                        "tree"
+                        "table",
+                        "list"
                       ]
-                    },
-                    "treeParentField": {
-                      "type": [
-                        "string",
-                        "null"
-                      ],
-                      "maxLength": 512
                     }
                   },
                   "additionalProperties": false,
                   "required": [
-                    "columns",
+                    "field_gids",
                     "filters",
-                    "filterMode",
-                    "sorts",
-                    "groupBy",
-                    "viewType",
-                    "treeParentField"
+                    "sort",
+                    "page_size",
+                    "presentation"
                   ]
                 },
                 "revision": {
@@ -22988,14 +22337,22 @@
                 "restore"
               ]
             }
+          },
+          "next_offset": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
           }
         },
         "additionalProperties": false,
         "required": [
-          "views"
+          "views",
+          "next_offset"
         ]
       },
-      "schema_hash": "sha256:f2b64d0ed2e6b4680ba23a2ccb557c8906fc40773e432d0821c9e48e7da085a9",
+      "schema_hash": "sha256:3a58553616a4c0e6a5cd9827fd9882d9dbf37d54228b3b753b2b15b41238f5ac",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -23020,50 +22377,8 @@
       "deprecation_message": null,
       "domain_errors": [
         {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "code": "invalid_input",
+          "meaning": "base.saved_view.search can return invalid_input.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -23072,50 +22387,8 @@
       "capability_version_gid": "cv2_621e3b8abdf04e9c260ef19b",
       "error_schema": [
         {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "error_code": "invalid_input",
+          "message_template": "base.saved_view.search can return invalid_input.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -23201,37 +22474,14 @@
           "config": {
             "type": "object",
             "properties": {
-              "columns": {
+              "field_gids": {
                 "type": "array",
                 "maxItems": 200,
+                "uniqueItems": true,
                 "items": {
-                  "type": "object",
-                  "properties": {
-                    "key": {
-                      "type": "string",
-                      "minLength": 1,
-                      "maxLength": 512
-                    },
-                    "visible": {
-                      "type": "boolean"
-                    },
-                    "order": {
-                      "type": "integer",
-                      "minimum": 0
-                    },
-                    "width": {
-                      "type": "integer",
-                      "minimum": 40,
-                      "maximum": 2000
-                    }
-                  },
-                  "additionalProperties": false,
-                  "required": [
-                    "key",
-                    "visible",
-                    "order",
-                    "width"
-                  ]
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
                 }
               },
               "filters": {
@@ -23240,17 +22490,12 @@
                 "items": {
                   "type": "object",
                   "properties": {
-                    "id": {
+                    "field_gid": {
                       "type": "string",
                       "minLength": 1,
                       "maxLength": 512
                     },
-                    "field": {
-                      "type": "string",
-                      "minLength": 1,
-                      "maxLength": 512
-                    },
-                    "op": {
+                    "operator": {
                       "type": "string",
                       "enum": [
                         "contains",
@@ -23297,32 +22542,24 @@
                   },
                   "additionalProperties": false,
                   "required": [
-                    "id",
-                    "field",
-                    "op",
+                    "field_gid",
+                    "operator",
                     "value"
                   ]
                 }
               },
-              "filterMode": {
-                "type": "string",
-                "enum": [
-                  "and",
-                  "or"
-                ]
-              },
-              "sorts": {
+              "sort": {
                 "type": "array",
                 "maxItems": 20,
                 "items": {
                   "type": "object",
                   "properties": {
-                    "field": {
+                    "field_gid": {
                       "type": "string",
                       "minLength": 1,
                       "maxLength": 512
                     },
-                    "dir": {
+                    "direction": {
                       "type": "string",
                       "enum": [
                         "asc",
@@ -23332,42 +22569,31 @@
                   },
                   "additionalProperties": false,
                   "required": [
-                    "field",
-                    "dir"
+                    "field_gid",
+                    "direction"
                   ]
                 }
               },
-              "groupBy": {
-                "type": [
-                  "string",
-                  "null"
-                ],
-                "maxLength": 512
+              "page_size": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 500
               },
-              "viewType": {
+              "presentation": {
                 "type": "string",
                 "enum": [
-                  "grid",
-                  "tree"
+                  "table",
+                  "list"
                 ]
-              },
-              "treeParentField": {
-                "type": [
-                  "string",
-                  "null"
-                ],
-                "maxLength": 512
               }
             },
             "additionalProperties": false,
             "required": [
-              "columns",
+              "field_gids",
               "filters",
-              "filterMode",
-              "sorts",
-              "groupBy",
-              "viewType",
-              "treeParentField"
+              "sort",
+              "page_size",
+              "presentation"
             ]
           },
           "share_scope": {
@@ -23428,37 +22654,14 @@
               "config": {
                 "type": "object",
                 "properties": {
-                  "columns": {
+                  "field_gids": {
                     "type": "array",
                     "maxItems": 200,
+                    "uniqueItems": true,
                     "items": {
-                      "type": "object",
-                      "properties": {
-                        "key": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 512
-                        },
-                        "visible": {
-                          "type": "boolean"
-                        },
-                        "order": {
-                          "type": "integer",
-                          "minimum": 0
-                        },
-                        "width": {
-                          "type": "integer",
-                          "minimum": 40,
-                          "maximum": 2000
-                        }
-                      },
-                      "additionalProperties": false,
-                      "required": [
-                        "key",
-                        "visible",
-                        "order",
-                        "width"
-                      ]
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
                     }
                   },
                   "filters": {
@@ -23467,17 +22670,12 @@
                     "items": {
                       "type": "object",
                       "properties": {
-                        "id": {
+                        "field_gid": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 512
                         },
-                        "field": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 512
-                        },
-                        "op": {
+                        "operator": {
                           "type": "string",
                           "enum": [
                             "contains",
@@ -23524,32 +22722,24 @@
                       },
                       "additionalProperties": false,
                       "required": [
-                        "id",
-                        "field",
-                        "op",
+                        "field_gid",
+                        "operator",
                         "value"
                       ]
                     }
                   },
-                  "filterMode": {
-                    "type": "string",
-                    "enum": [
-                      "and",
-                      "or"
-                    ]
-                  },
-                  "sorts": {
+                  "sort": {
                     "type": "array",
                     "maxItems": 20,
                     "items": {
                       "type": "object",
                       "properties": {
-                        "field": {
+                        "field_gid": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 512
                         },
-                        "dir": {
+                        "direction": {
                           "type": "string",
                           "enum": [
                             "asc",
@@ -23559,42 +22749,31 @@
                       },
                       "additionalProperties": false,
                       "required": [
-                        "field",
-                        "dir"
+                        "field_gid",
+                        "direction"
                       ]
                     }
                   },
-                  "groupBy": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 512
+                  "page_size": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 500
                   },
-                  "viewType": {
+                  "presentation": {
                     "type": "string",
                     "enum": [
-                      "grid",
-                      "tree"
+                      "table",
+                      "list"
                     ]
-                  },
-                  "treeParentField": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 512
                   }
                 },
                 "additionalProperties": false,
                 "required": [
-                  "columns",
+                  "field_gids",
                   "filters",
-                  "filterMode",
-                  "sorts",
-                  "groupBy",
-                  "viewType",
-                  "treeParentField"
+                  "sort",
+                  "page_size",
+                  "presentation"
                 ]
               },
               "revision": {
@@ -23704,37 +22883,14 @@
               "config": {
                 "type": "object",
                 "properties": {
-                  "columns": {
+                  "field_gids": {
                     "type": "array",
                     "maxItems": 200,
+                    "uniqueItems": true,
                     "items": {
-                      "type": "object",
-                      "properties": {
-                        "key": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 512
-                        },
-                        "visible": {
-                          "type": "boolean"
-                        },
-                        "order": {
-                          "type": "integer",
-                          "minimum": 0
-                        },
-                        "width": {
-                          "type": "integer",
-                          "minimum": 40,
-                          "maximum": 2000
-                        }
-                      },
-                      "additionalProperties": false,
-                      "required": [
-                        "key",
-                        "visible",
-                        "order",
-                        "width"
-                      ]
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
                     }
                   },
                   "filters": {
@@ -23743,17 +22899,12 @@
                     "items": {
                       "type": "object",
                       "properties": {
-                        "id": {
+                        "field_gid": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 512
                         },
-                        "field": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 512
-                        },
-                        "op": {
+                        "operator": {
                           "type": "string",
                           "enum": [
                             "contains",
@@ -23800,32 +22951,24 @@
                       },
                       "additionalProperties": false,
                       "required": [
-                        "id",
-                        "field",
-                        "op",
+                        "field_gid",
+                        "operator",
                         "value"
                       ]
                     }
                   },
-                  "filterMode": {
-                    "type": "string",
-                    "enum": [
-                      "and",
-                      "or"
-                    ]
-                  },
-                  "sorts": {
+                  "sort": {
                     "type": "array",
                     "maxItems": 20,
                     "items": {
                       "type": "object",
                       "properties": {
-                        "field": {
+                        "field_gid": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 512
                         },
-                        "dir": {
+                        "direction": {
                           "type": "string",
                           "enum": [
                             "asc",
@@ -23835,42 +22978,31 @@
                       },
                       "additionalProperties": false,
                       "required": [
-                        "field",
-                        "dir"
+                        "field_gid",
+                        "direction"
                       ]
                     }
                   },
-                  "groupBy": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 512
+                  "page_size": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 500
                   },
-                  "viewType": {
+                  "presentation": {
                     "type": "string",
                     "enum": [
-                      "grid",
-                      "tree"
+                      "table",
+                      "list"
                     ]
-                  },
-                  "treeParentField": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 512
                   }
                 },
                 "additionalProperties": false,
                 "required": [
-                  "columns",
+                  "field_gids",
                   "filters",
-                  "filterMode",
-                  "sorts",
-                  "groupBy",
-                  "viewType",
-                  "treeParentField"
+                  "sort",
+                  "page_size",
+                  "presentation"
                 ]
               },
               "revision": {
@@ -23945,7 +23077,7 @@
           "view"
         ]
       },
-      "schema_hash": "sha256:4b3ff8522d7c83e3c0ef0049bf933bdfa47ea3380414e5370e780c69bc77c130",
+      "schema_hash": "sha256:52246a4b05bc1e953c66e38e9cd36e2fc8a7c63f7fbd873e2dc9cdd49ce33eb9",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -23970,50 +23102,38 @@
       "deprecation_message": null,
       "domain_errors": [
         {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
+          "code": "idempotency_conflict",
+          "meaning": "base.saved_view.update can return idempotency_conflict.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "invalid_input",
+          "meaning": "base.saved_view.update can return invalid_input.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "legacy_config_unsupported",
+          "meaning": "base.saved_view.update can return legacy_config_unsupported.",
           "retryable": false,
           "is_caller_error": false
         },
         {
           "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
+          "meaning": "base.saved_view.update can return permission_denied.",
           "retryable": false,
           "is_caller_error": false
         },
         {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
+          "code": "resource_not_found",
+          "meaning": "base.saved_view.update can return resource_not_found.",
           "retryable": false,
           "is_caller_error": false
         },
         {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "code": "revision_conflict",
+          "meaning": "base.saved_view.update can return revision_conflict.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -24022,50 +23142,38 @@
       "capability_version_gid": "cv2_5d76ef62893804d33ac52f3a",
       "error_schema": [
         {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
+          "error_code": "idempotency_conflict",
+          "message_template": "base.saved_view.update can return idempotency_conflict.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "invalid_input",
+          "message_template": "base.saved_view.update can return invalid_input.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "legacy_config_unsupported",
+          "message_template": "base.saved_view.update can return legacy_config_unsupported.",
           "is_retryable": false,
           "is_caller_error": false
         },
         {
           "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
+          "message_template": "base.saved_view.update can return permission_denied.",
           "is_retryable": false,
           "is_caller_error": false
         },
         {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
+          "error_code": "resource_not_found",
+          "message_template": "base.saved_view.update can return resource_not_found.",
           "is_retryable": false,
           "is_caller_error": false
         },
         {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "error_code": "revision_conflict",
+          "message_template": "base.saved_view.update can return revision_conflict.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -24258,50 +23366,8 @@
       "deprecation_message": null,
       "domain_errors": [
         {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "code": "invalid_input",
+          "meaning": "base.self_annotation.batch.get can return invalid_input.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -24310,50 +23376,8 @@
       "capability_version_gid": "cv2_416a2d1e4acac748e77a7684",
       "error_schema": [
         {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "error_code": "invalid_input",
+          "message_template": "base.self_annotation.batch.get can return invalid_input.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -24757,50 +23781,26 @@
       "deprecation_message": null,
       "domain_errors": [
         {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "code": "attachment_not_visible",
+          "meaning": "base.self_annotation.change.apply can return attachment_not_visible.",
           "retryable": false,
           "is_caller_error": false
         },
         {
           "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
+          "meaning": "base.self_annotation.change.apply can return idempotency_conflict.",
           "retryable": false,
           "is_caller_error": false
         },
         {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
+          "code": "invalid_input",
+          "meaning": "base.self_annotation.change.apply can return invalid_input.",
           "retryable": false,
           "is_caller_error": false
         },
         {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "code": "revision_conflict",
+          "meaning": "base.self_annotation.change.apply can return revision_conflict.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -24809,50 +23809,26 @@
       "capability_version_gid": "cv2_9920c9dc42073de0c160e166",
       "error_schema": [
         {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "error_code": "attachment_not_visible",
+          "message_template": "base.self_annotation.change.apply can return attachment_not_visible.",
           "is_retryable": false,
           "is_caller_error": false
         },
         {
           "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
+          "message_template": "base.self_annotation.change.apply can return idempotency_conflict.",
           "is_retryable": false,
           "is_caller_error": false
         },
         {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
+          "error_code": "invalid_input",
+          "message_template": "base.self_annotation.change.apply can return invalid_input.",
           "is_retryable": false,
           "is_caller_error": false
         },
         {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "error_code": "revision_conflict",
+          "message_template": "base.self_annotation.change.apply can return revision_conflict.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -25184,50 +24160,8 @@
       "deprecation_message": null,
       "domain_errors": [
         {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "code": "invalid_input",
+          "meaning": "base.self_annotation.record.get can return invalid_input.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -25236,50 +24170,8 @@
       "capability_version_gid": "cv2_b2d992b5e2e2bc9af9f4336f",
       "error_schema": [
         {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "error_code": "invalid_input",
+          "message_template": "base.self_annotation.record.get can return invalid_input.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -25630,50 +24522,8 @@
       "deprecation_message": null,
       "domain_errors": [
         {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "code": "invalid_input",
+          "meaning": "base.self_annotation.search can return invalid_input.",
           "retryable": false,
           "is_caller_error": false
         }
@@ -25682,50 +24532,8 @@
       "capability_version_gid": "cv2_f71659779f980fb068f25e40",
       "error_schema": [
         {
-          "error_code": "resource_not_found",
-          "message_template": "The requested Base resource does not exist or is not visible.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "permission_denied",
-          "message_template": "The caller lacks a required Base Platform permission.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "approval_required",
-          "message_template": "The governed operation requires a valid approval.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "authentication_stale",
-          "message_template": "The caller must authenticate again before this high-risk operation.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different request.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "version_conflict",
-          "message_template": "The resource version differs from the expected version.",
-          "is_retryable": false,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "provider_unavailable",
-          "message_template": "A required domain provider is not registered.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "plugin_state_conflict",
-          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "error_code": "invalid_input",
+          "message_template": "base.self_annotation.search can return invalid_input.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -186577,7 +185385,7 @@
       "plugin_id": "official.base",
       "module": "backend.base.official_provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:f405dc5b1baca8d42443b9702e522aabe36201a6ca7843b9084dfd2078b84ac6"
+      "artifact_hash": "sha256:a0ca319be35b31f17d1d31becfec416d6de9129df8b50e6054058f2cdcbe3304"
     },
     {
       "plugin_id": "official.craft",
@@ -186634,5 +185442,5 @@
       "artifact_hash": "sha256:5c1fccaa2219f6833c24237667039685e322cefcffc7ca6f0287d28cfc0a2b39"
     }
   ],
-  "created_at": "2026-08-28T03:19:14.574123Z"
+  "created_at": "2026-08-28T06:36:28.587291Z"
 }

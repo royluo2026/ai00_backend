@@ -157,3 +157,26 @@ def test_gateway_derives_agent_storage_namespace_from_trusted_identity():
     context = CapabilityGatewayService._legacy_context(envelope)
     assert context.plugin_id == "agent.planner"
     assert _identity(context) == ("t1", "agent.planner")
+
+
+def test_structural_owner_capabilities_declare_exact_business_error_codes():
+    registrations = _registrations()
+    expected = {
+        "base.saved_view.search": {"invalid_input"},
+        "base.saved_view.create": {"invalid_input", "idempotency_conflict"},
+        "base.saved_view.update": {"invalid_input", "idempotency_conflict", "legacy_config_unsupported", "permission_denied", "resource_not_found", "revision_conflict"},
+        "base.saved_view.copy": {"invalid_input", "idempotency_conflict", "legacy_config_unsupported", "resource_not_found"},
+        "base.saved_view.delete": {"invalid_input", "idempotency_conflict", "legacy_config_unsupported", "permission_denied", "resource_not_found", "revision_conflict"},
+        "base.self_annotation.batch.get": {"invalid_input"},
+        "base.self_annotation.record.get": {"invalid_input"},
+        "base.self_annotation.search": {"invalid_input"},
+        "base.self_annotation.change.apply": {"attachment_not_visible", "idempotency_conflict", "invalid_input", "revision_conflict"},
+        "base.identity.session.profile.get": {"identity_not_found", "invalid_input", "tenant_mismatch"},
+        "base.plugin.installation.request.create": {"already_installed", "idempotency_conflict", "invalid_input", "release_not_verified"},
+        "base.plugin.installation.transition.uninstall": {"idempotency_conflict", "invalid_input", "invalid_transition", "release_not_verified", "resource_not_found", "revision_conflict"},
+    }
+
+    for capability_id, codes in expected.items():
+        descriptor = registrations[capability_id].descriptor
+        assert descriptor.domain_errors_complete is True
+        assert {error.code for error in descriptor.domain_errors} == codes

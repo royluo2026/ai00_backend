@@ -1,6 +1,6 @@
 {
-  "frontend_revision": "5d6dc5cad342d75a4137219ca7bbb5ece71899d2",
-  "content_hash": "1458b00910499b0c8b32734c8815507e967839c18a7c16972368d21e1b40852e",
+  "frontend_revision": "0647ee87ab48c8e6fb4092e5fa708d675767b41c",
+  "content_hash": "a36171d0fb8d89e03acc85031d43b06160ac7e55d1616f779ecc54eb53ab7e67",
   "wrapper_contracts_hash": "7fec8d2b3c7b989ad5dd570c8fc10984f3fac4745244194edb738a3015aa600c",
   "scan_roots": [
     "web",
@@ -31,7 +31,7 @@
   },
   "lexical_audit": {
     "token_count": 417,
-    "token_hash": "b942bf650d553a47f5a322714c00a2f1cb1e6caef1b59536c5c892aaa959c20e",
+    "token_hash": "eed3d061f91f2a71fdf00f61af9318cec24ea5c7e2399cd2ca33e40b47c93e2d",
     "mapped_count": 399,
     "reviewed_non_route_count": 18,
     "reviewed_non_route_tokens": [
@@ -3666,43 +3666,43 @@
     },
     {
       "source": "web/settings/settings.js",
-      "line": 1375,
+      "line": 1413,
       "column": 41,
       "raw_route": "/api/follows",
       "normalized_route": "/api/follows",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/settings/settings.js:1375:41:GET:/api/follows"
+      "occurrence_id": "web/settings/settings.js:1413:41:GET:/api/follows"
     },
     {
       "source": "web/settings/settings.js",
-      "line": 1384,
+      "line": 1422,
       "column": 44,
       "raw_route": "/api/tasks/${item_gid}",
       "normalized_route": "/api/tasks/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/settings/settings.js:1384:44:GET:/api/tasks/{dynamic}"
+      "occurrence_id": "web/settings/settings.js:1422:44:GET:/api/tasks/{dynamic}"
     },
     {
       "source": "web/settings/settings.js",
-      "line": 1389,
+      "line": 1427,
       "column": 44,
       "raw_route": "/api/issues/${item_gid}",
       "normalized_route": "/api/issues/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/settings/settings.js:1389:44:GET:/api/issues/{dynamic}"
+      "occurrence_id": "web/settings/settings.js:1427:44:GET:/api/issues/{dynamic}"
     },
     {
       "source": "web/settings/settings.js",
-      "line": 1401,
+      "line": 1439,
       "column": 30,
       "raw_route": "/api/follows/${fGid}",
       "normalized_route": "/api/follows/{dynamic}",
       "method": "DELETE",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/settings/settings.js:1401:30:DELETE:/api/follows/{dynamic}"
+      "occurrence_id": "web/settings/settings.js:1439:30:DELETE:/api/follows/{dynamic}"
     },
     {
       "source": "web/share/issues.html",
