@@ -1,12 +1,18 @@
+import asyncio
 import json
+import sys
+from datetime import UTC, datetime
 from pathlib import Path
+from types import ModuleType
 
 import pytest
 from jsonschema import Draft202012Validator, ValidationError
 
 from plugins.integration.integration_backend.application.network_policy import NetworkPolicy
 from plugins.integration.integration_backend.application.transform import RestrictedExpression
+from backend.capability_v2.provider_contracts import CapabilityContext
 from plugins.integration.integration_backend.capabilities import register_capabilities
+from plugins.integration.integration_backend.capabilities.wiring import IntegrationProviderAdapters
 from plugins.integration.integration_backend.data.connection import _params
 
 
@@ -31,6 +37,106 @@ CAPABILITY_IDS = {
 }
 
 
+class ProviderRepository:
+    def __init__(self):
+        self.connectors = {}
+        self.mappings = {}
+        self.operations = {}
+        self.scopes = {}
+
+    def create_connector(self, data):
+        row = {**data, "gid": "connector-1", "revision": 1, "status": "untested"}
+        self.connectors[row["gid"]] = row
+        return dict(row)
+
+    def get_connector(self, data):
+        row = self.connectors.get(data["gid"])
+        if row and row["owner_gid"] == data["owner_gid"] and row.get("team_gid") == data.get("team_gid"):
+            return dict(row)
+        return None
+
+    def create_mapping(self, data):
+        row = {**data, "revision": 1, "status": "active"}
+        self.mappings[row["gid"]] = row
+        return dict(row)
+
+    def claim_operation(self, record):
+        scope = (record.owner_gid, record.capability_id, record.idempotency_key)
+        existing = self.operations.get(self.scopes.get(scope))
+        if existing is not None:
+            return existing, True
+        self.operations[record.operation_id] = record
+        self.scopes[scope] = record.operation_id
+        return record, False
+
+    def claim_import_operation(self, record, run):
+        return self.claim_operation(record)
+
+    def get_operation(self, operation_id, owner_gid, team_gid):
+        record = self.operations.get(operation_id)
+        return record if record and record.owner_gid == owner_gid and record.team_gid == team_gid else None
+
+    def transition_operation(self, operation_id, expected_version, replacement, owner_gid, team_gid):
+        current = self.get_operation(operation_id, owner_gid, team_gid)
+        if current is None or current.version != expected_version:
+            raise RuntimeError("unexpected transition")
+        self.operations[operation_id] = replacement
+        return replacement
+
+
+class ProviderVault:
+    def consume(self, handle, actor_gid, team_gid):
+        assert (handle, actor_gid, team_gid) == ("once-1", "actor-1", "team-1")
+        return "vault://integration/enrolled-1"
+
+
+class ProviderCatalog:
+    def __init__(self):
+        self.calls = []
+
+    def require_stable(self, capability_id, major_version, minimum_release):
+        self.calls.append((capability_id, major_version, minimum_release))
+
+
+class ProviderRuntime:
+    async def test(self, connector, *, timeout_seconds, result_limit):
+        assert connector["gid"] == "connector-1"
+        assert (timeout_seconds, result_limit) == (15, 1)
+        return {"reachable": True, "message": "configured runtime"}
+
+    async def discover(self, connector, *, timeout_seconds, result_limit):
+        return {"objects": []}
+
+    async def source_columns(self, connector, mapping, *, timeout_seconds, result_limit):
+        return {"columns": []}
+
+    async def preview(self, connector, mapping, *, timeout_seconds, result_limit):
+        return {"rows": [], "truncated": False}
+
+
+class ProviderIdentity:
+    def __init__(self):
+        self.value = 0
+
+    def new_id(self, kind):
+        self.value += 1
+        return f"{kind}-{self.value}"
+
+    def now(self):
+        return datetime(2026, 8, 28, tzinfo=UTC)
+
+
+def provider_factory():
+    catalog = ProviderCatalog()
+    return IntegrationProviderAdapters(
+        repository=ProviderRepository(),
+        credential_enrollment=ProviderVault(),
+        catalog=catalog,
+        connector_runtime=ProviderRuntime(),
+        operation_identity=ProviderIdentity(),
+    )
+
+
 def test_integration_is_an_official_independent_domain():
     root = Path(__file__).parents[3]
     document = json.loads((root / "backend/capability_v2/official_domains.json").read_text(encoding="utf-8"))
@@ -49,7 +155,7 @@ def test_provider_publishes_seventeen_native_governed_capabilities():
             self.items.append((spec, handler, descriptor))
 
     registry = Registry()
-    register_capabilities(registry)
+    register_capabilities(registry, adapter_factory=provider_factory)
     registrations = {spec.id: (spec, handler, descriptor) for spec, handler, descriptor in registry.items}
     assert set(registrations) == CAPABILITY_IDS
     for capability_id, (spec, _, descriptor) in registrations.items():
@@ -98,8 +204,62 @@ def _registrations():
             self.items.append((spec, handler, descriptor))
 
     registry = Registry()
-    register_capabilities(registry)
+    register_capabilities(registry, adapter_factory=provider_factory)
     return {spec.id: (spec, descriptor) for spec, _, descriptor in registry.items}
+
+
+def test_provider_fails_startup_when_required_adapter_factory_is_unavailable(monkeypatch):
+    class Registry:
+        def register(self, *_args, **_kwargs):
+            pytest.fail("unconfigured provider must fail before registering handlers")
+
+    monkeypatch.delenv("AI00_INTEGRATION_ADAPTER_FACTORY", raising=False)
+    with pytest.raises(RuntimeError, match="AI00_INTEGRATION_ADAPTER_FACTORY"):
+        register_capabilities(Registry())
+
+
+def test_registered_handlers_use_configured_vault_catalog_and_bounded_runtime(monkeypatch):
+    class Registry:
+        def __init__(self):
+            self.handlers = {}
+
+        def register(self, spec, handler, *, descriptor=None):
+            self.handlers[spec.id] = handler
+
+    adapters = provider_factory()
+    factory_module = ModuleType("integration_test_adapter_factory")
+    factory_module.build = lambda: adapters
+    monkeypatch.setitem(sys.modules, factory_module.__name__, factory_module)
+    monkeypatch.setenv(
+        "AI00_INTEGRATION_ADAPTER_FACTORY", "integration_test_adapter_factory:build"
+    )
+    registry = Registry()
+    register_capabilities(registry)
+    context = CapabilityContext(user_gid="actor-1", team_gid="team-1", request_id="provider-e2e")
+
+    connector = asyncio.run(registry.handlers["integration.connector.create"]({
+        "name": "ERP", "connector_type": "postgresql", "host": "8.8.8.8", "port": 5432,
+        "database_name": "erp", "username": "reader", "credential_enrollment_handle": "once-1",
+        "idempotency_key": "connector-create-1",
+    }, context))
+    mapping = asyncio.run(registry.handlers["integration.mapping.create"]({
+        "datasource_gid": connector["gid"], "name": "Parts", "source_object": "parts",
+        "target_domain": "knowledge", "target_capability_id": "knowledge.reference_data.change.apply",
+        "target_major_version": 1, "minimum_catalog_release": "rel_20260828",
+        "field_mappings": [{"source_field": "part_no", "target_field": "code"}],
+        "idempotency_key": "mapping-create-1",
+    }, context))
+    tested = asyncio.run(registry.handlers["integration.connector.connection.test"](
+        {"gid": connector["gid"]}, context
+    ))
+
+    assert connector["gid"] == "connector-1"
+    assert mapping["datasource_gid"] == "connector-1"
+    assert adapters.catalog.calls == [
+        ("knowledge.reference_data.change.apply", 1, "rel_20260828")
+    ]
+    assert tested["reachable"] is True
+    assert tested["operation_ref"]["status"] == "succeeded"
 
 
 def test_twelve_exact_targets_have_recursively_closed_stable_v1_contracts():
@@ -159,6 +319,16 @@ def test_mapping_writes_require_exact_target_version_release_and_idempotency():
     assert {
         "mapping_gid", "idempotency_key"
     } <= set(registrations["integration.mapping.import.start"][0].input_schema["required"])
+
+
+def test_legacy_non_idempotent_writes_publish_their_actual_operation_policy():
+    registrations = _registrations()
+    for capability_id in (
+        "integration.connector.archive", "integration.mapping.update", "integration.mapping.archive",
+    ):
+        descriptor = registrations[capability_id][1]
+        assert descriptor.idempotency_policy == "none", capability_id
+        assert descriptor.operation_policy == "none", capability_id
 
 
 @pytest.mark.parametrize("host", ["127.0.0.1", "localhost", "10.1.2.3", "169.254.169.254", "::1"])

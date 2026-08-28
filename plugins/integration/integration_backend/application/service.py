@@ -14,6 +14,14 @@ from .transform import RestrictedExpression
 
 RUNTIME_TIMEOUT_SECONDS = 15
 MAX_RESULTS = 200
+REDACTED = "[REDACTED]"
+_SENSITIVE_KEYS = (
+    "password", "secret", "credential", "authorization", "api_key", "apikey",
+    "access_token", "refresh_token", "auth_token",
+)
+_SENSITIVE_VALUE_MARKERS = (
+    "authorization:", "bearer ", "basic ", "api_key=", "apikey=", "password=", "token=", "vault://",
+)
 
 
 class IntegrationApplication:
@@ -364,9 +372,14 @@ class IntegrationApplication:
             mappings = self._validate_mappings(data.get("field_mappings", []))
 
             def create() -> dict[str, Any]:
+                self._get_connector({**data, "gid": str(data["datasource_gid"])})
                 self._require_target(data)
+                mapping_gid = self.operations.new_id("mapping")
                 stored = {key: value for key, value in data.items() if key != "idempotency_key"}
-                stored["field_mappings"] = mappings
+                stored["gid"] = mapping_gid
+                stored["field_mappings"] = [
+                    self._field(mapping_gid, item, 1) for item in mappings
+                ]
                 return self._mapping(self.repository.create_mapping(stored))
 
             return self._write(capability_id, data, create)
@@ -391,8 +404,16 @@ class IntegrationApplication:
         if capability_id == "integration.mapping.update":
             self._closed(raw, {"gid", "expected_revision", "field_mappings"})
             self._require(data, "gid", "expected_revision")
-            stored = {**data, "field_mappings": self._validate_mappings(data.get("field_mappings", []))}
             try:
+                mapping = self._get_mapping(data, str(data["gid"]))
+                items = self._validate_mappings(data.get("field_mappings", []))
+                stored = {
+                    **data,
+                    "field_mappings": [
+                        self._field(str(mapping["gid"]), item, int(data["expected_revision"]) + 1)
+                        for item in items
+                    ],
+                }
                 return self.repository.update_mapping(stored)
             except (ResourceNotFound, RevisionConflict) as exc:
                 raise self._translate_repository(exc) from exc
@@ -413,22 +434,31 @@ class IntegrationApplication:
         if not exact:
             data["idempotency_key"] = context.request_id or self.operations.new_id("request")
         self._require(data, "idempotency_key")
-        run_id = self.operations.new_id("run")
-        claim = self.operations.start(
-            capability_id=capability_id,
-            payload={key: value for key, value in data.items() if key not in {"owner_gid", "team_gid"}},
+        operation_payload = {
+            key: value for key, value in data.items() if key not in {"owner_gid", "team_gid"}
+        }
+        replay = self.operations.replay_import(
+            capability_id=capability_id, payload=operation_payload,
             owner_gid=data["owner_gid"], team_gid=data.get("team_gid"),
-            idempotency_key=str(data["idempotency_key"]), result={"run_id": run_id},
+            idempotency_key=str(data["idempotency_key"]),
         )
-        if claim.replayed:
-            run_id = str((claim.record.result or {})["run_id"])
-            return {"run_id": run_id, "operation_ref": operation_ref(claim.record)}
-        try:
-            mapping = self._get_mapping(data, str(data["mapping_gid"]))
-            self._require_target(mapping)
-            self.repository.create_import_run({
+        if replay is not None:
+            run_id = str((replay.record.result or {}).get("run_id") or "")
+            if not run_id:
+                raise CapabilityBusinessError(
+                    "idempotency_conflict", "Integration import operation has no durable run identity"
+                )
+            return {"run_id": run_id, "operation_ref": operation_ref(replay.record)}
+        mapping = self._get_mapping(data, str(data["mapping_gid"]))
+        self._require_target(mapping)
+        run_id = self.operations.new_id("run")
+        claim = self.operations.start_import(
+            capability_id=capability_id,
+            payload=operation_payload,
+            owner_gid=data["owner_gid"], team_gid=data.get("team_gid"),
+            idempotency_key=str(data["idempotency_key"]),
+            run={
                 "run_id": run_id,
-                "operation_id": claim.record.operation_id,
                 "mapping_gid": mapping["gid"],
                 "target_capability_id": mapping["target_capability_id"],
                 "target_major_version": mapping["target_major_version"],
@@ -437,17 +467,13 @@ class IntegrationApplication:
                 "owner_gid": data["owner_gid"],
                 "team_gid": data.get("team_gid"),
                 "idempotency_key": data["idempotency_key"],
-            })
-        except (ResourceNotFound, RevisionConflict) as exc:
-            error = self._translate_repository(exc)
-            self.operations.failed(claim.record, error_code=error.code)
-            raise error from exc
-        except CapabilityBusinessError as exc:
-            self.operations.failed(claim.record, error_code=exc.code)
-            raise
-        except Exception as exc:
-            self.operations.outcome_unknown(claim.record, error_code=type(exc).__name__)
-            raise
+            },
+        )
+        run_id = str((claim.record.result or {}).get("run_id") or "")
+        if not run_id:
+            raise CapabilityBusinessError(
+                "idempotency_conflict", "Integration import operation has no durable run identity"
+            )
         return {"run_id": run_id, "operation_ref": operation_ref(claim.record)}
 
     async def _runtime(
@@ -472,13 +498,14 @@ class IntegrationApplication:
             owner_gid=data["owner_gid"], team_gid=data.get("team_gid"), idempotency_key=key,
         )
         if claim.replayed and claim.record.result is not None:
-            return {**claim.record.result, "operation_ref": operation_ref(claim.record)}
+            replay = self._sanitize_runtime_result(claim.record.result)
+            return {**replay, "operation_ref": operation_ref(claim.record)}
         try:
             raw = await asyncio.wait_for(
                 method(*args, timeout_seconds=RUNTIME_TIMEOUT_SECONDS, result_limit=limit),
                 timeout=RUNTIME_TIMEOUT_SECONDS,
             )
-            result = projector(raw, limit)
+            result = self._sanitize_runtime_result(projector(raw, limit))
             record = self.operations.succeeded(claim.record, result)
             return {**result, "operation_ref": operation_ref(record)}
         except TimeoutError:
@@ -495,31 +522,42 @@ class IntegrationApplication:
         result: dict[str, Any] = {}
         if isinstance(raw.get("reachable"), bool):
             result["reachable"] = raw["reachable"]
-        if isinstance(raw.get("latency_ms"), int):
+        if isinstance(raw.get("latency_ms"), int) and not isinstance(raw.get("latency_ms"), bool):
             result["latency_ms"] = raw["latency_ms"]
-        if raw.get("message"):
-            result["message"] = str(raw["message"])[:500]
+        if raw.get("message") is not None:
+            result["message"] = REDACTED
         return result
 
-    @staticmethod
-    def _project_objects(raw: Mapping[str, Any], limit: int) -> dict[str, Any]:
-        return {"objects": [
-            {"name": str(item["name"]), "kind": str(item.get("kind") or "object")}
-            for item in list(raw.get("objects") or ())[:limit]
-            if isinstance(item, Mapping) and item.get("name")
-        ]}
+    @classmethod
+    def _project_objects(cls, raw: Mapping[str, Any], limit: int) -> dict[str, Any]:
+        objects = []
+        for item in list(raw.get("objects") or ())[:limit]:
+            if not isinstance(item, Mapping):
+                continue
+            name = cls._scalar_text(item.get("name"))
+            if not name:
+                continue
+            kind = cls._scalar_text(item.get("kind")) or "object"
+            objects.append({"name": name, "kind": kind})
+        return {"objects": objects}
 
-    @staticmethod
-    def _project_columns(raw: Mapping[str, Any], limit: int) -> dict[str, Any]:
-        return {"columns": [
-            {
-                "name": str(item["name"]),
-                "data_type": str(item.get("data_type") or "unknown"),
-                "nullable": bool(item.get("nullable", True)),
-            }
-            for item in list(raw.get("columns") or ())[:limit]
-            if isinstance(item, Mapping) and item.get("name")
-        ]}
+    @classmethod
+    def _project_columns(cls, raw: Mapping[str, Any], limit: int) -> dict[str, Any]:
+        columns = []
+        for item in list(raw.get("columns") or ())[:limit]:
+            if not isinstance(item, Mapping):
+                continue
+            name = cls._scalar_text(item.get("name"))
+            if not name:
+                continue
+            data_type = cls._scalar_text(item.get("data_type")) or "unknown"
+            nullable = item.get("nullable", True)
+            columns.append({
+                "name": name,
+                "data_type": data_type,
+                "nullable": nullable if isinstance(nullable, bool) else True,
+            })
+        return {"columns": columns}
 
     @staticmethod
     def _project_preview(raw: Mapping[str, Any], limit: int) -> dict[str, Any]:
@@ -529,15 +567,58 @@ class IntegrationApplication:
                 continue
             values = []
             for field, value in sorted(row.items(), key=lambda item: str(item[0]))[:MAX_RESULTS]:
-                sensitive = any(token in str(field).casefold() for token in ("password", "secret", "credential", "token"))
-                scalar = value if value is None or isinstance(value, (str, int, float, bool)) else str(value)
+                sensitive = IntegrationApplication._secret_exposed({str(field): value})
+                scalar = value if value is None or isinstance(value, (str, int, float, bool)) else REDACTED
                 values.append({
                     "field": str(field),
-                    "value": "[REDACTED]" if sensitive else scalar,
-                    "redacted": sensitive,
+                    "value": REDACTED if sensitive else scalar,
+                    "redacted": sensitive or scalar == REDACTED,
                 })
             rows.append({"values": values})
         return {"rows": rows, "truncated": bool(raw.get("truncated") or len(list(raw.get("rows") or ())) > limit)}
+
+    @staticmethod
+    def _sensitive_key(key: object) -> bool:
+        normalized = str(key).casefold().replace("-", "_")
+        return any(token in normalized for token in _SENSITIVE_KEYS)
+
+    @classmethod
+    def _scalar_text(cls, value: Any) -> str | None:
+        if not isinstance(value, (str, int, float, bool)):
+            return None
+        if cls._secret_exposed(value):
+            return REDACTED
+        return str(value)
+
+    @classmethod
+    def _secret_exposed(cls, value: Any) -> bool:
+        if isinstance(value, Mapping):
+            return any(cls._sensitive_key(key) or cls._secret_exposed(child) for key, child in value.items())
+        if isinstance(value, (list, tuple, set)):
+            return any(cls._secret_exposed(child) for child in value)
+        if isinstance(value, str):
+            normalized = value.casefold()
+            return any(marker in normalized for marker in _SENSITIVE_VALUE_MARKERS)
+        return False
+
+    @classmethod
+    def _sanitize_runtime_result(cls, value: Any, *, key: object | None = None) -> Any:
+        if key is not None and cls._sensitive_key(key):
+            return REDACTED
+        if isinstance(value, Mapping):
+            return {
+                str(child_key): cls._sanitize_runtime_result(child, key=child_key)
+                for child_key, child in value.items()
+            }
+        if isinstance(value, list):
+            return [cls._sanitize_runtime_result(child) for child in value]
+        if isinstance(value, tuple):
+            return [cls._sanitize_runtime_result(child) for child in value]
+        if isinstance(value, str) and cls._secret_exposed(value):
+            return REDACTED
+        if value is None or isinstance(value, (str, int, float, bool)):
+            return value
+        return REDACTED
 
 
 __all__ = ["IntegrationApplication", "MAX_RESULTS", "RUNTIME_TIMEOUT_SECONDS"]

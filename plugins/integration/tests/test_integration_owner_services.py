@@ -57,7 +57,7 @@ class MemoryRepository:
         return [dict(row) for row in self.connectors.values() if self._visible(row, data)][: data.get("limit", 100)]
 
     def create_mapping(self, data):
-        gid = f"mapping-{len(self.mappings) + 1}"
+        gid = data.get("gid") or f"mapping-{len(self.mappings) + 1}"
         row = {**data, "gid": gid, "revision": 1, "status": "active"}
         self.mappings[gid] = row
         self.field_mappings[gid] = [dict(item) for item in data.get("field_mappings", ())]
@@ -65,7 +65,9 @@ class MemoryRepository:
 
     def get_mapping(self, data):
         row = self.mappings.get(data["gid"])
-        return dict(row) if row and self._visible(row, data) else None
+        if row and self._visible(row, data):
+            return {**row, "field_mappings": [dict(item) for item in self.field_mappings.get(data["gid"], ())]}
+        return None
 
     def search_mappings(self, data):
         return [dict(row) for row in self.mappings.values() if self._visible(row, data)][: data.get("limit", 100)]
@@ -89,29 +91,66 @@ class MemoryRepository:
         return {"mapping_gid": data["mapping_gid"], "revision": row["revision"], "updated_count": len(items), "items": items}
 
     def update_mapping(self, data):
-        return {"gid": data["gid"], "revision": data["expected_revision"] + 1, "changed": True}
+        from plugins.integration.integration_backend.application.ports import ResourceNotFound, RevisionConflict
+
+        row = self.mappings.get(data["gid"])
+        if not row or not self._visible(row, data):
+            raise ResourceNotFound("mapping")
+        if row["revision"] != data["expected_revision"]:
+            raise RevisionConflict("mapping")
+        row["revision"] += 1
+        self.field_mappings[data["gid"]] = [
+            dict(item, revision=row["revision"]) for item in data.get("field_mappings", ())
+        ]
+        return {"gid": data["gid"], "revision": row["revision"], "changed": True}
 
     def archive_mapping(self, data):
         return {"gid": data["gid"], "archived": True}
 
-    def create_import_run(self, data):
-        self.imports.append(dict(data))
+    def claim_import_operation(self, record, run):
+        winner, replayed = self.claim_operation(record)
+        if not replayed:
+            self.imports.append(dict(run))
+        return winner, replayed
 
     def find_operation(self, owner_gid, capability_id, idempotency_key):
         operation_id = self.operation_scopes.get((owner_gid, capability_id, idempotency_key))
         return self.operations.get(operation_id)
 
-    def create_operation(self, record):
+    def find_import_operation(self, owner_gid, capability_id, idempotency_key):
+        record = self.find_operation(owner_gid, capability_id, idempotency_key)
+        if record is None:
+            return None
+        if not any(run["operation_id"] == record.operation_id for run in self.imports):
+            from plugins.integration.integration_backend.application.ports import IncompleteOperation
+
+            raise IncompleteOperation(record.operation_id)
+        return record
+
+    def _create_operation(self, record):
         self.operations[record.operation_id] = record
         self.operation_scopes[(record.owner_gid, record.capability_id, record.idempotency_key)] = record.operation_id
         self.operation_statuses.append(record.status)
         return record
 
-    def get_operation(self, operation_id):
-        return self.operations.get(operation_id)
+    def claim_operation(self, record):
+        existing = self.find_operation(record.owner_gid, record.capability_id, record.idempotency_key)
+        if existing is not None:
+            return existing, True
+        return self._create_operation(record), False
 
-    def transition_operation(self, operation_id, expected_version, replacement):
-        current = self.operations[operation_id]
+    def get_operation(self, operation_id, owner_gid, team_gid):
+        record = self.operations.get(operation_id)
+        if record and record.owner_gid == owner_gid and record.team_gid == team_gid:
+            return record
+        return None
+
+    def transition_operation(self, operation_id, expected_version, replacement, owner_gid, team_gid):
+        current = self.get_operation(operation_id, owner_gid, team_gid)
+        if current is None:
+            from plugins.integration.integration_backend.application.ports import RevisionConflict
+
+            raise RevisionConflict("operation")
         if current.version != expected_version:
             from plugins.integration.integration_backend.application.ports import RevisionConflict
 
@@ -302,13 +341,20 @@ def test_connector_write_translates_network_policy_rejection():
 
 def test_mapping_create_requires_stable_exact_catalog_target_and_restricted_transforms():
     repository, catalog = MemoryRepository(), Catalog()
+    _seed_connector_and_mapping(repository)
+    repository.mappings.clear()
+    repository.field_mappings.clear()
     application = app(repository, catalog=catalog)
 
     created = asyncio.run(application.invoke("integration.mapping.create", mapping_payload(), CONTEXT))
     assert created["target_capability_id"] == "knowledge.reference_data.change.apply"
     assert catalog.calls == [("knowledge.reference_data.change.apply", 1, "rel_20260828")]
 
-    rejecting = app(MemoryRepository(), catalog=Catalog(reject=True))
+    rejecting_repository = MemoryRepository()
+    _seed_connector_and_mapping(rejecting_repository)
+    rejecting_repository.mappings.clear()
+    rejecting_repository.field_mappings.clear()
+    rejecting = app(rejecting_repository, catalog=Catalog(reject=True))
     with pytest.raises(CapabilityBusinessError) as unavailable:
         asyncio.run(rejecting.invoke("integration.mapping.create", mapping_payload(), CONTEXT))
     assert_code(unavailable, "target_capability_unavailable")
@@ -425,6 +471,43 @@ def test_import_start_is_durable_accepted_and_replayed_without_duplicate_run():
     assert catalog.calls == [("knowledge.reference_data.change.apply", 1, "rel_20260828")]
 
 
+def test_import_replay_preserves_run_identity_across_unknown_failed_and_reconciled_states():
+    repository, catalog = MemoryRepository(), Catalog()
+    _seed_connector_and_mapping(repository)
+    application = app(repository, catalog=catalog)
+    payload = {"mapping_gid": "mapping-1", "idempotency_key": "import-states-1"}
+    accepted = asyncio.run(application.invoke("integration.mapping.import.start", payload, CONTEXT))
+    record = repository.operations[accepted["operation_ref"]["operation_id"]]
+
+    unknown = application.operations.outcome_unknown(record, error_code="external_timeout")
+    unknown_replay = asyncio.run(application.invoke("integration.mapping.import.start", payload, CONTEXT))
+    assert unknown_replay["run_id"] == accepted["run_id"]
+    assert unknown_replay["operation_ref"]["status"] == "outcome_unknown"
+
+    reconciled = application.operations.reconcile(
+        unknown.operation_id, "succeeded", owner_gid="actor-1", team_gid="team-1",
+        expected_version=unknown.version, result={"imported_count": 4},
+    )
+    reconciled_replay = asyncio.run(application.invoke("integration.mapping.import.start", payload, CONTEXT))
+    assert reconciled.result["run_id"] == accepted["run_id"]
+    assert reconciled_replay["run_id"] == accepted["run_id"]
+    assert reconciled_replay["operation_ref"]["status"] == "succeeded"
+
+    failed_repository = MemoryRepository()
+    _seed_connector_and_mapping(failed_repository)
+    failed_application = app(failed_repository, catalog=Catalog())
+    failed_accepted = asyncio.run(failed_application.invoke(
+        "integration.mapping.import.start", {**payload, "idempotency_key": "import-states-2"}, CONTEXT
+    ))
+    failed_record = failed_repository.operations[failed_accepted["operation_ref"]["operation_id"]]
+    failed_application.operations.failed(failed_record, error_code="target_rejected")
+    failed_replay = asyncio.run(failed_application.invoke(
+        "integration.mapping.import.start", {**payload, "idempotency_key": "import-states-2"}, CONTEXT
+    ))
+    assert failed_replay["run_id"] == failed_accepted["run_id"]
+    assert failed_replay["operation_ref"]["status"] == "failed"
+
+
 def test_unknown_operation_can_only_be_reconciled_with_expected_version():
     try:
         from plugins.integration.integration_backend.application.operations import IntegrationOperations
@@ -439,12 +522,16 @@ def test_unknown_operation_can_only_be_reconciled_with_expected_version():
     )
     unknown = operations.outcome_unknown(claim.record, error_code="external_timeout")
     succeeded = operations.reconcile(
-        unknown.operation_id, "succeeded", expected_version=unknown.version, result={"imported_count": 4}
+        unknown.operation_id, "succeeded", owner_gid="actor-1", team_gid="team-1",
+        expected_version=unknown.version, result={"imported_count": 4}
     )
     assert succeeded.status == "succeeded" and succeeded.result == {"imported_count": 4}
 
     with pytest.raises(CapabilityBusinessError) as stale:
-        operations.reconcile(unknown.operation_id, "failed", expected_version=unknown.version, error_code="late_failure")
+        operations.reconcile(
+            unknown.operation_id, "failed", owner_gid="actor-1", team_gid="team-1",
+            expected_version=unknown.version, error_code="late_failure",
+        )
     assert_code(stale, "version_conflict")
 
 
@@ -519,8 +606,10 @@ def test_sql_repository_persists_operation_and_audit_transitions(monkeypatch):
         error_code=None, created_at=now, updated_at=now,
     )
     repository = IntegrationRepository()
-    repository.create_operation(record)
-    repository.transition_operation("operation-1", 1, replace(record, status="outcome_unknown", version=2))
+    repository.claim_operation(record)
+    repository.transition_operation(
+        "operation-1", 1, replace(record, status="outcome_unknown", version=2), "actor-1", "team-1"
+    )
 
     sql = "\n".join(statement for statement, _ in connection.statements)
     assert "workmanship_int_operations" in sql
@@ -529,6 +618,8 @@ def test_sql_repository_persists_operation_and_audit_transitions(monkeypatch):
 
 
 def test_sql_import_run_pins_target_version_release_and_idempotency(monkeypatch):
+    from plugins.integration.integration_backend.application.operations import IntegrationOperation
+
     connection = RecordingConnection()
 
     @contextmanager
@@ -539,7 +630,14 @@ def test_sql_import_run_pins_target_version_release_and_idempotency(monkeypatch)
         "plugins.integration.integration_backend.infrastructure.repository.get_integration_conn",
         connections,
     )
-    IntegrationRepository().create_import_run({
+    now = datetime(2026, 8, 28, tzinfo=UTC)
+    record = IntegrationOperation(
+        operation_id="operation-1", owner_gid="actor-1", team_gid="team-1",
+        capability_id="integration.mapping.import.start", idempotency_key="import-1",
+        payload_hash="a" * 64, status="accepted", version=1, result={"run_id": "run-1"},
+        error_code=None, created_at=now, updated_at=now,
+    )
+    IntegrationRepository().claim_import_operation(record, {
         "run_id": "run-1", "mapping_gid": "mapping-1", "operation_id": "operation-1",
         "status": "accepted", "target_capability_id": "knowledge.reference_data.change.apply",
         "target_major_version": 1, "catalog_release": "rel_20260828", "owner_gid": "actor-1",

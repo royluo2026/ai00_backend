@@ -13,6 +13,10 @@ class RevisionConflict(RuntimeError):
     pass
 
 
+class IncompleteOperation(RuntimeError):
+    pass
+
+
 class CredentialEnrollmentPort(Protocol):
     def consume(self, handle: str, actor_gid: str, team_gid: str | None) -> str: ...
 
@@ -54,12 +58,21 @@ class OperationPersistencePort(Protocol):
         self, owner_gid: str, capability_id: str, idempotency_key: str
     ) -> Any | None: ...
 
-    def create_operation(self, record: Any) -> Any: ...
+    def find_import_operation(
+        self, owner_gid: str, capability_id: str, idempotency_key: str
+    ) -> Any | None: ...
 
-    def get_operation(self, operation_id: str) -> Any | None: ...
+    def claim_operation(self, record: Any) -> tuple[Any, bool]: ...
+
+    def claim_import_operation(self, record: Any, run: Mapping[str, Any]) -> tuple[Any, bool]: ...
+
+    def get_operation(
+        self, operation_id: str, owner_gid: str, team_gid: str | None
+    ) -> Any | None: ...
 
     def transition_operation(
-        self, operation_id: str, expected_version: int, replacement: Any
+        self, operation_id: str, expected_version: int, replacement: Any,
+        owner_gid: str, team_gid: str | None,
     ) -> Any: ...
 
 
@@ -67,6 +80,7 @@ __all__ = [
     "CatalogResolverPort",
     "ConnectorRuntimePort",
     "CredentialEnrollmentPort",
+    "IncompleteOperation",
     "OperationIdentityPort",
     "OperationPersistencePort",
     "ResourceNotFound",
