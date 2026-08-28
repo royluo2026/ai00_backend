@@ -30,14 +30,21 @@ class FrozenCoverageReview:
     root: Path
 
     def capability_ids(self, owner: str) -> frozenset[str]:
+        document = self._document(owner)
+        supplement = document.get("official_provider_capabilities", {})
+        return frozenset(document.get("capabilities", {})) | frozenset(supplement.get("capability_ids", ()))
+
+    def catalog_capability_ids(self, owner: str) -> frozenset[str]:
+        return frozenset(self._document(owner).get("capabilities", {}))
+
+    def _document(self, owner: str) -> dict[str, Any]:
         filename = DOMAIN_REVIEW_FILES[owner]
         path = (
             self.root
             / "docs/governance/capability-coverage-review"
             / filename
         )
-        document = json.loads(path.read_text(encoding="utf-8"))
-        return frozenset(document.get("capabilities", {}))
+        return json.loads(path.read_text(encoding="utf-8"))
 
 
 def registered_descriptor_ids(module_name: str) -> set[str]:

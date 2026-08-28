@@ -73,6 +73,42 @@ class CapabilityRequirements(BaseModel):
         return self
 
 
+class PluginRequirement(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    plugin_id: str
+    version: str
+
+    @field_validator("plugin_id")
+    @classmethod
+    def valid_plugin_id(cls, value: str) -> str:
+        if not PLUGIN_ID.fullmatch(value):
+            raise ValueError("plugin dependency must be a reverse-DNS-like lowercase identity")
+        return value
+
+    @field_validator("version")
+    @classmethod
+    def valid_version(cls, value: str) -> str:
+        if not SEMVER.fullmatch(value):
+            raise ValueError("plugin dependency version must be SemVer")
+        return value
+
+
+class PluginRequirements(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    required: tuple[PluginRequirement, ...] = ()
+    optional: tuple[PluginRequirement, ...] = ()
+
+    @model_validator(mode="after")
+    def unique_requirements(self):
+        required = {(item.plugin_id, item.version) for item in self.required}
+        optional = {(item.plugin_id, item.version) for item in self.optional}
+        if len(required) != len(self.required) or len(optional) != len(self.optional):
+            raise ValueError("plugin requirements must be unique")
+        if required & optional:
+            raise ValueError("a plugin cannot be both required and optional")
+        return self
+
+
 class PluginManifestV2(BaseModel):
     model_config = ConfigDict(extra="forbid")
     schema_version: Literal["2.0"]
@@ -85,6 +121,7 @@ class PluginManifestV2(BaseModel):
     runtimes: dict[Literal["web"], WebRuntime]
     permissions: tuple[str, ...] = ()
     capabilities: CapabilityRequirements = Field(default_factory=CapabilityRequirements)
+    plugins: PluginRequirements = Field(default_factory=PluginRequirements)
     artifact: Artifact
     data: DataPolicy = Field(default_factory=DataPolicy)
 

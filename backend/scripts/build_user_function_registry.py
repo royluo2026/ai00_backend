@@ -73,6 +73,8 @@ TARGET_CAPABILITIES = {
     "rest:GET:/api/simulation/environments": "simulation.environment.search",
     "rest:GET:/api/simulation/environments/{environment_gid}": "simulation.environment.get",
     "rest:POST:/api/simulation/environments": "simulation.environment.create",
+    "rest:POST:/api/plugin/install": "base.plugin.installation.request.create",
+    "rest:DELETE:/api/plugin/uninstall/{plugin_id}": "base.plugin.installation.transition.uninstall",
     "agent_tool:get_bop_entries": "craft.bop.execution_structure.get",
     "agent_tool:list_asm_lines": "craft.bop.execution_structure.get",
     "agent_tool:search_knowledge": "knowledge.context.retrieve",

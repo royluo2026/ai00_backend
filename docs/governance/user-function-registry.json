@@ -9774,6 +9774,28 @@
         "plugins/craft/craft_backend/routers/ontology.py"
       ]
     },
+    "rest:DELETE:/api/plugin/uninstall/{plugin_id}": {
+      "function_id": "rest:DELETE:/api/plugin/uninstall/{plugin_id}",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": "base.plugin.installation.transition.uninstall",
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "mapped",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/plugins.py"
+      ]
+    },
     "rest:DELETE:/api/projects/vehicle_models/{gid}": {
       "function_id": "rest:DELETE:/api/projects/vehicle_models/{gid}",
       "domain": "Project Management",
@@ -12313,17 +12335,17 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.file_store.public_config.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
-      "data_classification": "internal",
-      "classification": "operations",
-      "migration_status": "excluded",
+      "data_classification": "confidential",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Base Platform",
-      "exclusion_reason": "rest:GET:/api/file-store/config is a storage configuration and connectivity diagnostic endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "exclusion_reason": null,
       "source_paths": [
         "backend/routers/file_store.py"
       ]
@@ -18717,28 +18739,6 @@
         "backend/routers/feishu_doc.py"
       ]
     },
-    "rest:GET:/api/file-store/config": {
-      "function_id": "rest:GET:/api/file-store/config",
-      "domain": "Base Platform",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
-      "target_capability": "base.file_store.public_config.get",
-      "exposure": "Web/REST",
-      "automation_level": "interactive",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "confidential",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/routers/file_store.py"
-      ]
-    },
     "rest:POST:/api/file-store/config": {
       "function_id": "rest:POST:/api/file-store/config",
       "domain": "Base Platform",
@@ -19957,6 +19957,28 @@
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/permission_requests.py"
+      ]
+    },
+    "rest:POST:/api/plugin/install": {
+      "function_id": "rest:POST:/api/plugin/install",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": "base.plugin.installation.request.create",
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "mapped",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/plugins.py"
       ]
     },
     "rest:POST:/api/projects": {

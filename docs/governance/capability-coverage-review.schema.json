@@ -22,6 +22,7 @@
     "unreviewed_functions": {"$ref": "#/$defs/UnreviewedFunctions"},
     "excluded_functions": {"$ref": "#/$defs/ExcludedFunctions"},
     "capabilities": {"$ref": "#/$defs/Capabilities"},
+    "official_provider_capabilities": {"$ref": "#/$defs/OfficialProviderCapabilities"},
     "code_extractions": {"type": "array", "items": {"$ref": "#/$defs/CodeExtraction"}},
     "database_boundaries": {"type": "array", "items": {"$ref": "#/$defs/DatabaseBoundary"}},
     "debt_dispositions": {"type": "array", "items": {"$ref": "#/$defs/DebtDisposition"}},
@@ -39,6 +40,16 @@
     }
   ],
   "$defs": {
+    "OfficialProviderCapabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["module", "artifact_sha256", "capability_ids"],
+      "properties": {
+        "module": {"const": "backend.base.official_provider"},
+        "artifact_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "capability_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
     "ReviewedAgainst": {
       "type": "object",
       "additionalProperties": false,

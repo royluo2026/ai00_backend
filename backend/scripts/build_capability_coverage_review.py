@@ -16,6 +16,8 @@ import jsonschema
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+if str(REPOSITORY_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPOSITORY_ROOT))
 GOVERNANCE_ROOT = REPOSITORY_ROOT / "docs" / "governance"
 REVIEW_ROOT = GOVERNANCE_ROOT / "capability-coverage-review"
 GENERATED_ROOT = REVIEW_ROOT / "generated"
@@ -616,6 +618,18 @@ def initialize_documents(sources: AuditSources, existing: dict[str, dict] | None
         document["reviewed_against"] = copy.deepcopy(sources.reviewed_against)
         document = merge_domain_review(document, domain_rows)
         document = _align_published_function_targets(document, domain_rows, catalog_ids)
+        if domain == "Base Platform":
+            from backend.base.official_provider import register_capabilities
+            from backend.capabilities.registry_next import CapabilityRegistry
+
+            registry = CapabilityRegistry()
+            register_capabilities(registry)
+            provider_path = REPOSITORY_ROOT / "backend/base/official_provider.py"
+            document["official_provider_capabilities"] = {
+                "module": "backend.base.official_provider",
+                "artifact_sha256": "sha256:" + hashlib.sha256(provider_path.read_bytes()).hexdigest(),
+                "capability_ids": [item.descriptor.id for item in registry.snapshot() if item.descriptor is not None],
+            }
         result.append(_merge_evidence(document, sources))
     corrected = _apply_approved_corrections(result, catalog_ids)
     for document in corrected:

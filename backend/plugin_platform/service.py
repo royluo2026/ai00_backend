@@ -2,18 +2,19 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import re
 import secrets
 from contextlib import contextmanager
 from copy import deepcopy
-from typing import Any, Iterator
+from typing import Any, Callable, Iterator, Protocol
 
 from backend.capability_v2.contracts import ConsumerIdentity, ConsumerType
 from backend.domain_ports.resource_authorization import resource_authorizers
 
 from .lifecycle import begin_upgrade, require_transition, rollback as plan_rollback
-from .manifest import parse_manifest
+from .manifest import ManifestError, PluginManifestV2, parse_manifest
 from .signing import SignatureError, canonical_release, fingerprint, sign, verify
 
 
@@ -60,6 +61,14 @@ def _tenant_for_user(user: dict) -> str:
     return user.get("team_id") or f"user:{user['gid']}"
 
 
+def platform_public_key() -> str:
+    """Return only the separately configured verifier key; publication fails closed without it."""
+    value = os.getenv("AI00_PLUGIN_PLATFORM_ED25519_PUBLIC_KEY", "").replace("\\n", "\n")
+    if not value:
+        raise SignatureError("platform verification key is not configured")
+    return value
+
+
 def validate_capability_grants(values: Any) -> tuple[str, ...]:
     """Reject unknown or platform-internal capabilities before a release can be installed."""
     grants = tuple(sorted({str(value) for value in (values or ())}))
@@ -101,6 +110,37 @@ def _lifecycle_actor(actor: dict[str, Any]) -> tuple[str, str]:
     if not isinstance(actor, dict):
         _lifecycle_invalid("invalid_actor")
     return _lifecycle_text(actor.get("gid"), maximum=128), _lifecycle_text(actor.get("tenant_gid"), maximum=128)
+
+
+def _command_digest(command: dict[str, Any]) -> str:
+    return hashlib.sha256(_json(command).encode("utf-8")).hexdigest()
+
+
+class DependencyResolver(Protocol):
+    def resolve(self, *, tenant_gid: str, manifest: PluginManifestV2) -> None: ...
+
+
+class CatalogDependencyResolver:
+    """Resolve signed dependencies through the stable Catalog and tenant installation port."""
+
+    def __init__(self, installations: Any) -> None:
+        self.installations = installations
+
+    def resolve(self, *, tenant_gid: str, manifest: PluginManifestV2) -> None:
+        from backend.capability_v2.bootstrap import get_capability_registry
+
+        registry = get_capability_registry()
+        for requirement in manifest.capabilities.required:
+            try:
+                capability = registry.get(requirement.id, requirement.major).spec
+            except KeyError as exc:
+                raise PluginLifecycleError("release_not_verified", "required capability dependency is unavailable") from exc
+            if not capability.plugin_callable:
+                raise PluginLifecycleError("release_not_verified", "required capability dependency is not plugin-callable")
+        for requirement in manifest.plugins.required:
+            installation = self.installations.installation(tenant_gid, requirement.plugin_id, lock=True)
+            if installation is None or installation.get("state") == "uninstalled" or installation.get("release_version") != requirement.version:
+                raise PluginLifecycleError("release_not_verified", "required plugin dependency is unavailable")
 
 
 class SqlPluginLifecycleRepository:
@@ -161,28 +201,30 @@ class SqlPluginLifecycleRepository:
                  row["mount_revocation_version"], row["revision"]),
             )
 
-    def claim(self, *, actor_gid: str, operation: str, idempotency_key: str) -> dict[str, Any] | None:
+    def claim(self, *, tenant_gid: str, actor_gid: str, operation: str, idempotency_key: str, command_sha256: str) -> dict[str, Any] | None:
         with self._cursor() as cur:
             cur.execute(
                 "INSERT INTO workmanship_base_plugin_lifecycle_idempotency "
-                "(actor_gid,operation,idempotency_key,status) VALUES (%s,%s,%s,'pending') "
-                "ON DUPLICATE KEY UPDATE actor_gid=VALUES(actor_gid)",
-                (actor_gid, operation, idempotency_key),
+                "(tenant_gid,actor_gid,operation,idempotency_key,command_sha256,status) VALUES (%s,%s,%s,%s,%s,'pending') "
+                "ON DUPLICATE KEY UPDATE tenant_gid=VALUES(tenant_gid)",
+                (tenant_gid, actor_gid, operation, idempotency_key, command_sha256),
             )
             cur.execute(
-                "SELECT status,result_json FROM workmanship_base_plugin_lifecycle_idempotency "
-                "WHERE actor_gid=%s AND operation=%s AND idempotency_key=%s FOR UPDATE",
-                (actor_gid, operation, idempotency_key),
+                "SELECT status,result_json,command_sha256 FROM workmanship_base_plugin_lifecycle_idempotency "
+                "WHERE tenant_gid=%s AND actor_gid=%s AND operation=%s AND idempotency_key=%s FOR UPDATE",
+                (tenant_gid, actor_gid, operation, idempotency_key),
             )
             row = cur.fetchone()
+        if row and str(row.get("command_sha256") or "") != command_sha256:
+            raise PluginLifecycleError("idempotency_conflict", "idempotency key is already bound to a different command")
         return _decode(row.get("result_json")) if row and row.get("status") == "completed" else None
 
-    def complete(self, *, actor_gid: str, operation: str, idempotency_key: str, result: dict[str, Any]) -> None:
+    def complete(self, *, tenant_gid: str, actor_gid: str, operation: str, idempotency_key: str, command_sha256: str, result: dict[str, Any]) -> None:
         with self._cursor() as cur:
             cur.execute(
                 "UPDATE workmanship_base_plugin_lifecycle_idempotency SET status='completed',result_json=%s,completed_at=CURRENT_TIMESTAMP(6) "
-                "WHERE actor_gid=%s AND operation=%s AND idempotency_key=%s",
-                (_json(result), actor_gid, operation, idempotency_key),
+                "WHERE tenant_gid=%s AND actor_gid=%s AND operation=%s AND idempotency_key=%s AND command_sha256=%s",
+                (_json(result), tenant_gid, actor_gid, operation, idempotency_key, command_sha256),
             )
 
     def revoke_mounts(self, *, tenant_gid: str, plugin_id: str, installation_id: str, new_revision: int) -> None:
@@ -227,18 +269,27 @@ class SqlPluginLifecycleRepository:
 class PluginPlatformService:
     """The sole owner of browser install/uninstall transitions."""
 
-    def __init__(self, *, repository: Any | None = None) -> None:
+    def __init__(
+        self,
+        *,
+        repository: Any | None = None,
+        platform_public_key_provider: Callable[[], str] | None = None,
+        dependency_resolver: DependencyResolver | None = None,
+    ) -> None:
         self.repository = repository or SqlPluginLifecycleRepository()
+        self.platform_public_key_provider = platform_public_key_provider or platform_public_key
+        self.dependency_resolver = dependency_resolver or CatalogDependencyResolver(self.repository)
 
     def request_install(self, *, actor: dict, command: dict) -> dict:
         command = self._install_command(command)
         actor_gid, tenant_gid = _lifecycle_actor(actor)
+        command_sha256 = _command_digest(command)
         with self.repository.transaction():
-            replay = self.repository.claim(actor_gid=actor_gid, operation="request.create", idempotency_key=command["idempotency_key"])
+            replay = self.repository.claim(tenant_gid=tenant_gid, actor_gid=actor_gid, operation="request.create", idempotency_key=command["idempotency_key"], command_sha256=command_sha256)
             if replay is not None:
                 return replay
             release = self.repository.release(command["plugin_id"], command["release_version"], lock=True)
-            self._verified_release(release, command)
+            self._verified_release(release, command, tenant_gid=tenant_gid)
             existing = self.repository.installation(tenant_gid, command["plugin_id"], lock=True)
             if existing is not None and existing["state"] != "uninstalled":
                 raise PluginLifecycleError("already_installed", "plugin is already installed")
@@ -251,7 +302,7 @@ class PluginPlatformService:
             }
             self.repository.save_installation(row)
             result = self._result(row)
-            self.repository.complete(actor_gid=actor_gid, operation="request.create", idempotency_key=command["idempotency_key"], result=result)
+            self.repository.complete(tenant_gid=tenant_gid, actor_gid=actor_gid, operation="request.create", idempotency_key=command["idempotency_key"], command_sha256=command_sha256, result=result)
             self.repository.audit({"tenant_gid": tenant_gid, "plugin_id": row["plugin_id"], "from_state": existing["state"] if existing else None,
                                    "to_state": "disabled", "release_version": row["release_version"], "actor_gid": actor_gid,
                                    "operation": "request.create", "details": {"operation": "request.create", "grants": row["granted_capabilities"], "revision": revision}})
@@ -260,8 +311,9 @@ class PluginPlatformService:
     def transition_uninstall(self, *, actor: dict, command: dict) -> dict:
         command = self._uninstall_command(command)
         actor_gid, tenant_gid = _lifecycle_actor(actor)
+        command_sha256 = _command_digest(command)
         with self.repository.transaction():
-            replay = self.repository.claim(actor_gid=actor_gid, operation="transition.uninstall", idempotency_key=command["idempotency_key"])
+            replay = self.repository.claim(tenant_gid=tenant_gid, actor_gid=actor_gid, operation="transition.uninstall", idempotency_key=command["idempotency_key"], command_sha256=command_sha256)
             if replay is not None:
                 return replay
             row = self.repository.installation(tenant_gid, command["plugin_id"], lock=True)
@@ -282,7 +334,7 @@ class PluginPlatformService:
             self.repository.preserve_tenant_data(tenant_gid=tenant_gid, plugin_id=row["plugin_id"], retain=command["retain_tenant_data"])
             self.repository.save_installation(new_row)
             result = self._result(new_row)
-            self.repository.complete(actor_gid=actor_gid, operation="transition.uninstall", idempotency_key=command["idempotency_key"], result=result)
+            self.repository.complete(tenant_gid=tenant_gid, actor_gid=actor_gid, operation="transition.uninstall", idempotency_key=command["idempotency_key"], command_sha256=command_sha256, result=result)
             self.repository.audit({"tenant_gid": tenant_gid, "plugin_id": row["plugin_id"], "from_state": row["state"], "to_state": "uninstalled",
                                    "release_version": row["release_version"], "actor_gid": actor_gid,
                                    "operation": "transition.uninstall", "details": {"operation": "transition.uninstall", "grants_revoked": row["granted_capabilities"], "data_retained": True, "revision": new_row["revision"]}})
@@ -318,16 +370,24 @@ class PluginPlatformService:
             _lifecycle_invalid("uninstall never purges tenant data")
         return command
 
-    @staticmethod
-    def _verified_release(release: dict[str, Any] | None, command: dict[str, Any]) -> None:
+    def _verified_release(self, release: dict[str, Any] | None, command: dict[str, Any], *, tenant_gid: str) -> None:
         if not release or release.get("status") != "published" or not release.get("platform_signature"):
             raise PluginLifecycleError("release_not_verified", "release is not published and platform-signed")
         actual_hash = str(release.get("artifact_sha256") or "")
         if command["release_sha256"] != f"sha256:{actual_hash}":
             raise PluginLifecycleError("release_not_verified", "release hash does not match signed release")
-        if release.get("dependencies_ready") is False:
-            raise PluginLifecycleError("release_not_verified", "release dependencies are unavailable")
-        allowed = list(release.get("permissions") or _decode(release.get("manifest") or {}).get("permissions") or [])
+        try:
+            manifest = parse_manifest(_decode(release.get("manifest")))
+            normalized = manifest.model_dump(mode="json")
+            if manifest.artifact.sha256 != actual_hash:
+                raise PluginLifecycleError("release_not_verified", "release artifact does not match signed manifest")
+            verify(self.platform_public_key_provider(), canonical_release(normalized, actual_hash), str(release["platform_signature"]))
+            self.dependency_resolver.resolve(tenant_gid=tenant_gid, manifest=manifest)
+        except PluginLifecycleError:
+            raise
+        except (ManifestError, SignatureError, TypeError, ValueError) as exc:
+            raise PluginLifecycleError("release_not_verified", "release signature or dependencies cannot be verified") from exc
+        allowed = list(manifest.permissions)
         if sorted(command["requested_grants"]) != sorted(allowed):
             raise PluginLifecycleError("invalid_input", "requested grants must exactly match signed release grants")
 

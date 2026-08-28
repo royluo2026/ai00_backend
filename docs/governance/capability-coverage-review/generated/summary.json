@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "domains": 11,
-  "stable_functions": 920,
+  "stable_functions": 922,
   "resolutions": {
-    "existing_capability": 807,
+    "existing_capability": 810,
     "new_capability": 0,
-    "excluded": 113,
+    "excluded": 112,
     "unreviewed": 0
   },
   "candidate_capabilities": 0,
@@ -18,9 +18,9 @@
       "unreviewed": 0
     },
     "Base Platform": {
-      "existing_capability": 67,
+      "existing_capability": 70,
       "new_capability": 0,
-      "excluded": 80,
+      "excluded": 79,
       "unreviewed": 0
     },
     "Craft": {
@@ -84,8 +84,8 @@
     "functions_per_candidate": 0
   },
   "enabled_exposures": {
-    "web": 35,
-    "rest": 130,
+    "web": 36,
+    "rest": 133,
     "plugin": 0,
     "agent": 27,
     "mcp": 0,
@@ -93,15 +93,15 @@
   },
   "code_extractions": 58,
   "debt_backlog": {},
-  "catalog_descriptors": 453,
-  "current_catalog_capabilities": 437,
-  "proposed_final_catalog_capabilities": 437,
+  "catalog_descriptors": 481,
+  "current_catalog_capabilities": 465,
+  "proposed_final_catalog_capabilities": 465,
   "evidence": {
     "module_dependencies": 0,
     "boundary_violations": 0,
     "cross_domain_sql": 0,
     "internal_import": 0,
     "tables": 226,
-    "migrations": 35
+    "migrations": 39
   }
 }

@@ -27,9 +27,12 @@
 | Base Platform | `base.authorization.grant.read` | rest |
 | Base Platform | `base.export_template.change.apply` | rest |
 | Base Platform | `base.export_template.read` | rest |
+| Base Platform | `base.file_store.public_config.get` | web, rest |
 | Base Platform | `base.identity.directory.sync` | rest |
 | Base Platform | `base.identity.role.assign` | rest |
 | Base Platform | `base.identity.session.get` | rest |
+| Base Platform | `base.plugin.installation.request.create` | rest |
+| Base Platform | `base.plugin.installation.transition.uninstall` | rest |
 | Base Platform | `base.plugin.marketplace.publisher.register` | rest |
 | Base Platform | `base.plugin.marketplace.release.change.apply` | rest |
 | Base Platform | `base.plugin.marketplace.search` | rest |

@@ -161,7 +161,10 @@
         "backend/db/migrations/202608100004_base_artifacts_and_operations.sql",
         "backend/db/migrations/202608100005_base_plugin_mount_sessions.sql",
         "backend/db/migrations/202608100007_base_revision_lineage.sql",
-        "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        "backend/db/migrations/202608280001_base_saved_view_governance.sql",
+        "backend/db/migrations/202608280002_base_self_annotation_governance.sql",
+        "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql",
+        "backend/db/migrations/202608280004_base_plugin_lifecycle_idempotency_scope.sql"
       ],
       "test_paths": ["backend/tests/test_base_*.py"],
       "documentation_paths": ["docs/capabilities/base-platform/**"]

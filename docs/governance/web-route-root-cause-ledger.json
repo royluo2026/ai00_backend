@@ -563,9 +563,9 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/plugins.py",
-          "start_line": 55,
-          "end_line": 62,
-          "sha256": "2a858b8676a041ba0100263b10a2ad3a69880612d2d19a5974277e3b97b30e4a",
+          "start_line": 64,
+          "end_line": 72,
+          "sha256": "53a92bdb3a239eac4885c54344a8abfc24371d2e34544f781b90459e3f94dc34",
           "method": "DELETE",
           "normalized_route": "/api/plugin/uninstall/{dynamic}"
         },
@@ -5124,9 +5124,9 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/plugins.py",
-          "start_line": 45,
-          "end_line": 52,
-          "sha256": "b6d41d953e7667d8e5175970fd1d23be839f34a332b32e08d4f86704d0fab208",
+          "start_line": 53,
+          "end_line": 61,
+          "sha256": "56b2e3c8889662a1615ea619971ef6f222f4304968afca42637e07dc2d7bc1f2",
           "method": "POST",
           "normalized_route": "/api/plugin/install"
         },

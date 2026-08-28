@@ -264,3 +264,7 @@
 | Digital Model | `backend/db/migrations/202608100009_digital_model_snapshots.sql` | migration | digital_model |
 | Simulation | `backend/db/migrations/202608100010_simulation_reproducibility.sql` | migration | simulation |
 | Device | `backend/db/migrations/202608100011_device_operation_protocol_v2.sql` | migration | device |
+| Base Platform | `backend/db/migrations/202608280001_base_saved_view_governance.sql` | migration | base |
+| Base Platform | `backend/db/migrations/202608280002_base_self_annotation_governance.sql` | migration | base |
+| Base Platform | `backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql` | migration | base |
+| Base Platform | `backend/db/migrations/202608280004_base_plugin_lifecycle_idempotency_scope.sql` | migration | base |

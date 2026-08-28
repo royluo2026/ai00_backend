@@ -3,9 +3,9 @@
   "domain": "Base Platform",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:da71946c9eb294138aa7081442c49017d792635be9e1715da322e954aab611bb",
-    "catalog_release": "rel_1b40890bffd2481e1cc55591ae4ffb0c",
-    "catalog_sha256": "sha256:a549747416ded00bd6cf98f223008e96e7710844be008aa9dc3998a4de527129"
+    "registry_sha256": "sha256:272ec997281749bc6c291b6224d46c83fb3813be8d61963f02694d23ed5a9cec",
+    "catalog_release": "rel_9f169ceddb4f7eb3e6c30f63861e655b",
+    "catalog_sha256": "sha256:0fff5c1a428105031e095deede46c517260707e5f1f23933c2564c82ef673b11"
   },
   "unreviewed_functions": {},
   "excluded_functions": {
@@ -1616,6 +1616,102 @@
           "enabled": false,
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "base.identity.session.get"
+        }
+      }
+    },
+    "base.plugin.installation.request.create": {
+      "kind": "existing",
+      "function_dispositions": {
+        "rest:POST:/api/plugin/install": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/routers/plugins.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Existing Registry evidence includes this consumer.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "base.plugin.installation.transition.uninstall": {
+      "kind": "existing",
+      "function_dispositions": {
+        "rest:DELETE:/api/plugin/uninstall/{plugin_id}": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/routers/plugins.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Existing Registry evidence includes this consumer.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
       }
     },
@@ -3661,5 +3757,86 @@
     "reviewer": "pending-domain-review",
     "reviewed_at": "2026-08-11",
     "status": "draft"
+  },
+  "official_provider_capabilities": {
+    "module": "backend.base.official_provider",
+    "artifact_sha256": "sha256:2293315d161db082ac3f2b2fabe736b31a58de3d271423294ec50143bfbe6c85",
+    "capability_ids": [
+      "base.annotation.change.apply",
+      "base.annotation.read",
+      "base.approval.request.cancel",
+      "base.approval.request.create",
+      "base.approval.request.decide",
+      "base.approval.request.get",
+      "base.approval.request.search",
+      "base.authorization.grant.change.apply",
+      "base.authorization.grant.create",
+      "base.authorization.grant.list",
+      "base.authorization.grant.read",
+      "base.authorization.grant.revoke",
+      "base.export_template.change.apply",
+      "base.export_template.read",
+      "base.file_store.public_config.get",
+      "base.identity.admin_user.list",
+      "base.identity.directory.feishu.sync",
+      "base.identity.directory.sync",
+      "base.identity.role.assign",
+      "base.identity.role.assign.atomic",
+      "base.identity.session.get",
+      "base.identity.session.profile.get",
+      "base.identity.user.search",
+      "base.notification.preference.atomic.get",
+      "base.notification.preference.atomic.update",
+      "base.notification.preference.get",
+      "base.notification.preference.update",
+      "base.notification.read_state.set",
+      "base.notification.search",
+      "base.organization.team.directory.list",
+      "base.plugin.installation.request.create",
+      "base.plugin.installation.transition.uninstall",
+      "base.plugin.installed.list",
+      "base.plugin.marketplace.publisher.register",
+      "base.plugin.marketplace.release.change.apply",
+      "base.plugin.marketplace.search",
+      "base.runtime.database_config.change.apply",
+      "base.runtime.database_config.get",
+      "base.runtime.database_connection.test",
+      "base.saved_view.change.apply",
+      "base.saved_view.copy",
+      "base.saved_view.create",
+      "base.saved_view.delete",
+      "base.saved_view.read",
+      "base.saved_view.search",
+      "base.saved_view.update",
+      "base.self_annotation.batch.get",
+      "base.self_annotation.change.apply",
+      "base.self_annotation.record.get",
+      "base.self_annotation.search",
+      "base.team.change.apply",
+      "base.team.directory.list",
+      "base.team.membership.change.apply",
+      "base.team.read",
+      "base.workspace.template.publish",
+      "base.workspace.template.read",
+      "identity.principal.search",
+      "plugin.disable",
+      "plugin.enable",
+      "plugin.install",
+      "plugin.revoke",
+      "plugin.rollback",
+      "plugin.storage.delete",
+      "plugin.storage.get",
+      "plugin.storage.list",
+      "plugin.storage.put",
+      "plugin.uninstall",
+      "plugin.upgrade",
+      "semantic.context.get",
+      "system.activity.search",
+      "system.change_impact.preview",
+      "system.job.cancel",
+      "system.job.get",
+      "system.lineage.get",
+      "system.search"
+    ]
   }
 }

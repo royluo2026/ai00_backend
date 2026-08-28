@@ -91,7 +91,6 @@
 | Base Platform | `rest:GET:/api/deploy/pipeline` | excluded | — |
 | Base Platform | `rest:GET:/api/feishu/im/contact-messages` | excluded | — |
 | Base Platform | `rest:GET:/api/feishu/im/mentions` | excluded | — |
-| Base Platform | `rest:GET:/api/file-store/config` | excluded | — |
 | Base Platform | `rest:GET:/api/v1/plugin-marketplace/assets/{token}/{plugin_id}/{version}/{asset_path:path}` | excluded | — |
 | Base Platform | `rest:GET:/api/v2/agent-capabilities/catalog` | excluded | — |
 | Base Platform | `rest:GET:/api/v2/agent-capabilities/catalog-preview` | excluded | — |
@@ -170,10 +169,13 @@
 | Base Platform | `rest:PATCH:/api/import-export/templates/{gid}` | existing_capability | `base.export_template.change.apply` |
 | Base Platform | `rest:POST:/api/import-export/templates` | existing_capability | `base.export_template.change.apply` |
 | Base Platform | `rest:GET:/api/import-export/templates` | existing_capability | `base.export_template.read` |
+| Base Platform | `rest:GET:/api/file-store/config` | existing_capability | `base.file_store.public_config.get` |
 | Base Platform | `rest:POST:/api/org/sync-from-feishu` | existing_capability | `base.identity.directory.sync` |
 | Base Platform | `rest:PATCH:/api/users/{user_gid}/role` | existing_capability | `base.identity.role.assign` |
 | Base Platform | `rest:GET:/api/users/me` | existing_capability | `base.identity.session.get` |
 | Base Platform | `rest:GET:/users/me` | existing_capability | `base.identity.session.get` |
+| Base Platform | `rest:POST:/api/plugin/install` | existing_capability | `base.plugin.installation.request.create` |
+| Base Platform | `rest:DELETE:/api/plugin/uninstall/{plugin_id}` | existing_capability | `base.plugin.installation.transition.uninstall` |
 | Base Platform | `rest:POST:/api/v1/plugin-marketplace/publishers` | existing_capability | `base.plugin.marketplace.publisher.register` |
 | Base Platform | `rest:POST:/api/v1/plugin-marketplace/releases` | existing_capability | `base.plugin.marketplace.release.change.apply` |
 | Base Platform | `rest:POST:/api/v1/plugin-marketplace/releases/{plugin_id}/{version}/review` | existing_capability | `base.plugin.marketplace.release.change.apply` |

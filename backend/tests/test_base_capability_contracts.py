@@ -7,8 +7,6 @@ from pathlib import Path
 from backend.capabilities.models_next import CapabilityContext
 from backend.capabilities.registry_next import CapabilityRegistry
 from backend.base.official_provider import register_capabilities
-from backend.base.approval import APPROVAL_CAPABILITY_IDS
-from backend.base.collaboration import COLLABORATION_CAPABILITY_IDS
 from backend.base.operations import worker_health
 from backend.plugin_platform.storage import _identity
 from backend.domain_ports.operations import operations_registry
@@ -24,20 +22,12 @@ from backend.tests.capability_completion_support import (
 
 
 ROOT = Path(__file__).resolve().parents[2]
-STABLE_CAPABILITIES = (
-    FrozenCoverageReview(ROOT).capability_ids("base")
-    | APPROVAL_CAPABILITY_IDS
-    | COLLABORATION_CAPABILITY_IDS
-)
+STABLE_CAPABILITIES = FrozenCoverageReview(ROOT).capability_ids("base")
 
 
 def test_base_provider_matches_corrected_frozen_review():
     root = Path(__file__).resolve().parents[2]
-    expected = (
-        FrozenCoverageReview(root).capability_ids("base")
-        | APPROVAL_CAPABILITY_IDS
-        | COLLABORATION_CAPABILITY_IDS
-    )
+    expected = FrozenCoverageReview(root).capability_ids("base")
 
     actual = registered_descriptor_ids("backend.base.official_provider")
 
@@ -70,16 +60,23 @@ def test_all_stable_base_capabilities_have_native_open_contracts():
         assert descriptor is not None, capability_id
         assert descriptor.owner_domain == "base"
         assert descriptor.lifecycle_status == "stable"
-        assert descriptor.exposure.plugin is True
-        assert descriptor.exposure.agent is True
-        assert descriptor.exposure.mcp is True
+        assert descriptor.exposure.web is True
+        assert descriptor.exposure.api is True
         assert descriptor.input_schema["additionalProperties"] is False
         assert descriptor.output_schema["additionalProperties"] is False
         assert descriptor.output_schema["properties"]
-        assert descriptor.agent_output_schema == descriptor.output_schema
         assert descriptor.domain_errors_complete is True
         assert descriptor.domain_errors
-        assert item.spec.plugin_callable is True
+        if item.spec.plugin_callable:
+            assert descriptor.exposure.plugin is True
+            assert descriptor.exposure.agent is True
+            assert descriptor.exposure.mcp is True
+            assert descriptor.agent_output_schema == descriptor.output_schema
+        else:
+            assert descriptor.exposure.plugin is False
+            assert descriptor.exposure.agent is False
+            assert descriptor.exposure.mcp is False
+            assert descriptor.agent_output_schema is None
 
 
 def test_plugin_lifecycle_is_exposed_but_remains_admin_governed():

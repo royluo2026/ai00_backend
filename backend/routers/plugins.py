@@ -7,8 +7,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, ConfigDict
 
 from backend.base.plugin_inventory import list_installed_plugins
-from backend.routers.deps import get_current_user
-from backend.plugin_platform.service import PluginLifecycleError, PluginPlatformService
+from backend.routers.deps import build_profile, get_current_user
+from backend.plugin_platform.service import PluginLifecycleError, PluginPlatformService, _tenant_for_user
 
 router = APIRouter(prefix="/api/plugin", tags=["plugin"])
 
@@ -42,11 +42,20 @@ def _error(exc: PluginLifecycleError) -> HTTPException:
     return HTTPException(status, {"code": exc.code, "message": str(exc)})
 
 
+def _trusted_lifecycle_actor(current_user: dict) -> dict[str, str]:
+    """Normalize the authenticated Base user before the REST adapter reaches lifecycle state."""
+    profile = build_profile(current_user)
+    if "system.plugin.manage" not in set(profile.get("permissions", ())):
+        raise HTTPException(status_code=403, detail="system.plugin.manage permission required")
+    return {"gid": str(profile["gid"]), "tenant_gid": _tenant_for_user(profile)}
+
+
 @router.post("/install")
 def install_plugin(body: PluginInstallBody, current_user: dict = Depends(get_current_user)):
     try:
+        actor = _trusted_lifecycle_actor(current_user)
         return {"success": True, "data": PluginPlatformService().request_install(
-            actor=current_user, command=body.model_dump(),
+            actor=actor, command=body.model_dump(),
         )}
     except PluginLifecycleError as exc:
         raise _error(exc) from exc
@@ -55,8 +64,9 @@ def install_plugin(body: PluginInstallBody, current_user: dict = Depends(get_cur
 @router.delete("/uninstall/{plugin_id}")
 def uninstall_plugin(plugin_id: str, body: PluginUninstallBody, current_user: dict = Depends(get_current_user)):
     try:
+        actor = _trusted_lifecycle_actor(current_user)
         return {"success": True, "data": PluginPlatformService().transition_uninstall(
-            actor=current_user, command={"plugin_id": plugin_id, **body.model_dump()},
+            actor=actor, command={"plugin_id": plugin_id, **body.model_dump()},
         )}
     except PluginLifecycleError as exc:
         raise _error(exc) from exc

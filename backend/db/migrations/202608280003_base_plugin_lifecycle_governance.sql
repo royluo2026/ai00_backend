@@ -4,11 +4,13 @@ ALTER TABLE workmanship_plugin_installations
   ADD COLUMN IF NOT EXISTS revision BIGINT UNSIGNED NOT NULL DEFAULT 1;
 
 CREATE TABLE IF NOT EXISTS workmanship_base_plugin_lifecycle_idempotency (
+    tenant_gid VARCHAR(128) NOT NULL,
     actor_gid VARCHAR(128) NOT NULL,
     operation VARCHAR(64) NOT NULL,
     idempotency_key VARCHAR(512) NOT NULL,
+    command_sha256 CHAR(64) NOT NULL,
     status VARCHAR(32) NOT NULL,
     result_json JSON NULL,
     completed_at DATETIME(6) NULL,
-    PRIMARY KEY (actor_gid, operation, idempotency_key)
+    PRIMARY KEY (tenant_gid, actor_gid, operation, idempotency_key)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
