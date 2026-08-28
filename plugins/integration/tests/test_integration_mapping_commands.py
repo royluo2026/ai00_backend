@@ -45,6 +45,9 @@ class BoundCatalog:
     def require_stable(self, capability_id, major_version, minimum_release):
         self.stable_calls.append((capability_id, major_version, minimum_release))
 
+    def upsert_mapping_target(self, **data):
+        return data
+
 
 VALID_BINDING = {
     "binding_id": "ontology:concept-part",

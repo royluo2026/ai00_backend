@@ -32,6 +32,7 @@ CAPABILITY_IDS = {
     "integration.mapping.search",
     "integration.mapping.source_columns.discover",
     "integration.mapping_target.search",
+    "integration.mapping_target.upsert",
     "integration.mapping.import.start",
     "integration.mapping.update",
     "integration.sync.start",
@@ -145,6 +146,9 @@ class ProviderCatalog:
             "ontology_object_gid": "concept-part",
         }]
 
+    def upsert_mapping_target(self, **data):
+        return {**data, "expected_version": data["target_expected_version"], "revision": 1}
+
 
 class ProviderRuntime:
     async def test(self, connector, *, timeout_seconds, result_limit):
@@ -248,7 +252,10 @@ def test_provider_publishes_eighteen_native_governed_capabilities():
         assert descriptor.input_schema["additionalProperties"] is False
         assert descriptor.output_schema["additionalProperties"] is False
         assert descriptor.domain_errors_complete is True
-        assert spec.confirmation == ("none" if spec.risk.value == "read" else "user")
+        expected_confirmation = "none" if spec.risk.value == "read" else (
+            "admin" if capability_id == "integration.mapping_target.upsert" else "user"
+        )
+        assert spec.confirmation == expected_confirmation
 
 
 EXACT_TARGETS = {
@@ -378,7 +385,7 @@ def test_provider_accepts_async_runtime_and_bounds_registered_execution(monkeypa
     register_capabilities(registry, adapter_factory=lambda: adapters)
 
     result = asyncio.run(registry.handlers["integration.connector.connection.test"](
-        {"gid": "connector-1"},
+        {"gid": "connector-1", "idempotency_key": "connection-test-timeout"},
         CapabilityContext(user_gid="actor-1", team_gid="team-1", request_id="bounded-runtime"),
     ))
 
@@ -422,7 +429,7 @@ def test_registered_handlers_use_configured_vault_catalog_and_bounded_runtime(mo
         "idempotency_key": "mapping-create-1",
     }, context))
     tested = asyncio.run(registry.handlers["integration.connector.connection.test"](
-        {"gid": connector["gid"]}, context
+        {"gid": connector["gid"], "idempotency_key": "connection-test-provider"}, context
     ))
     imported = asyncio.run(registry.handlers["integration.mapping.import.start"]({
         "mapping_gid": mapping["gid"], "idempotency_key": "mapping-import-1",

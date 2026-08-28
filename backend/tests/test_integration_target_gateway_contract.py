@@ -101,7 +101,13 @@ def test_persisted_import_invocation_passes_real_gateway_contract_and_provider(m
             InMemoryOutcomeStore(), InMemoryRateLimiter(limit=100),
         ),
     ).bind_release(release.release_id)
-    service = SyncService(DomainCapabilityClient(gateway), _identity())
+    class Catalog:
+        def require_stable(self, capability_id, major_version, minimum_release):
+            assert capability_id == persisted["capability_id"]
+            assert major_version == persisted["major_version"]
+            assert minimum_release == persisted["minimum_catalog_release"]
+
+    service = SyncService(DomainCapabilityClient(gateway), _identity(), Catalog())
     adapter = TargetAdapter(
         target_domain="knowledge", capability_id=persisted["capability_id"],
         major_version=persisted["major_version"],

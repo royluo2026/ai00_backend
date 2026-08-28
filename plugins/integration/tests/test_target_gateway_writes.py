@@ -26,7 +26,13 @@ def test_sync_dispatches_only_the_governed_reference_dataset_target():
             type=ConsumerType.WORKER, consumer_id="domain.integration",
         ),
     )
-    service = SyncService(Client(), identity)
+    class Catalog:
+        def require_stable(self, capability_id, major_version, minimum_release):
+            assert (capability_id, major_version, minimum_release) == (
+                "knowledge.reference_dataset.publish", 1, "rel_test"
+            )
+
+    service = SyncService(Client(), identity, Catalog())
     adapter = TargetAdapter(
         target_domain="knowledge", capability_id="knowledge.reference_dataset.publish",
         major_version=1, minimum_catalog_release="rel_test",

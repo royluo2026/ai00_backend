@@ -126,7 +126,7 @@ def test_provider_adapter_matches_owner_service_cross_team_binding_denials():
             True,
         ),
         ("integration.connector.schema.discover", {"gid": "connector-1", "limit": 200}, True),
-        ("integration.connector.connection.test", {"gid": "connector-1"}, True),
+        ("integration.connector.connection.test", {"gid": "connector-1", "idempotency_key": "connection-test-1"}, True),
         ("integration.mapping_target.search", {"ontology_object_gids": ["concept-part"]}, False),
     ),
 )

@@ -98,7 +98,9 @@ INPUT_SCHEMAS = {
     ),
     "integration.connector.archive": obj({"gid": STRING, "expected_revision": POSITIVE}, ("gid", "expected_revision")),
     "integration.connector.search": SEARCH,
-    "integration.connector.connection.test": obj({"gid": STRING}, ("gid",)),
+    "integration.connector.connection.test": obj(
+        {"gid": STRING, "idempotency_key": IDEMPOTENCY}, ("gid", "idempotency_key")
+    ),
     "integration.connector.schema.discover": obj({"gid": STRING, "limit": LIMIT}, ("gid",)),
     "integration.mapping.create": obj(
         MAPPING_INPUT,
@@ -123,6 +125,21 @@ INPUT_SCHEMAS = {
             }
         },
         ("ontology_object_gids",),
+    ),
+    "integration.mapping_target.upsert": obj(
+        {
+            "binding_id": STRING, "ontology_object_gid": STRING,
+            "target_domain": STRING, "target_capability_id": STRING,
+            "target_major_version": POSITIVE, "minimum_catalog_release": STRING,
+            "input_contract": STRING, "resource_gid": STRING,
+            "target_expected_version": POSITIVE, "expected_revision": POSITIVE,
+            "idempotency_key": IDEMPOTENCY,
+        },
+        (
+            "binding_id", "ontology_object_gid", "target_domain", "target_capability_id",
+            "target_major_version", "minimum_catalog_release", "input_contract",
+            "resource_gid", "target_expected_version", "idempotency_key",
+        ),
     ),
     "integration.field_mapping.search": obj({"mapping_gid": STRING, "limit": LIMIT}, ("mapping_gid",)),
     "integration.mapping.source_columns.discover": obj({"mapping_gid": STRING, "limit": LIMIT}, ("mapping_gid",)),
@@ -197,6 +214,10 @@ OUTPUT_SCHEMAS = {
     "integration.mapping.search": obj({"items": {"type": "array", "items": MAPPING, "maxItems": 200}}, ("items",)),
     "integration.mapping_target.search": obj(
         {"items": {"type": "array", "items": MAPPING_TARGET, "maxItems": 200}}, ("items",)
+    ),
+    "integration.mapping_target.upsert": obj(
+        {**MAPPING_TARGET["properties"], "resource_gid": STRING, "expected_version": POSITIVE, "revision": POSITIVE},
+        (*MAPPING_TARGET["required"], "resource_gid", "expected_version", "revision"),
     ),
     "integration.field_mapping.search": obj({"items": {"type": "array", "items": FIELD_RESULT, "maxItems": 200}}, ("items",)),
     "integration.mapping.source_columns.discover": obj(

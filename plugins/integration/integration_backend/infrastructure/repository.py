@@ -2,7 +2,8 @@
 from __future__ import annotations
 
 import json
-from datetime import UTC
+from dataclasses import replace
+from datetime import UTC, datetime
 from typing import Any, Mapping
 
 from backend.platform_sdk.ids import next_gid
@@ -378,6 +379,87 @@ class IntegrationRepository:
                 )
                 row = cur.fetchone()
         return dict(row) if row else None
+
+    def claim_next_import_run(self, worker_id: str) -> dict[str, Any] | None:
+        token = f"{str(worker_id).strip()}:{next_gid()}"
+        with get_integration_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT * FROM workmanship_int_sync_runs WHERE status='accepted' OR "
+                    "(status='claimed' AND claimed_at < DATE_SUB(NOW(6), INTERVAL 5 MINUTE)) "
+                    "ORDER BY created_at,run_id LIMIT 1 FOR UPDATE SKIP LOCKED"
+                )
+                row = cur.fetchone()
+                if row is None:
+                    return None
+                cur.execute(
+                    "UPDATE workmanship_int_sync_runs SET status='claimed',claim_token=%s,claimed_at=NOW(6) "
+                    "WHERE run_id=%s AND (status='accepted' OR "
+                    "(status='claimed' AND claimed_at < DATE_SUB(NOW(6), INTERVAL 5 MINUTE)))",
+                    (token, row["run_id"]),
+                )
+                if cur.rowcount != 1:
+                    return None
+        result = dict(row)
+        invocation = result.get("target_invocation_json")
+        if isinstance(invocation, (bytes, bytearray)):
+            invocation = invocation.decode("utf-8")
+        if isinstance(invocation, str):
+            invocation = json.loads(invocation)
+        result.update({"status": "claimed", "claim_token": token, "target_invocation": invocation})
+        return result
+
+    def transition_import_run(
+        self, *, run_id: str, claim_token: str, owner_gid: str, team_gid: str | None,
+        status: str, result: Mapping[str, Any] | None, error_code: str | None,
+    ) -> dict[str, Any]:
+        if status not in {"succeeded", "failed", "outcome_unknown"}:
+            raise ValueError("invalid import terminal status")
+        scope, scope_values = self._principal_scope(owner_gid, team_gid)
+        with get_integration_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    f"SELECT operation_id FROM workmanship_int_sync_runs WHERE run_id=%s AND claim_token=%s "
+                    f"AND status='claimed' AND {scope} FOR UPDATE",
+                    (run_id, claim_token, *scope_values),
+                )
+                row = cur.fetchone()
+                if row is None:
+                    raise RevisionConflict("import run")
+                cur.execute(
+                    f"SELECT * FROM workmanship_int_operations WHERE operation_id=%s AND {scope} FOR UPDATE",
+                    (row["operation_id"], *scope_values),
+                )
+                operation_row = cur.fetchone()
+                operation = self._operation(operation_row) if operation_row else None
+                if operation is None or operation.status != "accepted":
+                    raise RevisionConflict("import operation")
+                replacement = replace(
+                    operation, status=status, version=operation.version + 1,
+                    result={**dict(operation.result or {}), **dict(result or {})},
+                    error_code=error_code, updated_at=datetime.now(UTC),
+                )
+                cur.execute(
+                    "UPDATE workmanship_int_sync_runs SET status=%s,error_code=%s,updated_at=NOW(6) "
+                    "WHERE run_id=%s AND claim_token=%s AND status='claimed'",
+                    (status, error_code, run_id, claim_token),
+                )
+                cur.execute(
+                    "UPDATE workmanship_int_operations SET status=%s,operation_version=%s,result_json=%s,"
+                    "error_code=%s,updated_at=%s WHERE operation_id=%s AND operation_version=%s",
+                    (
+                        replacement.status, replacement.version, json.dumps(replacement.result),
+                        replacement.error_code, replacement.updated_at, replacement.operation_id,
+                        operation.version,
+                    ),
+                )
+                if cur.rowcount != 1:
+                    raise RevisionConflict("import operation")
+                self._audit(cur, replacement)
+        return {"run_id": run_id, "status": status, "operation_ref": {
+            "operation_id": replacement.operation_id, "status": replacement.status,
+            "version": replacement.version,
+        }}
 
     def transition_operation(
         self, operation_id: str, expected_version: int, replacement: IntegrationOperation,

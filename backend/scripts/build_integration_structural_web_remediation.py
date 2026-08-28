@@ -17,6 +17,8 @@ if str(ROOT) not in sys.path:
 from backend.capability_v2.git_tree import read_path
 from backend.scripts.check_web_capability_routes import build_report
 from plugins.integration.integration_backend.capabilities.contracts import INPUT_SCHEMAS, OUTPUT_SCHEMAS
+from plugins.integration.integration_backend.capabilities.descriptors import specs
+from plugins.integration.integration_backend.capabilities.provider import descriptor_for
 
 
 BASELINE = "ffc281cb141999433c188d4b3b9fb12b9670f8c4"
@@ -46,10 +48,7 @@ CANDIDATES = {
     ("GET", "/api/ext-mappings/{dynamic}/preview"): "integration.mapping.preview@1",
 }
 SCOPE = frozenset(CANDIDATES)
-WRITES = {
-    "integration.connector.create", "integration.connector.update", "integration.mapping.create",
-    "integration.field_mapping.batch.update", "integration.mapping.import.start",
-}
+DESCRIPTORS = {item.id: descriptor_for(item) for item in specs()}
 RUNTIME = {
     "integration.connector.connection.test", "integration.connector.schema.discover",
     "integration.mapping.source_columns.discover", "integration.mapping.preview",
@@ -116,14 +115,15 @@ def _baseline() -> tuple[Mapping[str, Any], bytes]:
 
 def _candidate_policy(capability: str) -> dict[str, str]:
     candidate = capability.removesuffix("@1")
+    descriptor = DESCRIPTORS[candidate]
     external = (
         "asynchronous_import" if candidate == "integration.mapping.import.start"
         else "connector_runtime" if candidate in RUNTIME else "none"
     )
     return {
         "authorization_scope": "CapabilityContext actor_gid and team_gid",
-        "confirmation": "user" if candidate in WRITES else "none",
-        "idempotency": "required" if candidate in WRITES else "none",
+        "confirmation": descriptor.confirmation_policy,
+        "idempotency": descriptor.idempotency_policy,
         "external_side_effect": external,
         "timeout": "15_seconds" if external == "connector_runtime" else "not_applicable",
         "outcome_recovery": "durable accepted/failed/succeeded/outcome_unknown operation",

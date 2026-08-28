@@ -234,6 +234,9 @@ class Catalog:
             "ontology_object_gid": "concept-part",
         }]
 
+    def upsert_mapping_target(self, **data):
+        return {**data, "expected_version": data["target_expected_version"], "revision": 1}
+
 
 class Runtime:
     def __init__(self, failure=None):
@@ -446,7 +449,7 @@ def test_runtime_calls_are_network_checked_bounded_redacted_and_durable():
 
     repository.connectors["connector-1"]["host"] = "127.0.0.1"
     with pytest.raises(CapabilityBusinessError) as rejected:
-        asyncio.run(application.invoke("integration.connector.connection.test", {"gid": "connector-1"}, CONTEXT))
+        asyncio.run(application.invoke("integration.connector.connection.test", {"gid": "connector-1", "idempotency_key": "connection-test-1"}, CONTEXT))
     assert_code(rejected, "network_policy_rejected")
     assert len(runtime.calls) == 1
 

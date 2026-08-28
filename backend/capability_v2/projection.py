@@ -1,7 +1,6 @@
 """Consumer-specific, fail-closed result projection for AI-facing boundaries."""
 from __future__ import annotations
 
-import re
 from typing import Any, Mapping
 
 from .contracts import (
@@ -11,23 +10,10 @@ from .contracts import (
     ConsumerType,
     EvidenceRefV2,
 )
+from .secret_detection import is_sensitive_key, redact_text
 
 
 _AI_CONSUMERS = {ConsumerType.AGENT, ConsumerType.MCP}
-_SENSITIVE_PARTS = {
-    "secret", "password", "passwd", "token", "credential", "privatekey", "accesskey",
-    "email", "phone", "mobile", "idcard", "filepath", "localpath", "rawpath",
-}
-_TEXT_REDACTIONS = (
-    (re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.IGNORECASE), "[redacted-email]"),
-    (re.compile(r"\bBearer\s+[A-Za-z0-9._~+/-]+=*", re.IGNORECASE), "Bearer [redacted]"),
-    (re.compile(r"\b(?:api[_-]?key|password|secret|token)\s*[:=]\s*\S+", re.IGNORECASE),
-     "[redacted-credential]"),
-    (re.compile(r"\b[A-Za-z]:\\[^\s;]+"), "[redacted-path]"),
-    (re.compile(r"(?<![A-Za-z0-9])/(?:home|Users|private|var|etc)/[^\s;]+"), "[redacted-path]"),
-)
-
-
 def project_result(
     result: CapabilityResultV2,
     descriptor: CapabilityDescriptorV2,
@@ -89,7 +75,7 @@ def _project(value: Any, schema: Mapping[str, Any], data_scopes: tuple[str, ...]
         projected = {}
         for key, child in value.items():
             child_schema = properties.get(key)
-            if not isinstance(child_schema, Mapping) or _sensitive_key(key):
+            if not isinstance(child_schema, Mapping) or is_sensitive_key(key):
                 continue
             required_scope = child_schema.get("x-data-scope")
             if required_scope and not _scope_allows(data_scopes, str(required_scope)):
@@ -115,17 +101,10 @@ def _project(value: Any, schema: Mapping[str, Any], data_scopes: tuple[str, ...]
     return value
 
 
-def _sensitive_key(key: str) -> bool:
-    normalized = re.sub(r"[^a-z0-9]", "", key.lower())
-    return any(part in normalized for part in _SENSITIVE_PARTS)
-
-
 def _redact_text(value: str, state: dict[str, bool]) -> str:
-    text = value
-    for pattern, replacement in _TEXT_REDACTIONS:
-        text, count = pattern.subn(replacement, text)
-        if count:
-            state["redacted"] = True
+    text, redacted = redact_text(value)
+    if redacted:
+        state["redacted"] = True
     return text
 
 

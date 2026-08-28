@@ -26,6 +26,7 @@ _IDEMPOTENT_WRITES = {
     "integration.mapping.create",
     "integration.field_mapping.batch.update",
     "integration.mapping.import.start",
+    "integration.mapping_target.upsert",
 }
 
 _DURABLE_OPERATIONS = {

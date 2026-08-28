@@ -12,7 +12,7 @@ INTEGRATION_CAPABILITY_IDS = (
     "integration.mapping.archive", "integration.mapping.create", "integration.mapping.get",
     "integration.mapping.import.start", "integration.mapping.preview", "integration.mapping.search",
     "integration.mapping.source_columns.discover", "integration.mapping.update",
-    "integration.mapping_target.search",
+    "integration.mapping_target.search", "integration.mapping_target.upsert",
     "integration.sync.start",
 )
 
@@ -27,6 +27,7 @@ def specs() -> tuple[CapabilitySpec, ...]:
     result = []
     for capability_id in INTEGRATION_CAPABILITY_IDS:
         read = capability_id in reads
+        privileged = capability_id == "integration.mapping_target.upsert"
         result.append(CapabilitySpec(
             id=capability_id,
             owner="integration",
@@ -34,8 +35,8 @@ def specs() -> tuple[CapabilitySpec, ...]:
             use_when="A consumer needs governed external connector, mapping, or sync orchestration.",
             do_not_use_when="The caller can use an owning domain Capability directly without external integration.",
             risk=CapabilityRisk.READ if read else CapabilityRisk.WRITE,
-            confirmation="none" if read else "user",
-            permissions=("integration.read",) if read else ("integration.write",),
+            confirmation="none" if read else ("admin" if privileged else "user"),
+            permissions=("integration.read",) if read else (("integration.admin",) if privileged else ("integration.write",)),
             input_schema=INPUT_SCHEMAS[capability_id], output_schema=OUTPUT_SCHEMAS[capability_id],
             tags=("integration", "read" if read else "write"),
         ))

@@ -6,6 +6,7 @@ import inspect
 from typing import Any, Callable, Mapping
 
 from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext
+from backend.capability_v2.secret_detection import contains_secret, is_sensitive_key
 
 from .network_policy import NetworkPolicy
 from .operations import IntegrationOperations, operation_ref
@@ -16,12 +17,9 @@ from .transform import RestrictedExpression
 RUNTIME_TIMEOUT_SECONDS = 15
 MAX_RESULTS = 200
 REDACTED = "[REDACTED]"
-_SENSITIVE_KEYS = (
-    "password", "secret", "credential", "authorization", "api_key", "apikey",
-    "token", "session", "cookie", "private_key", "privatekey",
-)
 _SENSITIVE_VALUE_MARKERS = (
-    "authorization:", "bearer ", "basic ", "api_key=", "apikey=", "password=", "token=", "vault://",
+    "authorization:", "bearer ", "basic ", "api_key=", "apikey=", "access_key=",
+    "password=", "passwd=", "pwd=", "token=", "vault://",
 )
 
 
@@ -468,6 +466,34 @@ class IntegrationApplication:
         data = self._bind(raw, context)
         if capability_id == "integration.mapping_target.search":
             return self._mapping_target_projection(raw, data)
+        if capability_id == "integration.mapping_target.upsert":
+            allowed = {
+                "binding_id", "ontology_object_gid", "target_domain", "target_capability_id",
+                "target_major_version", "minimum_catalog_release", "input_contract",
+                "resource_gid", "target_expected_version", "expected_revision", "idempotency_key",
+            }
+            self._closed(raw, allowed)
+            self._require(data, *(allowed - {"expected_revision"}))
+            actor_gid, team_gid = self._binding_scope(data)
+            return self._write(
+                capability_id,
+                data,
+                lambda: dict(self.catalog.upsert_mapping_target(
+                    binding_id=str(data["binding_id"]),
+                    ontology_object_gid=str(data["ontology_object_gid"]),
+                    target_domain=str(data["target_domain"]),
+                    target_capability_id=str(data["target_capability_id"]),
+                    target_major_version=int(data["target_major_version"]),
+                    minimum_catalog_release=str(data["minimum_catalog_release"]),
+                    input_contract=str(data["input_contract"]),
+                    resource_gid=str(data["resource_gid"]),
+                    target_expected_version=int(data["target_expected_version"]),
+                    actor_gid=actor_gid,
+                    team_gid=team_gid,
+                    expected_revision=(int(data["expected_revision"]) if data.get("expected_revision") else None),
+                    idempotency_key=str(data["idempotency_key"]),
+                )),
+            )
         if capability_id.startswith("integration.connector."):
             return await self._connector_outcome(capability_id, raw, data, context)
         if capability_id in {
@@ -546,8 +572,13 @@ class IntegrationApplication:
             limit = self._limit(data)
             return {"items": [self._connector(row) for row in self.repository.search_connectors({**data, "limit": limit})[:limit]]}
 
-        self._closed(raw, {"gid", "limit"} if capability_id.endswith("schema.discover") else {"gid"})
+        self._closed(
+            raw,
+            {"gid", "limit"} if capability_id.endswith("schema.discover") else {"gid", "idempotency_key"},
+        )
         self._require(data, "gid")
+        if capability_id.endswith("connection.test"):
+            self._require(data, "idempotency_key")
         connector = self._get_connector(data)
         self._validate_network(str(connector["host"]))
         limit = self._limit(data, 100) if capability_id.endswith("schema.discover") else 1
@@ -754,7 +785,7 @@ class IntegrationApplication:
             raise CapabilityBusinessError(
                 "connector_runtime_unavailable", "External connector runtime is unavailable", retryable=True
             )
-        key = context.request_id or self.operations.new_id("request")
+        key = str(data.get("idempotency_key") or context.request_id or self.operations.new_id("request"))
         claim = self.operations.start(
             capability_id=capability_id,
             payload={key: value for key, value in data.items() if key not in {"owner_gid", "team_gid"}},
@@ -842,8 +873,7 @@ class IntegrationApplication:
 
     @staticmethod
     def _sensitive_key(key: object) -> bool:
-        normalized = str(key).casefold().replace("-", "_")
-        return any(token in normalized for token in _SENSITIVE_KEYS)
+        return is_sensitive_key(key)
 
     @classmethod
     def _scalar_text(cls, value: Any) -> str | None:
@@ -855,6 +885,8 @@ class IntegrationApplication:
 
     @classmethod
     def _secret_exposed(cls, value: Any) -> bool:
+        if contains_secret(value):
+            return True
         if isinstance(value, Mapping):
             return any(cls._sensitive_key(key) or cls._secret_exposed(child) for key, child in value.items())
         if isinstance(value, (list, tuple, set)):

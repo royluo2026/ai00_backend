@@ -621,6 +621,11 @@ class SecretRuntime:
                 "session_token": "opaque-session-value",
                 "cookie": "opaque-cookie-value",
                 "private_key": "opaque-private-key-value",
+                "passwd": "hunter2",
+                "pwd": "hunter3",
+                "access_key": "AKIA-test",
+                "dsn": "postgresql://user:secret@example.test/db",
+                "certificate": "-----BEGIN PRIVATE KEY-----\nsecret\n-----END PRIVATE KEY-----",
             }],
             "truncated": False,
         }
@@ -644,7 +649,7 @@ def test_runtime_boundary_rejects_sync_method_without_invoking_it():
 
     with pytest.raises(CapabilityBusinessError) as unavailable:
         asyncio.run(application.invoke(
-            "integration.connector.connection.test", {"gid": "connector-1"}, CONTEXT
+            "integration.connector.connection.test", {"gid": "connector-1", "idempotency_key": "connection-test-fix-1"}, CONTEXT
         ))
 
     assert unavailable.value.code == "connector_runtime_unavailable"
@@ -657,7 +662,7 @@ def test_runtime_results_are_recursively_redacted_before_return_and_persistence(
         repository, connector_runtime=SecretRuntime(), operation_identity=Identity()
     )
     tested = asyncio.run(application.invoke(
-        "integration.connector.connection.test", {"gid": "connector-1"}, CONTEXT
+        "integration.connector.connection.test", {"gid": "connector-1", "idempotency_key": "connection-test-fix-2"}, CONTEXT
     ))
     assert tested["message"] == "[REDACTED]"
     assert repository.record.result["message"] == "[REDACTED]"
@@ -668,11 +673,14 @@ def test_runtime_results_are_recursively_redacted_before_return_and_persistence(
     ))
     metadata = next(cell for cell in previewed["rows"][0]["values"] if cell["field"] == "metadata")
     assert metadata == {"field": "metadata", "value": "[REDACTED]", "redacted": True}
-    for field in ("session_token", "cookie", "private_key"):
+    for field in ("session_token", "cookie", "private_key", "passwd", "pwd", "access_key", "dsn", "certificate"):
         cell = next(item for item in previewed["rows"][0]["values"] if item["field"] == field)
         assert cell == {"field": field, "value": "[REDACTED]", "redacted": True}
     assert "top-secret" not in str(repository.record.result)
     assert "opaque-" not in str(repository.record.result)
+    assert "hunter" not in str(repository.record.result)
+    assert "postgresql://" not in str(repository.record.result)
+    assert "BEGIN PRIVATE KEY" not in str(repository.record.result)
 
     sql_connection = ScriptedConnection()
     connection_sequence(monkeypatch, sql_connection)
