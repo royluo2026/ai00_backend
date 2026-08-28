@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3c-atomic-web-contracts",
   "baseline_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
-  "content_sha256": "sha256:c353016f64be07dde9c91e49926c0bf2a1f53c7f70b18131654c3493d4d006a4",
+  "content_sha256": "sha256:47d56f304f1c2f236cbfff1ecabf228fd184d29ff4cb47e7a7ee4f5e242c333b",
   "counts_by_owner": {
     "agent": {
       "groups": 4,
@@ -5849,7 +5849,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.read"
@@ -6044,7 +6044,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.write"
@@ -6222,7 +6222,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.write"
@@ -6356,7 +6356,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.read"
@@ -6478,7 +6478,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.write"
@@ -6592,7 +6592,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.read"
@@ -6775,7 +6775,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.write"
@@ -6919,7 +6919,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.read"
@@ -7101,7 +7101,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.write"
@@ -7239,7 +7239,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.read"
@@ -7357,7 +7357,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.write"
@@ -7518,7 +7518,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.read"

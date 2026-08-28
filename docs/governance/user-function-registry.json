@@ -5390,7 +5390,8 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/integration/integration_backend/capabilities/contracts.py",
-        "plugins/integration/integration_backend/capabilities/descriptors.py"
+        "plugins/integration/integration_backend/capabilities/descriptors.py",
+        "plugins/integration/integration_backend/capabilities/provider.py"
       ]
     },
     "capability:integration.connector.create": {
@@ -5414,7 +5415,8 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/integration/integration_backend/capabilities/contracts.py",
-        "plugins/integration/integration_backend/capabilities/descriptors.py"
+        "plugins/integration/integration_backend/capabilities/descriptors.py",
+        "plugins/integration/integration_backend/capabilities/provider.py"
       ]
     },
     "capability:integration.connector.schema.discover": {
@@ -5438,7 +5440,8 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/integration/integration_backend/capabilities/contracts.py",
-        "plugins/integration/integration_backend/capabilities/descriptors.py"
+        "plugins/integration/integration_backend/capabilities/descriptors.py",
+        "plugins/integration/integration_backend/capabilities/provider.py"
       ]
     },
     "capability:integration.connector.search": {
@@ -5485,6 +5488,54 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
+        "plugins/integration/integration_backend/capabilities/contracts.py",
+        "plugins/integration/integration_backend/capabilities/descriptors.py",
+        "plugins/integration/integration_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:integration.field_mapping.batch.update": {
+      "function_id": "capability:integration.field_mapping.batch.update",
+      "domain": "Integration",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "integration.field_mapping.batch.update",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Integration",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/integration/integration_backend/capabilities/contracts.py",
+        "plugins/integration/integration_backend/capabilities/descriptors.py",
+        "plugins/integration/integration_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:integration.field_mapping.search": {
+      "function_id": "capability:integration.field_mapping.search",
+      "domain": "Integration",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "integration.field_mapping.search",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Integration",
+      "exclusion_reason": null,
+      "source_paths": [
         "plugins/integration/integration_backend/capabilities/contracts.py",
         "plugins/integration/integration_backend/capabilities/descriptors.py"
       ]
@@ -5534,7 +5585,8 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/integration/integration_backend/capabilities/contracts.py",
-        "plugins/integration/integration_backend/capabilities/descriptors.py"
+        "plugins/integration/integration_backend/capabilities/descriptors.py",
+        "plugins/integration/integration_backend/capabilities/provider.py"
       ]
     },
     "capability:integration.mapping.get": {
@@ -5561,6 +5613,30 @@
         "plugins/integration/integration_backend/capabilities/descriptors.py"
       ]
     },
+    "capability:integration.mapping.import.start": {
+      "function_id": "capability:integration.mapping.import.start",
+      "domain": "Integration",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "integration.mapping.import.start",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Integration",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/integration/integration_backend/capabilities/contracts.py",
+        "plugins/integration/integration_backend/capabilities/descriptors.py",
+        "plugins/integration/integration_backend/capabilities/provider.py"
+      ]
+    },
     "capability:integration.mapping.preview": {
       "function_id": "capability:integration.mapping.preview",
       "domain": "Integration",
@@ -5582,7 +5658,8 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/integration/integration_backend/capabilities/contracts.py",
-        "plugins/integration/integration_backend/capabilities/descriptors.py"
+        "plugins/integration/integration_backend/capabilities/descriptors.py",
+        "plugins/integration/integration_backend/capabilities/provider.py"
       ]
     },
     "capability:integration.mapping.search": {
@@ -5609,6 +5686,30 @@
         "plugins/integration/integration_backend/capabilities/descriptors.py"
       ]
     },
+    "capability:integration.mapping.source_columns.discover": {
+      "function_id": "capability:integration.mapping.source_columns.discover",
+      "domain": "Integration",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "integration.mapping.source_columns.discover",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Integration",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/integration/integration_backend/capabilities/contracts.py",
+        "plugins/integration/integration_backend/capabilities/descriptors.py",
+        "plugins/integration/integration_backend/capabilities/provider.py"
+      ]
+    },
     "capability:integration.mapping.update": {
       "function_id": "capability:integration.mapping.update",
       "domain": "Integration",
@@ -5631,6 +5732,53 @@
         "backend/capabilities/agreed_catalog.py",
         "plugins/integration/integration_backend/capabilities/contracts.py",
         "plugins/integration/integration_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:integration.mapping_target.search": {
+      "function_id": "capability:integration.mapping_target.search",
+      "domain": "Integration",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "integration.mapping_target.search",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Integration",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/integration/integration_backend/capabilities/contracts.py",
+        "plugins/integration/integration_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:integration.mapping_target.upsert": {
+      "function_id": "capability:integration.mapping_target.upsert",
+      "domain": "Integration",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "integration.mapping_target.upsert",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Integration",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/integration/integration_backend/capabilities/contracts.py",
+        "plugins/integration/integration_backend/capabilities/descriptors.py",
+        "plugins/integration/integration_backend/capabilities/provider.py"
       ]
     },
     "capability:integration.sync.start": {
@@ -6329,6 +6477,29 @@
         "Capability Registry"
       ],
       "target_capability": "knowledge.reference_data.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/knowledge/knowledge_backend/capabilities/reference_data.py"
+      ]
+    },
+    "capability:knowledge.reference_dataset.publish": {
+      "function_id": "capability:knowledge.reference_dataset.publish",
+      "domain": "Knowledge",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "knowledge.reference_dataset.publish",
       "exposure": "Capability",
       "automation_level": "automated",
       "resource_types": [

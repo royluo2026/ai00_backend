@@ -5,7 +5,7 @@
     "groups": 14,
     "occurrences": 17
   },
-  "content_sha256": "sha256:f61f0a91ebcaa9a6824e52e0462ba5e4da0f2b81a7e13f3dda1520ada724630e",
+  "content_sha256": "sha256:74282ef98eb890ef7c9042f35b1a30d128e00c2bf38946930f3c6bb814b874c1",
   "counts": {
     "groups": 12,
     "migrated_groups": 12,
@@ -169,12 +169,12 @@
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
-        "end_line": 43,
+        "end_line": 42,
         "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-        "start_line": 43
+        "start_line": 42
       },
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "service_anchor": {
         "end_line": 583,
         "sha256": "ab2c27b403a9031af28346979a178de5b571dbab9ad580f0769f8af0fb0ea16a",
@@ -332,12 +332,12 @@
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
-        "end_line": 43,
+        "end_line": 42,
         "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-        "start_line": 43
+        "start_line": 42
       },
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "service_anchor": {
         "end_line": 526,
         "sha256": "e5d0b6c03e0cef11ec178ee65a524f4011cee1ed18777cc504123c0bdbf8e574",
@@ -480,12 +480,12 @@
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
-        "end_line": 43,
+        "end_line": 42,
         "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-        "start_line": 43
+        "start_line": 42
       },
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "service_anchor": {
         "end_line": 513,
         "sha256": "3abfaffd1e391781ce8c06f882e2a2ffa85f05ba7b1979b3f2c8ffbc0abb5485",
@@ -658,12 +658,12 @@
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
-        "end_line": 43,
+        "end_line": 42,
         "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-        "start_line": 43
+        "start_line": 42
       },
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "service_anchor": {
         "end_line": 513,
         "sha256": "3abfaffd1e391781ce8c06f882e2a2ffa85f05ba7b1979b3f2c8ffbc0abb5485",
@@ -825,12 +825,12 @@
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
-        "end_line": 43,
+        "end_line": 42,
         "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-        "start_line": 43
+        "start_line": 42
       },
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "service_anchor": {
         "end_line": 605,
         "sha256": "e41c549f68ccd794c6eb80da205b6ed51b9b0f76ceeadb86f7d02a13afc8185c",
@@ -1014,12 +1014,12 @@
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
-        "end_line": 43,
+        "end_line": 42,
         "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-        "start_line": 43
+        "start_line": 42
       },
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "service_anchor": {
         "end_line": 605,
         "sha256": "e41c549f68ccd794c6eb80da205b6ed51b9b0f76ceeadb86f7d02a13afc8185c",
@@ -1216,12 +1216,12 @@
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
-        "end_line": 43,
+        "end_line": 42,
         "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-        "start_line": 43
+        "start_line": 42
       },
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "service_anchor": {
         "end_line": 552,
         "sha256": "079ccaecfc7418945962f21d8901ddff906cd3848704aeb3071607b99e793123",
@@ -1430,12 +1430,12 @@
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
-        "end_line": 43,
+        "end_line": 42,
         "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-        "start_line": 43
+        "start_line": 42
       },
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "service_anchor": {
         "end_line": 529,
         "sha256": "45bd33cb1023303df1f0792d5153e4431375d7ce357fe6609cbb436e5dfc8bc9",
@@ -1581,12 +1581,12 @@
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
-        "end_line": 43,
+        "end_line": 42,
         "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-        "start_line": 43
+        "start_line": 42
       },
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "service_anchor": {
         "end_line": 526,
         "sha256": "e5d0b6c03e0cef11ec178ee65a524f4011cee1ed18777cc504123c0bdbf8e574",
@@ -1784,12 +1784,12 @@
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
-        "end_line": 43,
+        "end_line": 42,
         "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-        "start_line": 43
+        "start_line": 42
       },
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "service_anchor": {
         "end_line": 518,
         "sha256": "2db00ad26cb113eda87defb6241a1cfe81a1c3893475fd6f5c18e72732ff9bc8",
@@ -1930,12 +1930,12 @@
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
-        "end_line": 43,
+        "end_line": 42,
         "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-        "start_line": 43
+        "start_line": 42
       },
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "service_anchor": {
         "end_line": 522,
         "sha256": "1b4c98e48aa57428aedca4e8d035a4f977582edae157aec46d589125c55acd99",
@@ -2129,12 +2129,12 @@
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
-        "end_line": 43,
+        "end_line": 42,
         "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-        "start_line": 43
+        "start_line": 42
       },
-      "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
       "service_anchor": {
         "end_line": 519,
         "sha256": "6f65073a924a880015c9426ac4544d5e9e734819ceb80d5b95d0396895d1951e",

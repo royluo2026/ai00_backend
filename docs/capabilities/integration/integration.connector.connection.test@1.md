@@ -8,7 +8,7 @@ Execute the governed integration.connector.connection.test Integration outcome.
 - 不适用：The caller can use an owning domain Capability directly without external integration.
 - 生命周期：`stable`
 - 所属领域：`integration`
-- Catalog Release：`rel_306e41b762566c4dd7e25507f773e2b5`
+- Catalog Release：`rel_fd5e91d036d31863b94dd01f1dce6fad`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -47,7 +47,7 @@ Execute the governed integration.connector.connection.test Integration outcome.
 - 并发：`none`
 - 无预期版本信封要求。
 - 一致性：`external`
-- Operation：`required`
+- Operation：`none`
 - Artifact：`none`
 - 审计：`standard`
 - Evidence：`required`
@@ -93,7 +93,7 @@ Execute the governed integration.connector.connection.test Integration outcome.
 ```json
 {
   "capability_id": "integration.connector.connection.test",
-  "catalog_release": "rel_306e41b762566c4dd7e25507f773e2b5",
+  "catalog_release": "rel_fd5e91d036d31863b94dd01f1dce6fad",
   "major_version": 1,
   "payload": {
     "gid": "example",
@@ -104,7 +104,7 @@ Execute the governed integration.connector.connection.test Integration outcome.
 
 ## 输出 Schema
 
-首次调用返回 `status=accepted`、`data=null` 和持久化 `operation_ref`；下列输出 Schema 适用于 Operation 完成后的领域结果。
+领域数据必须符合下列 Schema，并封装在完整 `CapabilityResultV2` 中：
 
 ```json
 {

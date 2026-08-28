@@ -8,7 +8,7 @@ Execute the reviewed craft.gbop.change.apply Craft outcome.
 - 不适用：The operation belongs to another business domain.
 - 生命周期：`deprecated`
 - 所属领域：`craft`
-- Catalog Release：`rel_306e41b762566c4dd7e25507f773e2b5`
+- Catalog Release：`rel_fd5e91d036d31863b94dd01f1dce6fad`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -96,7 +96,7 @@ Execute the reviewed craft.gbop.change.apply Craft outcome.
 ```json
 {
   "capability_id": "craft.gbop.change.apply",
-  "catalog_release": "rel_306e41b762566c4dd7e25507f773e2b5",
+  "catalog_release": "rel_fd5e91d036d31863b94dd01f1dce6fad",
   "major_version": 1,
   "payload": {
     "arguments": {},

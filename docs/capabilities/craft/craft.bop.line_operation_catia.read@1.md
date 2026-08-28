@@ -8,7 +8,7 @@ Read bounded operation CATIA occurrence names below one BOP line entry.
 - 不适用：The request mutates BOP entries or needs a complete execution structure.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_306e41b762566c4dd7e25507f773e2b5`
+- Catalog Release：`rel_fd5e91d036d31863b94dd01f1dce6fad`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -86,7 +86,7 @@ Read bounded operation CATIA occurrence names below one BOP line entry.
 ```json
 {
   "capability_id": "craft.bop.line_operation_catia.read",
-  "catalog_release": "rel_306e41b762566c4dd7e25507f773e2b5",
+  "catalog_release": "rel_fd5e91d036d31863b94dd01f1dce6fad",
   "major_version": 1,
   "payload": {
     "line_entry_gid": "example"

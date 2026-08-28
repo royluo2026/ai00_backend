@@ -10,7 +10,7 @@
     "no silent REST fallback"
   ],
   "artifact_id": "capability-v2-structural-remediation-plan",
-  "content_sha256": "sha256:6fd6de147c99b16f6090bae95a46b79238899381aa632b5327268821a176431e",
+  "content_sha256": "sha256:d6dcdbcf0cf0968cfd79ae76474c07ccd3ddd4417003c15e2651079bc0b5afc2",
   "counts": {
     "groups": 37,
     "occurrences": 45
@@ -440,12 +440,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 43,
+          "end_line": 42,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 43
+          "start_line": 42
         },
-        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+        "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -624,12 +624,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 43,
+          "end_line": 42,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 43
+          "start_line": 42
         },
-        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+        "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -804,12 +804,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 43,
+          "end_line": 42,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 43
+          "start_line": 42
         },
-        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+        "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -969,12 +969,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 43,
+          "end_line": 42,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 43
+          "start_line": 42
         },
-        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+        "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -1164,12 +1164,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 43,
+          "end_line": 42,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 43
+          "start_line": 42
         },
-        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+        "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -1348,12 +1348,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 43,
+          "end_line": 42,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 43
+          "start_line": 42
         },
-        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+        "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -2136,12 +2136,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 43,
+          "end_line": 42,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 43
+          "start_line": 42
         },
-        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+        "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -2540,12 +2540,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 43,
+          "end_line": 42,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 43
+          "start_line": 42
         },
-        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+        "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -2771,12 +2771,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 43,
+          "end_line": 42,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 43
+          "start_line": 42
         },
-        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+        "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -2939,12 +2939,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 43,
+          "end_line": 42,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 43
+          "start_line": 42
         },
-        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+        "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -3159,12 +3159,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 43,
+          "end_line": 42,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 43
+          "start_line": 42
         },
-        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+        "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -4172,12 +4172,12 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/integration-structural-web-remediation.json",
         "provider_anchor": {
-          "end_line": 43,
+          "end_line": 42,
           "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d",
           "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-          "start_line": 43
+          "start_line": 42
         },
-        "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+        "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -4807,15 +4807,15 @@
   "source_artifacts": [
     {
       "path": "docs/governance/base-structural-web-remediation.json",
-      "sha256": "sha256:c8d031e04826c288f01863d5878613ee1139f3b9a4fc54bb8046c117a93ccabe"
+      "sha256": "sha256:fdf489c1815965c6e5e4f5934cfe39715842764709c4dec1c9e535b5ca414af9"
     },
     {
       "path": "docs/governance/integration-structural-web-remediation.json",
-      "sha256": "sha256:8e6f193f9ebb6842781933ed7173d0ce8b2fcc120a2c10e1c4fb80a26a1e2c0c"
+      "sha256": "sha256:d2d9b0cc90b0054c7e3fff422d4034945923235be19a106fa3dccf0875d0f3f3"
     },
     {
       "path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-      "sha256": "sha256:a6eda64bdb95cf620842ab6bb46caae6d9d211eca643fdfe323dce5cda5b3738"
+      "sha256": "sha256:fca8beb006ff0fcac9fdad79d1ad19ef97633ed90217c45600e78c9e5e5754c0"
     },
     {
       "path": "docs\\governance\\capability-coverage-review\\generated\\web_route_inventory.json",
