@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3e-integration-structural-remediation",
-  "atomic_contract_manifest_sha256": "sha256:ad3e325f3b1912d1fdc672af905605aefa4b7f8ede7803c6c266c90ac8c54a00",
-  "content_sha256": "sha256:28e74cf959a5bfc526afac70f01a3c4a918256293b5bcccf214b398598ac2f51",
+  "atomic_contract_manifest_sha256": "sha256:c75d6dbf4612bbc4240c2dbcef55678d6db462767221f4ded99556e8ae703bca",
+  "content_sha256": "sha256:bd76f3925f1e7ac8be72f71f151212a43aa831f93d2ba61b463124b0bb28870f",
   "counts": {
     "groups": 12,
     "migrated_groups": 0,
@@ -63,12 +63,12 @@
         },
         "migration_decision": {
           "anchor": {
-            "end_line": 63,
+            "end_line": 72,
             "sha256": "053321082a8cd533b2a7280625f2e48bba6c2781ed2d443e8174fd458a76b20e",
             "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
-            "start_line": 63
+            "start_line": 72
           },
-          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+          "source_sha256": "sha256:3b90da990fc5b548d4c6f2bba401ccff1384c70f6964ea70e40d194381b58ce7"
         },
         "service": {
           "anchor": {
@@ -189,12 +189,12 @@
         },
         "migration_decision": {
           "anchor": {
-            "end_line": 64,
+            "end_line": 73,
             "sha256": "2707d0592b739902bca7b9a6d64870e2a49665e2cd815dc5b62ada43af8cb7f5",
             "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
-            "start_line": 64
+            "start_line": 73
           },
-          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+          "source_sha256": "sha256:3b90da990fc5b548d4c6f2bba401ccff1384c70f6964ea70e40d194381b58ce7"
         },
         "service": {
           "anchor": {
@@ -348,12 +348,12 @@
         },
         "migration_decision": {
           "anchor": {
-            "end_line": 65,
+            "end_line": 74,
             "sha256": "3a7c3cd3f0e53d4708b105436b39fff010307862378150ea4385dba0b1b2ccef",
             "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
-            "start_line": 65
+            "start_line": 74
           },
-          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+          "source_sha256": "sha256:3b90da990fc5b548d4c6f2bba401ccff1384c70f6964ea70e40d194381b58ce7"
         },
         "service": {
           "anchor": {
@@ -476,12 +476,12 @@
         },
         "migration_decision": {
           "anchor": {
-            "end_line": 66,
+            "end_line": 75,
             "sha256": "87acc89beddb7ba27996305091d6a5891f845ea382807191b565dc6ccbfa8676",
             "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
-            "start_line": 66
+            "start_line": 75
           },
-          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+          "source_sha256": "sha256:3b90da990fc5b548d4c6f2bba401ccff1384c70f6964ea70e40d194381b58ce7"
         },
         "service": {
           "anchor": {
@@ -602,12 +602,12 @@
         },
         "migration_decision": {
           "anchor": {
-            "end_line": 67,
+            "end_line": 76,
             "sha256": "261444255bac746a6179ec72e6574187f8aed6766ce1dbd356465608113744ac",
             "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
-            "start_line": 67
+            "start_line": 76
           },
-          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+          "source_sha256": "sha256:3b90da990fc5b548d4c6f2bba401ccff1384c70f6964ea70e40d194381b58ce7"
         },
         "service": {
           "anchor": {
@@ -737,12 +737,12 @@
         },
         "migration_decision": {
           "anchor": {
-            "end_line": 68,
+            "end_line": 77,
             "sha256": "898ed31d9cba282f90d8e25a89eab1abb384478737284fe28a752d8262d12e29",
             "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
-            "start_line": 68
+            "start_line": 77
           },
-          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+          "source_sha256": "sha256:3b90da990fc5b548d4c6f2bba401ccff1384c70f6964ea70e40d194381b58ce7"
         },
         "service": {
           "anchor": {
@@ -882,12 +882,12 @@
         },
         "migration_decision": {
           "anchor": {
-            "end_line": 81,
+            "end_line": 86,
             "sha256": "2d22f92969d0364dfcade44f62cd747f0c58267950a24a2b7dd3206414968709",
             "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
-            "start_line": 81
+            "start_line": 86
           },
-          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+          "source_sha256": "sha256:3b90da990fc5b548d4c6f2bba401ccff1384c70f6964ea70e40d194381b58ce7"
         },
         "service": {
           "anchor": {
@@ -1046,12 +1046,12 @@
         },
         "migration_decision": {
           "anchor": {
-            "end_line": 86,
+            "end_line": 90,
             "sha256": "0a9a9d64433f5841f81599fb1ec94592477af44d3e7418dcce93e1f76341556f",
             "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
-            "start_line": 86
+            "start_line": 90
           },
-          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+          "source_sha256": "sha256:3b90da990fc5b548d4c6f2bba401ccff1384c70f6964ea70e40d194381b58ce7"
         },
         "service": {
           "anchor": {
@@ -1171,12 +1171,12 @@
         },
         "migration_decision": {
           "anchor": {
-            "end_line": 87,
+            "end_line": 91,
             "sha256": "4f66c679cc34b3612231c9c8d55a26e766e3b24caf494e5a0590cf68caf556b1",
             "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
-            "start_line": 87
+            "start_line": 91
           },
-          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+          "source_sha256": "sha256:3b90da990fc5b548d4c6f2bba401ccff1384c70f6964ea70e40d194381b58ce7"
         },
         "service": {
           "anchor": {
@@ -1359,12 +1359,12 @@
         },
         "migration_decision": {
           "anchor": {
-            "end_line": 88,
+            "end_line": 92,
             "sha256": "8326ab38320bf36b004338bfd1aaceb065de7b3e419028eecb0b8c9e84056088",
             "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
-            "start_line": 88
+            "start_line": 92
           },
-          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+          "source_sha256": "sha256:3b90da990fc5b548d4c6f2bba401ccff1384c70f6964ea70e40d194381b58ce7"
         },
         "service": {
           "anchor": {
@@ -1508,12 +1508,12 @@
         },
         "migration_decision": {
           "anchor": {
-            "end_line": 89,
+            "end_line": 93,
             "sha256": "086bf735fde1710218e98990b044184dd09f6b3d9155e8f34c87d5af3fd0b150",
             "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
-            "start_line": 89
+            "start_line": 93
           },
-          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+          "source_sha256": "sha256:3b90da990fc5b548d4c6f2bba401ccff1384c70f6964ea70e40d194381b58ce7"
         },
         "service": {
           "anchor": {
@@ -1670,12 +1670,12 @@
         },
         "migration_decision": {
           "anchor": {
-            "end_line": 99,
+            "end_line": 100,
             "sha256": "371370ba5e8f5f0e6aa838c6ecfc6ccc93902b8c867f67f26d93d4469d49d351",
             "source_path": "backend/capability_v2/existing_capability_migration_decisions.py",
-            "start_line": 99
+            "start_line": 100
           },
-          "source_sha256": "sha256:17bb1d24a6b778f2f34741a06d43618607e5f8fdc99ff061f418602c55c65b29"
+          "source_sha256": "sha256:3b90da990fc5b548d4c6f2bba401ccff1384c70f6964ea70e40d194381b58ce7"
         },
         "service": {
           "anchor": {
@@ -1747,8 +1747,8 @@
       "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
     }
   ],
-  "frontend_content_hash": "6c2d9dd40efff87a5200b668727d7b56b47989b3f65e3796de97c91d83a2affb",
-  "frontend_revision": "6dd62900c9a82173adcbbe277bb38846ab556031",
+  "frontend_content_hash": "1458b00910499b0c8b32734c8815507e967839c18a7c16972368d21e1b40852e",
+  "frontend_revision": "5d6dc5cad342d75a4137219ca7bbb5ece71899d2",
   "schema_version": "1.0.0",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "source_ledger_revision": "ffc281cb141999433c188d4b3b9fb12b9670f8c4",
