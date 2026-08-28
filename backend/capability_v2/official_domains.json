@@ -191,7 +191,7 @@
         "plugin_id": "official.integration",
         "module": "integration_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:71b10444815943aa6bc46f60e333b133f03b7132e4662d61f5067190c3f423a4"
+        "artifact_hash": "sha256:300764c85d2fbeceeedbec11a67bb9587980c08bdf38874361d50af4643521f8"
       },
       "artifact_path": "plugins/integration/integration_backend",
       "allowed_owners": [

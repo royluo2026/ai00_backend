@@ -8,7 +8,7 @@ Update BOP lifecycle initialization state or confirm and advance its current pha
 - 不适用：The request refreshes metrics, creates/restores checkpoints, or undoes/redoes history.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_bc7b6984f9f83f336f60b60bd489f268`
+- Catalog Release：`rel_828d616281e9c36b4c96fbc675e8c230`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -112,7 +112,7 @@ Update BOP lifecycle initialization state or confirm and advance its current pha
 ```json
 {
   "capability_id": "craft.bop.lifecycle.state.change.apply",
-  "catalog_release": "rel_bc7b6984f9f83f336f60b60bd489f268",
+  "catalog_release": "rel_828d616281e9c36b4c96fbc675e8c230",
   "major_version": 1,
   "payload": {
     "operation": "init.update",
