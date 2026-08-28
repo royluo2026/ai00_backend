@@ -33,7 +33,7 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 2617,
+      "line": 2618,
       "column": 10,
       "reason": "JSDoc describes the adjacent upload helper; it is not executable."
     },

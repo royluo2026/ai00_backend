@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_331a207029a6b2186322dcabb43f675c",
-  "catalog_hash": "sha256:331a207029a6b2186322dcabb43f675c185e26559e3e087dbcf37ca315f21a6b",
+  "release_id": "rel_7ff1698de921ab4fe38979bd5e9ec734",
+  "catalog_hash": "sha256:7ff1698de921ab4fe38979bd5e9ec73485407e8b1af12931bbd049aaaa7c01b1",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -14436,6 +14436,312 @@
       ]
     },
     {
+      "id": "base.identity.session.profile.get",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.identity.session.profile.get",
+      "description": "Execute exact Base outcome base.identity.session.profile.get.",
+      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
+      "do_not_use_when": "The request selects another operation or domain.",
+      "business_effect": "Reads the caller's closed browser-visible identity projection without credentials or tokens.",
+      "side_effect_level": "read",
+      "side_effects": "Reads the caller's closed browser-visible identity projection without credentials or tokens.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "base.v2:authenticated",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "profile": {
+            "type": "object",
+            "properties": {
+              "actor_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "display_name": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "tenant_gid": {
+                "type": "string",
+                "maxLength": 128
+              },
+              "team_gids": {
+                "type": "array",
+                "maxItems": 200,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "locale": {
+                "type": "string",
+                "maxLength": 64
+              },
+              "timezone": {
+                "type": "string",
+                "maxLength": 128
+              },
+              "permission_ids": {
+                "type": "array",
+                "maxItems": 1000,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "actor_gid",
+              "display_name",
+              "tenant_gid",
+              "team_gids",
+              "locale",
+              "timezone",
+              "permission_ids"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "profile"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "profile": {
+            "type": "object",
+            "properties": {
+              "actor_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "display_name": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "tenant_gid": {
+                "type": "string",
+                "maxLength": 128
+              },
+              "team_gids": {
+                "type": "array",
+                "maxItems": 200,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "locale": {
+                "type": "string",
+                "maxLength": 64
+              },
+              "timezone": {
+                "type": "string",
+                "maxLength": 128
+              },
+              "permission_ids": {
+                "type": "array",
+                "maxItems": 1000,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "actor_gid",
+              "display_name",
+              "tenant_gid",
+              "team_gids",
+              "locale",
+              "timezone",
+              "permission_ids"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "profile"
+        ]
+      },
+      "schema_hash": "sha256:6152eca0cee1b4deb44a60c82d80fe123801d721d0cd76c3ba387827830bca36",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_4499ba05a02a58d4613d224f",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "base.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/base.identity.session.profile.get:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
+          "result": "pass",
+          "path": "backend/tests/test_capability_v2_contracts.py"
+        }
+      ]
+    },
+    {
       "id": "base.identity.user.search",
       "major_version": 1,
       "owner_domain": "base",
@@ -23396,6 +23702,1371 @@
       "provider_ref": "base.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/base.self_annotation.batch.get:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
+          "result": "pass",
+          "path": "backend/tests/test_capability_v2_contracts.py"
+        }
+      ]
+    },
+    {
+      "id": "base.self_annotation.change.apply",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.self_annotation.change.apply",
+      "description": "Execute exact Base outcome base.self_annotation.change.apply.",
+      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
+      "do_not_use_when": "The request selects another operation or domain.",
+      "business_effect": "Revision-locks one caller-owned typed self-annotation update with replay and audit evidence.",
+      "side_effect_level": "write",
+      "side_effects": "Revision-locks one caller-owned typed self-annotation update with replay and audit evidence.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "base.v2:authenticated",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "item_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "schedule": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 512
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "attachments": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "properties": {
+                "attachment_gid": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "media_type": {
+                  "type": "string",
+                  "maxLength": 128
+                },
+                "display_name": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "size": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 52428800
+                },
+                "checksum": {
+                  "type": "string",
+                  "minLength": 71,
+                  "maxLength": 71,
+                  "pattern": "^sha256:[0-9a-f]{64}$"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "attachment_gid",
+                "media_type",
+                "display_name",
+                "size",
+                "checksum"
+              ]
+            }
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "item_gid",
+          "expected_revision",
+          "status",
+          "schedule",
+          "note",
+          "attachments",
+          "idempotency_key"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "annotation": {
+            "type": "object",
+            "properties": {
+              "item_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "status": {
+                "type": "string",
+                "maxLength": 64
+              },
+              "schedule": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "note": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "attachments": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "attachment_gid": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "media_type": {
+                      "type": "string",
+                      "maxLength": 128
+                    },
+                    "display_name": {
+                      "type": "string",
+                      "maxLength": 512
+                    },
+                    "size": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 52428800
+                    },
+                    "checksum": {
+                      "type": "string",
+                      "minLength": 71,
+                      "maxLength": 71,
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "attachment_gid",
+                    "media_type",
+                    "display_name",
+                    "size",
+                    "checksum"
+                  ]
+                }
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "restore": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "available": {
+                    "type": "boolean"
+                  },
+                  "deleted_by": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "deleted_at": {
+                    "type": "string",
+                    "maxLength": 64
+                  }
+                },
+                "required": [
+                  "available",
+                  "deleted_by",
+                  "deleted_at"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "item_gid",
+              "status",
+              "schedule",
+              "note",
+              "attachments",
+              "revision",
+              "deleted",
+              "restore"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "annotation"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "annotation": {
+            "type": "object",
+            "properties": {
+              "item_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "status": {
+                "type": "string",
+                "maxLength": 64
+              },
+              "schedule": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "note": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "attachments": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "attachment_gid": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "media_type": {
+                      "type": "string",
+                      "maxLength": 128
+                    },
+                    "display_name": {
+                      "type": "string",
+                      "maxLength": 512
+                    },
+                    "size": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 52428800
+                    },
+                    "checksum": {
+                      "type": "string",
+                      "minLength": 71,
+                      "maxLength": 71,
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "attachment_gid",
+                    "media_type",
+                    "display_name",
+                    "size",
+                    "checksum"
+                  ]
+                }
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "restore": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "available": {
+                    "type": "boolean"
+                  },
+                  "deleted_by": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "deleted_at": {
+                    "type": "string",
+                    "maxLength": 64
+                  }
+                },
+                "required": [
+                  "available",
+                  "deleted_by",
+                  "deleted_at"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "item_gid",
+              "status",
+              "schedule",
+              "note",
+              "attachments",
+              "revision",
+              "deleted",
+              "restore"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "annotation"
+        ]
+      },
+      "schema_hash": "sha256:182b3242c4d2f45d7df7bb68301a578e3dcf0699ba471509883c15fbe2aeba6b",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_9920c9dc42073de0c160e166",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "single_transaction",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "base.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/base.self_annotation.change.apply:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
+          "result": "pass",
+          "path": "backend/tests/test_capability_v2_contracts.py"
+        }
+      ]
+    },
+    {
+      "id": "base.self_annotation.record.get",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.self_annotation.record.get",
+      "description": "Execute exact Base outcome base.self_annotation.record.get.",
+      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
+      "do_not_use_when": "The request selects another operation or domain.",
+      "business_effect": "Reads one caller-owned closed self-annotation projection without mutation.",
+      "side_effect_level": "read",
+      "side_effects": "Reads one caller-owned closed self-annotation projection without mutation.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "base.v2:authenticated",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "item_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "item_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "annotation": {
+            "type": "object",
+            "properties": {
+              "item_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "status": {
+                "type": "string",
+                "maxLength": 64
+              },
+              "schedule": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "note": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "attachments": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "attachment_gid": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "media_type": {
+                      "type": "string",
+                      "maxLength": 128
+                    },
+                    "display_name": {
+                      "type": "string",
+                      "maxLength": 512
+                    },
+                    "size": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 52428800
+                    },
+                    "checksum": {
+                      "type": "string",
+                      "minLength": 71,
+                      "maxLength": 71,
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "attachment_gid",
+                    "media_type",
+                    "display_name",
+                    "size",
+                    "checksum"
+                  ]
+                }
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "restore": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "available": {
+                    "type": "boolean"
+                  },
+                  "deleted_by": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "deleted_at": {
+                    "type": "string",
+                    "maxLength": 64
+                  }
+                },
+                "required": [
+                  "available",
+                  "deleted_by",
+                  "deleted_at"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "item_gid",
+              "status",
+              "schedule",
+              "note",
+              "attachments",
+              "revision",
+              "deleted",
+              "restore"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "annotation"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "annotation": {
+            "type": "object",
+            "properties": {
+              "item_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "status": {
+                "type": "string",
+                "maxLength": 64
+              },
+              "schedule": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "note": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "attachments": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "attachment_gid": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "media_type": {
+                      "type": "string",
+                      "maxLength": 128
+                    },
+                    "display_name": {
+                      "type": "string",
+                      "maxLength": 512
+                    },
+                    "size": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 52428800
+                    },
+                    "checksum": {
+                      "type": "string",
+                      "minLength": 71,
+                      "maxLength": 71,
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "attachment_gid",
+                    "media_type",
+                    "display_name",
+                    "size",
+                    "checksum"
+                  ]
+                }
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "restore": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "available": {
+                    "type": "boolean"
+                  },
+                  "deleted_by": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "deleted_at": {
+                    "type": "string",
+                    "maxLength": 64
+                  }
+                },
+                "required": [
+                  "available",
+                  "deleted_by",
+                  "deleted_at"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "item_gid",
+              "status",
+              "schedule",
+              "note",
+              "attachments",
+              "revision",
+              "deleted",
+              "restore"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "annotation"
+        ]
+      },
+      "schema_hash": "sha256:d2b75224dc2779d047a28b4373761a5a16dd498c9fec70a2685a4cf74c49ce4e",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_b2d992b5e2e2bc9af9f4336f",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "base.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/base.self_annotation.record.get:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
+          "result": "pass",
+          "path": "backend/tests/test_capability_v2_contracts.py"
+        }
+      ]
+    },
+    {
+      "id": "base.self_annotation.search",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.self_annotation.search",
+      "description": "Execute exact Base outcome base.self_annotation.search.",
+      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
+      "do_not_use_when": "The request selects another operation or domain.",
+      "business_effect": "Reads a bounded caller-owned self-annotation collection without mutation.",
+      "side_effect_level": "read",
+      "side_effects": "Reads a bounded caller-owned self-annotation collection without mutation.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "base.v2:authenticated",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 512
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "type": "object",
+              "properties": {
+                "item_gid": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "status": {
+                  "type": "string",
+                  "maxLength": 64
+                },
+                "schedule": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "note": {
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "attachments": {
+                  "type": "array",
+                  "maxItems": 100,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "attachment_gid": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 512
+                      },
+                      "media_type": {
+                        "type": "string",
+                        "maxLength": 128
+                      },
+                      "display_name": {
+                        "type": "string",
+                        "maxLength": 512
+                      },
+                      "size": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 52428800
+                      },
+                      "checksum": {
+                        "type": "string",
+                        "minLength": 71,
+                        "maxLength": 71,
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                      "attachment_gid",
+                      "media_type",
+                      "display_name",
+                      "size",
+                      "checksum"
+                    ]
+                  }
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "deleted": {
+                  "type": "boolean"
+                },
+                "restore": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "properties": {
+                    "available": {
+                      "type": "boolean"
+                    },
+                    "deleted_by": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "deleted_at": {
+                      "type": "string",
+                      "maxLength": 64
+                    }
+                  },
+                  "required": [
+                    "available",
+                    "deleted_by",
+                    "deleted_at"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "item_gid",
+                "status",
+                "schedule",
+                "note",
+                "attachments",
+                "revision",
+                "deleted",
+                "restore"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "type": "object",
+              "properties": {
+                "item_gid": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "status": {
+                  "type": "string",
+                  "maxLength": 64
+                },
+                "schedule": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "note": {
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "attachments": {
+                  "type": "array",
+                  "maxItems": 100,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "attachment_gid": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 512
+                      },
+                      "media_type": {
+                        "type": "string",
+                        "maxLength": 128
+                      },
+                      "display_name": {
+                        "type": "string",
+                        "maxLength": 512
+                      },
+                      "size": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 52428800
+                      },
+                      "checksum": {
+                        "type": "string",
+                        "minLength": 71,
+                        "maxLength": 71,
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                      "attachment_gid",
+                      "media_type",
+                      "display_name",
+                      "size",
+                      "checksum"
+                    ]
+                  }
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "deleted": {
+                  "type": "boolean"
+                },
+                "restore": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "properties": {
+                    "available": {
+                      "type": "boolean"
+                    },
+                    "deleted_by": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "deleted_at": {
+                      "type": "string",
+                      "maxLength": 64
+                    }
+                  },
+                  "required": [
+                    "available",
+                    "deleted_by",
+                    "deleted_at"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "item_gid",
+                "status",
+                "schedule",
+                "note",
+                "attachments",
+                "revision",
+                "deleted",
+                "restore"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items"
+        ]
+      },
+      "schema_hash": "sha256:9523da19d6500fa2c054481503bee410b868bcb854f09db370233cf998b97def",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_f71659779f980fb068f25e40",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "base.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/base.self_annotation.search:invoke"
       ],
       "test_refs": [
         {
@@ -184234,7 +185905,7 @@
       "plugin_id": "official.base",
       "module": "backend.base.official_provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:5a0b17a8d088a71a58386b1d50692d9b0cc7b979e231e22f752b7ecc7e55924e"
+      "artifact_hash": "sha256:5e7fbf300751355a6f42b9b7a40a5f172857a8d914d63b790db25c08ab3b42ed"
     },
     {
       "plugin_id": "official.craft",
@@ -184291,5 +185962,5 @@
       "artifact_hash": "sha256:5c1fccaa2219f6833c24237667039685e322cefcffc7ca6f0287d28cfc0a2b39"
     }
   ],
-  "created_at": "2026-08-28T01:50:04.840702Z"
+  "created_at": "2026-08-28T02:36:45.385875Z"
 }

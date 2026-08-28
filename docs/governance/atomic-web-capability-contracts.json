@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3c-atomic-web-contracts",
   "baseline_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
-  "content_sha256": "sha256:7ca8cfd880dda3fbca18bbd3d5ec8d7be4dfeef268079f7b5ff501a5a2e72018",
+  "content_sha256": "sha256:41562cf513b95034a60b91f5dd2940f380de84e333c6ec39f35a881b0a1c3baf",
   "counts_by_owner": {
     "agent": {
       "groups": 4,
@@ -392,7 +392,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -589,7 +589,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -673,7 +673,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -777,7 +777,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -905,7 +905,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1015,7 +1015,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "reclassification_reason": null,
       "required_permissions": [
         "system.tech_config"
@@ -1155,7 +1155,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1321,7 +1321,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1542,7 +1542,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1552,14 +1552,19 @@
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": null,
+      "authorization_policy": "base.v2:authenticated",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
-      "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "capability_id": "base.self_annotation.search",
+      "confirmation_policy": "none",
+      "consistency_policy": "strong",
+      "example_input": {
+        "limit": 200,
+        "status": null
+      },
+      "example_output": {
+        "items": []
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "Exact registered route definition is anchored and machine-checked.",
@@ -1574,13 +1579,26 @@
         },
         "source_path": "backend/routers/self_annotations.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "limit": {
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "maxLength": 512,
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "GET",
       "normalized_route": "/api/self_ann/list",
       "occurrences": [
@@ -1620,28 +1638,161 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "attachments": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "attachment_gid": {
+                        "maxLength": 512,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "checksum": {
+                        "maxLength": 71,
+                        "minLength": 71,
+                        "pattern": "^sha256:[0-9a-f]{64}$",
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "maxLength": 512,
+                        "type": "string"
+                      },
+                      "media_type": {
+                        "maxLength": 128,
+                        "type": "string"
+                      },
+                      "size": {
+                        "maximum": 52428800,
+                        "minimum": 0,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "attachment_gid",
+                      "media_type",
+                      "display_name",
+                      "size",
+                      "checksum"
+                    ],
+                    "type": "object"
+                  },
+                  "maxItems": 100,
+                  "type": "array"
+                },
+                "deleted": {
+                  "type": "boolean"
+                },
+                "item_gid": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "note": {
+                  "maxLength": 2000,
+                  "type": "string"
+                },
+                "restore": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "available": {
+                      "type": "boolean"
+                    },
+                    "deleted_at": {
+                      "maxLength": 64,
+                      "type": "string"
+                    },
+                    "deleted_by": {
+                      "maxLength": 512,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "available",
+                    "deleted_by",
+                    "deleted_at"
+                  ],
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "revision": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "schedule": {
+                  "maxLength": 512,
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "status": {
+                  "maxLength": 64,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "item_gid",
+                "status",
+                "schedule",
+                "note",
+                "attachments",
+                "revision",
+                "deleted",
+                "restore"
+              ],
+              "type": "object"
+            },
+            "maxItems": 200,
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/routers/self_annotations.py",
-      "provider_source_sha256": "sha256:7624608452bd2173dacfaac9c77f703da331fc510512cc028857fb7319ca8c52",
-      "reclassification_reason": "The response contains attachment records without a governed nested attachment contract.",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Reads a bounded caller-owned self-annotation collection without mutation."
+      ]
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": null,
+      "authorization_policy": "base.v2:authenticated",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
-      "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "capability_id": "base.self_annotation.record.get",
+      "confirmation_policy": "none",
+      "consistency_policy": "strong",
+      "example_input": {
+        "item_gid": "item_1"
+      },
+      "example_output": {
+        "annotation": {
+          "attachments": [],
+          "deleted": false,
+          "item_gid": "item_1",
+          "note": "",
+          "restore": null,
+          "revision": 1,
+          "schedule": null,
+          "status": ""
+        }
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "Exact registered route definition is anchored and machine-checked.",
@@ -1656,13 +1807,22 @@
         },
         "source_path": "backend/routers/self_annotations.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "item_gid": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_gid"
+        ],
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "GET",
       "normalized_route": "/api/self_ann/{dynamic}",
       "occurrences": [
@@ -1680,28 +1840,179 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "annotation": {
+            "additionalProperties": false,
+            "properties": {
+              "attachments": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "attachment_gid": {
+                      "maxLength": 512,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "checksum": {
+                      "maxLength": 71,
+                      "minLength": 71,
+                      "pattern": "^sha256:[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "display_name": {
+                      "maxLength": 512,
+                      "type": "string"
+                    },
+                    "media_type": {
+                      "maxLength": 128,
+                      "type": "string"
+                    },
+                    "size": {
+                      "maximum": 52428800,
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "attachment_gid",
+                    "media_type",
+                    "display_name",
+                    "size",
+                    "checksum"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 100,
+                "type": "array"
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "item_gid": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "note": {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              "restore": {
+                "additionalProperties": false,
+                "properties": {
+                  "available": {
+                    "type": "boolean"
+                  },
+                  "deleted_at": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "deleted_by": {
+                    "maxLength": 512,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "available",
+                  "deleted_by",
+                  "deleted_at"
+                ],
+                "type": [
+                  "object",
+                  "null"
+                ]
+              },
+              "revision": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "schedule": {
+                "maxLength": 512,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "maxLength": 64,
+                "type": "string"
+              }
+            },
+            "required": [
+              "item_gid",
+              "status",
+              "schedule",
+              "note",
+              "attachments",
+              "revision",
+              "deleted",
+              "restore"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "annotation"
+        ],
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/routers/self_annotations.py",
-      "provider_source_sha256": "sha256:7624608452bd2173dacfaac9c77f703da331fc510512cc028857fb7319ca8c52",
-      "reclassification_reason": "The response contains attachment records without a governed nested attachment contract.",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Reads one caller-owned closed self-annotation projection without mutation."
+      ]
     },
     {
-      "atomicity_class": "read",
-      "authorization_policy": null,
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "base.v2:authenticated",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
-      "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "capability_id": "base.self_annotation.change.apply",
+      "confirmation_policy": "user",
+      "consistency_policy": "strong",
+      "example_input": {
+        "attachments": [
+          {
+            "attachment_gid": "att_1",
+            "checksum": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "display_name": "photo.png",
+            "media_type": "image/png",
+            "size": 42
+          }
+        ],
+        "expected_revision": 1,
+        "idempotency_key": "idem-ann-1",
+        "item_gid": "item_1",
+        "note": "note",
+        "schedule": "2026-08-28",
+        "status": "open"
+      },
+      "example_output": {
+        "annotation": {
+          "attachments": [
+            {
+              "attachment_gid": "att_1",
+              "checksum": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "display_name": "photo.png",
+              "media_type": "image/png",
+              "size": 42
+            }
+          ],
+          "deleted": false,
+          "item_gid": "item_1",
+          "note": "note",
+          "restore": null,
+          "revision": 2,
+          "schedule": "2026-08-28",
+          "status": "open"
+        }
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "Exact registered route definition is anchored and machine-checked.",
@@ -1716,13 +2027,94 @@
         },
         "source_path": "backend/routers/self_annotations.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "required",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "attachments": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "attachment_gid": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "checksum": {
+                  "maxLength": 71,
+                  "minLength": 71,
+                  "pattern": "^sha256:[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "display_name": {
+                  "maxLength": 512,
+                  "type": "string"
+                },
+                "media_type": {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                "size": {
+                  "maximum": 52428800,
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "attachment_gid",
+                "media_type",
+                "display_name",
+                "size",
+                "checksum"
+              ],
+              "type": "object"
+            },
+            "maxItems": 100,
+            "type": "array"
+          },
+          "expected_revision": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "idempotency_key": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "item_gid": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "note": {
+            "maxLength": 2000,
+            "type": "string"
+          },
+          "schedule": {
+            "maxLength": 512,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "maxLength": 64,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_gid",
+          "expected_revision",
+          "status",
+          "schedule",
+          "note",
+          "attachments",
+          "idempotency_key"
+        ],
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "PUT",
       "normalized_route": "/api/self_ann/{dynamic}",
       "occurrences": [
@@ -1740,17 +2132,133 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "annotation": {
+            "additionalProperties": false,
+            "properties": {
+              "attachments": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "attachment_gid": {
+                      "maxLength": 512,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "checksum": {
+                      "maxLength": 71,
+                      "minLength": 71,
+                      "pattern": "^sha256:[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "display_name": {
+                      "maxLength": 512,
+                      "type": "string"
+                    },
+                    "media_type": {
+                      "maxLength": 128,
+                      "type": "string"
+                    },
+                    "size": {
+                      "maximum": 52428800,
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "attachment_gid",
+                    "media_type",
+                    "display_name",
+                    "size",
+                    "checksum"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 100,
+                "type": "array"
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "item_gid": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "note": {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              "restore": {
+                "additionalProperties": false,
+                "properties": {
+                  "available": {
+                    "type": "boolean"
+                  },
+                  "deleted_at": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "deleted_by": {
+                    "maxLength": 512,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "available",
+                  "deleted_by",
+                  "deleted_at"
+                ],
+                "type": [
+                  "object",
+                  "null"
+                ]
+              },
+              "revision": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "schedule": {
+                "maxLength": 512,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "maxLength": 64,
+                "type": "string"
+              }
+            },
+            "required": [
+              "item_gid",
+              "status",
+              "schedule",
+              "note",
+              "attachments",
+              "revision",
+              "deleted",
+              "restore"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "annotation"
+        ],
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/routers/self_annotations.py",
-      "provider_source_sha256": "sha256:7624608452bd2173dacfaac9c77f703da331fc510512cc028857fb7319ca8c52",
-      "reclassification_reason": "The request contains attachment records without a governed nested attachment contract.",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Revision-locks one caller-owned typed self-annotation update with replay and audit evidence."
+      ]
     },
     {
       "atomicity_class": "read",
@@ -1850,7 +2358,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -2046,7 +2554,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -2058,14 +2566,24 @@
     },
     {
       "atomicity_class": "read",
-      "authorization_policy": null,
+      "authorization_policy": "base.v2:authenticated",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
+      "capability_id": "base.identity.session.profile.get",
+      "confirmation_policy": "none",
+      "consistency_policy": "strong",
       "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "example_output": {
+        "profile": {
+          "actor_gid": "user_1",
+          "display_name": "",
+          "locale": "",
+          "permission_ids": [],
+          "team_gids": [],
+          "tenant_gid": "",
+          "timezone": ""
+        }
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "Exact registered route definition is anchored and machine-checked.",
@@ -2080,13 +2598,13 @@
         },
         "source_path": "backend/routers/users.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "GET",
       "normalized_route": "/api/users/me",
       "occurrences": [
@@ -2104,17 +2622,77 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "profile": {
+            "additionalProperties": false,
+            "properties": {
+              "actor_gid": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "display_name": {
+                "maxLength": 512,
+                "type": "string"
+              },
+              "locale": {
+                "maxLength": 64,
+                "type": "string"
+              },
+              "permission_ids": {
+                "items": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 1000,
+                "type": "array"
+              },
+              "team_gids": {
+                "items": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 200,
+                "type": "array"
+              },
+              "tenant_gid": {
+                "maxLength": 128,
+                "type": "string"
+              },
+              "timezone": {
+                "maxLength": 128,
+                "type": "string"
+              }
+            },
+            "required": [
+              "actor_gid",
+              "display_name",
+              "tenant_gid",
+              "team_gids",
+              "locale",
+              "timezone",
+              "permission_ids"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "profile"
+        ],
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/routers/users.py",
-      "provider_source_sha256": "sha256:d632055fafa2aee6dea74b6c160c8889295a525373e6ee2604e52527d5df2b8f",
-      "reclassification_reason": "The profile contains dynamic grants and permissions without a closed exact output contract.",
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Reads the caller's closed browser-visible identity projection without credentials or tokens."
+      ]
     },
     {
       "atomicity_class": "read",
@@ -2253,7 +2831,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -2446,7 +3024,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -2813,7 +3391,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -3438,7 +4016,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -3840,7 +4418,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -4476,7 +5054,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -4875,7 +5453,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",

@@ -38,7 +38,7 @@ def main() -> int:
         return 1
     manifest = load_existing_capability_migrations(OUTPUT)
     issues = audit_existing_capability_migrations(
-        ROOT, manifest, web_root=args.web_root, ledger_path=LEDGER
+        ROOT, manifest, web_root=args.web_root
     )
     if issues:
         print("; ".join(issues), file=sys.stderr)

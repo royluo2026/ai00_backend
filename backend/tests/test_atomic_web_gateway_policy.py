@@ -41,8 +41,17 @@ def test_atomic_permissions_reuse_legacy_role_boundaries_not_broad_domain_flags(
         "base.organization.team.directory.list",
         "base.team.directory.list",
         "base.self_annotation.batch.get",
+        "base.self_annotation.record.get",
+        "base.self_annotation.search",
+        "base.self_annotation.change.apply",
+        "base.identity.session.profile.get",
         "base.identity.admin_user.list",
         "base.identity.role.assign.atomic",
+        "base.saved_view.search",
+        "base.saved_view.create",
+        "base.saved_view.update",
+        "base.saved_view.copy",
+        "base.saved_view.delete",
     }
     for capability_id in {
         "base.authorization.grant.list",
@@ -61,6 +70,10 @@ def test_atomic_permissions_reuse_legacy_role_boundaries_not_broad_domain_flags(
         "base.organization.team.directory.list",
         "base.team.directory.list",
         "base.self_annotation.batch.get",
+        "base.self_annotation.record.get",
+        "base.self_annotation.search",
+        "base.identity.session.profile.get",
+        "base.saved_view.search",
     }:
         assert specs[capability_id].permissions == ()
     for capability_id in {"base.identity.admin_user.list", "base.identity.role.assign.atomic"}:

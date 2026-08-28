@@ -1,6 +1,6 @@
 {
   "frontend_revision": "2b283c64fbe69b15779f9fec08d384174ab0c3a5",
-  "content_hash": "e2e32aff4cd40d6457e9a4c257097c8985ce519251d497ad4d086d9901be9d4b",
+  "content_hash": "0ee27f554329872a1d223d8cef8a1a23b880170eff366192388e23ef8786aae2",
   "wrapper_contracts_hash": "7fec8d2b3c7b989ad5dd570c8fc10984f3fac4745244194edb738a3015aa600c",
   "scan_roots": [
     "web",
@@ -27,12 +27,12 @@
     "legacy_registered": 311,
     "bff_registered": 2,
     "operations_excluded": 19,
-    "unresolved": 37
+    "unresolved": 31
   },
   "lexical_audit": {
-    "token_count": 426,
-    "token_hash": "c5a5c436961f8c5690a161034892d50b0ded4df5502701f4bf97a03710df32e4",
-    "mapped_count": 407,
+    "token_count": 420,
+    "token_hash": "0f3cdaae8555860a84fe0b44b36e5086a8e2c9fffeb9b2bc1fe691c5832ffbef",
+    "mapped_count": 401,
     "reviewed_non_route_count": 19,
     "reviewed_non_route_tokens": [
       "packages/craft-plugin/web/bop_nav/bop_nav.js:12:13:/api/",
@@ -40,7 +40,7 @@
       "packages/craft-plugin/web/gbop_lineage/layout_mode.js:48:32:/api/",
       "packages/craft-plugin/web/gbop_lineage/lineage.js:1417:10:/api/",
       "packages/craft-plugin/web/gbop_lineage/lineage.js:6:13:/api/",
-      "packages/craft-plugin/web/lineage_view/lineage.js:2617:10:/api/",
+      "packages/craft-plugin/web/lineage_view/lineage.js:2618:10:/api/",
       "packages/craft-plugin/web/pbom_check/pbom_check.js:6:23:/api/",
       "packages/plugin-sdk/frontend/plugin-sdk.js:43:42:/api/",
       "packages/plugin-sdk/frontend/plugin-sdk.js:8:20:/api/",
@@ -1144,23 +1144,13 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 511,
-      "column": 34,
-      "raw_route": "/api/users/me",
-      "normalized_route": "/api/users/me",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/craft-plugin/web/lineage_view/lineage.js:511:34:GET:/api/users/me"
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 1217,
+      "line": 1218,
       "column": 43,
       "raw_route": "/api/uploads/ois/resolve",
       "normalized_route": "/api/uploads/ois/resolve",
       "method": "POST",
       "disposition": "operations_excluded",
-      "occurrence_id": "packages/craft-plugin/web/lineage_view/lineage.js:1217:43:POST:/api/uploads/ois/resolve"
+      "occurrence_id": "packages/craft-plugin/web/lineage_view/lineage.js:1218:43:POST:/api/uploads/ois/resolve"
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage_version_mgr.js",
@@ -2106,46 +2096,6 @@
       "occurrence_id": "web/components/scope_badge.js:272:28:POST:/api/shares/lists/{dynamic}"
     },
     {
-      "source": "web/components/self_annotation_panel.js",
-      "line": 146,
-      "column": 36,
-      "raw_route": "/api/self_ann/${gid}",
-      "normalized_route": "/api/self_ann/{dynamic}",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/self_annotation_panel.js:146:36:GET:/api/self_ann/{dynamic}"
-    },
-    {
-      "source": "web/components/self_annotation_panel.js",
-      "line": 175,
-      "column": 35,
-      "raw_route": "/api/self_ann/${_currentGid}",
-      "normalized_route": "/api/self_ann/{dynamic}",
-      "method": "PUT",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/self_annotation_panel.js:175:35:PUT:/api/self_ann/{dynamic}"
-    },
-    {
-      "source": "web/components/self_annotation_panel.js",
-      "line": 292,
-      "column": 27,
-      "raw_route": "/api/self_ann/list?module=${encodeURIComponent(_module)}",
-      "normalized_route": "/api/self_ann/list",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/self_annotation_panel.js:292:27:GET:/api/self_ann/list"
-    },
-    {
-      "source": "web/components/self_annotation_panel.js",
-      "line": 293,
-      "column": 27,
-      "raw_route": "/api/self_ann/list",
-      "normalized_route": "/api/self_ann/list",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/self_annotation_panel.js:293:27:GET:/api/self_ann/list"
-    },
-    {
       "source": "web/components/sidebar_detail_panel.js",
       "line": 611,
       "column": 41,
@@ -2467,33 +2417,33 @@
     },
     {
       "source": "web/core/existing_capability_client.js",
-      "line": 252,
+      "line": 273,
       "column": 27,
       "raw_route": "/api/v1/capabilities/${capabilityId}:${action}",
       "normalized_route": "/api/v1/capabilities/{dynamic}:{dynamic}",
       "method": "POST",
       "disposition": "capability",
-      "occurrence_id": "web/core/existing_capability_client.js:252:27:POST:/api/v1/capabilities/{dynamic}:{dynamic}"
+      "occurrence_id": "web/core/existing_capability_client.js:273:27:POST:/api/v1/capabilities/{dynamic}:{dynamic}"
     },
     {
       "source": "web/core/existing_capability_client.js",
-      "line": 286,
+      "line": 307,
       "column": 51,
       "raw_route": "/api/lists?item_type=bop_version",
       "normalized_route": "/api/lists",
       "method": "GET",
       "disposition": "unresolved",
-      "occurrence_id": "web/core/existing_capability_client.js:286:51:GET:/api/lists"
+      "occurrence_id": "web/core/existing_capability_client.js:307:51:GET:/api/lists"
     },
     {
       "source": "web/core/existing_capability_client.js",
-      "line": 291,
+      "line": 312,
       "column": 12,
       "raw_route": "/api/lists/${encodeURIComponent(gid)}?item_type=bop_version&expected_revision=${revision}",
       "normalized_route": "/api/lists/{dynamic}",
       "method": "DELETE",
       "disposition": "unresolved",
-      "occurrence_id": "web/core/existing_capability_client.js:291:12:DELETE:/api/lists/{dynamic}"
+      "occurrence_id": "web/core/existing_capability_client.js:312:12:DELETE:/api/lists/{dynamic}"
     },
     {
       "source": "web/core/global_search.js",
@@ -2974,16 +2924,6 @@
       "method": "GET",
       "disposition": "legacy_registered",
       "occurrence_id": "web/knowledge_hub/knowledge_hub.js:361:37:GET:/api/knowledge_hub/folders"
-    },
-    {
-      "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 499,
-      "column": 42,
-      "raw_route": "/api/self_ann/list?module=knowledge_hub",
-      "normalized_route": "/api/self_ann/list",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:499:42:GET:/api/self_ann/list"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",

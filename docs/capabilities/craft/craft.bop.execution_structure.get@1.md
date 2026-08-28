@@ -8,7 +8,7 @@ Read the deterministic official execution structure of a published BOP.
 - 不适用：The BOP is a draft or the caller is editing it.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_331a207029a6b2186322dcabb43f675c`
+- Catalog Release：`rel_7ff1698de921ab4fe38979bd5e9ec734`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -87,7 +87,7 @@ Read the deterministic official execution structure of a published BOP.
 ```json
 {
   "capability_id": "craft.bop.execution_structure.get",
-  "catalog_release": "rel_331a207029a6b2186322dcabb43f675c",
+  "catalog_release": "rel_7ff1698de921ab4fe38979bd5e9ec734",
   "major_version": 1,
   "payload": {
     "version_gid": "example"

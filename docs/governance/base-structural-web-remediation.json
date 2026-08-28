@@ -1,14 +1,14 @@
 {
   "artifact_id": "task-3b3e-base-structural-remediation",
-  "atomic_contract_manifest_sha256": "sha256:a7c180cd15819108eadbc636cb93359bc994b55ce8b640ac66f611f7cc77b4a5",
-  "content_sha256": "sha256:5b95b8a41abb6bc9b2155e2f5aa18bfb04c6fdc2a9b457762563d4bcb28077e3",
+  "atomic_contract_manifest_sha256": "sha256:689fd93f1f11ea989803c9a17e32f926689f299ef112bd51b89f96d8cce3b76e",
+  "content_sha256": "sha256:0c1ee3109c518b05e658d5b6b63df5055afad82e083e9768d69415476835861f",
   "counts": {
     "groups": 16,
-    "migrated_groups": 10,
-    "migrated_occurrences": 25,
+    "migrated_groups": 14,
+    "migrated_occurrences": 31,
     "occurrences": 33,
-    "unresolved_groups": 6,
-    "unresolved_occurrences": 8
+    "unresolved_groups": 2,
+    "unresolved_occurrences": 2
   },
   "entries": [
     {
@@ -65,12 +65,12 @@
       "candidate_capability": "base.saved_view.delete@1",
       "confirmation_policy": "user",
       "contract_evidence": {
-        "end_line": 227,
+        "end_line": 262,
         "needle": "\"base.saved_view.delete\": _saved_view_delete",
         "sha256": "56229834691651b93ee38d67bb2fa715d321afba6c0af79b064497283f1a380b",
         "source_path": "backend/base/web_atomic.py",
-        "source_sha256": "e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
-        "start_line": 227
+        "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+        "start_line": 262
       },
       "final_disposition": "migrated",
       "final_inventory_mapping": "capability",
@@ -420,7 +420,7 @@
         "source_sha256": "sha256:0eb5da7a3e4ea2a8273cd90390110257b43630b4091e06e63429b650c5c1dc35"
       },
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "unresolved_reason": null
     },
     {
@@ -549,7 +549,7 @@
       },
       "owner_service_evidence": null,
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "unresolved_reason": null
     },
     {
@@ -704,23 +704,65 @@
       },
       "owner_service_evidence": null,
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "unresolved_reason": null
     },
     {
       "atomicity_class": "read",
-      "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
-      "candidate_capability": null,
-      "confirmation_policy": null,
-      "contract_evidence": null,
-      "final_disposition": "unresolved",
-      "final_inventory_mapping": "unresolved",
-      "frontend_call_sites": [],
-      "frontend_operation": null,
-      "idempotency_policy": null,
+      "authorization_and_scope": "base.v2:authenticated",
+      "candidate_capability": "base.self_annotation.search@1",
+      "confirmation_policy": "none",
+      "contract_evidence": {
+        "end_line": 253,
+        "needle": "\"base.self_annotation.search\": _annotation_search",
+        "sha256": "ba8c659ed3eed4912fc0cdeaab4c3f0466d25eb1a92fb775b6c28571cdb5c0f7",
+        "source_path": "backend/base/web_atomic.py",
+        "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+        "start_line": 253
+      },
+      "final_disposition": "migrated",
+      "final_inventory_mapping": "capability",
+      "frontend_call_sites": [
+        {
+          "column": 31,
+          "line": 293,
+          "operation": "base.annotations.search",
+          "source_path": "web/components/self_annotation_panel.js",
+          "source_sha256": "8b49958cf9b62cf44e8ac76f442a715ca2942e3973c53116eee60e44f75c26e1"
+        },
+        {
+          "column": 31,
+          "line": 294,
+          "operation": "base.annotations.search",
+          "source_path": "web/components/self_annotation_panel.js",
+          "source_sha256": "8b49958cf9b62cf44e8ac76f442a715ca2942e3973c53116eee60e44f75c26e1"
+        },
+        {
+          "column": 41,
+          "line": 499,
+          "operation": "base.annotations.search",
+          "source_path": "web/knowledge_hub/knowledge_hub.js",
+          "source_sha256": "c8454bfbb72276b6373ca72cc176dc2b83b5a88a5ade493596379f77d2f2e0de"
+        }
+      ],
+      "frontend_operation": "base.annotations.search",
+      "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "limit": {
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "maxLength": 512,
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
         "type": "object"
       },
       "method": "GET",
@@ -776,28 +818,173 @@
       },
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "attachments": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "attachment_gid": {
+                        "maxLength": 512,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "checksum": {
+                        "maxLength": 71,
+                        "minLength": 71,
+                        "pattern": "^sha256:[0-9a-f]{64}$",
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "maxLength": 512,
+                        "type": "string"
+                      },
+                      "media_type": {
+                        "maxLength": 128,
+                        "type": "string"
+                      },
+                      "size": {
+                        "maximum": 52428800,
+                        "minimum": 0,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "attachment_gid",
+                      "media_type",
+                      "display_name",
+                      "size",
+                      "checksum"
+                    ],
+                    "type": "object"
+                  },
+                  "maxItems": 100,
+                  "type": "array"
+                },
+                "deleted": {
+                  "type": "boolean"
+                },
+                "item_gid": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "note": {
+                  "maxLength": 2000,
+                  "type": "string"
+                },
+                "restore": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "available": {
+                      "type": "boolean"
+                    },
+                    "deleted_at": {
+                      "maxLength": 64,
+                      "type": "string"
+                    },
+                    "deleted_by": {
+                      "maxLength": 512,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "available",
+                    "deleted_by",
+                    "deleted_at"
+                  ],
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "revision": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "schedule": {
+                  "maxLength": 512,
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "status": {
+                  "maxLength": 64,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "item_gid",
+                "status",
+                "schedule",
+                "note",
+                "attachments",
+                "revision",
+                "deleted",
+                "restore"
+              ],
+              "type": "object"
+            },
+            "maxItems": 200,
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
         "type": "object"
       },
-      "owner_service_evidence": null,
-      "provider_anchor": "backend/routers/self_annotations.py",
-      "provider_source_sha256": "sha256:7624608452bd2173dacfaac9c77f703da331fc510512cc028857fb7319ca8c52",
-      "unresolved_reason": "The response contains attachment records without a governed nested attachment contract."
+      "owner_service_evidence": {
+        "source_path": "backend/base/self_annotations.py",
+        "source_sha256": "sha256:56483c161e9f4e84981b3ff5761be74dc6ba4d85b437e9c199906f245823104a"
+      },
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "unresolved_reason": null
     },
     {
       "atomicity_class": "read",
-      "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
-      "candidate_capability": null,
-      "confirmation_policy": null,
-      "contract_evidence": null,
-      "final_disposition": "unresolved",
-      "final_inventory_mapping": "unresolved",
-      "frontend_call_sites": [],
-      "frontend_operation": null,
-      "idempotency_policy": null,
+      "authorization_and_scope": "base.v2:authenticated",
+      "candidate_capability": "base.self_annotation.record.get@1",
+      "confirmation_policy": "none",
+      "contract_evidence": {
+        "end_line": 252,
+        "needle": "\"base.self_annotation.record.get\": _annotation_get",
+        "sha256": "0edcb0661f98ef845497594383b300542dd04c2746eb0498cc25acc8537588df",
+        "source_path": "backend/base/web_atomic.py",
+        "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+        "start_line": 252
+      },
+      "final_disposition": "migrated",
+      "final_inventory_mapping": "capability",
+      "frontend_call_sites": [
+        {
+          "column": 40,
+          "line": 157,
+          "operation": "base.annotations.get",
+          "source_path": "web/components/self_annotation_panel.js",
+          "source_sha256": "8b49958cf9b62cf44e8ac76f442a715ca2942e3973c53116eee60e44f75c26e1"
+        }
+      ],
+      "frontend_operation": "base.annotations.get",
+      "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "item_gid": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_gid"
+        ],
         "type": "object"
       },
       "method": "GET",
@@ -831,13 +1018,130 @@
       },
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "annotation": {
+            "additionalProperties": false,
+            "properties": {
+              "attachments": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "attachment_gid": {
+                      "maxLength": 512,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "checksum": {
+                      "maxLength": 71,
+                      "minLength": 71,
+                      "pattern": "^sha256:[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "display_name": {
+                      "maxLength": 512,
+                      "type": "string"
+                    },
+                    "media_type": {
+                      "maxLength": 128,
+                      "type": "string"
+                    },
+                    "size": {
+                      "maximum": 52428800,
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "attachment_gid",
+                    "media_type",
+                    "display_name",
+                    "size",
+                    "checksum"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 100,
+                "type": "array"
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "item_gid": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "note": {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              "restore": {
+                "additionalProperties": false,
+                "properties": {
+                  "available": {
+                    "type": "boolean"
+                  },
+                  "deleted_at": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "deleted_by": {
+                    "maxLength": 512,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "available",
+                  "deleted_by",
+                  "deleted_at"
+                ],
+                "type": [
+                  "object",
+                  "null"
+                ]
+              },
+              "revision": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "schedule": {
+                "maxLength": 512,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "maxLength": 64,
+                "type": "string"
+              }
+            },
+            "required": [
+              "item_gid",
+              "status",
+              "schedule",
+              "note",
+              "attachments",
+              "revision",
+              "deleted",
+              "restore"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "annotation"
+        ],
         "type": "object"
       },
-      "owner_service_evidence": null,
-      "provider_anchor": "backend/routers/self_annotations.py",
-      "provider_source_sha256": "sha256:7624608452bd2173dacfaac9c77f703da331fc510512cc028857fb7319ca8c52",
-      "unresolved_reason": "The response contains attachment records without a governed nested attachment contract."
+      "owner_service_evidence": {
+        "source_path": "backend/base/self_annotations.py",
+        "source_sha256": "sha256:56483c161e9f4e84981b3ff5761be74dc6ba4d85b437e9c199906f245823104a"
+      },
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "unresolved_reason": null
     },
     {
       "atomicity_class": "read",
@@ -932,7 +1236,7 @@
       },
       "owner_service_evidence": null,
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "unresolved_reason": null
     },
     {
@@ -1118,20 +1422,35 @@
       },
       "owner_service_evidence": null,
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "unresolved_reason": null
     },
     {
       "atomicity_class": "read",
-      "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
-      "candidate_capability": null,
-      "confirmation_policy": null,
-      "contract_evidence": null,
-      "final_disposition": "unresolved",
-      "final_inventory_mapping": "unresolved",
-      "frontend_call_sites": [],
-      "frontend_operation": null,
-      "idempotency_policy": null,
+      "authorization_and_scope": "base.v2:authenticated",
+      "candidate_capability": "base.identity.session.profile.get@1",
+      "confirmation_policy": "none",
+      "contract_evidence": {
+        "end_line": 255,
+        "needle": "\"base.identity.session.profile.get\": _identity_profile",
+        "sha256": "d9e31fd15b3fc655e44c4700447418464354287cd1311a4e883ab8f44bad72d0",
+        "source_path": "backend/base/web_atomic.py",
+        "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+        "start_line": 255
+      },
+      "final_disposition": "migrated",
+      "final_inventory_mapping": "capability",
+      "frontend_call_sites": [
+        {
+          "column": 40,
+          "line": 512,
+          "operation": "base.identity.session.profile.get",
+          "source_path": "packages/craft-plugin/web/lineage_view/lineage.js",
+          "source_sha256": "8307da58c257c93d0c31b2ee2d124cd6b12fd532d30d018dae4301db0d65dcd2"
+        }
+      ],
+      "frontend_operation": "base.identity.session.profile.get",
+      "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
         "properties": {},
@@ -1168,13 +1487,74 @@
       },
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "profile": {
+            "additionalProperties": false,
+            "properties": {
+              "actor_gid": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "display_name": {
+                "maxLength": 512,
+                "type": "string"
+              },
+              "locale": {
+                "maxLength": 64,
+                "type": "string"
+              },
+              "permission_ids": {
+                "items": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 1000,
+                "type": "array"
+              },
+              "team_gids": {
+                "items": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 200,
+                "type": "array"
+              },
+              "tenant_gid": {
+                "maxLength": 128,
+                "type": "string"
+              },
+              "timezone": {
+                "maxLength": 128,
+                "type": "string"
+              }
+            },
+            "required": [
+              "actor_gid",
+              "display_name",
+              "tenant_gid",
+              "team_gids",
+              "locale",
+              "timezone",
+              "permission_ids"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "profile"
+        ],
         "type": "object"
       },
-      "owner_service_evidence": null,
-      "provider_anchor": "backend/routers/users.py",
-      "provider_source_sha256": "sha256:d632055fafa2aee6dea74b6c160c8889295a525373e6ee2604e52527d5df2b8f",
-      "unresolved_reason": "The profile contains dynamic grants and permissions without a closed exact output contract."
+      "owner_service_evidence": {
+        "source_path": "backend/base/identity_profile.py",
+        "source_sha256": "sha256:bfcbf889e895d830076c67edd18d7b3688d5b1666ebb3e65daba188f778e50e7"
+      },
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "unresolved_reason": null
     },
     {
       "atomicity_class": "read",
@@ -1182,12 +1562,12 @@
       "candidate_capability": "base.saved_view.search@1",
       "confirmation_policy": "none",
       "contract_evidence": {
-        "end_line": 223,
+        "end_line": 258,
         "needle": "\"base.saved_view.search\": _saved_view_search",
         "sha256": "21e5f4f93bdc09b1ba703dc17a13307584bfc738466d3a1b71e4a491ef61c806",
         "source_path": "backend/base/web_atomic.py",
-        "source_sha256": "e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
-        "start_line": 223
+        "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+        "start_line": 258
       },
       "final_disposition": "migrated",
       "final_inventory_mapping": "capability",
@@ -1551,7 +1931,7 @@
         "source_sha256": "sha256:0eb5da7a3e4ea2a8273cd90390110257b43630b4091e06e63429b650c5c1dc35"
       },
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "unresolved_reason": null
     },
     {
@@ -1719,7 +2099,7 @@
       },
       "owner_service_evidence": null,
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "unresolved_reason": null
     },
     {
@@ -1728,12 +2108,12 @@
       "candidate_capability": "base.saved_view.update@1",
       "confirmation_policy": "user",
       "contract_evidence": {
-        "end_line": 225,
+        "end_line": 260,
         "needle": "\"base.saved_view.update\": _saved_view_update",
         "sha256": "799823cab800457fc52e02ea377c4efecaf3f4fb565b0f2a67b8e1ec6425e8e4",
         "source_path": "backend/base/web_atomic.py",
-        "source_sha256": "e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
-        "start_line": 225
+        "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+        "start_line": 260
       },
       "final_disposition": "migrated",
       "final_inventory_mapping": "capability",
@@ -2299,7 +2679,7 @@
         "source_sha256": "sha256:0eb5da7a3e4ea2a8273cd90390110257b43630b4091e06e63429b650c5c1dc35"
       },
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "unresolved_reason": null
     },
     {
@@ -2356,12 +2736,12 @@
       "candidate_capability": "base.saved_view.create@1",
       "confirmation_policy": "user",
       "contract_evidence": {
-        "end_line": 224,
+        "end_line": 259,
         "needle": "\"base.saved_view.create\": _saved_view_create",
         "sha256": "9d9ed3d4a5619754b9c0df361a0b2b4c01d1052d00d57414e9a50f40e172840c",
         "source_path": "backend/base/web_atomic.py",
-        "source_sha256": "e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
-        "start_line": 224
+        "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+        "start_line": 259
       },
       "final_disposition": "migrated",
       "final_inventory_mapping": "capability",
@@ -2917,7 +3297,7 @@
         "source_sha256": "sha256:0eb5da7a3e4ea2a8273cd90390110257b43630b4091e06e63429b650c5c1dc35"
       },
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "unresolved_reason": null
     },
     {
@@ -2926,12 +3306,12 @@
       "candidate_capability": "base.saved_view.copy@1",
       "confirmation_policy": "user",
       "contract_evidence": {
-        "end_line": 226,
+        "end_line": 261,
         "needle": "\"base.saved_view.copy\": _saved_view_copy",
         "sha256": "c68df23c39cb7979116bd209087170259a02fc5ec888ee1020a0dfd92f6c6848",
         "source_path": "backend/base/web_atomic.py",
-        "source_sha256": "e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
-        "start_line": 226
+        "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+        "start_line": 261
       },
       "final_disposition": "migrated",
       "final_inventory_mapping": "capability",
@@ -3282,23 +3662,119 @@
         "source_sha256": "sha256:0eb5da7a3e4ea2a8273cd90390110257b43630b4091e06e63429b650c5c1dc35"
       },
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
       "unresolved_reason": null
     },
     {
-      "atomicity_class": "read",
-      "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
-      "candidate_capability": null,
-      "confirmation_policy": null,
-      "contract_evidence": null,
-      "final_disposition": "unresolved",
-      "final_inventory_mapping": "unresolved",
-      "frontend_call_sites": [],
-      "frontend_operation": null,
-      "idempotency_policy": null,
+      "atomicity_class": "single_transaction",
+      "authorization_and_scope": "base.v2:authenticated",
+      "candidate_capability": "base.self_annotation.change.apply@1",
+      "confirmation_policy": "user",
+      "contract_evidence": {
+        "end_line": 254,
+        "needle": "\"base.self_annotation.change.apply\": _annotation_change",
+        "sha256": "c3860599d5ff529f59467bb49216cb62b04152c559aa2d9587ebff1871e8965e",
+        "source_path": "backend/base/web_atomic.py",
+        "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+        "start_line": 254
+      },
+      "final_disposition": "migrated",
+      "final_inventory_mapping": "capability",
+      "frontend_call_sites": [
+        {
+          "column": 39,
+          "line": 177,
+          "operation": "base.annotations.apply",
+          "source_path": "web/components/self_annotation_panel.js",
+          "source_sha256": "8b49958cf9b62cf44e8ac76f442a715ca2942e3973c53116eee60e44f75c26e1"
+        }
+      ],
+      "frontend_operation": "base.annotations.apply",
+      "idempotency_policy": "required",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "attachments": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "attachment_gid": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "checksum": {
+                  "maxLength": 71,
+                  "minLength": 71,
+                  "pattern": "^sha256:[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "display_name": {
+                  "maxLength": 512,
+                  "type": "string"
+                },
+                "media_type": {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                "size": {
+                  "maximum": 52428800,
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "attachment_gid",
+                "media_type",
+                "display_name",
+                "size",
+                "checksum"
+              ],
+              "type": "object"
+            },
+            "maxItems": 100,
+            "type": "array"
+          },
+          "expected_revision": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "idempotency_key": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "item_gid": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "note": {
+            "maxLength": 2000,
+            "type": "string"
+          },
+          "schedule": {
+            "maxLength": 512,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "maxLength": 64,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_gid",
+          "expected_revision",
+          "status",
+          "schedule",
+          "note",
+          "attachments",
+          "idempotency_key"
+        ],
         "type": "object"
       },
       "method": "PUT",
@@ -3332,16 +3808,133 @@
       },
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "annotation": {
+            "additionalProperties": false,
+            "properties": {
+              "attachments": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "attachment_gid": {
+                      "maxLength": 512,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "checksum": {
+                      "maxLength": 71,
+                      "minLength": 71,
+                      "pattern": "^sha256:[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "display_name": {
+                      "maxLength": 512,
+                      "type": "string"
+                    },
+                    "media_type": {
+                      "maxLength": 128,
+                      "type": "string"
+                    },
+                    "size": {
+                      "maximum": 52428800,
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "attachment_gid",
+                    "media_type",
+                    "display_name",
+                    "size",
+                    "checksum"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 100,
+                "type": "array"
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "item_gid": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "note": {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              "restore": {
+                "additionalProperties": false,
+                "properties": {
+                  "available": {
+                    "type": "boolean"
+                  },
+                  "deleted_at": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "deleted_by": {
+                    "maxLength": 512,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "available",
+                  "deleted_by",
+                  "deleted_at"
+                ],
+                "type": [
+                  "object",
+                  "null"
+                ]
+              },
+              "revision": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "schedule": {
+                "maxLength": 512,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "maxLength": 64,
+                "type": "string"
+              }
+            },
+            "required": [
+              "item_gid",
+              "status",
+              "schedule",
+              "note",
+              "attachments",
+              "revision",
+              "deleted",
+              "restore"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "annotation"
+        ],
         "type": "object"
       },
-      "owner_service_evidence": null,
-      "provider_anchor": "backend/routers/self_annotations.py",
-      "provider_source_sha256": "sha256:7624608452bd2173dacfaac9c77f703da331fc510512cc028857fb7319ca8c52",
-      "unresolved_reason": "The request contains attachment records without a governed nested attachment contract."
+      "owner_service_evidence": {
+        "source_path": "backend/base/self_annotations.py",
+        "source_sha256": "sha256:56483c161e9f4e84981b3ff5761be74dc6ba4d85b437e9c199906f245823104a"
+      },
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "unresolved_reason": null
     }
   ],
-  "frontend_content_hash": "e2e32aff4cd40d6457e9a4c257097c8985ce519251d497ad4d086d9901be9d4b",
+  "frontend_content_hash": "0ee27f554329872a1d223d8cef8a1a23b880170eff366192388e23ef8786aae2",
   "frontend_revision": "2b283c64fbe69b15779f9fec08d384174ab0c3a5",
   "schema_version": "1.0.0",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",

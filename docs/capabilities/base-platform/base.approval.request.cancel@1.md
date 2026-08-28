@@ -8,7 +8,7 @@ Execute base.approval.request.cancel in the Base Approval service.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_331a207029a6b2186322dcabb43f675c`
+- Catalog Release：`rel_7ff1698de921ab4fe38979bd5e9ec734`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -90,7 +90,7 @@ Execute base.approval.request.cancel in the Base Approval service.
 ```json
 {
   "capability_id": "base.approval.request.cancel",
-  "catalog_release": "rel_331a207029a6b2186322dcabb43f675c",
+  "catalog_release": "rel_7ff1698de921ab4fe38979bd5e9ec734",
   "major_version": 1,
   "payload": {
     "approval_id": "example",

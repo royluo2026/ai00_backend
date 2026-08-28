@@ -88,6 +88,27 @@ ANNOTATION_SUMMARY = obj(
      "attach_count": {"type": "integer", "minimum": 0, "maximum": 100}},
     ("item_gid", "status", "schedule", "has_note", "attach_count"),
 )
+ANNOTATION_ATTACHMENT = obj(
+    {"attachment_gid": STRING, "media_type": {"type": "string", "maxLength": 128},
+     "display_name": {"type": "string", "maxLength": 512},
+     "size": {"type": "integer", "minimum": 0, "maximum": 52428800},
+     "checksum": {"type": "string", "minLength": 71, "maxLength": 71, "pattern": "^sha256:[0-9a-f]{64}$"}},
+    ("attachment_gid", "media_type", "display_name", "size", "checksum"),
+)
+ANNOTATION_RESTORE = obj({"available": BOOL, "deleted_by": STRING, "deleted_at": {"type": "string", "maxLength": 64}}, ("available", "deleted_by", "deleted_at"))
+SELF_ANNOTATION = obj(
+    {"item_gid": STRING, "status": {"type": "string", "maxLength": 64}, "schedule": OPT_STRING,
+     "note": TEXT, "attachments": {"type": "array", "maxItems": 100, "items": ANNOTATION_ATTACHMENT},
+     "revision": {"type": "integer", "minimum": 1}, "deleted": BOOL,
+     "restore": {"type": ["object", "null"], "properties": ANNOTATION_RESTORE["properties"], "required": ANNOTATION_RESTORE["required"], "additionalProperties": False}},
+    ("item_gid", "status", "schedule", "note", "attachments", "revision", "deleted", "restore"),
+)
+IDENTITY_PROFILE = obj(
+    {"actor_gid": STRING, "display_name": {"type": "string", "maxLength": 512}, "tenant_gid": {"type": "string", "maxLength": 128},
+     "team_gids": {"type": "array", "maxItems": 200, "items": STRING}, "locale": {"type": "string", "maxLength": 64},
+     "timezone": {"type": "string", "maxLength": 128}, "permission_ids": {"type": "array", "maxItems": 1000, "items": STRING}},
+    ("actor_gid", "display_name", "tenant_gid", "team_gids", "locale", "timezone", "permission_ids"),
+)
 ADMIN_USER = obj(
     {"gid": STRING, "name": {"type": "string", "maxLength": 512},
      "email": {"type": "string", "maxLength": 512}, "avatar_url": {"type": "string", "maxLength": 2048},
@@ -162,6 +183,26 @@ ROUTE_CAPABILITIES: dict[tuple[str, str], dict[str, Any]] = {
         "schema": obj({"item_gids": {"type": "array", "minItems": 1, "maxItems": 500, "items": STRING}}, ("item_gids",)),
         "output_schema": obj({"items": {"type": "array", "maxItems": 500, "items": ANNOTATION_SUMMARY}}, ("items",)),
     },
+    ("GET", "/api/self_ann/{dynamic}"): {
+        "id": "base.self_annotation.record.get",
+        "schema": obj({"item_gid": STRING}, ("item_gid",)),
+        "output_schema": obj({"annotation": SELF_ANNOTATION}, ("annotation",)),
+    },
+    ("GET", "/api/self_ann/list"): {
+        "id": "base.self_annotation.search",
+        "schema": obj({"limit": {"type": "integer", "minimum": 1, "maximum": 200}, "status": OPT_STRING}),
+        "output_schema": obj({"items": {"type": "array", "maxItems": 200, "items": SELF_ANNOTATION}}, ("items",)),
+    },
+    ("PUT", "/api/self_ann/{dynamic}"): {
+        "id": "base.self_annotation.change.apply",
+        "schema": obj({"item_gid": STRING, "expected_revision": {"type": "integer", "minimum": 1}, "status": {"type": "string", "minLength": 1, "maxLength": 64}, "schedule": OPT_STRING, "note": TEXT, "attachments": {"type": "array", "maxItems": 100, "items": ANNOTATION_ATTACHMENT}, "idempotency_key": STRING}, ("item_gid", "expected_revision", "status", "schedule", "note", "attachments", "idempotency_key")),
+        "output_schema": obj({"annotation": SELF_ANNOTATION}, ("annotation",)),
+    },
+    ("GET", "/api/users/me"): {
+        "id": "base.identity.session.profile.get",
+        "schema": obj({}),
+        "output_schema": obj({"profile": IDENTITY_PROFILE}, ("profile",)),
+    },
     ("GET", "/api/users"): {
         "id": "base.identity.admin_user.list",
         "schema": obj({}),
@@ -223,6 +264,10 @@ EXAMPLES: dict[str, dict[str, Any]] = {
     "base.organization.team.directory.list": {},
     "base.team.directory.list": {},
     "base.self_annotation.batch.get": {"item_gids": ["item_1"]},
+    "base.self_annotation.record.get": {"item_gid": "item_1"},
+    "base.self_annotation.search": {"limit": 200, "status": None},
+    "base.self_annotation.change.apply": {"item_gid": "item_1", "expected_revision": 1, "status": "open", "schedule": "2026-08-28", "note": "note", "attachments": [{"attachment_gid": "att_1", "media_type": "image/png", "display_name": "photo.png", "size": 42, "checksum": "sha256:" + "a" * 64}], "idempotency_key": "idem-ann-1"},
+    "base.identity.session.profile.get": {},
     "base.identity.admin_user.list": {},
     "base.identity.role.assign.atomic": {"user_gid": "user_1", "new_role": "member", "external_subtype": None},
     "base.authorization.grant.list": {"user_gid": None},
@@ -244,6 +289,10 @@ EXAMPLE_OUTPUTS: dict[str, dict[str, Any]] = {
     "base.organization.team.directory.list": {"teams": []},
     "base.team.directory.list": {"success": True, "data": []},
     "base.self_annotation.batch.get": {"items": []},
+    "base.self_annotation.record.get": {"annotation": {"item_gid": "item_1", "status": "", "schedule": None, "note": "", "attachments": [], "revision": 1, "deleted": False, "restore": None}},
+    "base.self_annotation.search": {"items": []},
+    "base.self_annotation.change.apply": {"annotation": {"item_gid": "item_1", "status": "open", "schedule": "2026-08-28", "note": "note", "attachments": [{"attachment_gid": "att_1", "media_type": "image/png", "display_name": "photo.png", "size": 42, "checksum": "sha256:" + "a" * 64}], "revision": 2, "deleted": False, "restore": None}},
+    "base.identity.session.profile.get": {"profile": {"actor_gid": "user_1", "display_name": "", "tenant_gid": "", "team_gids": [], "locale": "", "timezone": "", "permission_ids": []}},
     "base.identity.admin_user.list": {"success": True, "data": []},
     "base.identity.role.assign.atomic": {"success": True, "data": {"gid": "user_1", "name": "", "email": "", "avatar_url": "", "system_role": "member", "org_role": "member", "external_subtype": None, "team_id": None, "is_active": True, "created_at": ""}},
     "base.authorization.grant.list": {"grants": []},
@@ -259,10 +308,6 @@ EXAMPLE_OUTPUTS: dict[str, dict[str, Any]] = {
 UNSAFE_REASONS = {
     ("POST", "/api/plugin/install"): "The arbitrary-URL installer route has no production handler and is not equivalent to signed marketplace installation.",
     ("DELETE", "/api/plugin/uninstall/{dynamic}"): "The unrestricted legacy uninstall route has no production handler and cannot bypass marketplace lifecycle controls.",
-    ("GET", "/api/self_ann/{dynamic}"): "The response contains attachment records without a governed nested attachment contract.",
-    ("PUT", "/api/self_ann/{dynamic}"): "The request contains attachment records without a governed nested attachment contract.",
-    ("GET", "/api/self_ann/list"): "The response contains attachment records without a governed nested attachment contract.",
-    ("GET", "/api/users/me"): "The profile contains dynamic grants and permissions without a closed exact output contract.",
     ("PUT", "/api/rules/{dynamic}"): "Rule definition changes contain dynamic rule_definition data without a governed closed nested contract.",
     ("DELETE", "/api/craft_lib/equipments/{dynamic}"): "No delete provider exists; the available obsolete transition is a different lifecycle outcome.",
     ("DELETE", "/api/craft_lib/fixtures/{dynamic}"): "No delete provider exists; the available obsolete transition is a different lifecycle outcome.",

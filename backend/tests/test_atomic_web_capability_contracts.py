@@ -25,8 +25,17 @@ SAFE_CAPABILITIES = {
     "base.organization.team.directory.list",
     "base.team.directory.list",
     "base.self_annotation.batch.get",
+    "base.self_annotation.record.get",
+    "base.self_annotation.search",
+    "base.self_annotation.change.apply",
+    "base.identity.session.profile.get",
     "base.identity.admin_user.list",
     "base.identity.role.assign.atomic",
+    "base.saved_view.search",
+    "base.saved_view.create",
+    "base.saved_view.update",
+    "base.saved_view.copy",
+    "base.saved_view.delete",
 }
 
 

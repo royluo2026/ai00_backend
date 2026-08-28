@@ -59,9 +59,9 @@
   },
   "final_evidence": {
     "frontend_revision": "2b283c64fbe69b15779f9fec08d384174ab0c3a5",
-    "content_hash": "e2e32aff4cd40d6457e9a4c257097c8985ce519251d497ad4d086d9901be9d4b",
-    "unresolved_count": 37,
-    "unresolved_group_count": 32
+    "content_hash": "0ee27f554329872a1d223d8cef8a1a23b880170eff366192388e23ef8786aae2",
+    "unresolved_count": 31,
+    "unresolved_group_count": 28
   },
   "final_unresolved_groups": [
     {
@@ -134,24 +134,6 @@
       "method": "GET",
       "normalized_route": "/api/rule-engine/check-entry",
       "occurrence_count": 2,
-      "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "GET",
-      "normalized_route": "/api/self_ann/list",
-      "occurrence_count": 3,
-      "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "GET",
-      "normalized_route": "/api/self_ann/{dynamic}",
-      "occurrence_count": 1,
-      "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "GET",
-      "normalized_route": "/api/users/me",
-      "occurrence_count": 1,
       "disposition": "existing_capability_reclassified"
     },
     {
@@ -248,12 +230,6 @@
       "method": "PUT",
       "normalized_route": "/api/rules/{dynamic}",
       "occurrence_count": 2,
-      "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "PUT",
-      "normalized_route": "/api/self_ann/{dynamic}",
-      "occurrence_count": 1,
       "disposition": "existing_capability_reclassified"
     }
   ],
@@ -439,11 +415,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 209,
-            "end_line": 209,
+            "start_line": 240,
+            "end_line": 240,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -678,11 +654,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 209,
-            "end_line": 209,
+            "start_line": 240,
+            "end_line": 240,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -1972,11 +1948,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 209,
-            "end_line": 209,
+            "start_line": 240,
+            "end_line": 240,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -2464,11 +2440,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 209,
-            "end_line": 209,
+            "start_line": 240,
+            "end_line": 240,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -2540,11 +2516,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 209,
-            "end_line": 209,
+            "start_line": 240,
+            "end_line": 240,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -2594,11 +2570,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 209,
-            "end_line": 209,
+            "start_line": 240,
+            "end_line": 240,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -2742,9 +2718,9 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/self_annotations.py",
-          "start_line": 47,
-          "end_line": 51,
-          "sha256": "9177bc8541b4a55756e9eba1e18e291677a960a5f7be56dac8c4ebb52de98388",
+          "start_line": 32,
+          "end_line": 36,
+          "sha256": "010c8e246a199700c6a22510d790476d95f1ad5494d9cde92b20d4d0de215152",
           "method": "GET",
           "normalized_route": "/api/self_ann/batch"
         },
@@ -2762,11 +2738,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 209,
-            "end_line": 209,
+            "start_line": 240,
+            "end_line": 240,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -2818,46 +2794,32 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/self_annotations.py",
-          "start_line": 54,
-          "end_line": 64,
-          "sha256": "0e4d958c84b56f440a5e6f398f6ee5d4a5707dbd457ef06cc3ed967795e304cc",
+          "start_line": 39,
+          "end_line": 44,
+          "sha256": "8fc06e18ac8a835032fdf10a7d36e5075d3d149f5f5a43285e36373a02cea389",
           "method": "GET",
           "normalized_route": "/api/self_ann/list"
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
-      "disposition": "existing_capability_reclassified",
+      "lifecycle_conclusion": "The frontend invokes the exact stable atomic owner-domain outcome through the shared Gateway client.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
-        "candidate_target_capability": "base.annotation.read@1",
-        "reason_code": "provider_equivalence_missing",
-        "followup": "provider_adapter_review",
-        "finding": "/api/self_ann/list: REST lists annotations with legacy filters; candidate has generic reviewed payload. | /api/self_ann/list: REST returns annotation collection; candidate projection is unproved. | /api/self_ann/list: Candidate BaseOutcomePort is unbound.",
-        "legacy_contract": {
-          "kind": "registered_route_definition",
-          "source_path": "backend/routers/self_annotations.py",
-          "start_line": 69,
-          "end_line": 79,
-          "sha256": "0e4d958c84b56f440a5e6f398f6ee5d4a5707dbd457ef06cc3ed967795e304cc",
-          "method": "GET",
-          "normalized_route": "/api/self_ann/list",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "source_sha256": "787edd04d1aaba5b622340b498baf4322cf5fc88dcdcaade394b962dcae93ed6"
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
-            "start_line": 17,
-            "end_line": 17,
-            "sha256": "3d3cecb0574f6e96638c8874790dcbcb5b82e05e923654ccd3e3f97bf01925d7",
-            "needle": "base.annotation.read"
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/self_ann/list: REST lists annotations with legacy filters; candidate has generic reviewed payload.",
-          "output": "/api/self_ann/list: REST returns annotation collection; candidate projection is unproved.",
-          "side_effects": "/api/self_ann/list: Candidate BaseOutcomePort is unbound."
+        "target_capability": "base.self_annotation.search@1",
+        "provider_equivalence": "proven",
+        "request_transform": "Exact closed payload defined by Task 3B.3c atomic contract manifest.",
+        "response_transform": "Bounded result_json is decoded to the original legacy response value.",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "provider_contract": {
+            "repository": "backend",
+            "source_path": "backend/base/web_atomic.py",
+            "start_line": 240,
+            "end_line": 240,
+            "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
+          },
+          "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+          "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
     },
@@ -2886,46 +2848,32 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/self_annotations.py",
-          "start_line": 67,
-          "end_line": 73,
-          "sha256": "8a4e814824a54cd479284be861c6f2d8fc5ca10bfeeefb871e141066a9cd12b0",
+          "start_line": 47,
+          "end_line": 52,
+          "sha256": "4294de46c881cfb62c6eef7f07c3cbcc09bddff853d9dbe18b7cbdb1709168c2",
           "method": "GET",
           "normalized_route": "/api/self_ann/{dynamic}"
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
-      "disposition": "existing_capability_reclassified",
+      "lifecycle_conclusion": "The frontend invokes the exact stable atomic owner-domain outcome through the shared Gateway client.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
-        "candidate_target_capability": "base.annotation.read@1",
-        "reason_code": "provider_equivalence_missing",
-        "followup": "provider_adapter_review",
-        "finding": "/api/self_ann/{dynamic}: REST reads annotation by legacy resource gid; candidate has generic reviewed payload. | /api/self_ann/{dynamic}: REST returns one annotation record; candidate projection is unproved. | /api/self_ann/{dynamic}: Candidate BaseOutcomePort is unbound.",
-        "legacy_contract": {
-          "kind": "registered_route_definition",
-          "source_path": "backend/routers/self_annotations.py",
-          "start_line": 82,
-          "end_line": 88,
-          "sha256": "8a4e814824a54cd479284be861c6f2d8fc5ca10bfeeefb871e141066a9cd12b0",
-          "method": "GET",
-          "normalized_route": "/api/self_ann/{dynamic}",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "source_sha256": "787edd04d1aaba5b622340b498baf4322cf5fc88dcdcaade394b962dcae93ed6"
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
-            "start_line": 17,
-            "end_line": 17,
-            "sha256": "3d3cecb0574f6e96638c8874790dcbcb5b82e05e923654ccd3e3f97bf01925d7",
-            "needle": "base.annotation.read"
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/self_ann/{dynamic}: REST reads annotation by legacy resource gid; candidate has generic reviewed payload.",
-          "output": "/api/self_ann/{dynamic}: REST returns one annotation record; candidate projection is unproved.",
-          "side_effects": "/api/self_ann/{dynamic}: Candidate BaseOutcomePort is unbound."
+        "target_capability": "base.self_annotation.record.get@1",
+        "provider_equivalence": "proven",
+        "request_transform": "Exact closed payload defined by Task 3B.3c atomic contract manifest.",
+        "response_transform": "Bounded result_json is decoded to the original legacy response value.",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "provider_contract": {
+            "repository": "backend",
+            "source_path": "backend/base/web_atomic.py",
+            "start_line": 240,
+            "end_line": 240,
+            "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
+          },
+          "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+          "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
     },
@@ -3049,11 +2997,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 209,
-            "end_line": 209,
+            "start_line": 240,
+            "end_line": 240,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -3138,8 +3086,8 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/users.py",
-          "start_line": 24,
-          "end_line": 26,
+          "start_line": 25,
+          "end_line": 27,
           "sha256": "531587e7f1b878933fde17d601cc972c2e91d03bfb0113943e9a83ae1a7349a1",
           "method": "GET",
           "normalized_route": "/api/users"
@@ -3158,11 +3106,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 209,
-            "end_line": 209,
+            "start_line": 240,
+            "end_line": 240,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -3192,46 +3140,32 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/users.py",
-          "start_line": 29,
-          "end_line": 31,
-          "sha256": "4023696d0886e4aacff7d1175b4dbb8b060dbcf87cbca7bcb8eaa0b61f1a0d80",
+          "start_line": 30,
+          "end_line": 32,
+          "sha256": "2c0722ad7c91b77377b31275853fc0242d09be1fdd95bdae9d47c039e9c24f47",
           "method": "GET",
           "normalized_route": "/api/users/me"
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
-      "disposition": "existing_capability_reclassified",
+      "lifecycle_conclusion": "The frontend invokes the exact stable atomic owner-domain outcome through the shared Gateway client.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
-        "candidate_target_capability": "base.identity.session.get@1",
-        "reason_code": "provider_equivalence_missing",
-        "followup": "provider_adapter_review",
-        "finding": "/api/users/me: REST derives current-user profile with permissions; candidate has generic reviewed payload. | /api/users/me: REST returns full session/profile projection; candidate result is unproved. | /api/users/me: Candidate BaseOutcomePort is unbound.",
-        "legacy_contract": {
-          "kind": "registered_route_definition",
-          "source_path": "backend/routers/users.py",
-          "start_line": 29,
-          "end_line": 31,
-          "sha256": "4023696d0886e4aacff7d1175b4dbb8b060dbcf87cbca7bcb8eaa0b61f1a0d80",
-          "method": "GET",
-          "normalized_route": "/api/users/me",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "source_sha256": "2b44124fe4937155446ae54c757704d2ff67fe9a55728c6b4fea7101968ea722"
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
-            "start_line": 19,
-            "end_line": 19,
-            "sha256": "3fc3cc46d28a7840563a311cc1c0ae2de3517041cda0cb168b30cbc6a7f2de99",
-            "needle": "base.identity.session.get"
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/users/me: REST derives current-user profile with permissions; candidate has generic reviewed payload.",
-          "output": "/api/users/me: REST returns full session/profile projection; candidate result is unproved.",
-          "side_effects": "/api/users/me: Candidate BaseOutcomePort is unbound."
+        "target_capability": "base.identity.session.profile.get@1",
+        "provider_equivalence": "proven",
+        "request_transform": "Exact closed payload defined by Task 3B.3c atomic contract manifest.",
+        "response_transform": "Bounded result_json is decoded to the original legacy response value.",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "provider_contract": {
+            "repository": "backend",
+            "source_path": "backend/base/web_atomic.py",
+            "start_line": 240,
+            "end_line": 240,
+            "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
+          },
+          "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+          "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
     },
@@ -3282,8 +3216,8 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/users.py",
-          "start_line": 34,
-          "end_line": 46,
+          "start_line": 35,
+          "end_line": 47,
           "sha256": "29ba580aedc61327adfcd1df6f92ea2d8ae73b1bb941941a970269c916d2c7ee",
           "method": "GET",
           "normalized_route": "/api/users/search"
@@ -3302,11 +3236,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 209,
-            "end_line": 209,
+            "start_line": 240,
+            "end_line": 240,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -3367,11 +3301,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 209,
-            "end_line": 209,
+            "start_line": 240,
+            "end_line": 240,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -3897,11 +3831,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 209,
-            "end_line": 209,
+            "start_line": 240,
+            "end_line": 240,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -4001,8 +3935,8 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/users.py",
-          "start_line": 49,
-          "end_line": 61,
+          "start_line": 50,
+          "end_line": 62,
           "sha256": "e0eba14ece9f3ef3f0469634e827ddb52ffac528b8fe04743d3ccc26baf4ad9b",
           "method": "PATCH",
           "normalized_route": "/api/users/{dynamic}/role"
@@ -4021,11 +3955,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 209,
-            "end_line": 209,
+            "start_line": 240,
+            "end_line": 240,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -4086,11 +4020,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 209,
-            "end_line": 209,
+            "start_line": 240,
+            "end_line": 240,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -5011,11 +4945,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 209,
-            "end_line": 209,
+            "start_line": 240,
+            "end_line": 240,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -5173,11 +5107,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 209,
-            "end_line": 209,
+            "start_line": 240,
+            "end_line": 240,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -5713,11 +5647,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 209,
-            "end_line": 209,
+            "start_line": 240,
+            "end_line": 240,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -5767,11 +5701,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "backend/base/web_atomic.py",
-            "start_line": 209,
-            "end_line": 209,
+            "start_line": 240,
+            "end_line": 240,
             "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
           },
-          "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -6129,46 +6063,32 @@
         "finding": "Exact registered route definition is anchored and machine-checked.",
         "route_definition": {
           "source_path": "backend/routers/self_annotations.py",
-          "start_line": 76,
-          "end_line": 91,
-          "sha256": "ae71702549cca7ff913a55626fa81dfab7127d760891b646b37ccd73e9b3ae91",
+          "start_line": 55,
+          "end_line": 60,
+          "sha256": "1d1a6778ecd0e8d31afb694ee8fffcbfce0f6bced0d4964e2ac3b40179f59bd7",
           "method": "PUT",
           "normalized_route": "/api/self_ann/{dynamic}"
         },
         "anchors": []
       },
-      "lifecycle_conclusion": "Independent Provider review found the name-matched stable candidate non-equivalent; the route remains visibly unresolved under its evidence-backed follow-up class.",
-      "disposition": "existing_capability_reclassified",
+      "lifecycle_conclusion": "The frontend invokes the exact stable atomic owner-domain outcome through the shared Gateway client.",
+      "disposition": "existing_capability_migrated",
       "disposition_details": {
-        "candidate_target_capability": "base.annotation.change.apply@1",
-        "reason_code": "provider_equivalence_missing",
-        "followup": "provider_adapter_review",
-        "finding": "/api/self_ann/{dynamic}: REST replaces one concrete annotation; candidate generic operation/resource is unproved. | /api/self_ann/{dynamic}: REST returns saved annotation; candidate generic result is unproved. | /api/self_ann/{dynamic}: Candidate BaseOutcomePort is unbound.",
-        "legacy_contract": {
-          "kind": "registered_route_definition",
-          "source_path": "backend/routers/self_annotations.py",
-          "start_line": 91,
-          "end_line": 106,
-          "sha256": "ae71702549cca7ff913a55626fa81dfab7127d760891b646b37ccd73e9b3ae91",
-          "method": "PUT",
-          "normalized_route": "/api/self_ann/{dynamic}",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "source_sha256": "787edd04d1aaba5b622340b498baf4322cf5fc88dcdcaade394b962dcae93ed6"
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
-            "start_line": 25,
-            "end_line": 25,
-            "sha256": "41995d3d3b4b3590b6d05e85cfca9efc482ef44ac32800ae5c6eebd6f088b215",
-            "needle": "base.annotation.change.apply"
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/self_ann/{dynamic}: REST replaces one concrete annotation; candidate generic operation/resource is unproved.",
-          "output": "/api/self_ann/{dynamic}: REST returns saved annotation; candidate generic result is unproved.",
-          "side_effects": "/api/self_ann/{dynamic}: Candidate BaseOutcomePort is unbound."
+        "target_capability": "base.self_annotation.change.apply@1",
+        "provider_equivalence": "proven",
+        "request_transform": "Exact closed payload defined by Task 3B.3c atomic contract manifest.",
+        "response_transform": "Bounded result_json is decoded to the original legacy response value.",
+        "equivalence_evidence": {
+          "proof_kind": "provider_equivalent_adapter",
+          "provider_contract": {
+            "repository": "backend",
+            "source_path": "backend/base/web_atomic.py",
+            "start_line": 240,
+            "end_line": 240,
+            "sha256": "6207585ddbe4b819f5f2a77fcf2e6f5f4969d61e803814f64cf07937ce1546dc"
+          },
+          "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+          "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
     },

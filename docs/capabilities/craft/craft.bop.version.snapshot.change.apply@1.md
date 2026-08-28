@@ -8,7 +8,7 @@ Fork an active BOP version into a baseline or promoted immutable snapshot.
 - 不适用：The request toggles frozen links, publishes an existing baseline, or edits draft content.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_331a207029a6b2186322dcabb43f675c`
+- Catalog Release：`rel_7ff1698de921ab4fe38979bd5e9ec734`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -116,7 +116,7 @@ Fork an active BOP version into a baseline or promoted immutable snapshot.
 ```json
 {
   "capability_id": "craft.bop.version.snapshot.change.apply",
-  "catalog_release": "rel_331a207029a6b2186322dcabb43f675c",
+  "catalog_release": "rel_7ff1698de921ab4fe38979bd5e9ec734",
   "major_version": 1,
   "payload": {
     "operation": "freeze_snapshot",

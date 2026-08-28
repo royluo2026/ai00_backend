@@ -8,8 +8,9 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
 from backend.services import user_service
-from backend.routers.deps import get_current_user, require_role, build_profile
+from backend.routers.deps import get_current_user, require_role
 from backend.base.structural_web import StructuralWebError, assign_user_role, list_admin_users
+from backend.base.identity_profile import IdentityProfileService
 
 router = APIRouter(prefix="/api/users", tags=["users"])
 
@@ -28,7 +29,7 @@ def list_users(current_user: dict = Depends(require_role(*_ADMIN_ROLES))):
 
 @router.get("/me")
 def get_me(current_user: dict = Depends(get_current_user)):
-    return {"success": True, "data": build_profile(current_user)}
+    return IdentityProfileService().get_current(actor=current_user)
 
 
 @router.get("/search")

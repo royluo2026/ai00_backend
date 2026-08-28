@@ -31,6 +31,10 @@ _ATOMIC_WEB_EFFECTS = {
     "base.organization.team.directory.list": "Reads a closed organization-team directory projection without mutation.",
     "base.team.directory.list": "Reads a closed active-team directory projection without mutation.",
     "base.self_annotation.batch.get": "Reads the caller's bounded self-annotation summaries without mutation.",
+    "base.self_annotation.record.get": "Reads one caller-owned closed self-annotation projection without mutation.",
+    "base.self_annotation.search": "Reads a bounded caller-owned self-annotation collection without mutation.",
+    "base.self_annotation.change.apply": "Revision-locks one caller-owned typed self-annotation update with replay and audit evidence.",
+    "base.identity.session.profile.get": "Reads the caller's closed browser-visible identity projection without credentials or tokens.",
     "base.identity.admin_user.list": "Reads a closed administrator-visible user directory projection without mutation.",
     "base.identity.role.assign.atomic": "Atomically changes one user's role after administrator authorization.",
     "base.saved_view.search": "Reads only saved views visible to the caller through the Base aggregate service.",
@@ -41,7 +45,7 @@ _ATOMIC_WEB_EFFECTS = {
 }
 _ATOMIC_WEB_STRONG_WRITES = {
     "base.identity.role.assign.atomic", "base.saved_view.create", "base.saved_view.update",
-    "base.saved_view.copy", "base.saved_view.delete",
+    "base.saved_view.copy", "base.saved_view.delete", "base.self_annotation.change.apply",
 }
 _RESOURCE_FIELDS = {
     **{capability_id: ("plugin-installation", "plugin_id") for capability_id in _LIFECYCLE},

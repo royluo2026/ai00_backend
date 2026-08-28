@@ -89,3 +89,23 @@ def test_saved_view_gateway_actor_preserves_team_identity():
     context = type("Context", (), {"user_gid": "user_1", "team_gid": "team_1", "active_roles": ("member",)})()
 
     assert _actor(context)["team_gids"] == ["team_1"]
+
+
+def test_annotation_and_identity_capabilities_use_closed_contracts_and_strong_confirmed_write():
+    from backend.base.web_atomic import register_atomic_web_capabilities
+
+    registry = CapabilityRegistry()
+    register_atomic_web_capabilities(registry)
+    change = registry.get("base.self_annotation.change.apply")
+    assert change.descriptor.consistency_policy == "strong"
+    assert change.descriptor.confirmation_policy == "user"
+    assert getattr(change.handler, "__capability_transactional__", False) is True
+    for capability_id, payload in {
+        "base.self_annotation.record.get": {"item_gid": "item_1"},
+        "base.self_annotation.search": {"limit": 200, "status": None},
+        "base.identity.session.profile.get": {},
+    }.items():
+        item = registry.get(capability_id)
+        validate_payload(dict(item.spec.input_schema), payload)
+        with __import__("pytest").raises(ValueError, match="unknown field"):
+            validate_payload(dict(item.spec.input_schema), {**payload, "unexpected": True})

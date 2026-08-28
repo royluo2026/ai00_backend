@@ -36,7 +36,7 @@
         "plugin_id": "official.base",
         "module": "backend.base.official_provider",
         "version": "1.0.0",
-        "artifact_hash": "sha256:5a0b17a8d088a71a58386b1d50692d9b0cc7b979e231e22f752b7ecc7e55924e"
+        "artifact_hash": "sha256:5e7fbf300751355a6f42b9b7a40a5f172857a8d914d63b790db25c08ab3b42ed"
       },
       "artifact_path": "backend/base",
       "allowed_owners": [
@@ -51,6 +51,7 @@
           "backend/db/migrations/domains/base",
           "backend/db/migrations/202608030006_base_platform_runtime_tables.sql",
           "backend/db/migrations/202608030010_base_self_annotations.sql",
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql",
           "backend/db/migrations/202608040001_base_plugin_namespace_storage.sql",
           "backend/db/migrations/202608040002_base_plugin_usage_metrics.sql",
           "backend/db/migrations/202608050001_base_permission_grants.sql",

@@ -20,6 +20,7 @@ _WRITES = {
     "base.saved_view.update",
     "base.saved_view.copy",
     "base.saved_view.delete",
+    "base.self_annotation.change.apply",
 }
 _PERMISSIONS = {
     "base.authorization.grant.list": ("system.user.manage",),
@@ -43,6 +44,7 @@ def _actor(context: object) -> dict[str, Any]:
         "system_role": role,
         "org_role": role,
         "is_active": True,
+        "tenant_gid": str(team_gid) if team_gid else "",
         "team_gids": [str(team_gid)] if team_gid else [],
     }
 
@@ -147,6 +149,35 @@ def _annotation_batch(payload: dict[str, Any], context: object) -> dict[str, Any
         raise _structural_error(exc) from exc
 
 
+def _annotation_get(payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.base.self_annotations import SelfAnnotationError, SelfAnnotationService
+    try:
+        return SelfAnnotationService().get(actor=_actor(context), item_gid=payload["item_gid"])
+    except SelfAnnotationError as exc:
+        raise _structural_error(exc) from exc
+
+
+def _annotation_search(payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.base.self_annotations import SelfAnnotationError, SelfAnnotationService
+    try:
+        return SelfAnnotationService().search(actor=_actor(context), query=payload)
+    except SelfAnnotationError as exc:
+        raise _structural_error(exc) from exc
+
+
+def _annotation_change(payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.base.self_annotations import SelfAnnotationError, SelfAnnotationService
+    try:
+        return SelfAnnotationService().apply_change(actor=_actor(context), command=payload)
+    except SelfAnnotationError as exc:
+        raise _structural_error(exc) from exc
+
+
+def _identity_profile(_payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.base.identity_profile import IdentityProfileService
+    return IdentityProfileService().get_current(actor=_actor(context))
+
+
 def _admin_users(_payload: dict[str, Any], context: object) -> dict[str, Any]:
     from backend.base.structural_web import StructuralWebError, list_admin_users
     try:
@@ -218,6 +249,10 @@ HANDLERS: dict[str, Callable[[dict[str, Any], object], dict[str, Any]]] = {
     "base.organization.team.directory.list": _organization_teams,
     "base.team.directory.list": _teams,
     "base.self_annotation.batch.get": _annotation_batch,
+    "base.self_annotation.record.get": _annotation_get,
+    "base.self_annotation.search": _annotation_search,
+    "base.self_annotation.change.apply": _annotation_change,
+    "base.identity.session.profile.get": _identity_profile,
     "base.identity.admin_user.list": _admin_users,
     "base.identity.role.assign.atomic": _assign_role,
     "base.saved_view.search": _saved_view_search,
@@ -255,7 +290,7 @@ def register_atomic_web_capabilities(registry: Any) -> None:
             tags=("base", "atomic", "web"),
         )
         handler = lambda payload, context, _id=capability_id: invoke_atomic(_id, payload, context)
-        if capability_id in {"base.identity.role.assign.atomic", "base.saved_view.create", "base.saved_view.update", "base.saved_view.copy", "base.saved_view.delete"}:
+        if capability_id in {"base.identity.role.assign.atomic", "base.saved_view.create", "base.saved_view.update", "base.saved_view.copy", "base.saved_view.delete", "base.self_annotation.change.apply"}:
             handler.__capability_transactional__ = True
         register_capability(registry, spec, handler)
 

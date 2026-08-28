@@ -244,9 +244,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
-          "start_line": 227,
-          "end_line": 227,
+          "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+          "start_line": 262,
+          "end_line": 262,
           "sha256": "56229834691651b93ee38d67bb2fa715d321afba6c0af79b064497283f1a380b",
           "needle": "\"base.saved_view.delete\": _saved_view_delete"
         }
@@ -1240,7 +1240,7 @@
           "source_sha256": "1f247f6133368b61baa10648243b7fc6659b33b8c342459a9d138afde102d465"
         }
       ],
-      "target_capability_id": "base.annotation.read",
+      "target_capability_id": "base.self_annotation.search",
       "target_major_version": 1,
       "owner_domain": "base",
       "transport_evidence": {
@@ -1257,43 +1257,45 @@
         },
         "anchors": []
       },
-      "decision": "reclassify",
-      "request_transform": "not applied: /api/self_ann/list: REST lists annotations with legacy filters; candidate has generic reviewed payload.",
-      "response_transform": "not applied: /api/self_ann/list: REST returns annotation collection; candidate projection is unproved.",
-      "frontend_operation": null,
-      "frontend_call_sites": [],
-      "equivalence_evidence": null,
-      "reclassification": {
-        "reason_code": "provider_equivalence_missing",
-        "followup": "provider_adapter_review",
-        "finding": "/api/self_ann/list: REST lists annotations with legacy filters; candidate has generic reviewed payload. | /api/self_ann/list: REST returns annotation collection; candidate projection is unproved. | /api/self_ann/list: Candidate BaseOutcomePort is unbound.",
-        "legacy_contract": {
-          "kind": "registered_route_definition",
-          "source_path": "backend/routers/self_annotations.py",
-          "start_line": 69,
-          "end_line": 79,
-          "sha256": "0e4d958c84b56f440a5e6f398f6ee5d4a5707dbd457ef06cc3ed967795e304cc",
-          "method": "GET",
-          "normalized_route": "/api/self_ann/list",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "source_sha256": "787edd04d1aaba5b622340b498baf4322cf5fc88dcdcaade394b962dcae93ed6"
+      "decision": "migrate",
+      "request_transform": "bounded status/limit query",
+      "response_transform": "items envelope -> bounded self annotation projections",
+      "frontend_operation": "base.annotations.search",
+      "frontend_call_sites": [
+        {
+          "source_path": "web/components/self_annotation_panel.js",
+          "line": 293,
+          "column": 31,
+          "operation": "base.annotations.search",
+          "source_sha256": "8b49958cf9b62cf44e8ac76f442a715ca2942e3973c53116eee60e44f75c26e1"
         },
-        "candidate_contracts": [
-          {
-            "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
-            "start_line": 17,
-            "end_line": 17,
-            "sha256": "3d3cecb0574f6e96638c8874790dcbcb5b82e05e923654ccd3e3f97bf01925d7",
-            "needle": "base.annotation.read"
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/self_ann/list: REST lists annotations with legacy filters; candidate has generic reviewed payload.",
-          "output": "/api/self_ann/list: REST returns annotation collection; candidate projection is unproved.",
-          "side_effects": "/api/self_ann/list: Candidate BaseOutcomePort is unbound."
+        {
+          "source_path": "web/components/self_annotation_panel.js",
+          "line": 294,
+          "column": 31,
+          "operation": "base.annotations.search",
+          "source_sha256": "8b49958cf9b62cf44e8ac76f442a715ca2942e3973c53116eee60e44f75c26e1"
+        },
+        {
+          "source_path": "web/knowledge_hub/knowledge_hub.js",
+          "line": 499,
+          "column": 41,
+          "operation": "base.annotations.search",
+          "source_sha256": "c8454bfbb72276b6373ca72cc176dc2b83b5a88a5ade493596379f77d2f2e0de"
         }
-      }
+      ],
+      "equivalence_evidence": {
+        "proof_kind": "provider_equivalent_adapter",
+        "provider_contract": {
+          "source_path": "backend/base/web_atomic.py",
+          "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+          "start_line": 253,
+          "end_line": 253,
+          "sha256": "ba8c659ed3eed4912fc0cdeaab4c3f0466d25eb1a92fb775b6c28571cdb5c0f7",
+          "needle": "\"base.self_annotation.search\": _annotation_search"
+        }
+      },
+      "reclassification": null
     },
     {
       "method": "GET",
@@ -1312,7 +1314,7 @@
           "source_sha256": "55c294a99365af52084ce49b89432bf3dee012cfdbad32ec9993b1467b871301"
         }
       ],
-      "target_capability_id": "base.annotation.read",
+      "target_capability_id": "base.self_annotation.record.get",
       "target_major_version": 1,
       "owner_domain": "base",
       "transport_evidence": {
@@ -1329,43 +1331,31 @@
         },
         "anchors": []
       },
-      "decision": "reclassify",
-      "request_transform": "not applied: /api/self_ann/{dynamic}: REST reads annotation by legacy resource gid; candidate has generic reviewed payload.",
-      "response_transform": "not applied: /api/self_ann/{dynamic}: REST returns one annotation record; candidate projection is unproved.",
-      "frontend_operation": null,
-      "frontend_call_sites": [],
-      "equivalence_evidence": null,
-      "reclassification": {
-        "reason_code": "provider_equivalence_missing",
-        "followup": "provider_adapter_review",
-        "finding": "/api/self_ann/{dynamic}: REST reads annotation by legacy resource gid; candidate has generic reviewed payload. | /api/self_ann/{dynamic}: REST returns one annotation record; candidate projection is unproved. | /api/self_ann/{dynamic}: Candidate BaseOutcomePort is unbound.",
-        "legacy_contract": {
-          "kind": "registered_route_definition",
-          "source_path": "backend/routers/self_annotations.py",
-          "start_line": 82,
-          "end_line": 88,
-          "sha256": "8a4e814824a54cd479284be861c6f2d8fc5ca10bfeeefb871e141066a9cd12b0",
-          "method": "GET",
-          "normalized_route": "/api/self_ann/{dynamic}",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "source_sha256": "787edd04d1aaba5b622340b498baf4322cf5fc88dcdcaade394b962dcae93ed6"
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
-            "start_line": 17,
-            "end_line": 17,
-            "sha256": "3d3cecb0574f6e96638c8874790dcbcb5b82e05e923654ccd3e3f97bf01925d7",
-            "needle": "base.annotation.read"
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/self_ann/{dynamic}: REST reads annotation by legacy resource gid; candidate has generic reviewed payload.",
-          "output": "/api/self_ann/{dynamic}: REST returns one annotation record; candidate projection is unproved.",
-          "side_effects": "/api/self_ann/{dynamic}: Candidate BaseOutcomePort is unbound."
+      "decision": "migrate",
+      "request_transform": "item gid -> closed self-only record query",
+      "response_transform": "annotation envelope -> closed annotation projection",
+      "frontend_operation": "base.annotations.get",
+      "frontend_call_sites": [
+        {
+          "source_path": "web/components/self_annotation_panel.js",
+          "line": 157,
+          "column": 40,
+          "operation": "base.annotations.get",
+          "source_sha256": "8b49958cf9b62cf44e8ac76f442a715ca2942e3973c53116eee60e44f75c26e1"
         }
-      }
+      ],
+      "equivalence_evidence": {
+        "proof_kind": "provider_equivalent_adapter",
+        "provider_contract": {
+          "source_path": "backend/base/web_atomic.py",
+          "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+          "start_line": 252,
+          "end_line": 252,
+          "sha256": "0edcb0661f98ef845497594383b300542dd04c2746eb0498cc25acc8537588df",
+          "needle": "\"base.self_annotation.record.get\": _annotation_get"
+        }
+      },
+      "reclassification": null
     },
     {
       "method": "GET",
@@ -1627,7 +1617,7 @@
           "source_sha256": "4eded0f1dca13981e7bff65526389f43f71b47cae211dbc00469e6c3f3466d65"
         }
       ],
-      "target_capability_id": "base.identity.session.get",
+      "target_capability_id": "base.identity.session.profile.get",
       "target_major_version": 1,
       "owner_domain": "base",
       "transport_evidence": {
@@ -1644,43 +1634,31 @@
         },
         "anchors": []
       },
-      "decision": "reclassify",
-      "request_transform": "not applied: /api/users/me: REST derives current-user profile with permissions; candidate has generic reviewed payload.",
-      "response_transform": "not applied: /api/users/me: REST returns full session/profile projection; candidate result is unproved.",
-      "frontend_operation": null,
-      "frontend_call_sites": [],
-      "equivalence_evidence": null,
-      "reclassification": {
-        "reason_code": "provider_equivalence_missing",
-        "followup": "provider_adapter_review",
-        "finding": "/api/users/me: REST derives current-user profile with permissions; candidate has generic reviewed payload. | /api/users/me: REST returns full session/profile projection; candidate result is unproved. | /api/users/me: Candidate BaseOutcomePort is unbound.",
-        "legacy_contract": {
-          "kind": "registered_route_definition",
-          "source_path": "backend/routers/users.py",
-          "start_line": 29,
-          "end_line": 31,
-          "sha256": "4023696d0886e4aacff7d1175b4dbb8b060dbcf87cbca7bcb8eaa0b61f1a0d80",
-          "method": "GET",
-          "normalized_route": "/api/users/me",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "source_sha256": "2b44124fe4937155446ae54c757704d2ff67fe9a55728c6b4fea7101968ea722"
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
-            "start_line": 19,
-            "end_line": 19,
-            "sha256": "3fc3cc46d28a7840563a311cc1c0ae2de3517041cda0cb168b30cbc6a7f2de99",
-            "needle": "base.identity.session.get"
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/users/me: REST derives current-user profile with permissions; candidate has generic reviewed payload.",
-          "output": "/api/users/me: REST returns full session/profile projection; candidate result is unproved.",
-          "side_effects": "/api/users/me: Candidate BaseOutcomePort is unbound."
+      "decision": "migrate",
+      "request_transform": "current actor -> empty closed input",
+      "response_transform": "closed identity projection without credential or token fields",
+      "frontend_operation": "base.identity.session.profile.get",
+      "frontend_call_sites": [
+        {
+          "source_path": "packages/craft-plugin/web/lineage_view/lineage.js",
+          "line": 512,
+          "column": 40,
+          "operation": "base.identity.session.profile.get",
+          "source_sha256": "8307da58c257c93d0c31b2ee2d124cd6b12fd532d30d018dae4301db0d65dcd2"
         }
-      }
+      ],
+      "equivalence_evidence": {
+        "proof_kind": "provider_equivalent_adapter",
+        "provider_contract": {
+          "source_path": "backend/base/web_atomic.py",
+          "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+          "start_line": 255,
+          "end_line": 255,
+          "sha256": "d9e31fd15b3fc655e44c4700447418464354287cd1311a4e883ab8f44bad72d0",
+          "needle": "\"base.identity.session.profile.get\": _identity_profile"
+        }
+      },
+      "reclassification": null
     },
     {
       "method": "GET",
@@ -1845,9 +1823,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
-          "start_line": 223,
-          "end_line": 223,
+          "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+          "start_line": 258,
+          "end_line": 258,
           "sha256": "21e5f4f93bdc09b1ba703dc17a13307584bfc738466d3a1b71e4a491ef61c806",
           "needle": "\"base.saved_view.search\": _saved_view_search"
         }
@@ -2194,9 +2172,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
-          "start_line": 225,
-          "end_line": 225,
+          "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+          "start_line": 260,
+          "end_line": 260,
           "sha256": "799823cab800457fc52e02ea377c4efecaf3f4fb565b0f2a67b8e1ec6425e8e4",
           "needle": "\"base.saved_view.update\": _saved_view_update"
         }
@@ -3110,9 +3088,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
-          "start_line": 224,
-          "end_line": 224,
+          "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+          "start_line": 259,
+          "end_line": 259,
           "sha256": "9d9ed3d4a5619754b9c0df361a0b2b4c01d1052d00d57414e9a50f40e172840c",
           "needle": "\"base.saved_view.create\": _saved_view_create"
         }
@@ -3170,9 +3148,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
-          "start_line": 226,
-          "end_line": 226,
+          "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+          "start_line": 261,
+          "end_line": 261,
           "sha256": "c68df23c39cb7979116bd209087170259a02fc5ec888ee1020a0dfd92f6c6848",
           "needle": "\"base.saved_view.copy\": _saved_view_copy"
         }
@@ -3528,7 +3506,7 @@
           "source_sha256": "55c294a99365af52084ce49b89432bf3dee012cfdbad32ec9993b1467b871301"
         }
       ],
-      "target_capability_id": "base.annotation.change.apply",
+      "target_capability_id": "base.self_annotation.change.apply",
       "target_major_version": 1,
       "owner_domain": "base",
       "transport_evidence": {
@@ -3545,43 +3523,31 @@
         },
         "anchors": []
       },
-      "decision": "reclassify",
-      "request_transform": "not applied: /api/self_ann/{dynamic}: REST replaces one concrete annotation; candidate generic operation/resource is unproved.",
-      "response_transform": "not applied: /api/self_ann/{dynamic}: REST returns saved annotation; candidate generic result is unproved.",
-      "frontend_operation": null,
-      "frontend_call_sites": [],
-      "equivalence_evidence": null,
-      "reclassification": {
-        "reason_code": "provider_equivalence_missing",
-        "followup": "provider_adapter_review",
-        "finding": "/api/self_ann/{dynamic}: REST replaces one concrete annotation; candidate generic operation/resource is unproved. | /api/self_ann/{dynamic}: REST returns saved annotation; candidate generic result is unproved. | /api/self_ann/{dynamic}: Candidate BaseOutcomePort is unbound.",
-        "legacy_contract": {
-          "kind": "registered_route_definition",
-          "source_path": "backend/routers/self_annotations.py",
-          "start_line": 91,
-          "end_line": 106,
-          "sha256": "ae71702549cca7ff913a55626fa81dfab7127d760891b646b37ccd73e9b3ae91",
-          "method": "PUT",
-          "normalized_route": "/api/self_ann/{dynamic}",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "source_sha256": "787edd04d1aaba5b622340b498baf4322cf5fc88dcdcaade394b962dcae93ed6"
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
-            "start_line": 25,
-            "end_line": 25,
-            "sha256": "41995d3d3b4b3590b6d05e85cfca9efc482ef44ac32800ae5c6eebd6f088b215",
-            "needle": "base.annotation.change.apply"
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/self_ann/{dynamic}: REST replaces one concrete annotation; candidate generic operation/resource is unproved.",
-          "output": "/api/self_ann/{dynamic}: REST returns saved annotation; candidate generic result is unproved.",
-          "side_effects": "/api/self_ann/{dynamic}: Candidate BaseOutcomePort is unbound."
+      "decision": "migrate",
+      "request_transform": "item gid/revision/typed attachment references -> closed idempotent command",
+      "response_transform": "annotation envelope -> closed annotation projection",
+      "frontend_operation": "base.annotations.apply",
+      "frontend_call_sites": [
+        {
+          "source_path": "web/components/self_annotation_panel.js",
+          "line": 177,
+          "column": 39,
+          "operation": "base.annotations.apply",
+          "source_sha256": "8b49958cf9b62cf44e8ac76f442a715ca2942e3973c53116eee60e44f75c26e1"
         }
-      }
+      ],
+      "equivalence_evidence": {
+        "proof_kind": "provider_equivalent_adapter",
+        "provider_contract": {
+          "source_path": "backend/base/web_atomic.py",
+          "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+          "start_line": 254,
+          "end_line": 254,
+          "sha256": "c3860599d5ff529f59467bb49216cb62b04152c559aa2d9587ebff1871e8965e",
+          "needle": "\"base.self_annotation.change.apply\": _annotation_change"
+        }
+      },
+      "reclassification": null
     },
     {
       "method": "PUT",

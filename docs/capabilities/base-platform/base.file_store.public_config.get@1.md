@@ -8,7 +8,7 @@ Read the secret-filtered public file-store runtime configuration.
 - 不适用：A caller needs raw storage credentials or intends to mutate configuration.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_331a207029a6b2186322dcabb43f675c`
+- Catalog Release：`rel_7ff1698de921ab4fe38979bd5e9ec734`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -79,7 +79,7 @@ Read the secret-filtered public file-store runtime configuration.
 ```json
 {
   "capability_id": "base.file_store.public_config.get",
-  "catalog_release": "rel_331a207029a6b2186322dcabb43f675c",
+  "catalog_release": "rel_7ff1698de921ab4fe38979bd5e9ec734",
   "major_version": 1,
   "payload": {}
 }
