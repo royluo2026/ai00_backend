@@ -5,6 +5,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import re
 import sys
 from typing import Any
 
@@ -34,12 +35,65 @@ PATTERNS = {
     "stale_annotation_rest": ("/api/self_ann",),
     "stale_identity_rest": ("/api/users/me",),
     "silent_saved_view_local_authority": (
-        "localStorage.getItem(this._lsKey()", "localStorage.setItem(this._lsKey()",
-        "localStorage.removeItem(this._lsKey()", "vm_views_",
+        "vm_views_",
         "localStorage.getItem('ai00_saved_views",
         'localStorage.getItem("ai00_saved_views',
+        "tls_views_", "tls_def_",
     ),
 }
+
+_NAMED_VIEW_KEY = re.compile(
+    r"(?<![A-Za-z0-9])_?(?:(?:named|saved|default)[_$]?)?views?[_$]?(?:storage[_$]?)?key\b",
+    re.IGNORECASE,
+)
+_TLS_CONFIG_SAVED_VIEW_SIGNATURES = (
+    ("vmFilters",),
+    ("vmSorts",),
+    ("vmFilterMode",),
+    ("vmGroupBy",),
+    ("field_gids",),
+    ("filters", "sort"),
+)
+_LOCAL_STORAGE_METHOD_KEY_TOKENS = (
+    "localStorage.getItem(this._lsKey()",
+    "localStorage.setItem(this._lsKey()",
+    "localStorage.removeItem(this._lsKey()",
+)
+_SAVED_VIEW_CONTEXT = (
+    "savedView",
+    "saved_view",
+    "namedView",
+    "named_view",
+    "view preset",
+    "视图预设",
+    "vmFilters",
+    "vmSorts",
+    "base.savedViews",
+)
+
+
+def _saved_view_local_authority_tokens(text: str) -> list[str]:
+    tokens = {
+        token
+        for token in PATTERNS["silent_saved_view_local_authority"]
+        if token in text
+    }
+    if "tls_cfg_" in text and any(
+        all(signature in text for signature in signatures)
+        for signatures in _TLS_CONFIG_SAVED_VIEW_SIGNATURES
+    ):
+        tokens.add("tls_cfg_")
+    if any(context in text for context in _SAVED_VIEW_CONTEXT):
+        tokens.update(token for token in _LOCAL_STORAGE_METHOD_KEY_TOKENS if token in text)
+    if "localStorage." in text:
+        for match in _NAMED_VIEW_KEY.finditer(text):
+            key_name = match.group(0)
+            use = re.compile(
+                rf"localStorage\.(?:get|set|remove)Item\s*\(\s*{re.escape(key_name)}\b"
+            )
+            if use.search(text):
+                tokens.add(key_name)
+    return sorted(tokens)
 
 
 def _canonical(value: Any) -> str:
@@ -80,10 +134,10 @@ def build_report(
             electron_check = code.startswith("retired_electron") and relative_root == "packages/core/electron"
             web_check = not code.startswith("retired_electron") and relative_root.startswith("dist-production")
             if code == "silent_saved_view_local_authority":
-                web_check = web_check and (
-                    blob.path.endswith("/view_manager.js")
-                    or blob.path.endswith("/task_planning.html")
-                )
+                if web_check:
+                    for token in _saved_view_local_authority_tokens(text):
+                        findings.append({"code": code, "path": blob.path, "token": token})
+                continue
             if electron_check or web_check:
                 for token in tokens:
                     if token in text:

@@ -1,6 +1,6 @@
 {
-  "frontend_revision": "d9db45c78f23afc3c32ab9bb8336d2a19bca6277",
-  "content_hash": "e5f556f5efa07f213f97f67c213583be31e02f208c1cc74d26001a4ef90d50e0",
+  "frontend_revision": "526ac0101b51fc2f53aa2fb1d2113dab36b2936a",
+  "content_hash": "4a08bb3a765fed9620b01dd48116a40cd17ece983e1509d6e21b9dfe9e24eb7a",
   "wrapper_contracts_hash": "33e0e1b6378d642ab2fb6131a3cd02fde4895615709a5a82aa7ea1a6bffc0db0",
   "scan_roots": [
     "web",

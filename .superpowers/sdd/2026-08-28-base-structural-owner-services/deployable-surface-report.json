@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "scan_mode": "commit",
-  "frontend_revision": "d9db45c78f23afc3c32ab9bb8336d2a19bca6277",
+  "frontend_revision": "526ac0101b51fc2f53aa2fb1d2113dab36b2936a",
   "roots": [
     "dist-production/packages",
     "dist-production/web",
@@ -663,8 +663,8 @@
     },
     {
       "path": "dist-production/web/components/tree_list_shell.js",
-      "blob_oid": "56e35202b0a028a7f03db762676ef03626fa9fe8",
-      "sha256": "d242fc8df437745e96750a481868315a0193acde094be994d1cb2cc58f56416e"
+      "blob_oid": "6da30099da89626f435578d4d6d60902e5047f5c",
+      "sha256": "6ac38d59cf8e94f50a2254d28e3c7738ebbb3039ce55738a5184d1f5f4ad9afa"
     },
     {
       "path": "dist-production/web/components/tree_shell.js",
@@ -1118,5 +1118,5 @@
     }
   ],
   "findings": [],
-  "content_sha256": "86b5b27a8825235609d3da2e55ed823b26a93bde97f54804c771c59eeab51971"
+  "content_sha256": "d21528a673782e47f6a828e99e0ef7bf5ab86d0c3efed4acea4bfdda6dc1f212"
 }

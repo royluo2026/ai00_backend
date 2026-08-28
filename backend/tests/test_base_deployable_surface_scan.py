@@ -141,12 +141,32 @@ def test_worktree_scan_refuses_dirty_tracked_deployable_roots(tmp_path: Path) ->
     [
         (
             "dist-production/web/components/view_manager.js",
-            "localStorage.getItem(this._lsKey());\n",
+            "const vmFilters = []; localStorage.getItem(this._lsKey());\n",
             "silent_saved_view_local_authority",
         ),
         (
             "dist-production/web/components/view_manager.js",
             "localStorage.setItem('vm_views_base', '{}');\n",
+            "silent_saved_view_local_authority",
+        ),
+        (
+            "dist-production/web/components/tree_list_shell.js",
+            "const key = 'tls_views_task'; localStorage.setItem(key, '[]');\n",
+            "silent_saved_view_local_authority",
+        ),
+        (
+            "dist-production/packages/craft-plugin/web/custom_shell.js",
+            "const key = 'tls_def_task'; localStorage.setItem(key, '{}');\n",
+            "silent_saved_view_local_authority",
+        ),
+        (
+            "dist-production/web/arbitrary/preferences.js",
+            "const key = 'tls_cfg_task'; localStorage.setItem(key, JSON.stringify({ vmFilters: [], vmSorts: [] }));\n",
+            "silent_saved_view_local_authority",
+        ),
+        (
+            "dist-production/packages/craft-plugin/web/named_views.js",
+            "const namedViewStorageKey = 'craft_named_views'; localStorage.setItem(namedViewStorageKey, JSON.stringify([{ name: 'Open', config: { filters: [] } }]));\n",
             "silent_saved_view_local_authority",
         ),
         (
@@ -175,3 +195,37 @@ def test_commit_scan_detects_exact_blocker_signatures(
     report = build_report(_commit_fixture(tmp_path, files))
 
     assert code in {finding["code"] for finding in report["findings"]}
+
+
+def test_tls_cfg_ephemeral_ui_preferences_do_not_trigger_saved_view_authority(
+    tmp_path: Path,
+) -> None:
+    from backend.scripts.check_base_deployable_surfaces import build_report
+
+    repo = _commit_fixture(tmp_path, {
+        "dist-production/packages/plugin.html": "<main>governed</main>\n",
+        "dist-production/web/preferences.js": (
+            "const key = 'tls_cfg_task'; "
+            "localStorage.setItem(key, JSON.stringify({ density: 'compact' }));\n"
+        ),
+        "packages/core/electron/main.js": "const safe = true;\n",
+    })
+
+    assert build_report(repo)["findings"] == []
+
+
+def test_generic_ls_key_layout_cache_does_not_trigger_saved_view_authority(
+    tmp_path: Path,
+) -> None:
+    from backend.scripts.check_base_deployable_surfaces import build_report
+
+    repo = _commit_fixture(tmp_path, {
+        "dist-production/packages/plugin.html": "<main>governed</main>\n",
+        "dist-production/web/layout.js": (
+            "const linePositions = {}; const layoutVersion = 5; "
+            "localStorage.setItem(this._lsKey(), JSON.stringify({ linePositions, layoutVersion }));\n"
+        ),
+        "packages/core/electron/main.js": "const safe = true;\n",
+    })
+
+    assert build_report(repo)["findings"] == []
