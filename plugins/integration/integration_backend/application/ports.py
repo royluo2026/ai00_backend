@@ -23,10 +23,12 @@ class CredentialEnrollmentPort(Protocol):
 
 class CatalogResolverPort(Protocol):
     def project_mapping_targets_for_ontology_objects(
-        self, ontology_object_gids: tuple[str, ...]
+        self, ontology_object_gids: tuple[str, ...], *, actor_gid: str, team_gid: str
     ) -> list[Mapping[str, Any]]: ...
 
-    def resolve_mapping_target(self, binding_id: str) -> Mapping[str, Any]: ...
+    def resolve_mapping_target(
+        self, binding_id: str, *, actor_gid: str, team_gid: str
+    ) -> Mapping[str, Any]: ...
 
     def require_stable(
         self, capability_id: str, major_version: int, minimum_release: str

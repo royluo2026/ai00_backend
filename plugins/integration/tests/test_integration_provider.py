@@ -10,7 +10,7 @@ from jsonschema import Draft202012Validator, ValidationError
 
 from plugins.integration.integration_backend.application.network_policy import NetworkPolicy
 from plugins.integration.integration_backend.application.transform import RestrictedExpression
-from backend.capability_v2.provider_contracts import CapabilityContext
+from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext
 from plugins.integration.integration_backend.capabilities import register_capabilities
 from plugins.integration.integration_backend.capabilities.wiring import IntegrationProviderAdapters
 from plugins.integration.integration_backend.data.connection import _params
@@ -61,6 +61,12 @@ class ProviderRepository:
         self.mappings[row["gid"]] = row
         return dict(row)
 
+    def get_mapping(self, data):
+        row = self.mappings.get(data["gid"])
+        if row and row["owner_gid"] == data["owner_gid"] and row.get("team_gid") == data.get("team_gid"):
+            return dict(row)
+        return None
+
     def find_operation(self, owner_gid, capability_id, idempotency_key):
         return self.operations.get(self.scopes.get((owner_gid, capability_id, idempotency_key)))
 
@@ -85,6 +91,9 @@ class ProviderRepository:
 
     def claim_import_operation(self, record, run):
         return self.claim_operation(record)
+
+    def find_import_operation(self, owner_gid, capability_id, idempotency_key):
+        return self.find_operation(owner_gid, capability_id, idempotency_key)
 
     def get_operation(self, operation_id, owner_gid, team_gid):
         record = self.operations.get(operation_id)
@@ -111,7 +120,9 @@ class ProviderCatalog:
     def require_stable(self, capability_id, major_version, minimum_release):
         self.calls.append((capability_id, major_version, minimum_release))
 
-    def resolve_mapping_target(self, binding_id):
+    def resolve_mapping_target(self, binding_id, *, actor_gid, team_gid):
+        if (actor_gid, team_gid) != ("actor-1", "team-1"):
+            raise LookupError("target binding is outside principal scope")
         return {
             "binding_id": binding_id, "target_domain": "knowledge",
             "target_capability_id": "knowledge.reference_data.change.apply",
@@ -120,10 +131,19 @@ class ProviderCatalog:
             "resource_gid": "dataset-parts", "expected_version": 7,
         }
 
-    def project_mapping_targets_for_ontology_objects(self, ontology_object_gids):
+    def project_mapping_targets_for_ontology_objects(
+        self, ontology_object_gids, *, actor_gid, team_gid
+    ):
+        if (actor_gid, team_gid) != ("actor-1", "team-1"):
+            return []
         if "concept-part" not in ontology_object_gids:
             return []
-        return [{**self.resolve_mapping_target("ontology:concept-part"), "ontology_object_gid": "concept-part"}]
+        return [{
+            **self.resolve_mapping_target(
+                "ontology:concept-part", actor_gid=actor_gid, team_gid=team_gid
+            ),
+            "ontology_object_gid": "concept-part",
+        }]
 
 
 class ProviderRuntime:
@@ -304,6 +324,33 @@ def test_provider_rejects_synchronous_runtime_before_handler_publication():
     assert runtime.called is False
 
 
+def test_provider_rejects_catalog_binding_methods_with_optional_principal_scope():
+    class UnscopedCatalog(ProviderCatalog):
+        def resolve_mapping_target(self, binding_id, *, actor_gid=None, team_gid=None):
+            return super().resolve_mapping_target(
+                binding_id, actor_gid=actor_gid, team_gid=team_gid
+            )
+
+        def project_mapping_targets_for_ontology_objects(
+            self, ontology_object_gids, *, actor_gid=None, team_gid=None
+        ):
+            return super().project_mapping_targets_for_ontology_objects(
+                ontology_object_gids, actor_gid=actor_gid, team_gid=team_gid
+            )
+
+    adapters = IntegrationProviderAdapters(
+        repository=ProviderRepository(), credential_enrollment=ProviderVault(),
+        catalog=UnscopedCatalog(), connector_runtime=ProviderRuntime(),
+        operation_identity=ProviderIdentity(),
+    )
+
+    with pytest.raises(RuntimeError, match="catalog"):
+        register_capabilities(
+            type("Registry", (), {"register": lambda *_args, **_kwargs: None})(),
+            adapter_factory=lambda: adapters,
+        )
+
+
 def test_provider_accepts_async_runtime_and_bounds_registered_execution(monkeypatch):
     class Registry:
         def __init__(self):
@@ -359,6 +406,10 @@ def test_registered_handlers_use_configured_vault_catalog_and_bounded_runtime(mo
     register_capabilities(registry)
     context = CapabilityContext(user_gid="actor-1", team_gid="team-1", request_id="provider-e2e")
 
+    projection = asyncio.run(registry.handlers["integration.mapping_target.search"]({
+        "ontology_object_gids": ["concept-part"],
+    }, context))
+
     connector = asyncio.run(registry.handlers["integration.connector.create"]({
         "name": "ERP", "connector_type": "postgresql", "host": "8.8.8.8", "port": 5432,
         "database_name": "erp", "username": "reader", "credential_enrollment_handle": "once-1",
@@ -373,14 +424,93 @@ def test_registered_handlers_use_configured_vault_catalog_and_bounded_runtime(mo
     tested = asyncio.run(registry.handlers["integration.connector.connection.test"](
         {"gid": connector["gid"]}, context
     ))
+    imported = asyncio.run(registry.handlers["integration.mapping.import.start"]({
+        "mapping_gid": mapping["gid"], "idempotency_key": "mapping-import-1",
+    }, context))
 
     assert connector["gid"] == "connector-1"
     assert mapping["datasource_gid"] == "connector-1"
+    assert projection["items"][0]["binding_id"] == "ontology:concept-part"
     assert adapters.catalog.calls == [
-        ("knowledge.reference_data.change.apply", 1, "rel_20260828")
+        ("knowledge.reference_data.change.apply", 1, "rel_20260828"),
+        ("knowledge.reference_data.change.apply", 1, "rel_20260828"),
+        ("knowledge.reference_data.change.apply", 1, "rel_20260828"),
     ]
     assert tested["reachable"] is True
     assert tested["operation_ref"]["status"] == "succeeded"
+    assert imported["operation_ref"]["status"] == "accepted"
+
+
+def test_registered_gateway_handlers_hide_and_reject_cross_team_bindings():
+    class Registry:
+        def __init__(self):
+            self.handlers = {}
+
+        def register(self, spec, handler, *, descriptor=None):
+            self.handlers[spec.id] = handler
+
+    adapters = provider_factory()
+    adapters.repository.connectors["connector-1"] = {
+        "gid": "connector-1", "revision": 1, "name": "ERP", "connector_type": "postgresql",
+        "host": "8.8.8.8", "port": 5432, "database_name": "erp", "username": "reader",
+        "status": "untested", "owner_gid": "actor-1", "team_gid": "team-2",
+    }
+    adapters.repository.mappings["mapping-foreign-binding"] = {
+        "gid": "mapping-foreign-binding", "revision": 1, "datasource_gid": "connector-1",
+        "name": "Parts", "source_object": "parts", "status": "active",
+        "owner_gid": "actor-1", "team_gid": "team-2", "field_mappings": [],
+        "target_binding_id": "ontology:concept-part", "target_domain": "knowledge",
+        "target_capability_id": "knowledge.reference_data.change.apply", "target_major_version": 1,
+        "minimum_catalog_release": "rel_20260828",
+        "target_input_contract": "knowledge.reference_dataset.publish.v1",
+        "target_resource_gid": "dataset-parts", "target_expected_version": 7,
+    }
+    registry = Registry()
+    register_capabilities(registry, adapter_factory=lambda: adapters)
+    context = CapabilityContext(user_gid="actor-1", team_gid="team-2", request_id="cross-team")
+
+    projected = asyncio.run(registry.handlers["integration.mapping_target.search"]({
+        "ontology_object_gids": ["concept-part"],
+    }, context))
+    with pytest.raises(CapabilityBusinessError) as create_rejected:
+        asyncio.run(registry.handlers["integration.mapping.create"]({
+            "datasource_gid": "connector-1", "name": "Parts", "source_object": "parts",
+            "target_binding_id": "ontology:concept-part", "field_mappings": [],
+            "idempotency_key": "cross-team-create",
+        }, context))
+    with pytest.raises(CapabilityBusinessError) as import_rejected:
+        asyncio.run(registry.handlers["integration.mapping.import.start"]({
+            "mapping_gid": "mapping-foreign-binding", "idempotency_key": "cross-team-import",
+        }, context))
+
+    assert projected == {"items": []}
+    assert create_rejected.value.code == "target_binding_unavailable"
+    assert import_rejected.value.code == "target_binding_unavailable"
+    assert adapters.repository.operations == {}
+    assert set(adapters.repository.mappings) == {"mapping-foreign-binding"}
+
+
+@pytest.mark.parametrize("context", [
+    CapabilityContext(user_gid="", team_gid="team-1", request_id="missing-actor"),
+    CapabilityContext(user_gid="actor-1", team_gid=None, request_id="missing-team"),
+])
+def test_registered_gateway_binding_lookup_requires_complete_authenticated_scope(context):
+    class Registry:
+        def __init__(self):
+            self.handlers = {}
+
+        def register(self, spec, handler, *, descriptor=None):
+            self.handlers[spec.id] = handler
+
+    registry = Registry()
+    register_capabilities(registry, adapter_factory=provider_factory)
+
+    with pytest.raises(CapabilityBusinessError) as rejected:
+        asyncio.run(registry.handlers["integration.mapping_target.search"]({
+            "ontology_object_gids": ["concept-part"],
+        }, context))
+
+    assert rejected.value.code == "permission_denied"
 
 
 def test_browser_targets_have_recursively_closed_stable_v1_contracts():

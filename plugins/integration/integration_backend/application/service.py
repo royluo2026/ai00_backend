@@ -142,14 +142,29 @@ class IntegrationApplication:
                 "target_capability_unavailable", "Target Capability is not stable at the required Catalog release"
             ) from exc
 
-    def _resolve_target_binding(self, binding_id: str) -> dict[str, Any]:
+    @staticmethod
+    def _binding_scope(data: Mapping[str, Any]) -> tuple[str, str]:
+        actor_gid = data.get("owner_gid")
+        team_gid = data.get("team_gid")
+        if (
+            not isinstance(actor_gid, str) or not actor_gid.strip()
+            or not isinstance(team_gid, str) or not team_gid.strip()
+        ):
+            raise CapabilityBusinessError(
+                "permission_denied", "Integration target binding access requires actor and team scope"
+            )
+        return actor_gid, team_gid
+
+    def _resolve_target_binding(
+        self, binding_id: str, *, actor_gid: str, team_gid: str
+    ) -> dict[str, Any]:
         resolver = getattr(self.catalog, "resolve_mapping_target", None) if self.catalog is not None else None
         if not callable(resolver):
             raise CapabilityBusinessError(
                 "target_binding_unavailable", "Integration target binding Catalog is unavailable", retryable=True
             )
         try:
-            binding = dict(resolver(binding_id))
+            binding = dict(resolver(binding_id, actor_gid=actor_gid, team_gid=team_gid))
         except Exception as exc:
             raise CapabilityBusinessError(
                 "target_binding_unavailable", "The selected ontology target has no governed binding"
@@ -190,7 +205,9 @@ class IntegrationApplication:
             "target_expected_version": int(binding["expected_version"]),
         }
 
-    def _mapping_target_projection(self, raw: dict[str, Any]) -> dict[str, Any]:
+    def _mapping_target_projection(
+        self, raw: dict[str, Any], data: Mapping[str, Any]
+    ) -> dict[str, Any]:
         self._closed(raw, {"ontology_object_gids"})
         gids = raw.get("ontology_object_gids")
         if (
@@ -202,6 +219,7 @@ class IntegrationApplication:
                 "invalid_input", "ontology_object_gids requires 1 to 200 unique non-empty identities"
             )
         requested = tuple(gids)
+        actor_gid, team_gid = self._binding_scope(data)
         projector = (
             getattr(self.catalog, "project_mapping_targets_for_ontology_objects", None)
             if self.catalog is not None else None
@@ -212,7 +230,7 @@ class IntegrationApplication:
                 retryable=True,
             )
         try:
-            rows = list(projector(requested))
+            rows = list(projector(requested, actor_gid=actor_gid, team_gid=team_gid))
         except Exception as exc:
             raise CapabilityBusinessError(
                 "target_binding_unavailable", "Integration target binding projection is unavailable",
@@ -257,6 +275,29 @@ class IntegrationApplication:
             }
             binding_ids.add(binding_id)
         return {"items": [projected[gid] for gid in requested if gid in projected]}
+
+    def _reauthorize_persisted_target(
+        self, mapping: Mapping[str, Any], data: Mapping[str, Any]
+    ) -> dict[str, Any]:
+        binding_id = mapping.get("target_binding_id")
+        if not isinstance(binding_id, str) or not binding_id:
+            raise CapabilityBusinessError(
+                "target_binding_unavailable", "Mapping has no governed target binding"
+            )
+        actor_gid, team_gid = self._binding_scope(data)
+        resolved = self._resolve_target_binding(
+            binding_id, actor_gid=actor_gid, team_gid=team_gid
+        )
+        persisted_keys = {
+            "target_binding_id", "target_domain", "target_capability_id", "target_major_version",
+            "minimum_catalog_release", "target_input_contract", "target_resource_gid",
+            "target_expected_version",
+        }
+        if any(mapping.get(key) != resolved[key] for key in persisted_keys):
+            raise CapabilityBusinessError(
+                "target_binding_incompatible", "Persisted mapping target no longer matches its binding"
+            )
+        return {**mapping, **resolved}
 
     @staticmethod
     def _target_invocation(mapping: Mapping[str, Any]) -> dict[str, Any]:
@@ -426,7 +467,7 @@ class IntegrationApplication:
         raw = dict(payload)
         data = self._bind(raw, context)
         if capability_id == "integration.mapping_target.search":
-            return self._mapping_target_projection(raw)
+            return self._mapping_target_projection(raw, data)
         if capability_id.startswith("integration.connector."):
             return await self._connector_outcome(capability_id, raw, data, context)
         if capability_id in {
@@ -579,7 +620,10 @@ class IntegrationApplication:
                 return replay
 
             self._get_connector({**data, "gid": str(data["datasource_gid"])})
-            target = self._resolve_target_binding(str(data["target_binding_id"]))
+            actor_gid, team_gid = self._binding_scope(data)
+            target = self._resolve_target_binding(
+                str(data["target_binding_id"]), actor_gid=actor_gid, team_gid=team_gid
+            )
             mapping_gid = self.operations.new_id("mapping")
             stored = {
                 key: value for key, value in data.items()
@@ -665,8 +709,9 @@ class IntegrationApplication:
                     "idempotency_conflict", "Integration import operation has no durable run identity"
                 )
             return {"run_id": run_id, "operation_ref": operation_ref(replay.record)}
-        mapping = self._get_mapping(data, str(data["mapping_gid"]))
-        self._require_target(mapping)
+        mapping = self._reauthorize_persisted_target(
+            self._get_mapping(data, str(data["mapping_gid"])), data
+        )
         target_invocation = self._target_invocation(mapping)
         run_id = self.operations.new_id("run")
         claim = self.operations.start_import(

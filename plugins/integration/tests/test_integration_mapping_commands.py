@@ -16,18 +16,28 @@ from plugins.integration.tests.test_integration_owner_services import (
 
 
 class BoundCatalog:
-    def __init__(self, binding=None):
+    def __init__(self, binding=None, *, actor_gid="actor-1", team_gid="team-1"):
         self.binding = binding
+        self.actor_gid = actor_gid
+        self.team_gid = team_gid
         self.stable_calls = []
         self.projection_calls = []
+        self.resolve_calls = []
 
-    def project_mapping_targets_for_ontology_objects(self, ontology_object_gids):
-        self.projection_calls.append(tuple(ontology_object_gids))
+    def project_mapping_targets_for_ontology_objects(
+        self, ontology_object_gids, *, actor_gid, team_gid
+    ):
+        self.projection_calls.append((tuple(ontology_object_gids), actor_gid, team_gid))
+        if (actor_gid, team_gid) != (self.actor_gid, self.team_gid):
+            return []
         if self.binding is None or "concept-part" not in ontology_object_gids:
             return []
         return [{**self.binding, "ontology_object_gid": "concept-part"}]
 
-    def resolve_mapping_target(self, binding_id):
+    def resolve_mapping_target(self, binding_id, *, actor_gid, team_gid):
+        self.resolve_calls.append((binding_id, actor_gid, team_gid))
+        if (actor_gid, team_gid) != (self.actor_gid, self.team_gid):
+            raise LookupError("binding is outside principal scope")
         if binding_id != "ontology:concept-part" or self.binding is None:
             raise LookupError(binding_id)
         return dict(self.binding)
@@ -135,6 +145,10 @@ def test_mapping_create_resolves_a_finite_binding_and_import_persists_valid_targ
         },
         "dispatch_state": "awaiting_rows",
     }
+    assert catalog.resolve_calls == [
+        ("ontology:concept-part", "actor-1", "team-1"),
+        ("ontology:concept-part", "actor-1", "team-1"),
+    ]
 
 
 def test_integration_owned_target_projection_joins_real_ontology_identity_to_exact_binding():
@@ -155,7 +169,7 @@ def test_integration_owned_target_projection_joins_real_ontology_identity_to_exa
         "target_major_version": 1,
         "minimum_catalog_release": "rel_7803705d3df421f9f4381d37c3500731",
     }]}
-    assert catalog.projection_calls == [("concept-part", "concept-unbound")]
+    assert catalog.projection_calls == [(("concept-part", "concept-unbound"), "actor-1", "team-1")]
     assert catalog.stable_calls == [(
         "knowledge.reference_data.change.apply", 1, "rel_7803705d3df421f9f4381d37c3500731"
     )]
@@ -176,6 +190,72 @@ def test_target_projection_fails_closed_for_incompatible_catalog_binding(binding
         ))
 
     assert error_code(rejected) == "target_binding_incompatible"
+
+
+@pytest.mark.parametrize(("actor_gid", "team_gid"), [
+    ("actor-1", "team-2"),
+    ("actor-2", "team-1"),
+])
+def test_target_binding_projection_and_known_id_create_are_principal_scoped(actor_gid, team_gid):
+    repository = MemoryRepository()
+    _seed_connector_and_mapping(repository)
+    repository.mappings.clear()
+    repository.field_mappings.clear()
+    repository.connectors["connector-1"].update({"owner_gid": actor_gid, "team_gid": team_gid})
+    catalog = BoundCatalog(VALID_BINDING)
+    application = app(repository, catalog=catalog)
+    other_principal = CONTEXT.model_copy(update={"user_gid": actor_gid, "team_gid": team_gid})
+
+    projected = asyncio.run(application.invoke(
+        "integration.mapping_target.search", {"ontology_object_gids": ["concept-part"]}, other_principal
+    ))
+    with pytest.raises(CapabilityBusinessError) as create_rejected:
+        asyncio.run(application.invoke(
+            "integration.mapping.create", bound_mapping_payload(), other_principal
+        ))
+
+    assert projected == {"items": []}
+    assert error_code(create_rejected) == "target_binding_unavailable"
+    assert repository.mappings == {}
+    assert catalog.projection_calls[-1] == (("concept-part",), actor_gid, team_gid)
+    assert catalog.resolve_calls[-1] == ("ontology:concept-part", actor_gid, team_gid)
+
+
+@pytest.mark.parametrize(("actor_gid", "team_gid"), [
+    ("actor-1", "team-2"),
+    ("actor-2", "team-1"),
+])
+def test_known_binding_import_is_reauthorized_for_the_mapping_principal(actor_gid, team_gid):
+    repository = MemoryRepository()
+    _seed_connector_and_mapping(repository)
+    repository.mappings["mapping-1"].update({
+        "owner_gid": actor_gid, "team_gid": team_gid,
+        "target_binding_id": VALID_BINDING["binding_id"],
+        "target_input_contract": VALID_BINDING["input_contract"],
+        "target_resource_gid": VALID_BINDING["resource_gid"],
+        "target_expected_version": VALID_BINDING["expected_version"],
+    })
+    catalog = BoundCatalog(VALID_BINDING)
+    other_principal = CONTEXT.model_copy(update={"user_gid": actor_gid, "team_gid": team_gid})
+
+    with pytest.raises(CapabilityBusinessError) as rejected:
+        asyncio.run(app(repository, catalog=catalog).invoke(
+            "integration.mapping.import.start",
+            {"mapping_gid": "mapping-1", "idempotency_key": "cross-team-import"},
+            other_principal,
+        ))
+
+    assert error_code(rejected) == "target_binding_unavailable"
+    assert repository.imports == []
+
+
+def test_catalog_binding_scope_arguments_cannot_be_omitted():
+    catalog = BoundCatalog(VALID_BINDING)
+
+    with pytest.raises(TypeError):
+        catalog.resolve_mapping_target("ontology:concept-part")
+    with pytest.raises(TypeError):
+        catalog.project_mapping_targets_for_ontology_objects(("concept-part",))
 
 
 @pytest.mark.parametrize(

@@ -204,7 +204,9 @@ class Catalog:
         if self.reject:
             raise ValueError("target is not a stable Catalog entry")
 
-    def resolve_mapping_target(self, binding_id):
+    def resolve_mapping_target(self, binding_id, *, actor_gid, team_gid):
+        if (actor_gid, team_gid) != ("actor-1", "team-1"):
+            raise ValueError("target binding is outside principal scope")
         if binding_id != "ontology:concept-part":
             raise ValueError("target binding is unavailable")
         return {
@@ -218,10 +220,19 @@ class Catalog:
             "expected_version": 7,
         }
 
-    def project_mapping_targets_for_ontology_objects(self, ontology_object_gids):
+    def project_mapping_targets_for_ontology_objects(
+        self, ontology_object_gids, *, actor_gid, team_gid
+    ):
+        if (actor_gid, team_gid) != ("actor-1", "team-1"):
+            return []
         if "concept-part" not in ontology_object_gids:
             return []
-        return [{**self.resolve_mapping_target("ontology:concept-part"), "ontology_object_gid": "concept-part"}]
+        return [{
+            **self.resolve_mapping_target(
+                "ontology:concept-part", actor_gid=actor_gid, team_gid=team_gid
+            ),
+            "ontology_object_gid": "concept-part",
+        }]
 
 
 class Runtime:

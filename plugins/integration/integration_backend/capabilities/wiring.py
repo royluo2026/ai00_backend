@@ -24,6 +24,19 @@ class IntegrationProviderAdapters:
 AdapterFactory = Callable[[], IntegrationProviderAdapters]
 
 
+def _requires_principal_scope(method: Any) -> bool:
+    try:
+        parameters = inspect.signature(method).parameters
+    except (TypeError, ValueError):
+        return False
+    return all(
+        name in parameters
+        and parameters[name].kind is inspect.Parameter.KEYWORD_ONLY
+        and parameters[name].default is inspect.Parameter.empty
+        for name in ("actor_gid", "team_gid")
+    )
+
+
 def _configured_factory() -> AdapterFactory:
     target = os.getenv("AI00_INTEGRATION_ADAPTER_FACTORY", "").strip()
     if not target:
@@ -76,6 +89,13 @@ def build_application(adapter_factory: AdapterFactory | None = None) -> Integrat
         for method in ("test", "discover", "source_columns", "preview")
     ):
         invalid.add("connector_runtime")
+    if any(
+        not _requires_principal_scope(getattr(adapters.catalog, method, None))
+        for method in (
+            "project_mapping_targets_for_ontology_objects", "resolve_mapping_target",
+        )
+    ):
+        invalid.add("catalog")
     if invalid:
         raise RuntimeError("Integration adapter factory returned invalid adapters: " + ", ".join(sorted(invalid)))
     return IntegrationApplication(

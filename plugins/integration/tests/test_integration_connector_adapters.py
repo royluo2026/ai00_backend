@@ -2,11 +2,13 @@ import asyncio
 
 import pytest
 
-from backend.capability_v2.provider_contracts import CapabilityContext
+from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext
 from plugins.integration.integration_backend.application.service import IntegrationApplication
 from plugins.integration.integration_backend.capabilities import register_capabilities
 from plugins.integration.integration_backend.capabilities.wiring import IntegrationProviderAdapters
-from plugins.integration.tests.test_integration_owner_services import Catalog, FixedIdentity, MemoryRepository, Runtime, Vault
+from plugins.integration.tests.test_integration_owner_services import (
+    Catalog, FixedIdentity, MemoryRepository, Runtime, Vault, _seed_connector_and_mapping,
+)
 
 
 CONTEXT = CapabilityContext(user_gid="actor-1", team_gid="team-1", request_id="adapter-equivalence")
@@ -55,6 +57,49 @@ def application(value):
         connector_runtime=value.connector_runtime,
         operation_identity=value.operation_identity,
     )
+
+
+def test_provider_adapter_matches_owner_service_cross_team_binding_denials():
+    direct_adapters = adapters()
+    provider_adapters = adapters()
+    for value in (direct_adapters, provider_adapters):
+        _seed_connector_and_mapping(value.repository)
+        value.repository.connectors["connector-1"]["team_gid"] = "team-2"
+        value.repository.mappings["mapping-1"]["team_gid"] = "team-2"
+    registry = Registry()
+    register_capabilities(registry, adapter_factory=lambda: provider_adapters)
+    context = CapabilityContext(
+        user_gid="actor-1", team_gid="team-2", request_id="adapter-cross-team"
+    )
+    direct = application(direct_adapters)
+
+    direct_projection = asyncio.run(direct.invoke(
+        "integration.mapping_target.search", {"ontology_object_gids": ["concept-part"]}, context
+    ))
+    provider_projection = asyncio.run(registry.handlers["integration.mapping_target.search"](
+        {"ontology_object_gids": ["concept-part"]}, context
+    ))
+    create_payload = {
+        "datasource_gid": "connector-1", "name": "Parts", "source_object": "parts",
+        "target_binding_id": "ontology:concept-part", "field_mappings": [],
+        "idempotency_key": "adapter-cross-team-create",
+    }
+    import_payload = {
+        "mapping_gid": "mapping-1", "idempotency_key": "adapter-cross-team-import",
+    }
+
+    assert direct_projection == provider_projection == {"items": []}
+    invokers = (
+        lambda capability_id, payload: direct.invoke(capability_id, payload, context),
+        lambda capability_id, payload: registry.handlers[capability_id](payload, context),
+    )
+    for invoke in invokers:
+        with pytest.raises(CapabilityBusinessError) as create_rejected:
+            asyncio.run(invoke("integration.mapping.create", create_payload))
+        with pytest.raises(CapabilityBusinessError) as import_rejected:
+            asyncio.run(invoke("integration.mapping.import.start", import_payload))
+        assert create_rejected.value.code == "target_binding_unavailable"
+        assert import_rejected.value.code == "target_binding_unavailable"
 
 
 @pytest.mark.parametrize(
