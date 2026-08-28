@@ -338,11 +338,16 @@ class IntegrationApplication:
             self._closed(raw, {"mapping_gid", "limit"})
             self._require(data, "mapping_gid")
             limit = self._limit(data)
-            mapping = self._get_mapping(data, str(data["mapping_gid"]))
             rows = self.repository.search_field_mappings({**data, "limit": limit})
             if rows is None:
                 raise CapabilityBusinessError("resource_not_found", "Integration mapping does not exist")
-            return {"items": [self._field(str(mapping["gid"]), row, int(mapping["revision"])) for row in rows[:limit]]}
+            return {"items": [
+                self._field(
+                    str(data["mapping_gid"]), row,
+                    int(row.get("mapping_revision") or row.get("revision") or 1),
+                )
+                for row in rows[:limit]
+            ]}
 
         self._closed(raw, {"mapping_gid", "limit"} if capability_id.endswith("source_columns.discover") else {"gid", "limit"})
         mapping_gid = str(data.get("mapping_gid") or data.get("gid") or "")

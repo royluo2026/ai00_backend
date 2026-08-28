@@ -139,7 +139,7 @@ class IntegrationRepository:
                 )
                 return [dict(row) for row in cur.fetchall()]
 
-    def search_field_mappings(self, data: dict) -> list[dict]:
+    def search_field_mappings(self, data: dict) -> list[dict] | None:
         if data.get("team_gid") is None:
             scope, scope_values = "m.owner_gid=%s AND m.team_gid IS NULL", (data["owner_gid"],)
         else:
@@ -148,14 +148,17 @@ class IntegrationRepository:
         with get_integration_conn() as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT f.gid,f.revision,f.source_field,f.target_field,f.transform_expression "
-                    "FROM workmanship_int_ext_field_mappings f "
-                    "JOIN workmanship_int_ext_mappings m ON m.gid=f.mapping_gid "
-                    f"WHERE f.mapping_gid=%s AND {scope} AND m.archived_at IS NULL "
+                    "SELECT f.gid,f.revision,f.source_field,f.target_field,f.transform_expression,"
+                    "m.revision AS mapping_revision FROM workmanship_int_ext_mappings m "
+                    "LEFT JOIN workmanship_int_ext_field_mappings f ON f.mapping_gid=m.gid "
+                    f"WHERE m.gid=%s AND {scope} AND m.archived_at IS NULL "
                     "ORDER BY f.sort_order LIMIT %s",
                     (data["mapping_gid"], *scope_values, limit),
                 )
-                return [dict(row) for row in cur.fetchall()]
+                rows = [dict(row) for row in cur.fetchall()]
+        if not rows:
+            return None
+        return [] if rows[0]["gid"] is None else rows
 
     def replace_field_mappings(self, data: dict) -> dict:
         scope, scope_values = self._scope(data)

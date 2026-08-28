@@ -168,7 +168,7 @@ class SqlConnection:
         }]
         self.field_rows = [{
             "gid": "field-1", "revision": 3, "source_field": "part_no", "target_field": "code",
-            "transform_expression": None,
+            "transform_expression": None, "mapping_revision": 3,
         }]
 
     def __enter__(self):
@@ -220,9 +220,69 @@ def test_field_mapping_repository_uses_one_owned_bounded_collection_query(monkey
     assert result == connection.field_rows
     assert len(connection.statements) == 1
     sql, params = connection.statements[0]
-    assert "JOIN workmanship_int_ext_mappings" in sql
+    assert "FROM workmanship_int_ext_mappings m LEFT JOIN workmanship_int_ext_field_mappings f" in sql
     assert "m.owner_gid=%s AND m.team_gid=%s" in sql and "m.archived_at IS NULL" in sql
     assert params == ("mapping-1", "actor-1", "team-1", 4)
+
+
+def test_field_mapping_repository_distinguishes_hidden_mapping_from_empty_collection(monkeypatch):
+    hidden = SqlConnection()
+    hidden.field_rows = []
+    use_connection(monkeypatch, hidden)
+    assert IntegrationRepository().search_field_mappings({
+        "mapping_gid": "mapping-hidden", "owner_gid": "actor-1", "team_gid": "team-1", "limit": 4,
+    }) is None
+    assert len(hidden.statements) == 1
+
+    empty = SqlConnection()
+    empty.field_rows = [{
+        "gid": None, "revision": None, "source_field": None, "target_field": None,
+        "transform_expression": None, "mapping_revision": 3,
+    }]
+    use_connection(monkeypatch, empty)
+    assert IntegrationRepository().search_field_mappings({
+        "mapping_gid": "mapping-empty", "owner_gid": "actor-1", "team_gid": "team-1", "limit": 4,
+    }) == []
+    assert len(empty.statements) == 1
+
+
+class FieldSearchRepository(MappingRepository):
+    def __init__(self, result):
+        super().__init__()
+        self.result = result
+        self.field_searches = []
+
+    def get_mapping(self, _data):
+        raise AssertionError("field_mapping.search must not prefetch mapping.get")
+
+    def search_field_mappings(self, data):
+        self.field_searches.append(dict(data))
+        return self.result
+
+
+def test_field_mapping_capability_uses_only_the_owned_bounded_collection_path():
+    repository = FieldSearchRepository([{
+        "gid": "field-1", "revision": 3, "source_field": "part_no", "target_field": "code",
+        "transform_expression": None,
+    }])
+
+    result = asyncio.run(application(repository).invoke(
+        "integration.field_mapping.search", {"mapping_gid": "mapping-1", "limit": 4}, CONTEXT
+    ))
+
+    assert result == {"items": [{
+        "gid": "field-1", "revision": 3, "source_field": "part_no", "target_field": "code",
+    }]}
+    assert repository.field_searches == [{
+        "mapping_gid": "mapping-1", "limit": 4, "owner_gid": "actor-1", "team_gid": "team-1",
+    }]
+
+    hidden = FieldSearchRepository(None)
+    with pytest.raises(CapabilityBusinessError) as missing:
+        asyncio.run(application(hidden).invoke(
+            "integration.field_mapping.search", {"mapping_gid": "mapping-1", "limit": 4}, CONTEXT
+        ))
+    assert missing.value.code == "resource_not_found"
 
 
 def test_source_columns_bind_owned_mapping_and_connector_and_return_closed_columns():
