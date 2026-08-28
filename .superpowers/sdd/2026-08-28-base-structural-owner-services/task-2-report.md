@@ -161,6 +161,6 @@ Base structural remediation checks all passed.
 
 - Frontend: `702ec5d fix: route self annotation batch consumers through gateway`
 - Frontend: `ca1afbf fix: preserve module-scoped annotation search`
-- Backend: pending `fix: close Base annotation attachment and evidence gaps`
+- Backend: `6fd55994 fix: close Base annotation attachment and evidence gaps`
 - Counts remain truthfully `14/16` Base groups and `31/33` occurrences migrated;
   the only unresolved two occurrences are the explicit plugin lifecycle groups.
