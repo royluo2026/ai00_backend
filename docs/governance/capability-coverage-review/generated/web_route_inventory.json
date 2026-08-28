@@ -1,7 +1,7 @@
 {
-  "frontend_revision": "6dd62900c9a82173adcbbe277bb38846ab556031",
-  "content_hash": "6c2d9dd40efff87a5200b668727d7b56b47989b3f65e3796de97c91d83a2affb",
-  "wrapper_contracts_hash": "0ec4f3ca4819c4e9f73d08b9a2871112efa1442e0266fa5606ca4de4e7d99316",
+  "frontend_revision": "2b283c64fbe69b15779f9fec08d384174ab0c3a5",
+  "content_hash": "e2e32aff4cd40d6457e9a4c257097c8985ce519251d497ad4d086d9901be9d4b",
+  "wrapper_contracts_hash": "7fec8d2b3c7b989ad5dd570c8fc10984f3fac4745244194edb738a3015aa600c",
   "scan_roots": [
     "web",
     "packages"
@@ -27,12 +27,12 @@
     "legacy_registered": 311,
     "bff_registered": 2,
     "operations_excluded": 19,
-    "unresolved": 45
+    "unresolved": 37
   },
   "lexical_audit": {
-    "token_count": 434,
-    "token_hash": "33bbb455ec263deb25093d32892a5782f260ef17672d6db2307d22180fd0ff53",
-    "mapped_count": 415,
+    "token_count": 426,
+    "token_hash": "c5a5c436961f8c5690a161034892d50b0ded4df5502701f4bf97a03710df32e4",
+    "mapped_count": 407,
     "reviewed_non_route_count": 19,
     "reviewed_non_route_tokens": [
       "packages/craft-plugin/web/bop_nav/bop_nav.js:12:13:/api/",
@@ -1644,23 +1644,13 @@
     },
     {
       "source": "web/admin/task_planning.html",
-      "line": 1069,
-      "column": 26,
-      "raw_route": "/api/views?module=task&list_gid=${listGid}",
-      "normalized_route": "/api/views",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/admin/task_planning.html:1069:26:GET:/api/views"
-    },
-    {
-      "source": "web/admin/task_planning.html",
-      "line": 2924,
+      "line": 2925,
       "column": 26,
       "raw_route": "/api/lists",
       "normalized_route": "/api/lists",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/admin/task_planning.html:2924:26:POST:/api/lists"
+      "occurrence_id": "web/admin/task_planning.html:2925:26:POST:/api/lists"
     },
     {
       "source": "web/canvas/types/flow_type.js",
@@ -2206,76 +2196,6 @@
       "occurrence_id": "web/components/subscribe_button.js:142:26:DELETE:/api/follows/{dynamic}"
     },
     {
-      "source": "web/components/view_manager.js",
-      "line": 541,
-      "column": 40,
-      "raw_route": "/api/views?module=${this.moduleId}${listQuery}",
-      "normalized_route": "/api/views",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/view_manager.js:541:40:GET:/api/views"
-    },
-    {
-      "source": "web/components/view_manager.js",
-      "line": 651,
-      "column": 30,
-      "raw_route": "/api/views/${this._activeViewGid}",
-      "normalized_route": "/api/views/{dynamic}",
-      "method": "PATCH",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/view_manager.js:651:30:PATCH:/api/views/{dynamic}"
-    },
-    {
-      "source": "web/components/view_manager.js",
-      "line": 657,
-      "column": 42,
-      "raw_route": "/api/views",
-      "normalized_route": "/api/views",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/view_manager.js:657:42:POST:/api/views"
-    },
-    {
-      "source": "web/components/view_manager.js",
-      "line": 713,
-      "column": 40,
-      "raw_route": "/api/views",
-      "normalized_route": "/api/views",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/view_manager.js:713:40:POST:/api/views"
-    },
-    {
-      "source": "web/components/view_manager.js",
-      "line": 978,
-      "column": 42,
-      "raw_route": "/api/views/${gid}/copy",
-      "normalized_route": "/api/views/{dynamic}/copy",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/view_manager.js:978:42:POST:/api/views/{dynamic}/copy"
-    },
-    {
-      "source": "web/components/view_manager.js",
-      "line": 1002,
-      "column": 28,
-      "raw_route": "/api/views/${gid}",
-      "normalized_route": "/api/views/{dynamic}",
-      "method": "DELETE",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/view_manager.js:1002:28:DELETE:/api/views/{dynamic}"
-    },
-    {
-      "source": "web/components/view_manager.js",
-      "line": 1011,
-      "column": 28,
-      "raw_route": "/api/views/${gid}",
-      "normalized_route": "/api/views/{dynamic}",
-      "method": "PATCH",
-      "disposition": "unresolved",
-      "occurrence_id": "web/components/view_manager.js:1011:28:PATCH:/api/views/{dynamic}"
-    },
-    {
       "source": "web/components/visibility_selector.js",
       "line": 52,
       "column": 41,
@@ -2547,33 +2467,33 @@
     },
     {
       "source": "web/core/existing_capability_client.js",
-      "line": 220,
+      "line": 252,
       "column": 27,
       "raw_route": "/api/v1/capabilities/${capabilityId}:${action}",
       "normalized_route": "/api/v1/capabilities/{dynamic}:{dynamic}",
       "method": "POST",
       "disposition": "capability",
-      "occurrence_id": "web/core/existing_capability_client.js:220:27:POST:/api/v1/capabilities/{dynamic}:{dynamic}"
+      "occurrence_id": "web/core/existing_capability_client.js:252:27:POST:/api/v1/capabilities/{dynamic}:{dynamic}"
     },
     {
       "source": "web/core/existing_capability_client.js",
-      "line": 254,
+      "line": 286,
       "column": 51,
       "raw_route": "/api/lists?item_type=bop_version",
       "normalized_route": "/api/lists",
       "method": "GET",
       "disposition": "unresolved",
-      "occurrence_id": "web/core/existing_capability_client.js:254:51:GET:/api/lists"
+      "occurrence_id": "web/core/existing_capability_client.js:286:51:GET:/api/lists"
     },
     {
       "source": "web/core/existing_capability_client.js",
-      "line": 259,
+      "line": 291,
       "column": 12,
       "raw_route": "/api/lists/${encodeURIComponent(gid)}?item_type=bop_version&expected_revision=${revision}",
       "normalized_route": "/api/lists/{dynamic}",
       "method": "DELETE",
       "disposition": "unresolved",
-      "occurrence_id": "web/core/existing_capability_client.js:259:12:DELETE:/api/lists/{dynamic}"
+      "occurrence_id": "web/core/existing_capability_client.js:291:12:DELETE:/api/lists/{dynamic}"
     },
     {
       "source": "web/core/global_search.js",

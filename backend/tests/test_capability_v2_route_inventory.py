@@ -53,6 +53,17 @@ def test_canonical_web_inventory_has_no_unknown_method() -> None:
     assert all("UNKNOWN:" not in route["occurrence_id"] for route in inventory["routes"])
 
 
+def test_canonical_web_inventory_truthfully_closes_saved_view_rest_calls() -> None:
+    inventory = json.loads(CANONICAL_WEB_INVENTORY.read_text(encoding="utf-8"))
+
+    assert inventory["counts"]["unresolved"] == 37
+    assert not [
+        route for route in inventory["routes"]
+        if route["disposition"] == "unresolved"
+        and route["normalized_route"].startswith("/api/views")
+    ]
+
+
 def test_task3b3a_root_cause_ledger_covers_pinned_unresolved_evidence() -> None:
     ledger = _root_cause_ledger()
 
@@ -298,8 +309,8 @@ def test_task3b3c_reviewed_disposition_totals_are_exact() -> None:
     assert len(ledger.entries) == 102
     assert sum(entry.occurrence_count for entry in ledger.entries) == 161
     assert groups == Counter({
-        "existing_capability_reclassified": 35,
-        "existing_capability_migrated": 19,
+        "existing_capability_reclassified": 25,
+        "existing_capability_migrated": 29,
         "frontend_retire": 17,
         "frontend_route_normalize": 15,
         "new_atomic_capability_required": 5,
@@ -310,8 +321,8 @@ def test_task3b3c_reviewed_disposition_totals_are_exact() -> None:
         "file_store_capability_migrated": 1,
     })
     assert occurrences == Counter({
-        "existing_capability_reclassified": 54,
-        "existing_capability_migrated": 27,
+        "existing_capability_reclassified": 29,
+        "existing_capability_migrated": 52,
         "frontend_route_normalize": 23,
         "frontend_retire": 21,
         "conditional_dispatch_partially_migrated": 14,

@@ -8,7 +8,7 @@
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_a4a5a17ebc77419f6a12eec1f32fcbea`
+- Catalog Release：`rel_331a207029a6b2186322dcabb43f675c`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -86,7 +86,7 @@
 ```json
 {
   "capability_id": "knowledge.proposal.outbox.retry",
-  "catalog_release": "rel_a4a5a17ebc77419f6a12eec1f32fcbea",
+  "catalog_release": "rel_331a207029a6b2186322dcabb43f675c",
   "major_version": 1,
   "payload": {
     "outbox_gid": "example"

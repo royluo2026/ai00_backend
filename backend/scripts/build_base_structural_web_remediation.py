@@ -20,6 +20,7 @@ from backend.scripts.check_web_capability_routes import build_report
 BASELINE = "8ee5dc2340a9e77c5d84e8f84f733bb5415e9d08"
 LEDGER_PATH = "docs/governance/web-route-root-cause-ledger.json"
 ATOMIC_PATH = ROOT / "docs/governance/atomic-web-capability-contracts.json"
+MIGRATION_PATH = ROOT / "docs/governance/existing-capability-web-migrations.json"
 OUTPUT = ROOT / "docs/governance/base-structural-web-remediation.json"
 SCOPE = {
     ("GET", "/api/org/teams"), ("GET", "/api/teams"),
@@ -62,6 +63,14 @@ def _canonical(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
 
 
+def _source_evidence(relative_path: str) -> dict[str, str]:
+    payload = (ROOT / relative_path).read_bytes()
+    return {
+        "source_path": relative_path,
+        "source_sha256": "sha256:" + hashlib.sha256(payload).hexdigest(),
+    }
+
+
 def _baseline() -> tuple[dict[str, Any], bytes]:
     result = subprocess.run(
         ["git", "show", f"{BASELINE}:{LEDGER_PATH}"], cwd=ROOT, check=True,
@@ -74,6 +83,11 @@ def build_manifest(web_root: Path) -> dict[str, Any]:
     ledger, ledger_blob = _baseline()
     atomic = json.loads(ATOMIC_PATH.read_text(encoding="utf-8"))
     atomic_by_key = {(item["method"], item["normalized_route"]): item for item in atomic["entries"]}
+    migration = json.loads(MIGRATION_PATH.read_text(encoding="utf-8"))
+    migration_by_key = {
+        (item["method"], item["normalized_route"]): item
+        for item in migration["groups"]
+    }
     report = json.loads(build_report(web_root.resolve()).json())
     unresolved = {(item["method"], item["normalized_route"]) for item in report["routes"] if item["disposition"] == "unresolved"}
     baseline_entries = {
@@ -92,6 +106,16 @@ def build_manifest(web_root: Path) -> dict[str, Any]:
         migrated = contract["final_disposition"] == "migrated"
         if migrated and not _saved_view_boundary_ready(key, contract):
             raise ValueError(f"saved-view boundary evidence missing: {key}")
+        saved_view_evidence = migration_by_key.get(key) if key in SAVED_VIEW_TARGETS else None
+        if saved_view_evidence is not None:
+            expected_target = SAVED_VIEW_TARGETS[key]
+            if (
+                saved_view_evidence.get("decision") != "migrate"
+                or saved_view_evidence.get("target_capability_id") != expected_target
+                or saved_view_evidence.get("target_major_version") != 1
+                or not saved_view_evidence.get("frontend_call_sites")
+            ):
+                raise ValueError(f"saved-view migration evidence missing: {key}")
         mapping = "unresolved" if key in unresolved else "capability"
         if migrated != (mapping == "capability"):
             raise ValueError(f"final mapping does not match contract: {key}")
@@ -104,6 +128,22 @@ def build_manifest(web_root: Path) -> dict[str, Any]:
             "candidate_capability": f"{contract['capability_id']}@{contract['major_version']}" if migrated else None,
             "provider_anchor": contract["provider_anchor"],
             "provider_source_sha256": contract["provider_source_sha256"],
+            "owner_service_evidence": (
+                _source_evidence("backend/base/saved_views.py")
+                if saved_view_evidence is not None else None
+            ),
+            "contract_evidence": (
+                saved_view_evidence["equivalence_evidence"]["provider_contract"]
+                if saved_view_evidence is not None else None
+            ),
+            "frontend_operation": (
+                saved_view_evidence["frontend_operation"]
+                if saved_view_evidence is not None else None
+            ),
+            "frontend_call_sites": (
+                saved_view_evidence["frontend_call_sites"]
+                if saved_view_evidence is not None else []
+            ),
             "input_schema": contract["input_schema"],
             "output_schema": contract["output_schema"],
             "confirmation_policy": contract.get("confirmation_policy"),
@@ -121,7 +161,7 @@ def build_manifest(web_root: Path) -> dict[str, Any]:
         "unresolved_groups": sum(item["final_disposition"] == "unresolved" for item in entries),
         "unresolved_occurrences": sum(len(item["occurrences"]) for item in entries if item["final_disposition"] == "unresolved"),
     }
-    if counts != {"groups": 16, "occurrences": 33, "migrated_groups": 5, "migrated_occurrences": 17, "unresolved_groups": 11, "unresolved_occurrences": 16}:
+    if counts != {"groups": 16, "occurrences": 33, "migrated_groups": 10, "migrated_occurrences": 25, "unresolved_groups": 6, "unresolved_occurrences": 8}:
         raise ValueError(f"Base structural count drift: {counts}")
     manifest = {
         "schema_version": "1.0.0", "artifact_id": "task-3b3e-base-structural-remediation",

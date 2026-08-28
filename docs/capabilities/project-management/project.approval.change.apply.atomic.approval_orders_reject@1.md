@@ -8,7 +8,7 @@ Execute Project Management operation approval.orders.reject.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_a4a5a17ebc77419f6a12eec1f32fcbea`
+- Catalog Release：`rel_331a207029a6b2186322dcabb43f675c`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -326,7 +326,7 @@ Execute Project Management operation approval.orders.reject.
 ```json
 {
   "capability_id": "project.approval.change.apply.atomic.approval_orders_reject",
-  "catalog_release": "rel_a4a5a17ebc77419f6a12eec1f32fcbea",
+  "catalog_release": "rel_331a207029a6b2186322dcabb43f675c",
   "major_version": 1,
   "payload": {}
 }

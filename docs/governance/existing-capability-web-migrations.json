@@ -3,7 +3,7 @@
   "artifact_id": "existing-capability-web-migrations",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "baseline_revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-  "frontend_revision": "6dd62900c9a82173adcbbe277bb38846ab556031",
+  "frontend_revision": "2b283c64fbe69b15779f9fec08d384174ab0c3a5",
   "groups": [
     {
       "method": "DELETE",
@@ -210,7 +210,7 @@
           "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
         }
       ],
-      "target_capability_id": "base.saved_view.change.apply",
+      "target_capability_id": "base.saved_view.delete",
       "target_major_version": 1,
       "owner_domain": "base",
       "transport_evidence": {
@@ -227,43 +227,31 @@
         },
         "anchors": []
       },
-      "decision": "reclassify",
-      "request_transform": "not applied: /api/views/{dynamic}: REST deletes a view gid; candidate accepts generic operation/resource.",
-      "response_transform": "not applied: /api/views/{dynamic}: REST returns deletion success; candidate returns generic result.",
-      "frontend_operation": null,
-      "frontend_call_sites": [],
-      "equivalence_evidence": null,
-      "reclassification": {
-        "reason_code": "provider_equivalence_missing",
-        "followup": "provider_adapter_review",
-        "finding": "/api/views/{dynamic}: REST deletes a view gid; candidate accepts generic operation/resource. | /api/views/{dynamic}: REST returns deletion success; candidate returns generic result. | /api/views/{dynamic}: Candidate BaseOutcomePort is unbound and cannot delete the saved view.",
-        "legacy_contract": {
-          "kind": "registered_route_definition",
-          "source_path": "backend/routers/views.py",
-          "start_line": 147,
-          "end_line": 159,
-          "sha256": "a9cac5f8e3dc93dc7201a5f25f8f7a97564ed5948c61e97a2bb9fe594c4cc2e3",
-          "method": "DELETE",
-          "normalized_route": "/api/views/{dynamic}",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "source_sha256": "304e2af4e42bbf743140f5fb949a3f4d636fcc31c4034ad53c6f7e020e52944b"
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
-            "start_line": 31,
-            "end_line": 31,
-            "sha256": "7eee85b095421dbd50ccfb06f9a7449a9605e111dfe6394ef005631ff2ec978b",
-            "needle": "base.saved_view.change.apply"
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/views/{dynamic}: REST deletes a view gid; candidate accepts generic operation/resource.",
-          "output": "/api/views/{dynamic}: REST returns deletion success; candidate returns generic result.",
-          "side_effects": "/api/views/{dynamic}: Candidate BaseOutcomePort is unbound and cannot delete the saved view."
+      "decision": "migrate",
+      "request_transform": "view gid/revision -> closed tombstone command with idempotency",
+      "response_transform": "provider view envelope -> deleted saved-view projection",
+      "frontend_operation": "base.savedViews.delete",
+      "frontend_call_sites": [
+        {
+          "source_path": "web/components/view_manager.js",
+          "line": 1005,
+          "column": 28,
+          "operation": "base.savedViews.delete",
+          "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
         }
-      }
+      ],
+      "equivalence_evidence": {
+        "proof_kind": "provider_equivalent_adapter",
+        "provider_contract": {
+          "source_path": "backend/base/web_atomic.py",
+          "source_sha256": "e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "start_line": 227,
+          "end_line": 227,
+          "sha256": "56229834691651b93ee38d67bb2fa715d321afba6c0af79b064497283f1a380b",
+          "needle": "\"base.saved_view.delete\": _saved_view_delete"
+        }
+      },
+      "reclassification": null
     },
     {
       "method": "GET",
@@ -1816,7 +1804,7 @@
           "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
         }
       ],
-      "target_capability_id": "base.saved_view.read",
+      "target_capability_id": "base.saved_view.search",
       "target_major_version": 1,
       "owner_domain": "base",
       "transport_evidence": {
@@ -1833,43 +1821,38 @@
         },
         "anchors": []
       },
-      "decision": "reclassify",
-      "request_transform": "not applied: /api/views: REST lists saved views by legacy scope; candidate generic payload is unproved.",
-      "response_transform": "not applied: /api/views: REST returns saved-view rows; candidate generic result is unproved.",
-      "frontend_operation": null,
-      "frontend_call_sites": [],
-      "equivalence_evidence": null,
-      "reclassification": {
-        "reason_code": "provider_equivalence_missing",
-        "followup": "provider_adapter_review",
-        "finding": "/api/views: REST lists saved views by legacy scope; candidate generic payload is unproved. | /api/views: REST returns saved-view rows; candidate generic result is unproved. | /api/views: Candidate BaseOutcomePort is unbound.",
-        "legacy_contract": {
-          "kind": "registered_route_definition",
-          "source_path": "backend/routers/views.py",
-          "start_line": 54,
-          "end_line": 96,
-          "sha256": "a7821ff682ccd637f93459679eed4427b5d387dd4885013046e19c22b17221f4",
-          "method": "GET",
-          "normalized_route": "/api/views",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "source_sha256": "304e2af4e42bbf743140f5fb949a3f4d636fcc31c4034ad53c6f7e020e52944b"
+      "decision": "migrate",
+      "request_transform": "module/list_gid -> closed aggregate scope query",
+      "response_transform": "provider views -> legacy saved-view array",
+      "frontend_operation": "base.savedViews.search",
+      "frontend_call_sites": [
+        {
+          "source_path": "web/admin/task_planning.html",
+          "line": 1070,
+          "column": 14,
+          "operation": "base.savedViews.search",
+          "source_sha256": "37cd37731ec9d580bf7c32f7da0601f5fac7e04ad2a6b74e03740bc58450b9d7"
         },
-        "candidate_contracts": [
-          {
-            "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
-            "start_line": 21,
-            "end_line": 21,
-            "sha256": "e5ce95c3cac1301ffa2b52e7389f3aab850c9531d9041b5d90fcf7cdcb43fca1",
-            "needle": "base.saved_view.read"
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/views: REST lists saved views by legacy scope; candidate generic payload is unproved.",
-          "output": "/api/views: REST returns saved-view rows; candidate generic result is unproved.",
-          "side_effects": "/api/views: Candidate BaseOutcomePort is unbound."
+        {
+          "source_path": "web/components/view_manager.js",
+          "line": 538,
+          "column": 40,
+          "operation": "base.savedViews.search",
+          "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
         }
-      }
+      ],
+      "equivalence_evidence": {
+        "proof_kind": "provider_equivalent_adapter",
+        "provider_contract": {
+          "source_path": "backend/base/web_atomic.py",
+          "source_sha256": "e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "start_line": 223,
+          "end_line": 223,
+          "sha256": "21e5f4f93bdc09b1ba703dc17a13307584bfc738466d3a1b71e4a491ef61c806",
+          "needle": "\"base.saved_view.search\": _saved_view_search"
+        }
+      },
+      "reclassification": null
     },
     {
       "method": "PATCH",
@@ -2170,7 +2153,7 @@
           "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
         }
       ],
-      "target_capability_id": "base.saved_view.change.apply",
+      "target_capability_id": "base.saved_view.update",
       "target_major_version": 1,
       "owner_domain": "base",
       "transport_evidence": {
@@ -2187,43 +2170,38 @@
         },
         "anchors": []
       },
-      "decision": "reclassify",
-      "request_transform": "not applied: /api/views/{dynamic}: REST patches one view gid with view fields; candidate generic operation/resource is unproved.",
-      "response_transform": "not applied: /api/views/{dynamic}: REST returns updated saved view; candidate generic result is unproved.",
-      "frontend_operation": null,
-      "frontend_call_sites": [],
-      "equivalence_evidence": null,
-      "reclassification": {
-        "reason_code": "provider_equivalence_missing",
-        "followup": "provider_adapter_review",
-        "finding": "/api/views/{dynamic}: REST patches one view gid with view fields; candidate generic operation/resource is unproved. | /api/views/{dynamic}: REST returns updated saved view; candidate generic result is unproved. | /api/views/{dynamic}: Candidate BaseOutcomePort is unbound.",
-        "legacy_contract": {
-          "kind": "registered_route_definition",
-          "source_path": "backend/routers/views.py",
-          "start_line": 116,
-          "end_line": 144,
-          "sha256": "68654ac19755eee9b4425ca6cb8fdf3aa7f42629b9be96f2b9a20184764bc159",
-          "method": "PATCH",
-          "normalized_route": "/api/views/{dynamic}",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "source_sha256": "304e2af4e42bbf743140f5fb949a3f4d636fcc31c4034ad53c6f7e020e52944b"
+      "decision": "migrate",
+      "request_transform": "view gid/revision/config -> closed update command with idempotency",
+      "response_transform": "provider view envelope -> saved-view projection",
+      "frontend_operation": "base.savedViews.update",
+      "frontend_call_sites": [
+        {
+          "source_path": "web/components/view_manager.js",
+          "line": 644,
+          "column": 44,
+          "operation": "base.savedViews.update",
+          "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
         },
-        "candidate_contracts": [
-          {
-            "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
-            "start_line": 31,
-            "end_line": 31,
-            "sha256": "7eee85b095421dbd50ccfb06f9a7449a9605e111dfe6394ef005631ff2ec978b",
-            "needle": "base.saved_view.change.apply"
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/views/{dynamic}: REST patches one view gid with view fields; candidate generic operation/resource is unproved.",
-          "output": "/api/views/{dynamic}: REST returns updated saved view; candidate generic result is unproved.",
-          "side_effects": "/api/views/{dynamic}: Candidate BaseOutcomePort is unbound."
+        {
+          "source_path": "web/components/view_manager.js",
+          "line": 1016,
+          "column": 42,
+          "operation": "base.savedViews.update",
+          "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
         }
-      }
+      ],
+      "equivalence_evidence": {
+        "proof_kind": "provider_equivalent_adapter",
+        "provider_contract": {
+          "source_path": "backend/base/web_atomic.py",
+          "source_sha256": "e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "start_line": 225,
+          "end_line": 225,
+          "sha256": "799823cab800457fc52e02ea377c4efecaf3f4fb565b0f2a67b8e1ec6425e8e4",
+          "needle": "\"base.saved_view.update\": _saved_view_update"
+        }
+      },
+      "reclassification": null
     },
     {
       "method": "POST",
@@ -3091,7 +3069,7 @@
           "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
         }
       ],
-      "target_capability_id": "base.saved_view.change.apply",
+      "target_capability_id": "base.saved_view.create",
       "target_major_version": 1,
       "owner_domain": "base",
       "transport_evidence": {
@@ -3108,43 +3086,38 @@
         },
         "anchors": []
       },
-      "decision": "reclassify",
-      "request_transform": "not applied: /api/views: REST creates concrete saved-view fields; candidate generic operation/resource is unproved.",
-      "response_transform": "not applied: /api/views: REST returns created view; candidate generic result is unproved.",
-      "frontend_operation": null,
-      "frontend_call_sites": [],
-      "equivalence_evidence": null,
-      "reclassification": {
-        "reason_code": "provider_equivalence_missing",
-        "followup": "provider_adapter_review",
-        "finding": "/api/views: REST creates concrete saved-view fields; candidate generic operation/resource is unproved. | /api/views: REST returns created view; candidate generic result is unproved. | /api/views: Candidate BaseOutcomePort is unbound.",
-        "legacy_contract": {
-          "kind": "registered_route_definition",
-          "source_path": "backend/routers/views.py",
-          "start_line": 99,
-          "end_line": 113,
-          "sha256": "63172679667ad2f9dfc3a9b406d4e2ac97e734f56abad8becc938d909d81cc73",
-          "method": "POST",
-          "normalized_route": "/api/views",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "source_sha256": "304e2af4e42bbf743140f5fb949a3f4d636fcc31c4034ad53c6f7e020e52944b"
+      "decision": "migrate",
+      "request_transform": "saved-view fields -> closed create command with idempotency",
+      "response_transform": "provider view envelope -> saved-view projection",
+      "frontend_operation": "base.savedViews.create",
+      "frontend_call_sites": [
+        {
+          "source_path": "web/components/view_manager.js",
+          "line": 653,
+          "column": 44,
+          "operation": "base.savedViews.create",
+          "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
         },
-        "candidate_contracts": [
-          {
-            "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
-            "start_line": 31,
-            "end_line": 31,
-            "sha256": "7eee85b095421dbd50ccfb06f9a7449a9605e111dfe6394ef005631ff2ec978b",
-            "needle": "base.saved_view.change.apply"
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/views: REST creates concrete saved-view fields; candidate generic operation/resource is unproved.",
-          "output": "/api/views: REST returns created view; candidate generic result is unproved.",
-          "side_effects": "/api/views: Candidate BaseOutcomePort is unbound."
+        {
+          "source_path": "web/components/view_manager.js",
+          "line": 712,
+          "column": 42,
+          "operation": "base.savedViews.create",
+          "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
         }
-      }
+      ],
+      "equivalence_evidence": {
+        "proof_kind": "provider_equivalent_adapter",
+        "provider_contract": {
+          "source_path": "backend/base/web_atomic.py",
+          "source_sha256": "e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "start_line": 224,
+          "end_line": 224,
+          "sha256": "9d9ed3d4a5619754b9c0df361a0b2b4c01d1052d00d57414e9a50f40e172840c",
+          "needle": "\"base.saved_view.create\": _saved_view_create"
+        }
+      },
+      "reclassification": null
     },
     {
       "method": "POST",
@@ -3163,7 +3136,7 @@
           "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
         }
       ],
-      "target_capability_id": "base.saved_view.change.apply",
+      "target_capability_id": "base.saved_view.copy",
       "target_major_version": 1,
       "owner_domain": "base",
       "transport_evidence": {
@@ -3180,43 +3153,31 @@
         },
         "anchors": []
       },
-      "decision": "reclassify",
-      "request_transform": "not applied: /api/views/{dynamic}/copy: REST copies a source view and derives ownership/name; candidate generic operation/resource is unproved.",
-      "response_transform": "not applied: /api/views/{dynamic}/copy: REST returns copied view; candidate generic result is unproved.",
-      "frontend_operation": null,
-      "frontend_call_sites": [],
-      "equivalence_evidence": null,
-      "reclassification": {
-        "reason_code": "provider_equivalence_missing",
-        "followup": "provider_adapter_review",
-        "finding": "/api/views/{dynamic}/copy: REST copies a source view and derives ownership/name; candidate generic operation/resource is unproved. | /api/views/{dynamic}/copy: REST returns copied view; candidate generic result is unproved. | /api/views/{dynamic}/copy: Candidate BaseOutcomePort is unbound and has no copy adapter.",
-        "legacy_contract": {
-          "kind": "registered_route_definition",
-          "source_path": "backend/routers/views.py",
-          "start_line": 162,
-          "end_line": 180,
-          "sha256": "e3661050f4d7b1902bdad78bb6ee4f4a96054cf7d2e606b6f7331dcb81804fd9",
-          "method": "POST",
-          "normalized_route": "/api/views/{dynamic}/copy",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "source_sha256": "304e2af4e42bbf743140f5fb949a3f4d636fcc31c4034ad53c6f7e020e52944b"
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
-            "start_line": 31,
-            "end_line": 31,
-            "sha256": "7eee85b095421dbd50ccfb06f9a7449a9605e111dfe6394ef005631ff2ec978b",
-            "needle": "base.saved_view.change.apply"
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/views/{dynamic}/copy: REST copies a source view and derives ownership/name; candidate generic operation/resource is unproved.",
-          "output": "/api/views/{dynamic}/copy: REST returns copied view; candidate generic result is unproved.",
-          "side_effects": "/api/views/{dynamic}/copy: Candidate BaseOutcomePort is unbound and has no copy adapter."
+      "decision": "migrate",
+      "request_transform": "view gid/name -> closed copy command with idempotency",
+      "response_transform": "provider view envelope -> copied saved-view projection",
+      "frontend_operation": "base.savedViews.copy",
+      "frontend_call_sites": [
+        {
+          "source_path": "web/components/view_manager.js",
+          "line": 978,
+          "column": 44,
+          "operation": "base.savedViews.copy",
+          "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
         }
-      }
+      ],
+      "equivalence_evidence": {
+        "proof_kind": "provider_equivalent_adapter",
+        "provider_contract": {
+          "source_path": "backend/base/web_atomic.py",
+          "source_sha256": "e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+          "start_line": 226,
+          "end_line": 226,
+          "sha256": "c68df23c39cb7979116bd209087170259a02fc5ec888ee1020a0dfd92f6c6848",
+          "needle": "\"base.saved_view.copy\": _saved_view_copy"
+        }
+      },
+      "reclassification": null
     },
     {
       "method": "PUT",

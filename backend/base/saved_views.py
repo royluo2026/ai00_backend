@@ -4,17 +4,18 @@ from __future__ import annotations
 from contextlib import contextmanager
 from copy import deepcopy
 import json
+import math
 from typing import Any, Iterator
 
 from backend.db.connection import get_conn
 from backend.utils.gid import next_gid
 
 
-_CONFIG_KEYS = {"field_gids", "sort", "filters", "page_size", "presentation"}
-_OPERATORS = {"eq", "neq", "contains", "in", "gt", "gte", "lt", "lte"}
-_PRESENTATIONS = {"table", "kanban", "calendar"}
+_CONFIG_KEYS = {"columns", "filters", "filterMode", "sorts", "groupBy", "viewType", "treeParentField"}
+_OPERATORS = {"contains", "not_contains", "eq", "not_eq", "empty", "not_empty", "gt", "gte", "lt", "lte"}
 _SCOPES = {"private", "team", "shared"}
 _ADMIN_ROLES = {"super_admin", "team_admin"}
+_SCALAR_TYPES = (str, int, float, bool, type(None))
 
 
 class SavedViewError(ValueError):
@@ -45,32 +46,64 @@ def _text(value: Any, *, label: str, required: bool = True, maximum: int = 512) 
     return value.strip()
 
 
+def _integer(value: Any, *, label: str, minimum: int = 0, maximum: int | None = None) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or value < minimum or (maximum is not None and value > maximum):
+        _invalid(f"{label} 无效")
+    return value
+
+
+def _filter_value(value: Any) -> Any:
+    if isinstance(value, float) and not math.isfinite(value):
+        _invalid("filters.value 无效")
+    if isinstance(value, _SCALAR_TYPES):
+        return deepcopy(value)
+    if isinstance(value, list) and len(value) <= 100 and all(
+        isinstance(item, _SCALAR_TYPES) and not (isinstance(item, float) and not math.isfinite(item))
+        for item in value
+    ):
+        return deepcopy(value)
+    _invalid("filters.value 无效")
+
+
 def _config(value: Any) -> dict[str, Any]:
     config = _closed(value, allowed=_CONFIG_KEYS, required=_CONFIG_KEYS)
-    fields = config["field_gids"]
-    if not isinstance(fields, list) or not fields or len(fields) > 200 or any(_text(item, label="field_gid") is None for item in fields):
-        _invalid("field_gids 无效")
-    sort = config["sort"]
-    if not isinstance(sort, list) or len(sort) > 20:
-        _invalid("sort 无效")
-    for item in sort:
-        clause = _closed(item, allowed={"field_gid", "direction"}, required={"field_gid", "direction"})
-        _text(clause["field_gid"], label="sort.field_gid")
-        if clause["direction"] not in {"asc", "desc"}:
-            _invalid("sort.direction 无效")
+    columns = config["columns"]
+    if not isinstance(columns, list) or len(columns) > 200:
+        _invalid("columns 无效")
+    for item in columns:
+        column = _closed(item, allowed={"key", "visible", "order", "width"}, required={"key", "visible", "order", "width"})
+        _text(column["key"], label="columns.key")
+        if not isinstance(column["visible"], bool):
+            _invalid("columns.visible 无效")
+        _integer(column["order"], label="columns.order")
+        _integer(column["width"], label="columns.width", minimum=40, maximum=2000)
+
     filters = config["filters"]
     if not isinstance(filters, list) or len(filters) > 50:
         _invalid("filters 无效")
     for item in filters:
-        clause = _closed(item, allowed={"field_gid", "operator", "value"}, required={"field_gid", "operator", "value"})
-        _text(clause["field_gid"], label="filters.field_gid")
-        if clause["operator"] not in _OPERATORS or isinstance(clause["value"], dict):
-            _invalid("filter 无效")
-    page_size = config["page_size"]
-    if isinstance(page_size, bool) or not isinstance(page_size, int) or not 1 <= page_size <= 200:
-        _invalid("page_size 无效")
-    if config["presentation"] not in _PRESENTATIONS:
-        _invalid("presentation 无效")
+        clause = _closed(item, allowed={"id", "field", "op", "value"}, required={"id", "field", "op", "value"})
+        _text(clause["id"], label="filters.id")
+        _text(clause["field"], label="filters.field")
+        if clause["op"] not in _OPERATORS:
+            _invalid("filters.op 无效")
+        _filter_value(clause["value"])
+
+    if config["filterMode"] not in {"and", "or"}:
+        _invalid("filterMode 无效")
+    sorts = config["sorts"]
+    if not isinstance(sorts, list) or len(sorts) > 20:
+        _invalid("sorts 无效")
+    for item in sorts:
+        clause = _closed(item, allowed={"field", "dir"}, required={"field", "dir"})
+        _text(clause["field"], label="sorts.field")
+        if clause["dir"] not in {"asc", "desc"}:
+            _invalid("sorts.dir 无效")
+    for key in ("groupBy", "treeParentField"):
+        if config[key] is not None:
+            _text(config[key], label=key)
+    if config["viewType"] not in {"grid", "tree"}:
+        _invalid("viewType 无效")
     return deepcopy(config)
 
 
@@ -82,8 +115,19 @@ def _is_admin(actor: dict[str, Any]) -> bool:
     return str(actor.get("system_role") or actor.get("org_role") or actor.get("role") or "") in _ADMIN_ROLES
 
 
+def _json(value: Any, default: Any) -> Any:
+    if value is None:
+        return deepcopy(default)
+    if isinstance(value, str):
+        try:
+            return json.loads(value)
+        except ValueError:
+            return deepcopy(default)
+    return deepcopy(value)
+
+
 class SqlSavedViewRepository:
-    """Persistence adapter using the existing view table and its JSON column envelope."""
+    """Persistence adapter for user config plus Base-owned lifecycle evidence."""
 
     def __init__(self) -> None:
         self._conn: Any | None = None
@@ -105,19 +149,24 @@ class SqlSavedViewRepository:
     def next_gid(self) -> str:
         return str(next_gid())
 
+    @staticmethod
+    def _select() -> str:
+        return (
+            "SELECT v.gid,v.name,v.module,v.list_gid,v.owner_gid,v.is_shared,v.config,v.created_at,v.updated_at,"
+            "s.revision AS state_revision,s.deleted AS state_deleted,s.share_scope AS state_share_scope,"
+            "s.grants_json AS state_grants_json,s.team_gids_json AS state_team_gids_json,s.restore_json AS state_restore_json "
+            "FROM workmanship_app_view_configs v LEFT JOIN workmanship_base_saved_view_states s ON s.view_gid=v.gid"
+        )
+
     def get(self, view_gid: str, *, lock: bool = False) -> dict[str, Any] | None:
         with self._cursor() as cur:
-            cur.execute(
-                "SELECT gid,name,module,list_gid,owner_gid,is_shared,config,created_at,updated_at "
-                "FROM workmanship_app_view_configs WHERE gid=%s" + (" FOR UPDATE" if lock else ""),
-                (view_gid,),
-            )
+            cur.execute(self._select() + " WHERE v.gid=%s" + (" FOR UPDATE" if lock else ""), (view_gid,))
             row = cur.fetchone()
         return _decode_row(dict(row)) if row else None
 
     def list(self) -> list[dict[str, Any]]:
         with self._cursor() as cur:
-            cur.execute("SELECT gid,name,module,list_gid,owner_gid,is_shared,config,created_at,updated_at FROM workmanship_app_view_configs")
+            cur.execute(self._select())
             rows = cur.fetchall()
         return [_decode_row(dict(row)) for row in rows]
 
@@ -129,62 +178,78 @@ class SqlSavedViewRepository:
                 "name=VALUES(name),module=VALUES(module),list_gid=VALUES(list_gid),owner_gid=VALUES(owner_gid),"
                 "is_shared=VALUES(is_shared),config=VALUES(config)",
                 (row["gid"], row["name"], row["module"], row["list_gid"], row["owner_gid"],
-                 row["share_scope"] != "private", json.dumps(_stored(row), ensure_ascii=False)),
+                 row["share_scope"] != "private", json.dumps(row["config"], ensure_ascii=False)),
+            )
+            cur.execute(
+                "INSERT INTO workmanship_base_saved_view_states "
+                "(view_gid,revision,deleted,share_scope,grants_json,team_gids_json,restore_json) "
+                "VALUES (%s,%s,%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE revision=VALUES(revision),"
+                "deleted=VALUES(deleted),share_scope=VALUES(share_scope),grants_json=VALUES(grants_json),"
+                "team_gids_json=VALUES(team_gids_json),restore_json=VALUES(restore_json)",
+                (row["gid"], row["revision"], row["deleted"], row["share_scope"],
+                 json.dumps(row["grants"], ensure_ascii=False), json.dumps(row["team_gids"], ensure_ascii=False),
+                 json.dumps(row["restore"], ensure_ascii=False) if row["restore"] is not None else None),
             )
 
-    def replay(self, *, actor_gid: str, operation: str, idempotency_key: str) -> dict[str, Any] | None:
-        key = f"{actor_gid}:{operation}:{idempotency_key}"
-        for row in self.list():
-            result = row.get("_replays", {}).get(key)
-            if result is not None:
-                return deepcopy(result)
+    def claim(self, *, actor_gid: str, operation: str, idempotency_key: str) -> dict[str, Any] | None:
+        with self._cursor() as cur:
+            cur.execute(
+                "INSERT INTO workmanship_base_saved_view_idempotency "
+                "(actor_gid,operation,idempotency_key,status) VALUES (%s,%s,%s,'pending') "
+                "ON DUPLICATE KEY UPDATE actor_gid=VALUES(actor_gid)",
+                (actor_gid, operation, idempotency_key),
+            )
+            cur.execute(
+                "SELECT status,result_json FROM workmanship_base_saved_view_idempotency "
+                "WHERE actor_gid=%s AND operation=%s AND idempotency_key=%s FOR UPDATE",
+                (actor_gid, operation, idempotency_key),
+            )
+            row = cur.fetchone()
+        if row and row.get("status") == "completed":
+            return _json(row.get("result_json"), None)
         return None
 
-    def remember(self, *, actor_gid: str, operation: str, idempotency_key: str, result: dict[str, Any], record_gid: str) -> None:
-        row = self.get(record_gid, lock=True)
-        if row is None:
-            raise SavedViewError("resource_not_found", "视图不存在")
-        row.setdefault("_replays", {})[f"{actor_gid}:{operation}:{idempotency_key}"] = deepcopy(result)
-        self.save(row)
+    def complete(self, *, actor_gid: str, operation: str, idempotency_key: str,
+                 result: dict[str, Any], record_gid: str) -> None:
+        with self._cursor() as cur:
+            cur.execute(
+                "UPDATE workmanship_base_saved_view_idempotency SET status='completed',view_gid=%s,result_json=%s,"
+                "completed_at=CURRENT_TIMESTAMP(6) "
+                "WHERE actor_gid=%s AND operation=%s AND idempotency_key=%s",
+                (record_gid, json.dumps(result, ensure_ascii=False), actor_gid, operation, idempotency_key),
+            )
 
     def audit(self, event: dict[str, Any]) -> None:
-        row = self.get(str(event["view_gid"]), lock=True)
-        if row is None:
-            raise SavedViewError("resource_not_found", "视图不存在")
-        row.setdefault("_audit", []).append(deepcopy(event))
-        self.save(row)
+        with self._cursor() as cur:
+            cur.execute(
+                "INSERT INTO workmanship_base_saved_view_audit_events "
+                "(gid,view_gid,actor_gid,operation,idempotency_key,status,details_json) VALUES (%s,%s,%s,%s,%s,%s,%s)",
+                (self.next_gid(), event["view_gid"], event["actor_gid"], event["operation"],
+                 event.get("idempotency_key") or None, event.get("status", "succeeded"),
+                 json.dumps(event.get("details") or {}, ensure_ascii=False)),
+            )
 
 
 def _decode_row(row: dict[str, Any]) -> dict[str, Any]:
-    raw = row.get("config")
-    if isinstance(raw, str):
-        try:
-            raw = json.loads(raw)
-        except ValueError:
-            raw = {}
-    stored = raw.get("_saved_view") if isinstance(raw, dict) else None
-    if not isinstance(stored, dict):
-        stored = {"config": raw if isinstance(raw, dict) else {}, "revision": 1, "deleted": False,
-                  "share_scope": "shared" if row.get("is_shared") else "private", "grants": [], "team_gids": [],
-                  "restore": None, "replays": {}, "audit": []}
-    return {
+    raw_config = _json(row.get("config"), None)
+    base = {
         "gid": str(row["gid"]), "name": str(row.get("name") or ""), "module": str(row.get("module") or ""),
         "list_gid": str(row["list_gid"]) if row.get("list_gid") is not None else None,
-        "owner_gid": str(row.get("owner_gid") or ""), "config": deepcopy(stored.get("config") or {}),
-        "revision": int(stored.get("revision") or 1), "deleted": bool(stored.get("deleted")),
-        "share_scope": str(stored.get("share_scope") or "private"), "grants": list(stored.get("grants") or []),
-        "team_gids": list(stored.get("team_gids") or []), "restore": deepcopy(stored.get("restore")),
-        "_replays": deepcopy(stored.get("replays") or {}), "_audit": deepcopy(stored.get("audit") or []),
+        "owner_gid": str(row.get("owner_gid") or ""),
     }
-
-
-def _stored(row: dict[str, Any]) -> dict[str, Any]:
-    values = {key: deepcopy(row.get(key)) for key in (
-        "config", "revision", "deleted", "share_scope", "grants", "team_gids", "restore",
-    )}
-    values["replays"] = deepcopy(row.get("_replays"))
-    values["audit"] = deepcopy(row.get("_audit"))
-    return {"_saved_view": values}
+    state = {
+        "revision": int(row.get("state_revision") or 1), "deleted": bool(row.get("state_deleted")),
+        "share_scope": str(row.get("state_share_scope") or ("shared" if row.get("is_shared") else "private")),
+        "grants": _json(row.get("state_grants_json"), []),
+        "team_gids": _json(row.get("state_team_gids_json"), []),
+        "restore": _json(row.get("state_restore_json"), None),
+    }
+    try:
+        config = _config(raw_config)
+    except SavedViewError:
+        return {**base, **state, "_legacy_status": "legacy_config_unsupported"}
+    return {**base, **state, "config": config,
+            "_legacy_status": "current" if row.get("state_revision") is not None else "migration_needed"}
 
 
 class SavedViewService:
@@ -193,16 +258,25 @@ class SavedViewService:
 
     def search(self, *, actor: dict, query: dict) -> dict:
         query = _closed(query, allowed={"module", "list_gid"})
-        module = query.get("module")
-        list_gid = query.get("list_gid")
-        if module is not None:
-            module = _text(module, label="module", required=False)
-        if list_gid is not None:
-            list_gid = _text(list_gid, label="list_gid", required=False)
+        has_module = "module" in query
+        module = _text(query.get("module"), label="module", required=False) if has_module else None
+        module = (module or "") if has_module else None
+        list_gid = _text(query.get("list_gid"), label="list_gid", required=False) if query.get("list_gid") is not None else None
         with self.repository.transaction():
-            views = [self._project(row) for row in self.repository.list() if self._visible(actor, row)
-                     and (module is None or row["module"] == module)
-                     and (list_gid is None or row["list_gid"] == list_gid)]
+            views = []
+            for row in self.repository.list():
+                if row.get("_legacy_status") == "legacy_config_unsupported":
+                    self.repository.audit({"operation": "legacy_migration_needed", "view_gid": row["gid"],
+                                           "actor_gid": _actor_gid(actor), "status": "legacy_config_unsupported"})
+                    continue
+                if not self._visible(actor, row) or (has_module and row["module"] != module):
+                    continue
+                if list_gid is not None:
+                    if row["list_gid"] not in {None, list_gid}:
+                        continue
+                elif has_module and row["list_gid"] is not None:
+                    continue
+                views.append(self._project(row))
         return {"views": views}
 
     def create(self, *, actor: dict, command: dict) -> dict:
@@ -219,7 +293,6 @@ class SavedViewService:
             "gid": self.repository.next_gid(), "name": name, "module": module, "list_gid": list_gid,
             "owner_gid": _actor_gid(actor), "config": config, "revision": 1, "deleted": False,
             "share_scope": scope, "grants": [], "team_gids": list(actor.get("team_gids") or []), "restore": None,
-            "_replays": {}, "_audit": [],
         })
 
     def update(self, *, actor: dict, view_gid: str, command: dict) -> dict:
@@ -227,12 +300,8 @@ class SavedViewService:
                           required={"expected_revision", "name", "config", "idempotency_key"})
         self._revision(command["expected_revision"])
         name, config = _text(command["name"], label="name"), _config(command["config"])
-        module = command.get("module")
-        list_gid = command.get("list_gid")
-        if module is not None:
-            module = _text(module, label="module", required=False) or ""
-        if list_gid is not None:
-            list_gid = _text(list_gid, label="list_gid", required=False)
+        module = _text(command.get("module"), label="module", required=False) if "module" in command else None
+        list_gid = _text(command.get("list_gid"), label="list_gid", required=False) if "list_gid" in command else None
         scope = command.get("share_scope")
         if scope is not None and scope not in _SCOPES:
             _invalid("share_scope 无效")
@@ -241,9 +310,13 @@ class SavedViewService:
             row = self._owned(actor, view_gid)
             self._check_revision(row, command["expected_revision"])
             row.update({"name": name, "config": config, "revision": row["revision"] + 1})
-            if module is not None: row["module"] = module
-            if list_gid is not None: row["list_gid"] = list_gid
-            if scope is not None: row["share_scope"] = scope
+            if "module" in command:
+                row["module"] = module or ""
+            if "list_gid" in command:
+                row["list_gid"] = list_gid
+            if scope is not None:
+                row["share_scope"] = scope
+            row.pop("_legacy_status", None)
             return row
         return self._write(actor=actor, operation="update", command=command, mutate=mutate)
 
@@ -253,11 +326,12 @@ class SavedViewService:
 
         def mutate() -> dict[str, Any]:
             source = self.repository.get(view_gid, lock=True)
+            self._ensure_supported(source)
             if source is None or source["deleted"] or not self._visible(actor, source):
                 raise SavedViewError("resource_not_found", "视图不存在")
             return {**source, "gid": self.repository.next_gid(), "name": name, "owner_gid": _actor_gid(actor),
                     "revision": 1, "deleted": False, "share_scope": "private", "grants": [],
-                    "team_gids": list(actor.get("team_gids") or []), "restore": None, "_replays": {}, "_audit": []}
+                    "team_gids": list(actor.get("team_gids") or []), "restore": None, "_legacy_status": "current"}
         return self._write(actor=actor, operation="copy", command=command, mutate=mutate)
 
     def delete(self, *, actor: dict, view_gid: str, command: dict) -> dict:
@@ -270,6 +344,7 @@ class SavedViewService:
             row["deleted"] = True
             row["revision"] += 1
             row["restore"] = {"available": True, "deleted_by": _actor_gid(actor), "deleted_at": "transaction"}
+            row.pop("_legacy_status", None)
             return row
         return self._write(actor=actor, operation="delete", command=command, mutate=mutate)
 
@@ -277,18 +352,26 @@ class SavedViewService:
         actor_gid = _actor_gid(actor)
         key = _text(command.get("idempotency_key"), label="idempotency_key") or ""
         with self.repository.transaction():
-            replay = self.repository.replay(actor_gid=actor_gid, operation=operation, idempotency_key=key)
+            replay = self.repository.claim(actor_gid=actor_gid, operation=operation, idempotency_key=key)
             if replay is not None:
                 return replay
             row = mutate()
             self.repository.save(row)
             result = {"view": self._project(row)}
-            self.repository.remember(actor_gid=actor_gid, operation=operation, idempotency_key=key, result=result, record_gid=row["gid"])
-            self.repository.audit({"operation": operation, "view_gid": row["gid"], "actor_gid": actor_gid, "idempotency_key": key})
+            self.repository.complete(actor_gid=actor_gid, operation=operation, idempotency_key=key,
+                                     result=result, record_gid=row["gid"])
+            self.repository.audit({"operation": operation, "view_gid": row["gid"], "actor_gid": actor_gid,
+                                   "idempotency_key": key, "status": "succeeded"})
             return result
+
+    @staticmethod
+    def _ensure_supported(row: dict[str, Any] | None) -> None:
+        if row is not None and row.get("_legacy_status") == "legacy_config_unsupported":
+            raise SavedViewError("legacy_config_unsupported", "旧视图配置不受支持，需迁移")
 
     def _owned(self, actor: dict, view_gid: str) -> dict[str, Any]:
         row = self.repository.get(view_gid, lock=True)
+        self._ensure_supported(row)
         if row is None or row["deleted"]:
             raise SavedViewError("resource_not_found", "视图不存在")
         if row["owner_gid"] != _actor_gid(actor) and not _is_admin(actor):

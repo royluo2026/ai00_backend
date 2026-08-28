@@ -8,7 +8,7 @@ Create an immutable solver profile.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`simulation`
-- Catalog Release：`rel_a4a5a17ebc77419f6a12eec1f32fcbea`
+- Catalog Release：`rel_331a207029a6b2186322dcabb43f675c`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -119,7 +119,7 @@ Create an immutable solver profile.
 ```json
 {
   "capability_id": "simulation.solver_profile.create",
-  "catalog_release": "rel_a4a5a17ebc77419f6a12eec1f32fcbea",
+  "catalog_release": "rel_331a207029a6b2186322dcabb43f675c",
   "major_version": 1,
   "payload": {
     "name": "example",

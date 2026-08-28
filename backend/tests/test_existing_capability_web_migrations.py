@@ -21,6 +21,12 @@ CATALOG = ROOT / "docs/capabilities/catalog.v2.json"
 
 
 def _frontend_payloads() -> dict[str, dict[str, object]]:
+    saved_view_config = {
+        "columns": [{"key": "status", "visible": True, "order": 0, "width": 120}],
+        "filters": [{"id": "open", "field": "status", "op": "eq", "value": "open"}],
+        "filterMode": "and", "sorts": [{"field": "status", "dir": "asc"}],
+        "groupBy": None, "viewType": "grid", "treeParentField": None,
+    }
     cases = {
         "knowledge.search": {"listGid": "list-1"},
         "knowledge.get": {"gid": "knowledge-1"},
@@ -31,6 +37,11 @@ def _frontend_payloads() -> dict[str, dict[str, object]]:
         "project.issue.update": {"gid": "issue-1", "updates": {"status": "closed"}},
         "project.itemEntries.get": {"itemGid": "task-1"},
         "project.itemEntries.replace": {"itemGid": "task-1", "entries": [{"gid": "entry-2"}]},
+        "base.savedViews.search": {"module": "task", "listGid": "list-1"},
+        "base.savedViews.create": {"name": "Open", "module": "task", "listGid": "list-1", "config": saved_view_config, "shareScope": "private"},
+        "base.savedViews.update": {"viewGid": "view-1", "expectedRevision": 1, "name": "Open", "module": "task", "listGid": "list-1", "config": saved_view_config, "shareScope": "private"},
+        "base.savedViews.copy": {"viewGid": "view-1", "name": "Copy"},
+        "base.savedViews.delete": {"viewGid": "view-1", "expectedRevision": 1},
     }
     script = r"""
 const fs = require('fs');
@@ -46,7 +57,7 @@ const cases = JSON.parse(fs.readFileSync(0, 'utf8'));
       }
       return { success: true, data: { ok: true, data: {} } };
     });
-    await client.call(operation, args);
+    await client.call(operation, args, { confirm: async () => true });
     output[operation] = firstInvoke;
   }
   process.stdout.write(JSON.stringify(output));
@@ -75,12 +86,12 @@ def test_manifest_accounts_for_all_53_groups_and_80_occurrences() -> None:
     assert len(manifest.groups) == 53
     assert sum(group.occurrence_count for group in manifest.groups) == 80
     assert Counter(group.decision for group in manifest.groups) == {
-        "migrate": 11,
-        "reclassify": 42,
+        "migrate": 16,
+        "reclassify": 37,
     }
     assert sum(
         group.occurrence_count for group in manifest.groups if group.decision == "migrate"
-    ) == 16
+    ) == 24
 
 
 def test_all_migrated_frontend_operation_payloads_pass_production_catalog_validation() -> None:
@@ -103,6 +114,8 @@ def test_all_migrated_frontend_operation_payloads_pass_production_catalog_valida
         "knowledge.search", "knowledge.get", "knowledge.create", "knowledge.update",
         "knowledge.delete", "project.task.update", "project.issue.update",
         "project.itemEntries.get", "project.itemEntries.replace",
+        "base.savedViews.search", "base.savedViews.create", "base.savedViews.update",
+        "base.savedViews.copy", "base.savedViews.delete",
     }
     assert failures == {}
 
@@ -137,6 +150,11 @@ def test_migrated_groups_are_only_the_provider_equivalent_families() -> None:
         ("PUT", "/api/tasks/{dynamic}/entries"),
         ("PUT", "/api/tasks"),
         ("PUT", "/api/issues"),
+        ("DELETE", "/api/views/{dynamic}"),
+        ("GET", "/api/views"),
+        ("PATCH", "/api/views/{dynamic}"),
+        ("POST", "/api/views"),
+        ("POST", "/api/views/{dynamic}/copy"),
     }
 
 
@@ -147,7 +165,7 @@ def test_manifest_independently_binds_pinned_baseline_frontend_and_ledger() -> N
     assert manifest.frontend_revision
     migrated = [group for group in manifest.groups if group.decision == "migrate"]
     assert all(group.frontend_operation and group.frontend_call_sites for group in migrated)
-    assert sum(len(group.frontend_call_sites) for group in migrated) == 16
+    assert sum(len(group.frontend_call_sites) for group in migrated) == 24
     reclassified = [group for group in manifest.groups if group.decision == "reclassify"]
     assert all(group.reclassification["legacy_contract"] for group in reclassified)
     assert all(group.reclassification["candidate_contracts"] for group in reclassified)

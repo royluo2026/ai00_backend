@@ -18,7 +18,7 @@ def _module():
 
 def test_manifest_conserves_pinned_base_scope_and_keeps_plugins_unresolved():
     payload = _module().build_manifest(ROOT.parent / "workmanship-web-capability-governance")
-    assert payload["counts"] == {"groups": 16, "occurrences": 33, "migrated_groups": 5, "migrated_occurrences": 17, "unresolved_groups": 11, "unresolved_occurrences": 16}
+    assert payload["counts"] == {"groups": 16, "occurrences": 33, "migrated_groups": 10, "migrated_occurrences": 25, "unresolved_groups": 6, "unresolved_occurrences": 8}
     entries = {(item["method"], item["normalized_route"]): item for item in payload["entries"]}
     for key in (("POST", "/api/plugin/install"), ("DELETE", "/api/plugin/uninstall/{dynamic}")):
         assert entries[key]["final_disposition"] == "unresolved"
@@ -34,3 +34,20 @@ def test_saved_view_routes_require_shared_service_and_closed_contract_evidence()
     key = ("POST", "/api/views")
     assert module._saved_view_boundary_ready(key, {"capability_id": "base.saved_view.create", "major_version": 1})
     assert not module._saved_view_boundary_ready(key, {"capability_id": "base.saved_view.create", "major_version": 2})
+
+
+def test_saved_view_routes_have_exact_owner_contract_and_frontend_source_evidence():
+    module = _module()
+    payload = module.build_manifest(ROOT.parent / "workmanship-web-capability-governance")
+    entries = {(item["method"], item["normalized_route"]): item for item in payload["entries"]}
+    for key, target in module.SAVED_VIEW_TARGETS.items():
+        entry = entries[key]
+        assert entry["final_disposition"] == "migrated"
+        assert entry["candidate_capability"] == f"{target}@1"
+        assert entry["provider_anchor"].startswith("backend/base/web_atomic.py:")
+        assert entry["owner_service_evidence"]["source_path"] == "backend/base/saved_views.py"
+        assert entry["owner_service_evidence"]["source_sha256"].startswith("sha256:")
+        assert entry["contract_evidence"]["source_path"] == "backend/base/web_atomic.py"
+        assert entry["frontend_operation"].startswith("base.savedViews.")
+        assert entry["frontend_call_sites"]
+        assert all(site["source_path"].startswith("web/") for site in entry["frontend_call_sites"])

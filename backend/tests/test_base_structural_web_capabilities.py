@@ -53,16 +53,18 @@ def test_saved_view_capabilities_register_closed_contracts_and_strong_writes():
         "base.saved_view.search": {"module": "", "list_gid": None},
         "base.saved_view.create": {
             "name": "Open", "module": "", "list_gid": None, "config": {
-                "field_gids": ["field_1"], "sort": [{"field_gid": "field_1", "direction": "asc"}],
-                "filters": [{"field_gid": "field_1", "operator": "eq", "value": "open"}],
-                "page_size": 50, "presentation": "table",
+                "columns": [{"key": "field_1", "visible": True, "order": 0, "width": 120}],
+                "filters": [{"id": "filter_1", "field": "field_1", "op": "eq", "value": "open"}],
+                "filterMode": "and", "sorts": [{"field": "field_1", "dir": "asc"}],
+                "groupBy": None, "viewType": "grid", "treeParentField": None,
             }, "share_scope": "private", "idempotency_key": "idem-1",
         },
         "base.saved_view.update": {
             "view_gid": "view_1", "expected_revision": 1, "name": "Open", "config": {
-                "field_gids": ["field_1"], "sort": [{"field_gid": "field_1", "direction": "asc"}],
-                "filters": [{"field_gid": "field_1", "operator": "eq", "value": "open"}],
-                "page_size": 50, "presentation": "table",
+                "columns": [{"key": "field_1", "visible": True, "order": 0, "width": 120}],
+                "filters": [{"id": "filter_1", "field": "field_1", "op": "eq", "value": "open"}],
+                "filterMode": "and", "sorts": [{"field": "field_1", "dir": "asc"}],
+                "groupBy": None, "viewType": "grid", "treeParentField": None,
             }, "idempotency_key": "idem-2",
         },
         "base.saved_view.copy": {"view_gid": "view_1", "name": "Copy", "idempotency_key": "idem-3"},

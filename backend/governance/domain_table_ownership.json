@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "registry_version": 1,
-  "table_count": 226,
+  "table_count": 229,
   "tables": [
     {
       "table": "workmanship_agent_capability_resources",
@@ -365,6 +365,24 @@
     },
     {
       "table": "workmanship_base_revision_snapshots",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_saved_view_audit_events",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_saved_view_idempotency",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_saved_view_states",
       "owner": "base",
       "runtime_domain": "base",
       "legacy_name": false

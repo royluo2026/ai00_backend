@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_a4a5a17ebc77419f6a12eec1f32fcbea",
-  "catalog_hash": "sha256:a4a5a17ebc77419f6a12eec1f32fcbeaa73e0f9fc8548d964841df72df20d605",
+  "release_id": "rel_331a207029a6b2186322dcabb43f675c",
+  "catalog_hash": "sha256:331a207029a6b2186322dcabb43f675c185e26559e3e087dbcf37ca315f21a6b",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -18735,6 +18735,2451 @@
       ]
     },
     {
+      "id": "base.saved_view.copy",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.saved_view.copy",
+      "description": "Execute exact Base outcome base.saved_view.copy.",
+      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
+      "do_not_use_when": "The request selects another operation or domain.",
+      "business_effect": "Copies one visible saved view into a new private owner-bound aggregate.",
+      "side_effect_level": "write",
+      "side_effects": "Copies one visible saved view into a new private owner-bound aggregate.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "base.v2:authenticated",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "view_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "view_gid",
+          "name",
+          "idempotency_key"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "view": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "module": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "list_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "owner_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "config": {
+                "type": "object",
+                "properties": {
+                  "columns": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "visible": {
+                          "type": "boolean"
+                        },
+                        "order": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "width": {
+                          "type": "integer",
+                          "minimum": 40,
+                          "maximum": 2000
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "key",
+                        "visible",
+                        "order",
+                        "width"
+                      ]
+                    }
+                  },
+                  "filters": {
+                    "type": "array",
+                    "maxItems": 50,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "field": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "op": {
+                          "type": "string",
+                          "enum": [
+                            "contains",
+                            "not_contains",
+                            "eq",
+                            "not_eq",
+                            "empty",
+                            "not_empty",
+                            "gt",
+                            "gte",
+                            "lt",
+                            "lte"
+                          ]
+                        },
+                        "value": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "maxLength": 2000
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            },
+                            {
+                              "type": "array",
+                              "maxItems": 100,
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean",
+                                  "null"
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "field",
+                        "op",
+                        "value"
+                      ]
+                    }
+                  },
+                  "filterMode": {
+                    "type": "string",
+                    "enum": [
+                      "and",
+                      "or"
+                    ]
+                  },
+                  "sorts": {
+                    "type": "array",
+                    "maxItems": 20,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "field": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "dir": {
+                          "type": "string",
+                          "enum": [
+                            "asc",
+                            "desc"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "field",
+                        "dir"
+                      ]
+                    }
+                  },
+                  "groupBy": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 512
+                  },
+                  "viewType": {
+                    "type": "string",
+                    "enum": [
+                      "grid",
+                      "tree"
+                    ]
+                  },
+                  "treeParentField": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 512
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "columns",
+                  "filters",
+                  "filterMode",
+                  "sorts",
+                  "groupBy",
+                  "viewType",
+                  "treeParentField"
+                ]
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "share_scope": {
+                "type": "string",
+                "enum": [
+                  "private",
+                  "team",
+                  "shared"
+                ]
+              },
+              "grants": {
+                "type": "array",
+                "maxItems": 200,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "restore": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "available": {
+                    "type": "boolean"
+                  },
+                  "deleted_by": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "deleted_at": {
+                    "type": "string",
+                    "maxLength": 64
+                  }
+                },
+                "required": [
+                  "available",
+                  "deleted_by",
+                  "deleted_at"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid",
+              "name",
+              "module",
+              "list_gid",
+              "owner_gid",
+              "config",
+              "revision",
+              "deleted",
+              "share_scope",
+              "grants",
+              "restore"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "view"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "view": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "module": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "list_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "owner_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "config": {
+                "type": "object",
+                "properties": {
+                  "columns": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "visible": {
+                          "type": "boolean"
+                        },
+                        "order": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "width": {
+                          "type": "integer",
+                          "minimum": 40,
+                          "maximum": 2000
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "key",
+                        "visible",
+                        "order",
+                        "width"
+                      ]
+                    }
+                  },
+                  "filters": {
+                    "type": "array",
+                    "maxItems": 50,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "field": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "op": {
+                          "type": "string",
+                          "enum": [
+                            "contains",
+                            "not_contains",
+                            "eq",
+                            "not_eq",
+                            "empty",
+                            "not_empty",
+                            "gt",
+                            "gte",
+                            "lt",
+                            "lte"
+                          ]
+                        },
+                        "value": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "maxLength": 2000
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            },
+                            {
+                              "type": "array",
+                              "maxItems": 100,
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean",
+                                  "null"
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "field",
+                        "op",
+                        "value"
+                      ]
+                    }
+                  },
+                  "filterMode": {
+                    "type": "string",
+                    "enum": [
+                      "and",
+                      "or"
+                    ]
+                  },
+                  "sorts": {
+                    "type": "array",
+                    "maxItems": 20,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "field": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "dir": {
+                          "type": "string",
+                          "enum": [
+                            "asc",
+                            "desc"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "field",
+                        "dir"
+                      ]
+                    }
+                  },
+                  "groupBy": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 512
+                  },
+                  "viewType": {
+                    "type": "string",
+                    "enum": [
+                      "grid",
+                      "tree"
+                    ]
+                  },
+                  "treeParentField": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 512
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "columns",
+                  "filters",
+                  "filterMode",
+                  "sorts",
+                  "groupBy",
+                  "viewType",
+                  "treeParentField"
+                ]
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "share_scope": {
+                "type": "string",
+                "enum": [
+                  "private",
+                  "team",
+                  "shared"
+                ]
+              },
+              "grants": {
+                "type": "array",
+                "maxItems": 200,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "restore": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "available": {
+                    "type": "boolean"
+                  },
+                  "deleted_by": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "deleted_at": {
+                    "type": "string",
+                    "maxLength": 64
+                  }
+                },
+                "required": [
+                  "available",
+                  "deleted_by",
+                  "deleted_at"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid",
+              "name",
+              "module",
+              "list_gid",
+              "owner_gid",
+              "config",
+              "revision",
+              "deleted",
+              "share_scope",
+              "grants",
+              "restore"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "view"
+        ]
+      },
+      "schema_hash": "sha256:8dced263b64bd89ebe3b1d05d0d56596efdca38ffee98679f0c47a0db8991ae4",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_78a34f79d69453add8bf8b6a",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "single_transaction",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "base.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/base.saved_view.copy:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
+          "result": "pass",
+          "path": "backend/tests/test_capability_v2_contracts.py"
+        }
+      ]
+    },
+    {
+      "id": "base.saved_view.create",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.saved_view.create",
+      "description": "Execute exact Base outcome base.saved_view.create.",
+      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
+      "do_not_use_when": "The request selects another operation or domain.",
+      "business_effect": "Creates one closed saved-view aggregate with idempotency and audit evidence.",
+      "side_effect_level": "write",
+      "side_effects": "Creates one closed saved-view aggregate with idempotency and audit evidence.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "base.v2:authenticated",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "module": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "list_gid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 512
+          },
+          "config": {
+            "type": "object",
+            "properties": {
+              "columns": {
+                "type": "array",
+                "maxItems": 200,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "visible": {
+                      "type": "boolean"
+                    },
+                    "order": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "width": {
+                      "type": "integer",
+                      "minimum": 40,
+                      "maximum": 2000
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "key",
+                    "visible",
+                    "order",
+                    "width"
+                  ]
+                }
+              },
+              "filters": {
+                "type": "array",
+                "maxItems": 50,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "field": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "op": {
+                      "type": "string",
+                      "enum": [
+                        "contains",
+                        "not_contains",
+                        "eq",
+                        "not_eq",
+                        "empty",
+                        "not_empty",
+                        "gt",
+                        "gte",
+                        "lt",
+                        "lte"
+                      ]
+                    },
+                    "value": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "maxLength": 2000
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "type": "array",
+                          "maxItems": 100,
+                          "items": {
+                            "type": [
+                              "string",
+                              "number",
+                              "boolean",
+                              "null"
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "id",
+                    "field",
+                    "op",
+                    "value"
+                  ]
+                }
+              },
+              "filterMode": {
+                "type": "string",
+                "enum": [
+                  "and",
+                  "or"
+                ]
+              },
+              "sorts": {
+                "type": "array",
+                "maxItems": 20,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "dir": {
+                      "type": "string",
+                      "enum": [
+                        "asc",
+                        "desc"
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "field",
+                    "dir"
+                  ]
+                }
+              },
+              "groupBy": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "viewType": {
+                "type": "string",
+                "enum": [
+                  "grid",
+                  "tree"
+                ]
+              },
+              "treeParentField": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "columns",
+              "filters",
+              "filterMode",
+              "sorts",
+              "groupBy",
+              "viewType",
+              "treeParentField"
+            ]
+          },
+          "share_scope": {
+            "type": "string",
+            "enum": [
+              "private",
+              "team",
+              "shared"
+            ]
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "config",
+          "share_scope",
+          "idempotency_key"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "view": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "module": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "list_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "owner_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "config": {
+                "type": "object",
+                "properties": {
+                  "columns": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "visible": {
+                          "type": "boolean"
+                        },
+                        "order": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "width": {
+                          "type": "integer",
+                          "minimum": 40,
+                          "maximum": 2000
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "key",
+                        "visible",
+                        "order",
+                        "width"
+                      ]
+                    }
+                  },
+                  "filters": {
+                    "type": "array",
+                    "maxItems": 50,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "field": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "op": {
+                          "type": "string",
+                          "enum": [
+                            "contains",
+                            "not_contains",
+                            "eq",
+                            "not_eq",
+                            "empty",
+                            "not_empty",
+                            "gt",
+                            "gte",
+                            "lt",
+                            "lte"
+                          ]
+                        },
+                        "value": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "maxLength": 2000
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            },
+                            {
+                              "type": "array",
+                              "maxItems": 100,
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean",
+                                  "null"
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "field",
+                        "op",
+                        "value"
+                      ]
+                    }
+                  },
+                  "filterMode": {
+                    "type": "string",
+                    "enum": [
+                      "and",
+                      "or"
+                    ]
+                  },
+                  "sorts": {
+                    "type": "array",
+                    "maxItems": 20,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "field": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "dir": {
+                          "type": "string",
+                          "enum": [
+                            "asc",
+                            "desc"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "field",
+                        "dir"
+                      ]
+                    }
+                  },
+                  "groupBy": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 512
+                  },
+                  "viewType": {
+                    "type": "string",
+                    "enum": [
+                      "grid",
+                      "tree"
+                    ]
+                  },
+                  "treeParentField": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 512
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "columns",
+                  "filters",
+                  "filterMode",
+                  "sorts",
+                  "groupBy",
+                  "viewType",
+                  "treeParentField"
+                ]
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "share_scope": {
+                "type": "string",
+                "enum": [
+                  "private",
+                  "team",
+                  "shared"
+                ]
+              },
+              "grants": {
+                "type": "array",
+                "maxItems": 200,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "restore": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "available": {
+                    "type": "boolean"
+                  },
+                  "deleted_by": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "deleted_at": {
+                    "type": "string",
+                    "maxLength": 64
+                  }
+                },
+                "required": [
+                  "available",
+                  "deleted_by",
+                  "deleted_at"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid",
+              "name",
+              "module",
+              "list_gid",
+              "owner_gid",
+              "config",
+              "revision",
+              "deleted",
+              "share_scope",
+              "grants",
+              "restore"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "view"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "view": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "module": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "list_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "owner_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "config": {
+                "type": "object",
+                "properties": {
+                  "columns": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "visible": {
+                          "type": "boolean"
+                        },
+                        "order": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "width": {
+                          "type": "integer",
+                          "minimum": 40,
+                          "maximum": 2000
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "key",
+                        "visible",
+                        "order",
+                        "width"
+                      ]
+                    }
+                  },
+                  "filters": {
+                    "type": "array",
+                    "maxItems": 50,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "field": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "op": {
+                          "type": "string",
+                          "enum": [
+                            "contains",
+                            "not_contains",
+                            "eq",
+                            "not_eq",
+                            "empty",
+                            "not_empty",
+                            "gt",
+                            "gte",
+                            "lt",
+                            "lte"
+                          ]
+                        },
+                        "value": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "maxLength": 2000
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            },
+                            {
+                              "type": "array",
+                              "maxItems": 100,
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean",
+                                  "null"
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "field",
+                        "op",
+                        "value"
+                      ]
+                    }
+                  },
+                  "filterMode": {
+                    "type": "string",
+                    "enum": [
+                      "and",
+                      "or"
+                    ]
+                  },
+                  "sorts": {
+                    "type": "array",
+                    "maxItems": 20,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "field": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "dir": {
+                          "type": "string",
+                          "enum": [
+                            "asc",
+                            "desc"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "field",
+                        "dir"
+                      ]
+                    }
+                  },
+                  "groupBy": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 512
+                  },
+                  "viewType": {
+                    "type": "string",
+                    "enum": [
+                      "grid",
+                      "tree"
+                    ]
+                  },
+                  "treeParentField": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 512
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "columns",
+                  "filters",
+                  "filterMode",
+                  "sorts",
+                  "groupBy",
+                  "viewType",
+                  "treeParentField"
+                ]
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "share_scope": {
+                "type": "string",
+                "enum": [
+                  "private",
+                  "team",
+                  "shared"
+                ]
+              },
+              "grants": {
+                "type": "array",
+                "maxItems": 200,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "restore": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "available": {
+                    "type": "boolean"
+                  },
+                  "deleted_by": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "deleted_at": {
+                    "type": "string",
+                    "maxLength": 64
+                  }
+                },
+                "required": [
+                  "available",
+                  "deleted_by",
+                  "deleted_at"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid",
+              "name",
+              "module",
+              "list_gid",
+              "owner_gid",
+              "config",
+              "revision",
+              "deleted",
+              "share_scope",
+              "grants",
+              "restore"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "view"
+        ]
+      },
+      "schema_hash": "sha256:79d8e30394f15a8a64d0a180c85e51abe555c7b87942defecfe0334dcd8375bc",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_c11e958a8729c753c2b6ee41",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "single_transaction",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "base.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/base.saved_view.create:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
+          "result": "pass",
+          "path": "backend/tests/test_capability_v2_contracts.py"
+        }
+      ]
+    },
+    {
+      "id": "base.saved_view.delete",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.saved_view.delete",
+      "description": "Execute exact Base outcome base.saved_view.delete.",
+      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
+      "do_not_use_when": "The request selects another operation or domain.",
+      "business_effect": "Revision-locks a recoverable saved-view tombstone with audit evidence.",
+      "side_effect_level": "write",
+      "side_effects": "Revision-locks a recoverable saved-view tombstone with audit evidence.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "base.v2:authenticated",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "view_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "view_gid",
+          "expected_revision",
+          "idempotency_key"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "view": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "module": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "list_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "owner_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "config": {
+                "type": "object",
+                "properties": {
+                  "columns": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "visible": {
+                          "type": "boolean"
+                        },
+                        "order": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "width": {
+                          "type": "integer",
+                          "minimum": 40,
+                          "maximum": 2000
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "key",
+                        "visible",
+                        "order",
+                        "width"
+                      ]
+                    }
+                  },
+                  "filters": {
+                    "type": "array",
+                    "maxItems": 50,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "field": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "op": {
+                          "type": "string",
+                          "enum": [
+                            "contains",
+                            "not_contains",
+                            "eq",
+                            "not_eq",
+                            "empty",
+                            "not_empty",
+                            "gt",
+                            "gte",
+                            "lt",
+                            "lte"
+                          ]
+                        },
+                        "value": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "maxLength": 2000
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            },
+                            {
+                              "type": "array",
+                              "maxItems": 100,
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean",
+                                  "null"
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "field",
+                        "op",
+                        "value"
+                      ]
+                    }
+                  },
+                  "filterMode": {
+                    "type": "string",
+                    "enum": [
+                      "and",
+                      "or"
+                    ]
+                  },
+                  "sorts": {
+                    "type": "array",
+                    "maxItems": 20,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "field": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "dir": {
+                          "type": "string",
+                          "enum": [
+                            "asc",
+                            "desc"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "field",
+                        "dir"
+                      ]
+                    }
+                  },
+                  "groupBy": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 512
+                  },
+                  "viewType": {
+                    "type": "string",
+                    "enum": [
+                      "grid",
+                      "tree"
+                    ]
+                  },
+                  "treeParentField": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 512
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "columns",
+                  "filters",
+                  "filterMode",
+                  "sorts",
+                  "groupBy",
+                  "viewType",
+                  "treeParentField"
+                ]
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "share_scope": {
+                "type": "string",
+                "enum": [
+                  "private",
+                  "team",
+                  "shared"
+                ]
+              },
+              "grants": {
+                "type": "array",
+                "maxItems": 200,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "restore": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "available": {
+                    "type": "boolean"
+                  },
+                  "deleted_by": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "deleted_at": {
+                    "type": "string",
+                    "maxLength": 64
+                  }
+                },
+                "required": [
+                  "available",
+                  "deleted_by",
+                  "deleted_at"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid",
+              "name",
+              "module",
+              "list_gid",
+              "owner_gid",
+              "config",
+              "revision",
+              "deleted",
+              "share_scope",
+              "grants",
+              "restore"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "view"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "view": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "module": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "list_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "owner_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "config": {
+                "type": "object",
+                "properties": {
+                  "columns": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "visible": {
+                          "type": "boolean"
+                        },
+                        "order": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "width": {
+                          "type": "integer",
+                          "minimum": 40,
+                          "maximum": 2000
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "key",
+                        "visible",
+                        "order",
+                        "width"
+                      ]
+                    }
+                  },
+                  "filters": {
+                    "type": "array",
+                    "maxItems": 50,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "field": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "op": {
+                          "type": "string",
+                          "enum": [
+                            "contains",
+                            "not_contains",
+                            "eq",
+                            "not_eq",
+                            "empty",
+                            "not_empty",
+                            "gt",
+                            "gte",
+                            "lt",
+                            "lte"
+                          ]
+                        },
+                        "value": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "maxLength": 2000
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            },
+                            {
+                              "type": "array",
+                              "maxItems": 100,
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean",
+                                  "null"
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "field",
+                        "op",
+                        "value"
+                      ]
+                    }
+                  },
+                  "filterMode": {
+                    "type": "string",
+                    "enum": [
+                      "and",
+                      "or"
+                    ]
+                  },
+                  "sorts": {
+                    "type": "array",
+                    "maxItems": 20,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "field": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "dir": {
+                          "type": "string",
+                          "enum": [
+                            "asc",
+                            "desc"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "field",
+                        "dir"
+                      ]
+                    }
+                  },
+                  "groupBy": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 512
+                  },
+                  "viewType": {
+                    "type": "string",
+                    "enum": [
+                      "grid",
+                      "tree"
+                    ]
+                  },
+                  "treeParentField": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 512
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "columns",
+                  "filters",
+                  "filterMode",
+                  "sorts",
+                  "groupBy",
+                  "viewType",
+                  "treeParentField"
+                ]
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "share_scope": {
+                "type": "string",
+                "enum": [
+                  "private",
+                  "team",
+                  "shared"
+                ]
+              },
+              "grants": {
+                "type": "array",
+                "maxItems": 200,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "restore": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "available": {
+                    "type": "boolean"
+                  },
+                  "deleted_by": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "deleted_at": {
+                    "type": "string",
+                    "maxLength": 64
+                  }
+                },
+                "required": [
+                  "available",
+                  "deleted_by",
+                  "deleted_at"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid",
+              "name",
+              "module",
+              "list_gid",
+              "owner_gid",
+              "config",
+              "revision",
+              "deleted",
+              "share_scope",
+              "grants",
+              "restore"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "view"
+        ]
+      },
+      "schema_hash": "sha256:854892570e9fb0fb15b0ae3de98b76d1094d298b3d314d2a8c29cb5b22e6990c",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_ab46575ba75993dacd95597d",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "single_transaction",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "base.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/base.saved_view.delete:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
+          "result": "pass",
+          "path": "backend/tests/test_capability_v2_contracts.py"
+        }
+      ]
+    },
+    {
       "id": "base.saved_view.read",
       "major_version": 1,
       "owner_domain": "base",
@@ -18961,6 +21406,1708 @@
       "provider_ref": "base.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/base.saved_view.read:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
+          "result": "pass",
+          "path": "backend/tests/test_capability_v2_contracts.py"
+        }
+      ]
+    },
+    {
+      "id": "base.saved_view.search",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.saved_view.search",
+      "description": "Execute exact Base outcome base.saved_view.search.",
+      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
+      "do_not_use_when": "The request selects another operation or domain.",
+      "business_effect": "Reads only saved views visible to the caller through the Base aggregate service.",
+      "side_effect_level": "read",
+      "side_effects": "Reads only saved views visible to the caller through the Base aggregate service.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "base.v2:authenticated",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "module": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "list_gid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 512
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "views": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "module": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "list_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "owner_gid": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "config": {
+                  "type": "object",
+                  "properties": {
+                    "columns": {
+                      "type": "array",
+                      "maxItems": 200,
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 512
+                          },
+                          "visible": {
+                            "type": "boolean"
+                          },
+                          "order": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "width": {
+                            "type": "integer",
+                            "minimum": 40,
+                            "maximum": 2000
+                          }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                          "key",
+                          "visible",
+                          "order",
+                          "width"
+                        ]
+                      }
+                    },
+                    "filters": {
+                      "type": "array",
+                      "maxItems": 50,
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 512
+                          },
+                          "field": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 512
+                          },
+                          "op": {
+                            "type": "string",
+                            "enum": [
+                              "contains",
+                              "not_contains",
+                              "eq",
+                              "not_eq",
+                              "empty",
+                              "not_empty",
+                              "gt",
+                              "gte",
+                              "lt",
+                              "lte"
+                            ]
+                          },
+                          "value": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "maxLength": 2000
+                              },
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "null"
+                              },
+                              {
+                                "type": "array",
+                                "maxItems": 100,
+                                "items": {
+                                  "type": [
+                                    "string",
+                                    "number",
+                                    "boolean",
+                                    "null"
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                          "id",
+                          "field",
+                          "op",
+                          "value"
+                        ]
+                      }
+                    },
+                    "filterMode": {
+                      "type": "string",
+                      "enum": [
+                        "and",
+                        "or"
+                      ]
+                    },
+                    "sorts": {
+                      "type": "array",
+                      "maxItems": 20,
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 512
+                          },
+                          "dir": {
+                            "type": "string",
+                            "enum": [
+                              "asc",
+                              "desc"
+                            ]
+                          }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                          "field",
+                          "dir"
+                        ]
+                      }
+                    },
+                    "groupBy": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 512
+                    },
+                    "viewType": {
+                      "type": "string",
+                      "enum": [
+                        "grid",
+                        "tree"
+                      ]
+                    },
+                    "treeParentField": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 512
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "columns",
+                    "filters",
+                    "filterMode",
+                    "sorts",
+                    "groupBy",
+                    "viewType",
+                    "treeParentField"
+                  ]
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "deleted": {
+                  "type": "boolean"
+                },
+                "share_scope": {
+                  "type": "string",
+                  "enum": [
+                    "private",
+                    "team",
+                    "shared"
+                  ]
+                },
+                "grants": {
+                  "type": "array",
+                  "maxItems": 200,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  }
+                },
+                "restore": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "properties": {
+                    "available": {
+                      "type": "boolean"
+                    },
+                    "deleted_by": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "deleted_at": {
+                      "type": "string",
+                      "maxLength": 64
+                    }
+                  },
+                  "required": [
+                    "available",
+                    "deleted_by",
+                    "deleted_at"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "gid",
+                "name",
+                "module",
+                "list_gid",
+                "owner_gid",
+                "config",
+                "revision",
+                "deleted",
+                "share_scope",
+                "grants",
+                "restore"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "views"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "views": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "module": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "list_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "owner_gid": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "config": {
+                  "type": "object",
+                  "properties": {
+                    "columns": {
+                      "type": "array",
+                      "maxItems": 200,
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 512
+                          },
+                          "visible": {
+                            "type": "boolean"
+                          },
+                          "order": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "width": {
+                            "type": "integer",
+                            "minimum": 40,
+                            "maximum": 2000
+                          }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                          "key",
+                          "visible",
+                          "order",
+                          "width"
+                        ]
+                      }
+                    },
+                    "filters": {
+                      "type": "array",
+                      "maxItems": 50,
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 512
+                          },
+                          "field": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 512
+                          },
+                          "op": {
+                            "type": "string",
+                            "enum": [
+                              "contains",
+                              "not_contains",
+                              "eq",
+                              "not_eq",
+                              "empty",
+                              "not_empty",
+                              "gt",
+                              "gte",
+                              "lt",
+                              "lte"
+                            ]
+                          },
+                          "value": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "maxLength": 2000
+                              },
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "null"
+                              },
+                              {
+                                "type": "array",
+                                "maxItems": 100,
+                                "items": {
+                                  "type": [
+                                    "string",
+                                    "number",
+                                    "boolean",
+                                    "null"
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                          "id",
+                          "field",
+                          "op",
+                          "value"
+                        ]
+                      }
+                    },
+                    "filterMode": {
+                      "type": "string",
+                      "enum": [
+                        "and",
+                        "or"
+                      ]
+                    },
+                    "sorts": {
+                      "type": "array",
+                      "maxItems": 20,
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 512
+                          },
+                          "dir": {
+                            "type": "string",
+                            "enum": [
+                              "asc",
+                              "desc"
+                            ]
+                          }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                          "field",
+                          "dir"
+                        ]
+                      }
+                    },
+                    "groupBy": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 512
+                    },
+                    "viewType": {
+                      "type": "string",
+                      "enum": [
+                        "grid",
+                        "tree"
+                      ]
+                    },
+                    "treeParentField": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 512
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "columns",
+                    "filters",
+                    "filterMode",
+                    "sorts",
+                    "groupBy",
+                    "viewType",
+                    "treeParentField"
+                  ]
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "deleted": {
+                  "type": "boolean"
+                },
+                "share_scope": {
+                  "type": "string",
+                  "enum": [
+                    "private",
+                    "team",
+                    "shared"
+                  ]
+                },
+                "grants": {
+                  "type": "array",
+                  "maxItems": 200,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  }
+                },
+                "restore": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "properties": {
+                    "available": {
+                      "type": "boolean"
+                    },
+                    "deleted_by": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "deleted_at": {
+                      "type": "string",
+                      "maxLength": 64
+                    }
+                  },
+                  "required": [
+                    "available",
+                    "deleted_by",
+                    "deleted_at"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "gid",
+                "name",
+                "module",
+                "list_gid",
+                "owner_gid",
+                "config",
+                "revision",
+                "deleted",
+                "share_scope",
+                "grants",
+                "restore"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "views"
+        ]
+      },
+      "schema_hash": "sha256:f2b64d0ed2e6b4680ba23a2ccb557c8906fc40773e432d0821c9e48e7da085a9",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_621e3b8abdf04e9c260ef19b",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "base.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/base.saved_view.search:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
+          "result": "pass",
+          "path": "backend/tests/test_capability_v2_contracts.py"
+        }
+      ]
+    },
+    {
+      "id": "base.saved_view.update",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.saved_view.update",
+      "description": "Execute exact Base outcome base.saved_view.update.",
+      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
+      "do_not_use_when": "The request selects another operation or domain.",
+      "business_effect": "Revision-locks one saved-view aggregate update with audit evidence.",
+      "side_effect_level": "write",
+      "side_effects": "Revision-locks one saved-view aggregate update with audit evidence.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "base.v2:authenticated",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "view_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "module": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "list_gid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 512
+          },
+          "config": {
+            "type": "object",
+            "properties": {
+              "columns": {
+                "type": "array",
+                "maxItems": 200,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "visible": {
+                      "type": "boolean"
+                    },
+                    "order": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "width": {
+                      "type": "integer",
+                      "minimum": 40,
+                      "maximum": 2000
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "key",
+                    "visible",
+                    "order",
+                    "width"
+                  ]
+                }
+              },
+              "filters": {
+                "type": "array",
+                "maxItems": 50,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "field": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "op": {
+                      "type": "string",
+                      "enum": [
+                        "contains",
+                        "not_contains",
+                        "eq",
+                        "not_eq",
+                        "empty",
+                        "not_empty",
+                        "gt",
+                        "gte",
+                        "lt",
+                        "lte"
+                      ]
+                    },
+                    "value": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "maxLength": 2000
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "type": "array",
+                          "maxItems": 100,
+                          "items": {
+                            "type": [
+                              "string",
+                              "number",
+                              "boolean",
+                              "null"
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "id",
+                    "field",
+                    "op",
+                    "value"
+                  ]
+                }
+              },
+              "filterMode": {
+                "type": "string",
+                "enum": [
+                  "and",
+                  "or"
+                ]
+              },
+              "sorts": {
+                "type": "array",
+                "maxItems": 20,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "dir": {
+                      "type": "string",
+                      "enum": [
+                        "asc",
+                        "desc"
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "field",
+                    "dir"
+                  ]
+                }
+              },
+              "groupBy": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "viewType": {
+                "type": "string",
+                "enum": [
+                  "grid",
+                  "tree"
+                ]
+              },
+              "treeParentField": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "columns",
+              "filters",
+              "filterMode",
+              "sorts",
+              "groupBy",
+              "viewType",
+              "treeParentField"
+            ]
+          },
+          "share_scope": {
+            "type": "string",
+            "enum": [
+              "private",
+              "team",
+              "shared"
+            ]
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "view_gid",
+          "expected_revision",
+          "name",
+          "config",
+          "idempotency_key"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "view": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "module": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "list_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "owner_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "config": {
+                "type": "object",
+                "properties": {
+                  "columns": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "visible": {
+                          "type": "boolean"
+                        },
+                        "order": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "width": {
+                          "type": "integer",
+                          "minimum": 40,
+                          "maximum": 2000
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "key",
+                        "visible",
+                        "order",
+                        "width"
+                      ]
+                    }
+                  },
+                  "filters": {
+                    "type": "array",
+                    "maxItems": 50,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "field": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "op": {
+                          "type": "string",
+                          "enum": [
+                            "contains",
+                            "not_contains",
+                            "eq",
+                            "not_eq",
+                            "empty",
+                            "not_empty",
+                            "gt",
+                            "gte",
+                            "lt",
+                            "lte"
+                          ]
+                        },
+                        "value": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "maxLength": 2000
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            },
+                            {
+                              "type": "array",
+                              "maxItems": 100,
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean",
+                                  "null"
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "field",
+                        "op",
+                        "value"
+                      ]
+                    }
+                  },
+                  "filterMode": {
+                    "type": "string",
+                    "enum": [
+                      "and",
+                      "or"
+                    ]
+                  },
+                  "sorts": {
+                    "type": "array",
+                    "maxItems": 20,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "field": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "dir": {
+                          "type": "string",
+                          "enum": [
+                            "asc",
+                            "desc"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "field",
+                        "dir"
+                      ]
+                    }
+                  },
+                  "groupBy": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 512
+                  },
+                  "viewType": {
+                    "type": "string",
+                    "enum": [
+                      "grid",
+                      "tree"
+                    ]
+                  },
+                  "treeParentField": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 512
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "columns",
+                  "filters",
+                  "filterMode",
+                  "sorts",
+                  "groupBy",
+                  "viewType",
+                  "treeParentField"
+                ]
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "share_scope": {
+                "type": "string",
+                "enum": [
+                  "private",
+                  "team",
+                  "shared"
+                ]
+              },
+              "grants": {
+                "type": "array",
+                "maxItems": 200,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "restore": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "available": {
+                    "type": "boolean"
+                  },
+                  "deleted_by": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "deleted_at": {
+                    "type": "string",
+                    "maxLength": 64
+                  }
+                },
+                "required": [
+                  "available",
+                  "deleted_by",
+                  "deleted_at"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid",
+              "name",
+              "module",
+              "list_gid",
+              "owner_gid",
+              "config",
+              "revision",
+              "deleted",
+              "share_scope",
+              "grants",
+              "restore"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "view"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "view": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "module": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "list_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "owner_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "config": {
+                "type": "object",
+                "properties": {
+                  "columns": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "visible": {
+                          "type": "boolean"
+                        },
+                        "order": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "width": {
+                          "type": "integer",
+                          "minimum": 40,
+                          "maximum": 2000
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "key",
+                        "visible",
+                        "order",
+                        "width"
+                      ]
+                    }
+                  },
+                  "filters": {
+                    "type": "array",
+                    "maxItems": 50,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "field": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "op": {
+                          "type": "string",
+                          "enum": [
+                            "contains",
+                            "not_contains",
+                            "eq",
+                            "not_eq",
+                            "empty",
+                            "not_empty",
+                            "gt",
+                            "gte",
+                            "lt",
+                            "lte"
+                          ]
+                        },
+                        "value": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "maxLength": 2000
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            },
+                            {
+                              "type": "array",
+                              "maxItems": 100,
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean",
+                                  "null"
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "field",
+                        "op",
+                        "value"
+                      ]
+                    }
+                  },
+                  "filterMode": {
+                    "type": "string",
+                    "enum": [
+                      "and",
+                      "or"
+                    ]
+                  },
+                  "sorts": {
+                    "type": "array",
+                    "maxItems": 20,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "field": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 512
+                        },
+                        "dir": {
+                          "type": "string",
+                          "enum": [
+                            "asc",
+                            "desc"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "field",
+                        "dir"
+                      ]
+                    }
+                  },
+                  "groupBy": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 512
+                  },
+                  "viewType": {
+                    "type": "string",
+                    "enum": [
+                      "grid",
+                      "tree"
+                    ]
+                  },
+                  "treeParentField": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 512
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "columns",
+                  "filters",
+                  "filterMode",
+                  "sorts",
+                  "groupBy",
+                  "viewType",
+                  "treeParentField"
+                ]
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "share_scope": {
+                "type": "string",
+                "enum": [
+                  "private",
+                  "team",
+                  "shared"
+                ]
+              },
+              "grants": {
+                "type": "array",
+                "maxItems": 200,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "restore": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "available": {
+                    "type": "boolean"
+                  },
+                  "deleted_by": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "deleted_at": {
+                    "type": "string",
+                    "maxLength": 64
+                  }
+                },
+                "required": [
+                  "available",
+                  "deleted_by",
+                  "deleted_at"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid",
+              "name",
+              "module",
+              "list_gid",
+              "owner_gid",
+              "config",
+              "revision",
+              "deleted",
+              "share_scope",
+              "grants",
+              "restore"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "view"
+        ]
+      },
+      "schema_hash": "sha256:4b3ff8522d7c83e3c0ef0049bf933bdfa47ea3380414e5370e780c69bc77c130",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_5d76ef62893804d33ac52f3a",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "single_transaction",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "base.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/base.saved_view.update:invoke"
       ],
       "test_refs": [
         {
@@ -180087,7 +184234,7 @@
       "plugin_id": "official.base",
       "module": "backend.base.official_provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:a0aaa126952acf9e2d0247309c8207ddadb18072023fcfae99e726800044d5f3"
+      "artifact_hash": "sha256:5a0b17a8d088a71a58386b1d50692d9b0cc7b979e231e22f752b7ecc7e55924e"
     },
     {
       "plugin_id": "official.craft",
@@ -180144,5 +184291,5 @@
       "artifact_hash": "sha256:5c1fccaa2219f6833c24237667039685e322cefcffc7ca6f0287d28cfc0a2b39"
     }
   ],
-  "created_at": "2026-08-27T03:26:17.649953Z"
+  "created_at": "2026-08-28T01:50:04.840702Z"
 }

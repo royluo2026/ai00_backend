@@ -1,14 +1,14 @@
 {
   "artifact_id": "task-3b3e-base-structural-remediation",
-  "atomic_contract_manifest_sha256": "sha256:ad3e325f3b1912d1fdc672af905605aefa4b7f8ede7803c6c266c90ac8c54a00",
-  "content_sha256": "sha256:fd43db4c281eb1fd49176d07584716191036d17f240bb42d5ecf1ea207ea7882",
+  "atomic_contract_manifest_sha256": "sha256:a7c180cd15819108eadbc636cb93359bc994b55ce8b640ac66f611f7cc77b4a5",
+  "content_sha256": "sha256:5b95b8a41abb6bc9b2155e2f5aa18bfb04c6fdc2a9b457762563d4bcb28077e3",
   "counts": {
     "groups": 16,
-    "migrated_groups": 5,
-    "migrated_occurrences": 17,
+    "migrated_groups": 10,
+    "migrated_occurrences": 25,
     "occurrences": 33,
-    "unresolved_groups": 11,
-    "unresolved_occurrences": 16
+    "unresolved_groups": 6,
+    "unresolved_occurrences": 8
   },
   "entries": [
     {
@@ -16,8 +16,11 @@
       "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
       "candidate_capability": null,
       "confirmation_policy": null,
+      "contract_evidence": null,
       "final_disposition": "unresolved",
       "final_inventory_mapping": "unresolved",
+      "frontend_call_sites": [],
+      "frontend_operation": null,
       "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
@@ -51,21 +54,60 @@
         "properties": {},
         "type": "object"
       },
+      "owner_service_evidence": null,
       "provider_anchor": "backend/routers/plugins.py",
       "provider_source_sha256": "sha256:bab080093bc16f582378f81ae82d6264d3cd724c2e55d842fad259507c11b2f2",
       "unresolved_reason": "The unrestricted legacy uninstall route has no production handler and cannot bypass marketplace lifecycle controls."
     },
     {
-      "atomicity_class": "read",
-      "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
-      "candidate_capability": null,
-      "confirmation_policy": null,
-      "final_disposition": "unresolved",
-      "final_inventory_mapping": "unresolved",
-      "idempotency_policy": null,
+      "atomicity_class": "single_transaction",
+      "authorization_and_scope": "base.v2:authenticated",
+      "candidate_capability": "base.saved_view.delete@1",
+      "confirmation_policy": "user",
+      "contract_evidence": {
+        "end_line": 227,
+        "needle": "\"base.saved_view.delete\": _saved_view_delete",
+        "sha256": "56229834691651b93ee38d67bb2fa715d321afba6c0af79b064497283f1a380b",
+        "source_path": "backend/base/web_atomic.py",
+        "source_sha256": "e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+        "start_line": 227
+      },
+      "final_disposition": "migrated",
+      "final_inventory_mapping": "capability",
+      "frontend_call_sites": [
+        {
+          "column": 28,
+          "line": 1005,
+          "operation": "base.savedViews.delete",
+          "source_path": "web/components/view_manager.js",
+          "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+        }
+      ],
+      "frontend_operation": "base.savedViews.delete",
+      "idempotency_policy": "required",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "expected_revision": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "idempotency_key": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "view_gid": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "view_gid",
+          "expected_revision",
+          "idempotency_key"
+        ],
         "type": "object"
       },
       "method": "DELETE",
@@ -99,20 +141,298 @@
       },
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "view": {
+            "additionalProperties": false,
+            "properties": {
+              "config": {
+                "additionalProperties": false,
+                "properties": {
+                  "columns": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "key": {
+                          "maxLength": 512,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "order": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "visible": {
+                          "type": "boolean"
+                        },
+                        "width": {
+                          "maximum": 2000,
+                          "minimum": 40,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "key",
+                        "visible",
+                        "order",
+                        "width"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
+                  },
+                  "filterMode": {
+                    "enum": [
+                      "and",
+                      "or"
+                    ],
+                    "type": "string"
+                  },
+                  "filters": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "field": {
+                          "maxLength": 512,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "id": {
+                          "maxLength": 512,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "op": {
+                          "enum": [
+                            "contains",
+                            "not_contains",
+                            "eq",
+                            "not_eq",
+                            "empty",
+                            "not_empty",
+                            "gt",
+                            "gte",
+                            "lt",
+                            "lte"
+                          ],
+                          "type": "string"
+                        },
+                        "value": {
+                          "anyOf": [
+                            {
+                              "maxLength": 2000,
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            },
+                            {
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean",
+                                  "null"
+                                ]
+                              },
+                              "maxItems": 100,
+                              "type": "array"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "field",
+                        "op",
+                        "value"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 50,
+                    "type": "array"
+                  },
+                  "groupBy": {
+                    "maxLength": 512,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "sorts": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "dir": {
+                          "enum": [
+                            "asc",
+                            "desc"
+                          ],
+                          "type": "string"
+                        },
+                        "field": {
+                          "maxLength": 512,
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "field",
+                        "dir"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 20,
+                    "type": "array"
+                  },
+                  "treeParentField": {
+                    "maxLength": 512,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "viewType": {
+                    "enum": [
+                      "grid",
+                      "tree"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "columns",
+                  "filters",
+                  "filterMode",
+                  "sorts",
+                  "groupBy",
+                  "viewType",
+                  "treeParentField"
+                ],
+                "type": "object"
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "gid": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "grants": {
+                "items": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 200,
+                "type": "array"
+              },
+              "list_gid": {
+                "maxLength": 512,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "module": {
+                "maxLength": 255,
+                "type": "string"
+              },
+              "name": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "owner_gid": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "restore": {
+                "additionalProperties": false,
+                "properties": {
+                  "available": {
+                    "type": "boolean"
+                  },
+                  "deleted_at": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "deleted_by": {
+                    "maxLength": 512,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "available",
+                  "deleted_by",
+                  "deleted_at"
+                ],
+                "type": [
+                  "object",
+                  "null"
+                ]
+              },
+              "revision": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "share_scope": {
+                "enum": [
+                  "private",
+                  "team",
+                  "shared"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "gid",
+              "name",
+              "module",
+              "list_gid",
+              "owner_gid",
+              "config",
+              "revision",
+              "deleted",
+              "share_scope",
+              "grants",
+              "restore"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "view"
+        ],
         "type": "object"
       },
-      "provider_anchor": "backend/routers/views.py",
-      "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
-      "unresolved_reason": "The object-ownership check has no public owner-service boundary independent of dynamic saved-view config."
+      "owner_service_evidence": {
+        "source_path": "backend/base/saved_views.py",
+        "source_sha256": "sha256:0eb5da7a3e4ea2a8273cd90390110257b43630b4091e06e63429b650c5c1dc35"
+      },
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "unresolved_reason": null
     },
     {
       "atomicity_class": "read",
       "authorization_and_scope": "base.v2:authenticated",
       "candidate_capability": "base.organization.team.directory.list@1",
       "confirmation_policy": "none",
+      "contract_evidence": null,
       "final_disposition": "migrated",
       "final_inventory_mapping": "capability",
+      "frontend_call_sites": [],
+      "frontend_operation": null,
       "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
@@ -227,8 +547,9 @@
         ],
         "type": "object"
       },
+      "owner_service_evidence": null,
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
+      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
       "unresolved_reason": null
     },
     {
@@ -236,8 +557,11 @@
       "authorization_and_scope": "base.v2:authenticated",
       "candidate_capability": "base.self_annotation.batch.get@1",
       "confirmation_policy": "none",
+      "contract_evidence": null,
       "final_disposition": "migrated",
       "final_inventory_mapping": "capability",
+      "frontend_call_sites": [],
+      "frontend_operation": null,
       "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
@@ -378,8 +702,9 @@
         ],
         "type": "object"
       },
+      "owner_service_evidence": null,
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
+      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
       "unresolved_reason": null
     },
     {
@@ -387,8 +712,11 @@
       "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
       "candidate_capability": null,
       "confirmation_policy": null,
+      "contract_evidence": null,
       "final_disposition": "unresolved",
       "final_inventory_mapping": "unresolved",
+      "frontend_call_sites": [],
+      "frontend_operation": null,
       "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
@@ -451,6 +779,7 @@
         "properties": {},
         "type": "object"
       },
+      "owner_service_evidence": null,
       "provider_anchor": "backend/routers/self_annotations.py",
       "provider_source_sha256": "sha256:7624608452bd2173dacfaac9c77f703da331fc510512cc028857fb7319ca8c52",
       "unresolved_reason": "The response contains attachment records without a governed nested attachment contract."
@@ -460,8 +789,11 @@
       "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
       "candidate_capability": null,
       "confirmation_policy": null,
+      "contract_evidence": null,
       "final_disposition": "unresolved",
       "final_inventory_mapping": "unresolved",
+      "frontend_call_sites": [],
+      "frontend_operation": null,
       "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
@@ -502,6 +834,7 @@
         "properties": {},
         "type": "object"
       },
+      "owner_service_evidence": null,
       "provider_anchor": "backend/routers/self_annotations.py",
       "provider_source_sha256": "sha256:7624608452bd2173dacfaac9c77f703da331fc510512cc028857fb7319ca8c52",
       "unresolved_reason": "The response contains attachment records without a governed nested attachment contract."
@@ -511,8 +844,11 @@
       "authorization_and_scope": "base.v2:authenticated",
       "candidate_capability": "base.team.directory.list@1",
       "confirmation_policy": "none",
+      "contract_evidence": null,
       "final_disposition": "migrated",
       "final_inventory_mapping": "capability",
+      "frontend_call_sites": [],
+      "frontend_operation": null,
       "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
@@ -594,8 +930,9 @@
         ],
         "type": "object"
       },
+      "owner_service_evidence": null,
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
+      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
       "unresolved_reason": null
     },
     {
@@ -603,8 +940,11 @@
       "authorization_and_scope": "base.v2:system.user.manage",
       "candidate_capability": "base.identity.admin_user.list@1",
       "confirmation_policy": "none",
+      "contract_evidence": null,
       "final_disposition": "migrated",
       "final_inventory_mapping": "capability",
+      "frontend_call_sites": [],
+      "frontend_operation": null,
       "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
@@ -776,8 +1116,9 @@
         ],
         "type": "object"
       },
+      "owner_service_evidence": null,
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
+      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
       "unresolved_reason": null
     },
     {
@@ -785,8 +1126,11 @@
       "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
       "candidate_capability": null,
       "confirmation_policy": null,
+      "contract_evidence": null,
       "final_disposition": "unresolved",
       "final_inventory_mapping": "unresolved",
+      "frontend_call_sites": [],
+      "frontend_operation": null,
       "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
@@ -827,21 +1171,59 @@
         "properties": {},
         "type": "object"
       },
+      "owner_service_evidence": null,
       "provider_anchor": "backend/routers/users.py",
       "provider_source_sha256": "sha256:d632055fafa2aee6dea74b6c160c8889295a525373e6ee2604e52527d5df2b8f",
       "unresolved_reason": "The profile contains dynamic grants and permissions without a closed exact output contract."
     },
     {
       "atomicity_class": "read",
-      "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
-      "candidate_capability": null,
-      "confirmation_policy": null,
-      "final_disposition": "unresolved",
-      "final_inventory_mapping": "unresolved",
-      "idempotency_policy": null,
+      "authorization_and_scope": "base.v2:authenticated",
+      "candidate_capability": "base.saved_view.search@1",
+      "confirmation_policy": "none",
+      "contract_evidence": {
+        "end_line": 223,
+        "needle": "\"base.saved_view.search\": _saved_view_search",
+        "sha256": "21e5f4f93bdc09b1ba703dc17a13307584bfc738466d3a1b71e4a491ef61c806",
+        "source_path": "backend/base/web_atomic.py",
+        "source_sha256": "e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+        "start_line": 223
+      },
+      "final_disposition": "migrated",
+      "final_inventory_mapping": "capability",
+      "frontend_call_sites": [
+        {
+          "column": 14,
+          "line": 1070,
+          "operation": "base.savedViews.search",
+          "source_path": "web/admin/task_planning.html",
+          "source_sha256": "37cd37731ec9d580bf7c32f7da0601f5fac7e04ad2a6b74e03740bc58450b9d7"
+        },
+        {
+          "column": 40,
+          "line": 538,
+          "operation": "base.savedViews.search",
+          "source_path": "web/components/view_manager.js",
+          "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+        }
+      ],
+      "frontend_operation": "base.savedViews.search",
+      "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "list_gid": {
+            "maxLength": 512,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "module": {
+            "maxLength": 255,
+            "type": "string"
+          }
+        },
         "type": "object"
       },
       "method": "GET",
@@ -886,20 +1268,302 @@
       },
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "views": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "config": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "columns": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "key": {
+                            "maxLength": 512,
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "order": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "visible": {
+                            "type": "boolean"
+                          },
+                          "width": {
+                            "maximum": 2000,
+                            "minimum": 40,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "key",
+                          "visible",
+                          "order",
+                          "width"
+                        ],
+                        "type": "object"
+                      },
+                      "maxItems": 200,
+                      "type": "array"
+                    },
+                    "filterMode": {
+                      "enum": [
+                        "and",
+                        "or"
+                      ],
+                      "type": "string"
+                    },
+                    "filters": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "field": {
+                            "maxLength": 512,
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "id": {
+                            "maxLength": 512,
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "op": {
+                            "enum": [
+                              "contains",
+                              "not_contains",
+                              "eq",
+                              "not_eq",
+                              "empty",
+                              "not_empty",
+                              "gt",
+                              "gte",
+                              "lt",
+                              "lte"
+                            ],
+                            "type": "string"
+                          },
+                          "value": {
+                            "anyOf": [
+                              {
+                                "maxLength": 2000,
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "null"
+                              },
+                              {
+                                "items": {
+                                  "type": [
+                                    "string",
+                                    "number",
+                                    "boolean",
+                                    "null"
+                                  ]
+                                },
+                                "maxItems": 100,
+                                "type": "array"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "field",
+                          "op",
+                          "value"
+                        ],
+                        "type": "object"
+                      },
+                      "maxItems": 50,
+                      "type": "array"
+                    },
+                    "groupBy": {
+                      "maxLength": 512,
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "sorts": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "dir": {
+                            "enum": [
+                              "asc",
+                              "desc"
+                            ],
+                            "type": "string"
+                          },
+                          "field": {
+                            "maxLength": 512,
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "dir"
+                        ],
+                        "type": "object"
+                      },
+                      "maxItems": 20,
+                      "type": "array"
+                    },
+                    "treeParentField": {
+                      "maxLength": 512,
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "viewType": {
+                      "enum": [
+                        "grid",
+                        "tree"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "columns",
+                    "filters",
+                    "filterMode",
+                    "sorts",
+                    "groupBy",
+                    "viewType",
+                    "treeParentField"
+                  ],
+                  "type": "object"
+                },
+                "deleted": {
+                  "type": "boolean"
+                },
+                "gid": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "grants": {
+                  "items": {
+                    "maxLength": 512,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "maxItems": 200,
+                  "type": "array"
+                },
+                "list_gid": {
+                  "maxLength": 512,
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "module": {
+                  "maxLength": 255,
+                  "type": "string"
+                },
+                "name": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "owner_gid": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "restore": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "available": {
+                      "type": "boolean"
+                    },
+                    "deleted_at": {
+                      "maxLength": 64,
+                      "type": "string"
+                    },
+                    "deleted_by": {
+                      "maxLength": 512,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "available",
+                    "deleted_by",
+                    "deleted_at"
+                  ],
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "revision": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "share_scope": {
+                  "enum": [
+                    "private",
+                    "team",
+                    "shared"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "gid",
+                "name",
+                "module",
+                "list_gid",
+                "owner_gid",
+                "config",
+                "revision",
+                "deleted",
+                "share_scope",
+                "grants",
+                "restore"
+              ],
+              "type": "object"
+            },
+            "maxItems": 500,
+            "type": "array"
+          }
+        },
+        "required": [
+          "views"
+        ],
         "type": "object"
       },
-      "provider_anchor": "backend/routers/views.py",
-      "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
-      "unresolved_reason": "Saved-view config is intentionally dynamic and has no governed closed nested contract."
+      "owner_service_evidence": {
+        "source_path": "backend/base/saved_views.py",
+        "source_sha256": "sha256:0eb5da7a3e4ea2a8273cd90390110257b43630b4091e06e63429b650c5c1dc35"
+      },
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "unresolved_reason": null
     },
     {
       "atomicity_class": "single_transaction",
       "authorization_and_scope": "base.v2:system.user.manage",
       "candidate_capability": "base.identity.role.assign.atomic@1",
       "confirmation_policy": "user",
+      "contract_evidence": null,
       "final_disposition": "migrated",
       "final_inventory_mapping": "capability",
+      "frontend_call_sites": [],
+      "frontend_operation": null,
       "idempotency_policy": "required",
       "input_schema": {
         "additionalProperties": false,
@@ -1053,21 +1717,265 @@
         ],
         "type": "object"
       },
+      "owner_service_evidence": null,
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:f005c4fd3cf25664bdf0346a58e1142d44a01ac401ca0dedf7f6a2e9a1727725",
+      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
       "unresolved_reason": null
     },
     {
-      "atomicity_class": "read",
-      "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
-      "candidate_capability": null,
-      "confirmation_policy": null,
-      "final_disposition": "unresolved",
-      "final_inventory_mapping": "unresolved",
-      "idempotency_policy": null,
+      "atomicity_class": "single_transaction",
+      "authorization_and_scope": "base.v2:authenticated",
+      "candidate_capability": "base.saved_view.update@1",
+      "confirmation_policy": "user",
+      "contract_evidence": {
+        "end_line": 225,
+        "needle": "\"base.saved_view.update\": _saved_view_update",
+        "sha256": "799823cab800457fc52e02ea377c4efecaf3f4fb565b0f2a67b8e1ec6425e8e4",
+        "source_path": "backend/base/web_atomic.py",
+        "source_sha256": "e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+        "start_line": 225
+      },
+      "final_disposition": "migrated",
+      "final_inventory_mapping": "capability",
+      "frontend_call_sites": [
+        {
+          "column": 44,
+          "line": 644,
+          "operation": "base.savedViews.update",
+          "source_path": "web/components/view_manager.js",
+          "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+        },
+        {
+          "column": 42,
+          "line": 1016,
+          "operation": "base.savedViews.update",
+          "source_path": "web/components/view_manager.js",
+          "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+        }
+      ],
+      "frontend_operation": "base.savedViews.update",
+      "idempotency_policy": "required",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "config": {
+            "additionalProperties": false,
+            "properties": {
+              "columns": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "key": {
+                      "maxLength": 512,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "order": {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "visible": {
+                      "type": "boolean"
+                    },
+                    "width": {
+                      "maximum": 2000,
+                      "minimum": 40,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "visible",
+                    "order",
+                    "width"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 200,
+                "type": "array"
+              },
+              "filterMode": {
+                "enum": [
+                  "and",
+                  "or"
+                ],
+                "type": "string"
+              },
+              "filters": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "field": {
+                      "maxLength": 512,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "id": {
+                      "maxLength": 512,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "op": {
+                      "enum": [
+                        "contains",
+                        "not_contains",
+                        "eq",
+                        "not_eq",
+                        "empty",
+                        "not_empty",
+                        "gt",
+                        "gte",
+                        "lt",
+                        "lte"
+                      ],
+                      "type": "string"
+                    },
+                    "value": {
+                      "anyOf": [
+                        {
+                          "maxLength": 2000,
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "items": {
+                            "type": [
+                              "string",
+                              "number",
+                              "boolean",
+                              "null"
+                            ]
+                          },
+                          "maxItems": 100,
+                          "type": "array"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "field",
+                    "op",
+                    "value"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 50,
+                "type": "array"
+              },
+              "groupBy": {
+                "maxLength": 512,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "sorts": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "dir": {
+                      "enum": [
+                        "asc",
+                        "desc"
+                      ],
+                      "type": "string"
+                    },
+                    "field": {
+                      "maxLength": 512,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "field",
+                    "dir"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 20,
+                "type": "array"
+              },
+              "treeParentField": {
+                "maxLength": 512,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "viewType": {
+                "enum": [
+                  "grid",
+                  "tree"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "columns",
+              "filters",
+              "filterMode",
+              "sorts",
+              "groupBy",
+              "viewType",
+              "treeParentField"
+            ],
+            "type": "object"
+          },
+          "expected_revision": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "idempotency_key": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "list_gid": {
+            "maxLength": 512,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "module": {
+            "maxLength": 255,
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "share_scope": {
+            "enum": [
+              "private",
+              "team",
+              "shared"
+            ],
+            "type": "string"
+          },
+          "view_gid": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "view_gid",
+          "expected_revision",
+          "name",
+          "config",
+          "idempotency_key"
+        ],
         "type": "object"
       },
       "method": "PATCH",
@@ -1112,20 +2020,298 @@
       },
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "view": {
+            "additionalProperties": false,
+            "properties": {
+              "config": {
+                "additionalProperties": false,
+                "properties": {
+                  "columns": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "key": {
+                          "maxLength": 512,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "order": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "visible": {
+                          "type": "boolean"
+                        },
+                        "width": {
+                          "maximum": 2000,
+                          "minimum": 40,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "key",
+                        "visible",
+                        "order",
+                        "width"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
+                  },
+                  "filterMode": {
+                    "enum": [
+                      "and",
+                      "or"
+                    ],
+                    "type": "string"
+                  },
+                  "filters": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "field": {
+                          "maxLength": 512,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "id": {
+                          "maxLength": 512,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "op": {
+                          "enum": [
+                            "contains",
+                            "not_contains",
+                            "eq",
+                            "not_eq",
+                            "empty",
+                            "not_empty",
+                            "gt",
+                            "gte",
+                            "lt",
+                            "lte"
+                          ],
+                          "type": "string"
+                        },
+                        "value": {
+                          "anyOf": [
+                            {
+                              "maxLength": 2000,
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            },
+                            {
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean",
+                                  "null"
+                                ]
+                              },
+                              "maxItems": 100,
+                              "type": "array"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "field",
+                        "op",
+                        "value"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 50,
+                    "type": "array"
+                  },
+                  "groupBy": {
+                    "maxLength": 512,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "sorts": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "dir": {
+                          "enum": [
+                            "asc",
+                            "desc"
+                          ],
+                          "type": "string"
+                        },
+                        "field": {
+                          "maxLength": 512,
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "field",
+                        "dir"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 20,
+                    "type": "array"
+                  },
+                  "treeParentField": {
+                    "maxLength": 512,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "viewType": {
+                    "enum": [
+                      "grid",
+                      "tree"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "columns",
+                  "filters",
+                  "filterMode",
+                  "sorts",
+                  "groupBy",
+                  "viewType",
+                  "treeParentField"
+                ],
+                "type": "object"
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "gid": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "grants": {
+                "items": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 200,
+                "type": "array"
+              },
+              "list_gid": {
+                "maxLength": 512,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "module": {
+                "maxLength": 255,
+                "type": "string"
+              },
+              "name": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "owner_gid": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "restore": {
+                "additionalProperties": false,
+                "properties": {
+                  "available": {
+                    "type": "boolean"
+                  },
+                  "deleted_at": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "deleted_by": {
+                    "maxLength": 512,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "available",
+                  "deleted_by",
+                  "deleted_at"
+                ],
+                "type": [
+                  "object",
+                  "null"
+                ]
+              },
+              "revision": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "share_scope": {
+                "enum": [
+                  "private",
+                  "team",
+                  "shared"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "gid",
+              "name",
+              "module",
+              "list_gid",
+              "owner_gid",
+              "config",
+              "revision",
+              "deleted",
+              "share_scope",
+              "grants",
+              "restore"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "view"
+        ],
         "type": "object"
       },
-      "provider_anchor": "backend/routers/views.py",
-      "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
-      "unresolved_reason": "Saved-view config is intentionally dynamic and has no governed closed nested contract."
+      "owner_service_evidence": {
+        "source_path": "backend/base/saved_views.py",
+        "source_sha256": "sha256:0eb5da7a3e4ea2a8273cd90390110257b43630b4091e06e63429b650c5c1dc35"
+      },
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "unresolved_reason": null
     },
     {
       "atomicity_class": "read",
       "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
       "candidate_capability": null,
       "confirmation_policy": null,
+      "contract_evidence": null,
       "final_disposition": "unresolved",
       "final_inventory_mapping": "unresolved",
+      "frontend_call_sites": [],
+      "frontend_operation": null,
       "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
@@ -1159,21 +2345,255 @@
         "properties": {},
         "type": "object"
       },
+      "owner_service_evidence": null,
       "provider_anchor": "backend/routers/plugins.py",
       "provider_source_sha256": "sha256:bab080093bc16f582378f81ae82d6264d3cd724c2e55d842fad259507c11b2f2",
       "unresolved_reason": "The arbitrary-URL installer route has no production handler and is not equivalent to signed marketplace installation."
     },
     {
-      "atomicity_class": "read",
-      "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
-      "candidate_capability": null,
-      "confirmation_policy": null,
-      "final_disposition": "unresolved",
-      "final_inventory_mapping": "unresolved",
-      "idempotency_policy": null,
+      "atomicity_class": "single_transaction",
+      "authorization_and_scope": "base.v2:authenticated",
+      "candidate_capability": "base.saved_view.create@1",
+      "confirmation_policy": "user",
+      "contract_evidence": {
+        "end_line": 224,
+        "needle": "\"base.saved_view.create\": _saved_view_create",
+        "sha256": "9d9ed3d4a5619754b9c0df361a0b2b4c01d1052d00d57414e9a50f40e172840c",
+        "source_path": "backend/base/web_atomic.py",
+        "source_sha256": "e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+        "start_line": 224
+      },
+      "final_disposition": "migrated",
+      "final_inventory_mapping": "capability",
+      "frontend_call_sites": [
+        {
+          "column": 44,
+          "line": 653,
+          "operation": "base.savedViews.create",
+          "source_path": "web/components/view_manager.js",
+          "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+        },
+        {
+          "column": 42,
+          "line": 712,
+          "operation": "base.savedViews.create",
+          "source_path": "web/components/view_manager.js",
+          "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+        }
+      ],
+      "frontend_operation": "base.savedViews.create",
+      "idempotency_policy": "required",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "config": {
+            "additionalProperties": false,
+            "properties": {
+              "columns": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "key": {
+                      "maxLength": 512,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "order": {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "visible": {
+                      "type": "boolean"
+                    },
+                    "width": {
+                      "maximum": 2000,
+                      "minimum": 40,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "visible",
+                    "order",
+                    "width"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 200,
+                "type": "array"
+              },
+              "filterMode": {
+                "enum": [
+                  "and",
+                  "or"
+                ],
+                "type": "string"
+              },
+              "filters": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "field": {
+                      "maxLength": 512,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "id": {
+                      "maxLength": 512,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "op": {
+                      "enum": [
+                        "contains",
+                        "not_contains",
+                        "eq",
+                        "not_eq",
+                        "empty",
+                        "not_empty",
+                        "gt",
+                        "gte",
+                        "lt",
+                        "lte"
+                      ],
+                      "type": "string"
+                    },
+                    "value": {
+                      "anyOf": [
+                        {
+                          "maxLength": 2000,
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "items": {
+                            "type": [
+                              "string",
+                              "number",
+                              "boolean",
+                              "null"
+                            ]
+                          },
+                          "maxItems": 100,
+                          "type": "array"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "field",
+                    "op",
+                    "value"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 50,
+                "type": "array"
+              },
+              "groupBy": {
+                "maxLength": 512,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "sorts": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "dir": {
+                      "enum": [
+                        "asc",
+                        "desc"
+                      ],
+                      "type": "string"
+                    },
+                    "field": {
+                      "maxLength": 512,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "field",
+                    "dir"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 20,
+                "type": "array"
+              },
+              "treeParentField": {
+                "maxLength": 512,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "viewType": {
+                "enum": [
+                  "grid",
+                  "tree"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "columns",
+              "filters",
+              "filterMode",
+              "sorts",
+              "groupBy",
+              "viewType",
+              "treeParentField"
+            ],
+            "type": "object"
+          },
+          "idempotency_key": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "list_gid": {
+            "maxLength": 512,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "module": {
+            "maxLength": 255,
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "share_scope": {
+            "enum": [
+              "private",
+              "team",
+              "shared"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "config",
+          "share_scope",
+          "idempotency_key"
+        ],
         "type": "object"
       },
       "method": "POST",
@@ -1218,24 +2638,338 @@
       },
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "view": {
+            "additionalProperties": false,
+            "properties": {
+              "config": {
+                "additionalProperties": false,
+                "properties": {
+                  "columns": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "key": {
+                          "maxLength": 512,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "order": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "visible": {
+                          "type": "boolean"
+                        },
+                        "width": {
+                          "maximum": 2000,
+                          "minimum": 40,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "key",
+                        "visible",
+                        "order",
+                        "width"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
+                  },
+                  "filterMode": {
+                    "enum": [
+                      "and",
+                      "or"
+                    ],
+                    "type": "string"
+                  },
+                  "filters": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "field": {
+                          "maxLength": 512,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "id": {
+                          "maxLength": 512,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "op": {
+                          "enum": [
+                            "contains",
+                            "not_contains",
+                            "eq",
+                            "not_eq",
+                            "empty",
+                            "not_empty",
+                            "gt",
+                            "gte",
+                            "lt",
+                            "lte"
+                          ],
+                          "type": "string"
+                        },
+                        "value": {
+                          "anyOf": [
+                            {
+                              "maxLength": 2000,
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            },
+                            {
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean",
+                                  "null"
+                                ]
+                              },
+                              "maxItems": 100,
+                              "type": "array"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "field",
+                        "op",
+                        "value"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 50,
+                    "type": "array"
+                  },
+                  "groupBy": {
+                    "maxLength": 512,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "sorts": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "dir": {
+                          "enum": [
+                            "asc",
+                            "desc"
+                          ],
+                          "type": "string"
+                        },
+                        "field": {
+                          "maxLength": 512,
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "field",
+                        "dir"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 20,
+                    "type": "array"
+                  },
+                  "treeParentField": {
+                    "maxLength": 512,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "viewType": {
+                    "enum": [
+                      "grid",
+                      "tree"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "columns",
+                  "filters",
+                  "filterMode",
+                  "sorts",
+                  "groupBy",
+                  "viewType",
+                  "treeParentField"
+                ],
+                "type": "object"
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "gid": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "grants": {
+                "items": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 200,
+                "type": "array"
+              },
+              "list_gid": {
+                "maxLength": 512,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "module": {
+                "maxLength": 255,
+                "type": "string"
+              },
+              "name": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "owner_gid": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "restore": {
+                "additionalProperties": false,
+                "properties": {
+                  "available": {
+                    "type": "boolean"
+                  },
+                  "deleted_at": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "deleted_by": {
+                    "maxLength": 512,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "available",
+                  "deleted_by",
+                  "deleted_at"
+                ],
+                "type": [
+                  "object",
+                  "null"
+                ]
+              },
+              "revision": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "share_scope": {
+                "enum": [
+                  "private",
+                  "team",
+                  "shared"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "gid",
+              "name",
+              "module",
+              "list_gid",
+              "owner_gid",
+              "config",
+              "revision",
+              "deleted",
+              "share_scope",
+              "grants",
+              "restore"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "view"
+        ],
         "type": "object"
       },
-      "provider_anchor": "backend/routers/views.py",
-      "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
-      "unresolved_reason": "Saved-view config is intentionally dynamic and has no governed closed nested contract."
+      "owner_service_evidence": {
+        "source_path": "backend/base/saved_views.py",
+        "source_sha256": "sha256:0eb5da7a3e4ea2a8273cd90390110257b43630b4091e06e63429b650c5c1dc35"
+      },
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "unresolved_reason": null
     },
     {
-      "atomicity_class": "read",
-      "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
-      "candidate_capability": null,
-      "confirmation_policy": null,
-      "final_disposition": "unresolved",
-      "final_inventory_mapping": "unresolved",
-      "idempotency_policy": null,
+      "atomicity_class": "single_transaction",
+      "authorization_and_scope": "base.v2:authenticated",
+      "candidate_capability": "base.saved_view.copy@1",
+      "confirmation_policy": "user",
+      "contract_evidence": {
+        "end_line": 226,
+        "needle": "\"base.saved_view.copy\": _saved_view_copy",
+        "sha256": "c68df23c39cb7979116bd209087170259a02fc5ec888ee1020a0dfd92f6c6848",
+        "source_path": "backend/base/web_atomic.py",
+        "source_sha256": "e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+        "start_line": 226
+      },
+      "final_disposition": "migrated",
+      "final_inventory_mapping": "capability",
+      "frontend_call_sites": [
+        {
+          "column": 44,
+          "line": 978,
+          "operation": "base.savedViews.copy",
+          "source_path": "web/components/view_manager.js",
+          "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+        }
+      ],
+      "frontend_operation": "base.savedViews.copy",
+      "idempotency_policy": "required",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "idempotency_key": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "view_gid": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "view_gid",
+          "name",
+          "idempotency_key"
+        ],
         "type": "object"
       },
       "method": "POST",
@@ -1269,20 +3003,298 @@
       },
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "view": {
+            "additionalProperties": false,
+            "properties": {
+              "config": {
+                "additionalProperties": false,
+                "properties": {
+                  "columns": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "key": {
+                          "maxLength": 512,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "order": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "visible": {
+                          "type": "boolean"
+                        },
+                        "width": {
+                          "maximum": 2000,
+                          "minimum": 40,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "key",
+                        "visible",
+                        "order",
+                        "width"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
+                  },
+                  "filterMode": {
+                    "enum": [
+                      "and",
+                      "or"
+                    ],
+                    "type": "string"
+                  },
+                  "filters": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "field": {
+                          "maxLength": 512,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "id": {
+                          "maxLength": 512,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "op": {
+                          "enum": [
+                            "contains",
+                            "not_contains",
+                            "eq",
+                            "not_eq",
+                            "empty",
+                            "not_empty",
+                            "gt",
+                            "gte",
+                            "lt",
+                            "lte"
+                          ],
+                          "type": "string"
+                        },
+                        "value": {
+                          "anyOf": [
+                            {
+                              "maxLength": 2000,
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            },
+                            {
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean",
+                                  "null"
+                                ]
+                              },
+                              "maxItems": 100,
+                              "type": "array"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "field",
+                        "op",
+                        "value"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 50,
+                    "type": "array"
+                  },
+                  "groupBy": {
+                    "maxLength": 512,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "sorts": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "dir": {
+                          "enum": [
+                            "asc",
+                            "desc"
+                          ],
+                          "type": "string"
+                        },
+                        "field": {
+                          "maxLength": 512,
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "field",
+                        "dir"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 20,
+                    "type": "array"
+                  },
+                  "treeParentField": {
+                    "maxLength": 512,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "viewType": {
+                    "enum": [
+                      "grid",
+                      "tree"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "columns",
+                  "filters",
+                  "filterMode",
+                  "sorts",
+                  "groupBy",
+                  "viewType",
+                  "treeParentField"
+                ],
+                "type": "object"
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "gid": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "grants": {
+                "items": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 200,
+                "type": "array"
+              },
+              "list_gid": {
+                "maxLength": 512,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "module": {
+                "maxLength": 255,
+                "type": "string"
+              },
+              "name": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "owner_gid": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "restore": {
+                "additionalProperties": false,
+                "properties": {
+                  "available": {
+                    "type": "boolean"
+                  },
+                  "deleted_at": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "deleted_by": {
+                    "maxLength": 512,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "available",
+                  "deleted_by",
+                  "deleted_at"
+                ],
+                "type": [
+                  "object",
+                  "null"
+                ]
+              },
+              "revision": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "share_scope": {
+                "enum": [
+                  "private",
+                  "team",
+                  "shared"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "gid",
+              "name",
+              "module",
+              "list_gid",
+              "owner_gid",
+              "config",
+              "revision",
+              "deleted",
+              "share_scope",
+              "grants",
+              "restore"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "view"
+        ],
         "type": "object"
       },
-      "provider_anchor": "backend/routers/views.py",
-      "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
-      "unresolved_reason": "The copied result depends on dynamic saved-view config without a governed closed nested contract."
+      "owner_service_evidence": {
+        "source_path": "backend/base/saved_views.py",
+        "source_sha256": "sha256:0eb5da7a3e4ea2a8273cd90390110257b43630b4091e06e63429b650c5c1dc35"
+      },
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:e97283efed2d1b5cfeee88f059587747eeb0bf79726756a297d558ebb723ce8a",
+      "unresolved_reason": null
     },
     {
       "atomicity_class": "read",
       "authorization_and_scope": "legacy route authorization retained; no safe provider contract",
       "candidate_capability": null,
       "confirmation_policy": null,
+      "contract_evidence": null,
       "final_disposition": "unresolved",
       "final_inventory_mapping": "unresolved",
+      "frontend_call_sites": [],
+      "frontend_operation": null,
       "idempotency_policy": null,
       "input_schema": {
         "additionalProperties": false,
@@ -1323,13 +3335,14 @@
         "properties": {},
         "type": "object"
       },
+      "owner_service_evidence": null,
       "provider_anchor": "backend/routers/self_annotations.py",
       "provider_source_sha256": "sha256:7624608452bd2173dacfaac9c77f703da331fc510512cc028857fb7319ca8c52",
       "unresolved_reason": "The request contains attachment records without a governed nested attachment contract."
     }
   ],
-  "frontend_content_hash": "6c2d9dd40efff87a5200b668727d7b56b47989b3f65e3796de97c91d83a2affb",
-  "frontend_revision": "6dd62900c9a82173adcbbe277bb38846ab556031",
+  "frontend_content_hash": "e2e32aff4cd40d6457e9a4c257097c8985ce519251d497ad4d086d9901be9d4b",
+  "frontend_revision": "2b283c64fbe69b15779f9fec08d384174ab0c3a5",
   "schema_version": "1.0.0",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "source_ledger_revision": "8ee5dc2340a9e77c5d84e8f84f733bb5415e9d08",
