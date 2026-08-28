@@ -116,7 +116,9 @@ INPUT_SCHEMAS = {
     ),
     "integration.mapping.archive": obj({"gid": STRING, "expected_revision": POSITIVE}, ("gid", "expected_revision")),
     "integration.mapping.get": obj({"gid": STRING}, ("gid",)),
-    "integration.mapping.search": obj({"datasource_gid": STRING, "query": STRING, "limit": LIMIT}),
+    "integration.mapping.search": obj(
+        {"datasource_gid": STRING, "query": STRING, "limit": LIMIT}, ("datasource_gid",)
+    ),
     "integration.field_mapping.search": obj({"mapping_gid": STRING, "limit": LIMIT}, ("mapping_gid",)),
     "integration.mapping.source_columns.discover": obj({"mapping_gid": STRING, "limit": LIMIT}, ("mapping_gid",)),
     "integration.mapping.preview": obj({"gid": STRING, "limit": LIMIT}, ("gid",)),

@@ -330,7 +330,9 @@ class IntegrationApplication:
             return {**self._mapping(row), "field_mappings": fields[:MAX_RESULTS]}
         if capability_id == "integration.mapping.search":
             self._closed(raw, {"datasource_gid", "query", "limit"})
+            self._require(data, "datasource_gid")
             limit = self._limit(data)
+            self._get_connector({**data, "gid": str(data["datasource_gid"])})
             return {"items": [self._mapping(row) for row in self.repository.search_mappings({**data, "limit": limit})[:limit]]}
         if capability_id == "integration.field_mapping.search":
             self._closed(raw, {"mapping_gid", "limit"})

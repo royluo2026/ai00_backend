@@ -121,14 +121,41 @@ class IntegrationRepository:
         return self._archive("workmanship_int_ext_mappings", data)
 
     def search_mappings(self, data: dict) -> list[dict]:
-        return self._search("workmanship_int_ext_mappings", data)
-
-    def search_field_mappings(self, data: dict) -> list[dict] | None:
-        if self.get_mapping({**data, "gid": data["mapping_gid"]}) is None:
-            return None
+        scope, scope_values = self._scope(data)
+        clauses = [scope, "archived_at IS NULL", "datasource_gid=%s"]
+        params = [*scope_values, data["datasource_gid"]]
+        if data.get("query"):
+            clauses.append("name LIKE %s")
+            params.append(f"%{data['query']}%")
+        limit = min(max(int(data.get("limit", 100)), 1), 200)
         with get_integration_conn() as conn:
             with conn.cursor() as cur:
-                return self._field_rows(cur, data["mapping_gid"], min(int(data.get("limit", 100)), 200))
+                cur.execute(
+                    "SELECT gid,revision,datasource_gid,name,source_object,target_domain,target_capability_id,"
+                    "target_major_version,minimum_catalog_release,status "
+                    f"FROM workmanship_int_ext_mappings WHERE {' AND '.join(clauses)} "
+                    "ORDER BY updated_at DESC LIMIT %s",
+                    (*params, limit),
+                )
+                return [dict(row) for row in cur.fetchall()]
+
+    def search_field_mappings(self, data: dict) -> list[dict]:
+        if data.get("team_gid") is None:
+            scope, scope_values = "m.owner_gid=%s AND m.team_gid IS NULL", (data["owner_gid"],)
+        else:
+            scope, scope_values = "m.owner_gid=%s AND m.team_gid=%s", (data["owner_gid"], data["team_gid"])
+        limit = min(max(int(data.get("limit", 100)), 1), 200)
+        with get_integration_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT f.gid,f.revision,f.source_field,f.target_field,f.transform_expression "
+                    "FROM workmanship_int_ext_field_mappings f "
+                    "JOIN workmanship_int_ext_mappings m ON m.gid=f.mapping_gid "
+                    f"WHERE f.mapping_gid=%s AND {scope} AND m.archived_at IS NULL "
+                    "ORDER BY f.sort_order LIMIT %s",
+                    (data["mapping_gid"], *scope_values, limit),
+                )
+                return [dict(row) for row in cur.fetchall()]
 
     def replace_field_mappings(self, data: dict) -> dict:
         scope, scope_values = self._scope(data)
