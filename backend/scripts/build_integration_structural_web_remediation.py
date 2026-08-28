@@ -15,6 +15,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from backend.scripts.check_web_capability_routes import build_report
+from backend.capability_v2.git_tree import read_path
 from backend.capability_v2.existing_capability_migration_decisions import RECLASSIFICATIONS
 from plugins.integration.integration_backend.capabilities.contracts import (
     INPUT_SCHEMAS,
@@ -155,17 +156,18 @@ def _candidate_evidence(key: tuple[str, str]) -> tuple[dict[str, Any], dict[str,
     return evidence, dict(mismatch), _candidate_policy(candidate)
 
 
-def _final_occurrence(raw: Mapping[str, Any], web_root: Path) -> dict[str, Any]:
+def _final_occurrence(
+    raw: Mapping[str, Any], web_root: Path, revision: str
+) -> dict[str, Any]:
     source = raw.get("source")
     if not isinstance(source, str):
         raise ValueError("final Integration occurrence source missing")
-    path = web_root / source
     return {
         "occurrence_id": raw.get("occurrence_id"),
         "source": source,
         "line": raw.get("line"),
         "column": raw.get("column"),
-        "source_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        "source_sha256": hashlib.sha256(read_path(web_root, revision, source)).hexdigest(),
     }
 
 
@@ -205,7 +207,9 @@ def _build_manifest(web_root: Path) -> dict[str, Any]:
     for raw in report["routes"]:
         key = raw["method"], raw["normalized_route"]
         if key in SCOPE and raw["disposition"] == "unresolved":
-            final_by_key.setdefault(key, []).append(_final_occurrence(raw, web_root))
+            final_by_key.setdefault(key, []).append(
+                _final_occurrence(raw, web_root, report["frontend_revision"])
+            )
     if set(final_by_key) != SCOPE or sum(len(values) for values in final_by_key.values()) != 12:
         raise ValueError("Integration final inventory no longer preserves exact unresolved occurrences")
 

@@ -34,6 +34,19 @@ def test_manifest_conserves_pinned_base_scope_and_closes_the_signed_plugin_lifec
         assert entry["final_inventory_mapping"] == "capability"
 
 
+def test_manifest_reads_real_consumer_evidence_from_the_pinned_commit() -> None:
+    module = _module()
+    frontend = ROOT.parent / "workmanship-web-capability-governance"
+    baseline = module.build_manifest(frontend)
+    consumer = frontend / "web/core/web_compat.js"
+    original = consumer.read_bytes()
+    try:
+        consumer.write_bytes(original + b"\nwindow.__uncommitted_evidence_bypass = true;\n")
+        assert module.build_manifest(frontend) == baseline
+    finally:
+        consumer.write_bytes(original)
+
+
 def test_every_migrated_base_entry_has_generated_owner_contract_and_frontend_evidence():
     payload = _module().build_manifest(ROOT.parent / "workmanship-web-capability-governance")
 

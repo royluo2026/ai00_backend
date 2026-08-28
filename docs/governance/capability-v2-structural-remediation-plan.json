@@ -10,7 +10,7 @@
     "no silent REST fallback"
   ],
   "artifact_id": "capability-v2-structural-remediation-plan",
-  "content_sha256": "sha256:5898f3e3abc2714394b913e800b11fdef74dfee15d361aca8a4a8f46f499ee5d",
+  "content_sha256": "sha256:23c7065474a8f380786a0391208d0cfc034e9df4e63065ff70c484107ed1fba0",
   "counts": {
     "groups": 37,
     "occurrences": 45
@@ -77,7 +77,7 @@
           "line": 771,
           "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:771:58:DELETE:/api/craft_lib/equipments/{dynamic}",
           "source": "web/knowledge_hub/pages/gbop_vpps.html",
-          "source_sha256": "9659421b97c7f769cc5aa1b0f8c486ad4803ca103772c56e7f82ad1aee81dedb"
+          "source_sha256": "db5265ec700318095f663c2571b1e5c734b37d8a51b200bf33aeea3b7c20e2f8"
         }
       ],
       "owner_domain": "craft",
@@ -155,7 +155,7 @@
           "line": 714,
           "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:714:58:DELETE:/api/craft_lib/fixtures/{dynamic}",
           "source": "web/knowledge_hub/pages/gbop_vpps.html",
-          "source_sha256": "9659421b97c7f769cc5aa1b0f8c486ad4803ca103772c56e7f82ad1aee81dedb"
+          "source_sha256": "db5265ec700318095f663c2571b1e5c734b37d8a51b200bf33aeea3b7c20e2f8"
         }
       ],
       "owner_domain": "craft",
@@ -233,7 +233,7 @@
           "line": 331,
           "occurrence_id": "web/core/existing_capability_client.js:331:12:DELETE:/api/lists/{dynamic}",
           "source": "web/core/existing_capability_client.js",
-          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+          "source_sha256": "145802a516060381300cdbb57a1dee635f1115df654e59602b5d0c1d83f69928"
         }
       ],
       "owner_domain": "craft",
@@ -369,15 +369,15 @@
         "frontend_call_sites": [
           {
             "column": 26,
-            "line": 951,
+            "line": 944,
             "operation": "base.savedViews.delete",
             "source_path": "web/components/view_manager.js",
-            "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
+            "source_sha256": "77d4177cdf9e2bd234f477eaabe9239fa6c619080ef8ae08c71f86f02c118e73"
           }
         ],
         "owner_service_evidence": {
           "source_path": "backend/base/saved_views.py",
-          "source_sha256": "sha256:92a308c9175bbea086a769bf903501c69f2e2e83f6db5efbc12377fddf37fcdf"
+          "source_sha256": "sha256:5c0930754b8b8d4339dc31146cbf752b27b1a1b347e2abb8cec41d796281dcee"
         },
         "target_capability": "base.saved_view.delete@1"
       },
@@ -486,7 +486,7 @@
           "line": 148,
           "occurrence_id": "web/ext_datasource/ext_ds.js:148:36:GET:/api/ext-datasources",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "owner_domain": "integration",
@@ -565,7 +565,7 @@
           "line": 640,
           "occurrence_id": "web/ext_datasource/ext_ds.js:640:36:GET:/api/ext-datasources/{dynamic}/tables",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "owner_domain": "integration",
@@ -644,7 +644,7 @@
           "line": 349,
           "occurrence_id": "web/ext_datasource/ext_ds.js:349:36:GET:/api/ext-field-mappings",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "owner_domain": "integration",
@@ -723,7 +723,7 @@
           "line": 187,
           "occurrence_id": "web/ext_datasource/ext_ds.js:187:36:GET:/api/ext-mappings",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "owner_domain": "integration",
@@ -802,7 +802,7 @@
           "line": 341,
           "occurrence_id": "web/ext_datasource/ext_ds.js:341:36:GET:/api/ext-mappings/{dynamic}/columns",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "owner_domain": "integration",
@@ -881,7 +881,7 @@
           "line": 496,
           "occurrence_id": "web/ext_datasource/ext_ds.js:496:36:GET:/api/ext-mappings/{dynamic}/preview",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "owner_domain": "integration",
@@ -959,7 +959,7 @@
           "line": 326,
           "occurrence_id": "web/core/existing_capability_client.js:326:51:GET:/api/lists",
           "source": "web/core/existing_capability_client.js",
-          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+          "source_sha256": "145802a516060381300cdbb57a1dee635f1115df654e59602b5d0c1d83f69928"
         }
       ],
       "owner_domain": "craft",
@@ -1047,14 +1047,14 @@
           "line": 2192,
           "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:2192:40:GET:/api/rule-engine/check-entry",
           "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-          "source_sha256": "52f36f7634ca6eba793c66cebc7768ee39c2f18ed0bfcf98fc4560338a83964d"
+          "source_sha256": "36bb20338757c77fcfe80f4d0f84449f2928df7183989efeb2798adbc9abc00a"
         },
         {
           "column": 40,
           "line": 3524,
           "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:3524:40:GET:/api/rule-engine/check-entry",
           "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-          "source_sha256": "52f36f7634ca6eba793c66cebc7768ee39c2f18ed0bfcf98fc4560338a83964d"
+          "source_sha256": "36bb20338757c77fcfe80f4d0f84449f2928df7183989efeb2798adbc9abc00a"
         }
       ],
       "owner_domain": "craft",
@@ -1406,23 +1406,23 @@
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
           {
-            "column": 14,
+            "column": 23,
             "line": 1070,
             "operation": "base.savedViews.search",
             "source_path": "web/admin/task_planning.html",
-            "source_sha256": "37cd37731ec9d580bf7c32f7da0601f5fac7e04ad2a6b74e03740bc58450b9d7"
+            "source_sha256": "02a0043e888e94172997f380ea5442d93ee7cc6d2efb8dcde44e183335cc587e"
           },
           {
             "column": 40,
             "line": 539,
             "operation": "base.savedViews.search",
             "source_path": "web/components/view_manager.js",
-            "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
+            "source_sha256": "77d4177cdf9e2bd234f477eaabe9239fa6c619080ef8ae08c71f86f02c118e73"
           }
         ],
         "owner_service_evidence": {
           "source_path": "backend/base/saved_views.py",
-          "source_sha256": "sha256:92a308c9175bbea086a769bf903501c69f2e2e83f6db5efbc12377fddf37fcdf"
+          "source_sha256": "sha256:5c0930754b8b8d4339dc31146cbf752b27b1a1b347e2abb8cec41d796281dcee"
         },
         "target_capability": "base.saved_view.search@1"
       },
@@ -1542,7 +1542,7 @@
           "line": 623,
           "occurrence_id": "web/ext_datasource/ext_ds.js:623:29:PATCH:/api/ext-datasources/{dynamic}",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "owner_domain": "integration",
@@ -1596,19 +1596,19 @@
             "line": 629,
             "operation": "base.savedViews.update",
             "source_path": "web/components/view_manager.js",
-            "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
+            "source_sha256": "77d4177cdf9e2bd234f477eaabe9239fa6c619080ef8ae08c71f86f02c118e73"
           },
           {
             "column": 38,
-            "line": 969,
+            "line": 962,
             "operation": "base.savedViews.update",
             "source_path": "web/components/view_manager.js",
-            "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
+            "source_sha256": "77d4177cdf9e2bd234f477eaabe9239fa6c619080ef8ae08c71f86f02c118e73"
           }
         ],
         "owner_service_evidence": {
           "source_path": "backend/base/saved_views.py",
-          "source_sha256": "sha256:92a308c9175bbea086a769bf903501c69f2e2e83f6db5efbc12377fddf37fcdf"
+          "source_sha256": "sha256:5c0930754b8b8d4339dc31146cbf752b27b1a1b347e2abb8cec41d796281dcee"
         },
         "target_capability": "base.saved_view.update@1"
       },
@@ -1806,7 +1806,7 @@
           "line": 625,
           "occurrence_id": "web/ext_datasource/ext_ds.js:625:28:POST:/api/ext-datasources",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "owner_domain": "integration",
@@ -1885,7 +1885,7 @@
           "line": 605,
           "occurrence_id": "web/ext_datasource/ext_ds.js:605:34:POST:/api/ext-datasources/{dynamic}/test",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "owner_domain": "integration",
@@ -1964,7 +1964,7 @@
           "line": 677,
           "occurrence_id": "web/ext_datasource/ext_ds.js:677:26:POST:/api/ext-mappings",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "owner_domain": "integration",
@@ -2043,7 +2043,7 @@
           "line": 549,
           "occurrence_id": "web/ext_datasource/ext_ds.js:549:37:POST:/api/ext-mappings/{dynamic}/import",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "owner_domain": "integration",
@@ -2751,19 +2751,19 @@
             "line": 638,
             "operation": "base.savedViews.create",
             "source_path": "web/components/view_manager.js",
-            "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
+            "source_sha256": "77d4177cdf9e2bd234f477eaabe9239fa6c619080ef8ae08c71f86f02c118e73"
           },
           {
             "column": 44,
-            "line": 677,
+            "line": 670,
             "operation": "base.savedViews.create",
             "source_path": "web/components/view_manager.js",
-            "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
+            "source_sha256": "77d4177cdf9e2bd234f477eaabe9239fa6c619080ef8ae08c71f86f02c118e73"
           }
         ],
         "owner_service_evidence": {
           "source_path": "backend/base/saved_views.py",
-          "source_sha256": "sha256:92a308c9175bbea086a769bf903501c69f2e2e83f6db5efbc12377fddf37fcdf"
+          "source_sha256": "sha256:5c0930754b8b8d4339dc31146cbf752b27b1a1b347e2abb8cec41d796281dcee"
         },
         "target_capability": "base.saved_view.create@1"
       },
@@ -2855,15 +2855,15 @@
         "frontend_call_sites": [
           {
             "column": 40,
-            "line": 933,
+            "line": 926,
             "operation": "base.savedViews.copy",
             "source_path": "web/components/view_manager.js",
-            "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
+            "source_sha256": "77d4177cdf9e2bd234f477eaabe9239fa6c619080ef8ae08c71f86f02c118e73"
           }
         ],
         "owner_service_evidence": {
           "source_path": "backend/base/saved_views.py",
-          "source_sha256": "sha256:92a308c9175bbea086a769bf903501c69f2e2e83f6db5efbc12377fddf37fcdf"
+          "source_sha256": "sha256:5c0930754b8b8d4339dc31146cbf752b27b1a1b347e2abb8cec41d796281dcee"
         },
         "target_capability": "base.saved_view.copy@1"
       },
@@ -2972,7 +2972,7 @@
           "line": 457,
           "occurrence_id": "web/ext_datasource/ext_ds.js:457:23:PUT:/api/ext-field-mappings/batch",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "owner_domain": "integration",
@@ -3424,19 +3424,19 @@
   "source_artifacts": [
     {
       "path": "docs/governance/base-structural-web-remediation.json",
-      "sha256": "sha256:15df472b0e2f467d5ceb58bbca5baa9fd74a91ee5f1335dc9f7d56a113683bc4"
+      "sha256": "sha256:66ab0dba1ca0e2e48c5061582df6bb2fe2a0e83707fa3a48d69c3762d3e2cfe7"
     },
     {
       "path": "docs/governance/integration-structural-web-remediation.json",
-      "sha256": "sha256:5bf9f7d817cde5510e6b4595835b8c7d8fb823ef83397b31f1b35e503eb0a41f"
+      "sha256": "sha256:9e6897b3c17069cc7490fb21e84dc88699476df6f66886379629b124d3867f94"
     },
     {
       "path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-      "sha256": "sha256:4b27537a4ca200b459b3de6d0e973de0a832f2255ba1fb3f20dbc62478a5f7d1"
+      "sha256": "sha256:52e110eb8369ba3e3d8b19a20cec99a307587db5160308030bb99b9d96b8a3ef"
     },
     {
       "path": "docs\\governance\\capability-coverage-review\\generated\\web_route_inventory.json",
-      "sha256": "sha256:0eecb36d5946e9e367266c0fde4a414c66ef6600d20e588ea212c7ca82037efd"
+      "sha256": "sha256:1aea2c7e768326103718e72df801a547588fc8b70a90de528d55542474dab570"
     }
   ]
 }

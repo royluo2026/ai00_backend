@@ -21,6 +21,8 @@ SAFE_CAPABILITIES = {
     "base.notification.preference.atomic.update",
     "base.identity.directory.feishu.sync",
     "base.plugin.installed.list",
+    "base.plugin.installation.request.create",
+    "base.plugin.installation.transition.uninstall",
     "base.identity.user.search",
     "base.organization.team.directory.list",
     "base.team.directory.list",

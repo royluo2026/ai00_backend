@@ -2,9 +2,7 @@
 from __future__ import annotations
 
 import argparse
-import re
-import subprocess
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import sys
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
@@ -12,6 +10,9 @@ if str(REPOSITORY_ROOT) not in sys.path:
     sys.path.insert(0, str(REPOSITORY_ROOT))
 
 from backend.capability_v2.consumer_routes import (
+    _SOURCE_SUFFIXES,
+    _is_excluded_file,
+    _is_skipped_directory,
     RouteScanConfigurationError,
     load_lexical_non_routes,
     load_operations_exclusions,
@@ -26,6 +27,9 @@ from backend.capability_v2.route_root_cause_ledger import (
     RouteRootCauseLedgerConfigurationError,
     audit_route_root_cause_ledger,
     load_route_root_cause_ledger,
+)
+from backend.capability_v2.git_tree import (
+    decode_text, list_blobs, read_blobs, resolve_revision,
 )
 
 
@@ -60,31 +64,10 @@ ROOT_CAUSE_LEDGER = (
 
 
 def _frontend_revision(web_root: Path) -> str:
-    if not web_root.is_dir():
-        raise RouteScanConfigurationError(f"frontend Git root is missing: {web_root}")
-    top_level = subprocess.run(
-        ["git", "-C", str(web_root), "rev-parse", "--show-toplevel"],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    result = subprocess.run(
-        ["git", "-C", str(web_root), "rev-parse", "HEAD"],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    revision = result.stdout.strip()
-    if (
-        top_level.returncode
-        or Path(top_level.stdout.strip()).resolve() != web_root
-        or result.returncode
-        or re.fullmatch(r"[0-9a-f]{40}", revision) is None
-    ):
-        raise RouteScanConfigurationError(
-            "frontend full Git revision is unavailable for exact root"
-        )
-    return revision
+    try:
+        return resolve_revision(web_root, "HEAD")
+    except ValueError as exc:
+        raise RouteScanConfigurationError(str(exc)) from exc
 
 
 def _inventory_index(path: Path) -> set[tuple[str, str]]:
@@ -103,15 +86,31 @@ def _require_known_methods(report):
 
 def build_report(web_root: Path, prefixes: tuple[str, ...] = DEFAULT_LEGACY_PREFIXES):
     web_root = web_root.resolve()
+    revision = _frontend_revision(web_root)
+    roots = ("web", "packages")
+    blobs = list_blobs(web_root, revision, roots)
+    payloads = read_blobs(web_root, blobs)
+    documents = {}
+    for blob in blobs:
+        path = Path(blob.path)
+        if path.suffix.lower() not in _SOURCE_SUFFIXES or _is_excluded_file(path):
+            continue
+        root = next(value for value in roots if blob.path == value or blob.path.startswith(value + "/"))
+        relative_parts = PurePosixPath(blob.path).relative_to(root).parts
+        if any(_is_skipped_directory(part) for part in relative_parts):
+            continue
+        documents[blob.path] = decode_text(payloads[blob.oid])
     return _require_known_methods(scan_web_api_routes(
-        [web_root / "web", web_root / "packages"],
+        (),
         legacy_index=_inventory_index(LEGACY_INVENTORY),
         bff_index=_inventory_index(BFF_INVENTORY),
         exclusions=load_operations_exclusions(OPERATIONS_EXCLUSIONS),
-        frontend_revision=_frontend_revision(web_root),
+        frontend_revision=revision,
         classification_prefixes=prefixes,
         lexical_non_routes=load_lexical_non_routes(LEXICAL_NON_ROUTES),
         wrapper_contracts=load_wrapper_contracts(WRAPPER_CONTRACTS),
+        source_documents=documents,
+        source_root_names=roots,
     ))
 
 

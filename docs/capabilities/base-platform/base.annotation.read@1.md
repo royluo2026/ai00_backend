@@ -8,7 +8,7 @@ Execute the reviewed base.annotation.read Base outcome.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_9618bda183d820aa83b56a9e47500f2b`
+- Catalog Release：`rel_7803705d3df421f9f4381d37c3500731`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -99,7 +99,7 @@ Execute the reviewed base.annotation.read Base outcome.
 ```json
 {
   "capability_id": "base.annotation.read",
-  "catalog_release": "rel_9618bda183d820aa83b56a9e47500f2b",
+  "catalog_release": "rel_7803705d3df421f9f4381d37c3500731",
   "major_version": 1,
   "payload": {
     "operation": "example"

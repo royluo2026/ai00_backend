@@ -8,7 +8,7 @@ Execute exact Base outcome base.saved_view.search.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_9618bda183d820aa83b56a9e47500f2b`
+- Catalog Release：`rel_7803705d3df421f9f4381d37c3500731`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -71,7 +71,7 @@ Execute exact Base outcome base.saved_view.search.
   "additionalProperties": false,
   "properties": {
     "limit": {
-      "maximum": 500,
+      "maximum": 200,
       "minimum": 1,
       "type": "integer"
     },
@@ -101,7 +101,7 @@ Execute exact Base outcome base.saved_view.search.
 ```json
 {
   "capability_id": "base.saved_view.search",
-  "catalog_release": "rel_9618bda183d820aa83b56a9e47500f2b",
+  "catalog_release": "rel_7803705d3df421f9f4381d37c3500731",
   "major_version": 1,
   "payload": {}
 }
@@ -204,7 +204,7 @@ Execute exact Base outcome base.saved_view.search.
                 "type": "array"
               },
               "page_size": {
-                "maximum": 500,
+                "maximum": 200,
                 "minimum": 1,
                 "type": "integer"
               },
@@ -343,7 +343,7 @@ Execute exact Base outcome base.saved_view.search.
         ],
         "type": "object"
       },
-      "maxItems": 500,
+      "maxItems": 200,
       "type": "array"
     }
   },

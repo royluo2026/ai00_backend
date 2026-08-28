@@ -32,6 +32,7 @@ from backend.capability_v2.existing_capability_migrations import (
     load_existing_capability_migrations,
 )
 from backend.scripts.check_web_capability_routes import build_report
+from backend.capability_v2.git_tree import read_path, read_text
 
 DEFAULT_LEDGER = ROOT / "docs/governance/web-route-root-cause-ledger.json"
 MIGRATION_MANIFEST = ROOT / "docs/governance/existing-capability-web-migrations.json"
@@ -345,13 +346,16 @@ def _git_blob(root: Path, revision: str, source: str) -> bytes:
 
 
 def _frontend_anchor(
-    web_root: Path, source_path: str, token: str, *, baseline: bool
+    web_root: Path, source_path: str, token: str, *, baseline: bool,
+    final_revision: str | None = None,
 ) -> dict[str, Any]:
     if baseline:
         text = _git_blob(web_root, BASELINE_FRONTEND_REVISION, source_path).decode("utf-8")
         repository = "frontend_baseline"
     else:
-        text = (web_root / source_path).read_text(encoding="utf-8")
+        if final_revision is None:
+            raise RuntimeError("final frontend revision is required")
+        text = read_text(web_root, final_revision, source_path)
         repository = "frontend_final"
     indexes = [index for index, line in enumerate(text.splitlines()) if token in line]
     if len(indexes) != 1:
@@ -401,15 +405,14 @@ def _backend_evidence(
 
 
 def _final_source_proof(
-    web_root: Path, occurrences: list[Mapping[str, Any]]
+    web_root: Path, revision: str, occurrences: list[Mapping[str, Any]]
 ) -> list[dict[str, Any]]:
     by_source: dict[str, set[str]] = defaultdict(set)
     for raw in occurrences:
         by_source[raw["source"]].add(raw["raw_route"])
     proofs = []
     for source, raw_routes in sorted(by_source.items()):
-        path = web_root / source
-        blob, text = path.read_bytes(), path.read_text(encoding="utf-8")
+        blob, text = read_path(web_root, revision, source), read_text(web_root, revision, source)
         present = [route for route in raw_routes if route in text]
         if present:
             raise RuntimeError(f"retired frontend calls remain in {source}: {present}")
@@ -426,6 +429,7 @@ def _retirement_proof(
     evidence: dict[str, Any],
     occurrences: list[Mapping[str, Any]],
     web_root: Path,
+    final_revision: str,
 ) -> dict[str, Any]:
     route = key[1]
     if route.startswith("/api/bitable-sync"):
@@ -434,6 +438,7 @@ def _retirement_proof(
         anchors = [_frontend_anchor(
             web_root, "web/components/bitable_sync_manager.js",
             "The Bitable synchronization backend was retired", baseline=False,
+            final_revision=final_revision,
         )]
     elif route.startswith("/api/craft/"):
         kind = "backend_route_retired"
@@ -463,7 +468,7 @@ def _retirement_proof(
     evidence["anchors"] = anchors
     return {
         "kind": kind, "rationale": rationale, "anchors": anchors,
-        "final_sources": _final_source_proof(web_root, occurrences),
+        "final_sources": _final_source_proof(web_root, final_revision, occurrences),
     }
 
 
@@ -487,7 +492,7 @@ def _classify(
     if key in RETIRE:
         if route.startswith("/api/craft/"):
             evidence = _backend_evidence(key, "backend/routers/craft.py", status="retired")
-        proof = _retirement_proof(key, evidence, occurrences, web_root)
+        proof = _retirement_proof(key, evidence, occurrences, web_root, final_revision)
         return owner, "frontend_retire", evidence, {
             "removed_in_frontend_revision": final_revision,
             "retirement_proof": proof,
@@ -655,7 +660,9 @@ def build_document(web_root: Path) -> dict[str, Any]:
             else:
                 occurrences = [
                     _occurrence_with_hash(
-                        raw, hashlib.sha256((web_root / raw["source"]).read_bytes()).hexdigest()
+                        raw, hashlib.sha256(
+                            read_path(web_root, final_report.frontend_revision, raw["source"])
+                        ).hexdigest()
                     )
                     for raw in values
                 ]

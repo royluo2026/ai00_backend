@@ -3,7 +3,7 @@
   "artifact_id": "existing-capability-web-migrations",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "baseline_revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-  "frontend_revision": "0647ee87ab48c8e6fb4092e5fa708d675767b41c",
+  "frontend_revision": "d9db45c78f23afc3c32ab9bb8336d2a19bca6277",
   "groups": [
     {
       "method": "DELETE",
@@ -224,10 +224,10 @@
       "frontend_call_sites": [
         {
           "source_path": "web/components/view_manager.js",
-          "line": 951,
+          "line": 944,
           "column": 26,
           "operation": "base.savedViews.delete",
-          "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
+          "source_sha256": "77d4177cdf9e2bd234f477eaabe9239fa6c619080ef8ae08c71f86f02c118e73"
         }
       ],
       "equivalence_evidence": {
@@ -1797,16 +1797,16 @@
         {
           "source_path": "web/admin/task_planning.html",
           "line": 1070,
-          "column": 14,
+          "column": 23,
           "operation": "base.savedViews.search",
-          "source_sha256": "37cd37731ec9d580bf7c32f7da0601f5fac7e04ad2a6b74e03740bc58450b9d7"
+          "source_sha256": "02a0043e888e94172997f380ea5442d93ee7cc6d2efb8dcde44e183335cc587e"
         },
         {
           "source_path": "web/components/view_manager.js",
           "line": 539,
           "column": 40,
           "operation": "base.savedViews.search",
-          "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
+          "source_sha256": "77d4177cdf9e2bd234f477eaabe9239fa6c619080ef8ae08c71f86f02c118e73"
         }
       ],
       "equivalence_evidence": {
@@ -2148,14 +2148,14 @@
           "line": 629,
           "column": 44,
           "operation": "base.savedViews.update",
-          "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
+          "source_sha256": "77d4177cdf9e2bd234f477eaabe9239fa6c619080ef8ae08c71f86f02c118e73"
         },
         {
           "source_path": "web/components/view_manager.js",
-          "line": 969,
+          "line": 962,
           "column": 38,
           "operation": "base.savedViews.update",
-          "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
+          "source_sha256": "77d4177cdf9e2bd234f477eaabe9239fa6c619080ef8ae08c71f86f02c118e73"
         }
       ],
       "equivalence_evidence": {
@@ -3054,14 +3054,14 @@
           "line": 638,
           "column": 44,
           "operation": "base.savedViews.create",
-          "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
+          "source_sha256": "77d4177cdf9e2bd234f477eaabe9239fa6c619080ef8ae08c71f86f02c118e73"
         },
         {
           "source_path": "web/components/view_manager.js",
-          "line": 677,
+          "line": 670,
           "column": 44,
           "operation": "base.savedViews.create",
-          "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
+          "source_sha256": "77d4177cdf9e2bd234f477eaabe9239fa6c619080ef8ae08c71f86f02c118e73"
         }
       ],
       "equivalence_evidence": {
@@ -3118,10 +3118,10 @@
       "frontend_call_sites": [
         {
           "source_path": "web/components/view_manager.js",
-          "line": 933,
+          "line": 926,
           "column": 40,
           "operation": "base.savedViews.copy",
-          "source_sha256": "541cee3dc12a3e385fa520612ddcde449b86744a221e541d3a4eced6b9667c24"
+          "source_sha256": "77d4177cdf9e2bd234f477eaabe9239fa6c619080ef8ae08c71f86f02c118e73"
         }
       ],
       "equivalence_evidence": {

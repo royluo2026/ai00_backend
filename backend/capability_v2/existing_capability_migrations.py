@@ -16,6 +16,7 @@ from .existing_capability_migration_decisions import (
     MIGRATIONS,
     REVIEWED_DECISIONS,
 )
+from .git_tree import read_text, resolve_revision
 
 
 BASELINE_LEDGER_PATH = "docs/governance/web-route-root-cause-ledger.json"
@@ -108,11 +109,7 @@ def _git_text(root: Path, revision: str, relative: str) -> str:
 
 
 def _git_revision(root: Path) -> str:
-    return subprocess.check_output(
-        ["git", "-C", str(root), "rev-parse", "HEAD"],
-        text=True,
-        encoding="utf-8",
-    ).strip()
+    return resolve_revision(root)
 
 
 def _pinned_groups(root: Path) -> dict[tuple[str, str], Mapping[str, Any]]:
@@ -162,10 +159,11 @@ def _source_text(
     web_root: Path,
     relative: str,
     overrides: Mapping[str, str] | None,
+    revision: str | None = None,
 ) -> str:
     if overrides and relative in overrides:
         return overrides[relative]
-    return web_root.joinpath(*PurePosixPath(relative).parts).read_text(encoding="utf-8")
+    return read_text(web_root, revision or _git_revision(web_root), relative)
 
 
 def _frontend_call_sites(
@@ -173,11 +171,12 @@ def _frontend_call_sites(
     operation: str,
     sources: list[str],
     overrides: Mapping[str, str] | None = None,
+    revision: str | None = None,
 ) -> tuple[dict[str, Any], ...]:
     pattern = re.compile(r"\.call\(\s*['\"]" + re.escape(operation) + r"['\"]")
     sites: list[dict[str, Any]] = []
     for relative in sorted(set(sources)):
-        source = _source_text(web_root, relative, overrides)
+        source = _source_text(web_root, relative, overrides, revision)
         source_hash = _sha256_bytes(source.encode("utf-8"))
         for match in pattern.finditer(source):
             operation_offset = match.start() + match.group(0).find(operation)
@@ -234,7 +233,8 @@ def build_existing_capability_migration_document(
     pinned_groups = _pinned_groups(root)
     if set(pinned_groups) != set(REVIEWED_DECISIONS):
         raise ValueError("reviewed decisions do not match the pinned 53-group baseline")
-    client_source = _source_text(web_root, FRONTEND_CLIENT, None)
+    frontend_revision = _git_revision(web_root)
+    client_source = _source_text(web_root, FRONTEND_CLIENT, None, frontend_revision)
     actual_targets = _operation_targets(client_source)
     expected_targets = {
         item["operation"]: item["target"].rsplit("@", 1)[0]
@@ -262,7 +262,9 @@ def build_existing_capability_migration_document(
         if reviewed["decision"] == "migrate":
             operation = reviewed["operation"]
             source_paths = [item["source"] for item in pinned["occurrences"]]
-            call_sites = _frontend_call_sites(web_root, operation, source_paths)
+            call_sites = _frontend_call_sites(
+                web_root, operation, source_paths, revision=frontend_revision
+            )
             if len(call_sites) != pinned["occurrence_count"]:
                 raise ValueError(f"frontend call-site count mismatch: {key}")
             evidence = _line_anchor(
@@ -306,7 +308,7 @@ def build_existing_capability_migration_document(
         "artifact_id": "existing-capability-web-migrations",
         "source_ledger": BASELINE_LEDGER_PATH,
         "baseline_revision": BASELINE_REVISION,
-        "frontend_revision": _git_revision(web_root),
+        "frontend_revision": frontend_revision,
         "groups": groups,
     }
 
@@ -365,7 +367,10 @@ def audit_existing_capability_migrations(
     }
     actual_operation_targets: dict[str, str] = {}
     if web_root is not None:
-        client = _source_text(web_root, FRONTEND_CLIENT, frontend_source_overrides)
+        client = _source_text(
+            web_root, FRONTEND_CLIENT, frontend_source_overrides,
+            manifest.frontend_revision,
+        )
         actual_operation_targets = _operation_targets(client)
         expected_operation_targets = {
             item["operation"]: item["target"].rsplit("@", 1)[0]
@@ -414,7 +419,8 @@ def audit_existing_capability_migrations(
             if web_root is not None:
                 sources = [item["source"] for item in baseline["occurrences"]]
                 actual_sites = _frontend_call_sites(
-                    web_root, reviewed["operation"], sources, frontend_source_overrides
+                    web_root, reviewed["operation"], sources,
+                    frontend_source_overrides, manifest.frontend_revision,
                 )
                 if list(actual_sites) != list(group.frontend_call_sites):
                     issues.append(f"migration_frontend_call_site_mismatch:{context}")

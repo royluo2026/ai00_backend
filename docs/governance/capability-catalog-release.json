@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_9618bda183d820aa83b56a9e47500f2b",
-  "catalog_hash": "sha256:9618bda183d820aa83b56a9e47500f2b7c4142f0f7252d680461fa0eae4193e0",
+  "release_id": "rel_7803705d3df421f9f4381d37c3500731",
+  "catalog_hash": "sha256:7803705d3df421f9f4381d37c3500731900c7f6b1d2f6cd72b1ec2a08982d3b9",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -19797,7 +19797,7 @@
                   "page_size": {
                     "type": "integer",
                     "minimum": 1,
-                    "maximum": 500
+                    "maximum": 200
                   },
                   "presentation": {
                     "type": "string",
@@ -20026,7 +20026,7 @@
                   "page_size": {
                     "type": "integer",
                     "minimum": 1,
-                    "maximum": 500
+                    "maximum": 200
                   },
                   "presentation": {
                     "type": "string",
@@ -20117,7 +20117,7 @@
           "view"
         ]
       },
-      "schema_hash": "sha256:28fd6b6eeb706e15fefc31b587efbd35450a2d4b3639f1852913fd741fef6e29",
+      "schema_hash": "sha256:57fdbf28e9f28d2c0ded93b2c3f8b13190509fe33b29ba8dae059cdfbcdf7efb",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -20369,7 +20369,7 @@
               "page_size": {
                 "type": "integer",
                 "minimum": 1,
-                "maximum": 500
+                "maximum": 200
               },
               "presentation": {
                 "type": "string",
@@ -20548,7 +20548,7 @@
                   "page_size": {
                     "type": "integer",
                     "minimum": 1,
-                    "maximum": 500
+                    "maximum": 200
                   },
                   "presentation": {
                     "type": "string",
@@ -20777,7 +20777,7 @@
                   "page_size": {
                     "type": "integer",
                     "minimum": 1,
-                    "maximum": 500
+                    "maximum": 200
                   },
                   "presentation": {
                     "type": "string",
@@ -20868,7 +20868,7 @@
           "view"
         ]
       },
-      "schema_hash": "sha256:7506454da50c575858c54ebb5cae357311de6f733b5c211eef73fadf127b4ea4",
+      "schema_hash": "sha256:b9fd6bc25ac03ce9aadb369b1e1804180fc109a30e9f47d97654825b46887016",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -21134,7 +21134,7 @@
                   "page_size": {
                     "type": "integer",
                     "minimum": 1,
-                    "maximum": 500
+                    "maximum": 200
                   },
                   "presentation": {
                     "type": "string",
@@ -21363,7 +21363,7 @@
                   "page_size": {
                     "type": "integer",
                     "minimum": 1,
-                    "maximum": 500
+                    "maximum": 200
                   },
                   "presentation": {
                     "type": "string",
@@ -21454,7 +21454,7 @@
           "view"
         ]
       },
-      "schema_hash": "sha256:6602b8b443e1731f09fcf2aeeec6b1f9881510ef8b6604f328bebab631ca4fce",
+      "schema_hash": "sha256:b4afa3f63f56647bca28d9d46de3ad0587936f31e9059da49b94c9aa75bacfd5",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -21860,7 +21860,7 @@
           "limit": {
             "type": "integer",
             "minimum": 1,
-            "maximum": 500
+            "maximum": 200
           },
           "offset": {
             "type": "integer",
@@ -21875,7 +21875,7 @@
         "properties": {
           "views": {
             "type": "array",
-            "maxItems": 500,
+            "maxItems": 200,
             "items": {
               "type": "object",
               "properties": {
@@ -22011,7 +22011,7 @@
                     "page_size": {
                       "type": "integer",
                       "minimum": 1,
-                      "maximum": 500
+                      "maximum": 200
                     },
                     "presentation": {
                       "type": "string",
@@ -22116,7 +22116,7 @@
         "properties": {
           "views": {
             "type": "array",
-            "maxItems": 500,
+            "maxItems": 200,
             "items": {
               "type": "object",
               "properties": {
@@ -22252,7 +22252,7 @@
                     "page_size": {
                       "type": "integer",
                       "minimum": 1,
-                      "maximum": 500
+                      "maximum": 200
                     },
                     "presentation": {
                       "type": "string",
@@ -22352,7 +22352,7 @@
           "next_offset"
         ]
       },
-      "schema_hash": "sha256:3a58553616a4c0e6a5cd9827fd9882d9dbf37d54228b3b753b2b15b41238f5ac",
+      "schema_hash": "sha256:a214da276b59532c81a2b96ad7b1f2335eae4e7ddd2def01aa33bfbfda600816",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -22577,7 +22577,7 @@
               "page_size": {
                 "type": "integer",
                 "minimum": 1,
-                "maximum": 500
+                "maximum": 200
               },
               "presentation": {
                 "type": "string",
@@ -22757,7 +22757,7 @@
                   "page_size": {
                     "type": "integer",
                     "minimum": 1,
-                    "maximum": 500
+                    "maximum": 200
                   },
                   "presentation": {
                     "type": "string",
@@ -22986,7 +22986,7 @@
                   "page_size": {
                     "type": "integer",
                     "minimum": 1,
-                    "maximum": 500
+                    "maximum": 200
                   },
                   "presentation": {
                     "type": "string",
@@ -23077,7 +23077,7 @@
           "view"
         ]
       },
-      "schema_hash": "sha256:52246a4b05bc1e953c66e38e9cd36e2fc8a7c63f7fbd873e2dc9cdd49ce33eb9",
+      "schema_hash": "sha256:5767a0999de9abec4ea01ad513aa47de1c9d69c90c5d281ec1be6b99a7b382ff",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -185385,7 +185385,7 @@
       "plugin_id": "official.base",
       "module": "backend.base.official_provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:a0ca319be35b31f17d1d31becfec416d6de9129df8b50e6054058f2cdcbe3304"
+      "artifact_hash": "sha256:19c2c760b3f740c5f9bbcb01503c4ae1cc28bb9f320b040c8dc1afef947a5b05"
     },
     {
       "plugin_id": "official.craft",
@@ -185442,5 +185442,5 @@
       "artifact_hash": "sha256:5c1fccaa2219f6833c24237667039685e322cefcffc7ca6f0287d28cfc0a2b39"
     }
   ],
-  "created_at": "2026-08-28T06:36:28.587291Z"
+  "created_at": "2026-08-28T10:11:08.843157Z"
 }

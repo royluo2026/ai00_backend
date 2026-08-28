@@ -8,7 +8,7 @@ Read bounded legacy BOP version layout, tree and station-part projections.
 - 不适用：The consumer needs version CRUD or a revision-pinned navigation capability.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_9618bda183d820aa83b56a9e47500f2b`
+- Catalog Release：`rel_7803705d3df421f9f4381d37c3500731`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -95,7 +95,7 @@ Read bounded legacy BOP version layout, tree and station-part projections.
 ```json
 {
   "capability_id": "craft.bop.version.legacy_read",
-  "catalog_release": "rel_9618bda183d820aa83b56a9e47500f2b",
+  "catalog_release": "rel_7803705d3df421f9f4381d37c3500731",
   "major_version": 1,
   "payload": {
     "operation": "layout_config",

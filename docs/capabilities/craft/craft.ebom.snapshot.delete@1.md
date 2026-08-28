@@ -8,7 +8,7 @@ Delete one PBOM snapshot.
 - 不适用：The request changes snapshot status, statistics, or a part.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_9618bda183d820aa83b56a9e47500f2b`
+- Catalog Release：`rel_7803705d3df421f9f4381d37c3500731`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -87,7 +87,7 @@ Delete one PBOM snapshot.
 ```json
 {
   "capability_id": "craft.ebom.snapshot.delete",
-  "catalog_release": "rel_9618bda183d820aa83b56a9e47500f2b",
+  "catalog_release": "rel_7803705d3df421f9f4381d37c3500731",
   "major_version": 1,
   "payload": {
     "snapshot_gid": "example"

@@ -408,12 +408,15 @@ def _mask_strings(source: str) -> str:
     return "".join(chars)
 
 
-def _validate_source(source: str, relative: str, path: Path) -> None:
+def _validate_source(source: str, relative: str, path: Path | None) -> None:
     if _EMPTY_ASSIGNMENT.search(source):
         raise RouteScanConfigurationError(f"Web source cannot be parsed: {relative}")
-    if path.suffix.lower() in {".cjs", ".js", ".mjs"} and shutil.which("node"):
+    suffix = (path.suffix if path is not None else Path(relative).suffix).lower()
+    if suffix in {".cjs", ".js", ".mjs"} and shutil.which("node"):
         result = subprocess.run(
-            ["node", "--check", str(path)], capture_output=True, text=True, check=False
+            ["node", "--check", str(path)] if path is not None else ["node", "--check", "-"],
+            input=None if path is not None else source,
+            capture_output=True, text=True, encoding="utf-8", check=False,
         )
         if result.returncode:
             raise RouteScanConfigurationError(f"Web source cannot be parsed: {relative}")
@@ -1351,19 +1354,35 @@ def scan_web_api_routes(
     classification_prefixes: Sequence[str] = (),
     lexical_non_routes: Sequence[LexicalNonRoute] = (),
     wrapper_contracts: Sequence[WrapperContract] = (),
+    source_documents: Mapping[str, str] | None = None,
+    source_root_names: Sequence[str] | None = None,
 ) -> RouteScanReport:
     """Discover every source ``/api/`` occurrence and assign one disposition."""
 
     if not isinstance(frontend_revision, str) or not frontend_revision:
         raise RouteScanConfigurationError("frontend revision is required")
-    common_base, sources = _iter_sources(roots)
-    source_documents: dict[str, str] = {}
-    for path in sources:
-        relative = path.relative_to(common_base).as_posix()
-        source = path.read_text(encoding="utf-8")
-        _validate_source(source, relative, path)
-        source_documents[relative] = source
-    contract_index = _validate_wrapper_contracts(wrapper_contracts, source_documents)
+    if source_documents is None:
+        common_base, sources = _iter_sources(roots)
+        documents: dict[str, str] = {}
+        for path in sources:
+            relative = path.relative_to(common_base).as_posix()
+            source = path.read_text(encoding="utf-8")
+            _validate_source(source, relative, path)
+            documents[relative] = source
+        report_roots = tuple(
+            Path(path).resolve().relative_to(common_base).as_posix() for path in roots
+        )
+    else:
+        if not source_root_names:
+            raise RouteScanConfigurationError("immutable Web scan root names are required")
+        documents = dict(sorted(source_documents.items()))
+        for relative, source in documents.items():
+            pure = PurePosixPath(relative)
+            if pure.is_absolute() or ".." in pure.parts or "\\" in relative:
+                raise RouteScanConfigurationError(f"unsafe immutable Web source path: {relative}")
+            _validate_source(source, relative, None)
+        report_roots = tuple(source_root_names)
+    contract_index = _validate_wrapper_contracts(wrapper_contracts, documents)
     legacy_keys = canonical_route_index(legacy_index)
     bff_keys = canonical_route_index(bff_index)
     operations = _validate_exclusions(exclusions)
@@ -1373,9 +1392,7 @@ def scan_web_api_routes(
     lexical_tokens: list[str] = []
     route_token_ids: set[str] = set()
     digest = hashlib.sha256()
-    for path in sources:
-        relative = path.relative_to(common_base).as_posix()
-        source = source_documents[relative]
+    for relative, source in documents.items():
         source_sha256 = hashlib.sha256(source.encode("utf-8")).hexdigest()
         digest.update(relative.encode("utf-8"))
         digest.update(b"\0")
@@ -1477,14 +1494,11 @@ def scan_web_api_routes(
     for token_id in sorted(lexical_token_set):
         lexical_hash.update(token_id.encode("utf-8"))
         lexical_hash.update(b"\0")
-    scan_roots = tuple(
-        Path(path).resolve().relative_to(common_base).as_posix() for path in roots
-    )
     return RouteScanReport(
         frontend_revision=frontend_revision,
         content_hash=digest.hexdigest(),
         wrapper_contracts_hash=wrapper_contracts_hash(wrapper_contracts),
-        scan_roots=scan_roots,
+        scan_roots=report_roots,
         excluded_roots=_EXCLUDED_ROOTS,
         routes=tuple(routes),
         lexical_audit=LexicalAudit(

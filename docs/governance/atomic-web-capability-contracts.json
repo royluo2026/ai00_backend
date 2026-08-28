@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3c-atomic-web-contracts",
   "baseline_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
-  "content_sha256": "sha256:7cbe05bfbf1314c41edba16d0956e224536937ca3cbbbd1ebb9eb0b192b52a78",
+  "content_sha256": "sha256:a48340f7b2d3547cb0be23389f6e535a46997d511f0e7a5352b1e7d2504467b9",
   "counts_by_owner": {
     "agent": {
       "groups": 4,
@@ -3272,7 +3272,7 @@
       "confirmation_policy": "none",
       "consistency_policy": "strong",
       "example_input": {
-        "limit": 500,
+        "limit": 200,
         "list_gid": null,
         "module": "",
         "offset": 0
@@ -3301,7 +3301,7 @@
         "additionalProperties": false,
         "properties": {
           "limit": {
-            "maximum": 500,
+            "maximum": 200,
             "minimum": 1,
             "type": "integer"
           },
@@ -3443,7 +3443,7 @@
                       "type": "array"
                     },
                     "page_size": {
-                      "maximum": 500,
+                      "maximum": 200,
                       "minimum": 1,
                       "type": "integer"
                     },
@@ -3582,7 +3582,7 @@
               ],
               "type": "object"
             },
-            "maxItems": 500,
+            "maxItems": 200,
             "type": "array"
           }
         },
@@ -3766,7 +3766,7 @@
                 "type": "array"
               },
               "page_size": {
-                "maximum": 500,
+                "maximum": 200,
                 "minimum": 1,
                 "type": "integer"
               },
@@ -3962,7 +3962,7 @@
                     "type": "array"
                   },
                   "page_size": {
-                    "maximum": 500,
+                    "maximum": 200,
                     "minimum": 1,
                     "type": "integer"
                   },
@@ -4309,7 +4309,7 @@
                     "type": "array"
                   },
                   "page_size": {
-                    "maximum": 500,
+                    "maximum": 200,
                     "minimum": 1,
                     "type": "integer"
                   },
@@ -4629,7 +4629,7 @@
                 "type": "array"
               },
               "page_size": {
-                "maximum": 500,
+                "maximum": 200,
                 "minimum": 1,
                 "type": "integer"
               },
@@ -4835,7 +4835,7 @@
                     "type": "array"
                   },
                   "page_size": {
-                    "maximum": 500,
+                    "maximum": 200,
                     "minimum": 1,
                     "type": "integer"
                   },
@@ -5179,7 +5179,7 @@
                     "type": "array"
                   },
                   "page_size": {
-                    "maximum": 500,
+                    "maximum": 200,
                     "minimum": 1,
                     "type": "integer"
                   },

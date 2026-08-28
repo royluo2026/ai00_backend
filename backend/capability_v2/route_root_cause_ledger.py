@@ -11,6 +11,8 @@ import re
 import subprocess
 from typing import Any, Mapping
 
+from backend.capability_v2.git_tree import read_path, read_text
+
 
 BASELINE_BACKEND_REVISION = "800ec6ba559db3301221e674b2a5026d354214ff"
 BASELINE_INVENTORY_PATH = (
@@ -194,6 +196,7 @@ def _anchor_text(
     anchor: object,
     *,
     web_root: Path | None = None,
+    frontend_revision: str | None = None,
 ) -> str | None:
     if not isinstance(anchor, Mapping) or set(anchor) != {
         "repository", "source_path", "start_line", "end_line", "sha256"
@@ -228,11 +231,11 @@ def _anchor_text(
         except UnicodeDecodeError:
             return None
     else:
+        if frontend_revision is None:
+            return None
         try:
-            text = web_root.joinpath(*PurePosixPath(source_path).parts).read_text(
-                encoding="utf-8"
-            )
-        except (OSError, UnicodeDecodeError):
+            text = read_text(web_root, frontend_revision, source_path)
+        except (ValueError, UnicodeDecodeError):
             return None
     selected = _line_slice(text, start, end)
     if selected is None:
@@ -240,8 +243,13 @@ def _anchor_text(
     return selected if hashlib.sha256(selected.encode("utf-8")).hexdigest() == anchor["sha256"] else None
 
 
-def _anchor_valid(root: Path, anchor: object, *, web_root: Path | None = None) -> bool:
-    return _anchor_text(root, anchor, web_root=web_root) is not None
+def _anchor_valid(
+    root: Path, anchor: object, *, web_root: Path | None = None,
+    frontend_revision: str | None = None,
+) -> bool:
+    return _anchor_text(
+        root, anchor, web_root=web_root, frontend_revision=frontend_revision
+    ) is not None
 
 
 def _normalize_backend_route(value: str) -> str:
@@ -393,6 +401,7 @@ def _retirement_proof_valid(
     *,
     web_root: Path | None,
 ) -> bool:
+    frontend_revision = ledger.final_evidence.get("frontend_revision")
     proof = entry.disposition_details.get("retirement_proof")
     if not isinstance(proof, Mapping) or set(proof) != {
         "kind", "rationale", "anchors", "final_sources"
@@ -405,7 +414,9 @@ def _retirement_proof_valid(
         or not isinstance(rationale, str) or len(rationale.strip()) < 20
         or rationale.strip().lower() in {"reviewed", "retired", "removed"}
         or not isinstance(anchors, list) or not anchors
-        or not all(_anchor_valid(root, anchor, web_root=web_root) for anchor in anchors)
+        or not all(_anchor_valid(
+            root, anchor, web_root=web_root, frontend_revision=frontend_revision
+        ) for anchor in anchors)
         or not isinstance(final_sources, list) or not final_sources
     ):
         return False
@@ -428,10 +439,10 @@ def _retirement_proof_valid(
             return False
         actual_by_source[source] = set(routes)
         if web_root is not None:
-            path = web_root.joinpath(*PurePosixPath(source).parts)
             try:
-                blob, text = path.read_bytes(), path.read_text(encoding="utf-8")
-            except (OSError, UnicodeDecodeError):
+                blob = read_path(web_root, frontend_revision, source)
+                text = read_text(web_root, frontend_revision, source)
+            except (ValueError, UnicodeDecodeError):
                 return False
             if hashlib.sha256(blob).hexdigest() != raw["sha256"] or any(route in text for route in routes):
                 return False
@@ -439,7 +450,9 @@ def _retirement_proof_valid(
         return False
     evidence = entry.backend_evidence
     anchor_texts = [
-        _anchor_text(root, anchor, web_root=web_root) or "" for anchor in anchors
+        _anchor_text(
+            root, anchor, web_root=web_root, frontend_revision=frontend_revision
+        ) or "" for anchor in anchors
     ]
     if kind == "http_410":
         return evidence.get("handler_status") == "registered" and any("410" in text for text in anchor_texts)
@@ -562,10 +575,11 @@ def audit_route_root_cause_ledger(
                     if verified_baseline_hashes[source] != source_hash:
                         issues.append(f"ledger_baseline_source_hash_invalid:{context}")
             elif web_root is not None:
-                path = web_root.joinpath(*PurePosixPath(source).parts)
                 try:
-                    actual_hash = hashlib.sha256(path.read_bytes()).hexdigest()
-                except OSError:
+                    actual_hash = hashlib.sha256(read_path(
+                        web_root, ledger.final_evidence.get("frontend_revision"), source
+                    )).hexdigest()
+                except ValueError:
                     actual_hash = None
                 if actual_hash != source_hash:
                     issues.append(f"ledger_post_normalization_source_hash_invalid:{context}")
@@ -577,7 +591,10 @@ def audit_route_root_cause_ledger(
         anchors = evidence.get("anchors")
         if source_path is None or not root.joinpath(*PurePosixPath(source_path).parts).is_file():
             issues.append(f"ledger_handler_path_missing:{context}")
-        if not isinstance(anchors, list) or not all(_anchor_valid(root, anchor, web_root=web_root) for anchor in anchors):
+        if not isinstance(anchors, list) or not all(_anchor_valid(
+            root, anchor, web_root=web_root,
+            frontend_revision=ledger.final_evidence.get("frontend_revision"),
+        ) for anchor in anchors):
             issues.append(f"ledger_backend_anchor_invalid:{context}")
         if handler_status == "registered":
             actual_definition = build_route_definition_evidence(root, source_path, entry.key) if source_path is not None else None

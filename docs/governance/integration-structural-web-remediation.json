@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3e-integration-structural-remediation",
-  "atomic_contract_manifest_sha256": "sha256:c75d6dbf4612bbc4240c2dbcef55678d6db462767221f4ded99556e8ae703bca",
-  "content_sha256": "sha256:bd76f3925f1e7ac8be72f71f151212a43aa831f93d2ba61b463124b0bb28870f",
+  "atomic_contract_manifest_sha256": "sha256:9fb716c0ac5914568d21f9248b1ff3f5d4e8bf6c0a4e343e80309528a5d29cb1",
+  "content_sha256": "sha256:adc1f2a3071d76bac776b17f297bc52597d45f981da32b8933d19422cea024bb",
   "counts": {
     "groups": 12,
     "migrated_groups": 0,
@@ -99,7 +99,7 @@
           "line": 148,
           "occurrence_id": "web/ext_datasource/ext_ds.js:148:36:GET:/api/ext-datasources",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
@@ -225,7 +225,7 @@
           "line": 640,
           "occurrence_id": "web/ext_datasource/ext_ds.js:640:36:GET:/api/ext-datasources/{dynamic}/tables",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
@@ -384,7 +384,7 @@
           "line": 349,
           "occurrence_id": "web/ext_datasource/ext_ds.js:349:36:GET:/api/ext-field-mappings",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
@@ -512,7 +512,7 @@
           "line": 187,
           "occurrence_id": "web/ext_datasource/ext_ds.js:187:36:GET:/api/ext-mappings",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
@@ -638,7 +638,7 @@
           "line": 341,
           "occurrence_id": "web/ext_datasource/ext_ds.js:341:36:GET:/api/ext-mappings/{dynamic}/columns",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
@@ -773,7 +773,7 @@
           "line": 496,
           "occurrence_id": "web/ext_datasource/ext_ds.js:496:36:GET:/api/ext-mappings/{dynamic}/preview",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
@@ -918,7 +918,7 @@
           "line": 623,
           "occurrence_id": "web/ext_datasource/ext_ds.js:623:29:PATCH:/api/ext-datasources/{dynamic}",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
@@ -1082,7 +1082,7 @@
           "line": 625,
           "occurrence_id": "web/ext_datasource/ext_ds.js:625:28:POST:/api/ext-datasources",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
@@ -1207,7 +1207,7 @@
           "line": 605,
           "occurrence_id": "web/ext_datasource/ext_ds.js:605:34:POST:/api/ext-datasources/{dynamic}/test",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
@@ -1395,7 +1395,7 @@
           "line": 677,
           "occurrence_id": "web/ext_datasource/ext_ds.js:677:26:POST:/api/ext-mappings",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
@@ -1544,7 +1544,7 @@
           "line": 549,
           "occurrence_id": "web/ext_datasource/ext_ds.js:549:37:POST:/api/ext-mappings/{dynamic}/import",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
@@ -1706,7 +1706,7 @@
           "line": 457,
           "occurrence_id": "web/ext_datasource/ext_ds.js:457:23:PUT:/api/ext-field-mappings/batch",
           "source": "web/ext_datasource/ext_ds.js",
-          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
+          "source_sha256": "576ba0a77f059933310dac198fd7be855cf020000dc0bbdc2a1d4fd4b2034c01"
         }
       ],
       "idempotency_policy": "unresolved: candidate policy cannot establish legacy replay equivalence",
@@ -1747,8 +1747,8 @@
       "unresolved_reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
     }
   ],
-  "frontend_content_hash": "1458b00910499b0c8b32734c8815507e967839c18a7c16972368d21e1b40852e",
-  "frontend_revision": "5d6dc5cad342d75a4137219ca7bbb5ece71899d2",
+  "frontend_content_hash": "e5f556f5efa07f213f97f67c213583be31e02f208c1cc74d26001a4ef90d50e0",
+  "frontend_revision": "d9db45c78f23afc3c32ab9bb8336d2a19bca6277",
   "schema_version": "1.0.0",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "source_ledger_revision": "ffc281cb141999433c188d4b3b9fb12b9670f8c4",

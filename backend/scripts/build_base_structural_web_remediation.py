@@ -16,6 +16,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from backend.scripts.check_web_capability_routes import build_report
+from backend.capability_v2.git_tree import read_text
 
 
 BASELINE = "8ee5dc2340a9e77c5d84e8f84f733bb5415e9d08"
@@ -126,10 +127,12 @@ def _owner_service_boundary_ready(key: tuple[str, str], contract: dict[str, Any]
     )
 
 
-def _plugin_frontend_evidence(web_root: Path, key: tuple[str, str]) -> dict[str, Any]:
+def _plugin_frontend_evidence(
+    web_root: Path, revision: str, key: tuple[str, str]
+) -> dict[str, Any]:
     operation = PLUGIN_FRONTEND_OPERATIONS[key]
     relative = "web/core/web_compat.js"
-    source = (web_root / relative).read_text(encoding="utf-8")
+    source = read_text(web_root, revision, relative)
     needle = f".call('{operation}'"
     offset = source.find(needle)
     if offset < 0:
@@ -146,7 +149,8 @@ def _plugin_frontend_evidence(web_root: Path, key: tuple[str, str]) -> dict[str,
 
 
 def _atomic_frontend_evidence(
-    web_root: Path, key: tuple[str, str], contract: dict[str, Any], occurrences: list[dict[str, Any]]
+    web_root: Path, revision: str, key: tuple[str, str], contract: dict[str, Any],
+    occurrences: list[dict[str, Any]]
 ) -> dict[str, Any]:
     operation = ATOMIC_FRONTEND_OPERATIONS[key]
     target = contract["capability_id"]
@@ -156,7 +160,7 @@ def _atomic_frontend_evidence(
         by_source.setdefault(occurrence["source"], []).append(occurrence)
     call_sites = []
     for relative, source_occurrences in by_source.items():
-        source = (web_root / relative).read_text(encoding="utf-8")
+        source = read_text(web_root, revision, relative)
         matches = list(matcher.finditer(source))
         if len(matches) != len(source_occurrences):
             raise ValueError(
@@ -250,8 +254,10 @@ def build_manifest(web_root: Path) -> dict[str, Any]:
         if migrated and not _owner_service_boundary_ready(key, contract):
             raise ValueError(f"owner-service boundary evidence missing: {key}")
         owner_evidence = (
-            _plugin_frontend_evidence(web_root, key) if key in PLUGIN_FRONTEND_OPERATIONS
-            else _atomic_frontend_evidence(web_root, key, contract, source["occurrences"]) if key in ATOMIC_FRONTEND_OPERATIONS
+            _plugin_frontend_evidence(web_root, report["frontend_revision"], key) if key in PLUGIN_FRONTEND_OPERATIONS
+            else _atomic_frontend_evidence(
+                web_root, report["frontend_revision"], key, contract, source["occurrences"]
+            ) if key in ATOMIC_FRONTEND_OPERATIONS
             else migration_by_key.get(key) if key in OWNER_SERVICE_TARGETS else None
         )
         if owner_evidence is not None:

@@ -14,15 +14,16 @@ if str(ROOT) not in sys.path:
 from backend.capability_v2.consumer_routes import (
     _ROUTE_LITERAL, _find_call_details, _mask_comments, _raw_route, normalize_route,
 )
+from backend.capability_v2.git_tree import read_text, resolve_revision
 
 CONTRACTS = ROOT / "docs/governance/web-api-wrapper-contracts.json"
 
 
 def build(web_root: Path) -> dict:
     payload = json.loads(CONTRACTS.read_text(encoding="utf-8"))
+    revision = resolve_revision(web_root)
     for entry in payload["entries"]:
-        source_path = web_root / entry["source"]
-        source = source_path.read_text(encoding="utf-8")
+        source = read_text(web_root, revision, entry["source"])
         digest = hashlib.sha256(source.encode("utf-8")).hexdigest()
         entry["source_sha256"] = digest
         definition = entry["definition"]

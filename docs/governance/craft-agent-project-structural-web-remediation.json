@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3e-craft-agent-project-structural-remediation",
-  "atomic_contract_manifest_sha256": "sha256:c75d6dbf4612bbc4240c2dbcef55678d6db462767221f4ded99556e8ae703bca",
-  "content_sha256": "sha256:8b9b3316f72a6e23fb502b6873b1836a4ef5396c0279e842e578d7605f9dd99c",
+  "atomic_contract_manifest_sha256": "sha256:9fb716c0ac5914568d21f9248b1ff3f5d4e8bf6c0a4e343e80309528a5d29cb1",
+  "content_sha256": "sha256:2769ccf479fab689a80ef70aee3d8bd65d636dba1238f13cd29a0ccb0f76507f",
   "counts": {
     "groups": 14,
     "migrated_groups": 0,
@@ -24,7 +24,7 @@
           "line": 771,
           "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:771:58:DELETE:/api/craft_lib/equipments/{dynamic}",
           "source": "web/knowledge_hub/pages/gbop_vpps.html",
-          "source_sha256": "9659421b97c7f769cc5aa1b0f8c486ad4803ca103772c56e7f82ad1aee81dedb"
+          "source_sha256": "db5265ec700318095f663c2571b1e5c734b37d8a51b200bf33aeea3b7c20e2f8"
         }
       ],
       "input_output_contract": {
@@ -80,7 +80,7 @@
           "line": 714,
           "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:714:58:DELETE:/api/craft_lib/fixtures/{dynamic}",
           "source": "web/knowledge_hub/pages/gbop_vpps.html",
-          "source_sha256": "9659421b97c7f769cc5aa1b0f8c486ad4803ca103772c56e7f82ad1aee81dedb"
+          "source_sha256": "db5265ec700318095f663c2571b1e5c734b37d8a51b200bf33aeea3b7c20e2f8"
         }
       ],
       "input_output_contract": {
@@ -136,7 +136,7 @@
           "line": 331,
           "occurrence_id": "web/core/existing_capability_client.js:331:12:DELETE:/api/lists/{dynamic}",
           "source": "web/core/existing_capability_client.js",
-          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+          "source_sha256": "145802a516060381300cdbb57a1dee635f1115df654e59602b5d0c1d83f69928"
         }
       ],
       "input_output_contract": {
@@ -242,7 +242,7 @@
           "line": 326,
           "occurrence_id": "web/core/existing_capability_client.js:326:51:GET:/api/lists",
           "source": "web/core/existing_capability_client.js",
-          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+          "source_sha256": "145802a516060381300cdbb57a1dee635f1115df654e59602b5d0c1d83f69928"
         }
       ],
       "input_output_contract": {
@@ -451,14 +451,14 @@
           "line": 2192,
           "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:2192:40:GET:/api/rule-engine/check-entry",
           "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-          "source_sha256": "52f36f7634ca6eba793c66cebc7768ee39c2f18ed0bfcf98fc4560338a83964d"
+          "source_sha256": "36bb20338757c77fcfe80f4d0f84449f2928df7183989efeb2798adbc9abc00a"
         },
         {
           "column": 40,
           "line": 3524,
           "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:3524:40:GET:/api/rule-engine/check-entry",
           "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-          "source_sha256": "52f36f7634ca6eba793c66cebc7768ee39c2f18ed0bfcf98fc4560338a83964d"
+          "source_sha256": "36bb20338757c77fcfe80f4d0f84449f2928df7183989efeb2798adbc9abc00a"
         }
       ],
       "input_output_contract": {
@@ -1092,8 +1092,8 @@
       "unresolved_reason": "Rule definition changes contain dynamic rule_definition data without a governed closed nested contract."
     }
   ],
-  "frontend_content_hash": "1458b00910499b0c8b32734c8815507e967839c18a7c16972368d21e1b40852e",
-  "frontend_revision": "5d6dc5cad342d75a4137219ca7bbb5ece71899d2",
+  "frontend_content_hash": "e5f556f5efa07f213f97f67c213583be31e02f208c1cc74d26001a4ef90d50e0",
+  "frontend_revision": "d9db45c78f23afc3c32ab9bb8336d2a19bca6277",
   "schema_version": "1.0.0",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "source_ledger_revision": "2db07be4",

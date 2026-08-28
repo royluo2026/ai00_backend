@@ -36,7 +36,7 @@
         "plugin_id": "official.base",
         "module": "backend.base.official_provider",
         "version": "1.0.0",
-        "artifact_hash": "sha256:a0ca319be35b31f17d1d31becfec416d6de9129df8b50e6054058f2cdcbe3304"
+        "artifact_hash": "sha256:19c2c760b3f740c5f9bbcb01503c4ae1cc28bb9f320b040c8dc1afef947a5b05"
       },
       "artifact_path": "backend/base",
       "allowed_owners": [

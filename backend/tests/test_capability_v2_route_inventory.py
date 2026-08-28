@@ -65,10 +65,9 @@ def test_canonical_web_inventory_truthfully_closes_saved_view_rest_calls() -> No
     assert fresh == inventory
     assert audit_route_root_cause_ledger(ROOT, ledger, web_root=FRONTEND_ROOT) == ()
 
-    assert inventory["counts"]["unresolved"] == 29
-    assert inventory["counts"]["unresolved"] == ledger.final_evidence["unresolved_count"]
     fresh_unresolved = [route for route in fresh["routes"] if route["disposition"] == "unresolved"]
-    assert len(fresh_unresolved) == 29
+    assert inventory["counts"]["unresolved"] == len(fresh_unresolved)
+    assert inventory["counts"]["unresolved"] == ledger.final_evidence["unresolved_count"]
     assert Counter((route["method"], route["normalized_route"]) for route in fresh_unresolved) == Counter(
         (group["method"], group["normalized_route"])
         for group in ledger.final_unresolved_groups
@@ -87,6 +86,17 @@ def test_canonical_web_inventory_truthfully_closes_saved_view_rest_calls() -> No
         if route["disposition"] == "unresolved"
         and route["normalized_route"].startswith("/api/views")
     ]
+
+
+def test_canonical_web_inventory_ignores_untracked_frontend_sources() -> None:
+    baseline = json.loads(build_report(FRONTEND_ROOT).json())
+    probe = FRONTEND_ROOT / "web/__immutable_route_evidence_probe__.js"
+    assert not probe.exists()
+    try:
+        probe.write_text("fetch('/api/untracked-evidence-bypass')\n", encoding="utf-8")
+        assert json.loads(build_report(FRONTEND_ROOT).json()) == baseline
+    finally:
+        probe.unlink(missing_ok=True)
 
 
 def test_task3b3a_root_cause_ledger_covers_pinned_unresolved_evidence() -> None:
