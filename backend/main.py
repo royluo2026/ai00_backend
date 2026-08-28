@@ -118,7 +118,11 @@ async def lifespan(app: FastAPI):
     Path(__file__).parent.joinpath("static", "uploads").mkdir(parents=True, exist_ok=True)
     # System Skill seeds are deployment data migrations, never application-startup writes.
     _run_route_self_check(app)
-    yield
+    await _capability_registry.start_lifecycles()
+    try:
+        yield
+    finally:
+        await _capability_registry.stop_lifecycles()
 
 
 app = FastAPI(

@@ -2,7 +2,7 @@
 from __future__ import annotations
 import inspect
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Awaitable, Callable
 from .models_next import CapabilityContext, CapabilityHandler, CapabilityOutput, CapabilityResult, CapabilitySpec
 from .validation_next import validate_payload
 from backend.plugin_platform.metrics import record_usage
@@ -23,7 +23,9 @@ class RegisteredCapability:
     descriptor: Any | None = None
 
 class CapabilityRegistry:
-    def __init__(self) -> None: self._items: dict[tuple[str, int], RegisteredCapability] = {}
+    def __init__(self) -> None:
+        self._items: dict[tuple[str, int], RegisteredCapability] = {}
+        self._lifecycles: dict[str, tuple[Callable[[], Awaitable[None]], Callable[[], Awaitable[None]]]] = {}
     def register(self, spec: CapabilitySpec, handler: CapabilityHandler, *, descriptor: Any | None = None) -> None:
         key = (spec.id, spec.version)
         if key in self._items: raise ValueError(f"Capability already registered: {spec.id}@{spec.version}")
@@ -54,6 +56,18 @@ class CapabilityRegistry:
     def keys(self) -> tuple[tuple[str, int], ...]:
         """Return stable public identities without exposing registry storage."""
         return tuple(sorted(self._items))
+    def register_lifecycle(self, name: str, start: Callable[[], Awaitable[None]], stop: Callable[[], Awaitable[None]]) -> None:
+        if name in self._lifecycles:
+            raise ValueError(f"Capability lifecycle already registered: {name}")
+        self._lifecycles[name] = (start, stop)
+    def lifecycle_names(self) -> tuple[str, ...]:
+        return tuple(sorted(self._lifecycles))
+    async def start_lifecycles(self) -> None:
+        for name in self.lifecycle_names():
+            await self._lifecycles[name][0]()
+    async def stop_lifecycles(self) -> None:
+        for name in reversed(self.lifecycle_names()):
+            await self._lifecycles[name][1]()
     async def invoke(self, capability_id: str, payload: dict[str, Any], context: CapabilityContext, *, version: int | None = None) -> CapabilityResult:
         item = self.get(capability_id, version)
         validate_payload(dict(item.spec.input_schema), payload)

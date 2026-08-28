@@ -7,18 +7,27 @@ from backend.capability_v2.catalog import CatalogResolver, build_release
 from backend.capability_v2.catalog_store import InMemoryCatalogStore
 from backend.capability_v2.contracts import (
     ActorIdentity, ConsumerDescriptor, ConsumerIdentity, ConsumerType, CorrelationRef,
-    TenantIdentity,
+    InvocationEnvelope, TenantIdentity,
 )
 from backend.capability_v2.domain_client import DomainCapabilityClient
 from backend.capability_v2.gateway import CapabilityGatewayService
+from backend.capability_v2.policies import GatewayPolicyError
 from backend.capability_v2.outcomes import InMemoryOutcomeStore
+from backend.capability_v2.operations import InMemoryOperationStore, OperationService
 from backend.capability_v2.reliability import InMemoryRateLimiter, ReliabilityCoordinator
 from plugins.integration.integration_backend.application.sync import SyncService, TargetAdapter
+from plugins.integration.integration_backend.capabilities.descriptors import specs as integration_specs
+from plugins.integration.integration_backend.capabilities.provider import descriptor_for
+from plugins.integration.integration_backend.capabilities import register_capabilities
+from plugins.integration.integration_backend.capabilities.wiring import IntegrationProviderAdapters
 from plugins.integration.tests.test_integration_mapping_commands import (
     BoundCatalog, VALID_BINDING, bound_mapping_payload,
 )
 from plugins.integration.tests.test_integration_owner_services import (
     CONTEXT, MemoryRepository, _seed_connector_and_mapping, app,
+)
+from plugins.integration.tests.test_integration_provider import (
+    ProviderCatalog, ProviderRepository, ProviderRuntime, ProviderVault,
 )
 from plugins.knowledge.knowledge_backend.application.reference_data import ReferenceDataService
 from plugins.knowledge.knowledge_backend.capabilities import reference_data
@@ -67,6 +76,38 @@ def _identity():
     )
 
 
+def test_production_registry_registration_installs_startable_and_safely_stoppable_import_worker():
+    repository = ProviderRepository()
+    repository.claim_next_import_run = lambda _worker: None
+    registry = CapabilityRegistry()
+    register_capabilities(registry, adapter_factory=lambda: IntegrationProviderAdapters(
+        repository=repository, credential_enrollment=ProviderVault(), catalog=ProviderCatalog(),
+        connector_runtime=ProviderRuntime(), target_client=DomainCapabilityClient(object()),
+        worker_identity_factory=lambda run: ConsumerIdentity(
+            actor=ActorIdentity(
+                user_id=run["owner_gid"], authentication_method="persisted-integration-operation",
+                authenticated_at=datetime.now(UTC),
+            ),
+            tenant=TenantIdentity(
+                tenant_id=run.get("team_gid") or f"user:{run['owner_gid']}",
+                membership="persisted-operation",
+            ),
+            consumer=ConsumerDescriptor(
+                type=ConsumerType.WORKER, consumer_id="domain.integration.import-worker",
+            ),
+        ),
+    ))
+
+    assert registry.lifecycle_names() == ("integration.import-worker",)
+
+    async def exercise():
+        await registry.start_lifecycles()
+        await asyncio.sleep(0)
+        await registry.stop_lifecycles()
+
+    asyncio.run(exercise())
+
+
 def test_persisted_import_invocation_passes_real_gateway_contract_and_provider(monkeypatch):
     integration_repository = MemoryRepository()
     _seed_connector_and_mapping(integration_repository)
@@ -107,7 +148,7 @@ def test_persisted_import_invocation_passes_real_gateway_contract_and_provider(m
             assert major_version == persisted["major_version"]
             assert minimum_release == persisted["minimum_catalog_release"]
 
-    service = SyncService(DomainCapabilityClient(gateway), _identity(), Catalog())
+    service = SyncService(DomainCapabilityClient(gateway), Catalog())
     adapter = TargetAdapter(
         target_domain="knowledge", capability_id=persisted["capability_id"],
         major_version=persisted["major_version"],
@@ -116,7 +157,7 @@ def test_persisted_import_invocation_passes_real_gateway_contract_and_provider(m
 
     result = asyncio.run(service.apply_batch(
         adapter=adapter, payload=payload, idempotency_key="sync-1:batch-1",
-        correlation=CorrelationRef(request_id="req-1", trace_id="trace-1"),
+        correlation=CorrelationRef(request_id="req-1", trace_id="trace-1"), identity=_identity(),
     ))
 
     assert result.ok is True
@@ -126,3 +167,53 @@ def test_persisted_import_invocation_passes_real_gateway_contract_and_provider(m
         "rows": [{"key": "part-1", "values": [{"field": "code", "value": "P1"}]}],
         "actor_gid": "integration-sync", "tenant_gid": "team-1",
     }]
+
+
+def test_real_connection_test_descriptor_gateway_rejects_missing_confirmation_and_mismatched_idempotency():
+    spec = next(item for item in integration_specs() if item.id == "integration.connector.connection.test")
+    descriptor = descriptor_for(spec)
+    registry = CapabilityRegistry()
+    registry.register(spec, lambda *_args: {
+        "operation_ref": {"operation_id": "operation-1", "status": "succeeded", "version": 2}
+    }, descriptor=descriptor)
+    release = build_release([descriptor])
+    store = InMemoryCatalogStore(); store.publish(release)
+
+    class Policy(_Policy):
+        def approve(self, _descriptor, envelope, *_args):
+            if envelope.approval_reference != "confirm-1":
+                raise GatewayPolicyError("confirmation_required", "Confirmation is required.")
+
+    gateway = CapabilityGatewayService(
+        CatalogResolver(store, registry), Policy(),
+        reliability=ReliabilityCoordinator(InMemoryOutcomeStore(), InMemoryRateLimiter(limit=100)),
+        operations=OperationService(InMemoryOperationStore()),
+    ).bind_release(release.release_id)
+    principal = ConsumerIdentity(
+        actor=ActorIdentity(user_id="actor-1", authentication_method="session", authenticated_at=datetime.now(UTC)),
+        tenant=TenantIdentity(tenant_id="team-1", membership="member"),
+        consumer=ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="web.integration"),
+    )
+
+    def envelope(payload, key=None, approval=None):
+        return InvocationEnvelope(
+            capability_id=spec.id, major_version=1, catalog_release=release.release_id,
+            payload=payload, identity=principal, idempotency_key=key, approval_reference=approval,
+            request_id=f"request-{key or 'missing'}", trace_id="trace-connection",
+        )
+
+    missing = asyncio.run(gateway.invoke(envelope({"gid": "connector-1", "idempotency_key": "idem-1"})))
+    mismatch = asyncio.run(gateway.invoke(envelope(
+        {"gid": "connector-1", "idempotency_key": "idem-payload"}, "idem-envelope", "confirm-1"
+    )))
+    unconfirmed = asyncio.run(gateway.invoke(envelope(
+        {"gid": "connector-1", "idempotency_key": "idem-2"}, "idem-2"
+    )))
+    confirmed = asyncio.run(gateway.invoke(envelope(
+        {"gid": "connector-1", "idempotency_key": "idem-3"}, "idem-3", "confirm-1"
+    )))
+
+    assert missing.error.code == "idempotency_key_mismatch"
+    assert mismatch.error.code == "idempotency_key_mismatch"
+    assert unconfirmed.error.code == "confirmation_required"
+    assert confirmed.ok is True

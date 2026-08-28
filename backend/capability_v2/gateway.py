@@ -178,6 +178,12 @@ class CapabilityGatewayService:
             )
 
         is_write = descriptor.side_effect_level is not SideEffectLevel.READ
+        payload_idempotency = envelope.payload.get("idempotency_key")
+        if payload_idempotency is not None and payload_idempotency != envelope.idempotency_key:
+            return self._rejected(
+                envelope, "idempotency_key_mismatch",
+                "Payload and invocation idempotency keys must match.",
+            )
         if descriptor.operation_policy == "required" and self._operations is None:
             return self._rejected(
                 envelope, "operation_service_unavailable",

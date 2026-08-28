@@ -93,6 +93,85 @@ class IntegrationRepository:
             return winner, True
         return completed, False
 
+    def execute_binding_command(
+        self, record: IntegrationOperation, target: Mapping[str, Any], *,
+        expected_revision: int | None, mapping_gid: str | None,
+        mapping_expected_revision: int | None,
+    ) -> tuple[IntegrationOperation, bool]:
+        try:
+            with get_integration_conn() as conn:
+                with conn.cursor() as cur:
+                    self._insert_operation(cur, record)
+                    self._audit(cur, record)
+                    cur.execute(
+                        "SELECT revision FROM workmanship_int_mapping_target_bindings WHERE binding_id=%s "
+                        "AND owner_gid=%s AND team_gid=%s FOR UPDATE",
+                        (target["binding_id"], record.owner_gid, record.team_gid),
+                    )
+                    existing = cur.fetchone()
+                    if existing:
+                        if expected_revision is None or int(existing["revision"]) != int(expected_revision):
+                            raise RevisionConflict("target binding")
+                        revision = int(existing["revision"]) + 1
+                        cur.execute(
+                            "UPDATE workmanship_int_mapping_target_bindings SET ontology_object_gid=%s,target_domain=%s,"
+                            "target_capability_id=%s,target_major_version=%s,minimum_catalog_release=%s,input_contract=%s,"
+                            "resource_gid=%s,expected_version=%s,active=1,revision=%s,last_idempotency_key=%s "
+                            "WHERE binding_id=%s AND owner_gid=%s AND team_gid=%s AND revision=%s",
+                            (target["ontology_object_gid"], target["target_domain"], target["target_capability_id"],
+                             target["target_major_version"], target["minimum_catalog_release"], target["input_contract"],
+                             target["resource_gid"], target["expected_version"], revision, record.idempotency_key,
+                             target["binding_id"], record.owner_gid, record.team_gid, expected_revision),
+                        )
+                    else:
+                        if expected_revision is not None:
+                            raise RevisionConflict("target binding")
+                        revision = 1
+                        cur.execute(
+                            "INSERT INTO workmanship_int_mapping_target_bindings "
+                            "(binding_id,ontology_object_gid,target_domain,target_capability_id,target_major_version,"
+                            "minimum_catalog_release,input_contract,resource_gid,expected_version,owner_gid,team_gid,"
+                            "active,revision,last_idempotency_key) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,1,1,%s)",
+                            (target["binding_id"], target["ontology_object_gid"], target["target_domain"],
+                             target["target_capability_id"], target["target_major_version"], target["minimum_catalog_release"],
+                             target["input_contract"], target["resource_gid"], target["expected_version"],
+                             record.owner_gid, record.team_gid, record.idempotency_key),
+                        )
+                    result = {key: target[key] for key in (
+                        "binding_id", "ontology_object_gid", "target_domain", "target_capability_id",
+                        "target_major_version", "minimum_catalog_release", "resource_gid", "expected_version",
+                    )} | {"revision": revision}
+                    if mapping_gid is not None:
+                        if mapping_expected_revision is None:
+                            raise RevisionConflict("mapping")
+                        scope, values = self._principal_scope(record.owner_gid, record.team_gid)
+                        cur.execute(
+                            "UPDATE workmanship_int_ext_mappings SET target_binding_id=%s,target_domain=%s,"
+                            "target_capability_id=%s,target_major_version=%s,minimum_catalog_release=%s,"
+                            "target_input_contract=%s,target_resource_gid=%s,target_expected_version=%s,"
+                            f"status='active',revision=revision+1 WHERE gid=%s AND revision=%s AND {scope} AND archived_at IS NULL",
+                            (target["binding_id"], target["target_domain"], target["target_capability_id"],
+                             target["target_major_version"], target["minimum_catalog_release"], target["input_contract"],
+                             target["resource_gid"], target["expected_version"], mapping_gid, mapping_expected_revision, *values),
+                        )
+                        if cur.rowcount != 1:
+                            self._raise_miss(cur, "workmanship_int_ext_mappings", {
+                                "gid": mapping_gid, "expected_revision": mapping_expected_revision,
+                                "owner_gid": record.owner_gid, "team_gid": record.team_gid,
+                            })
+                        result.update(mapping_gid=mapping_gid, mapping_revision=int(mapping_expected_revision) + 1)
+                    completed = replace(record, status="succeeded", version=record.version + 1, result=result, updated_at=datetime.now(UTC))
+                    self._complete_operation(cur, record, completed)
+                    self._audit(cur, completed)
+        except Exception as exc:
+            if not self._is_duplicate_key(exc):
+                raise
+            winner = self.find_operation(record.owner_gid, record.capability_id, record.idempotency_key)
+            if winner is None:
+                raise RuntimeError("Integration binding idempotency winner could not be reloaded") from exc
+            return winner, True
+        return completed, False
+
     @classmethod
     def _insert_mapping(cls, cur, data: Mapping[str, Any]) -> None:
         field_mappings = [dict(item, revision=1) for item in data.get("field_mappings", ())]
@@ -388,9 +467,13 @@ class IntegrationRepository:
         with get_integration_conn() as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT * FROM workmanship_int_sync_runs WHERE status='accepted' OR "
-                    "(status='claimed' AND claimed_at < DATE_SUB(NOW(6), INTERVAL 5 MINUTE)) "
-                    "ORDER BY created_at,run_id LIMIT 1 FOR UPDATE SKIP LOCKED"
+                    "SELECT r.* FROM workmanship_int_sync_runs r JOIN workmanship_int_operations o "
+                    "ON o.operation_id=r.operation_id AND o.owner_gid=r.owner_gid "
+                    "AND (o.team_gid=r.team_gid OR (o.team_gid IS NULL AND r.team_gid IS NULL)) "
+                    "WHERE r.status='accepted' OR "
+                    "(r.status='reconcile_pending' AND r.next_attempt_at<=NOW(6) AND r.attempt_count<3) OR "
+                    "(r.status='claimed' AND r.claimed_at < DATE_SUB(NOW(6), INTERVAL 5 MINUTE)) "
+                    "ORDER BY r.created_at,r.run_id LIMIT 1 FOR UPDATE SKIP LOCKED"
                 )
                 row = cur.fetchone()
                 if row is None:
@@ -398,6 +481,7 @@ class IntegrationRepository:
                 cur.execute(
                     "UPDATE workmanship_int_sync_runs SET status='claimed',claim_token=%s,claimed_at=NOW(6) "
                     "WHERE run_id=%s AND (status='accepted' OR "
+                    "(status='reconcile_pending' AND next_attempt_at<=NOW(6) AND attempt_count<3) OR "
                     "(status='claimed' AND claimed_at < DATE_SUB(NOW(6), INTERVAL 5 MINUTE)))",
                     (token, row["run_id"]),
                 )
@@ -411,6 +495,52 @@ class IntegrationRepository:
             invocation = json.loads(invocation)
         result.update({"status": "claimed", "claim_token": token, "target_invocation": invocation})
         return result
+
+    def mark_target_invocation(
+        self, *, run_id: str, claim_token: str, owner_gid: str, team_gid: str | None,
+        target_invocation: Mapping[str, Any], target_idempotency_key: str,
+    ) -> dict[str, Any]:
+        scope, values = self._principal_scope(owner_gid, team_gid)
+        with get_integration_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "UPDATE workmanship_int_sync_runs SET target_invocation_json=%s,target_idempotency_key=%s,"
+                    f"target_dispatched_at=NOW(6) WHERE run_id=%s AND claim_token=%s AND status='claimed' AND {scope}",
+                    (json.dumps(dict(target_invocation)), target_idempotency_key, run_id, claim_token, *values),
+                )
+                if cur.rowcount != 1:
+                    raise RevisionConflict("import claim")
+        return {"target_dispatched_at": datetime.now(UTC), "target_idempotency_key": target_idempotency_key}
+
+    def record_import_uncertainty(
+        self, *, run_id: str, claim_token: str, owner_gid: str, team_gid: str | None,
+        error_code: str,
+    ) -> dict[str, Any]:
+        scope, values = self._principal_scope(owner_gid, team_gid)
+        with get_integration_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    f"SELECT operation_id,attempt_count FROM workmanship_int_sync_runs WHERE run_id=%s "
+                    f"AND claim_token=%s AND status='claimed' AND {scope} FOR UPDATE",
+                    (run_id, claim_token, *values),
+                )
+                row = cur.fetchone()
+                if row is None:
+                    raise RevisionConflict("import claim")
+                attempts = int(row.get("attempt_count") or 0) + 1
+                status = "outcome_unknown" if attempts >= 3 else "reconcile_pending"
+                cur.execute(
+                    "UPDATE workmanship_int_sync_runs SET status=%s,attempt_count=%s,error_code=%s,"
+                    "next_attempt_at=DATE_ADD(NOW(6), INTERVAL %s SECOND),updated_at=NOW(6) WHERE run_id=%s AND claim_token=%s",
+                    (status, attempts, error_code, min(60, 2 ** attempts), run_id, claim_token),
+                )
+                operation = self._select_operation(cur, str(row["operation_id"]))
+                if operation is None:
+                    raise ResourceNotFound("operation")
+                replacement = replace(operation, status="outcome_unknown", version=operation.version + 1, error_code=error_code, updated_at=datetime.now(UTC))
+                self._complete_operation(cur, operation, replacement)
+                self._audit(cur, replacement)
+        return {"run_id": run_id, "status": status, "attempt_count": attempts}
 
     def transition_import_run(
         self, *, run_id: str, claim_token: str, owner_gid: str, team_gid: str | None,
@@ -435,7 +565,7 @@ class IntegrationRepository:
                 )
                 operation_row = cur.fetchone()
                 operation = self._operation(operation_row) if operation_row else None
-                if operation is None or operation.status != "accepted":
+                if operation is None or operation.status not in {"accepted", "outcome_unknown"}:
                     raise RevisionConflict("import operation")
                 replacement = replace(
                     operation, status=status, version=operation.version + 1,

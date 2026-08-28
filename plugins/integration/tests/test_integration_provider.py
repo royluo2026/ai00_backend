@@ -149,6 +149,9 @@ class ProviderCatalog:
     def upsert_mapping_target(self, **data):
         return {**data, "expected_version": data["target_expected_version"], "revision": 1}
 
+    def validate_mapping_target(self, candidate):
+        return dict(candidate)
+
 
 class ProviderRuntime:
     async def test(self, connector, *, timeout_seconds, result_limit):

@@ -7,7 +7,7 @@ from .ports import (
     OperationIdentityPort,
     OperationPersistencePort,
 )
-from .sync import ImportDispatcher, SyncService, TargetAdapter
+from .sync import ImportDispatcher, IntegrationImportWorker, SyncService, TargetAdapter
 from .service import IntegrationApplication
 from .transform import RestrictedExpression
 
@@ -19,6 +19,7 @@ __all__ = [
     "IntegrationOperation",
     "IntegrationOperations",
     "ImportDispatcher",
+    "IntegrationImportWorker",
     "NetworkPolicy",
     "OperationIdentityPort",
     "OperationPersistencePort",

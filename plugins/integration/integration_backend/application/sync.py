@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import asyncio
+from contextlib import suppress
 from typing import Any, Mapping
 
 from backend.capability_v2.contracts import ConsumerIdentity, CorrelationRef
@@ -20,14 +21,13 @@ class TargetAdapter:
 
 
 class SyncService:
-    def __init__(self, client: DomainCapabilityClient, identity: ConsumerIdentity, catalog=None):
+    def __init__(self, client: DomainCapabilityClient, catalog=None):
         self._client = client
-        self._identity = identity
         self._catalog = catalog
 
     async def apply_batch(
         self, *, adapter: TargetAdapter, payload: Mapping[str, Any], idempotency_key: str,
-        correlation: CorrelationRef,
+        correlation: CorrelationRef, identity: ConsumerIdentity,
     ) -> Any:
         if not adapter.capability_id.startswith(adapter.target_domain + "."):
             raise ValueError("target adapter domain and capability do not match")
@@ -42,16 +42,17 @@ class SyncService:
             payload=dict(payload),
             idempotency_key=idempotency_key,
         )
-        return await self._client.invoke(invocation, self._identity, correlation)
+        return await self._client.invoke(invocation, identity, correlation)
 
 
 class ImportDispatcher:
     """Claim and execute one durable Integration import through the governed Gateway."""
 
-    def __init__(self, repository, connector_runtime, sync_service: SyncService):
+    def __init__(self, repository, connector_runtime, sync_service: SyncService, identity_factory):
         self._repository = repository
         self._runtime = connector_runtime
         self._sync = sync_service
+        self._identity_factory = identity_factory
 
     async def dispatch_next(self, *, worker_id: str, correlation: CorrelationRef) -> Mapping[str, Any] | None:
         run = self._repository.claim_next_import_run(worker_id)
@@ -59,19 +60,31 @@ class ImportDispatcher:
             return None
         scope = {"owner_gid": run["owner_gid"], "team_gid": run.get("team_gid")}
         try:
+            identity = self._identity_factory(run)
+            if identity.actor.user_id != run["owner_gid"] or identity.tenant.tenant_id != (run.get("team_gid") or f"user:{run['owner_gid']}"):
+                return self._finish(run, "failed", error_code="worker_principal_mismatch")
             mapping = self._repository.get_mapping({**scope, "gid": run["mapping_gid"]})
             if mapping is None or mapping.get("status") == "binding_required":
                 return self._finish(run, "failed", error_code="target_binding_unavailable")
             connector = self._repository.get_connector({**scope, "gid": mapping["datasource_gid"]})
             if connector is None:
                 return self._finish(run, "failed", error_code="resource_not_found")
-            raw = await asyncio.wait_for(
-                self._runtime.preview(connector, mapping, timeout_seconds=15, result_limit=200),
-                timeout=15,
-            )
-            rows = self._transform_rows(raw, mapping)
             invocation = dict(run["target_invocation"])
-            payload = {**dict(invocation["payload"]), "rows": rows}
+            if run.get("target_dispatched_at"):
+                payload = dict(invocation["payload"])
+            else:
+                raw = await asyncio.wait_for(
+                    self._runtime.preview(connector, mapping, timeout_seconds=15, result_limit=200),
+                    timeout=15,
+                )
+                rows = self._transform_rows(raw, mapping)
+                payload = {**dict(invocation["payload"]), "rows": rows}
+                invocation = {**invocation, "payload": payload}
+                run = {**run, **self._repository.mark_target_invocation(
+                    run_id=run["run_id"], claim_token=run["claim_token"], owner_gid=run["owner_gid"],
+                    team_gid=run.get("team_gid"), target_invocation=invocation,
+                    target_idempotency_key=str(run.get("target_idempotency_key") or f"{run['run_id']}:target"),
+                ), "target_invocation": invocation}
             result = await self._sync.apply_batch(
                 adapter=TargetAdapter(
                     target_domain=str(mapping["target_domain"]),
@@ -80,18 +93,18 @@ class ImportDispatcher:
                     minimum_catalog_release=str(invocation["minimum_catalog_release"]),
                 ),
                 payload=payload,
-                idempotency_key=f"{run['run_id']}:target",
-                correlation=correlation,
+                idempotency_key=str(run.get("target_idempotency_key") or f"{run['run_id']}:target"),
+                correlation=correlation, identity=identity,
             )
             if getattr(result, "status", None) is CapabilityStatus.OUTCOME_UNKNOWN:
-                return self._finish(run, "outcome_unknown", error_code="target_outcome_unknown")
+                return self._uncertain(run, "target_outcome_unknown")
             if not getattr(result, "ok", False):
                 return self._finish(
                     run, "failed", error_code=getattr(getattr(result, "error", None), "code", None) or "target_failed"
                 )
             return self._finish(run, "succeeded", result={"target": result.data or {}})
         except TimeoutError:
-            return self._finish(run, "outcome_unknown", error_code="external_timeout")
+            return self._uncertain(run, "external_timeout")
         except Exception as exc:
             return self._finish(run, "failed", error_code=type(exc).__name__)
 
@@ -100,6 +113,12 @@ class ImportDispatcher:
             run_id=run["run_id"], claim_token=run["claim_token"],
             owner_gid=run["owner_gid"], team_gid=run.get("team_gid"), status=status,
             result=result, error_code=error_code,
+        )
+
+    def _uncertain(self, run, error_code):
+        return self._repository.record_import_uncertainty(
+            run_id=run["run_id"], claim_token=run["claim_token"], owner_gid=run["owner_gid"],
+            team_gid=run.get("team_gid"), error_code=error_code,
         )
 
     @staticmethod
@@ -120,3 +139,34 @@ class ImportDispatcher:
                 values.append({"field": str(field["target_field"]), "value": value})
             result.append({"key": str(index + 1), "values": values})
         return result
+
+
+class IntegrationImportWorker:
+    """Lifecycle-managed bounded poller for accepted and reconcilable imports."""
+
+    def __init__(self, dispatcher: ImportDispatcher, *, worker_id: str = "integration-import", idle_seconds: float = 0.25):
+        self._dispatcher = dispatcher
+        self._worker_id = worker_id
+        self._idle_seconds = max(0.05, float(idle_seconds))
+        self._task: asyncio.Task | None = None
+        self._stopping = asyncio.Event()
+
+    async def start(self) -> None:
+        if self._task is None:
+            self._stopping.clear()
+            self._task = asyncio.create_task(self._run(), name=self._worker_id)
+
+    async def stop(self) -> None:
+        self._stopping.set()
+        task, self._task = self._task, None
+        if task is not None:
+            task.cancel()
+            with suppress(asyncio.CancelledError):
+                await task
+
+    async def _run(self) -> None:
+        while not self._stopping.is_set():
+            correlation = CorrelationRef(request_id=f"{self._worker_id}-{id(asyncio.current_task())}")
+            consumed = await self._dispatcher.dispatch_next(worker_id=self._worker_id, correlation=correlation)
+            if consumed is None:
+                await asyncio.sleep(self._idle_seconds)

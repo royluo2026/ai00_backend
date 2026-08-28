@@ -133,6 +133,7 @@ INPUT_SCHEMAS = {
             "target_major_version": POSITIVE, "minimum_catalog_release": STRING,
             "input_contract": STRING, "resource_gid": STRING,
             "target_expected_version": POSITIVE, "expected_revision": POSITIVE,
+            "mapping_gid": STRING, "mapping_expected_revision": POSITIVE,
             "idempotency_key": IDEMPOTENCY,
         },
         (
@@ -216,7 +217,8 @@ OUTPUT_SCHEMAS = {
         {"items": {"type": "array", "items": MAPPING_TARGET, "maxItems": 200}}, ("items",)
     ),
     "integration.mapping_target.upsert": obj(
-        {**MAPPING_TARGET["properties"], "resource_gid": STRING, "expected_version": POSITIVE, "revision": POSITIVE},
+        {**MAPPING_TARGET["properties"], "resource_gid": STRING, "expected_version": POSITIVE, "revision": POSITIVE,
+         "mapping_gid": STRING, "mapping_revision": POSITIVE},
         (*MAPPING_TARGET["required"], "resource_gid", "expected_version", "revision"),
     ),
     "integration.field_mapping.search": obj({"items": {"type": "array", "items": FIELD_RESULT, "maxItems": 200}}, ("items",)),

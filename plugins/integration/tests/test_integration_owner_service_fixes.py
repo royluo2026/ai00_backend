@@ -374,6 +374,71 @@ def test_sql_mapping_command_crash_rolls_back_then_retry_and_replay_are_byte_equ
     ).encode()
 
 
+def test_sql_binding_rebind_crash_rolls_back_then_retry_and_replay_are_byte_equivalent(monkeypatch):
+    accepted = operation(
+        capability_id="integration.mapping_target_binding.upsert",
+        idempotency_key="binding-command-1", result=None,
+    )
+    target = {
+        "binding_id": "ontology:concept-part", "ontology_object_gid": "concept-part",
+        "target_domain": "knowledge",
+        "target_capability_id": "knowledge.reference_dataset.publish",
+        "target_major_version": 1, "minimum_catalog_release": "rel_20260828",
+        "input_contract": "knowledge.reference_dataset.publish.v1",
+        "resource_gid": "dataset-parts", "expected_version": 7,
+    }
+    result = {
+        **{key: target[key] for key in (
+            "binding_id", "ontology_object_gid", "target_domain", "target_capability_id",
+            "target_major_version", "minimum_catalog_release", "resource_gid", "expected_version",
+        )},
+        "revision": 1, "mapping_gid": "mapping-legacy", "mapping_revision": 2,
+    }
+    crash = ScriptedConnection(
+        fail_on="UPDATE workmanship_int_operations SET status",
+        failure=RuntimeError("crash before binding outcome"), results=(None,),
+    )
+    retry = ScriptedConnection(results=(None,))
+    duplicate = ScriptedConnection(
+        fail_on="INSERT INTO workmanship_int_operations",
+        failure=DuplicateKey(1062, "duplicate idempotency scope"),
+    )
+    reload = ScriptedConnection(results=(operation_db_row(
+        capability_id=accepted.capability_id,
+        idempotency_key=accepted.idempotency_key,
+        status="succeeded", operation_version=2,
+        result_json=json.dumps(result, separators=(",", ":")),
+    ),))
+    connection_sequence(monkeypatch, crash, retry, duplicate, reload)
+    repository = IntegrationRepository()
+
+    with pytest.raises(RuntimeError, match="crash before binding outcome"):
+        repository.execute_binding_command(
+            accepted, target, expected_revision=None,
+            mapping_gid="mapping-legacy", mapping_expected_revision=1,
+        )
+
+    first, replayed = repository.execute_binding_command(
+        accepted, target, expected_revision=None,
+        mapping_gid="mapping-legacy", mapping_expected_revision=1,
+    )
+    second, replayed_again = repository.execute_binding_command(
+        accepted, target, expected_revision=None,
+        mapping_gid="mapping-legacy", mapping_expected_revision=1,
+    )
+
+    crash_sql = "\n".join(statement for statement, _ in crash.statements)
+    assert "workmanship_int_mapping_target_bindings" in crash_sql
+    assert "UPDATE workmanship_int_ext_mappings SET target_binding_id" in crash_sql
+    assert "UPDATE workmanship_int_operations SET status" in crash_sql
+    assert crash.rollbacks == 1 and crash.commits == 0
+    assert retry.commits == 1 and replayed is False
+    assert duplicate.rollbacks == 1 and reload.commits == 1 and replayed_again is True
+    assert json.dumps(first.result, separators=(",", ":"), ensure_ascii=False).encode() == json.dumps(
+        second.result, separators=(",", ":"), ensure_ascii=False
+    ).encode()
+
+
 def test_sql_mapping_get_projects_normalized_fields_and_explicit_legacy_binding_disposition(monkeypatch):
     mapping = {
         "gid": "mapping-1", "owner_gid": "actor-1", "team_gid": "team-1",

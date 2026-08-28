@@ -23,6 +23,7 @@ class MemoryRepository:
         self.operations = {}
         self.operation_scopes = {}
         self.operation_statuses = []
+        self.bindings = {}
 
     @staticmethod
     def _visible(row, data):
@@ -100,6 +101,37 @@ class MemoryRepository:
             self.replace_field_mappings(dict(data))
         else:
             raise AssertionError(command)
+        self._create_operation(completed)
+        return completed, False
+
+    def execute_binding_command(self, record, target, *, expected_revision, mapping_gid, mapping_expected_revision):
+        existing_op = self.find_operation(record.owner_gid, record.capability_id, record.idempotency_key)
+        if existing_op is not None:
+            return existing_op, True
+        current = self.bindings.get(target["binding_id"])
+        if current and current["revision"] != expected_revision:
+            from plugins.integration.integration_backend.application.ports import RevisionConflict
+            raise RevisionConflict("target binding")
+        revision = int(current["revision"] if current else 0) + 1
+        result = {key: target[key] for key in (
+            "binding_id", "ontology_object_gid", "target_domain", "target_capability_id",
+            "target_major_version", "minimum_catalog_release", "resource_gid", "expected_version",
+        )} | {"revision": revision}
+        self.bindings[target["binding_id"]] = {**target, "revision": revision, "owner_gid": record.owner_gid, "team_gid": record.team_gid}
+        if mapping_gid:
+            mapping = self.mappings.get(mapping_gid)
+            if not mapping or not self._visible(mapping, {"owner_gid": record.owner_gid, "team_gid": record.team_gid}) or mapping["revision"] != mapping_expected_revision:
+                from plugins.integration.integration_backend.application.ports import RevisionConflict
+                raise RevisionConflict("mapping")
+            mapping.update({
+                "target_binding_id": target["binding_id"], "target_domain": target["target_domain"],
+                "target_capability_id": target["target_capability_id"], "target_major_version": target["target_major_version"],
+                "minimum_catalog_release": target["minimum_catalog_release"], "target_input_contract": target["input_contract"],
+                "target_resource_gid": target["resource_gid"], "target_expected_version": target["expected_version"],
+                "status": "active", "revision": mapping_expected_revision + 1,
+            })
+            result.update(mapping_gid=mapping_gid, mapping_revision=mapping_expected_revision + 1)
+        completed = replace(record, status="succeeded", version=record.version + 1, result=result)
         self._create_operation(completed)
         return completed, False
 
@@ -203,6 +235,12 @@ class Catalog:
         self.calls.append((capability_id, major_version, minimum_release))
         if self.reject:
             raise ValueError("target is not a stable Catalog entry")
+
+    def validate_mapping_target(self, candidate):
+        self.require_stable(candidate["target_capability_id"], candidate["target_major_version"], candidate["minimum_catalog_release"])
+        if candidate["target_domain"] != "knowledge":
+            raise ValueError("target_binding_owner_mismatch")
+        return dict(candidate)
 
     def resolve_mapping_target(self, binding_id, *, actor_gid, team_gid):
         if (actor_gid, team_gid) != ("actor-1", "team-1"):

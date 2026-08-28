@@ -5,12 +5,12 @@ import importlib
 import inspect
 import os
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any, Callable, Mapping
 
 from backend.capability_v2.contracts import ConsumerIdentity
 from backend.capability_v2.domain_client import DomainCapabilityClient
 
-from ..application import ImportDispatcher, IntegrationApplication, SyncService
+from ..application import ImportDispatcher, IntegrationApplication, IntegrationImportWorker, SyncService
 from ..infrastructure import IntegrationRepository
 
 
@@ -23,7 +23,7 @@ class IntegrationProviderAdapters:
     operation_identity: Any | None = None
     network_policy: Any | None = None
     target_client: DomainCapabilityClient | None = None
-    worker_identity: ConsumerIdentity | None = None
+    worker_identity_factory: Callable[[Mapping[str, Any]], ConsumerIdentity] | None = None
 
 
 AdapterFactory = Callable[[], IntegrationProviderAdapters]
@@ -79,7 +79,7 @@ def build_application(adapter_factory: AdapterFactory | None = None) -> Integrat
         "credential_enrollment": (adapters.credential_enrollment, ("consume",)),
         "catalog": (adapters.catalog, (
             "project_mapping_targets_for_ontology_objects", "resolve_mapping_target", "require_stable",
-            "upsert_mapping_target",
+            "validate_mapping_target",
         )),
         "connector_runtime": (
             adapters.connector_runtime, ("test", "discover", "source_columns", "preview")
@@ -120,16 +120,33 @@ def build_import_dispatcher(adapter_factory: AdapterFactory | None = None) -> Im
         raise RuntimeError("Integration adapter factory returned an invalid composition")
     if not isinstance(adapters.target_client, DomainCapabilityClient):
         raise RuntimeError("Integration import dispatcher requires DomainCapabilityClient")
-    if not isinstance(adapters.worker_identity, ConsumerIdentity):
-        raise RuntimeError("Integration import dispatcher requires a worker ConsumerIdentity")
+    if not callable(adapters.worker_identity_factory):
+        raise RuntimeError("Integration import dispatcher requires a per-run worker identity factory")
     repository = adapters.repository if adapters.repository is not None else IntegrationRepository()
     if adapters.catalog is None or adapters.connector_runtime is None:
         raise RuntimeError("Integration import dispatcher requires Catalog and connector runtime")
     return ImportDispatcher(
         repository,
         adapters.connector_runtime,
-        SyncService(adapters.target_client, adapters.worker_identity, adapters.catalog),
+        SyncService(adapters.target_client, adapters.catalog),
+        adapters.worker_identity_factory,
     )
 
 
-__all__ = ["AdapterFactory", "IntegrationProviderAdapters", "build_application", "build_import_dispatcher"]
+def register_import_worker_lifecycle(registry, adapter_factory: AdapterFactory | None = None) -> None:
+    state: dict[str, IntegrationImportWorker] = {}
+
+    async def start() -> None:
+        worker = IntegrationImportWorker(build_import_dispatcher(adapter_factory))
+        state["worker"] = worker
+        await worker.start()
+
+    async def stop() -> None:
+        worker = state.pop("worker", None)
+        if worker is not None:
+            await worker.stop()
+
+    registry.register_lifecycle("integration.import-worker", start, stop)
+
+
+__all__ = ["AdapterFactory", "IntegrationProviderAdapters", "build_application", "build_import_dispatcher", "register_import_worker_lifecycle"]

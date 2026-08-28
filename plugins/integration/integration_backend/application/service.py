@@ -461,6 +461,34 @@ class IntegrationApplication:
             )
         return dict(claim.record.result)
 
+    def _atomic_binding_command(self, capability_id: str, data: dict[str, Any]) -> dict[str, Any]:
+        payload = {key: value for key, value in data.items() if key not in {"owner_gid", "team_gid"}}
+        candidate = self.operations.prepare(
+            capability_id=capability_id, payload=payload, owner_gid=data["owner_gid"],
+            team_gid=data.get("team_gid"), idempotency_key=str(data["idempotency_key"]),
+        )
+        target = self.catalog.validate_mapping_target({
+            "binding_id": str(data["binding_id"]), "ontology_object_gid": str(data["ontology_object_gid"]),
+            "target_domain": str(data["target_domain"]), "target_capability_id": str(data["target_capability_id"]),
+            "target_major_version": int(data["target_major_version"]),
+            "minimum_catalog_release": str(data["minimum_catalog_release"]),
+            "input_contract": str(data["input_contract"]), "resource_gid": str(data["resource_gid"]),
+            "expected_version": int(data["target_expected_version"]),
+        })
+        try:
+            winner, replayed = self.repository.execute_binding_command(
+                candidate, target,
+                expected_revision=(int(data["expected_revision"]) if data.get("expected_revision") else None),
+                mapping_gid=(str(data["mapping_gid"]) if data.get("mapping_gid") else None),
+                mapping_expected_revision=(int(data["mapping_expected_revision"]) if data.get("mapping_expected_revision") else None),
+            )
+        except (ResourceNotFound, RevisionConflict) as exc:
+            raise self._translate_repository(exc) from exc
+        claim = self.operations.validate_claim(candidate, winner, replayed)
+        if claim.record.status != "succeeded" or claim.record.result is None:
+            raise CapabilityBusinessError("idempotency_conflict", f"Previous Integration request is {claim.record.status}")
+        return dict(claim.record.result)
+
     async def invoke(self, capability_id: str, payload: dict, context: CapabilityContext):
         raw = dict(payload)
         data = self._bind(raw, context)
@@ -471,29 +499,14 @@ class IntegrationApplication:
                 "binding_id", "ontology_object_gid", "target_domain", "target_capability_id",
                 "target_major_version", "minimum_catalog_release", "input_contract",
                 "resource_gid", "target_expected_version", "expected_revision", "idempotency_key",
+                "mapping_gid", "mapping_expected_revision",
             }
             self._closed(raw, allowed)
-            self._require(data, *(allowed - {"expected_revision"}))
+            self._require(data, *(allowed - {"expected_revision", "mapping_gid", "mapping_expected_revision"}))
             actor_gid, team_gid = self._binding_scope(data)
-            return self._write(
-                capability_id,
-                data,
-                lambda: dict(self.catalog.upsert_mapping_target(
-                    binding_id=str(data["binding_id"]),
-                    ontology_object_gid=str(data["ontology_object_gid"]),
-                    target_domain=str(data["target_domain"]),
-                    target_capability_id=str(data["target_capability_id"]),
-                    target_major_version=int(data["target_major_version"]),
-                    minimum_catalog_release=str(data["minimum_catalog_release"]),
-                    input_contract=str(data["input_contract"]),
-                    resource_gid=str(data["resource_gid"]),
-                    target_expected_version=int(data["target_expected_version"]),
-                    actor_gid=actor_gid,
-                    team_gid=team_gid,
-                    expected_revision=(int(data["expected_revision"]) if data.get("expected_revision") else None),
-                    idempotency_key=str(data["idempotency_key"]),
-                )),
-            )
+            if bool(data.get("mapping_gid")) != bool(data.get("mapping_expected_revision")):
+                raise CapabilityBusinessError("invalid_input", "mapping rebind requires mapping_gid and mapping_expected_revision")
+            return self._atomic_binding_command(capability_id, data)
         if capability_id.startswith("integration.connector."):
             return await self._connector_outcome(capability_id, raw, data, context)
         if capability_id in {

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import inspect
 import asyncio
+import pytest
 from dataclasses import replace
 from datetime import UTC, datetime
 from types import SimpleNamespace
@@ -23,9 +23,8 @@ def test_production_composition_exposes_import_dispatcher():
     assert callable(getattr(wiring, "build_import_dispatcher", None))
 
 
-def test_target_catalog_has_governed_binding_writer():
-    signature = inspect.signature(IntegrationTargetCatalog.upsert_mapping_target)
-    assert {"actor_gid", "team_gid", "expected_revision", "idempotency_key"} <= set(signature.parameters)
+def test_target_catalog_has_no_direct_steady_state_binding_writer():
+    assert not hasattr(IntegrationTargetCatalog, "upsert_mapping_target")
 
 
 def test_binding_writer_is_a_first_class_integration_capability():
@@ -39,16 +38,9 @@ def test_binding_upsert_is_actor_team_scoped_revisioned_and_idempotent():
         def __init__(self):
             self.calls = []
 
-        def upsert_mapping_target(self, **data):
+        def validate_mapping_target(self, data):
             self.calls.append(data)
-            return {
-                "binding_id": data["binding_id"], "ontology_object_gid": data["ontology_object_gid"],
-                "target_domain": data["target_domain"], "target_capability_id": data["target_capability_id"],
-                "target_major_version": data["target_major_version"],
-                "minimum_catalog_release": data["minimum_catalog_release"],
-                "resource_gid": data["resource_gid"], "expected_version": data["target_expected_version"],
-                "revision": 1,
-            }
+            return dict(data)
 
     payload = {
         "binding_id": "ontology:concept-part", "ontology_object_gid": "concept-part",
@@ -64,8 +56,8 @@ def test_binding_upsert_is_actor_team_scoped_revisioned_and_idempotent():
     replay = asyncio.run(application.invoke("integration.mapping_target.upsert", payload, CONTEXT))
 
     assert replay == first
-    assert len(catalog.calls) == 1
-    assert (catalog.calls[0]["actor_gid"], catalog.calls[0]["team_gid"]) == ("actor-1", "team-1")
+    assert len(catalog.calls) == 2
+    assert catalog.calls[0]["target_domain"] == "knowledge"
 
 
 def test_preview_uses_canonical_detector_for_aliases_uris_and_pem():
@@ -77,6 +69,35 @@ def test_preview_uses_canonical_detector_for_aliases_uris_and_pem():
         "-----BEGIN PRIVATE KEY-----\nsecret\n-----END PRIVATE KEY-----",
     )
     assert all(IntegrationApplication._secret_exposed(value) for value in samples)
+
+
+def test_governed_binding_writer_rebinds_legacy_mapping_and_conflicts_on_changed_replay():
+    from plugins.integration.tests.test_integration_owner_services import CONTEXT, Catalog, MemoryRepository, app
+
+    repository = MemoryRepository()
+    repository.mappings["legacy-1"] = {
+        "gid": "legacy-1", "owner_gid": "actor-1", "team_gid": "team-1", "revision": 3,
+        "status": "binding_required", "datasource_gid": "connector-1", "name": "legacy", "source_object": "parts",
+    }
+    payload = {
+        "binding_id": "ontology:concept-part", "ontology_object_gid": "concept-part",
+        "target_domain": "knowledge", "target_capability_id": "knowledge.reference_dataset.publish",
+        "target_major_version": 1, "minimum_catalog_release": "rel_7803705d3df421f9f4381d37c3500731",
+        "input_contract": "knowledge.reference_dataset.publish.v1", "resource_gid": "dataset-parts",
+        "target_expected_version": 7, "mapping_gid": "legacy-1", "mapping_expected_revision": 3,
+        "idempotency_key": "binding-rebind-1",
+    }
+    application = app(repository, catalog=Catalog())
+
+    result = asyncio.run(application.invoke("integration.mapping_target.upsert", payload, CONTEXT))
+    replay = asyncio.run(application.invoke("integration.mapping_target.upsert", payload, CONTEXT))
+
+    assert result["mapping_revision"] == 4 and replay == result
+    assert repository.mappings["legacy-1"]["status"] == "active"
+    with pytest.raises(Exception, match="idempotency"):
+        asyncio.run(application.invoke(
+            "integration.mapping_target.upsert", {**payload, "resource_gid": "dataset-other"}, CONTEXT
+        ))
 
 
 def test_production_composed_dispatcher_claims_started_run_once_and_reaches_domain_client():
@@ -108,6 +129,12 @@ def test_production_composed_dispatcher_claims_started_run_once_and_reaches_doma
             )
             return {"run_id": run["run_id"], "status": run["status"]}
 
+        def mark_target_invocation(self, **data):
+            run = next(item for item in self.imports if item["run_id"] == data["run_id"])
+            run.update(target_invocation=data["target_invocation"], target_dispatched_at=datetime.now(UTC),
+                       target_idempotency_key=data["target_idempotency_key"])
+            return {"target_dispatched_at": run["target_dispatched_at"], "target_idempotency_key": run["target_idempotency_key"]}
+
     class Catalog(BoundCatalog):
         def upsert_mapping_target(self, **_data):
             raise AssertionError("not used")
@@ -138,13 +165,13 @@ def test_production_composed_dispatcher_claims_started_run_once_and_reaches_doma
         CONTEXT,
     ))
     identity = ConsumerIdentity(
-        actor=ActorIdentity(service_id="integration-sync", authentication_method="service-token", authenticated_at=datetime.now(UTC)),
+        actor=ActorIdentity(user_id="actor-1", authentication_method="persisted-operation", authenticated_at=datetime.now(UTC)),
         tenant=TenantIdentity(tenant_id="team-1", membership="service"),
         consumer=ConsumerDescriptor(type=ConsumerType.WORKER, consumer_id="domain.integration"),
     )
     dispatcher = build_import_dispatcher(lambda: IntegrationProviderAdapters(
         repository=repository, credential_enrollment=object(), catalog=catalog,
-        connector_runtime=Runtime(), target_client=client, worker_identity=identity,
+        connector_runtime=Runtime(), target_client=client, worker_identity_factory=lambda _run: identity,
     ))
 
     terminal = asyncio.run(dispatcher.dispatch_next(

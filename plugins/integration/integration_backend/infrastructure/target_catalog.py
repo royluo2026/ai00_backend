@@ -105,75 +105,9 @@ class IntegrationTargetCatalog:
             active_schema_hash=descriptor.schema_hash,
         )
 
-    def upsert_mapping_target(
-        self, *, binding_id: str, ontology_object_gid: str, target_domain: str,
-        target_capability_id: str, target_major_version: int, minimum_catalog_release: str,
-        input_contract: str, resource_gid: str, target_expected_version: int,
-        actor_gid: str, team_gid: str, expected_revision: int | None,
-        idempotency_key: str,
-    ) -> dict[str, Any]:
-        actor, team = self._scope(actor_gid, team_gid)
-        candidate = {
-            "binding_id": str(binding_id), "ontology_object_gid": str(ontology_object_gid),
-            "target_domain": str(target_domain), "target_capability_id": str(target_capability_id),
-            "target_major_version": int(target_major_version),
-            "minimum_catalog_release": str(minimum_catalog_release),
-            "input_contract": str(input_contract), "resource_gid": str(resource_gid),
-            "expected_version": int(target_expected_version),
-        }
-        self._validated(candidate)
-        key = str(idempotency_key or "").strip()
-        if not key:
-            raise ValueError("idempotency_key_required")
-        with self._connection_factory() as connection:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    "SELECT revision,last_idempotency_key FROM workmanship_int_mapping_target_bindings "
-                    "WHERE binding_id=%s AND owner_gid=%s AND team_gid=%s FOR UPDATE",
-                    (candidate["binding_id"], actor, team),
-                )
-                existing = cursor.fetchone()
-                if existing and str(existing.get("last_idempotency_key") or "") == key:
-                    revision = int(existing["revision"])
-                elif existing:
-                    if expected_revision is None or int(existing["revision"]) != int(expected_revision):
-                        raise ValueError("target_binding_revision_conflict")
-                    revision = int(existing["revision"]) + 1
-                    cursor.execute(
-                        "UPDATE workmanship_int_mapping_target_bindings SET ontology_object_gid=%s,"
-                        "target_domain=%s,target_capability_id=%s,target_major_version=%s,"
-                        "minimum_catalog_release=%s,input_contract=%s,resource_gid=%s,expected_version=%s,"
-                        "active=1,revision=%s,last_idempotency_key=%s WHERE binding_id=%s AND owner_gid=%s AND team_gid=%s",
-                        (
-                            candidate["ontology_object_gid"], candidate["target_domain"], candidate["target_capability_id"],
-                            candidate["target_major_version"], candidate["minimum_catalog_release"], candidate["input_contract"],
-                            candidate["resource_gid"], candidate["expected_version"], revision, key,
-                            candidate["binding_id"], actor, team,
-                        ),
-                    )
-                else:
-                    if expected_revision is not None:
-                        raise ValueError("target_binding_revision_conflict")
-                    revision = 1
-                    cursor.execute(
-                        "INSERT INTO workmanship_int_mapping_target_bindings "
-                        "(binding_id,ontology_object_gid,target_domain,target_capability_id,target_major_version,"
-                        "minimum_catalog_release,input_contract,resource_gid,expected_version,owner_gid,team_gid,"
-                        "active,revision,last_idempotency_key) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,1,1,%s)",
-                        (
-                            candidate["binding_id"], candidate["ontology_object_gid"], candidate["target_domain"],
-                            candidate["target_capability_id"], candidate["target_major_version"],
-                            candidate["minimum_catalog_release"], candidate["input_contract"], candidate["resource_gid"],
-                            candidate["expected_version"], actor, team, key,
-                        ),
-                    )
-        return {
-            key: candidate[key]
-            for key in (
-                "binding_id", "ontology_object_gid", "target_domain", "target_capability_id",
-                "target_major_version", "minimum_catalog_release", "resource_gid", "expected_version",
-            )
-        } | {"revision": revision}
+    def validate_mapping_target(self, candidate: Mapping[str, Any]) -> dict[str, Any]:
+        """Validate an exact target without mutating Integration persistence."""
+        return self._validated(candidate)
 
     def _query(self, sql: str, params: tuple[Any, ...], *, many: bool):
         with self._connection_factory() as connection:
@@ -197,6 +131,8 @@ class IntegrationTargetCatalog:
             str(value["target_capability_id"]),
             int(value["target_major_version"]),
         )
+        if str(value["target_domain"]) != descriptor.owner_domain:
+            raise ValueError("target_binding_owner_mismatch")
         self._validate_contract(descriptor, value)
         value["target_major_version"] = int(value["target_major_version"])
         value["expected_version"] = int(value["expected_version"])

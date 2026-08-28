@@ -3,11 +3,15 @@ from __future__ import annotations
 
 from .descriptors import specs
 from .provider import descriptor_for
-from .wiring import AdapterFactory, build_application
+from .wiring import AdapterFactory, build_application, register_import_worker_lifecycle
 
 
 def register_capabilities(registry, *, adapter_factory: AdapterFactory | None = None) -> None:
     application = build_application(adapter_factory)
+    # The production CapabilityRegistry owns lifecycle hooks. Lightweight
+    # descriptor collectors intentionally expose only ``register``.
+    if hasattr(registry, "register_lifecycle"):
+        register_import_worker_lifecycle(registry, adapter_factory)
     for spec in specs():
         capability_id = spec.id
 

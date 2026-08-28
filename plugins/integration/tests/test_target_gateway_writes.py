@@ -32,7 +32,7 @@ def test_sync_dispatches_only_the_governed_reference_dataset_target():
                 "knowledge.reference_dataset.publish", 1, "rel_test"
             )
 
-    service = SyncService(Client(), identity, Catalog())
+    service = SyncService(Client(), Catalog())
     adapter = TargetAdapter(
         target_domain="knowledge", capability_id="knowledge.reference_dataset.publish",
         major_version=1, minimum_catalog_release="rel_test",
@@ -47,6 +47,7 @@ def test_sync_dispatches_only_the_governed_reference_dataset_target():
         },
         idempotency_key="sync-1:batch-1",
         correlation=CorrelationRef(request_id="req-1", trace_id="trace-1"),
+        identity=identity,
     ))
 
     invocation, invoked_identity, _ = trace[-1]
