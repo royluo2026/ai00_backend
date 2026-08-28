@@ -27,3 +27,10 @@ def test_manifest_conserves_pinned_base_scope_and_keeps_plugins_unresolved():
         assert entry["occurrences"]
         assert entry["old_route_evidence"]["source_path"]
         assert entry["final_inventory_mapping"] in {"capability", "unresolved"}
+
+
+def test_saved_view_routes_require_shared_service_and_closed_contract_evidence():
+    module = _module()
+    key = ("POST", "/api/views")
+    assert module._saved_view_boundary_ready(key, {"capability_id": "base.saved_view.create", "major_version": 1})
+    assert not module._saved_view_boundary_ready(key, {"capability_id": "base.saved_view.create", "major_version": 2})

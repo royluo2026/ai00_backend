@@ -42,3 +42,48 @@ def test_plugins_remain_explicitly_unresolved_without_marketplace_lifecycle_proo
     for key in (("POST", "/api/plugin/install"), ("DELETE", "/api/plugin/uninstall/{dynamic}")):
         assert key not in ROUTE_CAPABILITIES
         assert "signed" in UNSAFE_REASONS[key] or "lifecycle" in UNSAFE_REASONS[key]
+
+
+def test_saved_view_capabilities_register_closed_contracts_and_strong_writes():
+    from backend.base.web_atomic import register_atomic_web_capabilities
+
+    registry = CapabilityRegistry()
+    register_atomic_web_capabilities(registry)
+    expected = {
+        "base.saved_view.search": {"module": "", "list_gid": None},
+        "base.saved_view.create": {
+            "name": "Open", "module": "", "list_gid": None, "config": {
+                "field_gids": ["field_1"], "sort": [{"field_gid": "field_1", "direction": "asc"}],
+                "filters": [{"field_gid": "field_1", "operator": "eq", "value": "open"}],
+                "page_size": 50, "presentation": "table",
+            }, "share_scope": "private", "idempotency_key": "idem-1",
+        },
+        "base.saved_view.update": {
+            "view_gid": "view_1", "expected_revision": 1, "name": "Open", "config": {
+                "field_gids": ["field_1"], "sort": [{"field_gid": "field_1", "direction": "asc"}],
+                "filters": [{"field_gid": "field_1", "operator": "eq", "value": "open"}],
+                "page_size": 50, "presentation": "table",
+            }, "idempotency_key": "idem-2",
+        },
+        "base.saved_view.copy": {"view_gid": "view_1", "name": "Copy", "idempotency_key": "idem-3"},
+        "base.saved_view.delete": {"view_gid": "view_1", "expected_revision": 2, "idempotency_key": "idem-4"},
+    }
+    for capability_id, payload in expected.items():
+        item = registry.get(capability_id)
+        assert item.spec.owner == "base"
+        validate_payload(dict(item.spec.input_schema), payload)
+        with __import__("pytest").raises(ValueError, match="unknown field"):
+            validate_payload(dict(item.spec.input_schema), {**payload, "unexpected": True})
+    for capability_id in set(expected) - {"base.saved_view.search"}:
+        item = registry.get(capability_id)
+        assert item.descriptor.consistency_policy == "strong"
+        assert item.descriptor.transaction_policy["mode"] == "single_transaction"
+        assert getattr(item.handler, "__capability_transactional__", False) is True
+
+
+def test_saved_view_gateway_actor_preserves_team_identity():
+    from backend.base.web_atomic import _actor
+
+    context = type("Context", (), {"user_gid": "user_1", "team_gid": "team_1", "active_roles": ("member",)})()
+
+    assert _actor(context)["team_gids"] == ["team_1"]

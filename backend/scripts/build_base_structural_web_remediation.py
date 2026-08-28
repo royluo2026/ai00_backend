@@ -30,8 +30,34 @@ SCOPE = {
     ("GET", "/api/views"), ("POST", "/api/views"), ("DELETE", "/api/views/{dynamic}"),
     ("PATCH", "/api/views/{dynamic}"), ("POST", "/api/views/{dynamic}/copy"),
 }
+SAVED_VIEW_TARGETS = {
+    ("GET", "/api/views"): "base.saved_view.search",
+    ("POST", "/api/views"): "base.saved_view.create",
+    ("PATCH", "/api/views/{dynamic}"): "base.saved_view.update",
+    ("DELETE", "/api/views/{dynamic}"): "base.saved_view.delete",
+    ("POST", "/api/views/{dynamic}/copy"): "base.saved_view.copy",
+}
 
 
+def _saved_view_boundary_ready(key: tuple[str, str], contract: dict[str, Any]) -> bool:
+    """Prevent a saved-view route from being marked migrated without its owner boundary."""
+    expected = SAVED_VIEW_TARGETS.get(key)
+    if expected is None:
+        return True
+    from backend.base.saved_views import SavedViewService
+    from backend.base.web_atomic import HANDLERS
+    from backend.capability_v2.atomic_web_contracts import ROUTE_CAPABILITIES
+
+    definition = ROUTE_CAPABILITIES.get(key, {})
+    return (
+        contract.get("capability_id") == expected
+        and contract.get("major_version") == 1
+        and definition.get("id") == expected
+        and expected in HANDLERS
+        and all(callable(getattr(SavedViewService, method, None)) for method in ("search", "create", "update", "copy", "delete"))
+        and definition.get("schema", {}).get("additionalProperties") is False
+        and definition.get("output_schema", {}).get("additionalProperties") is False
+    )
 def _canonical(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
 
@@ -64,6 +90,8 @@ def build_manifest(web_root: Path) -> dict[str, Any]:
         if not contract:
             raise ValueError(f"atomic contract missing: {key}")
         migrated = contract["final_disposition"] == "migrated"
+        if migrated and not _saved_view_boundary_ready(key, contract):
+            raise ValueError(f"saved-view boundary evidence missing: {key}")
         mapping = "unresolved" if key in unresolved else "capability"
         if migrated != (mapping == "capability"):
             raise ValueError(f"final mapping does not match contract: {key}")

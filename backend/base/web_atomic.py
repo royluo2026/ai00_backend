@@ -16,6 +16,10 @@ _WRITES = {
     "base.notification.preference.atomic.update",
     "base.identity.directory.feishu.sync",
     "base.identity.role.assign.atomic",
+    "base.saved_view.create",
+    "base.saved_view.update",
+    "base.saved_view.copy",
+    "base.saved_view.delete",
 }
 _PERMISSIONS = {
     "base.authorization.grant.list": ("system.user.manage",),
@@ -29,6 +33,7 @@ _PERMISSIONS = {
 
 def _actor(context: object) -> dict[str, Any]:
     roles = tuple(getattr(context, "active_roles", ()) or ())
+    team_gid = getattr(context, "team_gid", None)
     role = next(
         (item for item in ("super_admin", "team_admin", "project_admin", "rule_admin", "knowledge_admin", "member", "external") if item in roles),
         "external",
@@ -38,6 +43,7 @@ def _actor(context: object) -> dict[str, Any]:
         "system_role": role,
         "org_role": role,
         "is_active": True,
+        "team_gids": [str(team_gid)] if team_gid else [],
     }
 
 
@@ -157,6 +163,49 @@ def _assign_role(payload: dict[str, Any], context: object) -> dict[str, Any]:
         raise _structural_error(exc) from exc
 
 
+def _saved_view_search(payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.base.saved_views import SavedViewError, SavedViewService
+    try:
+        return SavedViewService().search(actor=_actor(context), query=payload)
+    except SavedViewError as exc:
+        raise _structural_error(exc) from exc
+
+
+def _saved_view_create(payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.base.saved_views import SavedViewError, SavedViewService
+    try:
+        return SavedViewService().create(actor=_actor(context), command=payload)
+    except SavedViewError as exc:
+        raise _structural_error(exc) from exc
+
+
+def _saved_view_update(payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.base.saved_views import SavedViewError, SavedViewService
+    try:
+        command = {key: value for key, value in payload.items() if key != "view_gid"}
+        return SavedViewService().update(actor=_actor(context), view_gid=payload["view_gid"], command=command)
+    except SavedViewError as exc:
+        raise _structural_error(exc) from exc
+
+
+def _saved_view_copy(payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.base.saved_views import SavedViewError, SavedViewService
+    try:
+        command = {key: value for key, value in payload.items() if key != "view_gid"}
+        return SavedViewService().copy(actor=_actor(context), view_gid=payload["view_gid"], command=command)
+    except SavedViewError as exc:
+        raise _structural_error(exc) from exc
+
+
+def _saved_view_delete(payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.base.saved_views import SavedViewError, SavedViewService
+    try:
+        command = {key: value for key, value in payload.items() if key != "view_gid"}
+        return SavedViewService().delete(actor=_actor(context), view_gid=payload["view_gid"], command=command)
+    except SavedViewError as exc:
+        raise _structural_error(exc) from exc
+
+
 HANDLERS: dict[str, Callable[[dict[str, Any], object], dict[str, Any]]] = {
     "base.authorization.grant.list": _list_grants,
     "base.authorization.grant.create": _create_grant,
@@ -171,6 +220,11 @@ HANDLERS: dict[str, Callable[[dict[str, Any], object], dict[str, Any]]] = {
     "base.self_annotation.batch.get": _annotation_batch,
     "base.identity.admin_user.list": _admin_users,
     "base.identity.role.assign.atomic": _assign_role,
+    "base.saved_view.search": _saved_view_search,
+    "base.saved_view.create": _saved_view_create,
+    "base.saved_view.update": _saved_view_update,
+    "base.saved_view.copy": _saved_view_copy,
+    "base.saved_view.delete": _saved_view_delete,
 }
 
 
@@ -201,7 +255,7 @@ def register_atomic_web_capabilities(registry: Any) -> None:
             tags=("base", "atomic", "web"),
         )
         handler = lambda payload, context, _id=capability_id: invoke_atomic(_id, payload, context)
-        if capability_id == "base.identity.role.assign.atomic":
+        if capability_id in {"base.identity.role.assign.atomic", "base.saved_view.create", "base.saved_view.update", "base.saved_view.copy", "base.saved_view.delete"}:
             handler.__capability_transactional__ = True
         register_capability(registry, spec, handler)
 

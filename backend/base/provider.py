@@ -33,8 +33,16 @@ _ATOMIC_WEB_EFFECTS = {
     "base.self_annotation.batch.get": "Reads the caller's bounded self-annotation summaries without mutation.",
     "base.identity.admin_user.list": "Reads a closed administrator-visible user directory projection without mutation.",
     "base.identity.role.assign.atomic": "Atomically changes one user's role after administrator authorization.",
+    "base.saved_view.search": "Reads only saved views visible to the caller through the Base aggregate service.",
+    "base.saved_view.create": "Creates one closed saved-view aggregate with idempotency and audit evidence.",
+    "base.saved_view.update": "Revision-locks one saved-view aggregate update with audit evidence.",
+    "base.saved_view.copy": "Copies one visible saved view into a new private owner-bound aggregate.",
+    "base.saved_view.delete": "Revision-locks a recoverable saved-view tombstone with audit evidence.",
 }
-_ATOMIC_WEB_STRONG_WRITES = {"base.identity.role.assign.atomic"}
+_ATOMIC_WEB_STRONG_WRITES = {
+    "base.identity.role.assign.atomic", "base.saved_view.create", "base.saved_view.update",
+    "base.saved_view.copy", "base.saved_view.delete",
+}
 _RESOURCE_FIELDS = {
     **{capability_id: ("plugin-installation", "plugin_id") for capability_id in _LIFECYCLE},
     **{capability_id: ("plugin-storage-key", "key") for capability_id in {

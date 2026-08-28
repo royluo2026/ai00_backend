@@ -96,9 +96,55 @@ ADMIN_USER = obj(
      "created_at": {"type": "string", "maxLength": 64}},
     ("gid", "name", "email", "avatar_url", "system_role", "org_role", "external_subtype", "team_id", "is_active", "created_at"),
 )
+FILTER_VALUE = {"anyOf": [{"type": "string", "maxLength": 2000}, {"type": "number"}, {"type": "boolean"}, {"type": "null"}, {"type": "array", "maxItems": 100, "items": {"type": ["string", "number", "boolean", "null"]}}]}
+SAVED_VIEW_CONFIG = obj(
+    {
+        "field_gids": {"type": "array", "minItems": 1, "maxItems": 200, "items": STRING},
+        "sort": {"type": "array", "maxItems": 20, "items": obj({"field_gid": STRING, "direction": {"type": "string", "enum": ["asc", "desc"]}}, ("field_gid", "direction"))},
+        "filters": {"type": "array", "maxItems": 50, "items": obj({"field_gid": STRING, "operator": {"type": "string", "enum": ["eq", "neq", "contains", "in", "gt", "gte", "lt", "lte"]}, "value": FILTER_VALUE}, ("field_gid", "operator", "value"))},
+        "page_size": {"type": "integer", "minimum": 1, "maximum": 200},
+        "presentation": {"type": "string", "enum": ["table", "kanban", "calendar"]},
+    },
+    ("field_gids", "sort", "filters", "page_size", "presentation"),
+)
+RESTORE = obj({"available": BOOL, "deleted_by": STRING, "deleted_at": {"type": "string", "maxLength": 64}}, ("available", "deleted_by", "deleted_at"))
+SAVED_VIEW = obj(
+    {
+        "gid": STRING, "name": STRING, "module": {"type": "string", "maxLength": 255}, "list_gid": OPT_STRING,
+        "owner_gid": STRING, "config": SAVED_VIEW_CONFIG, "revision": {"type": "integer", "minimum": 1},
+        "deleted": BOOL, "share_scope": {"type": "string", "enum": ["private", "team", "shared"]},
+        "grants": {"type": "array", "maxItems": 200, "items": STRING}, "restore": {"type": ["object", "null"], "properties": RESTORE["properties"], "required": RESTORE["required"], "additionalProperties": False},
+    },
+    ("gid", "name", "module", "list_gid", "owner_gid", "config", "revision", "deleted", "share_scope", "grants", "restore"),
+)
 
 
 ROUTE_CAPABILITIES: dict[tuple[str, str], dict[str, Any]] = {
+    ("GET", "/api/views"): {
+        "id": "base.saved_view.search",
+        "schema": obj({"module": {"type": "string", "maxLength": 255}, "list_gid": OPT_STRING}),
+        "output_schema": obj({"views": {"type": "array", "maxItems": 500, "items": SAVED_VIEW}}, ("views",)),
+    },
+    ("POST", "/api/views"): {
+        "id": "base.saved_view.create",
+        "schema": obj({"name": STRING, "module": {"type": "string", "maxLength": 255}, "list_gid": OPT_STRING, "config": SAVED_VIEW_CONFIG, "share_scope": {"type": "string", "enum": ["private", "team", "shared"]}, "idempotency_key": STRING}, ("name", "config", "share_scope", "idempotency_key")),
+        "output_schema": obj({"view": SAVED_VIEW}, ("view",)),
+    },
+    ("PATCH", "/api/views/{dynamic}"): {
+        "id": "base.saved_view.update",
+        "schema": obj({"view_gid": STRING, "expected_revision": {"type": "integer", "minimum": 1}, "name": STRING, "module": {"type": "string", "maxLength": 255}, "list_gid": OPT_STRING, "config": SAVED_VIEW_CONFIG, "share_scope": {"type": "string", "enum": ["private", "team", "shared"]}, "idempotency_key": STRING}, ("view_gid", "expected_revision", "name", "config", "idempotency_key")),
+        "output_schema": obj({"view": SAVED_VIEW}, ("view",)),
+    },
+    ("DELETE", "/api/views/{dynamic}"): {
+        "id": "base.saved_view.delete",
+        "schema": obj({"view_gid": STRING, "expected_revision": {"type": "integer", "minimum": 1}, "idempotency_key": STRING}, ("view_gid", "expected_revision", "idempotency_key")),
+        "output_schema": obj({"view": SAVED_VIEW}, ("view",)),
+    },
+    ("POST", "/api/views/{dynamic}/copy"): {
+        "id": "base.saved_view.copy",
+        "schema": obj({"view_gid": STRING, "name": STRING, "idempotency_key": STRING}, ("view_gid", "name", "idempotency_key")),
+        "output_schema": obj({"view": SAVED_VIEW}, ("view",)),
+    },
     ("GET", "/api/org/teams"): {
         "id": "base.organization.team.directory.list",
         "schema": obj({}),
@@ -167,6 +213,11 @@ ROUTE_CAPABILITIES: dict[tuple[str, str], dict[str, Any]] = {
 }
 
 EXAMPLES: dict[str, dict[str, Any]] = {
+    "base.saved_view.search": {"module": "", "list_gid": None},
+    "base.saved_view.create": {"name": "Open", "config": {"field_gids": ["field_1"], "sort": [{"field_gid": "field_1", "direction": "asc"}], "filters": [{"field_gid": "field_1", "operator": "eq", "value": "open"}], "page_size": 50, "presentation": "table"}, "share_scope": "private", "idempotency_key": "idem-1"},
+    "base.saved_view.update": {"view_gid": "view_1", "expected_revision": 1, "name": "Open", "config": {"field_gids": ["field_1"], "sort": [{"field_gid": "field_1", "direction": "asc"}], "filters": [{"field_gid": "field_1", "operator": "eq", "value": "open"}], "page_size": 50, "presentation": "table"}, "idempotency_key": "idem-2"},
+    "base.saved_view.copy": {"view_gid": "view_1", "name": "Copy", "idempotency_key": "idem-3"},
+    "base.saved_view.delete": {"view_gid": "view_1", "expected_revision": 1, "idempotency_key": "idem-4"},
     "base.organization.team.directory.list": {},
     "base.team.directory.list": {},
     "base.self_annotation.batch.get": {"item_gids": ["item_1"]},
@@ -183,6 +234,11 @@ EXAMPLES: dict[str, dict[str, Any]] = {
 }
 
 EXAMPLE_OUTPUTS: dict[str, dict[str, Any]] = {
+    "base.saved_view.search": {"views": []},
+    "base.saved_view.create": {"view": {"gid": "view_1", "name": "Open", "module": "", "list_gid": None, "owner_gid": "user_1", "config": {"field_gids": ["field_1"], "sort": [{"field_gid": "field_1", "direction": "asc"}], "filters": [{"field_gid": "field_1", "operator": "eq", "value": "open"}], "page_size": 50, "presentation": "table"}, "revision": 1, "deleted": False, "share_scope": "private", "grants": [], "restore": None}},
+    "base.saved_view.update": {"view": {"gid": "view_1", "name": "Open", "module": "", "list_gid": None, "owner_gid": "user_1", "config": {"field_gids": ["field_1"], "sort": [{"field_gid": "field_1", "direction": "asc"}], "filters": [{"field_gid": "field_1", "operator": "eq", "value": "open"}], "page_size": 50, "presentation": "table"}, "revision": 2, "deleted": False, "share_scope": "private", "grants": [], "restore": None}},
+    "base.saved_view.copy": {"view": {"gid": "view_2", "name": "Copy", "module": "", "list_gid": None, "owner_gid": "user_1", "config": {"field_gids": ["field_1"], "sort": [{"field_gid": "field_1", "direction": "asc"}], "filters": [{"field_gid": "field_1", "operator": "eq", "value": "open"}], "page_size": 50, "presentation": "table"}, "revision": 1, "deleted": False, "share_scope": "private", "grants": [], "restore": None}},
+    "base.saved_view.delete": {"view": {"gid": "view_1", "name": "Open", "module": "", "list_gid": None, "owner_gid": "user_1", "config": {"field_gids": ["field_1"], "sort": [{"field_gid": "field_1", "direction": "asc"}], "filters": [{"field_gid": "field_1", "operator": "eq", "value": "open"}], "page_size": 50, "presentation": "table"}, "revision": 2, "deleted": True, "share_scope": "private", "grants": [], "restore": {"available": True, "deleted_by": "user_1", "deleted_at": "transaction"}}},
     "base.organization.team.directory.list": {"teams": []},
     "base.team.directory.list": {"success": True, "data": []},
     "base.self_annotation.batch.get": {"items": []},
@@ -205,11 +261,6 @@ UNSAFE_REASONS = {
     ("PUT", "/api/self_ann/{dynamic}"): "The request contains attachment records without a governed nested attachment contract.",
     ("GET", "/api/self_ann/list"): "The response contains attachment records without a governed nested attachment contract.",
     ("GET", "/api/users/me"): "The profile contains dynamic grants and permissions without a closed exact output contract.",
-    ("GET", "/api/views"): "Saved-view config is intentionally dynamic and has no governed closed nested contract.",
-    ("POST", "/api/views"): "Saved-view config is intentionally dynamic and has no governed closed nested contract.",
-    ("DELETE", "/api/views/{dynamic}"): "The object-ownership check has no public owner-service boundary independent of dynamic saved-view config.",
-    ("PATCH", "/api/views/{dynamic}"): "Saved-view config is intentionally dynamic and has no governed closed nested contract.",
-    ("POST", "/api/views/{dynamic}/copy"): "The copied result depends on dynamic saved-view config without a governed closed nested contract.",
     ("PUT", "/api/rules/{dynamic}"): "Rule definition changes contain dynamic rule_definition data without a governed closed nested contract.",
     ("DELETE", "/api/craft_lib/equipments/{dynamic}"): "No delete provider exists; the available obsolete transition is a different lifecycle outcome.",
     ("DELETE", "/api/craft_lib/fixtures/{dynamic}"): "No delete provider exists; the available obsolete transition is a different lifecycle outcome.",
