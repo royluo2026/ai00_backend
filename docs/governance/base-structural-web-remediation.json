@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3e-base-structural-remediation",
   "atomic_contract_manifest_sha256": "sha256:c75d6dbf4612bbc4240c2dbcef55678d6db462767221f4ded99556e8ae703bca",
-  "content_sha256": "sha256:29443b3026fac23c1de3725c898f88949cecb77511da244f34094d46866e3876",
+  "content_sha256": "sha256:32e7f7362ecbdac9f4ddbf4f718f1160b450d1edfae50a73a4276f390405415c",
   "counts": {
     "groups": 16,
     "migrated_groups": 16,
@@ -519,11 +519,29 @@
       "authorization_and_scope": "base.v2:authenticated",
       "candidate_capability": "base.organization.team.directory.list@1",
       "confirmation_policy": "none",
-      "contract_evidence": null,
+      "contract_evidence": {
+        "source_path": "backend/base/web_atomic.py",
+        "source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4"
+      },
       "final_disposition": "migrated",
       "final_inventory_mapping": "capability",
-      "frontend_call_sites": [],
-      "frontend_operation": null,
+      "frontend_call_sites": [
+        {
+          "column": 5,
+          "line": 26,
+          "operation": "base.orgTeams.list",
+          "source_path": "web/core/existing_capability_client.js",
+          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+        },
+        {
+          "column": 5,
+          "line": 151,
+          "operation": "base.orgTeams.list",
+          "source_path": "web/core/existing_capability_client.js",
+          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+        }
+      ],
+      "frontend_operation": "base.orgTeams.list",
       "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
@@ -638,7 +656,10 @@
         ],
         "type": "object"
       },
-      "owner_service_evidence": null,
+      "owner_service_evidence": {
+        "source_path": "backend/base/web_atomic.py",
+        "source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4"
+      },
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
       "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "unresolved_reason": null
@@ -648,11 +669,29 @@
       "authorization_and_scope": "base.v2:authenticated",
       "candidate_capability": "base.self_annotation.batch.get@1",
       "confirmation_policy": "none",
-      "contract_evidence": null,
+      "contract_evidence": {
+        "source_path": "backend/base/web_atomic.py",
+        "source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4"
+      },
       "final_disposition": "migrated",
       "final_inventory_mapping": "capability",
-      "frontend_call_sites": [],
-      "frontend_operation": null,
+      "frontend_call_sites": [
+        {
+          "column": 5,
+          "line": 28,
+          "operation": "base.annotations.batch",
+          "source_path": "web/core/existing_capability_client.js",
+          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+        },
+        {
+          "column": 5,
+          "line": 156,
+          "operation": "base.annotations.batch",
+          "source_path": "web/core/existing_capability_client.js",
+          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+        }
+      ],
+      "frontend_operation": "base.annotations.batch",
       "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
@@ -793,7 +832,10 @@
         ],
         "type": "object"
       },
-      "owner_service_evidence": null,
+      "owner_service_evidence": {
+        "source_path": "backend/base/web_atomic.py",
+        "source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4"
+      },
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
       "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "unresolved_reason": null
@@ -1246,11 +1288,29 @@
       "authorization_and_scope": "base.v2:authenticated",
       "candidate_capability": "base.team.directory.list@1",
       "confirmation_policy": "none",
-      "contract_evidence": null,
+      "contract_evidence": {
+        "source_path": "backend/base/web_atomic.py",
+        "source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4"
+      },
       "final_disposition": "migrated",
       "final_inventory_mapping": "capability",
-      "frontend_call_sites": [],
-      "frontend_operation": null,
+      "frontend_call_sites": [
+        {
+          "column": 5,
+          "line": 27,
+          "operation": "base.teams.list",
+          "source_path": "web/core/existing_capability_client.js",
+          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+        },
+        {
+          "column": 5,
+          "line": 155,
+          "operation": "base.teams.list",
+          "source_path": "web/core/existing_capability_client.js",
+          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+        }
+      ],
+      "frontend_operation": "base.teams.list",
       "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
@@ -1332,7 +1392,10 @@
         ],
         "type": "object"
       },
-      "owner_service_evidence": null,
+      "owner_service_evidence": {
+        "source_path": "backend/base/web_atomic.py",
+        "source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4"
+      },
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
       "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "unresolved_reason": null
@@ -1342,11 +1405,29 @@
       "authorization_and_scope": "base.v2:system.user.manage",
       "candidate_capability": "base.identity.admin_user.list@1",
       "confirmation_policy": "none",
-      "contract_evidence": null,
+      "contract_evidence": {
+        "source_path": "backend/base/web_atomic.py",
+        "source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4"
+      },
       "final_disposition": "migrated",
       "final_inventory_mapping": "capability",
-      "frontend_call_sites": [],
-      "frontend_operation": null,
+      "frontend_call_sites": [
+        {
+          "column": 5,
+          "line": 33,
+          "operation": "base.users.list",
+          "source_path": "web/core/existing_capability_client.js",
+          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+        },
+        {
+          "column": 5,
+          "line": 177,
+          "operation": "base.users.list",
+          "source_path": "web/core/existing_capability_client.js",
+          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+        }
+      ],
+      "frontend_operation": "base.users.list",
       "idempotency_policy": "none",
       "input_schema": {
         "additionalProperties": false,
@@ -1518,7 +1599,10 @@
         ],
         "type": "object"
       },
-      "owner_service_evidence": null,
+      "owner_service_evidence": {
+        "source_path": "backend/base/web_atomic.py",
+        "source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4"
+      },
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
       "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "unresolved_reason": null
@@ -2037,11 +2121,29 @@
       "authorization_and_scope": "base.v2:system.user.manage",
       "candidate_capability": "base.identity.role.assign.atomic@1",
       "confirmation_policy": "user",
-      "contract_evidence": null,
+      "contract_evidence": {
+        "source_path": "backend/base/web_atomic.py",
+        "source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4"
+      },
       "final_disposition": "migrated",
       "final_inventory_mapping": "capability",
-      "frontend_call_sites": [],
-      "frontend_operation": null,
+      "frontend_call_sites": [
+        {
+          "column": 5,
+          "line": 34,
+          "operation": "base.users.assignRole",
+          "source_path": "web/core/existing_capability_client.js",
+          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+        },
+        {
+          "column": 5,
+          "line": 178,
+          "operation": "base.users.assignRole",
+          "source_path": "web/core/existing_capability_client.js",
+          "source_sha256": "b8d4d1156f7f483eac093831f228a2ec0ff922f699d47b0d4a9c3f98689a1024"
+        }
+      ],
+      "frontend_operation": "base.users.assignRole",
       "idempotency_policy": "required",
       "input_schema": {
         "additionalProperties": false,
@@ -2195,7 +2297,10 @@
         ],
         "type": "object"
       },
-      "owner_service_evidence": null,
+      "owner_service_evidence": {
+        "source_path": "backend/base/web_atomic.py",
+        "source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4"
+      },
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
       "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "unresolved_reason": null

@@ -60,6 +60,13 @@ PLUGIN_FRONTEND_OPERATIONS = {
     ("POST", "/api/plugin/install"): "base.plugins.install",
     ("DELETE", "/api/plugin/uninstall/{dynamic}"): "base.plugins.uninstall",
 }
+ATOMIC_FRONTEND_OPERATIONS = {
+    ("GET", "/api/org/teams"): "base.orgTeams.list",
+    ("GET", "/api/self_ann/batch"): "base.annotations.batch",
+    ("GET", "/api/teams"): "base.teams.list",
+    ("GET", "/api/users"): "base.users.list",
+    ("PATCH", "/api/users/{dynamic}/role"): "base.users.assignRole",
+}
 
 
 def _saved_view_boundary_ready(key: tuple[str, str], contract: dict[str, Any]) -> bool:
@@ -124,6 +131,39 @@ def _plugin_frontend_evidence(web_root: Path, key: tuple[str, str]) -> dict[str,
                                    "operation": operation, "source_sha256": hashlib.sha256(source.encode("utf-8")).hexdigest()}],
         "equivalence_evidence": {"provider_contract": _source_evidence("backend/base/web_atomic.py")},
     }
+
+
+def _atomic_frontend_evidence(
+    web_root: Path, key: tuple[str, str], contract: dict[str, Any]
+) -> dict[str, Any]:
+    operation = ATOMIC_FRONTEND_OPERATIONS[key]
+    relative = "web/core/existing_capability_client.js"
+    source = (web_root / relative).read_text(encoding="utf-8")
+    target = contract["capability_id"]
+    target_offset = source.find(f"'{operation}': '{target}'")
+    consumer_offset = source.find(f"'{operation}':", target_offset + 1)
+    if target_offset < 0 or consumer_offset < 0:
+        raise ValueError(f"atomic frontend consumer missing: {operation} -> {target}")
+
+    def call_site(offset: int) -> dict[str, Any]:
+        line = source.count("\n", 0, offset) + 1
+        line_start = source.rfind("\n", 0, offset) + 1
+        return {
+            "source_path": relative,
+            "line": line,
+            "column": offset - line_start + 1,
+            "operation": operation,
+            "source_sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
+        }
+
+    return {
+        "decision": "migrate",
+        "target_capability_id": target,
+        "target_major_version": contract["major_version"],
+        "frontend_operation": operation,
+        "frontend_call_sites": [call_site(target_offset), call_site(consumer_offset)],
+        "equivalence_evidence": {"provider_contract": _source_evidence("backend/base/web_atomic.py")},
+    }
 def _canonical(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
 
@@ -173,10 +213,11 @@ def build_manifest(web_root: Path) -> dict[str, Any]:
             raise ValueError(f"owner-service boundary evidence missing: {key}")
         owner_evidence = (
             _plugin_frontend_evidence(web_root, key) if key in PLUGIN_FRONTEND_OPERATIONS
+            else _atomic_frontend_evidence(web_root, key, contract) if key in ATOMIC_FRONTEND_OPERATIONS
             else migration_by_key.get(key) if key in OWNER_SERVICE_TARGETS else None
         )
         if owner_evidence is not None:
-            expected_target = OWNER_SERVICE_TARGETS[key]
+            expected_target = OWNER_SERVICE_TARGETS.get(key, contract["capability_id"])
             if (
                 owner_evidence.get("decision") != "migrate"
                 or owner_evidence.get("target_capability_id") != expected_target
@@ -187,6 +228,10 @@ def build_manifest(web_root: Path) -> dict[str, Any]:
         mapping = "unresolved" if key in unresolved else "capability"
         if migrated != (mapping == "capability"):
             raise ValueError(f"final mapping does not match contract: {key}")
+        owner_source = (
+            OWNER_SERVICE_EVIDENCE[key][0] if key in OWNER_SERVICE_EVIDENCE
+            else "backend/base/web_atomic.py" if key in ATOMIC_FRONTEND_OPERATIONS else None
+        )
         entry = {
             "method": key[0],
             "normalized_route": key[1],
@@ -197,7 +242,7 @@ def build_manifest(web_root: Path) -> dict[str, Any]:
             "provider_anchor": contract["provider_anchor"],
             "provider_source_sha256": contract["provider_source_sha256"],
             "owner_service_evidence": (
-                _source_evidence(OWNER_SERVICE_EVIDENCE[key][0])
+                _source_evidence(owner_source)
                 if owner_evidence is not None else None
             ),
             "contract_evidence": (

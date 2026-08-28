@@ -34,6 +34,22 @@ def test_manifest_conserves_pinned_base_scope_and_closes_the_signed_plugin_lifec
         assert entry["final_inventory_mapping"] == "capability"
 
 
+def test_every_migrated_base_entry_has_generated_owner_contract_and_frontend_evidence():
+    payload = _module().build_manifest(ROOT.parent / "workmanship-web-capability-governance")
+
+    for entry in payload["entries"]:
+        assert entry["final_disposition"] == "migrated"
+        assert entry["candidate_capability"].endswith("@1")
+        assert entry["provider_anchor"].startswith("backend/base/web_atomic.py:")
+        assert entry["owner_service_evidence"]["source_path"]
+        assert entry["owner_service_evidence"]["source_sha256"].startswith("sha256:")
+        assert entry["contract_evidence"]["source_path"] == "backend/base/web_atomic.py"
+        assert entry["contract_evidence"]["source_sha256"]
+        assert entry["frontend_operation"]
+        assert entry["frontend_call_sites"]
+        assert all("web/" in site["source_path"] for site in entry["frontend_call_sites"])
+
+
 def test_saved_view_routes_require_shared_service_and_closed_contract_evidence():
     module = _module()
     key = ("POST", "/api/views")
