@@ -8,7 +8,7 @@ Execute the governed integration.connector.search Integration outcome.
 - 不适用：The caller can use an owning domain Capability directly without external integration.
 - 生命周期：`stable`
 - 所属领域：`integration`
-- Catalog Release：`rel_828d616281e9c36b4c96fbc675e8c230`
+- Catalog Release：`rel_d524fd558ea4d3012d906ce1aaf5be69`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -89,7 +89,7 @@ Execute the governed integration.connector.search Integration outcome.
 ```json
 {
   "capability_id": "integration.connector.search",
-  "catalog_release": "rel_828d616281e9c36b4c96fbc675e8c230",
+  "catalog_release": "rel_d524fd558ea4d3012d906ce1aaf5be69",
   "major_version": 1,
   "payload": {}
 }

@@ -8,7 +8,7 @@ Execute the reviewed project.bitable_binding.read project outcome.
 - 不适用：The operation belongs to another domain.
 - 生命周期：`deprecated`
 - 所属领域：`project_management`
-- Catalog Release：`rel_828d616281e9c36b4c96fbc675e8c230`
+- Catalog Release：`rel_d524fd558ea4d3012d906ce1aaf5be69`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -93,7 +93,7 @@ Execute the reviewed project.bitable_binding.read project outcome.
 ```json
 {
   "capability_id": "project.bitable_binding.read",
-  "catalog_release": "rel_828d616281e9c36b4c96fbc675e8c230",
+  "catalog_release": "rel_d524fd558ea4d3012d906ce1aaf5be69",
   "major_version": 1,
   "payload": {
     "arguments": {},

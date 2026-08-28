@@ -8,7 +8,7 @@ Execute the governed integration.mapping_target.upsert Integration outcome.
 - 不适用：The caller can use an owning domain Capability directly without external integration.
 - 生命周期：`stable`
 - 所属领域：`integration`
-- Catalog Release：`rel_828d616281e9c36b4c96fbc675e8c230`
+- Catalog Release：`rel_d524fd558ea4d3012d906ce1aaf5be69`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -87,6 +87,14 @@ Execute the governed integration.mapping_target.upsert Integration outcome.
       "minLength": 1,
       "type": "string"
     },
+    "mapping_expected_revision": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "mapping_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
     "minimum_catalog_release": {
       "minLength": 1,
       "type": "string"
@@ -137,7 +145,7 @@ Execute the governed integration.mapping_target.upsert Integration outcome.
 ```json
 {
   "capability_id": "integration.mapping_target.upsert",
-  "catalog_release": "rel_828d616281e9c36b4c96fbc675e8c230",
+  "catalog_release": "rel_d524fd558ea4d3012d906ce1aaf5be69",
   "major_version": 1,
   "payload": {
     "binding_id": "example",
@@ -167,6 +175,14 @@ Execute the governed integration.mapping_target.upsert Integration outcome.
       "type": "string"
     },
     "expected_version": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "mapping_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "mapping_revision": {
       "minimum": 1,
       "type": "integer"
     },

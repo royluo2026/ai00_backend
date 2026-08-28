@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_828d616281e9c36b4c96fbc675e8c230",
-  "catalog_hash": "sha256:828d616281e9c36b4c96fbc675e8c23073df3e7b1496afb7d0c2e01e28c26f73",
+  "release_id": "rel_d524fd558ea4d3012d906ce1aaf5be69",
+  "catalog_hash": "sha256:d524fd558ea4d3012d906ce1aaf5be69da4f30411bf1b0b010df7c75241be933",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -101176,6 +101176,14 @@
             "type": "integer",
             "minimum": 1
           },
+          "mapping_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "mapping_expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
           "idempotency_key": {
             "type": "string",
             "minLength": 1,
@@ -101234,6 +101242,14 @@
           "revision": {
             "type": "integer",
             "minimum": 1
+          },
+          "mapping_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "mapping_revision": {
+            "type": "integer",
+            "minimum": 1
           }
         },
         "additionalProperties": false,
@@ -101287,6 +101303,14 @@
           "revision": {
             "type": "integer",
             "minimum": 1
+          },
+          "mapping_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "mapping_revision": {
+            "type": "integer",
+            "minimum": 1
           }
         },
         "additionalProperties": false,
@@ -101302,7 +101326,7 @@
           "revision"
         ]
       },
-      "schema_hash": "sha256:d083086949ffb84d3f841ebf3b0a9b826d093a9ceddc6ea7c331e449e9c99f2c",
+      "schema_hash": "sha256:5a85418b0524b8bcc055872d1eea6e9c0d50d3083f14eace7b815f3a0de5cc6d",
       "artifact_policy": "none",
       "operation_policy": "required",
       "concurrency_policy": "none",
@@ -189567,7 +189591,7 @@
       "plugin_id": "official.integration",
       "module": "integration_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:300764c85d2fbeceeedbec11a67bb9587980c08bdf38874361d50af4643521f8"
+      "artifact_hash": "sha256:69a6dac7960aee328be36fe8daf3d4eee45ba8d69f225b5c260b6c78d593481b"
     },
     {
       "plugin_id": "official.knowledge",
@@ -189594,5 +189618,5 @@
       "artifact_hash": "sha256:5c1fccaa2219f6833c24237667039685e322cefcffc7ca6f0287d28cfc0a2b39"
     }
   ],
-  "created_at": "2026-08-28T19:28:52.498033Z"
+  "created_at": "2026-08-28T20:01:18.635387Z"
 }

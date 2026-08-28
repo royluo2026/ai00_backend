@@ -5,7 +5,7 @@
     "groups": 14,
     "occurrences": 17
   },
-  "content_sha256": "sha256:30cac8fb9dd7bb87454876bc1042a2528a8260dfbb302927aa258ae86da05ec4",
+  "content_sha256": "sha256:f61f0a91ebcaa9a6824e52e0462ba5e4da0f2b81a7e13f3dda1520ada724630e",
   "counts": {
     "groups": 12,
     "migrated_groups": 12,
@@ -49,10 +49,10 @@
           "type": "object"
         },
         "output_anchor": {
-          "end_line": 198,
+          "end_line": 199,
           "sha256": "db4f645b006e42d905c6e9c032ea780603955bde66251d17ea65e146c188bddb",
           "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-          "start_line": 198
+          "start_line": 199
         },
         "output_schema": {
           "additionalProperties": false,
@@ -162,10 +162,10 @@
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
       "owner_service_evidence": {
-        "end_line": 570,
+        "end_line": 583,
         "sha256": "ab2c27b403a9031af28346979a178de5b571dbab9ad580f0769f8af0fb0ea16a",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 570
+        "start_line": 583
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
@@ -176,10 +176,10 @@
       },
       "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
       "service_anchor": {
-        "end_line": 570,
+        "end_line": 583,
         "sha256": "ab2c27b403a9031af28346979a178de5b571dbab9ad580f0769f8af0fb0ea16a",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 570
+        "start_line": 583
       }
     },
     {
@@ -219,10 +219,10 @@
           "type": "object"
         },
         "output_anchor": {
-          "end_line": 203,
+          "end_line": 204,
           "sha256": "e220b6305199bbfc9c1b357faf6223bd507c7da3aa3e683a2411d3e9207cdc85",
           "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-          "start_line": 203
+          "start_line": 204
         },
         "output_schema": {
           "additionalProperties": false,
@@ -325,10 +325,10 @@
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
       "owner_service_evidence": {
-        "end_line": 513,
+        "end_line": 526,
         "sha256": "e5d0b6c03e0cef11ec178ee65a524f4011cee1ed18777cc504123c0bdbf8e574",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 513
+        "start_line": 526
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
@@ -339,10 +339,10 @@
       },
       "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
       "service_anchor": {
-        "end_line": 513,
+        "end_line": 526,
         "sha256": "e5d0b6c03e0cef11ec178ee65a524f4011cee1ed18777cc504123c0bdbf8e574",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 513
+        "start_line": 526
       }
     },
     {
@@ -358,10 +358,10 @@
       },
       "contract_evidence": {
         "input_anchor": {
-          "end_line": 144,
+          "end_line": 145,
           "sha256": "57f66f66d0fef0c42176e90b7dcb6dfd7bc0a5cee5552134d147f0ab47f5d820",
           "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-          "start_line": 144
+          "start_line": 145
         },
         "input_schema": {
           "additionalProperties": false,
@@ -382,10 +382,10 @@
           "type": "object"
         },
         "output_anchor": {
-          "end_line": 222,
+          "end_line": 224,
           "sha256": "4532e2f34e32776a1e8da16375a364b26e1ac8fbe645e65a0a9730372b22473c",
           "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-          "start_line": 222
+          "start_line": 224
         },
         "output_schema": {
           "additionalProperties": false,
@@ -473,10 +473,10 @@
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
       "owner_service_evidence": {
-        "end_line": 500,
+        "end_line": 513,
         "sha256": "3abfaffd1e391781ce8c06f882e2a2ffa85f05ba7b1979b3f2c8ffbc0abb5485",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 500
+        "start_line": 513
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
@@ -487,10 +487,10 @@
       },
       "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
       "service_anchor": {
-        "end_line": 500,
+        "end_line": 513,
         "sha256": "3abfaffd1e391781ce8c06f882e2a2ffa85f05ba7b1979b3f2c8ffbc0abb5485",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 500
+        "start_line": 513
       }
     },
     {
@@ -534,10 +534,10 @@
           "type": "object"
         },
         "output_anchor": {
-          "end_line": 214,
+          "end_line": 215,
           "sha256": "3d469465d7109252c48684f226fd537c01a623802fa93139956cd8567b91cc0f",
           "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-          "start_line": 214
+          "start_line": 215
         },
         "output_schema": {
           "additionalProperties": false,
@@ -651,10 +651,10 @@
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
       "owner_service_evidence": {
-        "end_line": 500,
+        "end_line": 513,
         "sha256": "3abfaffd1e391781ce8c06f882e2a2ffa85f05ba7b1979b3f2c8ffbc0abb5485",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 500
+        "start_line": 513
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
@@ -665,10 +665,10 @@
       },
       "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
       "service_anchor": {
-        "end_line": 500,
+        "end_line": 513,
         "sha256": "3abfaffd1e391781ce8c06f882e2a2ffa85f05ba7b1979b3f2c8ffbc0abb5485",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 500
+        "start_line": 513
       }
     },
     {
@@ -684,10 +684,10 @@
       },
       "contract_evidence": {
         "input_anchor": {
-          "end_line": 145,
+          "end_line": 146,
           "sha256": "f5828f020df47ca20fa1804a6b967462641ae7b9e88ccde3735660dcc203b636",
           "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-          "start_line": 145
+          "start_line": 146
         },
         "input_schema": {
           "additionalProperties": false,
@@ -708,10 +708,10 @@
           "type": "object"
         },
         "output_anchor": {
-          "end_line": 223,
+          "end_line": 225,
           "sha256": "a986aacb305ae464b51e05c0e145ba68ce1e235567a85193d36725325bb02adf",
           "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-          "start_line": 223
+          "start_line": 225
         },
         "output_schema": {
           "additionalProperties": false,
@@ -818,10 +818,10 @@
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
       "owner_service_evidence": {
-        "end_line": 592,
+        "end_line": 605,
         "sha256": "e41c549f68ccd794c6eb80da205b6ed51b9b0f76ceeadb86f7d02a13afc8185c",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 592
+        "start_line": 605
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
@@ -832,10 +832,10 @@
       },
       "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
       "service_anchor": {
-        "end_line": 592,
+        "end_line": 605,
         "sha256": "e41c549f68ccd794c6eb80da205b6ed51b9b0f76ceeadb86f7d02a13afc8185c",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 592
+        "start_line": 605
       }
     },
     {
@@ -851,10 +851,10 @@
       },
       "contract_evidence": {
         "input_anchor": {
-          "end_line": 146,
+          "end_line": 147,
           "sha256": "24aeb6e79865061c10753a58867f118e2e4c0ab68853db6f04fef19b18cd7525",
           "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-          "start_line": 146
+          "start_line": 147
         },
         "input_schema": {
           "additionalProperties": false,
@@ -875,10 +875,10 @@
           "type": "object"
         },
         "output_anchor": {
-          "end_line": 227,
+          "end_line": 229,
           "sha256": "0424e87908ff6ed75ca62f30def5bb7fea0b935d2e9d4b551e5f05ce08b955ec",
           "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-          "start_line": 227
+          "start_line": 229
         },
         "output_schema": {
           "additionalProperties": false,
@@ -1007,10 +1007,10 @@
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
       "owner_service_evidence": {
-        "end_line": 592,
+        "end_line": 605,
         "sha256": "e41c549f68ccd794c6eb80da205b6ed51b9b0f76ceeadb86f7d02a13afc8185c",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 592
+        "start_line": 605
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
@@ -1021,10 +1021,10 @@
       },
       "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
       "service_anchor": {
-        "end_line": 592,
+        "end_line": 605,
         "sha256": "e41c549f68ccd794c6eb80da205b6ed51b9b0f76ceeadb86f7d02a13afc8185c",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 592
+        "start_line": 605
       }
     },
     {
@@ -1109,10 +1109,10 @@
           "type": "object"
         },
         "output_anchor": {
-          "end_line": 196,
+          "end_line": 197,
           "sha256": "78118399541752f44bb7c8a57add5fdeddb420c0ddd7b84a6b17c06c247800d5",
           "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-          "start_line": 196
+          "start_line": 197
         },
         "output_schema": {
           "additionalProperties": false,
@@ -1209,10 +1209,10 @@
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
       "owner_service_evidence": {
-        "end_line": 539,
+        "end_line": 552,
         "sha256": "079ccaecfc7418945962f21d8901ddff906cd3848704aeb3071607b99e793123",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 539
+        "start_line": 552
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
@@ -1223,10 +1223,10 @@
       },
       "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
       "service_anchor": {
-        "end_line": 539,
+        "end_line": 552,
         "sha256": "079ccaecfc7418945962f21d8901ddff906cd3848704aeb3071607b99e793123",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 539
+        "start_line": 552
       }
     },
     {
@@ -1323,10 +1323,10 @@
           "type": "object"
         },
         "output_anchor": {
-          "end_line": 195,
+          "end_line": 196,
           "sha256": "4403928a048a0bcfd79c7c054da8c0eb9b81485a9f57499d5e4576f7879e5ed9",
           "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-          "start_line": 195
+          "start_line": 196
         },
         "output_schema": {
           "additionalProperties": false,
@@ -1423,10 +1423,10 @@
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
       "owner_service_evidence": {
-        "end_line": 516,
+        "end_line": 529,
         "sha256": "45bd33cb1023303df1f0792d5153e4431375d7ce357fe6609cbb436e5dfc8bc9",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 516
+        "start_line": 529
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
@@ -1437,10 +1437,10 @@
       },
       "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
       "service_anchor": {
-        "end_line": 516,
+        "end_line": 529,
         "sha256": "45bd33cb1023303df1f0792d5153e4431375d7ce357fe6609cbb436e5dfc8bc9",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 516
+        "start_line": 529
       }
     },
     {
@@ -1481,10 +1481,10 @@
           "type": "object"
         },
         "output_anchor": {
-          "end_line": 199,
+          "end_line": 200,
           "sha256": "c9cdadc1b161d7c0601610b6b2e9e287f3948189e3364dba9742b35350837a93",
           "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-          "start_line": 199
+          "start_line": 200
         },
         "output_schema": {
           "additionalProperties": false,
@@ -1574,10 +1574,10 @@
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
       "owner_service_evidence": {
-        "end_line": 513,
+        "end_line": 526,
         "sha256": "e5d0b6c03e0cef11ec178ee65a524f4011cee1ed18777cc504123c0bdbf8e574",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 513
+        "start_line": 526
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
@@ -1588,10 +1588,10 @@
       },
       "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
       "service_anchor": {
-        "end_line": 513,
+        "end_line": 526,
         "sha256": "e5d0b6c03e0cef11ec178ee65a524f4011cee1ed18777cc504123c0bdbf8e574",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 513
+        "start_line": 526
       }
     },
     {
@@ -1673,10 +1673,10 @@
           "type": "object"
         },
         "output_anchor": {
-          "end_line": 207,
+          "end_line": 208,
           "sha256": "12ca375cf3a39fd7aab8c31994b0cbf2fce3ea76a22b5410cc000f9576a34ad0",
           "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-          "start_line": 207
+          "start_line": 208
         },
         "output_schema": {
           "additionalProperties": false,
@@ -1777,10 +1777,10 @@
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
       "owner_service_evidence": {
-        "end_line": 505,
+        "end_line": 518,
         "sha256": "2db00ad26cb113eda87defb6241a1cfe81a1c3893475fd6f5c18e72732ff9bc8",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 505
+        "start_line": 518
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
@@ -1791,10 +1791,10 @@
       },
       "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
       "service_anchor": {
-        "end_line": 505,
+        "end_line": 518,
         "sha256": "2db00ad26cb113eda87defb6241a1cfe81a1c3893475fd6f5c18e72732ff9bc8",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 505
+        "start_line": 518
       }
     },
     {
@@ -1810,10 +1810,10 @@
       },
       "contract_evidence": {
         "input_anchor": {
-          "end_line": 156,
+          "end_line": 157,
           "sha256": "9c73a820f74afd2895742ff79b4f53f3b6d42733faea1d1db51cc57fb9723d71",
           "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-          "start_line": 156
+          "start_line": 157
         },
         "input_schema": {
           "additionalProperties": false,
@@ -1835,10 +1835,10 @@
           "type": "object"
         },
         "output_anchor": {
-          "end_line": 242,
+          "end_line": 244,
           "sha256": "9c73a820f74afd2895742ff79b4f53f3b6d42733faea1d1db51cc57fb9723d71",
           "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-          "start_line": 242
+          "start_line": 244
         },
         "output_schema": {
           "additionalProperties": false,
@@ -1923,10 +1923,10 @@
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
       "owner_service_evidence": {
-        "end_line": 509,
+        "end_line": 522,
         "sha256": "1b4c98e48aa57428aedca4e8d035a4f977582edae157aec46d589125c55acd99",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 509
+        "start_line": 522
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
@@ -1937,10 +1937,10 @@
       },
       "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
       "service_anchor": {
-        "end_line": 509,
+        "end_line": 522,
         "sha256": "1b4c98e48aa57428aedca4e8d035a4f977582edae157aec46d589125c55acd99",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 509
+        "start_line": 522
       }
     },
     {
@@ -1956,10 +1956,10 @@
       },
       "contract_evidence": {
         "input_anchor": {
-          "end_line": 147,
+          "end_line": 148,
           "sha256": "c87a48cb80232aef37b5495b37515ec0ef6a2269da9ac5dea3a226f199e773f6",
           "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-          "start_line": 147
+          "start_line": 148
         },
         "input_schema": {
           "additionalProperties": false,
@@ -2014,10 +2014,10 @@
           "type": "object"
         },
         "output_anchor": {
-          "end_line": 235,
+          "end_line": 237,
           "sha256": "c87a48cb80232aef37b5495b37515ec0ef6a2269da9ac5dea3a226f199e773f6",
           "source_path": "plugins/integration/integration_backend/capabilities/contracts.py",
-          "start_line": 235
+          "start_line": 237
         },
         "output_schema": {
           "additionalProperties": false,
@@ -2122,10 +2122,10 @@
         "source_path": "plugins/integration/integration_backend/capabilities/provider.py"
       },
       "owner_service_evidence": {
-        "end_line": 506,
+        "end_line": 519,
         "sha256": "6f65073a924a880015c9426ac4544d5e9e734819ceb80d5b95d0396895d1951e",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 506
+        "start_line": 519
       },
       "plaintext_credentials_absent": true,
       "provider_anchor": {
@@ -2136,10 +2136,10 @@
       },
       "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
       "service_anchor": {
-        "end_line": 506,
+        "end_line": 519,
         "sha256": "6f65073a924a880015c9426ac4544d5e9e734819ceb80d5b95d0396895d1951e",
         "source_path": "plugins/integration/integration_backend/application/service.py",
-        "start_line": 506
+        "start_line": 519
       }
     }
   ],
@@ -2149,7 +2149,7 @@
     "path": "dist-production/web/ext_datasource/ext_ds.js",
     "sha256": "sha256:bf95202bca72d6c844864ef2c3ca285a4ee288770f3538c4bc63717ec0c2ee0f"
   },
-  "frontend_revision": "a39751ec8e0f17b31dfa4244088b7a14ab3fa1eb",
+  "frontend_revision": "b1c0b0e25e895022c1e9ea12abf767ea2b7637c3",
   "frontend_source": {
     "blob": "4c95a998bb2f1048183d063587526eb76238be53",
     "path": "web/ext_datasource/ext_ds.js",

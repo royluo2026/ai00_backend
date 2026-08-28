@@ -8,7 +8,7 @@ Create, import, copy, auto-link, purge, patch, or rollback BOP entries through o
 - 不适用：The request only updates or deletes one existing entry or only changes an entry link.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_828d616281e9c36b4c96fbc675e8c230`
+- Catalog Release：`rel_d524fd558ea4d3012d906ce1aaf5be69`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -194,7 +194,7 @@ Create, import, copy, auto-link, purge, patch, or rollback BOP entries through o
 ```json
 {
   "capability_id": "craft.bop.entry.bulk.change.apply",
-  "catalog_release": "rel_828d616281e9c36b4c96fbc675e8c230",
+  "catalog_release": "rel_d524fd558ea4d3012d906ce1aaf5be69",
   "major_version": 1,
   "payload": {
     "operation": "create"
