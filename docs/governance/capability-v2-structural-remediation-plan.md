@@ -1,8 +1,9 @@
 # Capability V2 Structural Owner-Service Remediation Plan
 
-This plan reconciles the fresh canonical unresolved Web inventory to the three independent remediation manifests. It is an implementation sequence, not an operations or BFF exemption.
+This plan preserves the reviewed historical Web source scope while reconciling each group to current canonical unresolved evidence or current generated migrated-capability evidence. It is an implementation sequence, not an operations or BFF exemption.
 
-- Scope: **45 occurrences / 37 root-cause groups**.
+- Historical scope: **45 occurrences / 37 root-cause groups**.
+- Current progress: **11 migrated groups**; remaining groups are retained rather than erased.
 - Implementation disposition for every group: `owner_service_required`.
 - Global prohibitions: no private-router import; no direct SQL provider; no generic JSON contracts; no secret logging; no auto-confirm; no unbounded runtime execution; no fabricated atomicity; no silent REST fallback.
 
@@ -100,7 +101,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `DELETE /api/craft_lib/equipments/{dynamic}`
 
-- Occurrences: web/knowledge_hub/pages/gbop_vpps.html:771:58:DELETE:/api/craft_lib/equipments/{dynamic}
+- Historical occurrences: web/knowledge_hub/pages/gbop_vpps.html:771:58:DELETE:/api/craft_lib/equipments/{dynamic}
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `craft` / `plugins.craft.craft_backend.application.library_lifecycle_service`
 - Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/craft_library.py`; No delete provider exists; the available obsolete transition is a different lifecycle outcome.
 - Service boundary and transaction: New public Craft library lifecycle service that validates references and performs one lifecycle transition; no route-shaped SQL provider. one Craft library transaction locking item and references plus audit.
@@ -113,7 +115,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `DELETE /api/craft_lib/fixtures/{dynamic}`
 
-- Occurrences: web/knowledge_hub/pages/gbop_vpps.html:714:58:DELETE:/api/craft_lib/fixtures/{dynamic}
+- Historical occurrences: web/knowledge_hub/pages/gbop_vpps.html:714:58:DELETE:/api/craft_lib/fixtures/{dynamic}
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `craft` / `plugins.craft.craft_backend.application.library_lifecycle_service`
 - Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/craft_library.py`; No delete provider exists; the available obsolete transition is a different lifecycle outcome.
 - Service boundary and transaction: New public Craft library lifecycle service that validates references and performs one lifecycle transition; no route-shaped SQL provider. one Craft library transaction locking item and references plus audit.
@@ -126,7 +129,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `DELETE /api/lists/{dynamic}`
 
-- Occurrences: web/core/existing_capability_client.js:259:12:DELETE:/api/lists/{dynamic}
+- Historical occurrences: web/core/existing_capability_client.js:259:12:DELETE:/api/lists/{dynamic}
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `craft` / `plugins.craft.craft_backend.application.bop_version_lifecycle_service`
 - Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/lists.py`; The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch.
 - Service boundary and transaction: New public Craft BOP-version lifecycle service selected before Project list dispatch; it owns the conditional bop_version branch only. one Craft BOP-version revision-locked archive transaction with audit.
@@ -139,9 +143,10 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `DELETE /api/plugin/uninstall/{dynamic}`
 
-- Occurrences: web/core/web_compat.js:294:29:DELETE:/api/plugin/uninstall/{dynamic}
+- Historical occurrences: web/core/web_compat.js:294:29:DELETE:/api/plugin/uninstall/{dynamic}
+- Current status: `migrated` (`migrated`).
 - Owner/service: `base` / `backend.plugin_platform.service`
-- Blocker evidence: `docs/governance/base-structural-web-remediation.json`; `backend/routers/plugins.py`; The unrestricted legacy uninstall route has no production handler and cannot bypass marketplace lifecycle controls.
+- Blocker evidence: `docs/governance/base-structural-web-remediation.json`; `backend/base/web_atomic.py:HANDLERS: dict`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: Public marketplace lifecycle service; REST compatibility and Gateway provider call the same signed-release transition API. one tenant installation transaction with release/data-policy lock and audit event.
 - Target: `base.plugin.installation.transition.uninstall@1`. Scope: signed publisher release and dependency compatibility.
 - Contract/security: signed publisher release and dependency compatibility; tenant-scoped installation lock and audit event; no arbitrary URL or secret logging.
@@ -152,9 +157,10 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `DELETE /api/views/{dynamic}`
 
-- Occurrences: web/components/view_manager.js:1002:28:DELETE:/api/views/{dynamic}
+- Historical occurrences: web/components/view_manager.js:1002:28:DELETE:/api/views/{dynamic}
+- Current status: `migrated` (`migrated`).
 - Owner/service: `base` / `base.saved_view_service`
-- Blocker evidence: `docs/governance/base-structural-web-remediation.json`; `backend/routers/views.py`; The object-ownership check has no public owner-service boundary independent of dynamic saved-view config.
+- Blocker evidence: `docs/governance/base-structural-web-remediation.json`; `backend/base/web_atomic.py:HANDLERS: dict`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: New public Base saved-view aggregate service, used by Gateway and legacy adapter; it owns view records, sharing, copying, and revisions. one revision-locked delete transaction with audit.
 - Target: `base.saved_view.delete@1`. Scope: owner/team/share visibility.
 - Contract/security: owner/team/share visibility; closed semantic view schema; optimistic revision and idempotency key for writes.
@@ -165,7 +171,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `GET /api/ext-datasources`
 
-- Occurrences: web/ext_datasource/ext_ds.js:148:36:GET:/api/ext-datasources
+- Historical occurrences: web/ext_datasource/ext_ds.js:148:36:GET:/api/ext-datasources
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
 - Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
 - Service boundary and transaction: Existing public IntegrationApplication with a credential-vault port and connector-runtime port; both legacy adapters and providers invoke that boundary. read-only actor/team bound query.
@@ -178,7 +185,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `GET /api/ext-datasources/{dynamic}/tables`
 
-- Occurrences: web/ext_datasource/ext_ds.js:640:36:GET:/api/ext-datasources/{dynamic}/tables
+- Historical occurrences: web/ext_datasource/ext_ds.js:640:36:GET:/api/ext-datasources/{dynamic}/tables
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
 - Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
 - Service boundary and transaction: Existing public IntegrationApplication with a credential-vault port and connector-runtime port; both legacy adapters and providers invoke that boundary. bounded external read through runtime port; no fabricated atomic DB transaction.
@@ -191,7 +199,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `GET /api/ext-field-mappings`
 
-- Occurrences: web/ext_datasource/ext_ds.js:349:36:GET:/api/ext-field-mappings
+- Historical occurrences: web/ext_datasource/ext_ds.js:349:36:GET:/api/ext-field-mappings
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
 - Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
 - Service boundary and transaction: Existing public IntegrationApplication mapping operations backed by Integration repository and connector-runtime ports; no cross-domain database adapter. read-only actor/team bound bounded query.
@@ -204,7 +213,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `GET /api/ext-mappings`
 
-- Occurrences: web/ext_datasource/ext_ds.js:187:36:GET:/api/ext-mappings
+- Historical occurrences: web/ext_datasource/ext_ds.js:187:36:GET:/api/ext-mappings
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
 - Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
 - Service boundary and transaction: Existing public IntegrationApplication mapping operations backed by Integration repository and connector-runtime ports; no cross-domain database adapter. read-only actor/team bound query.
@@ -217,7 +227,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `GET /api/ext-mappings/{dynamic}/columns`
 
-- Occurrences: web/ext_datasource/ext_ds.js:341:36:GET:/api/ext-mappings/{dynamic}/columns
+- Historical occurrences: web/ext_datasource/ext_ds.js:341:36:GET:/api/ext-mappings/{dynamic}/columns
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
 - Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
 - Service boundary and transaction: Existing public IntegrationApplication mapping operations backed by Integration repository and connector-runtime ports; no cross-domain database adapter. bounded external discovery through connector runtime.
@@ -230,7 +241,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `GET /api/ext-mappings/{dynamic}/preview`
 
-- Occurrences: web/ext_datasource/ext_ds.js:496:36:GET:/api/ext-mappings/{dynamic}/preview
+- Historical occurrences: web/ext_datasource/ext_ds.js:496:36:GET:/api/ext-mappings/{dynamic}/preview
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
 - Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
 - Service boundary and transaction: Existing public IntegrationApplication mapping operations backed by Integration repository and connector-runtime ports; no cross-domain database adapter. bounded external preview through runtime port.
@@ -243,7 +255,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `GET /api/lists`
 
-- Occurrences: web/core/existing_capability_client.js:254:51:GET:/api/lists
+- Historical occurrences: web/core/existing_capability_client.js:254:51:GET:/api/lists
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `craft` / `plugins.craft.craft_backend.application.bop_version_lifecycle_service`
 - Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/lists.py`; The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch.
 - Service boundary and transaction: New public Craft BOP-version lifecycle service selected before Project list dispatch; it owns the conditional bop_version branch only. read-only Craft BOP-version query selected by item_type before Project dispatch.
@@ -256,7 +269,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `GET /api/rule-engine/check-entry`
 
-- Occurrences: packages/craft-plugin/web/lineage_view/layout_detail_panel.js:2192:40:GET:/api/rule-engine/check-entry, packages/craft-plugin/web/lineage_view/layout_detail_panel.js:3524:40:GET:/api/rule-engine/check-entry
+- Historical occurrences: packages/craft-plugin/web/lineage_view/layout_detail_panel.js:2192:40:GET:/api/rule-engine/check-entry, packages/craft-plugin/web/lineage_view/layout_detail_panel.js:3524:40:GET:/api/rule-engine/check-entry
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `craft` / `plugins.craft.craft_backend.application.rules.RuleService`
 - Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/rule_engine.py`; No entry-check provider exists; CEL evaluation and BOP audit are different outcomes.
 - Service boundary and transaction: Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it. bounded read/evaluation with audit record; no arbitrary executable expression.
@@ -269,9 +283,10 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `GET /api/self_ann/list`
 
-- Occurrences: web/components/self_annotation_panel.js:292:27:GET:/api/self_ann/list, web/components/self_annotation_panel.js:293:27:GET:/api/self_ann/list, web/knowledge_hub/knowledge_hub.js:499:42:GET:/api/self_ann/list
+- Historical occurrences: web/components/self_annotation_panel.js:292:27:GET:/api/self_ann/list, web/components/self_annotation_panel.js:293:27:GET:/api/self_ann/list, web/knowledge_hub/knowledge_hub.js:499:42:GET:/api/self_ann/list
+- Current status: `migrated` (`migrated`).
 - Owner/service: `base` / `base.self_annotation_service`
-- Blocker evidence: `docs/governance/base-structural-web-remediation.json`; `backend/routers/self_annotations.py`; The response contains attachment records without a governed nested attachment contract.
+- Blocker evidence: `docs/governance/base-structural-web-remediation.json`; `backend/base/web_atomic.py:HANDLERS: dict`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: New public Base self-annotation service, with compatibility handlers and providers delegating to it rather than sharing router SQL. read-only self-scoped bounded query.
 - Target: `base.self_annotation.search@1`. Scope: self-only user scope.
 - Contract/security: self-only user scope; closed attachment summary/reference schema; no opaque attachment JSON or secret-derived fields.
@@ -282,9 +297,10 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `GET /api/self_ann/{dynamic}`
 
-- Occurrences: web/components/self_annotation_panel.js:146:36:GET:/api/self_ann/{dynamic}
+- Historical occurrences: web/components/self_annotation_panel.js:146:36:GET:/api/self_ann/{dynamic}
+- Current status: `migrated` (`migrated`).
 - Owner/service: `base` / `base.self_annotation_service`
-- Blocker evidence: `docs/governance/base-structural-web-remediation.json`; `backend/routers/self_annotations.py`; The response contains attachment records without a governed nested attachment contract.
+- Blocker evidence: `docs/governance/base-structural-web-remediation.json`; `backend/base/web_atomic.py:HANDLERS: dict`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: New public Base self-annotation service, with compatibility handlers and providers delegating to it rather than sharing router SQL. read-only self-scoped query.
 - Target: `base.self_annotation.record.get@1`. Scope: self-only user scope.
 - Contract/security: self-only user scope; closed attachment summary/reference schema; no opaque attachment JSON or secret-derived fields.
@@ -295,9 +311,10 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `GET /api/users/me`
 
-- Occurrences: packages/craft-plugin/web/lineage_view/lineage.js:511:34:GET:/api/users/me
+- Historical occurrences: packages/craft-plugin/web/lineage_view/lineage.js:511:34:GET:/api/users/me
+- Current status: `migrated` (`migrated`).
 - Owner/service: `base` / `base.identity_profile_service`
-- Blocker evidence: `docs/governance/base-structural-web-remediation.json`; `backend/routers/users.py`; The profile contains dynamic grants and permissions without a closed exact output contract.
+- Blocker evidence: `docs/governance/base-structural-web-remediation.json`; `backend/base/web_atomic.py:HANDLERS: dict`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: Public Base identity projection service shared by session compatibility handler and Gateway provider. read-only actor-bound projection.
 - Target: `base.identity.session.profile.get@1`. Scope: actor-bound self scope.
 - Contract/security: actor-bound self scope; allowlisted profile/grant projection; never expose raw grants or permission blobs.
@@ -308,9 +325,10 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `GET /api/views`
 
-- Occurrences: web/admin/task_planning.html:1069:26:GET:/api/views, web/components/view_manager.js:541:40:GET:/api/views
+- Historical occurrences: web/admin/task_planning.html:1068:26:GET:/api/views, web/components/view_manager.js:541:40:GET:/api/views
+- Current status: `migrated` (`migrated`).
 - Owner/service: `base` / `base.saved_view_service`
-- Blocker evidence: `docs/governance/base-structural-web-remediation.json`; `backend/routers/views.py`; Saved-view config is intentionally dynamic and has no governed closed nested contract.
+- Blocker evidence: `docs/governance/base-structural-web-remediation.json`; `backend/base/web_atomic.py:HANDLERS: dict`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: New public Base saved-view aggregate service, used by Gateway and legacy adapter; it owns view records, sharing, copying, and revisions. read-only owner/team/share scoped query.
 - Target: `base.saved_view.search@1`. Scope: owner/team/share visibility.
 - Contract/security: owner/team/share visibility; closed semantic view schema; optimistic revision and idempotency key for writes.
@@ -321,7 +339,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `PATCH /api/ext-datasources/{dynamic}`
 
-- Occurrences: web/ext_datasource/ext_ds.js:623:29:PATCH:/api/ext-datasources/{dynamic}
+- Historical occurrences: web/ext_datasource/ext_ds.js:623:29:PATCH:/api/ext-datasources/{dynamic}
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
 - Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
 - Service boundary and transaction: Existing public IntegrationApplication with a credential-vault port and connector-runtime port; both legacy adapters and providers invoke that boundary. one revision-locked connector aggregate transaction.
@@ -334,9 +353,10 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `PATCH /api/views/{dynamic}`
 
-- Occurrences: web/components/view_manager.js:651:30:PATCH:/api/views/{dynamic}, web/components/view_manager.js:1011:28:PATCH:/api/views/{dynamic}
+- Historical occurrences: web/components/view_manager.js:1011:28:PATCH:/api/views/{dynamic}, web/components/view_manager.js:651:30:PATCH:/api/views/{dynamic}
+- Current status: `migrated` (`migrated`).
 - Owner/service: `base` / `base.saved_view_service`
-- Blocker evidence: `docs/governance/base-structural-web-remediation.json`; `backend/routers/views.py`; Saved-view config is intentionally dynamic and has no governed closed nested contract.
+- Blocker evidence: `docs/governance/base-structural-web-remediation.json`; `backend/base/web_atomic.py:HANDLERS: dict`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: New public Base saved-view aggregate service, used by Gateway and legacy adapter; it owns view records, sharing, copying, and revisions. one revision-locked update transaction with audit.
 - Target: `base.saved_view.update@1`. Scope: owner/team/share visibility.
 - Contract/security: owner/team/share visibility; closed semantic view schema; optimistic revision and idempotency key for writes.
@@ -347,7 +367,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `POST /api/approval/orders/{dynamic}/reject`
 
-- Occurrences: packages/craft-plugin/web/approval/approval.js:153:26:POST:/api/approval/orders/{dynamic}/reject
+- Historical occurrences: packages/craft-plugin/web/approval/approval.js:153:26:POST:/api/approval/orders/{dynamic}/reject
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `project_management` / `plugins.project_management.project_management_backend.application.service.ProjectManagementApplication`
 - Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/approval.py`; The Project outcome omits the legacy notification publication side effect.
 - Service boundary and transaction: Existing ProjectManagementApplication approval.orders.reject boundary, extended in-package with notification outbox, audit and idempotency rather than a fabricated Project service. one Project approval transition transaction with audit and transactional notification outbox.
@@ -360,7 +381,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `POST /api/ext-datasources`
 
-- Occurrences: web/ext_datasource/ext_ds.js:625:28:POST:/api/ext-datasources
+- Historical occurrences: web/ext_datasource/ext_ds.js:625:28:POST:/api/ext-datasources
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
 - Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
 - Service boundary and transaction: Existing public IntegrationApplication with a credential-vault port and connector-runtime port; both legacy adapters and providers invoke that boundary. one connector aggregate transaction; credential material is written only through vault port.
@@ -373,7 +395,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `POST /api/ext-datasources/{dynamic}/test`
 
-- Occurrences: web/ext_datasource/ext_ds.js:605:34:POST:/api/ext-datasources/{dynamic}/test
+- Historical occurrences: web/ext_datasource/ext_ds.js:605:34:POST:/api/ext-datasources/{dynamic}/test
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
 - Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
 - Service boundary and transaction: Existing public IntegrationApplication with a credential-vault port and connector-runtime port; both legacy adapters and providers invoke that boundary. bounded external probe with durable operation result when outcome is uncertain.
@@ -386,7 +409,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `POST /api/ext-mappings`
 
-- Occurrences: web/ext_datasource/ext_ds.js:677:26:POST:/api/ext-mappings
+- Historical occurrences: web/ext_datasource/ext_ds.js:677:26:POST:/api/ext-mappings
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
 - Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
 - Service boundary and transaction: Existing public IntegrationApplication mapping operations backed by Integration repository and connector-runtime ports; no cross-domain database adapter. one mapping aggregate transaction with target-capability validation.
@@ -399,7 +423,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `POST /api/ext-mappings/{dynamic}/import`
 
-- Occurrences: web/ext_datasource/ext_ds.js:549:37:POST:/api/ext-mappings/{dynamic}/import
+- Historical occurrences: web/ext_datasource/ext_ds.js:549:37:POST:/api/ext-mappings/{dynamic}/import
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
 - Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
 - Service boundary and transaction: Existing public IntegrationApplication mapping operations backed by Integration repository and connector-runtime ports; no cross-domain database adapter. durable asynchronous import operation with idempotency and recoverable status.
@@ -412,7 +437,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `POST /api/flows/test-node`
 
-- Occurrences: packages/agent-plugin/web/flow_canvas/flow_editor.js:754:36:POST:/api/flows/test-node, web/canvas/types/flow_type.js:145:29:POST:/api/flows/test-node
+- Historical occurrences: packages/agent-plugin/web/flow_canvas/flow_editor.js:754:36:POST:/api/flows/test-node, web/canvas/types/flow_type.js:145:29:POST:/api/flows/test-node
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `agent` / `plugins.agent.agent_backend.application.bounded_runtime_service`
 - Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/agent/agent_backend/routers/flows.py`; No node-test handler or runtime service exists in the Agent provider.
 - Service boundary and transaction: New public Agent bounded-runtime service with a fixed tool/node allowlist, sandbox executor, durable run records and audit lineage. durable bounded sandbox run with timeout/resource limits and auditable result.
@@ -425,9 +451,10 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `POST /api/plugin/install`
 
-- Occurrences: web/core/web_compat.js:287:27:POST:/api/plugin/install
+- Historical occurrences: web/core/web_compat.js:287:27:POST:/api/plugin/install
+- Current status: `migrated` (`migrated`).
 - Owner/service: `base` / `backend.plugin_platform.service`
-- Blocker evidence: `docs/governance/base-structural-web-remediation.json`; `backend/routers/plugins.py`; The arbitrary-URL installer route has no production handler and is not equivalent to signed marketplace installation.
+- Blocker evidence: `docs/governance/base-structural-web-remediation.json`; `backend/base/web_atomic.py:HANDLERS: dict`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: Public marketplace lifecycle service; REST compatibility and Gateway provider call the same signed-release transition API. one tenant installation transaction; release verification and mount activation are explicit lifecycle steps.
 - Target: `base.plugin.installation.request.create@1`. Scope: signed publisher release and dependency compatibility.
 - Contract/security: signed publisher release and dependency compatibility; tenant-scoped installation lock and audit event; no arbitrary URL or secret logging.
@@ -438,7 +465,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `POST /api/rules/{dynamic}/activate`
 
-- Occurrences: web/rule_mgmt/rule_mgmt.js:173:26:POST:/api/rules/{dynamic}/activate
+- Historical occurrences: web/rule_mgmt/rule_mgmt.js:173:26:POST:/api/rules/{dynamic}/activate
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `craft` / `plugins.craft.craft_backend.application.rules.RuleService`
 - Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/rules.py`; No mutable-rule activation provider exists; immutable release activation is a different lifecycle outcome.
 - Service boundary and transaction: Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it. one rule lifecycle transition with audit and expected state.
@@ -451,7 +479,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `POST /api/rules/{dynamic}/deviations`
 
-- Occurrences: web/rule_mgmt/rule_mgmt.js:220:36:POST:/api/rules/{dynamic}/deviations
+- Historical occurrences: web/rule_mgmt/rule_mgmt.js:220:36:POST:/api/rules/{dynamic}/deviations
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `craft` / `plugins.craft.craft_backend.application.rules.RuleService`
 - Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/rules.py`; No legacy deviation provider exists; governed release waiver creation has a different evidence contract.
 - Service boundary and transaction: Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it. one rule deviation/waiver transaction with evidence and audit.
@@ -464,7 +493,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `POST /api/rules/{dynamic}/suspend`
 
-- Occurrences: web/rule_mgmt/rule_mgmt.js:175:26:POST:/api/rules/{dynamic}/suspend
+- Historical occurrences: web/rule_mgmt/rule_mgmt.js:175:26:POST:/api/rules/{dynamic}/suspend
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `craft` / `plugins.craft.craft_backend.application.rules.RuleService`
 - Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/rules.py`; No mutable-rule suspension handler or domain service exists.
 - Service boundary and transaction: Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it. one rule lifecycle transition with audit and expected state.
@@ -477,7 +507,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `POST /api/skills/canvas-options`
 
-- Occurrences: packages/agent-plugin/web/wfc_window/wfc_window.js:1599:35:POST:/api/skills/canvas-options
+- Historical occurrences: packages/agent-plugin/web/wfc_window/wfc_window.js:1599:35:POST:/api/skills/canvas-options
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `agent` / `plugins.agent.agent_backend.application.bounded_runtime_service`
 - Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/agent/agent_backend/routers/skills_v2.py`; No bounded canvas-option resolver exists in the Agent provider.
 - Service boundary and transaction: New public Agent bounded-runtime service with a fixed tool/node allowlist, sandbox executor, durable run records and audit lineage. bounded deterministic resolver with actor/workspace audit.
@@ -490,7 +521,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `POST /api/skills/execute-canvas`
 
-- Occurrences: packages/agent-plugin/web/wfc_window/wfc_window.js:2264:40:POST:/api/skills/execute-canvas
+- Historical occurrences: packages/agent-plugin/web/wfc_window/wfc_window.js:2264:40:POST:/api/skills/execute-canvas
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `agent` / `plugins.agent.agent_backend.application.bounded_runtime_service`
 - Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/agent/agent_backend/routers/skills_v2.py`; No canvas execution provider exists; generic run mutation is not provider-equivalent.
 - Service boundary and transaction: New public Agent bounded-runtime service with a fixed tool/node allowlist, sandbox executor, durable run records and audit lineage. durable sandbox run with confirmation, idempotency, pause token and outcome recovery.
@@ -503,7 +535,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `POST /api/skills/resume-canvas`
 
-- Occurrences: packages/agent-plugin/web/wfc_window/wfc_window.js:1615:40:POST:/api/skills/resume-canvas
+- Historical occurrences: packages/agent-plugin/web/wfc_window/wfc_window.js:1615:40:POST:/api/skills/resume-canvas
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `agent` / `plugins.agent.agent_backend.application.bounded_runtime_service`
 - Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/agent/agent_backend/routers/skills_v2.py`; No pause-token resume provider exists; generic run mutation is not provider-equivalent.
 - Service boundary and transaction: New public Agent bounded-runtime service with a fixed tool/node allowlist, sandbox executor, durable run records and audit lineage. durable resume transaction locking validated pause token and run state.
@@ -516,9 +549,10 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `POST /api/views`
 
-- Occurrences: web/components/view_manager.js:657:42:POST:/api/views, web/components/view_manager.js:713:40:POST:/api/views
+- Historical occurrences: web/components/view_manager.js:657:42:POST:/api/views, web/components/view_manager.js:713:40:POST:/api/views
+- Current status: `migrated` (`migrated`).
 - Owner/service: `base` / `base.saved_view_service`
-- Blocker evidence: `docs/governance/base-structural-web-remediation.json`; `backend/routers/views.py`; Saved-view config is intentionally dynamic and has no governed closed nested contract.
+- Blocker evidence: `docs/governance/base-structural-web-remediation.json`; `backend/base/web_atomic.py:HANDLERS: dict`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: New public Base saved-view aggregate service, used by Gateway and legacy adapter; it owns view records, sharing, copying, and revisions. one saved-view create transaction with owner/share validation.
 - Target: `base.saved_view.create@1`. Scope: owner/team/share visibility.
 - Contract/security: owner/team/share visibility; closed semantic view schema; optimistic revision and idempotency key for writes.
@@ -529,9 +563,10 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `POST /api/views/{dynamic}/copy`
 
-- Occurrences: web/components/view_manager.js:978:42:POST:/api/views/{dynamic}/copy
+- Historical occurrences: web/components/view_manager.js:978:42:POST:/api/views/{dynamic}/copy
+- Current status: `migrated` (`migrated`).
 - Owner/service: `base` / `base.saved_view_service`
-- Blocker evidence: `docs/governance/base-structural-web-remediation.json`; `backend/routers/views.py`; The copied result depends on dynamic saved-view config without a governed closed nested contract.
+- Blocker evidence: `docs/governance/base-structural-web-remediation.json`; `backend/base/web_atomic.py:HANDLERS: dict`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: New public Base saved-view aggregate service, used by Gateway and legacy adapter; it owns view records, sharing, copying, and revisions. one source-read plus destination-create transaction with idempotency.
 - Target: `base.saved_view.copy@1`. Scope: owner/team/share visibility.
 - Contract/security: owner/team/share visibility; closed semantic view schema; optimistic revision and idempotency key for writes.
@@ -542,7 +577,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `PUT /api/ext-field-mappings/batch`
 
-- Occurrences: web/ext_datasource/ext_ds.js:457:23:PUT:/api/ext-field-mappings/batch
+- Historical occurrences: web/ext_datasource/ext_ds.js:457:23:PUT:/api/ext-field-mappings/batch
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `integration` / `plugins.integration.integration_backend.application.service.IntegrationApplication`
 - Blocker evidence: `docs/governance/integration-structural-web-remediation.json`; `plugins/integration/integration_backend/capabilities/provider.py`; The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract.
 - Service boundary and transaction: Existing public IntegrationApplication mapping operations backed by Integration repository and connector-runtime ports; no cross-domain database adapter. one bounded batch transaction with per-item revision conflicts.
@@ -555,7 +591,8 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `PUT /api/rules/{dynamic}`
 
-- Occurrences: web/container_card/modes/container_item_detail.js:137:53:PUT:/api/rules/{dynamic}, web/container_card/modes/mode_field_detail.js:47:50:PUT:/api/rules/{dynamic}
+- Historical occurrences: web/container_card/modes/container_item_detail.js:137:53:PUT:/api/rules/{dynamic}, web/container_card/modes/mode_field_detail.js:47:50:PUT:/api/rules/{dynamic}
+- Current status: `unresolved` (`unresolved`).
 - Owner/service: `craft` / `plugins.craft.craft_backend.application.rules.RuleService`
 - Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/rules.py`; Rule definition changes contain dynamic rule_definition data without a governed closed nested contract.
 - Service boundary and transaction: Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it. one revision-locked rule-definition transaction plus audit.
@@ -568,9 +605,10 @@ This plan reconciles the fresh canonical unresolved Web inventory to the three i
 
 ### `PUT /api/self_ann/{dynamic}`
 
-- Occurrences: web/components/self_annotation_panel.js:175:35:PUT:/api/self_ann/{dynamic}
+- Historical occurrences: web/components/self_annotation_panel.js:175:35:PUT:/api/self_ann/{dynamic}
+- Current status: `migrated` (`migrated`).
 - Owner/service: `base` / `base.self_annotation_service`
-- Blocker evidence: `docs/governance/base-structural-web-remediation.json`; `backend/routers/self_annotations.py`; The request contains attachment records without a governed nested attachment contract.
+- Blocker evidence: `docs/governance/base-structural-web-remediation.json`; `backend/base/web_atomic.py:HANDLERS: dict`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: New public Base self-annotation service, with compatibility handlers and providers delegating to it rather than sharing router SQL. one self-annotation revision transaction with attachment reference validation.
 - Target: `base.self_annotation.change.apply@1`. Scope: self-only user scope.
 - Contract/security: self-only user scope; closed attachment summary/reference schema; no opaque attachment JSON or secret-derived fields.

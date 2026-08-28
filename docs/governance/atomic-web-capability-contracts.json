@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3c-atomic-web-contracts",
   "baseline_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
-  "content_sha256": "sha256:a98407a9cfbc13430586c65a38d39bd9e138cc3e371a68e11d3be65faca82003",
+  "content_sha256": "sha256:9a3551299cb234694b2c98771fc171905da73a409824718dcb866f35d4e88560",
   "counts_by_owner": {
     "agent": {
       "groups": 4,
@@ -392,7 +392,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -589,7 +589,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -673,7 +673,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -777,7 +777,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -905,7 +905,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1015,7 +1015,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "reclassification_reason": null,
       "required_permissions": [
         "system.tech_config"
@@ -1155,7 +1155,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1164,15 +1164,34 @@
       ]
     },
     {
-      "atomicity_class": "read",
-      "authorization_policy": null,
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "base.v2:system.plugin.manage",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
-      "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "capability_id": "base.plugin.installation.request.create",
+      "confirmation_policy": "user",
+      "consistency_policy": "strong",
+      "example_input": {
+        "idempotency_key": "idem-plugin-1",
+        "plugin_id": "plugin.example",
+        "release_sha256": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "release_version": "1.2.3",
+        "requested_grants": [
+          "project.read"
+        ]
+      },
+      "example_output": {
+        "installation": {
+          "granted_capabilities": [
+            "project.read"
+          ],
+          "plugin_id": "plugin.example",
+          "release_version": "1.2.3",
+          "revision": 1,
+          "state": "disabled",
+          "tenant_gid": "tenant_1"
+        }
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "No exact registered route/method definition exists in this reviewed handler family.",
@@ -1180,13 +1199,50 @@
         "route_definition": null,
         "source_path": "backend/routers/plugins.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "required",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "idempotency_key": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "plugin_id": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "release_sha256": {
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "release_version": {
+            "maxLength": 64,
+            "minLength": 1,
+            "type": "string"
+          },
+          "requested_grants": {
+            "items": {
+              "maxLength": 512,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 200,
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "plugin_id",
+          "release_version",
+          "release_sha256",
+          "requested_grants",
+          "idempotency_key"
+        ],
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "POST",
       "normalized_route": "/api/plugin/install",
       "occurrences": [
@@ -1204,17 +1260,74 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "installation": {
+            "additionalProperties": false,
+            "properties": {
+              "granted_capabilities": {
+                "items": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 200,
+                "type": "array"
+              },
+              "plugin_id": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "release_version": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "revision": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "state": {
+                "enum": [
+                  "disabled",
+                  "uninstalled"
+                ],
+                "type": "string"
+              },
+              "tenant_gid": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "plugin_id",
+              "release_version",
+              "state",
+              "revision",
+              "granted_capabilities",
+              "tenant_gid"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "installation"
+        ],
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/routers/plugins.py",
-      "provider_source_sha256": "sha256:bab080093bc16f582378f81ae82d6264d3cd724c2e55d842fad259507c11b2f2",
-      "reclassification_reason": "The arbitrary-URL installer route has no production handler and is not equivalent to signed marketplace installation.",
-      "required_permissions": [],
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "reclassification_reason": null,
+      "required_permissions": [
+        "system.plugin.manage"
+      ],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Verifies one signed published marketplace release and creates a tenant-bound disabled installation with explicit grants."
+      ]
     },
     {
       "atomicity_class": "read",
@@ -1321,7 +1434,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1330,15 +1443,29 @@
       ]
     },
     {
-      "atomicity_class": "read",
-      "authorization_policy": null,
+      "atomicity_class": "single_transaction",
+      "authorization_policy": "base.v2:system.plugin.manage",
       "baseline_disposition": "existing_capability_reclassified",
-      "capability_id": null,
-      "confirmation_policy": null,
-      "consistency_policy": null,
-      "example_input": {},
-      "example_output": {},
-      "final_disposition": "domain_design_required",
+      "capability_id": "base.plugin.installation.transition.uninstall",
+      "confirmation_policy": "user",
+      "consistency_policy": "strong",
+      "example_input": {
+        "expected_revision": 3,
+        "idempotency_key": "idem-plugin-2",
+        "plugin_id": "plugin.example",
+        "retain_tenant_data": true
+      },
+      "example_output": {
+        "installation": {
+          "granted_capabilities": [],
+          "plugin_id": "plugin.example",
+          "release_version": "1.2.3",
+          "revision": 4,
+          "state": "uninstalled",
+          "tenant_gid": "tenant_1"
+        }
+      },
+      "final_disposition": "migrated",
       "handler_evidence": {
         "anchors": [],
         "finding": "No exact registered route/method definition exists in this reviewed handler family.",
@@ -1346,13 +1473,37 @@
         "route_definition": null,
         "source_path": "backend/routers/plugins.py"
       },
-      "idempotency_policy": null,
+      "idempotency_policy": "required",
       "input_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "expected_revision": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "idempotency_key": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "plugin_id": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "retain_tenant_data": {
+            "const": true
+          }
+        },
+        "required": [
+          "plugin_id",
+          "expected_revision",
+          "retain_tenant_data",
+          "idempotency_key"
+        ],
         "type": "object"
       },
-      "major_version": null,
+      "major_version": 1,
       "method": "DELETE",
       "normalized_route": "/api/plugin/uninstall/{dynamic}",
       "occurrences": [
@@ -1370,17 +1521,74 @@
       ],
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "installation": {
+            "additionalProperties": false,
+            "properties": {
+              "granted_capabilities": {
+                "items": {
+                  "maxLength": 512,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 200,
+                "type": "array"
+              },
+              "plugin_id": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "release_version": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "revision": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "state": {
+                "enum": [
+                  "disabled",
+                  "uninstalled"
+                ],
+                "type": "string"
+              },
+              "tenant_gid": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "plugin_id",
+              "release_version",
+              "state",
+              "revision",
+              "granted_capabilities",
+              "tenant_gid"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "installation"
+        ],
         "type": "object"
       },
       "owner_domain": "base",
       "owner_prefix": "base",
-      "provider_anchor": "backend/routers/plugins.py",
-      "provider_source_sha256": "sha256:bab080093bc16f582378f81ae82d6264d3cd724c2e55d842fad259507c11b2f2",
-      "reclassification_reason": "The unrestricted legacy uninstall route has no production handler and cannot bypass marketplace lifecycle controls.",
-      "required_permissions": [],
+      "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+      "reclassification_reason": null,
+      "required_permissions": [
+        "system.plugin.manage"
+      ],
       "review_reference": "task-3b3c:exact-provider-review",
-      "side_effects": []
+      "side_effects": [
+        "Atomically revokes mounts and grants, preserves tenant data, and records a recoverable uninstall transition."
+      ]
     },
     {
       "atomicity_class": "read",
@@ -1542,7 +1750,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1770,7 +1978,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1968,7 +2176,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -2260,7 +2468,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -2366,7 +2574,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -2562,7 +2770,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -2694,7 +2902,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -2839,7 +3047,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -3032,7 +3240,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -3399,7 +3607,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -4024,7 +4232,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -4426,7 +4634,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -5062,7 +5270,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -5461,7 +5669,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
+      "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",

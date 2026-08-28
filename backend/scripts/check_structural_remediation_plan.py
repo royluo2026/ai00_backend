@@ -25,6 +25,7 @@ REQUIRED_GROUP_FIELDS = {
     "transaction_model", "target_capability", "permission_object_scope",
     "contract_security_rules", "migration_strategy", "tests", "dependencies", "cross_domain_links",
     "approval", "exit_criteria", "implementation_disposition",
+    "current_status", "current_disposition", "current_evidence",
 }
 
 
@@ -213,33 +214,62 @@ def _occurrences(entry: Mapping[str, Any]) -> list[dict[str, Any]]:
 
 
 def source_groups(root: Path) -> dict[tuple[str, str], dict[str, Any]]:
-    """Reconcile group membership from all independent manifests, then use fresh inventory IDs."""
+    """Keep the reviewed historical scope while reconciling current generated evidence."""
     manifests: dict[tuple[str, str], dict[str, Any]] = {}
     for relative in MANIFEST_PATHS:
         path = root / relative
         payload = json.loads(path.read_text(encoding="utf-8"))
         for entry in payload.get("entries", []):
-            if entry.get("final_disposition") != "unresolved":
-                continue
             key = (entry.get("method"), entry.get("normalized_route"))
+            if key not in GROUP_SPECS:
+                continue
             if not all(isinstance(value, str) and value for value in key) or key in manifests:
                 raise ValueError("manifest group identity invalid or duplicate")
-            manifests[key] = {"manifest_path": relative, "entry": entry, "manifest_occurrence_count": len(_occurrences(entry))}
+            disposition = entry.get("final_disposition")
+            if disposition not in {"unresolved", "migrated"}:
+                raise ValueError(f"structural group disposition invalid: {key}")
+            occurrences = _occurrences(entry)
+            manifests[key] = {
+                "manifest_path": relative,
+                "entry": entry,
+                "occurrences": occurrences,
+                "manifest_occurrence_count": len(occurrences),
+                "current_disposition": disposition,
+                "canonical_occurrences": [],
+            }
     inventory = json.loads((root / INVENTORY_PATH.relative_to(root)).read_text(encoding="utf-8"))
     for route in inventory.get("routes", []):
-        if route.get("disposition") != "unresolved":
-            continue
         key = (route.get("method"), route.get("normalized_route"))
-        if key not in manifests:
-            raise ValueError(f"canonical unresolved group absent from remediation manifests: {key}")
-        manifests[key].setdefault("occurrences", []).append(dict(route))
+        if route.get("disposition") != "unresolved" or key not in manifests:
+            continue
+        if manifests[key]["current_disposition"] != "unresolved":
+            raise ValueError(f"canonical unresolved group is not unresolved in manifest: {key}")
+        manifests[key]["canonical_occurrences"].append(dict(route))
     for key, evidence in manifests.items():
-        occurrences = evidence.get("occurrences", [])
-        if len(occurrences) != evidence["manifest_occurrence_count"]:
+        if evidence["current_disposition"] == "unresolved" and len(evidence["canonical_occurrences"]) != evidence["manifest_occurrence_count"]:
             raise ValueError(f"manifest/canonical occurrence count drift: {key}")
-    if len(manifests) != 37 or sum(len(item.get("occurrences", [])) for item in manifests.values()) != 45:
+    if set(manifests) != set(GROUP_SPECS) or len(manifests) != 37 or sum(len(item["occurrences"]) for item in manifests.values()) != 45:
         raise ValueError("final structural source scope drift")
     return manifests
+
+
+def _current_evidence(source: Mapping[str, Any], spec: Mapping[str, Any]) -> dict[str, Any]:
+    entry = source["entry"]
+    disposition = source["current_disposition"]
+    evidence = {
+        "target_capability": entry.get("candidate_capability"),
+        "final_inventory_mapping": entry.get("final_inventory_mapping"),
+        "contract_evidence": entry.get("contract_evidence"),
+        "owner_service_evidence": entry.get("owner_service_evidence"),
+        "frontend_call_sites": entry.get("frontend_call_sites", []),
+        "canonical_occurrences": source["canonical_occurrences"],
+    }
+    if disposition == "migrated":
+        if evidence["target_capability"] != spec["target_capability"] or evidence["final_inventory_mapping"] != "capability":
+            raise ValueError(f"migrated target evidence invalid: {(entry.get('method'), entry.get('normalized_route'))}")
+        if not isinstance(evidence["frontend_call_sites"], list) or not evidence["frontend_call_sites"]:
+            raise ValueError(f"migrated frontend evidence missing: {(entry.get('method'), entry.get('normalized_route'))}")
+    return evidence
 
 
 def build_plan(root: Path) -> dict[str, Any]:
@@ -251,7 +281,11 @@ def build_plan(root: Path) -> dict[str, Any]:
         source, spec = sources[key], GROUP_SPECS[key]
         package = PACKAGES[spec["package_id"]]
         entry = source["entry"]
-        blocker = entry.get("unresolved_reason") or entry.get("non_equivalence") or "No provider-equivalent source boundary exists."
+        current_disposition = source["current_disposition"]
+        blocker = entry.get("unresolved_reason") or entry.get("non_equivalence") or (
+            "Migrated through the reviewed public owner service and generated capability evidence."
+            if current_disposition == "migrated" else "No provider-equivalent source boundary exists."
+        )
         groups.append({
             "group_id": f"{key[0]} {key[1]}", "package_id": spec["package_id"],
             "method": key[0], "normalized_route": key[1], "occurrences": source["occurrences"],
@@ -264,6 +298,9 @@ def build_plan(root: Path) -> dict[str, Any]:
             "approval": {"required": spec["approval_required"], "decision": package["approval_gate"] if spec["approval_required"] else None},
             "exit_criteria": ["public owner service and Gateway provider share this boundary", "closed contract and scope tests pass", "fresh canonical occurrence migrates without REST fallback", "no operations/BFF/canonical-disposition relabeling"],
             "implementation_disposition": "owner_service_required",
+            "current_status": current_disposition,
+            "current_disposition": current_disposition,
+            "current_evidence": _current_evidence(source, spec),
         })
     source_artifacts = [{"path": relative, "sha256": _sha256(root / relative)} for relative in (*MANIFEST_PATHS, str(INVENTORY_PATH.relative_to(root)))]
     plan = {"schema_version": "1.0.0", "artifact_id": "capability-v2-structural-remediation-plan",
@@ -328,13 +365,23 @@ def validate_plan(root: Path, payload: Mapping[str, Any]) -> tuple[str, ...]:
         expected = sources[key]["occurrences"]
         if occurrences != expected:
             issues.add("occurrence_identity_mismatch")
+        current_disposition = sources[key]["current_disposition"]
+        if group.get("current_status") != current_disposition or group.get("current_disposition") != current_disposition:
+            issues.add("current_status_mismatch")
+        try:
+            current_evidence = _current_evidence(sources[key], spec)
+        except ValueError:
+            issues.add("current_evidence_invalid")
+        else:
+            if group.get("current_evidence") != current_evidence:
+                issues.add("current_evidence_mismatch")
     if actual_ids != expected_ids or len(actual_ids) != 45:
         issues.add("occurrence_identity_mismatch")
     return tuple(sorted(issues))
 
 
 def render_markdown(plan: Mapping[str, Any]) -> str:
-    lines = ["# Capability V2 Structural Owner-Service Remediation Plan", "", "This plan reconciles the fresh canonical unresolved Web inventory to the three independent remediation manifests. It is an implementation sequence, not an operations or BFF exemption.", "", f"- Scope: **{plan['counts']['occurrences']} occurrences / {plan['counts']['groups']} root-cause groups**.", "- Implementation disposition for every group: `owner_service_required`.", "- Global prohibitions: " + "; ".join(plan["anti_patterns"]) + ".", "", "## Ordered packages", ""]
+    lines = ["# Capability V2 Structural Owner-Service Remediation Plan", "", "This plan preserves the reviewed historical Web source scope while reconciling each group to current canonical unresolved evidence or current generated migrated-capability evidence. It is an implementation sequence, not an operations or BFF exemption.", "", f"- Historical scope: **{plan['counts']['occurrences']} occurrences / {plan['counts']['groups']} root-cause groups**.", f"- Current progress: **{sum(group['current_status'] == 'migrated' for group in plan['groups'])} migrated groups**; remaining groups are retained rather than erased.", "- Implementation disposition for every group: `owner_service_required`.", "- Global prohibitions: " + "; ".join(plan["anti_patterns"]) + ".", "", "## Ordered packages", ""]
     for number, package in enumerate(plan["packages"], 1):
         approval = package["approval_gate"] or "No product/security decision is currently identified."
         links = PACKAGE_CROSS_DOMAIN_LINKS[package["package_id"]]
@@ -343,7 +390,7 @@ def render_markdown(plan: Mapping[str, Any]) -> str:
     for group in plan["groups"]:
         occurrences = ", ".join(item["occurrence_id"] for item in group["occurrences"])
         approval = group["approval"]["decision"] if group["approval"]["required"] else "None; implement from existing source evidence."
-        lines += [f"### `{group['group_id']}`", "", f"- Occurrences: {occurrences}", f"- Owner/service: `{group['owner_domain']}` / `{group['owner_service']}`", f"- Blocker evidence: `{group['current_blocker_evidence']['manifest_path']}`; `{group['current_blocker_evidence']['provider_anchor']}`; {group['current_blocker_evidence']['reason']}", f"- Service boundary and transaction: {group['service_boundary']} {group['transaction_model']}.", f"- Target: `{group['target_capability']}`. Scope: {group['permission_object_scope']}.", f"- Contract/security: {'; '.join(group['contract_security_rules'])}.", f"- Migration: {group['migration_strategy']}", f"- Tests: {'; '.join(group['tests'])}. Dependencies: {', '.join(group['dependencies'])}. Cross-domain links: {'; '.join(group['cross_domain_links'])}.", f"- Approval: {approval}", f"- Exit: {'; '.join(group['exit_criteria'])}.", ""]
+        lines += [f"### `{group['group_id']}`", "", f"- Historical occurrences: {occurrences}", f"- Current status: `{group['current_status']}` (`{group['current_disposition']}`).", f"- Owner/service: `{group['owner_domain']}` / `{group['owner_service']}`", f"- Blocker evidence: `{group['current_blocker_evidence']['manifest_path']}`; `{group['current_blocker_evidence']['provider_anchor']}`; {group['current_blocker_evidence']['reason']}", f"- Service boundary and transaction: {group['service_boundary']} {group['transaction_model']}.", f"- Target: `{group['target_capability']}`. Scope: {group['permission_object_scope']}.", f"- Contract/security: {'; '.join(group['contract_security_rules'])}.", f"- Migration: {group['migration_strategy']}", f"- Tests: {'; '.join(group['tests'])}. Dependencies: {', '.join(group['dependencies'])}. Cross-domain links: {'; '.join(group['cross_domain_links'])}.", f"- Approval: {approval}", f"- Exit: {'; '.join(group['exit_criteria'])}.", ""]
     return "\n".join(lines)
 
 

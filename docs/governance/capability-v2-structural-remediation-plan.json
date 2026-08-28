@@ -10,7 +10,7 @@
     "no silent REST fallback"
   ],
   "artifact_id": "capability-v2-structural-remediation-plan",
-  "content_sha256": "sha256:425eefc70e7c4e7498b7d348785bb156ff2ef10d6bcd3ccb320210dadf6c7446",
+  "content_sha256": "sha256:3d8a222e66328b056e0a888d2bfd1a42164d716dc95ce51ff6127347c92b4283",
   "counts": {
     "groups": 37,
     "occurrences": 45
@@ -35,6 +35,27 @@
         "provider_source_sha256": "sha256:30c275048c808550f27bbdcf2da96871936a4b6a53f7eda3aefa0ee3d522eed3",
         "reason": "No delete provider exists; the available obsolete transition is a different lifecycle outcome."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 58,
+            "disposition": "unresolved",
+            "line": 771,
+            "method": "DELETE",
+            "normalized_route": "/api/craft_lib/equipments/{dynamic}",
+            "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:771:58:DELETE:/api/craft_lib/equipments/{dynamic}",
+            "raw_route": "/api/craft_lib/equipments/${gid}",
+            "source": "web/knowledge_hub/pages/gbop_vpps.html"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": null
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "library reference index",
         "Craft lifecycle audit migration"
@@ -53,13 +74,10 @@
       "occurrences": [
         {
           "column": 58,
-          "disposition": "unresolved",
           "line": 771,
-          "method": "DELETE",
-          "normalized_route": "/api/craft_lib/equipments/{dynamic}",
           "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:771:58:DELETE:/api/craft_lib/equipments/{dynamic}",
-          "raw_route": "/api/craft_lib/equipments/${gid}",
-          "source": "web/knowledge_hub/pages/gbop_vpps.html"
+          "source": "web/knowledge_hub/pages/gbop_vpps.html",
+          "source_sha256": "9659421b97c7f769cc5aa1b0f8c486ad4803ca103772c56e7f82ad1aee81dedb"
         }
       ],
       "owner_domain": "craft",
@@ -95,6 +113,27 @@
         "provider_source_sha256": "sha256:30c275048c808550f27bbdcf2da96871936a4b6a53f7eda3aefa0ee3d522eed3",
         "reason": "No delete provider exists; the available obsolete transition is a different lifecycle outcome."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 58,
+            "disposition": "unresolved",
+            "line": 714,
+            "method": "DELETE",
+            "normalized_route": "/api/craft_lib/fixtures/{dynamic}",
+            "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:714:58:DELETE:/api/craft_lib/fixtures/{dynamic}",
+            "raw_route": "/api/craft_lib/fixtures/${gid}",
+            "source": "web/knowledge_hub/pages/gbop_vpps.html"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": null
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "library reference index",
         "Craft lifecycle audit migration"
@@ -113,13 +152,10 @@
       "occurrences": [
         {
           "column": 58,
-          "disposition": "unresolved",
           "line": 714,
-          "method": "DELETE",
-          "normalized_route": "/api/craft_lib/fixtures/{dynamic}",
           "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:714:58:DELETE:/api/craft_lib/fixtures/{dynamic}",
-          "raw_route": "/api/craft_lib/fixtures/${gid}",
-          "source": "web/knowledge_hub/pages/gbop_vpps.html"
+          "source": "web/knowledge_hub/pages/gbop_vpps.html",
+          "source_sha256": "9659421b97c7f769cc5aa1b0f8c486ad4803ca103772c56e7f82ad1aee81dedb"
         }
       ],
       "owner_domain": "craft",
@@ -155,6 +191,27 @@
         "provider_source_sha256": "sha256:af843b6c197bf6434836a15bb387068f89910db7c984c1191e96e4e329e1f1a7",
         "reason": "The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 12,
+            "disposition": "unresolved",
+            "line": 331,
+            "method": "DELETE",
+            "normalized_route": "/api/lists/{dynamic}",
+            "occurrence_id": "web/core/existing_capability_client.js:331:12:DELETE:/api/lists/{dynamic}",
+            "raw_route": "/api/lists/${encodeURIComponent(gid)}?item_type=bop_version&expected_revision=${revision}",
+            "source": "web/core/existing_capability_client.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": null
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "BOP version aggregate",
         "conditional dispatch adapter"
@@ -173,13 +230,10 @@
       "occurrences": [
         {
           "column": 12,
-          "disposition": "unresolved",
           "line": 259,
-          "method": "DELETE",
-          "normalized_route": "/api/lists/{dynamic}",
           "occurrence_id": "web/core/existing_capability_client.js:259:12:DELETE:/api/lists/{dynamic}",
-          "raw_route": "/api/lists/${encodeURIComponent(gid)}?item_type=bop_version&expected_revision=${revision}",
-          "source": "web/core/existing_capability_client.js"
+          "source": "web/core/existing_capability_client.js",
+          "source_sha256": "b63965b4c800fed62758fce610913d1e3210fb7432553330958881d74dd8ad7d"
         }
       ],
       "owner_domain": "craft",
@@ -211,10 +265,34 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/base-structural-web-remediation.json",
-        "provider_anchor": "backend/routers/plugins.py",
-        "provider_source_sha256": "sha256:bab080093bc16f582378f81ae82d6264d3cd724c2e55d842fad259507c11b2f2",
-        "reason": "The unrestricted legacy uninstall route has no production handler and cannot bypass marketplace lifecycle controls."
+        "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+        "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
+      "current_disposition": "migrated",
+      "current_evidence": {
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "source_path": "backend/base/web_atomic.py",
+          "source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4"
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
+          {
+            "column": 20,
+            "line": 307,
+            "operation": "base.plugins.uninstall",
+            "source_path": "web/core/web_compat.js",
+            "source_sha256": "0f43f54421116086204e0eb5e36792d96efa1136d2398e77074999a342473f99"
+          }
+        ],
+        "owner_service_evidence": {
+          "source_path": "backend/plugin_platform/service.py",
+          "source_sha256": "sha256:87b3a8b0a65079b25805f81c2e7dce033c22d3a33ae9d4342f3b32be810981d3"
+        },
+        "target_capability": "base.plugin.installation.transition.uninstall@1"
+      },
+      "current_status": "migrated",
       "dependencies": [
         "signed marketplace release registry",
         "plugin installation migration"
@@ -239,7 +317,8 @@
           "normalized_route": "/api/plugin/uninstall/{dynamic}",
           "occurrence_id": "web/core/web_compat.js:294:29:DELETE:/api/plugin/uninstall/{dynamic}",
           "raw_route": "/api/plugin/uninstall/${pluginId}",
-          "source": "web/core/web_compat.js"
+          "source": "web/core/web_compat.js",
+          "source_sha256": "ec21b526867d051eb968d8e1b451c535dbbf819251463d42a9f5d82ea870b02c"
         }
       ],
       "owner_domain": "base",
@@ -271,10 +350,38 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/base-structural-web-remediation.json",
-        "provider_anchor": "backend/routers/views.py",
-        "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
-        "reason": "The object-ownership check has no public owner-service boundary independent of dynamic saved-view config."
+        "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+        "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
+      "current_disposition": "migrated",
+      "current_evidence": {
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "end_line": 284,
+          "needle": "\"base.saved_view.delete\": _saved_view_delete",
+          "sha256": "56229834691651b93ee38d67bb2fa715d321afba6c0af79b064497283f1a380b",
+          "source_path": "backend/base/web_atomic.py",
+          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+          "start_line": 284
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
+          {
+            "column": 28,
+            "line": 1005,
+            "operation": "base.savedViews.delete",
+            "source_path": "web/components/view_manager.js",
+            "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+          }
+        ],
+        "owner_service_evidence": {
+          "source_path": "backend/base/saved_views.py",
+          "source_sha256": "sha256:0eb5da7a3e4ea2a8273cd90390110257b43630b4091e06e63429b650c5c1dc35"
+        },
+        "target_capability": "base.saved_view.delete@1"
+      },
+      "current_status": "migrated",
       "dependencies": [
         "saved-view storage migration",
         "approved semantic view configuration"
@@ -299,7 +406,8 @@
           "normalized_route": "/api/views/{dynamic}",
           "occurrence_id": "web/components/view_manager.js:1002:28:DELETE:/api/views/{dynamic}",
           "raw_route": "/api/views/${gid}",
-          "source": "web/components/view_manager.js"
+          "source": "web/components/view_manager.js",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
         }
       ],
       "owner_domain": "base",
@@ -335,6 +443,27 @@
         "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
         "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 36,
+            "disposition": "unresolved",
+            "line": 148,
+            "method": "GET",
+            "normalized_route": "/api/ext-datasources",
+            "occurrence_id": "web/ext_datasource/ext_ds.js:148:36:GET:/api/ext-datasources",
+            "raw_route": "/api/ext-datasources",
+            "source": "web/ext_datasource/ext_ds.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": "integration.connector.search@1"
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "credential-vault write channel",
         "connector runtime policy",
@@ -354,13 +483,10 @@
       "occurrences": [
         {
           "column": 36,
-          "disposition": "unresolved",
           "line": 148,
-          "method": "GET",
-          "normalized_route": "/api/ext-datasources",
           "occurrence_id": "web/ext_datasource/ext_ds.js:148:36:GET:/api/ext-datasources",
-          "raw_route": "/api/ext-datasources",
-          "source": "web/ext_datasource/ext_ds.js"
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
         }
       ],
       "owner_domain": "integration",
@@ -396,6 +522,27 @@
         "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
         "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 36,
+            "disposition": "unresolved",
+            "line": 640,
+            "method": "GET",
+            "normalized_route": "/api/ext-datasources/{dynamic}/tables",
+            "occurrence_id": "web/ext_datasource/ext_ds.js:640:36:GET:/api/ext-datasources/{dynamic}/tables",
+            "raw_route": "/api/ext-datasources/${_selectedDs.gid}/tables",
+            "source": "web/ext_datasource/ext_ds.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": "integration.connector.schema.discover@1"
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "credential-vault write channel",
         "connector runtime policy",
@@ -415,13 +562,10 @@
       "occurrences": [
         {
           "column": 36,
-          "disposition": "unresolved",
           "line": 640,
-          "method": "GET",
-          "normalized_route": "/api/ext-datasources/{dynamic}/tables",
           "occurrence_id": "web/ext_datasource/ext_ds.js:640:36:GET:/api/ext-datasources/{dynamic}/tables",
-          "raw_route": "/api/ext-datasources/${_selectedDs.gid}/tables",
-          "source": "web/ext_datasource/ext_ds.js"
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
         }
       ],
       "owner_domain": "integration",
@@ -457,6 +601,27 @@
         "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
         "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 36,
+            "disposition": "unresolved",
+            "line": 349,
+            "method": "GET",
+            "normalized_route": "/api/ext-field-mappings",
+            "occurrence_id": "web/ext_datasource/ext_ds.js:349:36:GET:/api/ext-field-mappings",
+            "raw_route": "/api/ext-field-mappings?mapping_gid=${_selectedMap.gid}",
+            "source": "web/ext_datasource/ext_ds.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": "integration.mapping.get@1"
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "connector package",
         "mapping aggregate migration",
@@ -476,13 +641,10 @@
       "occurrences": [
         {
           "column": 36,
-          "disposition": "unresolved",
           "line": 349,
-          "method": "GET",
-          "normalized_route": "/api/ext-field-mappings",
           "occurrence_id": "web/ext_datasource/ext_ds.js:349:36:GET:/api/ext-field-mappings",
-          "raw_route": "/api/ext-field-mappings?mapping_gid=${_selectedMap.gid}",
-          "source": "web/ext_datasource/ext_ds.js"
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
         }
       ],
       "owner_domain": "integration",
@@ -518,6 +680,27 @@
         "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
         "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 36,
+            "disposition": "unresolved",
+            "line": 187,
+            "method": "GET",
+            "normalized_route": "/api/ext-mappings",
+            "occurrence_id": "web/ext_datasource/ext_ds.js:187:36:GET:/api/ext-mappings",
+            "raw_route": "/api/ext-mappings?datasource_gid=${_selectedDs.gid}",
+            "source": "web/ext_datasource/ext_ds.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": "integration.mapping.search@1"
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "connector package",
         "mapping aggregate migration",
@@ -537,13 +720,10 @@
       "occurrences": [
         {
           "column": 36,
-          "disposition": "unresolved",
           "line": 187,
-          "method": "GET",
-          "normalized_route": "/api/ext-mappings",
           "occurrence_id": "web/ext_datasource/ext_ds.js:187:36:GET:/api/ext-mappings",
-          "raw_route": "/api/ext-mappings?datasource_gid=${_selectedDs.gid}",
-          "source": "web/ext_datasource/ext_ds.js"
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
         }
       ],
       "owner_domain": "integration",
@@ -579,6 +759,27 @@
         "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
         "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 36,
+            "disposition": "unresolved",
+            "line": 341,
+            "method": "GET",
+            "normalized_route": "/api/ext-mappings/{dynamic}/columns",
+            "occurrence_id": "web/ext_datasource/ext_ds.js:341:36:GET:/api/ext-mappings/{dynamic}/columns",
+            "raw_route": "/api/ext-mappings/${_selectedMap.gid}/columns",
+            "source": "web/ext_datasource/ext_ds.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": "integration.connector.schema.discover@1"
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "connector package",
         "mapping aggregate migration",
@@ -598,13 +799,10 @@
       "occurrences": [
         {
           "column": 36,
-          "disposition": "unresolved",
           "line": 341,
-          "method": "GET",
-          "normalized_route": "/api/ext-mappings/{dynamic}/columns",
           "occurrence_id": "web/ext_datasource/ext_ds.js:341:36:GET:/api/ext-mappings/{dynamic}/columns",
-          "raw_route": "/api/ext-mappings/${_selectedMap.gid}/columns",
-          "source": "web/ext_datasource/ext_ds.js"
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
         }
       ],
       "owner_domain": "integration",
@@ -640,6 +838,27 @@
         "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
         "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 36,
+            "disposition": "unresolved",
+            "line": 496,
+            "method": "GET",
+            "normalized_route": "/api/ext-mappings/{dynamic}/preview",
+            "occurrence_id": "web/ext_datasource/ext_ds.js:496:36:GET:/api/ext-mappings/{dynamic}/preview",
+            "raw_route": "/api/ext-mappings/${_selectedMap.gid}/preview?limit=5",
+            "source": "web/ext_datasource/ext_ds.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": "integration.mapping.preview@1"
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "connector package",
         "mapping aggregate migration",
@@ -659,13 +878,10 @@
       "occurrences": [
         {
           "column": 36,
-          "disposition": "unresolved",
           "line": 496,
-          "method": "GET",
-          "normalized_route": "/api/ext-mappings/{dynamic}/preview",
           "occurrence_id": "web/ext_datasource/ext_ds.js:496:36:GET:/api/ext-mappings/{dynamic}/preview",
-          "raw_route": "/api/ext-mappings/${_selectedMap.gid}/preview?limit=5",
-          "source": "web/ext_datasource/ext_ds.js"
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
         }
       ],
       "owner_domain": "integration",
@@ -701,6 +917,27 @@
         "provider_source_sha256": "sha256:af843b6c197bf6434836a15bb387068f89910db7c984c1191e96e4e329e1f1a7",
         "reason": "The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 51,
+            "disposition": "unresolved",
+            "line": 326,
+            "method": "GET",
+            "normalized_route": "/api/lists",
+            "occurrence_id": "web/core/existing_capability_client.js:326:51:GET:/api/lists",
+            "raw_route": "/api/lists?item_type=bop_version",
+            "source": "web/core/existing_capability_client.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": null
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "BOP version aggregate",
         "conditional dispatch adapter"
@@ -719,13 +956,10 @@
       "occurrences": [
         {
           "column": 51,
-          "disposition": "unresolved",
           "line": 254,
-          "method": "GET",
-          "normalized_route": "/api/lists",
           "occurrence_id": "web/core/existing_capability_client.js:254:51:GET:/api/lists",
-          "raw_route": "/api/lists?item_type=bop_version",
-          "source": "web/core/existing_capability_client.js"
+          "source": "web/core/existing_capability_client.js",
+          "source_sha256": "b63965b4c800fed62758fce610913d1e3210fb7432553330958881d74dd8ad7d"
         }
       ],
       "owner_domain": "craft",
@@ -761,6 +995,37 @@
         "provider_source_sha256": "sha256:ac258d5ffc6531a5da259750f8b637fea6e467c0a50d4f64a379069aa660f86a",
         "reason": "No entry-check provider exists; CEL evaluation and BOP audit are different outcomes."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 40,
+            "disposition": "unresolved",
+            "line": 2192,
+            "method": "GET",
+            "normalized_route": "/api/rule-engine/check-entry",
+            "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:2192:40:GET:/api/rule-engine/check-entry",
+            "raw_route": "/api/rule-engine/check-entry?entry_gid=${encodeURIComponent(gid)}",
+            "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js"
+          },
+          {
+            "column": 40,
+            "disposition": "unresolved",
+            "line": 3524,
+            "method": "GET",
+            "normalized_route": "/api/rule-engine/check-entry",
+            "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:3524:40:GET:/api/rule-engine/check-entry",
+            "raw_route": "/api/rule-engine/check-entry?entry_gid=${encodeURIComponent(gid)}",
+            "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": "craft.rule.engine.evaluate@1"
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "rule aggregate migration",
         "approved closed rule-definition vocabulary"
@@ -779,23 +1044,17 @@
       "occurrences": [
         {
           "column": 40,
-          "disposition": "unresolved",
           "line": 2192,
-          "method": "GET",
-          "normalized_route": "/api/rule-engine/check-entry",
           "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:2192:40:GET:/api/rule-engine/check-entry",
-          "raw_route": "/api/rule-engine/check-entry?entry_gid=${encodeURIComponent(gid)}",
-          "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js"
+          "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+          "source_sha256": "52f36f7634ca6eba793c66cebc7768ee39c2f18ed0bfcf98fc4560338a83964d"
         },
         {
           "column": 40,
-          "disposition": "unresolved",
           "line": 3524,
-          "method": "GET",
-          "normalized_route": "/api/rule-engine/check-entry",
           "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:3524:40:GET:/api/rule-engine/check-entry",
-          "raw_route": "/api/rule-engine/check-entry?entry_gid=${encodeURIComponent(gid)}",
-          "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js"
+          "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+          "source_sha256": "52f36f7634ca6eba793c66cebc7768ee39c2f18ed0bfcf98fc4560338a83964d"
         }
       ],
       "owner_domain": "craft",
@@ -827,10 +1086,52 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/base-structural-web-remediation.json",
-        "provider_anchor": "backend/routers/self_annotations.py",
-        "provider_source_sha256": "sha256:7624608452bd2173dacfaac9c77f703da331fc510512cc028857fb7319ca8c52",
-        "reason": "The response contains attachment records without a governed nested attachment contract."
+        "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+        "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
+      "current_disposition": "migrated",
+      "current_evidence": {
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "end_line": 275,
+          "needle": "\"base.self_annotation.search\": _annotation_search",
+          "sha256": "ba8c659ed3eed4912fc0cdeaab4c3f0466d25eb1a92fb775b6c28571cdb5c0f7",
+          "source_path": "backend/base/web_atomic.py",
+          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+          "start_line": 275
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
+          {
+            "column": 31,
+            "line": 293,
+            "operation": "base.annotations.search",
+            "source_path": "web/components/self_annotation_panel.js",
+            "source_sha256": "e5641d767398182ba7c409feed65e157c17db3434ed47dddb59265e43a9dd7be"
+          },
+          {
+            "column": 31,
+            "line": 294,
+            "operation": "base.annotations.search",
+            "source_path": "web/components/self_annotation_panel.js",
+            "source_sha256": "e5641d767398182ba7c409feed65e157c17db3434ed47dddb59265e43a9dd7be"
+          },
+          {
+            "column": 41,
+            "line": 499,
+            "operation": "base.annotations.search",
+            "source_path": "web/knowledge_hub/knowledge_hub.js",
+            "source_sha256": "c8454bfbb72276b6373ca72cc176dc2b83b5a88a5ade493596379f77d2f2e0de"
+          }
+        ],
+        "owner_service_evidence": {
+          "source_path": "backend/base/self_annotations.py",
+          "source_sha256": "sha256:a38d6ec2bb507a94e4b61c9c084df8ac527b6dfb51dd0fdeb21ed37ce1238c63"
+        },
+        "target_capability": "base.self_annotation.search@1"
+      },
+      "current_status": "migrated",
       "dependencies": [
         "annotation aggregate migration",
         "attachment reference policy"
@@ -855,7 +1156,8 @@
           "normalized_route": "/api/self_ann/list",
           "occurrence_id": "web/components/self_annotation_panel.js:292:27:GET:/api/self_ann/list",
           "raw_route": "/api/self_ann/list?module=${encodeURIComponent(_module)}",
-          "source": "web/components/self_annotation_panel.js"
+          "source": "web/components/self_annotation_panel.js",
+          "source_sha256": "55c294a99365af52084ce49b89432bf3dee012cfdbad32ec9993b1467b871301"
         },
         {
           "column": 27,
@@ -865,7 +1167,8 @@
           "normalized_route": "/api/self_ann/list",
           "occurrence_id": "web/components/self_annotation_panel.js:293:27:GET:/api/self_ann/list",
           "raw_route": "/api/self_ann/list",
-          "source": "web/components/self_annotation_panel.js"
+          "source": "web/components/self_annotation_panel.js",
+          "source_sha256": "55c294a99365af52084ce49b89432bf3dee012cfdbad32ec9993b1467b871301"
         },
         {
           "column": 42,
@@ -875,7 +1178,8 @@
           "normalized_route": "/api/self_ann/list",
           "occurrence_id": "web/knowledge_hub/knowledge_hub.js:499:42:GET:/api/self_ann/list",
           "raw_route": "/api/self_ann/list?module=knowledge_hub",
-          "source": "web/knowledge_hub/knowledge_hub.js"
+          "source": "web/knowledge_hub/knowledge_hub.js",
+          "source_sha256": "1f247f6133368b61baa10648243b7fc6659b33b8c342459a9d138afde102d465"
         }
       ],
       "owner_domain": "base",
@@ -907,10 +1211,38 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/base-structural-web-remediation.json",
-        "provider_anchor": "backend/routers/self_annotations.py",
-        "provider_source_sha256": "sha256:7624608452bd2173dacfaac9c77f703da331fc510512cc028857fb7319ca8c52",
-        "reason": "The response contains attachment records without a governed nested attachment contract."
+        "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+        "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
+      "current_disposition": "migrated",
+      "current_evidence": {
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "end_line": 274,
+          "needle": "\"base.self_annotation.record.get\": _annotation_get",
+          "sha256": "0edcb0661f98ef845497594383b300542dd04c2746eb0498cc25acc8537588df",
+          "source_path": "backend/base/web_atomic.py",
+          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+          "start_line": 274
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
+          {
+            "column": 40,
+            "line": 157,
+            "operation": "base.annotations.get",
+            "source_path": "web/components/self_annotation_panel.js",
+            "source_sha256": "e5641d767398182ba7c409feed65e157c17db3434ed47dddb59265e43a9dd7be"
+          }
+        ],
+        "owner_service_evidence": {
+          "source_path": "backend/base/self_annotations.py",
+          "source_sha256": "sha256:a38d6ec2bb507a94e4b61c9c084df8ac527b6dfb51dd0fdeb21ed37ce1238c63"
+        },
+        "target_capability": "base.self_annotation.record.get@1"
+      },
+      "current_status": "migrated",
       "dependencies": [
         "annotation aggregate migration",
         "attachment reference policy"
@@ -935,7 +1267,8 @@
           "normalized_route": "/api/self_ann/{dynamic}",
           "occurrence_id": "web/components/self_annotation_panel.js:146:36:GET:/api/self_ann/{dynamic}",
           "raw_route": "/api/self_ann/${gid}",
-          "source": "web/components/self_annotation_panel.js"
+          "source": "web/components/self_annotation_panel.js",
+          "source_sha256": "55c294a99365af52084ce49b89432bf3dee012cfdbad32ec9993b1467b871301"
         }
       ],
       "owner_domain": "base",
@@ -967,10 +1300,38 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/base-structural-web-remediation.json",
-        "provider_anchor": "backend/routers/users.py",
-        "provider_source_sha256": "sha256:d632055fafa2aee6dea74b6c160c8889295a525373e6ee2604e52527d5df2b8f",
-        "reason": "The profile contains dynamic grants and permissions without a closed exact output contract."
+        "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+        "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
+      "current_disposition": "migrated",
+      "current_evidence": {
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "end_line": 277,
+          "needle": "\"base.identity.session.profile.get\": _identity_profile",
+          "sha256": "d9e31fd15b3fc655e44c4700447418464354287cd1311a4e883ab8f44bad72d0",
+          "source_path": "backend/base/web_atomic.py",
+          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+          "start_line": 277
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
+          {
+            "column": 40,
+            "line": 512,
+            "operation": "base.identity.session.profile.get",
+            "source_path": "packages/craft-plugin/web/lineage_view/lineage.js",
+            "source_sha256": "8307da58c257c93d0c31b2ee2d124cd6b12fd532d30d018dae4301db0d65dcd2"
+          }
+        ],
+        "owner_service_evidence": {
+          "source_path": "backend/base/identity_profile.py",
+          "source_sha256": "sha256:bfcbf889e895d830076c67edd18d7b3688d5b1666ebb3e65daba188f778e50e7"
+        },
+        "target_capability": "base.identity.session.profile.get@1"
+      },
+      "current_status": "migrated",
       "dependencies": [
         "identity projection contract"
       ],
@@ -994,7 +1355,8 @@
           "normalized_route": "/api/users/me",
           "occurrence_id": "packages/craft-plugin/web/lineage_view/lineage.js:511:34:GET:/api/users/me",
           "raw_route": "/api/users/me",
-          "source": "packages/craft-plugin/web/lineage_view/lineage.js"
+          "source": "packages/craft-plugin/web/lineage_view/lineage.js",
+          "source_sha256": "4eded0f1dca13981e7bff65526389f43f71b47cae211dbc00469e6c3f3466d65"
         }
       ],
       "owner_domain": "base",
@@ -1026,10 +1388,45 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/base-structural-web-remediation.json",
-        "provider_anchor": "backend/routers/views.py",
-        "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
-        "reason": "Saved-view config is intentionally dynamic and has no governed closed nested contract."
+        "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+        "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
+      "current_disposition": "migrated",
+      "current_evidence": {
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "end_line": 280,
+          "needle": "\"base.saved_view.search\": _saved_view_search",
+          "sha256": "21e5f4f93bdc09b1ba703dc17a13307584bfc738466d3a1b71e4a491ef61c806",
+          "source_path": "backend/base/web_atomic.py",
+          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+          "start_line": 280
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
+          {
+            "column": 14,
+            "line": 1070,
+            "operation": "base.savedViews.search",
+            "source_path": "web/admin/task_planning.html",
+            "source_sha256": "37cd37731ec9d580bf7c32f7da0601f5fac7e04ad2a6b74e03740bc58450b9d7"
+          },
+          {
+            "column": 40,
+            "line": 538,
+            "operation": "base.savedViews.search",
+            "source_path": "web/components/view_manager.js",
+            "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+          }
+        ],
+        "owner_service_evidence": {
+          "source_path": "backend/base/saved_views.py",
+          "source_sha256": "sha256:0eb5da7a3e4ea2a8273cd90390110257b43630b4091e06e63429b650c5c1dc35"
+        },
+        "target_capability": "base.saved_view.search@1"
+      },
+      "current_status": "migrated",
       "dependencies": [
         "saved-view storage migration",
         "approved semantic view configuration"
@@ -1049,12 +1446,13 @@
         {
           "column": 26,
           "disposition": "unresolved",
-          "line": 1069,
+          "line": 1068,
           "method": "GET",
           "normalized_route": "/api/views",
-          "occurrence_id": "web/admin/task_planning.html:1069:26:GET:/api/views",
+          "occurrence_id": "web/admin/task_planning.html:1068:26:GET:/api/views",
           "raw_route": "/api/views?module=task&list_gid=${listGid}",
-          "source": "web/admin/task_planning.html"
+          "source": "web/admin/task_planning.html",
+          "source_sha256": "9458faf6cb26c55b84344d405084358da501c59cae64b8725f18b559fd6b29e7"
         },
         {
           "column": 40,
@@ -1064,7 +1462,8 @@
           "normalized_route": "/api/views",
           "occurrence_id": "web/components/view_manager.js:541:40:GET:/api/views",
           "raw_route": "/api/views?module=${this.moduleId}${listQuery}",
-          "source": "web/components/view_manager.js"
+          "source": "web/components/view_manager.js",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
         }
       ],
       "owner_domain": "base",
@@ -1100,6 +1499,27 @@
         "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
         "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 29,
+            "disposition": "unresolved",
+            "line": 623,
+            "method": "PATCH",
+            "normalized_route": "/api/ext-datasources/{dynamic}",
+            "occurrence_id": "web/ext_datasource/ext_ds.js:623:29:PATCH:/api/ext-datasources/{dynamic}",
+            "raw_route": "/api/ext-datasources/${ds.gid}",
+            "source": "web/ext_datasource/ext_ds.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": "integration.connector.update@1"
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "credential-vault write channel",
         "connector runtime policy",
@@ -1119,13 +1539,10 @@
       "occurrences": [
         {
           "column": 29,
-          "disposition": "unresolved",
           "line": 623,
-          "method": "PATCH",
-          "normalized_route": "/api/ext-datasources/{dynamic}",
           "occurrence_id": "web/ext_datasource/ext_ds.js:623:29:PATCH:/api/ext-datasources/{dynamic}",
-          "raw_route": "/api/ext-datasources/${ds.gid}",
-          "source": "web/ext_datasource/ext_ds.js"
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
         }
       ],
       "owner_domain": "integration",
@@ -1157,10 +1574,45 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/base-structural-web-remediation.json",
-        "provider_anchor": "backend/routers/views.py",
-        "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
-        "reason": "Saved-view config is intentionally dynamic and has no governed closed nested contract."
+        "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+        "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
+      "current_disposition": "migrated",
+      "current_evidence": {
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "end_line": 282,
+          "needle": "\"base.saved_view.update\": _saved_view_update",
+          "sha256": "799823cab800457fc52e02ea377c4efecaf3f4fb565b0f2a67b8e1ec6425e8e4",
+          "source_path": "backend/base/web_atomic.py",
+          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+          "start_line": 282
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
+          {
+            "column": 44,
+            "line": 644,
+            "operation": "base.savedViews.update",
+            "source_path": "web/components/view_manager.js",
+            "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+          },
+          {
+            "column": 42,
+            "line": 1016,
+            "operation": "base.savedViews.update",
+            "source_path": "web/components/view_manager.js",
+            "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+          }
+        ],
+        "owner_service_evidence": {
+          "source_path": "backend/base/saved_views.py",
+          "source_sha256": "sha256:0eb5da7a3e4ea2a8273cd90390110257b43630b4091e06e63429b650c5c1dc35"
+        },
+        "target_capability": "base.saved_view.update@1"
+      },
+      "current_status": "migrated",
       "dependencies": [
         "saved-view storage migration",
         "approved semantic view configuration"
@@ -1178,16 +1630,6 @@
       "normalized_route": "/api/views/{dynamic}",
       "occurrences": [
         {
-          "column": 30,
-          "disposition": "unresolved",
-          "line": 651,
-          "method": "PATCH",
-          "normalized_route": "/api/views/{dynamic}",
-          "occurrence_id": "web/components/view_manager.js:651:30:PATCH:/api/views/{dynamic}",
-          "raw_route": "/api/views/${this._activeViewGid}",
-          "source": "web/components/view_manager.js"
-        },
-        {
           "column": 28,
           "disposition": "unresolved",
           "line": 1011,
@@ -1195,7 +1637,19 @@
           "normalized_route": "/api/views/{dynamic}",
           "occurrence_id": "web/components/view_manager.js:1011:28:PATCH:/api/views/{dynamic}",
           "raw_route": "/api/views/${gid}",
-          "source": "web/components/view_manager.js"
+          "source": "web/components/view_manager.js",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
+        },
+        {
+          "column": 30,
+          "disposition": "unresolved",
+          "line": 651,
+          "method": "PATCH",
+          "normalized_route": "/api/views/{dynamic}",
+          "occurrence_id": "web/components/view_manager.js:651:30:PATCH:/api/views/{dynamic}",
+          "raw_route": "/api/views/${this._activeViewGid}",
+          "source": "web/components/view_manager.js",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
         }
       ],
       "owner_domain": "base",
@@ -1231,6 +1685,27 @@
         "provider_source_sha256": "sha256:1b6d618b9562ad4509f81a848234af9c02f75e17392fe26ed9ca203bf1c7569a",
         "reason": "The Project outcome omits the legacy notification publication side effect."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 26,
+            "disposition": "unresolved",
+            "line": 153,
+            "method": "POST",
+            "normalized_route": "/api/approval/orders/{dynamic}/reject",
+            "occurrence_id": "packages/craft-plugin/web/approval/approval.js:153:26:POST:/api/approval/orders/{dynamic}/reject",
+            "raw_route": "/api/approval/orders/${_selected.gid}/reject",
+            "source": "packages/craft-plugin/web/approval/approval.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": "project.approval.change.apply.atomic.approval_orders_reject@1"
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "Project approval aggregate",
         "notification outbox migration"
@@ -1249,13 +1724,10 @@
       "occurrences": [
         {
           "column": 26,
-          "disposition": "unresolved",
           "line": 153,
-          "method": "POST",
-          "normalized_route": "/api/approval/orders/{dynamic}/reject",
           "occurrence_id": "packages/craft-plugin/web/approval/approval.js:153:26:POST:/api/approval/orders/{dynamic}/reject",
-          "raw_route": "/api/approval/orders/${_selected.gid}/reject",
-          "source": "packages/craft-plugin/web/approval/approval.js"
+          "source": "packages/craft-plugin/web/approval/approval.js",
+          "source_sha256": "33fb221332f9f502763b07d9956eb7da1ebfd9ebf2fb9f124c0582189873e0ae"
         }
       ],
       "owner_domain": "project_management",
@@ -1291,6 +1763,27 @@
         "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
         "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 28,
+            "disposition": "unresolved",
+            "line": 625,
+            "method": "POST",
+            "normalized_route": "/api/ext-datasources",
+            "occurrence_id": "web/ext_datasource/ext_ds.js:625:28:POST:/api/ext-datasources",
+            "raw_route": "/api/ext-datasources",
+            "source": "web/ext_datasource/ext_ds.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": "integration.connector.create@1"
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "credential-vault write channel",
         "connector runtime policy",
@@ -1310,13 +1803,10 @@
       "occurrences": [
         {
           "column": 28,
-          "disposition": "unresolved",
           "line": 625,
-          "method": "POST",
-          "normalized_route": "/api/ext-datasources",
           "occurrence_id": "web/ext_datasource/ext_ds.js:625:28:POST:/api/ext-datasources",
-          "raw_route": "/api/ext-datasources",
-          "source": "web/ext_datasource/ext_ds.js"
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
         }
       ],
       "owner_domain": "integration",
@@ -1352,6 +1842,27 @@
         "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
         "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 34,
+            "disposition": "unresolved",
+            "line": 605,
+            "method": "POST",
+            "normalized_route": "/api/ext-datasources/{dynamic}/test",
+            "occurrence_id": "web/ext_datasource/ext_ds.js:605:34:POST:/api/ext-datasources/{dynamic}/test",
+            "raw_route": "/api/ext-datasources/${ds.gid}/test",
+            "source": "web/ext_datasource/ext_ds.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": "integration.connector.connection.test@1"
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "credential-vault write channel",
         "connector runtime policy",
@@ -1371,13 +1882,10 @@
       "occurrences": [
         {
           "column": 34,
-          "disposition": "unresolved",
           "line": 605,
-          "method": "POST",
-          "normalized_route": "/api/ext-datasources/{dynamic}/test",
           "occurrence_id": "web/ext_datasource/ext_ds.js:605:34:POST:/api/ext-datasources/{dynamic}/test",
-          "raw_route": "/api/ext-datasources/${ds.gid}/test",
-          "source": "web/ext_datasource/ext_ds.js"
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
         }
       ],
       "owner_domain": "integration",
@@ -1413,6 +1921,27 @@
         "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
         "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 26,
+            "disposition": "unresolved",
+            "line": 677,
+            "method": "POST",
+            "normalized_route": "/api/ext-mappings",
+            "occurrence_id": "web/ext_datasource/ext_ds.js:677:26:POST:/api/ext-mappings",
+            "raw_route": "/api/ext-mappings",
+            "source": "web/ext_datasource/ext_ds.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": "integration.mapping.create@1"
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "connector package",
         "mapping aggregate migration",
@@ -1432,13 +1961,10 @@
       "occurrences": [
         {
           "column": 26,
-          "disposition": "unresolved",
           "line": 677,
-          "method": "POST",
-          "normalized_route": "/api/ext-mappings",
           "occurrence_id": "web/ext_datasource/ext_ds.js:677:26:POST:/api/ext-mappings",
-          "raw_route": "/api/ext-mappings",
-          "source": "web/ext_datasource/ext_ds.js"
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
         }
       ],
       "owner_domain": "integration",
@@ -1474,6 +2000,27 @@
         "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
         "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 37,
+            "disposition": "unresolved",
+            "line": 549,
+            "method": "POST",
+            "normalized_route": "/api/ext-mappings/{dynamic}/import",
+            "occurrence_id": "web/ext_datasource/ext_ds.js:549:37:POST:/api/ext-mappings/{dynamic}/import",
+            "raw_route": "/api/ext-mappings/${_selectedMap.gid}/import",
+            "source": "web/ext_datasource/ext_ds.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": "integration.sync.start@1"
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "connector package",
         "mapping aggregate migration",
@@ -1493,13 +2040,10 @@
       "occurrences": [
         {
           "column": 37,
-          "disposition": "unresolved",
           "line": 549,
-          "method": "POST",
-          "normalized_route": "/api/ext-mappings/{dynamic}/import",
           "occurrence_id": "web/ext_datasource/ext_ds.js:549:37:POST:/api/ext-mappings/{dynamic}/import",
-          "raw_route": "/api/ext-mappings/${_selectedMap.gid}/import",
-          "source": "web/ext_datasource/ext_ds.js"
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
         }
       ],
       "owner_domain": "integration",
@@ -1535,6 +2079,39 @@
         "provider_source_sha256": "sha256:b7451e4b3a5537ec078bad85d9c1131b6ce4e20d608d07b8cde116e159b48ad8",
         "reason": "No node-test handler or runtime service exists in the Agent provider."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "classification_prefix": "/api/flows",
+            "column": 36,
+            "disposition": "unresolved",
+            "line": 754,
+            "method": "POST",
+            "normalized_route": "/api/flows/test-node",
+            "occurrence_id": "packages/agent-plugin/web/flow_canvas/flow_editor.js:754:36:POST:/api/flows/test-node",
+            "raw_route": "/api/flows/test-node",
+            "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js"
+          },
+          {
+            "classification_prefix": "/api/flows",
+            "column": 29,
+            "disposition": "unresolved",
+            "line": 145,
+            "method": "POST",
+            "normalized_route": "/api/flows/test-node",
+            "occurrence_id": "web/canvas/types/flow_type.js:145:29:POST:/api/flows/test-node",
+            "raw_route": "/api/flows/test-node",
+            "source": "web/canvas/types/flow_type.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": null
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "sandbox runtime",
         "durable run/pause-token store",
@@ -1553,26 +2130,18 @@
       "normalized_route": "/api/flows/test-node",
       "occurrences": [
         {
-          "classification_prefix": "/api/flows",
           "column": 36,
-          "disposition": "unresolved",
           "line": 754,
-          "method": "POST",
-          "normalized_route": "/api/flows/test-node",
           "occurrence_id": "packages/agent-plugin/web/flow_canvas/flow_editor.js:754:36:POST:/api/flows/test-node",
-          "raw_route": "/api/flows/test-node",
-          "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js"
+          "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
+          "source_sha256": "9bb1fe5371a15087509924b6de1304199977757f1038a76177e78e490deca049"
         },
         {
-          "classification_prefix": "/api/flows",
           "column": 29,
-          "disposition": "unresolved",
           "line": 145,
-          "method": "POST",
-          "normalized_route": "/api/flows/test-node",
           "occurrence_id": "web/canvas/types/flow_type.js:145:29:POST:/api/flows/test-node",
-          "raw_route": "/api/flows/test-node",
-          "source": "web/canvas/types/flow_type.js"
+          "source": "web/canvas/types/flow_type.js",
+          "source_sha256": "591904dbc5db76114ccc02ac981ab675147876890bd297d814a2d9024928212f"
         }
       ],
       "owner_domain": "agent",
@@ -1604,10 +2173,34 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/base-structural-web-remediation.json",
-        "provider_anchor": "backend/routers/plugins.py",
-        "provider_source_sha256": "sha256:bab080093bc16f582378f81ae82d6264d3cd724c2e55d842fad259507c11b2f2",
-        "reason": "The arbitrary-URL installer route has no production handler and is not equivalent to signed marketplace installation."
+        "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+        "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
+      "current_disposition": "migrated",
+      "current_evidence": {
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "source_path": "backend/base/web_atomic.py",
+          "source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4"
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
+          {
+            "column": 20,
+            "line": 290,
+            "operation": "base.plugins.install",
+            "source_path": "web/core/web_compat.js",
+            "source_sha256": "0f43f54421116086204e0eb5e36792d96efa1136d2398e77074999a342473f99"
+          }
+        ],
+        "owner_service_evidence": {
+          "source_path": "backend/plugin_platform/service.py",
+          "source_sha256": "sha256:87b3a8b0a65079b25805f81c2e7dce033c22d3a33ae9d4342f3b32be810981d3"
+        },
+        "target_capability": "base.plugin.installation.request.create@1"
+      },
+      "current_status": "migrated",
       "dependencies": [
         "signed marketplace release registry",
         "plugin installation migration"
@@ -1632,7 +2225,8 @@
           "normalized_route": "/api/plugin/install",
           "occurrence_id": "web/core/web_compat.js:287:27:POST:/api/plugin/install",
           "raw_route": "/api/plugin/install",
-          "source": "web/core/web_compat.js"
+          "source": "web/core/web_compat.js",
+          "source_sha256": "ec21b526867d051eb968d8e1b451c535dbbf819251463d42a9f5d82ea870b02c"
         }
       ],
       "owner_domain": "base",
@@ -1668,6 +2262,27 @@
         "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
         "reason": "No mutable-rule activation provider exists; immutable release activation is a different lifecycle outcome."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 26,
+            "disposition": "unresolved",
+            "line": 173,
+            "method": "POST",
+            "normalized_route": "/api/rules/{dynamic}/activate",
+            "occurrence_id": "web/rule_mgmt/rule_mgmt.js:173:26:POST:/api/rules/{dynamic}/activate",
+            "raw_route": "/api/rules/${gid}/activate",
+            "source": "web/rule_mgmt/rule_mgmt.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": "craft.rule.release.activate@1"
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "rule aggregate migration",
         "approved closed rule-definition vocabulary"
@@ -1686,13 +2301,10 @@
       "occurrences": [
         {
           "column": 26,
-          "disposition": "unresolved",
           "line": 173,
-          "method": "POST",
-          "normalized_route": "/api/rules/{dynamic}/activate",
           "occurrence_id": "web/rule_mgmt/rule_mgmt.js:173:26:POST:/api/rules/{dynamic}/activate",
-          "raw_route": "/api/rules/${gid}/activate",
-          "source": "web/rule_mgmt/rule_mgmt.js"
+          "source": "web/rule_mgmt/rule_mgmt.js",
+          "source_sha256": "bd55a892edbaa2a50722415783b68419a52452d6a72f305048935275106a2994"
         }
       ],
       "owner_domain": "craft",
@@ -1728,6 +2340,27 @@
         "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
         "reason": "No legacy deviation provider exists; governed release waiver creation has a different evidence contract."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 36,
+            "disposition": "unresolved",
+            "line": 220,
+            "method": "POST",
+            "normalized_route": "/api/rules/{dynamic}/deviations",
+            "occurrence_id": "web/rule_mgmt/rule_mgmt.js:220:36:POST:/api/rules/{dynamic}/deviations",
+            "raw_route": "/api/rules/${_devRuleGid}/deviations",
+            "source": "web/rule_mgmt/rule_mgmt.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": "craft.rule.waiver.create@1"
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "rule aggregate migration",
         "approved closed rule-definition vocabulary"
@@ -1746,13 +2379,10 @@
       "occurrences": [
         {
           "column": 36,
-          "disposition": "unresolved",
           "line": 220,
-          "method": "POST",
-          "normalized_route": "/api/rules/{dynamic}/deviations",
           "occurrence_id": "web/rule_mgmt/rule_mgmt.js:220:36:POST:/api/rules/{dynamic}/deviations",
-          "raw_route": "/api/rules/${_devRuleGid}/deviations",
-          "source": "web/rule_mgmt/rule_mgmt.js"
+          "source": "web/rule_mgmt/rule_mgmt.js",
+          "source_sha256": "bd55a892edbaa2a50722415783b68419a52452d6a72f305048935275106a2994"
         }
       ],
       "owner_domain": "craft",
@@ -1788,6 +2418,27 @@
         "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
         "reason": "No mutable-rule suspension handler or domain service exists."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 26,
+            "disposition": "unresolved",
+            "line": 175,
+            "method": "POST",
+            "normalized_route": "/api/rules/{dynamic}/suspend",
+            "occurrence_id": "web/rule_mgmt/rule_mgmt.js:175:26:POST:/api/rules/{dynamic}/suspend",
+            "raw_route": "/api/rules/${gid}/suspend",
+            "source": "web/rule_mgmt/rule_mgmt.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": null
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "rule aggregate migration",
         "approved closed rule-definition vocabulary"
@@ -1806,13 +2457,10 @@
       "occurrences": [
         {
           "column": 26,
-          "disposition": "unresolved",
           "line": 175,
-          "method": "POST",
-          "normalized_route": "/api/rules/{dynamic}/suspend",
           "occurrence_id": "web/rule_mgmt/rule_mgmt.js:175:26:POST:/api/rules/{dynamic}/suspend",
-          "raw_route": "/api/rules/${gid}/suspend",
-          "source": "web/rule_mgmt/rule_mgmt.js"
+          "source": "web/rule_mgmt/rule_mgmt.js",
+          "source_sha256": "bd55a892edbaa2a50722415783b68419a52452d6a72f305048935275106a2994"
         }
       ],
       "owner_domain": "craft",
@@ -1848,6 +2496,27 @@
         "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
         "reason": "No bounded canvas-option resolver exists in the Agent provider."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 35,
+            "disposition": "unresolved",
+            "line": 1599,
+            "method": "POST",
+            "normalized_route": "/api/skills/canvas-options",
+            "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1599:35:POST:/api/skills/canvas-options",
+            "raw_route": "/api/skills/canvas-options",
+            "source": "packages/agent-plugin/web/wfc_window/wfc_window.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": null
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "sandbox runtime",
         "durable run/pause-token store",
@@ -1867,13 +2536,10 @@
       "occurrences": [
         {
           "column": 35,
-          "disposition": "unresolved",
           "line": 1599,
-          "method": "POST",
-          "normalized_route": "/api/skills/canvas-options",
           "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1599:35:POST:/api/skills/canvas-options",
-          "raw_route": "/api/skills/canvas-options",
-          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js"
+          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+          "source_sha256": "c6f654458ff966e9bb4c2f023dd877c682243a6ff70c71ef0646f4acf9c041a7"
         }
       ],
       "owner_domain": "agent",
@@ -1909,6 +2575,27 @@
         "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
         "reason": "No canvas execution provider exists; generic run mutation is not provider-equivalent."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 40,
+            "disposition": "unresolved",
+            "line": 2264,
+            "method": "POST",
+            "normalized_route": "/api/skills/execute-canvas",
+            "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2264:40:POST:/api/skills/execute-canvas",
+            "raw_route": "/api/skills/execute-canvas",
+            "source": "packages/agent-plugin/web/wfc_window/wfc_window.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": "agent.run.change.apply@1"
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "sandbox runtime",
         "durable run/pause-token store",
@@ -1928,13 +2615,10 @@
       "occurrences": [
         {
           "column": 40,
-          "disposition": "unresolved",
           "line": 2264,
-          "method": "POST",
-          "normalized_route": "/api/skills/execute-canvas",
           "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2264:40:POST:/api/skills/execute-canvas",
-          "raw_route": "/api/skills/execute-canvas",
-          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js"
+          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+          "source_sha256": "c6f654458ff966e9bb4c2f023dd877c682243a6ff70c71ef0646f4acf9c041a7"
         }
       ],
       "owner_domain": "agent",
@@ -1970,6 +2654,27 @@
         "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
         "reason": "No pause-token resume provider exists; generic run mutation is not provider-equivalent."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 40,
+            "disposition": "unresolved",
+            "line": 1615,
+            "method": "POST",
+            "normalized_route": "/api/skills/resume-canvas",
+            "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1615:40:POST:/api/skills/resume-canvas",
+            "raw_route": "/api/skills/resume-canvas",
+            "source": "packages/agent-plugin/web/wfc_window/wfc_window.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": "agent.run.change.apply@1"
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "sandbox runtime",
         "durable run/pause-token store",
@@ -1989,13 +2694,10 @@
       "occurrences": [
         {
           "column": 40,
-          "disposition": "unresolved",
           "line": 1615,
-          "method": "POST",
-          "normalized_route": "/api/skills/resume-canvas",
           "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1615:40:POST:/api/skills/resume-canvas",
-          "raw_route": "/api/skills/resume-canvas",
-          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js"
+          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+          "source_sha256": "c6f654458ff966e9bb4c2f023dd877c682243a6ff70c71ef0646f4acf9c041a7"
         }
       ],
       "owner_domain": "agent",
@@ -2027,10 +2729,45 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/base-structural-web-remediation.json",
-        "provider_anchor": "backend/routers/views.py",
-        "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
-        "reason": "Saved-view config is intentionally dynamic and has no governed closed nested contract."
+        "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+        "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
+      "current_disposition": "migrated",
+      "current_evidence": {
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "end_line": 281,
+          "needle": "\"base.saved_view.create\": _saved_view_create",
+          "sha256": "9d9ed3d4a5619754b9c0df361a0b2b4c01d1052d00d57414e9a50f40e172840c",
+          "source_path": "backend/base/web_atomic.py",
+          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+          "start_line": 281
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
+          {
+            "column": 44,
+            "line": 653,
+            "operation": "base.savedViews.create",
+            "source_path": "web/components/view_manager.js",
+            "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+          },
+          {
+            "column": 42,
+            "line": 712,
+            "operation": "base.savedViews.create",
+            "source_path": "web/components/view_manager.js",
+            "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+          }
+        ],
+        "owner_service_evidence": {
+          "source_path": "backend/base/saved_views.py",
+          "source_sha256": "sha256:0eb5da7a3e4ea2a8273cd90390110257b43630b4091e06e63429b650c5c1dc35"
+        },
+        "target_capability": "base.saved_view.create@1"
+      },
+      "current_status": "migrated",
       "dependencies": [
         "saved-view storage migration",
         "approved semantic view configuration"
@@ -2055,7 +2792,8 @@
           "normalized_route": "/api/views",
           "occurrence_id": "web/components/view_manager.js:657:42:POST:/api/views",
           "raw_route": "/api/views",
-          "source": "web/components/view_manager.js"
+          "source": "web/components/view_manager.js",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
         },
         {
           "column": 40,
@@ -2065,7 +2803,8 @@
           "normalized_route": "/api/views",
           "occurrence_id": "web/components/view_manager.js:713:40:POST:/api/views",
           "raw_route": "/api/views",
-          "source": "web/components/view_manager.js"
+          "source": "web/components/view_manager.js",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
         }
       ],
       "owner_domain": "base",
@@ -2097,10 +2836,38 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/base-structural-web-remediation.json",
-        "provider_anchor": "backend/routers/views.py",
-        "provider_source_sha256": "sha256:10a128122a0101b74cfc7c9396eaf7088465c53311028a2574bfa90fe1f52d0f",
-        "reason": "The copied result depends on dynamic saved-view config without a governed closed nested contract."
+        "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+        "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
+      "current_disposition": "migrated",
+      "current_evidence": {
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "end_line": 283,
+          "needle": "\"base.saved_view.copy\": _saved_view_copy",
+          "sha256": "c68df23c39cb7979116bd209087170259a02fc5ec888ee1020a0dfd92f6c6848",
+          "source_path": "backend/base/web_atomic.py",
+          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+          "start_line": 283
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
+          {
+            "column": 44,
+            "line": 978,
+            "operation": "base.savedViews.copy",
+            "source_path": "web/components/view_manager.js",
+            "source_sha256": "ae0552d084157beebd54eeb63d7a7ae8b2ae0eb80763b748fc37030d5ecc5510"
+          }
+        ],
+        "owner_service_evidence": {
+          "source_path": "backend/base/saved_views.py",
+          "source_sha256": "sha256:0eb5da7a3e4ea2a8273cd90390110257b43630b4091e06e63429b650c5c1dc35"
+        },
+        "target_capability": "base.saved_view.copy@1"
+      },
+      "current_status": "migrated",
       "dependencies": [
         "saved-view storage migration",
         "approved semantic view configuration"
@@ -2125,7 +2892,8 @@
           "normalized_route": "/api/views/{dynamic}/copy",
           "occurrence_id": "web/components/view_manager.js:978:42:POST:/api/views/{dynamic}/copy",
           "raw_route": "/api/views/${gid}/copy",
-          "source": "web/components/view_manager.js"
+          "source": "web/components/view_manager.js",
+          "source_sha256": "c22d4e49f42252f82bc6aa9d0ec19715d17c9a702951cae28d1108505ed7d3c6"
         }
       ],
       "owner_domain": "base",
@@ -2161,6 +2929,27 @@
         "provider_source_sha256": "sha256:43c60d3f7cd27f1219befe6874bec42e7441fff66021ed8a2171aeb0457935d7",
         "reason": "The legacy endpoint has no production handler; the governed Integration provider has a non-equivalent contract."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 23,
+            "disposition": "unresolved",
+            "line": 457,
+            "method": "PUT",
+            "normalized_route": "/api/ext-field-mappings/batch",
+            "occurrence_id": "web/ext_datasource/ext_ds.js:457:23:PUT:/api/ext-field-mappings/batch",
+            "raw_route": "/api/ext-field-mappings/batch?mapping_gid=${_selectedMap.gid}",
+            "source": "web/ext_datasource/ext_ds.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": "integration.mapping.update@1"
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "connector package",
         "mapping aggregate migration",
@@ -2180,13 +2969,10 @@
       "occurrences": [
         {
           "column": 23,
-          "disposition": "unresolved",
           "line": 457,
-          "method": "PUT",
-          "normalized_route": "/api/ext-field-mappings/batch",
           "occurrence_id": "web/ext_datasource/ext_ds.js:457:23:PUT:/api/ext-field-mappings/batch",
-          "raw_route": "/api/ext-field-mappings/batch?mapping_gid=${_selectedMap.gid}",
-          "source": "web/ext_datasource/ext_ds.js"
+          "source": "web/ext_datasource/ext_ds.js",
+          "source_sha256": "676d4274098a4753c011eb7b6a64d1e1c8fe1ba76fd364720a5fb82b308d8d89"
         }
       ],
       "owner_domain": "integration",
@@ -2222,6 +3008,37 @@
         "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
         "reason": "Rule definition changes contain dynamic rule_definition data without a governed closed nested contract."
       },
+      "current_disposition": "unresolved",
+      "current_evidence": {
+        "canonical_occurrences": [
+          {
+            "column": 53,
+            "disposition": "unresolved",
+            "line": 137,
+            "method": "PUT",
+            "normalized_route": "/api/rules/{dynamic}",
+            "occurrence_id": "web/container_card/modes/container_item_detail.js:137:53:PUT:/api/rules/{dynamic}",
+            "raw_route": "/api/rules/${gid}",
+            "source": "web/container_card/modes/container_item_detail.js"
+          },
+          {
+            "column": 50,
+            "disposition": "unresolved",
+            "line": 47,
+            "method": "PUT",
+            "normalized_route": "/api/rules/{dynamic}",
+            "occurrence_id": "web/container_card/modes/mode_field_detail.js:47:50:PUT:/api/rules/{dynamic}",
+            "raw_route": "/api/rules/${gid}",
+            "source": "web/container_card/modes/mode_field_detail.js"
+          }
+        ],
+        "contract_evidence": null,
+        "final_inventory_mapping": "unresolved",
+        "frontend_call_sites": [],
+        "owner_service_evidence": null,
+        "target_capability": "craft.rule.library.change.apply@1"
+      },
+      "current_status": "unresolved",
       "dependencies": [
         "rule aggregate migration",
         "approved closed rule-definition vocabulary"
@@ -2240,23 +3057,17 @@
       "occurrences": [
         {
           "column": 53,
-          "disposition": "unresolved",
           "line": 137,
-          "method": "PUT",
-          "normalized_route": "/api/rules/{dynamic}",
           "occurrence_id": "web/container_card/modes/container_item_detail.js:137:53:PUT:/api/rules/{dynamic}",
-          "raw_route": "/api/rules/${gid}",
-          "source": "web/container_card/modes/container_item_detail.js"
+          "source": "web/container_card/modes/container_item_detail.js",
+          "source_sha256": "80d6527fda0872ecb118a8a06cb11066956feed460b190f257e6b6a3016d530a"
         },
         {
           "column": 50,
-          "disposition": "unresolved",
           "line": 47,
-          "method": "PUT",
-          "normalized_route": "/api/rules/{dynamic}",
           "occurrence_id": "web/container_card/modes/mode_field_detail.js:47:50:PUT:/api/rules/{dynamic}",
-          "raw_route": "/api/rules/${gid}",
-          "source": "web/container_card/modes/mode_field_detail.js"
+          "source": "web/container_card/modes/mode_field_detail.js",
+          "source_sha256": "1751d2f01f071191219fd19cdb59b477f96abd93725905398d9d8a6ddfcc3c99"
         }
       ],
       "owner_domain": "craft",
@@ -2288,10 +3099,38 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/base-structural-web-remediation.json",
-        "provider_anchor": "backend/routers/self_annotations.py",
-        "provider_source_sha256": "sha256:7624608452bd2173dacfaac9c77f703da331fc510512cc028857fb7319ca8c52",
-        "reason": "The request contains attachment records without a governed nested attachment contract."
+        "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
+        "provider_source_sha256": "sha256:98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
+      "current_disposition": "migrated",
+      "current_evidence": {
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "end_line": 276,
+          "needle": "\"base.self_annotation.change.apply\": _annotation_change",
+          "sha256": "c3860599d5ff529f59467bb49216cb62b04152c559aa2d9587ebff1871e8965e",
+          "source_path": "backend/base/web_atomic.py",
+          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+          "start_line": 276
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
+          {
+            "column": 39,
+            "line": 177,
+            "operation": "base.annotations.apply",
+            "source_path": "web/components/self_annotation_panel.js",
+            "source_sha256": "e5641d767398182ba7c409feed65e157c17db3434ed47dddb59265e43a9dd7be"
+          }
+        ],
+        "owner_service_evidence": {
+          "source_path": "backend/base/self_annotations.py",
+          "source_sha256": "sha256:a38d6ec2bb507a94e4b61c9c084df8ac527b6dfb51dd0fdeb21ed37ce1238c63"
+        },
+        "target_capability": "base.self_annotation.change.apply@1"
+      },
+      "current_status": "migrated",
       "dependencies": [
         "annotation aggregate migration",
         "attachment reference policy"
@@ -2316,7 +3155,8 @@
           "normalized_route": "/api/self_ann/{dynamic}",
           "occurrence_id": "web/components/self_annotation_panel.js:175:35:PUT:/api/self_ann/{dynamic}",
           "raw_route": "/api/self_ann/${_currentGid}",
-          "source": "web/components/self_annotation_panel.js"
+          "source": "web/components/self_annotation_panel.js",
+          "source_sha256": "55c294a99365af52084ce49b89432bf3dee012cfdbad32ec9993b1467b871301"
         }
       ],
       "owner_domain": "base",
@@ -2584,7 +3424,7 @@
   "source_artifacts": [
     {
       "path": "docs/governance/base-structural-web-remediation.json",
-      "sha256": "sha256:f3422520b9a46470c89926f50e261df31c35d9bdd181a5ac1e97b8e6f3ec150b"
+      "sha256": "sha256:72f8d57e236b54198dfcb0a6c0d5783ff73d8dcfee33eedddf2f13448a6342e3"
     },
     {
       "path": "docs/governance/integration-structural-web-remediation.json",
@@ -2596,7 +3436,7 @@
     },
     {
       "path": "docs\\governance\\capability-coverage-review\\generated\\web_route_inventory.json",
-      "sha256": "sha256:f4cd8e71bfad345f6cce52cd4259a8c4cd081ea47def645be3db45cfd899eb32"
+      "sha256": "sha256:17abf0e7015484abe956851e6fa27b64b09458c007192d1fb3626c1f0e83653d"
     }
   ]
 }

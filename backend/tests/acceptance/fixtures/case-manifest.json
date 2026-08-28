@@ -351,6 +351,15 @@
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[base.identity.session.get@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[base.identity.session.get@1]"
     },
+    "base.identity.session.profile.get@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[base.identity.session.profile.get@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[base.identity.session.profile.get@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[base.identity.session.profile.get@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[base.identity.session.profile.get@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[base.identity.session.profile.get@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[base.identity.session.profile.get@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[base.identity.session.profile.get@1]"
+    },
     "base.identity.user.search@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[base.identity.user.search@1]",
       "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[base.identity.user.search@1]",
@@ -422,6 +431,24 @@
       "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[base.organization.team.directory.list@1]",
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[base.organization.team.directory.list@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[base.organization.team.directory.list@1]"
+    },
+    "base.plugin.installation.request.create@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[base.plugin.installation.request.create@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[base.plugin.installation.request.create@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[base.plugin.installation.request.create@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[base.plugin.installation.request.create@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[base.plugin.installation.request.create@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[base.plugin.installation.request.create@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[base.plugin.installation.request.create@1]"
+    },
+    "base.plugin.installation.transition.uninstall@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[base.plugin.installation.transition.uninstall@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[base.plugin.installation.transition.uninstall@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[base.plugin.installation.transition.uninstall@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[base.plugin.installation.transition.uninstall@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[base.plugin.installation.transition.uninstall@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[base.plugin.installation.transition.uninstall@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[base.plugin.installation.transition.uninstall@1]"
     },
     "base.plugin.installed.list@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[base.plugin.installed.list@1]",
@@ -504,6 +531,33 @@
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[base.saved_view.change.apply@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[base.saved_view.change.apply@1]"
     },
+    "base.saved_view.copy@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[base.saved_view.copy@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[base.saved_view.copy@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[base.saved_view.copy@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[base.saved_view.copy@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[base.saved_view.copy@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[base.saved_view.copy@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[base.saved_view.copy@1]"
+    },
+    "base.saved_view.create@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[base.saved_view.create@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[base.saved_view.create@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[base.saved_view.create@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[base.saved_view.create@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[base.saved_view.create@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[base.saved_view.create@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[base.saved_view.create@1]"
+    },
+    "base.saved_view.delete@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[base.saved_view.delete@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[base.saved_view.delete@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[base.saved_view.delete@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[base.saved_view.delete@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[base.saved_view.delete@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[base.saved_view.delete@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[base.saved_view.delete@1]"
+    },
     "base.saved_view.read@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[base.saved_view.read@1]",
       "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[base.saved_view.read@1]",
@@ -513,6 +567,24 @@
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[base.saved_view.read@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[base.saved_view.read@1]"
     },
+    "base.saved_view.search@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[base.saved_view.search@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[base.saved_view.search@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[base.saved_view.search@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[base.saved_view.search@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[base.saved_view.search@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[base.saved_view.search@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[base.saved_view.search@1]"
+    },
+    "base.saved_view.update@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[base.saved_view.update@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[base.saved_view.update@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[base.saved_view.update@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[base.saved_view.update@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[base.saved_view.update@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[base.saved_view.update@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[base.saved_view.update@1]"
+    },
     "base.self_annotation.batch.get@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[base.self_annotation.batch.get@1]",
       "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[base.self_annotation.batch.get@1]",
@@ -521,6 +593,33 @@
       "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[base.self_annotation.batch.get@1]",
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[base.self_annotation.batch.get@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[base.self_annotation.batch.get@1]"
+    },
+    "base.self_annotation.change.apply@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[base.self_annotation.change.apply@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[base.self_annotation.change.apply@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[base.self_annotation.change.apply@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[base.self_annotation.change.apply@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[base.self_annotation.change.apply@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[base.self_annotation.change.apply@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[base.self_annotation.change.apply@1]"
+    },
+    "base.self_annotation.record.get@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[base.self_annotation.record.get@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[base.self_annotation.record.get@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[base.self_annotation.record.get@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[base.self_annotation.record.get@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[base.self_annotation.record.get@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[base.self_annotation.record.get@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[base.self_annotation.record.get@1]"
+    },
+    "base.self_annotation.search@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[base.self_annotation.search@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[base.self_annotation.search@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[base.self_annotation.search@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[base.self_annotation.search@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[base.self_annotation.search@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[base.self_annotation.search@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[base.self_annotation.search@1]"
     },
     "base.team.change.apply@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[base.team.change.apply@1]",
@@ -4087,7 +4186,7 @@
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[vismockup.visibility@1]"
     }
   },
-  "catalog_release": "rel_a4a5a17ebc77419f6a12eec1f32fcbea",
+  "catalog_release": "rel_9f169ceddb4f7eb3e6c30f63861e655b",
   "mandatory_cases": [
     "success",
     "invalid_input",

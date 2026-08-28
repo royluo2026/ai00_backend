@@ -1,6 +1,6 @@
 {
-  "frontend_revision": "ca1afbf4c169b4d7d95dec460c1cd64af21915fd",
-  "content_hash": "2f4df39a9ee0402386eef0072ef8ad289167f6069d1d803c51ec9ae1bece8609",
+  "frontend_revision": "5d6dc5cad342d75a4137219ca7bbb5ece71899d2",
+  "content_hash": "1458b00910499b0c8b32734c8815507e967839c18a7c16972368d21e1b40852e",
   "wrapper_contracts_hash": "7fec8d2b3c7b989ad5dd570c8fc10984f3fac4745244194edb738a3015aa600c",
   "scan_roots": [
     "web",
@@ -27,13 +27,13 @@
     "legacy_registered": 311,
     "bff_registered": 2,
     "operations_excluded": 19,
-    "unresolved": 31
+    "unresolved": 29
   },
   "lexical_audit": {
-    "token_count": 420,
-    "token_hash": "0f3cdaae8555860a84fe0b44b36e5086a8e2c9fffeb9b2bc1fe691c5832ffbef",
-    "mapped_count": 401,
-    "reviewed_non_route_count": 19,
+    "token_count": 417,
+    "token_hash": "b942bf650d553a47f5a322714c00a2f1cb1e6caef1b59536c5c892aaa959c20e",
+    "mapped_count": 399,
+    "reviewed_non_route_count": 18,
     "reviewed_non_route_tokens": [
       "packages/craft-plugin/web/bop_nav/bop_nav.js:12:13:/api/",
       "packages/craft-plugin/web/craft_table/table.js:8:9:/api/",
@@ -49,7 +49,6 @@
       "web/components/list_sidebar.js:903:14:/api/",
       "web/components/list_tree.html:626:18:/api/",
       "web/container_card/modes/mode_spreadsheet.js:53:19:/api/",
-      "web/core/web_compat.js:331:47:/api/",
       "web/handbook/index.html:477:58:/api/",
       "web/handbook/index.html:777:16:/api/",
       "web/main.js:1068:33:/api/",
@@ -2417,33 +2416,33 @@
     },
     {
       "source": "web/core/existing_capability_client.js",
-      "line": 273,
+      "line": 292,
       "column": 27,
       "raw_route": "/api/v1/capabilities/${capabilityId}:${action}",
       "normalized_route": "/api/v1/capabilities/{dynamic}:{dynamic}",
       "method": "POST",
       "disposition": "capability",
-      "occurrence_id": "web/core/existing_capability_client.js:273:27:POST:/api/v1/capabilities/{dynamic}:{dynamic}"
+      "occurrence_id": "web/core/existing_capability_client.js:292:27:POST:/api/v1/capabilities/{dynamic}:{dynamic}"
     },
     {
       "source": "web/core/existing_capability_client.js",
-      "line": 307,
+      "line": 326,
       "column": 51,
       "raw_route": "/api/lists?item_type=bop_version",
       "normalized_route": "/api/lists",
       "method": "GET",
       "disposition": "unresolved",
-      "occurrence_id": "web/core/existing_capability_client.js:307:51:GET:/api/lists"
+      "occurrence_id": "web/core/existing_capability_client.js:326:51:GET:/api/lists"
     },
     {
       "source": "web/core/existing_capability_client.js",
-      "line": 312,
+      "line": 331,
       "column": 12,
       "raw_route": "/api/lists/${encodeURIComponent(gid)}?item_type=bop_version&expected_revision=${revision}",
       "normalized_route": "/api/lists/{dynamic}",
       "method": "DELETE",
       "disposition": "unresolved",
-      "occurrence_id": "web/core/existing_capability_client.js:312:12:DELETE:/api/lists/{dynamic}"
+      "occurrence_id": "web/core/existing_capability_client.js:331:12:DELETE:/api/lists/{dynamic}"
     },
     {
       "source": "web/core/global_search.js",
@@ -2574,26 +2573,6 @@
       "method": "PATCH",
       "disposition": "legacy_registered",
       "occurrence_id": "web/core/notification_manager.js:80:24:PATCH:/api/notifications/read_all"
-    },
-    {
-      "source": "web/core/web_compat.js",
-      "line": 287,
-      "column": 27,
-      "raw_route": "/api/plugin/install",
-      "normalized_route": "/api/plugin/install",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "web/core/web_compat.js:287:27:POST:/api/plugin/install"
-    },
-    {
-      "source": "web/core/web_compat.js",
-      "line": 294,
-      "column": 29,
-      "raw_route": "/api/plugin/uninstall/${pluginId}",
-      "normalized_route": "/api/plugin/uninstall/{dynamic}",
-      "method": "DELETE",
-      "disposition": "unresolved",
-      "occurrence_id": "web/core/web_compat.js:294:29:DELETE:/api/plugin/uninstall/{dynamic}"
     },
     {
       "source": "web/ext_datasource/ext_ds.js",
@@ -3687,43 +3666,43 @@
     },
     {
       "source": "web/settings/settings.js",
-      "line": 1368,
+      "line": 1375,
       "column": 41,
       "raw_route": "/api/follows",
       "normalized_route": "/api/follows",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/settings/settings.js:1368:41:GET:/api/follows"
+      "occurrence_id": "web/settings/settings.js:1375:41:GET:/api/follows"
     },
     {
       "source": "web/settings/settings.js",
-      "line": 1377,
+      "line": 1384,
       "column": 44,
       "raw_route": "/api/tasks/${item_gid}",
       "normalized_route": "/api/tasks/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/settings/settings.js:1377:44:GET:/api/tasks/{dynamic}"
+      "occurrence_id": "web/settings/settings.js:1384:44:GET:/api/tasks/{dynamic}"
     },
     {
       "source": "web/settings/settings.js",
-      "line": 1382,
+      "line": 1389,
       "column": 44,
       "raw_route": "/api/issues/${item_gid}",
       "normalized_route": "/api/issues/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/settings/settings.js:1382:44:GET:/api/issues/{dynamic}"
+      "occurrence_id": "web/settings/settings.js:1389:44:GET:/api/issues/{dynamic}"
     },
     {
       "source": "web/settings/settings.js",
-      "line": 1394,
+      "line": 1401,
       "column": 30,
       "raw_route": "/api/follows/${fGid}",
       "normalized_route": "/api/follows/{dynamic}",
       "method": "DELETE",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/settings/settings.js:1394:30:DELETE:/api/follows/{dynamic}"
+      "occurrence_id": "web/settings/settings.js:1401:30:DELETE:/api/follows/{dynamic}"
     },
     {
       "source": "web/share/issues.html",

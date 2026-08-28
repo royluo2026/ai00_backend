@@ -8,7 +8,7 @@ Execute the reviewed project.bitable_binding.change.apply project outcome.
 - 不适用：The operation belongs to another domain.
 - 生命周期：`deprecated`
 - 所属领域：`project_management`
-- Catalog Release：`rel_37018ca4060a969eecca08519ba359d5`
+- Catalog Release：`rel_9f169ceddb4f7eb3e6c30f63861e655b`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -93,7 +93,7 @@ Execute the reviewed project.bitable_binding.change.apply project outcome.
 ```json
 {
   "capability_id": "project.bitable_binding.change.apply",
-  "catalog_release": "rel_37018ca4060a969eecca08519ba359d5",
+  "catalog_release": "rel_9f169ceddb4f7eb3e6c30f63861e655b",
   "major_version": 1,
   "payload": {
     "arguments": {},

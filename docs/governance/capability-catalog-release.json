@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_37018ca4060a969eecca08519ba359d5",
-  "catalog_hash": "sha256:37018ca4060a969eecca08519ba359d5814f8452d971fd2279a835a7850c1377",
+  "release_id": "rel_9f169ceddb4f7eb3e6c30f63861e655b",
+  "catalog_hash": "sha256:9f169ceddb4f7eb3e6c30f63861e655bcb0b555e89c76cdb91f92fed6e8f8d37",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -16873,6 +16873,671 @@
       "provider_ref": "base.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/base.organization.team.directory.list:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
+          "result": "pass",
+          "path": "backend/tests/test_capability_v2_contracts.py"
+        }
+      ]
+    },
+    {
+      "id": "base.plugin.installation.request.create",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.plugin.installation.request.create",
+      "description": "Execute exact Base outcome base.plugin.installation.request.create.",
+      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
+      "do_not_use_when": "The request selects another operation or domain.",
+      "business_effect": "Verifies one signed published marketplace release and creates a tenant-bound disabled installation with explicit grants.",
+      "side_effect_level": "write",
+      "side_effects": "Verifies one signed published marketplace release and creates a tenant-bound disabled installation with explicit grants.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A0",
+      "authorization_policy": "base.v2:system.plugin.manage",
+      "resource_selectors": [
+        {
+          "resource_type": "plugin-installation",
+          "payload_path": "plugin_id",
+          "required": true
+        }
+      ],
+      "data_classification": "restricted",
+      "required_auth_freshness_seconds": 300,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "plugin_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "release_version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "release_sha256": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "requested_grants": {
+            "type": "array",
+            "maxItems": 200,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "plugin_id",
+          "release_version",
+          "release_sha256",
+          "requested_grants",
+          "idempotency_key"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "installation": {
+            "type": "object",
+            "properties": {
+              "plugin_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "release_version": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "state": {
+                "type": "string",
+                "enum": [
+                  "disabled",
+                  "uninstalled"
+                ]
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "granted_capabilities": {
+                "type": "array",
+                "maxItems": 200,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "tenant_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "plugin_id",
+              "release_version",
+              "state",
+              "revision",
+              "granted_capabilities",
+              "tenant_gid"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "installation"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "installation": {
+            "type": "object",
+            "properties": {
+              "plugin_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "release_version": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "state": {
+                "type": "string",
+                "enum": [
+                  "disabled",
+                  "uninstalled"
+                ]
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "granted_capabilities": {
+                "type": "array",
+                "maxItems": 200,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "tenant_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "plugin_id",
+              "release_version",
+              "state",
+              "revision",
+              "granted_capabilities",
+              "tenant_gid"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "installation"
+        ]
+      },
+      "schema_hash": "sha256:91d7bf71d7501379d9d08ac91938c081593e2f82f69a35caf954515391b074a2",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "high_risk",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_96a411616dc66c13a40a58e1",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "single_transaction",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "base.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/base.plugin.installation.request.create:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
+          "result": "pass",
+          "path": "backend/tests/test_capability_v2_contracts.py"
+        }
+      ]
+    },
+    {
+      "id": "base.plugin.installation.transition.uninstall",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.plugin.installation.transition.uninstall",
+      "description": "Execute exact Base outcome base.plugin.installation.transition.uninstall.",
+      "use_when": "A browser consumer needs exactly this Base-owned outcome.",
+      "do_not_use_when": "The request selects another operation or domain.",
+      "business_effect": "Atomically revokes mounts and grants, preserves tenant data, and records a recoverable uninstall transition.",
+      "side_effect_level": "write",
+      "side_effects": "Atomically revokes mounts and grants, preserves tenant data, and records a recoverable uninstall transition.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A0",
+      "authorization_policy": "base.v2:system.plugin.manage",
+      "resource_selectors": [
+        {
+          "resource_type": "plugin-installation",
+          "payload_path": "plugin_id",
+          "required": true
+        }
+      ],
+      "data_classification": "restricted",
+      "required_auth_freshness_seconds": 300,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "plugin_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "retain_tenant_data": {
+            "const": true
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "plugin_id",
+          "expected_revision",
+          "retain_tenant_data",
+          "idempotency_key"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "installation": {
+            "type": "object",
+            "properties": {
+              "plugin_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "release_version": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "state": {
+                "type": "string",
+                "enum": [
+                  "disabled",
+                  "uninstalled"
+                ]
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "granted_capabilities": {
+                "type": "array",
+                "maxItems": 200,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "tenant_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "plugin_id",
+              "release_version",
+              "state",
+              "revision",
+              "granted_capabilities",
+              "tenant_gid"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "installation"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "installation": {
+            "type": "object",
+            "properties": {
+              "plugin_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "release_version": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "state": {
+                "type": "string",
+                "enum": [
+                  "disabled",
+                  "uninstalled"
+                ]
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "granted_capabilities": {
+                "type": "array",
+                "maxItems": 200,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "tenant_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "plugin_id",
+              "release_version",
+              "state",
+              "revision",
+              "granted_capabilities",
+              "tenant_gid"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "installation"
+        ]
+      },
+      "schema_hash": "sha256:73ae1bf913c4951a21b85c0e8f1ba1c0205a45098c306d50c8f44b5bf6c1b26f",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "high_risk",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_ff4456f5df6151d5f1a7fc54",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "single_transaction",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "base.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/base.plugin.installation.transition.uninstall:invoke"
       ],
       "test_refs": [
         {
@@ -185912,7 +186577,7 @@
       "plugin_id": "official.base",
       "module": "backend.base.official_provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:6a87a9a9f2241740f4abc43e3bdbb28a8b757447c47657bc1512f85738eee390"
+      "artifact_hash": "sha256:f405dc5b1baca8d42443b9702e522aabe36201a6ca7843b9084dfd2078b84ac6"
     },
     {
       "plugin_id": "official.craft",
@@ -185969,5 +186634,5 @@
       "artifact_hash": "sha256:5c1fccaa2219f6833c24237667039685e322cefcffc7ca6f0287d28cfc0a2b39"
     }
   ],
-  "created_at": "2026-08-28T02:55:07.343445Z"
+  "created_at": "2026-08-28T03:19:14.574123Z"
 }

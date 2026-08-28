@@ -17,13 +17,22 @@ def _module():
     return module
 
 
-def test_plan_reconciles_the_fresh_final_unresolved_occurrence_identities():
-    """Breaks if an unresolved source occurrence can disappear from the execution plan."""
+def test_plan_preserves_historical_scope_and_records_current_migration_progress():
+    """Breaks if a completed owner-service group disappears instead of being marked migrated."""
     module = _module()
     payload = module.load_plan(ROOT / "docs/governance/capability-v2-structural-remediation-plan.json")
 
     assert module.validate_plan(ROOT, payload) == ()
     assert payload["counts"] == {"groups": 37, "occurrences": 45}
+    plugin_install = next(
+        group for group in payload["groups"]
+        if group["group_id"] == "POST /api/plugin/install"
+    )
+    assert plugin_install["current_status"] == "migrated"
+    assert plugin_install["current_disposition"] == "migrated"
+    assert plugin_install["current_evidence"]["target_capability"] == (
+        "base.plugin.installation.request.create@1"
+    )
 
 
 def test_plan_validator_rejects_missing_occurrence_identity():

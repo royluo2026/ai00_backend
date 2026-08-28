@@ -3,7 +3,7 @@
   "artifact_id": "existing-capability-web-migrations",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "baseline_revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-  "frontend_revision": "ca1afbf4c169b4d7d95dec460c1cd64af21915fd",
+  "frontend_revision": "5d6dc5cad342d75a4137219ca7bbb5ece71899d2",
   "groups": [
     {
       "method": "DELETE",
@@ -147,7 +147,7 @@
           "source_sha256": "ec21b526867d051eb968d8e1b451c535dbbf819251463d42a9f5d82ea870b02c"
         }
       ],
-      "target_capability_id": "plugin.uninstall",
+      "target_capability_id": "base.plugin.installation.transition.uninstall",
       "target_major_version": 1,
       "owner_domain": "base",
       "transport_evidence": {
@@ -157,41 +157,31 @@
         "route_definition": null,
         "anchors": []
       },
-      "decision": "reclassify",
-      "request_transform": "not applied: /api/plugin/uninstall/{dynamic}: REST accepts an installed plugin gid; candidate requires signed marketplace plugin_id lifecycle state.",
-      "response_transform": "not applied: /api/plugin/uninstall/{dynamic}: REST reports unrestricted uninstall; candidate reports governed installation state.",
-      "frontend_operation": null,
-      "frontend_call_sites": [],
-      "equivalence_evidence": null,
-      "reclassification": {
-        "reason_code": "contract_shape_mismatch",
-        "followup": "atomic_capability_review",
-        "finding": "/api/plugin/uninstall/{dynamic}: REST accepts an installed plugin gid; candidate requires signed marketplace plugin_id lifecycle state. | /api/plugin/uninstall/{dynamic}: REST reports unrestricted uninstall; candidate reports governed installation state. | /api/plugin/uninstall/{dynamic}: Candidate enforces lifecycle/auth freshness not represented by the legacy call.",
-        "legacy_contract": {
-          "kind": "reviewed_handler_absence",
-          "source_path": "backend/routers/plugins.py",
-          "source_sha256": "dc55b05a46094b76be8c3d7ba3634c3fe9242649cc4c50da82c42e4d95835ea4",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "method": "DELETE",
-          "normalized_route": "/api/plugin/uninstall/{dynamic}",
-          "finding": "No exact registered route/method definition exists in this reviewed handler family."
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "backend/capabilities/plugin_marketplace_next.py",
-            "source_sha256": "8dd7f911592cdad969e48775fab19b82c5f036160b4f0291963df804628a3af4",
-            "start_line": 30,
-            "end_line": 30,
-            "sha256": "8c843fbabcb3d0288c5d1cfc024c128a814af4a522b95861946fd93ee6d960fd",
-            "needle": "\"plugin.uninstall\""
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/plugin/uninstall/{dynamic}: REST accepts an installed plugin gid; candidate requires signed marketplace plugin_id lifecycle state.",
-          "output": "/api/plugin/uninstall/{dynamic}: REST reports unrestricted uninstall; candidate reports governed installation state.",
-          "side_effects": "/api/plugin/uninstall/{dynamic}: Candidate enforces lifecycle/auth freshness not represented by the legacy call."
+      "decision": "migrate",
+      "request_transform": "plugin id/revision -> explicit confirmed recoverable uninstall command",
+      "response_transform": "installation envelope -> uninstalled projection with revoked grants",
+      "frontend_operation": "base.plugins.uninstall",
+      "frontend_call_sites": [
+        {
+          "source_path": "web/core/web_compat.js",
+          "line": 307,
+          "column": 27,
+          "operation": "base.plugins.uninstall",
+          "source_sha256": "0f43f54421116086204e0eb5e36792d96efa1136d2398e77074999a342473f99"
         }
-      }
+      ],
+      "equivalence_evidence": {
+        "proof_kind": "provider_equivalent_adapter",
+        "provider_contract": {
+          "source_path": "backend/base/web_atomic.py",
+          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+          "start_line": 269,
+          "end_line": 269,
+          "sha256": "f7bcbf43257471c7a2821fbe4e1c9fddf6f1a87ff8ad68f6bd38c1f8cc363568",
+          "needle": "\"base.plugin.installation.transition.uninstall\": _plugin_uninstall"
+        }
+      },
+      "reclassification": null
     },
     {
       "method": "DELETE",
@@ -244,9 +234,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
-          "start_line": 262,
-          "end_line": 262,
+          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+          "start_line": 284,
+          "end_line": 284,
           "sha256": "56229834691651b93ee38d67bb2fa715d321afba6c0af79b064497283f1a380b",
           "needle": "\"base.saved_view.delete\": _saved_view_delete"
         }
@@ -1288,9 +1278,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
-          "start_line": 253,
-          "end_line": 253,
+          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+          "start_line": 275,
+          "end_line": 275,
           "sha256": "ba8c659ed3eed4912fc0cdeaab4c3f0466d25eb1a92fb775b6c28571cdb5c0f7",
           "needle": "\"base.self_annotation.search\": _annotation_search"
         }
@@ -1348,9 +1338,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
-          "start_line": 252,
-          "end_line": 252,
+          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+          "start_line": 274,
+          "end_line": 274,
           "sha256": "0edcb0661f98ef845497594383b300542dd04c2746eb0498cc25acc8537588df",
           "needle": "\"base.self_annotation.record.get\": _annotation_get"
         }
@@ -1651,9 +1641,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
-          "start_line": 255,
-          "end_line": 255,
+          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+          "start_line": 277,
+          "end_line": 277,
           "sha256": "d9e31fd15b3fc655e44c4700447418464354287cd1311a4e883ab8f44bad72d0",
           "needle": "\"base.identity.session.profile.get\": _identity_profile"
         }
@@ -1823,9 +1813,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
-          "start_line": 258,
-          "end_line": 258,
+          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+          "start_line": 280,
+          "end_line": 280,
           "sha256": "21e5f4f93bdc09b1ba703dc17a13307584bfc738466d3a1b71e4a491ef61c806",
           "needle": "\"base.saved_view.search\": _saved_view_search"
         }
@@ -2172,9 +2162,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
-          "start_line": 260,
-          "end_line": 260,
+          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+          "start_line": 282,
+          "end_line": 282,
           "sha256": "799823cab800457fc52e02ea377c4efecaf3f4fb565b0f2a67b8e1ec6425e8e4",
           "needle": "\"base.saved_view.update\": _saved_view_update"
         }
@@ -2721,7 +2711,7 @@
           "source_sha256": "ec21b526867d051eb968d8e1b451c535dbbf819251463d42a9f5d82ea870b02c"
         }
       ],
-      "target_capability_id": "plugin.install",
+      "target_capability_id": "base.plugin.installation.request.create",
       "target_major_version": 1,
       "owner_domain": "base",
       "transport_evidence": {
@@ -2731,41 +2721,31 @@
         "route_definition": null,
         "anchors": []
       },
-      "decision": "reclassify",
-      "request_transform": "not applied: /api/plugin/install: REST accepts arbitrary plugin URL/package input; candidate requires platform-signed release identity.",
-      "response_transform": "not applied: /api/plugin/install: REST returns downloaded installation; candidate returns disabled governed installation.",
-      "frontend_operation": null,
-      "frontend_call_sites": [],
-      "equivalence_evidence": null,
-      "reclassification": {
-        "reason_code": "contract_shape_mismatch",
-        "followup": "atomic_capability_review",
-        "finding": "/api/plugin/install: REST accepts arbitrary plugin URL/package input; candidate requires platform-signed release identity. | /api/plugin/install: REST returns downloaded installation; candidate returns disabled governed installation. | /api/plugin/install: Candidate verifies marketplace signature and lifecycle state.",
-        "legacy_contract": {
-          "kind": "reviewed_handler_absence",
-          "source_path": "backend/routers/plugins.py",
-          "source_sha256": "dc55b05a46094b76be8c3d7ba3634c3fe9242649cc4c50da82c42e4d95835ea4",
-          "revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-          "method": "POST",
-          "normalized_route": "/api/plugin/install",
-          "finding": "No exact registered route/method definition exists in this reviewed handler family."
-        },
-        "candidate_contracts": [
-          {
-            "source_path": "backend/capabilities/plugin_marketplace_next.py",
-            "source_sha256": "8dd7f911592cdad969e48775fab19b82c5f036160b4f0291963df804628a3af4",
-            "start_line": 22,
-            "end_line": 22,
-            "sha256": "1e0e18c9ef177978992c690f1cb2701c6e3b20b6f8ac505ed52897d3c85d0c6f",
-            "needle": "\"plugin.install\""
-          }
-        ],
-        "contract_mismatch": {
-          "input": "/api/plugin/install: REST accepts arbitrary plugin URL/package input; candidate requires platform-signed release identity.",
-          "output": "/api/plugin/install: REST returns downloaded installation; candidate returns disabled governed installation.",
-          "side_effects": "/api/plugin/install: Candidate verifies marketplace signature and lifecycle state."
+      "decision": "migrate",
+      "request_transform": "signed release identity/hash and explicit grants -> closed tenant-bound install command",
+      "response_transform": "installation envelope -> disabled signed-release projection",
+      "frontend_operation": "base.plugins.install",
+      "frontend_call_sites": [
+        {
+          "source_path": "web/core/web_compat.js",
+          "line": 290,
+          "column": 27,
+          "operation": "base.plugins.install",
+          "source_sha256": "0f43f54421116086204e0eb5e36792d96efa1136d2398e77074999a342473f99"
         }
-      }
+      ],
+      "equivalence_evidence": {
+        "proof_kind": "provider_equivalent_adapter",
+        "provider_contract": {
+          "source_path": "backend/base/web_atomic.py",
+          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+          "start_line": 268,
+          "end_line": 268,
+          "sha256": "34c9a56b6eb9924d2918aa691ef9ad3c25d95766958763f767d47eb52a5b8c07",
+          "needle": "\"base.plugin.installation.request.create\": _plugin_install"
+        }
+      },
+      "reclassification": null
     },
     {
       "method": "POST",
@@ -3088,9 +3068,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
-          "start_line": 259,
-          "end_line": 259,
+          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+          "start_line": 281,
+          "end_line": 281,
           "sha256": "9d9ed3d4a5619754b9c0df361a0b2b4c01d1052d00d57414e9a50f40e172840c",
           "needle": "\"base.saved_view.create\": _saved_view_create"
         }
@@ -3148,9 +3128,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
-          "start_line": 261,
-          "end_line": 261,
+          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+          "start_line": 283,
+          "end_line": 283,
           "sha256": "c68df23c39cb7979116bd209087170259a02fc5ec888ee1020a0dfd92f6c6848",
           "needle": "\"base.saved_view.copy\": _saved_view_copy"
         }
@@ -3540,9 +3520,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "ec34b631c8b2afa22f17aa7111ab6868dfb968b6b39966f6922c1497e1221d98",
-          "start_line": 254,
-          "end_line": 254,
+          "source_sha256": "98463d83a6a6b2637ddbd6cfa3fb0a096a64ff6c9f5b7748501b0e762367f9c4",
+          "start_line": 276,
+          "end_line": 276,
           "sha256": "c3860599d5ff529f59467bb49216cb62b04152c559aa2d9587ebff1871e8965e",
           "needle": "\"base.self_annotation.change.apply\": _annotation_change"
         }

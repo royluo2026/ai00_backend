@@ -106,6 +106,8 @@ def example_for_schema(schema: Mapping[str, Any]) -> Any:
     if expected == "null":
         return None
     if expected == "string":
+        if schema.get("pattern") == "^sha256:[0-9a-f]{64}$":
+            return "sha256:" + "0" * 64
         minimum = max(1, int(schema.get("minLength", 0)))
         return "example" if minimum <= 7 else "x" * minimum
     # V1 descriptors may declare a required field without a type. Preserve its

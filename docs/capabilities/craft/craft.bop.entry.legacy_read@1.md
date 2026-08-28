@@ -8,7 +8,7 @@ Read bounded legacy BOP entry links, PBOM projections, auto-link previews and hi
 - 不适用：The request mutates entries, links, entities, imports data, or needs the canonical structure capability.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_37018ca4060a969eecca08519ba359d5`
+- Catalog Release：`rel_9f169ceddb4f7eb3e6c30f63861e655b`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -156,7 +156,7 @@ Read bounded legacy BOP entry links, PBOM projections, auto-link previews and hi
 ```json
 {
   "capability_id": "craft.bop.entry.legacy_read",
-  "catalog_release": "rel_37018ca4060a969eecca08519ba359d5",
+  "catalog_release": "rel_9f169ceddb4f7eb3e6c30f63861e655b",
   "major_version": 1,
   "payload": {
     "operation": "auto_link_preview"

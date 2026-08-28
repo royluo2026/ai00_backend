@@ -54,6 +54,8 @@
     "base-platform/base.notification.read_state.set@1.md",
     "base-platform/base.notification.search@1.md",
     "base-platform/base.organization.team.directory.list@1.md",
+    "base-platform/base.plugin.installation.request.create@1.md",
+    "base-platform/base.plugin.installation.transition.uninstall@1.md",
     "base-platform/base.plugin.installed.list@1.md",
     "base-platform/base.plugin.marketplace.publisher.register@1.md",
     "base-platform/base.plugin.marketplace.release.change.apply@1.md",

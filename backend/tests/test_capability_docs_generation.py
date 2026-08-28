@@ -47,6 +47,16 @@ def test_v1_adapter_preserves_explicit_typed_any_json_schema():
     validate_payload(dict(descriptor.input_schema), {"value": {"items": [1, 2]}})
 
 
+def test_minimal_example_satisfies_sha256_string_patterns():
+    """Breaks if generated machine examples use a generic string for a digest field."""
+    schema = {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+
+    example = example_for_schema(schema)
+
+    assert example == "sha256:" + "0" * 64
+    validate_payload(schema, example)
+
+
 def test_deprecated_empty_operation_enum_is_compatibility_unconstrained():
     validate_payload({"type": "string", "enum": []}, "legacy-operation")
 
