@@ -57,8 +57,8 @@ def test_craft_closure_evidence_freezes_exact_source_identities_and_anchors():
     """Breaks if Craft closure drifts from the reviewed backend or frozen Web tree."""
     evidence = _module().build_craft_closure_evidence(WEB_ROOT)
 
-    assert evidence["backend_revision"] == "045124def4de6742fb99d8d7c436624c8fdee1e9"
-    assert evidence["backend_tree"] == "c1e39bac2f7500cdc0f49711ab02bac01ab878b4"
+    assert evidence["backend_revision"] == "076ed4348a066c59b6852f75d479fa08c2a49f14"
+    assert evidence["backend_tree"] == "e76fbe8b6f42ad5cfd8e9de67995fac233559cb2"
     assert evidence["frontend_revision"] == CRAFT_FRONTEND_REVISION
     assert evidence["scanner_materialization"] == {
         "method": "git-tree-blobs-v1",

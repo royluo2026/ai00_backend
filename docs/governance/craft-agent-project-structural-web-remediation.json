@@ -17,7 +17,7 @@
   },
   "closure_baseline_revision": "614805f59294006b8802ae01869dc9d7fe3cf694",
   "closure_baseline_sha256": "sha256:fca8beb006ff0fcac9fdad79d1ad19ef97633ed90217c45600e78c9e5e5754c0",
-  "content_sha256": "sha256:36d328ed575dadd5d8f5e7c5bd8c307ad2e5fbe599dd6fec74ccb51cbfe8466e",
+  "content_sha256": "sha256:cb4020ec76b6716a610a7fbdbf95f2775d807bdfe7e445a89c4ef725647c97b9",
   "counts": {
     "groups": 14,
     "migrated_groups": 5,
@@ -57,16 +57,16 @@
         "sha256": "sha256:d86f0fcd4a247cd51970d44fcf7ec3a889af64f47fb79f7ebe9b93ab8a433f42"
       },
       "plugins/craft/craft_backend/capabilities/rule_engine.py": {
-        "blob": "416826716c10a8ea1abdc43d39872dd777a2d8cc",
-        "sha256": "sha256:c8ac721a01fe3bfb22ffab47e859b19097bf9f5524309e16356d2dc02259bec5"
+        "blob": "1bfc3853483c16ef69c5074391fa8c1d5736b8e3",
+        "sha256": "sha256:3f7cdfe1036ce95c00ee8548725e94bb0876c7ca5430984c79c94cc773850455"
       },
       "plugins/craft/craft_backend/capabilities/rule_library.py": {
         "blob": "aa9cab3ca3585e67626be447aea3f92acd50b3e6",
         "sha256": "sha256:8667724722a2be77f58d69ce9815ab8bc603dbb196fd04009ef6bd635ce3e5d6"
       }
     },
-    "backend_revision": "045124def4de6742fb99d8d7c436624c8fdee1e9",
-    "backend_tree": "c1e39bac2f7500cdc0f49711ab02bac01ab878b4",
+    "backend_revision": "076ed4348a066c59b6852f75d479fa08c2a49f14",
+    "backend_tree": "e76fbe8b6f42ad5cfd8e9de67995fac233559cb2",
     "dead_actions": {
       "DELETE /api/craft_lib/equipments/{dynamic}": {
         "frontend_anchor": {
@@ -254,7 +254,7 @@
           "end_line": 183,
           "snippet_sha256": "sha256:5e26b15637963ae5cedc244ab113431069cae0e9045526a2401fe17688db9bf2",
           "source_path": "plugins/craft/craft_backend/capabilities/rule_engine.py",
-          "source_sha256": "sha256:c8ac721a01fe3bfb22ffab47e859b19097bf9f5524309e16356d2dc02259bec5",
+          "source_sha256": "sha256:3f7cdfe1036ce95c00ee8548725e94bb0876c7ca5430984c79c94cc773850455",
           "start_line": 174
         }
       },
@@ -1085,11 +1085,11 @@
         "end_line": 183,
         "snippet_sha256": "sha256:5e26b15637963ae5cedc244ab113431069cae0e9045526a2401fe17688db9bf2",
         "source_path": "plugins/craft/craft_backend/capabilities/rule_engine.py",
-        "source_sha256": "sha256:c8ac721a01fe3bfb22ffab47e859b19097bf9f5524309e16356d2dc02259bec5",
+        "source_sha256": "sha256:3f7cdfe1036ce95c00ee8548725e94bb0876c7ca5430984c79c94cc773850455",
         "start_line": 174
       },
       "provider_anchor": "plugins/craft/craft_backend/capabilities/rule_engine.py:174-183",
-      "provider_source_sha256": "sha256:c8ac721a01fe3bfb22ffab47e859b19097bf9f5524309e16356d2dc02259bec5",
+      "provider_source_sha256": "sha256:3f7cdfe1036ce95c00ee8548725e94bb0876c7ca5430984c79c94cc773850455",
       "runtime_execution": "bounded_provider",
       "unresolved_reason": null
     },

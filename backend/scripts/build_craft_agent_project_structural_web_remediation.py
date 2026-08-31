@@ -58,7 +58,7 @@ PROJECT_SERVICE_SOURCE = "plugins/project_management/project_management_backend/
 PROJECT_PROVIDER_SOURCE = "plugins/project_management/project_management_backend/capabilities/provider.py"
 PROJECT_FRONTEND_REVISION = "69e5e00054d3c1cff635fe41fcb96fbe150d25fb"
 CRAFT_FRONTEND_REVISION = "43a650ab35cba99c6788ce3622a46e08404e7731"
-CRAFT_BACKEND_REVISION = "045124def4de6742fb99d8d7c436624c8fdee1e9"
+CRAFT_BACKEND_REVISION = "076ed4348a066c59b6852f75d479fa08c2a49f14"
 PROJECT_CLOSURE_SCOPE = {
     ("GET", "/api/lists"),
     ("DELETE", "/api/lists/{dynamic}"),

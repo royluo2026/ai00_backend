@@ -1061,7 +1061,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/craft/craft_backend/capabilities/rule_engine.py",
-            "source_sha256": "c8ac721a01fe3bfb22ffab47e859b19097bf9f5524309e16356d2dc02259bec5",
+            "source_sha256": "3f7cdfe1036ce95c00ee8548725e94bb0876c7ca5430984c79c94cc773850455",
             "start_line": 175,
             "end_line": 175,
             "sha256": "70894c43c2c5b0f52bb6a3a20e53eab6c624f41ef91801052aa58b2caf9b7390",
