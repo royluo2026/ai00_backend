@@ -126,6 +126,9 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         "delegation_policy": "scoped",
         "agent_output_schema": descriptor.output_schema,
         "operation_policy": "optional" if is_write else "none",
+        "replay_data_policy": (
+            "projected" if spec.id == RULE_DEFINITION_CHANGE_CAPABILITY_ID else "metadata_only"
+        ),
         "concurrency_policy": "expected_version" if spec.id in _EXPECTED_REVISION else "none",
         "expected_version_payload_path": "expected_revision" if spec.id in _EXPECTED_REVISION else None,
         "idempotency_policy": "required" if is_write else "none",
