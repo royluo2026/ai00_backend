@@ -8,6 +8,17 @@ def obj(properties: dict, required: tuple[str, ...] = ()) -> dict:
 
 
 STRING = {"type": "string", "minLength": 1}
+IDENTITY = {"type": "string", "minLength": 1, "maxLength": 255}
+TOKEN = {"type": "string", "minLength": 1, "maxLength": 512}
+REVISION = {"type": "integer", "minimum": 1}
+SCALAR = {"type": ["string", "number", "integer", "boolean", "null"], "maxLength": 4096}
+VALUE = {"oneOf": [SCALAR, {"type": "array", "maxItems": 64, "items": SCALAR}]}
+NAMED_VALUE = obj({
+    "name": {"type": "string", "minLength": 1, "maxLength": 128},
+    "value": VALUE,
+}, required=("name", "value"))
+INPUT_VALUES = {"type": "array", "maxItems": 64, "uniqueItems": True, "items": NAMED_VALUE}
+OUTPUT_VALUES = {"type": "array", "maxItems": 128, "items": NAMED_VALUE}
 INPUT = obj({
     "resource_gid": STRING, "expected_version": {"type": "integer", "minimum": 0},
     "status": STRING, "content": {"type": "object", "additionalProperties": True},
@@ -66,6 +77,8 @@ CAPABILITY_IDS = (
     "agent.interaction.request", "agent.interaction.cancel", "agent.memory.change.apply", "agent.memory.read", "agent.runtime.config.read", "agent.tool_catalog.read", "agent.script.generate",
     "agent.run.change.apply", "agent.run.read", "agent.session.change.apply", "agent.session.read",
     "agent.skill.change.apply", "agent.skill.read",
+    "agent.workflow.node.test.execute", "agent.canvas.options.resolve",
+    "agent.canvas.execution.start", "agent.canvas.execution.resume",
 )
 INPUT_SCHEMAS = {capability_id: INPUT for capability_id in CAPABILITY_IDS}
 OUTPUT_SCHEMAS = {capability_id: OUTPUT for capability_id in CAPABILITY_IDS}
@@ -81,6 +94,39 @@ OUTPUT_SCHEMAS["agent.tool_catalog.read"] = obj({
     "system": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}},
     "total": {"type": "integer", "minimum": 0},
 })
+INPUT_SCHEMAS["agent.workflow.node.test.execute"] = obj({
+    "flow_gid": IDENTITY, "node_id": IDENTITY, "input_values": INPUT_VALUES,
+}, required=("flow_gid", "node_id", "input_values"))
+OUTPUT_SCHEMAS["agent.workflow.node.test.execute"] = obj({
+    "status": {"type": "string", "enum": ["completed", "rejected"]},
+    "output_values": OUTPUT_VALUES, "summary": {"type": "string", "maxLength": 4000},
+}, required=("status", "output_values", "summary"))
+INPUT_SCHEMAS["agent.canvas.options.resolve"] = obj({
+    "skill_gid": IDENTITY, "node_id": IDENTITY,
+    "field_key": {"type": "string", "minLength": 1, "maxLength": 128},
+    "input_values": INPUT_VALUES,
+}, required=("skill_gid", "node_id", "field_key", "input_values"))
+OUTPUT_SCHEMAS["agent.canvas.options.resolve"] = obj({
+    "revision": REVISION,
+    "options": {"type": "array", "maxItems": 200, "items": obj({
+        "value": {"type": "string", "minLength": 1, "maxLength": 512},
+        "label": {"type": "string", "minLength": 1, "maxLength": 512},
+    }, required=("value", "label"))},
+}, required=("revision", "options"))
+INPUT_SCHEMAS["agent.canvas.execution.start"] = obj({
+    "skill_gid": IDENTITY, "expected_revision": REVISION, "input_values": INPUT_VALUES,
+}, required=("skill_gid", "expected_revision", "input_values"))
+INPUT_SCHEMAS["agent.canvas.execution.resume"] = obj({
+    "run_token": TOKEN, "pause_token": TOKEN, "expected_revision": REVISION,
+    "approved": {"type": "boolean"}, "input_values": INPUT_VALUES,
+}, required=("run_token", "pause_token", "expected_revision", "approved", "input_values"))
+RUNTIME_DISPATCH = obj({
+    "status": {"type": "string", "enum": ["accepted", "completed", "paused", "outcome_unknown"]},
+    "run_token": TOKEN, "revision": REVISION, "pause_token": TOKEN,
+    "summary": {"type": "string", "maxLength": 4000},
+}, required=("status", "run_token", "revision", "summary"))
+OUTPUT_SCHEMAS["agent.canvas.execution.start"] = RUNTIME_DISPATCH
+OUTPUT_SCHEMAS["agent.canvas.execution.resume"] = RUNTIME_DISPATCH
 INPUT_SCHEMAS["agent.interaction.cancel"] = obj({"session_gid": STRING}, required=("session_gid",))
 OUTPUT_SCHEMAS["agent.interaction.cancel"] = obj({"ok": {"type": "boolean"}, "session_gid": STRING}, required=("ok", "session_gid"))
 INPUT_SCHEMAS["agent.interaction.chat.change.apply"] = obj({"operation": {"type": "string", "enum": ["chat_stream", "chat_sync", "confirm", "confirm_sync"]}, "body": {"type": "object", "additionalProperties": True}, "ai00_token": STRING}, required=("operation", "body"))

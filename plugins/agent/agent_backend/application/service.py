@@ -1,19 +1,50 @@
 from __future__ import annotations
 
 from backend.capability_v2.provider_contracts import CapabilityBusinessError
+from dataclasses import asdict
+
+from .canvas_runtime import (
+    CanvasOptionsRequest, CanvasResumeRequest, CanvasStartRequest, NodeTestRequest, RunPrincipal,
+)
+
+
+_CANVAS_REQUESTS = {
+    "agent.workflow.node.test.execute": (NodeTestRequest, "test_node"),
+    "agent.canvas.options.resolve": (CanvasOptionsRequest, "resolve_options"),
+    "agent.canvas.execution.start": (CanvasStartRequest, "start"),
+    "agent.canvas.execution.resume": (CanvasResumeRequest, "resume"),
+}
 
 
 class AgentApplication:
-    def __init__(self, repository, audit_repository=None, session_repository=None):
+    def __init__(self, repository, audit_repository=None, session_repository=None, canvas_runtime=None):
         self.repository = repository
         self.audit_repository = audit_repository
         self.session_repository = session_repository
+        self.canvas_runtime = canvas_runtime
 
     def invoke(self, capability_id: str, payload: dict, context):
         actor = getattr(context, "user_gid", None) or getattr(context, "actor_gid", None)
         tenant = getattr(context, "team_gid", None) or getattr(context, "tenant_gid", None)
         if not actor or not tenant:
             raise CapabilityBusinessError("permission_denied", "Agent access requires actor and tenant context")
+        if capability_id in _CANVAS_REQUESTS:
+            if self.canvas_runtime is None:
+                raise CapabilityBusinessError(
+                    "provider_unavailable", "Agent canvas runtime adapter is not configured", retryable=True
+                )
+            request_type, method_name = _CANVAS_REQUESTS[capability_id]
+            try:
+                request = request_type.from_payload(payload)
+            except (TypeError, ValueError) as exc:
+                raise CapabilityBusinessError("invalid_input", str(exc)) from exc
+            principal = RunPrincipal(actor_gid=str(actor), team_gid=str(tenant))
+
+            async def invoke_canvas():
+                result = await getattr(self.canvas_runtime, method_name)(request, principal)
+                return asdict(result)
+
+            return invoke_canvas()
         family = capability_id.split(".")[1]
         data = {
             **payload,

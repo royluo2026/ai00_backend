@@ -7,7 +7,7 @@ from .contracts import CAPABILITY_IDS, INPUT_SCHEMAS, OUTPUT_SCHEMAS
 def specs() -> tuple[CapabilitySpec, ...]:
     result = []
     for capability_id in CAPABILITY_IDS:
-        read = capability_id.endswith(".read")
+        read = capability_id.endswith(".read") or capability_id == "agent.canvas.options.resolve"
         result.append(CapabilitySpec(
             id=capability_id, owner="agent",
             description=f"Execute the governed {capability_id} Agent outcome.",

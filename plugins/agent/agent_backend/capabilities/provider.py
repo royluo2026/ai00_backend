@@ -12,12 +12,19 @@ ERRORS = tuple(DomainErrorContract(code=code, meaning=meaning, retryable=retryab
     ("catalog_release_unavailable", "The pinned Catalog release is unavailable.", True),
     ("delegation_expired", "The Agent delegation is missing or expired.", False),
     ("approval_required", "The delegated operation requires Base approval.", False),
+    ("provider_unavailable", "The Agent canvas runtime adapter is unavailable.", True),
+    ("runtime_timeout", "The bounded Agent canvas runtime timed out.", True),
+    ("idempotency_conflict", "The Agent canvas invocation conflicts with an earlier request.", False),
+    ("outcome_unknown", "The Agent canvas outcome must be reconciled.", True),
 ))
+
+_CANVAS_COMMANDS = {"agent.canvas.execution.start", "agent.canvas.execution.resume"}
+_CANVAS_SYNC = {"agent.workflow.node.test.execute", "agent.canvas.options.resolve"}
 
 
 def descriptor_for(spec) -> CapabilityDescriptorV2:
     base = descriptor_from_provider_spec(spec); write = base.side_effect_level is not SideEffectLevel.READ
-    interaction = spec.id in {"agent.interaction.request", "agent.script.generate"}
+    interaction = spec.id in {"agent.interaction.request", "agent.script.generate", *_CANVAS_COMMANDS}
     return CapabilityDescriptorV2.model_validate({
         **base.model_dump(), "owner_domain": "agent", "lifecycle_status": LifecycleStatus.STABLE,
         "exposure": ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True),
@@ -27,8 +34,9 @@ def descriptor_for(spec) -> CapabilityDescriptorV2:
         "data_classification": "confidential", "delegation_policy": "scoped",
         "agent_output_schema": base.output_schema,
         "execution_mode": ExecutionMode.CLOUD_ASYNC if interaction else base.execution_mode,
-        "operation_policy": "required" if interaction else ("optional" if write else "none"),
-        "idempotency_policy": "required" if write else "none", "consistency_policy": "strong",
+        "operation_policy": "required" if interaction else ("optional" if write and spec.id not in _CANVAS_SYNC else "none"),
+        "idempotency_policy": "required" if write and spec.id not in _CANVAS_SYNC else "none",
+        "consistency_policy": "strong",
         "evidence_policy": "required", "domain_errors": ERRORS, "domain_errors_complete": True,
     })
 

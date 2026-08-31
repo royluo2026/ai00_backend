@@ -6,7 +6,10 @@ from plugins.agent.agent_backend.capabilities import register_capabilities
 
 EXPECTED = {
     "agent.audit.read", "agent.audit.record", "agent.flow.change.apply", "agent.flow.read",
-    "agent.interaction.request", "agent.interaction.cancel", "agent.memory.change.apply", "agent.memory.read", "agent.runtime.config.read", "agent.tool_catalog.read", "agent.script.generate",
+    "agent.workflow.node.test.execute", "agent.canvas.options.resolve",
+    "agent.canvas.execution.start", "agent.canvas.execution.resume",
+    "agent.interaction.request", "agent.interaction.cancel", "agent.interaction.chat.change.apply",
+    "agent.memory.change.apply", "agent.memory.read", "agent.runtime.config.read", "agent.tool_catalog.read", "agent.script.generate",
     "agent.run.change.apply", "agent.run.read", "agent.session.change.apply", "agent.session.read",
     "agent.skill.change.apply", "agent.skill.read",
 }
