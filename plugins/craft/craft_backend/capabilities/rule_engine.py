@@ -7,7 +7,7 @@ from queue import Empty
 from typing import Any
 
 from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilityExecutionBudget, CapabilityOutput, CapabilitySpec
-from backend.capabilities.validation_next import validate_payload
+from backend.capability_v2.schema_validation import validate_payload
 
 from ..application.rules import load_visible_rule, rule_revision
 from ..data.connection import get_conn
