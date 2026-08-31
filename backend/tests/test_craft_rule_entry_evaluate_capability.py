@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import importlib
 import json
+import multiprocessing
 import time
+from pathlib import Path
 
 import pytest
 
@@ -16,12 +18,12 @@ def _handler():
     return module, handler
 
 
-def _rule(*, team_gid: str = "team-a", revision: str = "rev-1"):
+def _rule(*, team_gid: str = "team-a", revision: str = "rev-1", share_scope: str = "team"):
     return {
         "gid": "rule-1",
         "team_gid": team_gid,
         "owner_user_gid": "owner-1",
-        "share_scope": "team",
+        "share_scope": share_scope,
         "rule_revision": revision,
         "expression": "quantity > 0",
     }
@@ -39,25 +41,13 @@ def _context():
     return CapabilityContext(user_gid="user-1", team_gid="team-a")
 
 
-def test_rule_entry_evaluation_returns_only_the_closed_result(monkeypatch):
-    module, handler = _handler()
-    monkeypatch.setattr(module, "load_visible_rule", lambda *_: _rule())
-    monkeypatch.setattr(module, "check_rule", lambda *_: (module.RuleResult.PASS, None))
-
-    result = handler(_payload(), _context()).data
-
-    assert result == {"passed": True, "rule_revision": "rev-1", "diagnostics": []}
-
-
-def test_rule_entry_evaluation_hides_cross_team_rule(monkeypatch):
-    from plugins.craft.craft_backend.application import rules
-
+def _connection(row):
     class Cursor:
         def execute(self, *_args):
             pass
 
         def fetchone(self):
-            return _rule(team_gid="team-b")
+            return row
 
         def __enter__(self):
             return self
@@ -75,10 +65,42 @@ def test_rule_entry_evaluation_hides_cross_team_rule(monkeypatch):
         def __exit__(self, *_args):
             pass
 
-    monkeypatch.setattr(rules, "get_conn", lambda: Connection())
+    return Connection()
 
-    with pytest.raises(LookupError, match="rule not found"):
-        rules.load_visible_rule("rule-1", "user-1", "team-a")
+
+def _slow_marker_worker(result_queue, marker_path, _entry_json):
+    time.sleep(0.2)
+    Path(marker_path).write_text("finished", encoding="utf-8")
+    result_queue.put("pass")
+
+
+def test_rule_entry_evaluation_returns_only_the_closed_result(monkeypatch):
+    module, handler = _handler()
+    monkeypatch.setattr(module, "load_visible_rule", lambda *_: _rule())
+    monkeypatch.setattr(module, "_run_isolated_check", lambda *_: module.RuleResult.PASS.value)
+
+    result = handler(_payload(), _context()).data
+
+    assert result == {"passed": True, "rule_revision": "rev-1", "diagnostics": []}
+
+
+@pytest.mark.parametrize(("row", "user_gid", "team_gid", "visible"), [
+    (None, "user-1", "team-a", False),
+    (_rule(share_scope="private"), "owner-1", "team-a", True),
+    (_rule(share_scope="private"), "user-1", "team-a", False),
+    (_rule(share_scope="team"), "user-1", "team-a", True),
+    (_rule(team_gid="team-b", share_scope="team"), "user-1", "team-a", False),
+])
+def test_rule_entry_evaluation_visibility_is_owner_or_explicit_team_share(monkeypatch, row, user_gid, team_gid, visible):
+    from plugins.craft.craft_backend.application import rules
+
+    monkeypatch.setattr(rules, "get_conn", lambda: _connection(row))
+
+    if visible:
+        assert rules.load_visible_rule("rule-1", user_gid, team_gid)["gid"] == "rule-1"
+    else:
+        with pytest.raises(LookupError, match="rule not found"):
+            rules.load_visible_rule("rule-1", user_gid, team_gid)
 
 
 def test_rule_entry_evaluation_rejects_wrong_revision(monkeypatch):
@@ -106,13 +128,7 @@ def test_rule_entry_evaluation_rejects_unbounded_or_executable_entry(monkeypatch
 def test_rule_entry_evaluation_times_out_without_exposing_checker_text(monkeypatch):
     module, handler = _handler()
     monkeypatch.setattr(module, "load_visible_rule", lambda *_: _rule())
-    monkeypatch.setattr(module, "RULE_EVALUATION_TIMEOUT_SECONDS", 0.01)
-
-    def slow_check(*_args):
-        time.sleep(0.05)
-        return module.RuleResult.FAIL, "expression secret: source code"
-
-    monkeypatch.setattr(module, "check_rule", slow_check)
+    monkeypatch.setattr(module, "_run_isolated_check", lambda *_: None)
 
     result = handler(_payload(), _context()).data
 
@@ -121,10 +137,26 @@ def test_rule_entry_evaluation_times_out_without_exposing_checker_text(monkeypat
     assert "expression" not in json.dumps(result)
 
 
+def test_rule_entry_timeout_terminates_worker_without_later_side_effect(tmp_path):
+    module, unused_handler = _handler()
+    assert unused_handler is not None
+    runner = getattr(module, "_run_isolated_check", None)
+    assert runner is not None, "rule checks must run in a terminable isolated worker"
+    marker = tmp_path / "late-worker.txt"
+    before = {child.pid for child in multiprocessing.active_children()}
+
+    for _ in range(3):
+        assert runner(str(marker), {}, 0.01, worker_target=_slow_marker_worker) is None
+
+    time.sleep(0.25)
+    assert not marker.exists()
+    assert {child.pid for child in multiprocessing.active_children()} <= before
+
+
 def test_rule_entry_evaluation_caps_diagnostics_and_never_returns_checker_message(monkeypatch):
     module, handler = _handler()
     monkeypatch.setattr(module, "load_visible_rule", lambda *_: _rule())
-    monkeypatch.setattr(module, "check_rule", lambda *_: (module.RuleResult.FAIL, "source=hidden; secret=hidden"))
+    monkeypatch.setattr(module, "_run_isolated_check", lambda *_: module.RuleResult.FAIL.value)
 
     result = handler(_payload(), _context()).data
 

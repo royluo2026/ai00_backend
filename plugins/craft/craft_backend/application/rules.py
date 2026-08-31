@@ -22,7 +22,7 @@ def load_visible_rule(rule_gid, user_gid, team_gid):
     if not (
         rule.get("share_scope") == "global"
         or rule.get("owner_user_gid") == user_gid
-        or (team_gid and rule.get("team_gid") == team_gid)
+        or (rule.get("share_scope") == "team" and team_gid and rule.get("team_gid") == team_gid)
     ):
         raise LookupError("rule not found")
     return rule

@@ -2,7 +2,8 @@
 from __future__ import annotations
 
 import json
-from concurrent.futures import ThreadPoolExecutor, TimeoutError
+import multiprocessing
+from queue import Empty
 from typing import Any
 
 from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilityExecutionBudget, CapabilityOutput, CapabilitySpec
@@ -18,7 +19,7 @@ MAX_ENTRY_BYTES = 8 * 1024
 MAX_ENTRY_DEPTH = 4
 MAX_DIAGNOSTICS = 5
 MAX_DIAGNOSTIC_CODE_LENGTH = 64
-RULE_EVALUATION_TIMEOUT_SECONDS = 0.25
+RULE_EVALUATION_TIMEOUT_SECONDS = 1.0
 _FORBIDDEN_ENTRY_FIELDS = {"expression", "source", "code", "sql", "provider", "secret", "script", "query"}
 _ENTRY_FIELDS = (
     "gid", "node_type", "title", "name", "vpps", "version_no", "std_time", "torque", "qualification",
@@ -76,6 +77,50 @@ def _outcome(passed: bool, revision: str, code: str | None = None) -> Capability
     return CapabilityOutput(data={"passed": passed, "rule_revision": revision, "diagnostics": diagnostics[:MAX_DIAGNOSTICS]})
 
 
+def _check_worker(result_queue: Any, expression: str, entry_json: str) -> None:
+    """Run the already-approved pure checker in a fresh process."""
+    try:
+        result, _message = check_rule(expression, json.loads(entry_json))
+        result_queue.put(result.value)
+    except Exception:
+        result_queue.put("")
+
+
+def _run_isolated_check(
+    expression: str,
+    entry: dict[str, Any],
+    timeout: float,
+    *,
+    worker_target: Any = _check_worker,
+) -> str | None:
+    """Return a checker result, or None after terminating a timed-out worker."""
+    context = multiprocessing.get_context("spawn")
+    result_queue = context.Queue(maxsize=1)
+    process = context.Process(target=worker_target, args=(result_queue, expression, json.dumps(entry, ensure_ascii=False)))
+    started = False
+    try:
+        process.start()
+        started = True
+        process.join(timeout)
+        if process.is_alive():
+            process.terminate()
+            process.join()
+            return None
+        try:
+            result = result_queue.get(timeout=0.05)
+        except Empty:
+            return ""
+        return result if result in {item.value for item in RuleResult} else ""
+    finally:
+        if started and process.is_alive():
+            process.terminate()
+            process.join()
+        if started:
+            process.close()
+        result_queue.close()
+        result_queue.join_thread()
+
+
 def evaluate_rule_entry(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
     """Evaluate one visible, revision-pinned Craft rule against a closed entry projection."""
     entry = _bounded_entry(payload)
@@ -83,20 +128,12 @@ def evaluate_rule_entry(payload: dict[str, Any], context: CapabilityContext) -> 
     revision = rule_revision(rule)
     if revision != payload["rule_revision"]:
         raise CapabilityBusinessError("revision_conflict", "The requested rule revision is unavailable.")
-    executor = ThreadPoolExecutor(max_workers=1)
-    try:
-        future = executor.submit(check_rule, str(rule.get("expression") or ""), entry)
-        try:
-            result, _message = future.result(timeout=RULE_EVALUATION_TIMEOUT_SECONDS)
-        except TimeoutError:
-            return _outcome(False, revision, "evaluation_timeout")
-        except Exception:
-            return _outcome(False, revision, "evaluation_unavailable")
-    finally:
-        executor.shutdown(wait=False, cancel_futures=True)
-    if result is RuleResult.PASS:
+    result = _run_isolated_check(str(rule.get("expression") or ""), entry, RULE_EVALUATION_TIMEOUT_SECONDS)
+    if result is None:
+        return _outcome(False, revision, "evaluation_timeout")
+    if result == RuleResult.PASS.value:
         return _outcome(True, revision)
-    if result is RuleResult.FAIL:
+    if result == RuleResult.FAIL.value:
         return _outcome(False, revision, "rule_failed")
     return _outcome(False, revision, "evaluation_unavailable")
 
