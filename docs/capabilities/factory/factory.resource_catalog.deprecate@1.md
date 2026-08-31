@@ -8,7 +8,7 @@ Execute the governed factory.resource_catalog.deprecate Factory outcome.
 - 不适用：The resource is a BOP plan node or production schedule.
 - 生命周期：`stable`
 - 所属领域：`factory`
-- Catalog Release：`rel_05bcccdde2e100f8dba2e9e85c3dab50`
+- Catalog Release：`rel_b79f7e734da4b72dbf4af4adbf91bb37`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -175,7 +175,7 @@ Execute the governed factory.resource_catalog.deprecate Factory outcome.
 ```json
 {
   "capability_id": "factory.resource_catalog.deprecate",
-  "catalog_release": "rel_05bcccdde2e100f8dba2e9e85c3dab50",
+  "catalog_release": "rel_b79f7e734da4b72dbf4af4adbf91bb37",
   "major_version": 1,
   "payload": {}
 }

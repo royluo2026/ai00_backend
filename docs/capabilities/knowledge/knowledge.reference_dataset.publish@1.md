@@ -8,7 +8,7 @@ Read or publish immutable versioned reference datasets.
 - 不适用：The caller needs mutable operational transactions or cross-domain SQL.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_05bcccdde2e100f8dba2e9e85c3dab50`
+- Catalog Release：`rel_b79f7e734da4b72dbf4af4adbf91bb37`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -177,7 +177,7 @@ Read or publish immutable versioned reference datasets.
 ```json
 {
   "capability_id": "knowledge.reference_dataset.publish",
-  "catalog_release": "rel_05bcccdde2e100f8dba2e9e85c3dab50",
+  "catalog_release": "rel_b79f7e734da4b72dbf4af4adbf91bb37",
   "major_version": 1,
   "payload": {
     "dataset_gid": "example",

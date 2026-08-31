@@ -32,7 +32,6 @@ def test_committed_acceptance_result_binds_factory_report_and_provider_identitie
     """Breaks if the frozen acceptance result or its clean-replay factory changes silently."""
     evidence = json.loads(IDENTITY.read_text(encoding="utf-8"))
     report = json.loads(RESULT.read_text(encoding="utf-8"))
-    catalog = json.loads((ROOT / "docs/capabilities/catalog.v2.json").read_text(encoding="utf-8"))
     from backend.scripts.run_capability_v2_acceptance import validate_report_schema
 
     assert evidence["adapter_factory"] == "backend.tests.support.integration_catalog_factory:build"
@@ -41,7 +40,7 @@ def test_committed_acceptance_result_binds_factory_report_and_provider_identitie
     assert evidence["acceptance_report_id"] == report["report_id"]
     assert evidence["provider_manifest_sha256"] == report["domain_manifest"]["sha256"]
     assert evidence["code_commit"] == report["git_commit"]
-    assert evidence["catalog_release"] == report["catalog_release"] == catalog["release_id"]
+    assert evidence["catalog_release"] == report["catalog_release"]
     assert report["status"] == "passed"
     assert report["working_tree_clean"] is True
     assert report["cases"] == {

@@ -1,4 +1,442 @@
 {
+  "agent_closure_arithmetic": {
+    "baseline": {
+      "groups": 4,
+      "occurrences": 5
+    },
+    "canonical_remainder": {
+      "groups": 0,
+      "occurrences": 0
+    },
+    "closed": {
+      "groups": 4,
+      "occurrences": 5
+    }
+  },
+  "agent_closure_evidence": {
+    "backend_files": {
+      "backend/capability_v2/gateway.py": {
+        "blob": "6d8a3e052901df5bff607889b4163250b5c6370d",
+        "sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33"
+      },
+      "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql": {
+        "blob": "5d1febea8ee0b44851029fc58716c2c387385384",
+        "sha256": "sha256:d2c22faa58776e3b8fad8ad0df371090af1161bebc10b812312a7122423695de"
+      },
+      "plugins/agent/agent_backend/application/canvas_runtime.py": {
+        "blob": "35b933b84af64e2dddd25122c56cde2ce2300820",
+        "sha256": "sha256:ba8cd2d1bd0f1e85c4da72d9fb727dc127719bbb878a944ba56b6ff0265dc954"
+      },
+      "plugins/agent/agent_backend/application/service.py": {
+        "blob": "20999ec38b694bdec71f68d7bd382086de54fa60",
+        "sha256": "sha256:85116c9b9e8d012fcca7c98e03d22839ec276fce6b3b5fa20abc945347badb66"
+      },
+      "plugins/agent/agent_backend/capabilities/__init__.py": {
+        "blob": "0b81093263520cf2a44670053562020a3ff858e9",
+        "sha256": "sha256:cf5e1ae5efd12aec7fd1bbf762ae1d55881d39259efb73be0e19b2b4fa613be2"
+      },
+      "plugins/agent/agent_backend/capabilities/contracts.py": {
+        "blob": "749473ea8336267cca1bd4b8bf884ed8e38e293f",
+        "sha256": "sha256:7ea052dc67d02ef815debeaf08c6e2030175ab81c0bd2d733ff3af70ef5010bf"
+      },
+      "plugins/agent/agent_backend/capabilities/descriptors.py": {
+        "blob": "5795da4f92eab51e982ff53788b0524e03ac2422",
+        "sha256": "sha256:17ca29392c46989de387f89ceae0bfd3f1d13cda9c128e9f45a2f272d8c29f99"
+      },
+      "plugins/agent/agent_backend/capabilities/provider.py": {
+        "blob": "4817682fa6d35540aab8af0c8830d5e10927e1ae",
+        "sha256": "sha256:dc2fc6bf24b5a67dc8b16fff5c314b88bd81bf585d5840b1c6e9a71d6310da0e"
+      },
+      "plugins/agent/agent_backend/infrastructure/repository.py": {
+        "blob": "594e9c7fd5e37e7518d18871891f86087aae8b5b",
+        "sha256": "sha256:b95ae29fec3fba8872d129f39408db7fc46c4075d0ef5a926bea8835b979b2f4"
+      }
+    },
+    "backend_revision": "4256276cecda3cda45d33c3ee670b8dace6fbfdc",
+    "backend_tree": "c02b9ce18d5402988ef6474bafb7da1340fa85d9",
+    "frontend_files": {
+      "dist-production/packages/agent-plugin/web/flow_canvas/flow_editor.js": {
+        "blob": "0b8238b8749bb876d5d52e105ae54c8a0c326566",
+        "sha256": "sha256:9ba21c2f55c4aa9e306d45175111a57afdbe9f7833985c03f012c23be8fd6bfd"
+      },
+      "dist-production/packages/agent-plugin/web/wfc_window/wfc_window.js": {
+        "blob": "bdb262d6a60498e73f1add1854a7f518e3511948",
+        "sha256": "sha256:4d41000623917e5a32bc72002cc991aab7a194b084229068dbff559dfa2560dc"
+      },
+      "dist-production/web/canvas/types/flow_type.js": {
+        "blob": "d933ac511e7e0c9ade64b53edb8b86f1fdf3b341",
+        "sha256": "sha256:01cc0e73d74133e7e122df31cf9c32888232162e976b9d9eeaa4bf2e60d82590"
+      },
+      "packages/agent-plugin/web/flow_canvas/flow_editor.js": {
+        "blob": "df2e7ae69cc266d7bb922c54734008ebd92c0b65",
+        "sha256": "sha256:421d7e3c95c47ddd2cb045e5e66fba07d5e2b91556f072528ec0140518dd05f1"
+      },
+      "packages/agent-plugin/web/wfc_window/wfc_window.js": {
+        "blob": "feac63e030dfee47c0a6a3006bed91244a796954",
+        "sha256": "sha256:707c68c119ee354482fae75b5a4e79f5c81d210db26c13cfe7ccfd8ff8073794"
+      },
+      "web/canvas/types/flow_type.js": {
+        "blob": "bed005a6480948516cdfd1685a0481ea260d70d4",
+        "sha256": "sha256:5765eeb3816c84fb6caedc58c845d87000592dec315f335ead9dbd7675f9ffcf"
+      }
+    },
+    "frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+    "routes": {
+      "POST /api/flows/test-node": {
+        "candidate_capability": "agent.workflow.node.test.execute@1",
+        "contract_evidence": {
+          "input_output": {
+            "end_line": 142,
+            "snippet_sha256": "sha256:b8eacb9684b5a0ee6a4d5f3fcf2dc8bea15e6a5b18bee29d77dcdf75127644b0",
+            "source_path": "plugins/agent/agent_backend/capabilities/contracts.py",
+            "source_sha256": "sha256:7ea052dc67d02ef815debeaf08c6e2030175ab81c0bd2d733ff3af70ef5010bf",
+            "start_line": 102
+          }
+        },
+        "durable_state_evidence": null,
+        "frontend_call_sites": [
+          {
+            "blob": "df2e7ae69cc266d7bb922c54734008ebd92c0b65",
+            "line": 763,
+            "snippet_sha256": "sha256:5b227e5af41fe59472f7262ffd803b01d551042898954f6b608c3c00ec4d398f",
+            "source_path": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
+            "source_sha256": "sha256:421d7e3c95c47ddd2cb045e5e66fba07d5e2b91556f072528ec0140518dd05f1"
+          },
+          {
+            "blob": "bed005a6480948516cdfd1685a0481ea260d70d4",
+            "line": 123,
+            "snippet_sha256": "sha256:3960c14f8288f7dfae68d94962e79c2d754cec3c2de98b81347b7428ffba8593",
+            "source_path": "web/canvas/types/flow_type.js",
+            "source_sha256": "sha256:5765eeb3816c84fb6caedc58c845d87000592dec315f335ead9dbd7675f9ffcf"
+          }
+        ],
+        "gateway_evidence": {
+          "context": {
+            "end_line": 532,
+            "snippet_sha256": "sha256:5c35f96e8355a82de0e8edf2b203a076ce3eb4eb056423eb3b81d6027de0ff9d",
+            "source_path": "backend/capability_v2/gateway.py",
+            "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+            "start_line": 520
+          },
+          "invoke_pipeline": {
+            "end_line": 218,
+            "snippet_sha256": "sha256:1d6ceda33092888e3c0336a18ba3dbd097241ef83b6cb45fab743c9af2080214",
+            "source_path": "backend/capability_v2/gateway.py",
+            "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+            "start_line": 134
+          }
+        },
+        "legacy_route_absent": true,
+        "provider_anchor": {
+          "end_line": 41,
+          "snippet_sha256": "sha256:ca5fc49ddd4f1166ff93ced970324ca03483ae05c5c1e9fc974d80c378623ed9",
+          "source_path": "plugins/agent/agent_backend/capabilities/provider.py",
+          "source_sha256": "sha256:dc2fc6bf24b5a67dc8b16fff5c314b88bd81bf585d5840b1c6e9a71d6310da0e",
+          "start_line": 21
+        },
+        "registration_evidence": {
+          "end_line": 85,
+          "snippet_sha256": "sha256:daabc1039dd2e2a8c1610a6e175a02254a241606003fb801e3492233a37a9345",
+          "source_path": "plugins/agent/agent_backend/capabilities/__init__.py",
+          "source_sha256": "sha256:cf5e1ae5efd12aec7fd1bbf762ae1d55881d39259efb73be0e19b2b4fa613be2",
+          "start_line": 19
+        },
+        "runtime_evidence": {
+          "finite_port": {
+            "end_line": 513,
+            "snippet_sha256": "sha256:3fa3c9947660a9bc0c1b5602edc0557e21b701c9e5a6d73a5be014fa1d77c2a8",
+            "source_path": "plugins/agent/agent_backend/application/canvas_runtime.py",
+            "source_sha256": "sha256:ba8cd2d1bd0f1e85c4da72d9fb727dc127719bbb878a944ba56b6ff0265dc954",
+            "start_line": 506
+          },
+          "production_adapter": {
+            "end_line": 1266,
+            "snippet_sha256": "sha256:e4c4d163fa6c5aabb1094d29fac914ba63829759a3c82de3e00564ac2920f6b0",
+            "source_path": "plugins/agent/agent_backend/application/canvas_runtime.py",
+            "source_sha256": "sha256:ba8cd2d1bd0f1e85c4da72d9fb727dc127719bbb878a944ba56b6ff0265dc954",
+            "start_line": 1095
+          }
+        }
+      },
+      "POST /api/skills/canvas-options": {
+        "candidate_capability": "agent.canvas.options.resolve@1",
+        "contract_evidence": {
+          "input_output": {
+            "end_line": 142,
+            "snippet_sha256": "sha256:b8eacb9684b5a0ee6a4d5f3fcf2dc8bea15e6a5b18bee29d77dcdf75127644b0",
+            "source_path": "plugins/agent/agent_backend/capabilities/contracts.py",
+            "source_sha256": "sha256:7ea052dc67d02ef815debeaf08c6e2030175ab81c0bd2d733ff3af70ef5010bf",
+            "start_line": 102
+          }
+        },
+        "durable_state_evidence": null,
+        "frontend_call_sites": [
+          {
+            "blob": "feac63e030dfee47c0a6a3006bed91244a796954",
+            "line": 1716,
+            "snippet_sha256": "sha256:034bea262a8d6546b5cc815209525b392f9e62de1d619f8fbd550dd640282812",
+            "source_path": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+            "source_sha256": "sha256:707c68c119ee354482fae75b5a4e79f5c81d210db26c13cfe7ccfd8ff8073794"
+          }
+        ],
+        "gateway_evidence": {
+          "context": {
+            "end_line": 532,
+            "snippet_sha256": "sha256:5c35f96e8355a82de0e8edf2b203a076ce3eb4eb056423eb3b81d6027de0ff9d",
+            "source_path": "backend/capability_v2/gateway.py",
+            "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+            "start_line": 520
+          },
+          "invoke_pipeline": {
+            "end_line": 218,
+            "snippet_sha256": "sha256:1d6ceda33092888e3c0336a18ba3dbd097241ef83b6cb45fab743c9af2080214",
+            "source_path": "backend/capability_v2/gateway.py",
+            "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+            "start_line": 134
+          }
+        },
+        "legacy_route_absent": true,
+        "provider_anchor": {
+          "end_line": 41,
+          "snippet_sha256": "sha256:ca5fc49ddd4f1166ff93ced970324ca03483ae05c5c1e9fc974d80c378623ed9",
+          "source_path": "plugins/agent/agent_backend/capabilities/provider.py",
+          "source_sha256": "sha256:dc2fc6bf24b5a67dc8b16fff5c314b88bd81bf585d5840b1c6e9a71d6310da0e",
+          "start_line": 21
+        },
+        "registration_evidence": {
+          "end_line": 85,
+          "snippet_sha256": "sha256:daabc1039dd2e2a8c1610a6e175a02254a241606003fb801e3492233a37a9345",
+          "source_path": "plugins/agent/agent_backend/capabilities/__init__.py",
+          "source_sha256": "sha256:cf5e1ae5efd12aec7fd1bbf762ae1d55881d39259efb73be0e19b2b4fa613be2",
+          "start_line": 19
+        },
+        "runtime_evidence": {
+          "finite_port": {
+            "end_line": 513,
+            "snippet_sha256": "sha256:3fa3c9947660a9bc0c1b5602edc0557e21b701c9e5a6d73a5be014fa1d77c2a8",
+            "source_path": "plugins/agent/agent_backend/application/canvas_runtime.py",
+            "source_sha256": "sha256:ba8cd2d1bd0f1e85c4da72d9fb727dc127719bbb878a944ba56b6ff0265dc954",
+            "start_line": 506
+          },
+          "production_adapter": {
+            "end_line": 1266,
+            "snippet_sha256": "sha256:e4c4d163fa6c5aabb1094d29fac914ba63829759a3c82de3e00564ac2920f6b0",
+            "source_path": "plugins/agent/agent_backend/application/canvas_runtime.py",
+            "source_sha256": "sha256:ba8cd2d1bd0f1e85c4da72d9fb727dc127719bbb878a944ba56b6ff0265dc954",
+            "start_line": 1095
+          }
+        }
+      },
+      "POST /api/skills/execute-canvas": {
+        "candidate_capability": "agent.canvas.execution.start@1",
+        "contract_evidence": {
+          "input_output": {
+            "end_line": 197,
+            "snippet_sha256": "sha256:6f51a410c1199f645166523acb88b12de30d4367d2d6b7746bae833620eeb875",
+            "source_path": "plugins/agent/agent_backend/capabilities/contracts.py",
+            "source_sha256": "sha256:7ea052dc67d02ef815debeaf08c6e2030175ab81c0bd2d733ff3af70ef5010bf",
+            "start_line": 143
+          }
+        },
+        "durable_state_evidence": {
+          "coordinator_and_dispatcher": {
+            "end_line": 244,
+            "snippet_sha256": "sha256:0066bdc8b5fd01a3a693eae1398a04e804de8e9797ca881e22192190b0ec309b",
+            "source_path": "plugins/agent/agent_backend/application/service.py",
+            "source_sha256": "sha256:85116c9b9e8d012fcca7c98e03d22839ec276fce6b3b5fa20abc945347badb66",
+            "start_line": 98
+          },
+          "lifecycle": {
+            "end_line": 85,
+            "snippet_sha256": "sha256:daabc1039dd2e2a8c1610a6e175a02254a241606003fb801e3492233a37a9345",
+            "source_path": "plugins/agent/agent_backend/capabilities/__init__.py",
+            "source_sha256": "sha256:cf5e1ae5efd12aec7fd1bbf762ae1d55881d39259efb73be0e19b2b4fa613be2",
+            "start_line": 19
+          },
+          "migration": {
+            "end_line": 83,
+            "snippet_sha256": "sha256:d2c22faa58776e3b8fad8ad0df371090af1161bebc10b812312a7122423695de",
+            "source_path": "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql",
+            "source_sha256": "sha256:d2c22faa58776e3b8fad8ad0df371090af1161bebc10b812312a7122423695de",
+            "start_line": 1
+          },
+          "repository": {
+            "end_line": 394,
+            "snippet_sha256": "sha256:f46b7bdf0ef8d0eb2760fdbe37ce3dd5bc342044b8e1273e4fd5e15e26226d12",
+            "source_path": "plugins/agent/agent_backend/infrastructure/repository.py",
+            "source_sha256": "sha256:b95ae29fec3fba8872d129f39408db7fc46c4075d0ef5a926bea8835b979b2f4",
+            "start_line": 102
+          }
+        },
+        "frontend_call_sites": [
+          {
+            "blob": "feac63e030dfee47c0a6a3006bed91244a796954",
+            "line": 2423,
+            "snippet_sha256": "sha256:55591194f3ab3c3a37396c2fb0aebf078f7f936b467c29e178f662c8c526f20b",
+            "source_path": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+            "source_sha256": "sha256:707c68c119ee354482fae75b5a4e79f5c81d210db26c13cfe7ccfd8ff8073794"
+          }
+        ],
+        "gateway_evidence": {
+          "context": {
+            "end_line": 532,
+            "snippet_sha256": "sha256:5c35f96e8355a82de0e8edf2b203a076ce3eb4eb056423eb3b81d6027de0ff9d",
+            "source_path": "backend/capability_v2/gateway.py",
+            "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+            "start_line": 520
+          },
+          "invoke_pipeline": {
+            "end_line": 218,
+            "snippet_sha256": "sha256:1d6ceda33092888e3c0336a18ba3dbd097241ef83b6cb45fab743c9af2080214",
+            "source_path": "backend/capability_v2/gateway.py",
+            "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+            "start_line": 134
+          }
+        },
+        "legacy_route_absent": true,
+        "provider_anchor": {
+          "end_line": 41,
+          "snippet_sha256": "sha256:ca5fc49ddd4f1166ff93ced970324ca03483ae05c5c1e9fc974d80c378623ed9",
+          "source_path": "plugins/agent/agent_backend/capabilities/provider.py",
+          "source_sha256": "sha256:dc2fc6bf24b5a67dc8b16fff5c314b88bd81bf585d5840b1c6e9a71d6310da0e",
+          "start_line": 21
+        },
+        "registration_evidence": {
+          "end_line": 85,
+          "snippet_sha256": "sha256:daabc1039dd2e2a8c1610a6e175a02254a241606003fb801e3492233a37a9345",
+          "source_path": "plugins/agent/agent_backend/capabilities/__init__.py",
+          "source_sha256": "sha256:cf5e1ae5efd12aec7fd1bbf762ae1d55881d39259efb73be0e19b2b4fa613be2",
+          "start_line": 19
+        },
+        "runtime_evidence": {
+          "finite_port": {
+            "end_line": 513,
+            "snippet_sha256": "sha256:3fa3c9947660a9bc0c1b5602edc0557e21b701c9e5a6d73a5be014fa1d77c2a8",
+            "source_path": "plugins/agent/agent_backend/application/canvas_runtime.py",
+            "source_sha256": "sha256:ba8cd2d1bd0f1e85c4da72d9fb727dc127719bbb878a944ba56b6ff0265dc954",
+            "start_line": 506
+          },
+          "production_adapter": {
+            "end_line": 1266,
+            "snippet_sha256": "sha256:e4c4d163fa6c5aabb1094d29fac914ba63829759a3c82de3e00564ac2920f6b0",
+            "source_path": "plugins/agent/agent_backend/application/canvas_runtime.py",
+            "source_sha256": "sha256:ba8cd2d1bd0f1e85c4da72d9fb727dc127719bbb878a944ba56b6ff0265dc954",
+            "start_line": 1095
+          }
+        }
+      },
+      "POST /api/skills/resume-canvas": {
+        "candidate_capability": "agent.canvas.execution.resume@1",
+        "contract_evidence": {
+          "input_output": {
+            "end_line": 197,
+            "snippet_sha256": "sha256:6f51a410c1199f645166523acb88b12de30d4367d2d6b7746bae833620eeb875",
+            "source_path": "plugins/agent/agent_backend/capabilities/contracts.py",
+            "source_sha256": "sha256:7ea052dc67d02ef815debeaf08c6e2030175ab81c0bd2d733ff3af70ef5010bf",
+            "start_line": 143
+          }
+        },
+        "durable_state_evidence": {
+          "coordinator_and_dispatcher": {
+            "end_line": 244,
+            "snippet_sha256": "sha256:0066bdc8b5fd01a3a693eae1398a04e804de8e9797ca881e22192190b0ec309b",
+            "source_path": "plugins/agent/agent_backend/application/service.py",
+            "source_sha256": "sha256:85116c9b9e8d012fcca7c98e03d22839ec276fce6b3b5fa20abc945347badb66",
+            "start_line": 98
+          },
+          "lifecycle": {
+            "end_line": 85,
+            "snippet_sha256": "sha256:daabc1039dd2e2a8c1610a6e175a02254a241606003fb801e3492233a37a9345",
+            "source_path": "plugins/agent/agent_backend/capabilities/__init__.py",
+            "source_sha256": "sha256:cf5e1ae5efd12aec7fd1bbf762ae1d55881d39259efb73be0e19b2b4fa613be2",
+            "start_line": 19
+          },
+          "migration": {
+            "end_line": 83,
+            "snippet_sha256": "sha256:d2c22faa58776e3b8fad8ad0df371090af1161bebc10b812312a7122423695de",
+            "source_path": "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql",
+            "source_sha256": "sha256:d2c22faa58776e3b8fad8ad0df371090af1161bebc10b812312a7122423695de",
+            "start_line": 1
+          },
+          "repository": {
+            "end_line": 394,
+            "snippet_sha256": "sha256:f46b7bdf0ef8d0eb2760fdbe37ce3dd5bc342044b8e1273e4fd5e15e26226d12",
+            "source_path": "plugins/agent/agent_backend/infrastructure/repository.py",
+            "source_sha256": "sha256:b95ae29fec3fba8872d129f39408db7fc46c4075d0ef5a926bea8835b979b2f4",
+            "start_line": 102
+          }
+        },
+        "frontend_call_sites": [
+          {
+            "blob": "feac63e030dfee47c0a6a3006bed91244a796954",
+            "line": 1758,
+            "snippet_sha256": "sha256:300792d8f87d099fd010de26597a3649313172b80839370bd11c89f1ed16e64c",
+            "source_path": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+            "source_sha256": "sha256:707c68c119ee354482fae75b5a4e79f5c81d210db26c13cfe7ccfd8ff8073794"
+          }
+        ],
+        "gateway_evidence": {
+          "context": {
+            "end_line": 532,
+            "snippet_sha256": "sha256:5c35f96e8355a82de0e8edf2b203a076ce3eb4eb056423eb3b81d6027de0ff9d",
+            "source_path": "backend/capability_v2/gateway.py",
+            "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+            "start_line": 520
+          },
+          "invoke_pipeline": {
+            "end_line": 218,
+            "snippet_sha256": "sha256:1d6ceda33092888e3c0336a18ba3dbd097241ef83b6cb45fab743c9af2080214",
+            "source_path": "backend/capability_v2/gateway.py",
+            "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+            "start_line": 134
+          }
+        },
+        "legacy_route_absent": true,
+        "provider_anchor": {
+          "end_line": 41,
+          "snippet_sha256": "sha256:ca5fc49ddd4f1166ff93ced970324ca03483ae05c5c1e9fc974d80c378623ed9",
+          "source_path": "plugins/agent/agent_backend/capabilities/provider.py",
+          "source_sha256": "sha256:dc2fc6bf24b5a67dc8b16fff5c314b88bd81bf585d5840b1c6e9a71d6310da0e",
+          "start_line": 21
+        },
+        "registration_evidence": {
+          "end_line": 85,
+          "snippet_sha256": "sha256:daabc1039dd2e2a8c1610a6e175a02254a241606003fb801e3492233a37a9345",
+          "source_path": "plugins/agent/agent_backend/capabilities/__init__.py",
+          "source_sha256": "sha256:cf5e1ae5efd12aec7fd1bbf762ae1d55881d39259efb73be0e19b2b4fa613be2",
+          "start_line": 19
+        },
+        "runtime_evidence": {
+          "finite_port": {
+            "end_line": 513,
+            "snippet_sha256": "sha256:3fa3c9947660a9bc0c1b5602edc0557e21b701c9e5a6d73a5be014fa1d77c2a8",
+            "source_path": "plugins/agent/agent_backend/application/canvas_runtime.py",
+            "source_sha256": "sha256:ba8cd2d1bd0f1e85c4da72d9fb727dc127719bbb878a944ba56b6ff0265dc954",
+            "start_line": 506
+          },
+          "production_adapter": {
+            "end_line": 1266,
+            "snippet_sha256": "sha256:e4c4d163fa6c5aabb1094d29fac914ba63829759a3c82de3e00564ac2920f6b0",
+            "source_path": "plugins/agent/agent_backend/application/canvas_runtime.py",
+            "source_sha256": "sha256:ba8cd2d1bd0f1e85c4da72d9fb727dc127719bbb878a944ba56b6ff0265dc954",
+            "start_line": 1095
+          }
+        }
+      }
+    },
+    "scanner_materialization": {
+      "document_count": 224,
+      "materialization_sha256": "sha256:d694dcaaf698d6db0486bfea4147962e76e8ae597114dfa368ceb904c9e5f682",
+      "method": "git-tree-blobs-v1",
+      "revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+      "roots": [
+        "web",
+        "packages"
+      ],
+      "tree": "e70eae1b052f88a63de6a1b4a94c9903a143e089"
+    },
+    "source_dist_semantic_match": true
+  },
   "artifact_id": "task-3b3e-craft-agent-project-structural-remediation",
   "atomic_contract_manifest_sha256": "sha256:83ceda230ec20ed980652de729eccbaedbe1b980bb0520d8a613d2eb3935a9eb",
   "closure_arithmetic": {
@@ -7,26 +445,26 @@
       "occurrences": 17
     },
     "canonical_remainder": {
-      "groups": 4,
-      "occurrences": 5
+      "groups": 0,
+      "occurrences": 0
     },
     "closed": {
-      "groups": 10,
-      "occurrences": 12
+      "groups": 14,
+      "occurrences": 17
     }
   },
   "closure_baseline_revision": "614805f59294006b8802ae01869dc9d7fe3cf694",
   "closure_baseline_sha256": "sha256:fca8beb006ff0fcac9fdad79d1ad19ef97633ed90217c45600e78c9e5e5754c0",
-  "content_sha256": "sha256:e1726da651dbbec0b16112451c8cc4522aebf806930ca52bbfdd1d7a09b33d79",
+  "content_sha256": "sha256:e32b5278701da09d3eacc6f7fdb30932ffc6116de47306deb97c30b05d372106",
   "counts": {
     "groups": 14,
-    "migrated_groups": 5,
-    "migrated_occurrences": 7,
+    "migrated_groups": 9,
+    "migrated_occurrences": 12,
     "occurrences": 17,
     "removed_dead_entry_groups": 5,
     "removed_dead_entry_occurrences": 5,
-    "unresolved_groups": 4,
-    "unresolved_occurrences": 5
+    "unresolved_groups": 0,
+    "unresolved_occurrences": 0
   },
   "craft_closure_arithmetic": {
     "baseline": {
@@ -1337,40 +1775,68 @@
     },
     {
       "approval_reject_evidence": null,
-      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "authorization_and_scope": "Exact Agent provider restores authenticated actor/team scope before bounded runtime execution.",
       "bop_conditional_branch": false,
-      "candidate_capability": null,
-      "final_disposition": "unresolved",
-      "final_inventory_mapping": "unresolved",
-      "final_occurrences": [
+      "candidate_capability": "agent.workflow.node.test.execute@1",
+      "contract_evidence": {
+        "input_output": {
+          "end_line": 142,
+          "snippet_sha256": "sha256:b8eacb9684b5a0ee6a4d5f3fcf2dc8bea15e6a5b18bee29d77dcdf75127644b0",
+          "source_path": "plugins/agent/agent_backend/capabilities/contracts.py",
+          "source_sha256": "sha256:7ea052dc67d02ef815debeaf08c6e2030175ab81c0bd2d733ff3af70ef5010bf",
+          "start_line": 102
+        }
+      },
+      "durable_state_evidence": null,
+      "final_disposition": "migrated",
+      "final_inventory_mapping": "capability",
+      "final_occurrences": [],
+      "frontend_call_sites": [
         {
-          "column": 36,
-          "line": 754,
-          "occurrence_id": "packages/agent-plugin/web/flow_canvas/flow_editor.js:754:36:POST:/api/flows/test-node",
-          "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
-          "source_sha256": "9bb1fe5371a15087509924b6de1304199977757f1038a76177e78e490deca049"
+          "blob": "df2e7ae69cc266d7bb922c54734008ebd92c0b65",
+          "line": 763,
+          "snippet_sha256": "sha256:5b227e5af41fe59472f7262ffd803b01d551042898954f6b608c3c00ec4d398f",
+          "source_path": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
+          "source_sha256": "sha256:421d7e3c95c47ddd2cb045e5e66fba07d5e2b91556f072528ec0140518dd05f1"
         },
         {
-          "column": 29,
-          "line": 145,
-          "occurrence_id": "web/canvas/types/flow_type.js:145:29:POST:/api/flows/test-node",
-          "source": "web/canvas/types/flow_type.js",
-          "source_sha256": "591904dbc5db76114ccc02ac981ab675147876890bd297d814a2d9024928212f"
+          "blob": "bed005a6480948516cdfd1685a0481ea260d70d4",
+          "line": 123,
+          "snippet_sha256": "sha256:3960c14f8288f7dfae68d94962e79c2d754cec3c2de98b81347b7428ffba8593",
+          "source_path": "web/canvas/types/flow_type.js",
+          "source_sha256": "sha256:5765eeb3816c84fb6caedc58c845d87000592dec315f335ead9dbd7675f9ffcf"
         }
       ],
-      "input_output_contract": {
-        "input": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
-        "output": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
-        "side_effects": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected."
+      "gateway_evidence": {
+        "context": {
+          "end_line": 532,
+          "snippet_sha256": "sha256:5c35f96e8355a82de0e8edf2b203a076ce3eb4eb056423eb3b81d6027de0ff9d",
+          "source_path": "backend/capability_v2/gateway.py",
+          "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+          "start_line": 520
+        },
+        "invoke_pipeline": {
+          "end_line": 218,
+          "snippet_sha256": "sha256:1d6ceda33092888e3c0336a18ba3dbd097241ef83b6cb45fab743c9af2080214",
+          "source_path": "backend/capability_v2/gateway.py",
+          "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+          "start_line": 134
+        }
       },
-      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "input_output_contract": {
+        "input_output": {
+          "end_line": 142,
+          "snippet_sha256": "sha256:b8eacb9684b5a0ee6a4d5f3fcf2dc8bea15e6a5b18bee29d77dcdf75127644b0",
+          "source_path": "plugins/agent/agent_backend/capabilities/contracts.py",
+          "source_sha256": "sha256:7ea052dc67d02ef815debeaf08c6e2030175ab81c0bd2d733ff3af70ef5010bf",
+          "start_line": 102
+        }
+      },
+      "legacy_route_absent": true,
+      "lifecycle_confirmation_idempotency": "Resolved by the exact Agent contract, Gateway policy, production runtime, and durable command state where applicable.",
       "lifecycle_evidence": null,
       "method": "POST",
-      "non_equivalence": {
-        "input": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
-        "output": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
-        "side_effects": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected."
-      },
+      "non_equivalence": null,
       "normalized_route": "/api/flows/test-node",
       "occurrences": [
         {
@@ -1422,10 +1888,24 @@
         "source_path": "plugins/agent/agent_backend/routers/flows.py"
       },
       "owner_domain": "agent",
-      "provider_anchor": "plugins/agent/agent_backend/routers/flows.py",
-      "provider_source_sha256": "sha256:b7451e4b3a5537ec078bad85d9c1131b6ce4e20d608d07b8cde116e159b48ad8",
-      "runtime_execution": "unresolved_no_bounded_runtime_service",
-      "unresolved_reason": "No node-test handler or runtime service exists in the Agent provider."
+      "owner_service_evidence": {
+        "end_line": 1266,
+        "snippet_sha256": "sha256:e4c4d163fa6c5aabb1094d29fac914ba63829759a3c82de3e00564ac2920f6b0",
+        "source_path": "plugins/agent/agent_backend/application/canvas_runtime.py",
+        "source_sha256": "sha256:ba8cd2d1bd0f1e85c4da72d9fb727dc127719bbb878a944ba56b6ff0265dc954",
+        "start_line": 1095
+      },
+      "provider_anchor": "plugins/agent/agent_backend/capabilities/provider.py:21-41",
+      "provider_source_sha256": "sha256:dc2fc6bf24b5a67dc8b16fff5c314b88bd81bf585d5840b1c6e9a71d6310da0e",
+      "registration_evidence": {
+        "end_line": 85,
+        "snippet_sha256": "sha256:daabc1039dd2e2a8c1610a6e175a02254a241606003fb801e3492233a37a9345",
+        "source_path": "plugins/agent/agent_backend/capabilities/__init__.py",
+        "source_sha256": "sha256:cf5e1ae5efd12aec7fd1bbf762ae1d55881d39259efb73be0e19b2b4fa613be2",
+        "start_line": 19
+      },
+      "runtime_execution": "bounded_production_runtime",
+      "unresolved_reason": null
     },
     {
       "approval_reject_evidence": null,
@@ -1663,33 +2143,61 @@
     },
     {
       "approval_reject_evidence": null,
-      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "authorization_and_scope": "Exact Agent provider restores authenticated actor/team scope before bounded runtime execution.",
       "bop_conditional_branch": false,
-      "candidate_capability": null,
-      "final_disposition": "unresolved",
-      "final_inventory_mapping": "unresolved",
-      "final_occurrences": [
+      "candidate_capability": "agent.canvas.options.resolve@1",
+      "contract_evidence": {
+        "input_output": {
+          "end_line": 142,
+          "snippet_sha256": "sha256:b8eacb9684b5a0ee6a4d5f3fcf2dc8bea15e6a5b18bee29d77dcdf75127644b0",
+          "source_path": "plugins/agent/agent_backend/capabilities/contracts.py",
+          "source_sha256": "sha256:7ea052dc67d02ef815debeaf08c6e2030175ab81c0bd2d733ff3af70ef5010bf",
+          "start_line": 102
+        }
+      },
+      "durable_state_evidence": null,
+      "final_disposition": "migrated",
+      "final_inventory_mapping": "capability",
+      "final_occurrences": [],
+      "frontend_call_sites": [
         {
-          "column": 35,
-          "line": 1599,
-          "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1599:35:POST:/api/skills/canvas-options",
-          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
-          "source_sha256": "c6f654458ff966e9bb4c2f023dd877c682243a6ff70c71ef0646f4acf9c041a7"
+          "blob": "feac63e030dfee47c0a6a3006bed91244a796954",
+          "line": 1716,
+          "snippet_sha256": "sha256:034bea262a8d6546b5cc815209525b392f9e62de1d619f8fbd550dd640282812",
+          "source_path": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+          "source_sha256": "sha256:707c68c119ee354482fae75b5a4e79f5c81d210db26c13cfe7ccfd8ff8073794"
         }
       ],
-      "input_output_contract": {
-        "input": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
-        "output": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
-        "side_effects": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected."
+      "gateway_evidence": {
+        "context": {
+          "end_line": 532,
+          "snippet_sha256": "sha256:5c35f96e8355a82de0e8edf2b203a076ce3eb4eb056423eb3b81d6027de0ff9d",
+          "source_path": "backend/capability_v2/gateway.py",
+          "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+          "start_line": 520
+        },
+        "invoke_pipeline": {
+          "end_line": 218,
+          "snippet_sha256": "sha256:1d6ceda33092888e3c0336a18ba3dbd097241ef83b6cb45fab743c9af2080214",
+          "source_path": "backend/capability_v2/gateway.py",
+          "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+          "start_line": 134
+        }
       },
-      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "input_output_contract": {
+        "input_output": {
+          "end_line": 142,
+          "snippet_sha256": "sha256:b8eacb9684b5a0ee6a4d5f3fcf2dc8bea15e6a5b18bee29d77dcdf75127644b0",
+          "source_path": "plugins/agent/agent_backend/capabilities/contracts.py",
+          "source_sha256": "sha256:7ea052dc67d02ef815debeaf08c6e2030175ab81c0bd2d733ff3af70ef5010bf",
+          "start_line": 102
+        }
+      },
+      "legacy_route_absent": true,
+      "lifecycle_confirmation_idempotency": "Resolved by the exact Agent contract, Gateway policy, production runtime, and durable command state where applicable.",
       "lifecycle_evidence": null,
       "method": "POST",
-      "non_equivalence": {
-        "input": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
-        "output": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
-        "side_effects": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected."
-      },
+      "non_equivalence": null,
       "normalized_route": "/api/skills/canvas-options",
       "occurrences": [
         {
@@ -1721,40 +2229,117 @@
         "source_path": "plugins/agent/agent_backend/routers/skills_v2.py"
       },
       "owner_domain": "agent",
-      "provider_anchor": "plugins/agent/agent_backend/routers/skills_v2.py",
-      "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
-      "runtime_execution": "unresolved_no_bounded_runtime_service",
-      "unresolved_reason": "No bounded canvas-option resolver exists in the Agent provider."
+      "owner_service_evidence": {
+        "end_line": 1266,
+        "snippet_sha256": "sha256:e4c4d163fa6c5aabb1094d29fac914ba63829759a3c82de3e00564ac2920f6b0",
+        "source_path": "plugins/agent/agent_backend/application/canvas_runtime.py",
+        "source_sha256": "sha256:ba8cd2d1bd0f1e85c4da72d9fb727dc127719bbb878a944ba56b6ff0265dc954",
+        "start_line": 1095
+      },
+      "provider_anchor": "plugins/agent/agent_backend/capabilities/provider.py:21-41",
+      "provider_source_sha256": "sha256:dc2fc6bf24b5a67dc8b16fff5c314b88bd81bf585d5840b1c6e9a71d6310da0e",
+      "registration_evidence": {
+        "end_line": 85,
+        "snippet_sha256": "sha256:daabc1039dd2e2a8c1610a6e175a02254a241606003fb801e3492233a37a9345",
+        "source_path": "plugins/agent/agent_backend/capabilities/__init__.py",
+        "source_sha256": "sha256:cf5e1ae5efd12aec7fd1bbf762ae1d55881d39259efb73be0e19b2b4fa613be2",
+        "start_line": 19
+      },
+      "runtime_execution": "bounded_production_runtime",
+      "unresolved_reason": null
     },
     {
       "approval_reject_evidence": null,
-      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "authorization_and_scope": "Exact Agent provider restores authenticated actor/team scope before bounded runtime execution.",
       "bop_conditional_branch": false,
-      "candidate_capability": "agent.run.change.apply@1",
-      "final_disposition": "unresolved",
-      "final_inventory_mapping": "unresolved",
-      "final_occurrences": [
+      "candidate_capability": "agent.canvas.execution.start@1",
+      "contract_evidence": {
+        "input_output": {
+          "end_line": 197,
+          "snippet_sha256": "sha256:6f51a410c1199f645166523acb88b12de30d4367d2d6b7746bae833620eeb875",
+          "source_path": "plugins/agent/agent_backend/capabilities/contracts.py",
+          "source_sha256": "sha256:7ea052dc67d02ef815debeaf08c6e2030175ab81c0bd2d733ff3af70ef5010bf",
+          "start_line": 143
+        }
+      },
+      "durable_state_evidence": {
+        "coordinator_and_dispatcher": {
+          "end_line": 244,
+          "snippet_sha256": "sha256:0066bdc8b5fd01a3a693eae1398a04e804de8e9797ca881e22192190b0ec309b",
+          "source_path": "plugins/agent/agent_backend/application/service.py",
+          "source_sha256": "sha256:85116c9b9e8d012fcca7c98e03d22839ec276fce6b3b5fa20abc945347badb66",
+          "start_line": 98
+        },
+        "lifecycle": {
+          "end_line": 85,
+          "snippet_sha256": "sha256:daabc1039dd2e2a8c1610a6e175a02254a241606003fb801e3492233a37a9345",
+          "source_path": "plugins/agent/agent_backend/capabilities/__init__.py",
+          "source_sha256": "sha256:cf5e1ae5efd12aec7fd1bbf762ae1d55881d39259efb73be0e19b2b4fa613be2",
+          "start_line": 19
+        },
+        "migration": {
+          "end_line": 83,
+          "snippet_sha256": "sha256:d2c22faa58776e3b8fad8ad0df371090af1161bebc10b812312a7122423695de",
+          "source_path": "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql",
+          "source_sha256": "sha256:d2c22faa58776e3b8fad8ad0df371090af1161bebc10b812312a7122423695de",
+          "start_line": 1
+        },
+        "repository": {
+          "end_line": 394,
+          "snippet_sha256": "sha256:f46b7bdf0ef8d0eb2760fdbe37ce3dd5bc342044b8e1273e4fd5e15e26226d12",
+          "source_path": "plugins/agent/agent_backend/infrastructure/repository.py",
+          "source_sha256": "sha256:b95ae29fec3fba8872d129f39408db7fc46c4075d0ef5a926bea8835b979b2f4",
+          "start_line": 102
+        }
+      },
+      "final_disposition": "migrated",
+      "final_inventory_mapping": "capability",
+      "final_occurrences": [],
+      "frontend_call_sites": [
         {
-          "column": 40,
-          "line": 2264,
-          "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2264:40:POST:/api/skills/execute-canvas",
-          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
-          "source_sha256": "c6f654458ff966e9bb4c2f023dd877c682243a6ff70c71ef0646f4acf9c041a7"
+          "blob": "feac63e030dfee47c0a6a3006bed91244a796954",
+          "line": 2423,
+          "snippet_sha256": "sha256:55591194f3ab3c3a37396c2fb0aebf078f7f936b467c29e178f662c8c526f20b",
+          "source_path": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+          "source_sha256": "sha256:707c68c119ee354482fae75b5a4e79f5c81d210db26c13cfe7ccfd8ff8073794"
         }
       ],
+      "gateway_evidence": {
+        "context": {
+          "end_line": 532,
+          "snippet_sha256": "sha256:5c35f96e8355a82de0e8edf2b203a076ce3eb4eb056423eb3b81d6027de0ff9d",
+          "source_path": "backend/capability_v2/gateway.py",
+          "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+          "start_line": 520
+        },
+        "invoke_pipeline": {
+          "end_line": 218,
+          "snippet_sha256": "sha256:1d6ceda33092888e3c0336a18ba3dbd097241ef83b6cb45fab743c9af2080214",
+          "source_path": "backend/capability_v2/gateway.py",
+          "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+          "start_line": 134
+        }
+      },
       "input_output_contract": {
-        "input": "/api/skills/execute-canvas: REST accepts canvas/flow inputs and execution mode; candidate run change contract uses run resource operations.",
-        "output": "/api/skills/execute-canvas: REST returns canvas execution and pause token; candidate returns run resource projection.",
-        "side_effects": "/api/skills/execute-canvas: Candidate does not execute the legacy skill canvas orchestration."
+        "input_output": {
+          "end_line": 197,
+          "snippet_sha256": "sha256:6f51a410c1199f645166523acb88b12de30d4367d2d6b7746bae833620eeb875",
+          "source_path": "plugins/agent/agent_backend/capabilities/contracts.py",
+          "source_sha256": "sha256:7ea052dc67d02ef815debeaf08c6e2030175ab81c0bd2d733ff3af70ef5010bf",
+          "start_line": 143
+        }
       },
-      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
-      "lifecycle_evidence": null,
+      "legacy_route_absent": true,
+      "lifecycle_confirmation_idempotency": "Resolved by the exact Agent contract, Gateway policy, production runtime, and durable command state where applicable.",
+      "lifecycle_evidence": {
+        "end_line": 85,
+        "snippet_sha256": "sha256:daabc1039dd2e2a8c1610a6e175a02254a241606003fb801e3492233a37a9345",
+        "source_path": "plugins/agent/agent_backend/capabilities/__init__.py",
+        "source_sha256": "sha256:cf5e1ae5efd12aec7fd1bbf762ae1d55881d39259efb73be0e19b2b4fa613be2",
+        "start_line": 19
+      },
       "method": "POST",
-      "non_equivalence": {
-        "input": "/api/skills/execute-canvas: REST accepts canvas/flow inputs and execution mode; candidate run change contract uses run resource operations.",
-        "output": "/api/skills/execute-canvas: REST returns canvas execution and pause token; candidate returns run resource projection.",
-        "side_effects": "/api/skills/execute-canvas: Candidate does not execute the legacy skill canvas orchestration."
-      },
+      "non_equivalence": null,
       "normalized_route": "/api/skills/execute-canvas",
       "occurrences": [
         {
@@ -1786,40 +2371,117 @@
         "source_path": "plugins/agent/agent_backend/routers/skills_v2.py"
       },
       "owner_domain": "agent",
-      "provider_anchor": "plugins/agent/agent_backend/routers/skills_v2.py",
-      "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
-      "runtime_execution": "unresolved_no_bounded_runtime_service",
-      "unresolved_reason": "No canvas execution provider exists; generic run mutation is not provider-equivalent."
+      "owner_service_evidence": {
+        "end_line": 1266,
+        "snippet_sha256": "sha256:e4c4d163fa6c5aabb1094d29fac914ba63829759a3c82de3e00564ac2920f6b0",
+        "source_path": "plugins/agent/agent_backend/application/canvas_runtime.py",
+        "source_sha256": "sha256:ba8cd2d1bd0f1e85c4da72d9fb727dc127719bbb878a944ba56b6ff0265dc954",
+        "start_line": 1095
+      },
+      "provider_anchor": "plugins/agent/agent_backend/capabilities/provider.py:21-41",
+      "provider_source_sha256": "sha256:dc2fc6bf24b5a67dc8b16fff5c314b88bd81bf585d5840b1c6e9a71d6310da0e",
+      "registration_evidence": {
+        "end_line": 85,
+        "snippet_sha256": "sha256:daabc1039dd2e2a8c1610a6e175a02254a241606003fb801e3492233a37a9345",
+        "source_path": "plugins/agent/agent_backend/capabilities/__init__.py",
+        "source_sha256": "sha256:cf5e1ae5efd12aec7fd1bbf762ae1d55881d39259efb73be0e19b2b4fa613be2",
+        "start_line": 19
+      },
+      "runtime_execution": "bounded_production_runtime",
+      "unresolved_reason": null
     },
     {
       "approval_reject_evidence": null,
-      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "authorization_and_scope": "Exact Agent provider restores authenticated actor/team scope before bounded runtime execution.",
       "bop_conditional_branch": false,
-      "candidate_capability": "agent.run.change.apply@1",
-      "final_disposition": "unresolved",
-      "final_inventory_mapping": "unresolved",
-      "final_occurrences": [
+      "candidate_capability": "agent.canvas.execution.resume@1",
+      "contract_evidence": {
+        "input_output": {
+          "end_line": 197,
+          "snippet_sha256": "sha256:6f51a410c1199f645166523acb88b12de30d4367d2d6b7746bae833620eeb875",
+          "source_path": "plugins/agent/agent_backend/capabilities/contracts.py",
+          "source_sha256": "sha256:7ea052dc67d02ef815debeaf08c6e2030175ab81c0bd2d733ff3af70ef5010bf",
+          "start_line": 143
+        }
+      },
+      "durable_state_evidence": {
+        "coordinator_and_dispatcher": {
+          "end_line": 244,
+          "snippet_sha256": "sha256:0066bdc8b5fd01a3a693eae1398a04e804de8e9797ca881e22192190b0ec309b",
+          "source_path": "plugins/agent/agent_backend/application/service.py",
+          "source_sha256": "sha256:85116c9b9e8d012fcca7c98e03d22839ec276fce6b3b5fa20abc945347badb66",
+          "start_line": 98
+        },
+        "lifecycle": {
+          "end_line": 85,
+          "snippet_sha256": "sha256:daabc1039dd2e2a8c1610a6e175a02254a241606003fb801e3492233a37a9345",
+          "source_path": "plugins/agent/agent_backend/capabilities/__init__.py",
+          "source_sha256": "sha256:cf5e1ae5efd12aec7fd1bbf762ae1d55881d39259efb73be0e19b2b4fa613be2",
+          "start_line": 19
+        },
+        "migration": {
+          "end_line": 83,
+          "snippet_sha256": "sha256:d2c22faa58776e3b8fad8ad0df371090af1161bebc10b812312a7122423695de",
+          "source_path": "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql",
+          "source_sha256": "sha256:d2c22faa58776e3b8fad8ad0df371090af1161bebc10b812312a7122423695de",
+          "start_line": 1
+        },
+        "repository": {
+          "end_line": 394,
+          "snippet_sha256": "sha256:f46b7bdf0ef8d0eb2760fdbe37ce3dd5bc342044b8e1273e4fd5e15e26226d12",
+          "source_path": "plugins/agent/agent_backend/infrastructure/repository.py",
+          "source_sha256": "sha256:b95ae29fec3fba8872d129f39408db7fc46c4075d0ef5a926bea8835b979b2f4",
+          "start_line": 102
+        }
+      },
+      "final_disposition": "migrated",
+      "final_inventory_mapping": "capability",
+      "final_occurrences": [],
+      "frontend_call_sites": [
         {
-          "column": 40,
-          "line": 1615,
-          "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1615:40:POST:/api/skills/resume-canvas",
-          "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
-          "source_sha256": "c6f654458ff966e9bb4c2f023dd877c682243a6ff70c71ef0646f4acf9c041a7"
+          "blob": "feac63e030dfee47c0a6a3006bed91244a796954",
+          "line": 1758,
+          "snippet_sha256": "sha256:300792d8f87d099fd010de26597a3649313172b80839370bd11c89f1ed16e64c",
+          "source_path": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+          "source_sha256": "sha256:707c68c119ee354482fae75b5a4e79f5c81d210db26c13cfe7ccfd8ff8073794"
         }
       ],
+      "gateway_evidence": {
+        "context": {
+          "end_line": 532,
+          "snippet_sha256": "sha256:5c35f96e8355a82de0e8edf2b203a076ce3eb4eb056423eb3b81d6027de0ff9d",
+          "source_path": "backend/capability_v2/gateway.py",
+          "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+          "start_line": 520
+        },
+        "invoke_pipeline": {
+          "end_line": 218,
+          "snippet_sha256": "sha256:1d6ceda33092888e3c0336a18ba3dbd097241ef83b6cb45fab743c9af2080214",
+          "source_path": "backend/capability_v2/gateway.py",
+          "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+          "start_line": 134
+        }
+      },
       "input_output_contract": {
-        "input": "/api/skills/resume-canvas: REST accepts pause token/resume inputs; candidate run change contract uses run resource operations.",
-        "output": "/api/skills/resume-canvas: REST returns resumed canvas execution; candidate returns run resource projection.",
-        "side_effects": "/api/skills/resume-canvas: Candidate has no pause-token resume side effect."
+        "input_output": {
+          "end_line": 197,
+          "snippet_sha256": "sha256:6f51a410c1199f645166523acb88b12de30d4367d2d6b7746bae833620eeb875",
+          "source_path": "plugins/agent/agent_backend/capabilities/contracts.py",
+          "source_sha256": "sha256:7ea052dc67d02ef815debeaf08c6e2030175ab81c0bd2d733ff3af70ef5010bf",
+          "start_line": 143
+        }
       },
-      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
-      "lifecycle_evidence": null,
+      "legacy_route_absent": true,
+      "lifecycle_confirmation_idempotency": "Resolved by the exact Agent contract, Gateway policy, production runtime, and durable command state where applicable.",
+      "lifecycle_evidence": {
+        "end_line": 85,
+        "snippet_sha256": "sha256:daabc1039dd2e2a8c1610a6e175a02254a241606003fb801e3492233a37a9345",
+        "source_path": "plugins/agent/agent_backend/capabilities/__init__.py",
+        "source_sha256": "sha256:cf5e1ae5efd12aec7fd1bbf762ae1d55881d39259efb73be0e19b2b4fa613be2",
+        "start_line": 19
+      },
       "method": "POST",
-      "non_equivalence": {
-        "input": "/api/skills/resume-canvas: REST accepts pause token/resume inputs; candidate run change contract uses run resource operations.",
-        "output": "/api/skills/resume-canvas: REST returns resumed canvas execution; candidate returns run resource projection.",
-        "side_effects": "/api/skills/resume-canvas: Candidate has no pause-token resume side effect."
-      },
+      "non_equivalence": null,
       "normalized_route": "/api/skills/resume-canvas",
       "occurrences": [
         {
@@ -1851,10 +2513,24 @@
         "source_path": "plugins/agent/agent_backend/routers/skills_v2.py"
       },
       "owner_domain": "agent",
-      "provider_anchor": "plugins/agent/agent_backend/routers/skills_v2.py",
-      "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
-      "runtime_execution": "unresolved_no_bounded_runtime_service",
-      "unresolved_reason": "No pause-token resume provider exists; generic run mutation is not provider-equivalent."
+      "owner_service_evidence": {
+        "end_line": 1266,
+        "snippet_sha256": "sha256:e4c4d163fa6c5aabb1094d29fac914ba63829759a3c82de3e00564ac2920f6b0",
+        "source_path": "plugins/agent/agent_backend/application/canvas_runtime.py",
+        "source_sha256": "sha256:ba8cd2d1bd0f1e85c4da72d9fb727dc127719bbb878a944ba56b6ff0265dc954",
+        "start_line": 1095
+      },
+      "provider_anchor": "plugins/agent/agent_backend/capabilities/provider.py:21-41",
+      "provider_source_sha256": "sha256:dc2fc6bf24b5a67dc8b16fff5c314b88bd81bf585d5840b1c6e9a71d6310da0e",
+      "registration_evidence": {
+        "end_line": 85,
+        "snippet_sha256": "sha256:daabc1039dd2e2a8c1610a6e175a02254a241606003fb801e3492233a37a9345",
+        "source_path": "plugins/agent/agent_backend/capabilities/__init__.py",
+        "source_sha256": "sha256:cf5e1ae5efd12aec7fd1bbf762ae1d55881d39259efb73be0e19b2b4fa613be2",
+        "start_line": 19
+      },
+      "runtime_execution": "bounded_production_runtime",
+      "unresolved_reason": null
     },
     {
       "approval_reject_evidence": null,
@@ -1988,8 +2664,8 @@
       "unresolved_reason": null
     }
   ],
-  "frontend_content_hash": "9905775b994a8fed621ae74bd41b19ccc4779d73a0da1bd626ee324f5e4ea8ae",
-  "frontend_revision": "8ebc8de49b5d4f86c9360664fffa912c3d969102",
+  "frontend_content_hash": "d3154ce47292b3b9f4daabb5df6c611c3415790336f280b0e8630bb9d16e30b0",
+  "frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
   "project_closure_evidence": {
     "approval": {
       "frontend_anchor": {

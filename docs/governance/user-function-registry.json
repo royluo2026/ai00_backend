@@ -1235,6 +1235,79 @@
         "plugins/agent/agent_backend/capabilities/contracts.py"
       ]
     },
+    "capability:agent.canvas.execution.resume": {
+      "function_id": "capability:agent.canvas.execution.resume",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.canvas.execution.resume",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/agent/agent_backend/capabilities/__init__.py",
+        "plugins/agent/agent_backend/capabilities/contracts.py",
+        "plugins/agent/agent_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:agent.canvas.execution.start": {
+      "function_id": "capability:agent.canvas.execution.start",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.canvas.execution.start",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/agent/agent_backend/capabilities/__init__.py",
+        "plugins/agent/agent_backend/capabilities/contracts.py",
+        "plugins/agent/agent_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:agent.canvas.options.resolve": {
+      "function_id": "capability:agent.canvas.options.resolve",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.canvas.options.resolve",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/agent/agent_backend/capabilities/__init__.py",
+        "plugins/agent/agent_backend/capabilities/contracts.py",
+        "plugins/agent/agent_backend/capabilities/descriptors.py",
+        "plugins/agent/agent_backend/capabilities/provider.py"
+      ]
+    },
     "capability:agent.flow.change.apply": {
       "function_id": "capability:agent.flow.change.apply",
       "domain": "Agent",
@@ -1599,6 +1672,30 @@
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:agent.workflow.node.test.execute": {
+      "function_id": "capability:agent.workflow.node.test.execute",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.workflow.node.test.execute",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/agent/agent_backend/capabilities/__init__.py",
+        "plugins/agent/agent_backend/capabilities/contracts.py",
+        "plugins/agent/agent_backend/capabilities/provider.py"
       ]
     },
     "capability:base.project.search": {
@@ -4202,6 +4299,29 @@
         "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
       ]
     },
+    "capability:craft.rule.definition.change.apply": {
+      "function_id": "capability:craft.rule.definition.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.rule.definition.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/rule_descriptors.py",
+        "plugins/craft/craft_backend/capabilities/rule_library.py"
+      ]
+    },
     "capability:craft.rule.draft.create": {
       "function_id": "capability:craft.rule.draft.create",
       "domain": "Craft",
@@ -4337,6 +4457,30 @@
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/rule_engine.py"
+      ]
+    },
+    "capability:craft.rule.entry.evaluate": {
+      "function_id": "capability:craft.rule.entry.evaluate",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.rule.entry.evaluate",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/rule_descriptors.py",
         "plugins/craft/craft_backend/capabilities/rule_engine.py"
       ]
     },
@@ -7382,6 +7526,28 @@
       "exclusion_reason": null,
       "source_paths": [
         "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.approval.order.reject": {
+      "function_id": "capability:project.approval.order.reject",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.approval.order.reject",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/provider.py"
       ]
     },
     "capability:project.approval.read": {

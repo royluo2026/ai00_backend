@@ -13,6 +13,8 @@ PLAN_SCRIPT = ROOT / "backend/scripts/check_structural_remediation_plan.py"
 LEDGER_SCRIPT = ROOT / "backend/scripts/build_web_route_root_cause_ledger.py"
 WEB_ROOT = ROOT.parent / "workmanship-web-capability-governance"
 CRAFT_FRONTEND_REVISION = "8ebc8de49b5d4f86c9360664fffa912c3d969102"
+AGENT_BACKEND_REVISION = "4256276cecda3cda45d33c3ee670b8dace6fbfdc"
+AGENT_FRONTEND_REVISION = "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78"
 
 
 def _module():
@@ -51,6 +53,68 @@ def _craft_frontend_source(path: str) -> str:
         ["git", "show", f"{CRAFT_FRONTEND_REVISION}:{path}"],
         cwd=WEB_ROOT, check=True, capture_output=True, text=True, encoding="utf-8",
     ).stdout
+
+
+def test_agent_closure_evidence_freezes_exact_source_identities_and_anchors():
+    """Breaks if Agent closure is inferred from names or a mutable checkout."""
+    evidence = _module().build_agent_closure_evidence(WEB_ROOT)
+
+    assert evidence["backend_revision"] == AGENT_BACKEND_REVISION
+    assert evidence["backend_tree"] == "c02b9ce18d5402988ef6474bafb7da1340fa85d9"
+    assert evidence["frontend_revision"] == AGENT_FRONTEND_REVISION
+    assert evidence["scanner_materialization"] == {
+        "method": "git-tree-blobs-v1",
+        "revision": AGENT_FRONTEND_REVISION,
+        "tree": "e70eae1b052f88a63de6a1b4a94c9903a143e089",
+        "roots": ["web", "packages"],
+        "document_count": 224,
+        "materialization_sha256": "sha256:d694dcaaf698d6db0486bfea4147962e76e8ae597114dfa368ceb904c9e5f682",
+    }
+    assert {
+        path: item["blob"] for path, item in evidence["backend_files"].items()
+    } == {
+        "backend/capability_v2/gateway.py": "6d8a3e052901df5bff607889b4163250b5c6370d",
+        "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql": "5d1febea8ee0b44851029fc58716c2c387385384",
+        "plugins/agent/agent_backend/application/canvas_runtime.py": "35b933b84af64e2dddd25122c56cde2ce2300820",
+        "plugins/agent/agent_backend/application/service.py": "20999ec38b694bdec71f68d7bd382086de54fa60",
+        "plugins/agent/agent_backend/capabilities/__init__.py": "0b81093263520cf2a44670053562020a3ff858e9",
+        "plugins/agent/agent_backend/capabilities/contracts.py": "749473ea8336267cca1bd4b8bf884ed8e38e293f",
+        "plugins/agent/agent_backend/capabilities/descriptors.py": "5795da4f92eab51e982ff53788b0524e03ac2422",
+        "plugins/agent/agent_backend/capabilities/provider.py": "4817682fa6d35540aab8af0c8830d5e10927e1ae",
+        "plugins/agent/agent_backend/infrastructure/repository.py": "594e9c7fd5e37e7518d18871891f86087aae8b5b",
+    }
+    assert {
+        path: item["blob"] for path, item in evidence["frontend_files"].items()
+    } == {
+        "dist-production/packages/agent-plugin/web/flow_canvas/flow_editor.js": "0b8238b8749bb876d5d52e105ae54c8a0c326566",
+        "dist-production/packages/agent-plugin/web/wfc_window/wfc_window.js": "bdb262d6a60498e73f1add1854a7f518e3511948",
+        "dist-production/web/canvas/types/flow_type.js": "d933ac511e7e0c9ade64b53edb8b86f1fdf3b341",
+        "packages/agent-plugin/web/flow_canvas/flow_editor.js": "df2e7ae69cc266d7bb922c54734008ebd92c0b65",
+        "packages/agent-plugin/web/wfc_window/wfc_window.js": "feac63e030dfee47c0a6a3006bed91244a796954",
+        "web/canvas/types/flow_type.js": "bed005a6480948516cdfd1685a0481ea260d70d4",
+    }
+    assert set(evidence["routes"]) == {
+        "POST /api/flows/test-node",
+        "POST /api/skills/canvas-options",
+        "POST /api/skills/execute-canvas",
+        "POST /api/skills/resume-canvas",
+    }
+    assert {
+        key: item["candidate_capability"] for key, item in evidence["routes"].items()
+    } == {
+        "POST /api/flows/test-node": "agent.workflow.node.test.execute@1",
+        "POST /api/skills/canvas-options": "agent.canvas.options.resolve@1",
+        "POST /api/skills/execute-canvas": "agent.canvas.execution.start@1",
+        "POST /api/skills/resume-canvas": "agent.canvas.execution.resume@1",
+    }
+    assert sum(len(item["frontend_call_sites"]) for item in evidence["routes"].values()) == 5
+    for item in evidence["routes"].values():
+        assert item["provider_anchor"]
+        assert item["contract_evidence"]
+        assert item["runtime_evidence"]
+        assert item["gateway_evidence"]
+        assert item["frontend_call_sites"]
+        assert item["legacy_route_absent"] is True
 
 
 def test_craft_closure_evidence_freezes_exact_source_identities_and_anchors():
@@ -134,13 +198,13 @@ def test_craft_dead_action_evidence_fails_closed_on_network_or_control_reintrodu
             module._dead_action_evidence(changed)
 
 
-def test_root_cause_ledger_retains_removed_derived_occurrence_from_canonical_craft_evidence():
+def test_root_cause_ledger_retains_removed_derived_occurrence_after_zero_remainder():
     """Breaks if clean regeneration requires a fake migration for removed rule suspend."""
     document = _ledger_module().build_document(WEB_ROOT)
 
-    assert document["final_evidence"]["frontend_revision"] == CRAFT_FRONTEND_REVISION
-    assert document["final_evidence"]["unresolved_group_count"] == 4
-    assert document["final_evidence"]["unresolved_count"] == 5
+    assert document["final_evidence"]["frontend_revision"] == AGENT_FRONTEND_REVISION
+    assert document["final_evidence"]["unresolved_group_count"] == 0
+    assert document["final_evidence"]["unresolved_count"] == 0
     suspend = next(
         item for item in document["entries"]
         if (item["method"], item["normalized_route"])
@@ -185,6 +249,52 @@ def test_structural_plan_uses_the_registered_craft_list_capability_identity():
     assert _plan_module().GROUP_SPECS[("GET", "/api/lists")]["target_capability"] == (
         "craft.bop.version.list@1"
     )
+
+
+def test_structural_plan_uses_the_shipped_agent_runtime_without_pending_approval():
+    """Breaks if closed Agent groups retain the obsolete proposed-service plan."""
+    module = _plan_module()
+    package = module.PACKAGES["agent_bounded_runtime"]
+
+    assert package["owner_service"] == (
+        "plugins.agent.agent_backend.application.canvas_runtime.ProductionAgentCanvasRuntime"
+    )
+    assert package["owner_service_source"] == (
+        "plugins/agent/agent_backend/application/canvas_runtime.py"
+    )
+    assert package["approval_gate"] is None
+    assert all(
+        module.GROUP_SPECS[key]["approval_required"] is False
+        for key in module.AGENT_STRUCTURAL_KEYS
+    )
+
+
+def test_structural_plan_preserves_base_integration_and_records_agent_closure():
+    """Breaks if zero remainder rewrites historical Base/Integration scope."""
+    payload = _plan_module().build_plan(ROOT)
+    by_domain = {
+        domain: {
+            "groups": sum(group["owner_domain"] == domain for group in payload["groups"]),
+            "occurrences": sum(
+                len(group["occurrences"])
+                for group in payload["groups"] if group["owner_domain"] == domain
+            ),
+        }
+        for domain in ("base", "integration")
+    }
+    assert by_domain == {
+        "base": {"groups": 11, "occurrences": 16},
+        "integration": {"groups": 12, "occurrences": 12},
+    }
+    agent = [
+        group for group in payload["groups"]
+        if (group["method"], group["normalized_route"])
+        in _plan_module().AGENT_STRUCTURAL_KEYS
+    ]
+    assert len(agent) == 4
+    assert sum(len(group["occurrences"]) for group in agent) == 5
+    assert all(group["current_status"] == "migrated" for group in agent)
+    assert all(group["current_evidence"]["canonical_occurrences"] == [] for group in agent)
 
 
 def test_project_closure_evidence_freezes_exact_frontend_commit_blobs_and_absence():
@@ -358,24 +468,24 @@ def manifest():
     return module, module.build_manifest(WEB_ROOT)
 
 
-def test_manifest_conserves_all_source_proved_closures_and_the_agent_remainder(manifest):
-    """Breaks if closure counts are hand-authored instead of conserved from immutable evidence."""
+def test_manifest_conserves_all_source_proved_closures_to_zero_remainder(manifest):
+    """Breaks if 14/17 closure is hand-authored instead of derived from immutable evidence."""
     _, payload = manifest
 
     assert payload["counts"] == {
         "groups": 14,
         "occurrences": 17,
-        "migrated_groups": 5,
-        "migrated_occurrences": 7,
+        "migrated_groups": 9,
+        "migrated_occurrences": 12,
         "removed_dead_entry_groups": 5,
         "removed_dead_entry_occurrences": 5,
-        "unresolved_groups": 4,
-        "unresolved_occurrences": 5,
+        "unresolved_groups": 0,
+        "unresolved_occurrences": 0,
     }
     assert payload["closure_arithmetic"] == {
         "baseline": {"groups": 14, "occurrences": 17},
-        "closed": {"groups": 10, "occurrences": 12},
-        "canonical_remainder": {"groups": 4, "occurrences": 5},
+        "closed": {"groups": 14, "occurrences": 17},
+        "canonical_remainder": {"groups": 0, "occurrences": 0},
     }
     assert payload["closure_arithmetic"]["baseline"]["groups"] - payload["closure_arithmetic"]["closed"]["groups"] == payload["closure_arithmetic"]["canonical_remainder"]["groups"]
     assert payload["closure_arithmetic"]["baseline"]["occurrences"] - payload["closure_arithmetic"]["closed"]["occurrences"] == payload["closure_arithmetic"]["canonical_remainder"]["occurrences"]
@@ -389,17 +499,20 @@ def test_manifest_conserves_all_source_proved_closures_and_the_agent_remainder(m
         ("GET", "/api/rule-engine/check-entry"),
         ("DELETE", "/api/lists/{dynamic}"),
         ("POST", "/api/approval/orders/{dynamic}/reject"),
+        ("POST", "/api/flows/test-node"),
+        ("POST", "/api/skills/canvas-options"),
+        ("POST", "/api/skills/execute-canvas"),
+        ("POST", "/api/skills/resume-canvas"),
         ("PUT", "/api/rules/{dynamic}"),
     }
-    assert sum(len(entry["occurrences"]) for entry in migrated) == 7
-    assert sum(len(entry["occurrences"]) for entry in unresolved) == 5
-    for entry in unresolved:
-        assert entry["final_disposition"] == "unresolved"
-        assert entry["final_inventory_mapping"] == "unresolved"
-        assert entry["non_equivalence"]
+    assert sum(len(entry["occurrences"]) for entry in migrated) == 12
+    assert unresolved == []
+    assert payload["frontend_revision"] == AGENT_FRONTEND_REVISION
+    assert len(payload["entries"]) == 14
+    assert all(entry["legacy_route_absent"] is True for entry in payload["entries"])
 
 
-def test_manifest_closes_craft_from_source_and_preserves_exact_agent_remainder(manifest):
+def test_manifest_preserves_craft_dispositions_and_closes_exact_agent_remainder(manifest):
     """Breaks on fake migration, hand-authored counts, or drift in any Agent occurrence."""
     module, payload = manifest
     prior = module._build_manifest.__globals__["_closure_baseline"]()[0]
@@ -415,12 +528,12 @@ def test_manifest_closes_craft_from_source_and_preserves_exact_agent_remainder(m
     assert payload["counts"] == {
         "groups": 14,
         "occurrences": 17,
-        "migrated_groups": 5,
-        "migrated_occurrences": 7,
+        "migrated_groups": 9,
+        "migrated_occurrences": 12,
         "removed_dead_entry_groups": 5,
         "removed_dead_entry_occurrences": 5,
-        "unresolved_groups": 4,
-        "unresolved_occurrences": 5,
+        "unresolved_groups": 0,
+        "unresolved_occurrences": 0,
     }
     assert payload["craft_closure_arithmetic"] == {
         "baseline": {"groups": 11, "occurrences": 14},
@@ -457,27 +570,47 @@ def test_manifest_closes_craft_from_source_and_preserves_exact_agent_remainder(m
         assert entry["gateway_evidence"]
         assert entry["frontend_call_sites"]
 
-    current_agent = {
-        key: entries[key]["final_occurrences"] for key in prior_agent
-    }
+    current_agent = {key: entries[key]["occurrences"] for key in prior_agent}
     assert current_agent == prior_agent
-    assert all(entries[key]["runtime_execution"] == "unresolved_no_bounded_runtime_service" for key in prior_agent)
+    for key in prior_agent:
+        entry = entries[key]
+        assert entry["final_occurrences"] == []
+        assert entry["final_disposition"] == "migrated"
+        assert entry["final_inventory_mapping"] == "capability"
+        assert entry["runtime_execution"] == "bounded_production_runtime"
+        assert entry["provider_anchor"]
+        assert entry["contract_evidence"]
+        assert entry["gateway_evidence"]
+        assert entry["owner_service_evidence"]
+        assert entry["frontend_call_sites"]
+        assert entry["legacy_route_absent"] is True
+    assert payload["agent_closure_arithmetic"] == {
+        "baseline": {"groups": 4, "occurrences": 5},
+        "closed": {"groups": 4, "occurrences": 5},
+        "canonical_remainder": {"groups": 0, "occurrences": 0},
+    }
 
 
-def test_manifest_preserves_agent_findings_and_closes_only_exact_bop_and_approval_outcomes(manifest):
-    """Breaks if unresolved Agent/Craft findings are relabeled or Project closure uses a generic target."""
+def test_manifest_closes_agent_to_exact_capabilities_and_preserves_project_outcomes(manifest):
+    """Breaks if Agent uses generic targets or Project closure changes disposition."""
     _, payload = manifest
     entries = {
         (entry["method"], entry["normalized_route"]): entry
         for entry in payload["entries"]
     }
-    for key in (
-        ("POST", "/api/flows/test-node"),
-        ("POST", "/api/skills/canvas-options"),
-        ("POST", "/api/skills/execute-canvas"),
-        ("POST", "/api/skills/resume-canvas"),
-    ):
-        assert entries[key]["runtime_execution"] == "unresolved_no_bounded_runtime_service"
+    assert {
+        key: entries[key]["candidate_capability"] for key in (
+            ("POST", "/api/flows/test-node"),
+            ("POST", "/api/skills/canvas-options"),
+            ("POST", "/api/skills/execute-canvas"),
+            ("POST", "/api/skills/resume-canvas"),
+        )
+    } == {
+        ("POST", "/api/flows/test-node"): "agent.workflow.node.test.execute@1",
+        ("POST", "/api/skills/canvas-options"): "agent.canvas.options.resolve@1",
+        ("POST", "/api/skills/execute-canvas"): "agent.canvas.execution.start@1",
+        ("POST", "/api/skills/resume-canvas"): "agent.canvas.execution.resume@1",
+    }
     for key in (("GET", "/api/lists"), ("DELETE", "/api/lists/{dynamic}")):
         entry = entries[key]
         assert entry["bop_conditional_branch"] is True
@@ -502,7 +635,7 @@ def test_manifest_preserves_agent_findings_and_closes_only_exact_bop_and_approva
     assert approval["gateway_integration"]["source_path"].endswith("test_project_approval_reject_gateway_integration.py")
 
 
-def test_manifest_validator_rejects_tampered_provider_contract_and_final_occurrence(manifest):
+def test_manifest_validator_rejects_tampered_provider_contract_and_occurrence(manifest):
     """Breaks if hand edits can erase owner-service, contract, or frontend identity evidence."""
     module, payload = manifest
     assert module.validate_manifest_against_expected(payload, payload) == ()
@@ -521,9 +654,9 @@ def test_manifest_validator_rejects_tampered_provider_contract_and_final_occurre
 
     for field, value in (("occurrence_id", "forged"), ("source", "web/forged.js"), ("line", 999), ("column", 999), ("source_sha256", "0" * 64)):
         changed = json.loads(json.dumps(payload))
-        entry = next(item for item in changed["entries"] if item["final_occurrences"])
-        entry["final_occurrences"][0][field] = value
-        assert "final_occurrence_mismatch" in module.validate_manifest_against_expected(changed, payload)
+        entry = next(item for item in changed["entries"] if item["occurrences"])
+        entry["occurrences"][0][field] = value
+        assert "occurrence_evidence_mismatch" in module.validate_manifest_against_expected(changed, payload)
     for field in ("source_ledger_revision", "source_ledger_sha256"):
         changed = json.loads(json.dumps(payload))
         changed[field] = "forged"

@@ -59,6 +59,8 @@ PROJECT_PROVIDER_SOURCE = "plugins/project_management/project_management_backend
 PROJECT_FRONTEND_REVISION = "69e5e00054d3c1cff635fe41fcb96fbe150d25fb"
 CRAFT_FRONTEND_REVISION = "8ebc8de49b5d4f86c9360664fffa912c3d969102"
 CRAFT_BACKEND_REVISION = "9cda07080f3e27b10d30ec6492ea875c31c82492"
+AGENT_FRONTEND_REVISION = "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78"
+AGENT_BACKEND_REVISION = "4256276cecda3cda45d33c3ee670b8dace6fbfdc"
 PROJECT_CLOSURE_SCOPE = {
     ("GET", "/api/lists"),
     ("DELETE", "/api/lists/{dynamic}"),
@@ -104,6 +106,25 @@ CRAFT_BACKEND_FILES = (
     "plugins/craft/craft_backend/capabilities/rule_library.py",
     "plugins/craft/craft_backend/capabilities/contracts.py",
     "plugins/craft/craft_backend/capabilities/provider.py",
+    "backend/capability_v2/gateway.py",
+)
+AGENT_FRONTEND_FILES = (
+    "packages/agent-plugin/web/flow_canvas/flow_editor.js",
+    "dist-production/packages/agent-plugin/web/flow_canvas/flow_editor.js",
+    "web/canvas/types/flow_type.js",
+    "dist-production/web/canvas/types/flow_type.js",
+    "packages/agent-plugin/web/wfc_window/wfc_window.js",
+    "dist-production/packages/agent-plugin/web/wfc_window/wfc_window.js",
+)
+AGENT_BACKEND_FILES = (
+    "plugins/agent/agent_backend/capabilities/contracts.py",
+    "plugins/agent/agent_backend/capabilities/descriptors.py",
+    "plugins/agent/agent_backend/capabilities/provider.py",
+    "plugins/agent/agent_backend/capabilities/__init__.py",
+    "plugins/agent/agent_backend/application/canvas_runtime.py",
+    "plugins/agent/agent_backend/application/service.py",
+    "plugins/agent/agent_backend/infrastructure/repository.py",
+    "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql",
     "backend/capability_v2/gateway.py",
 )
 
@@ -732,6 +753,189 @@ def build_craft_closure_evidence(web_root: Path) -> dict[str, Any]:
     }
 
 
+def build_agent_closure_evidence(web_root: Path) -> dict[str, Any]:
+    """Bind the four closed Agent groups to reviewed immutable source."""
+    web_root = web_root.resolve()
+    frontend_revision = resolve_revision(web_root, AGENT_FRONTEND_REVISION)
+    backend_revision = resolve_revision(ROOT, AGENT_BACKEND_REVISION)
+    if frontend_revision != AGENT_FRONTEND_REVISION or backend_revision != AGENT_BACKEND_REVISION:
+        raise ValueError("Agent closure revision drift")
+
+    frontend_files: dict[str, dict[str, Any]] = {}
+    texts: dict[str, str] = {}
+    for source_path in AGENT_FRONTEND_FILES:
+        frontend_files[source_path], texts[source_path] = _frontend_file(
+            web_root, frontend_revision, source_path,
+        )
+    backend_files: dict[str, dict[str, Any]] = {}
+    for source_path in AGENT_BACKEND_FILES:
+        backend_files[source_path], _ = _frontend_file(ROOT, backend_revision, source_path)
+        if _sha256((ROOT / source_path).read_bytes()) != backend_files[source_path]["sha256"]:
+            raise ValueError(f"backend source drift: {source_path}")
+
+    pairs = (
+        AGENT_FRONTEND_FILES[0:2], AGENT_FRONTEND_FILES[2:4], AGENT_FRONTEND_FILES[4:6],
+    )
+    if any(texts[source].splitlines() != texts[dist].splitlines() for source, dist in pairs):
+        raise ValueError("Agent frontend source/dist drift")
+    expected_calls = {
+        AGENT_FRONTEND_FILES[0]: {"agent.workflow.node.test.execute": 1},
+        AGENT_FRONTEND_FILES[2]: {"agent.workflow.node.test.execute": 1},
+        AGENT_FRONTEND_FILES[4]: {
+            "agent.canvas.options.resolve": 1,
+            "agent.canvas.execution.start": 1,
+            "agent.canvas.execution.resume": 1,
+        },
+    }
+    for source, expected in expected_calls.items():
+        for capability_id, count in expected.items():
+            if texts[source].count(f"invoke('{capability_id}'") != count:
+                raise ValueError(f"Agent frontend capability drift: {source}:{capability_id}")
+            dist = next(dist for candidate, dist in pairs if candidate == source)
+            if texts[dist].count(f"invoke('{capability_id}'") != count:
+                raise ValueError(f"Agent frontend distribution drift: {dist}:{capability_id}")
+    legacy_routes = (
+        "/api/flows/test-node", "/api/skills/canvas-options",
+        "/api/skills/execute-canvas", "/api/skills/resume-canvas",
+    )
+    if any(route in source for source in texts.values() for route in legacy_routes):
+        raise ValueError("Agent legacy route or fallback drift")
+
+    provider = _anchor(
+        "plugins/agent/agent_backend/capabilities/provider.py", 21, 41,
+        "agent.canvas.execution.start", "agent.workflow.node.test.execute",
+        '"idempotency_policy": "required"', '"evidence_policy": "required"',
+    )
+    registration = _anchor(
+        "plugins/agent/agent_backend/capabilities/__init__.py", 19, 85,
+        "agent.workflow.node.test.execute", "agent.canvas.options.resolve",
+        "agent.canvas.execution.start", "agent.canvas.execution.resume",
+        "ProductionAgentCanvasRuntime", "registry.register", "agent.canvas-execution-worker",
+    )
+    contracts = {
+        "queries": _anchor(
+            "plugins/agent/agent_backend/capabilities/contracts.py", 102, 142,
+            "agent.workflow.node.test.execute", "agent.canvas.options.resolve",
+            "additionalProperties", "maxItems",
+        ),
+        "commands": _anchor(
+            "plugins/agent/agent_backend/capabilities/contracts.py", 143, 197,
+            "agent.canvas.execution.start", "agent.canvas.execution.resume",
+            "expected_revision", "pause_token", "outcome_unknown", "maxItems",
+        ),
+    }
+    runtime = {
+        "finite_port": _anchor(
+            "plugins/agent/agent_backend/application/canvas_runtime.py", 506, 513,
+            "class AgentCanvasRuntime", "test_node", "resolve_options", "start", "resume",
+        ),
+        "production_adapter": _anchor(
+            "plugins/agent/agent_backend/application/canvas_runtime.py", 1095, 1266,
+            "class ProductionAgentCanvasRuntime", "MAX_WORKER_ENVELOPE_BYTES",
+            "async def test_node", "async def resolve_options", "async def start",
+            "async def resume", "reconcile_canvas_command", "invocation_id",
+        ),
+    }
+    durable_state = {
+        "coordinator_and_dispatcher": _anchor(
+            "plugins/agent/agent_backend/application/service.py", 98, 244,
+            "class CanvasExecutionCoordinator", "derive_canvas_token",
+            "class CanvasExecutionDispatcher", "mark_canvas_invocation_dispatched",
+            "reconcile_canvas_command", "record_canvas_uncertainty",
+        ),
+        "repository": _anchor(
+            "plugins/agent/agent_backend/infrastructure/repository.py", 102, 394,
+            "def create_canvas_start", "def create_canvas_resume", "FOR UPDATE SKIP LOCKED",
+            "def complete_canvas_invocation", "def record_canvas_uncertainty",
+            "def record_canvas_runtime_result", "def load_canvas_runtime_result",
+        ),
+        "migration": _anchor(
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql", 1, 83,
+            "workmanship_agent_canvas_runs", "workmanship_agent_canvas_invocations",
+            "workmanship_agent_canvas_audit_events", "workmanship_agent_canvas_runtime_results",
+            "idempotency_key", "lease_token",
+        ),
+        "lifecycle": registration,
+    }
+    gateway = {
+        "invoke_pipeline": _anchor(
+            "backend/capability_v2/gateway.py", 134, 218,
+            "validate_payload", "idempotency_key_mismatch", "transaction_participant_required",
+        ),
+        "context": _anchor(
+            "backend/capability_v2/gateway.py", 520, 532,
+            "CapabilityContext", "confirmation_token", "idempotency_key",
+        ),
+    }
+    frontend = {
+        "node_editor": _frontend_anchor(
+            web_root, frontend_revision, AGENT_FRONTEND_FILES[0],
+            "invoke('agent.workflow.node.test.execute'",
+        ),
+        "node_type": _frontend_anchor(
+            web_root, frontend_revision, AGENT_FRONTEND_FILES[2],
+            "invoke('agent.workflow.node.test.execute'",
+        ),
+        "options": _frontend_anchor(
+            web_root, frontend_revision, AGENT_FRONTEND_FILES[4],
+            "invoke('agent.canvas.options.resolve'",
+        ),
+        "resume": _frontend_anchor(
+            web_root, frontend_revision, AGENT_FRONTEND_FILES[4],
+            "invoke('agent.canvas.execution.resume'",
+        ),
+        "start": _frontend_anchor(
+            web_root, frontend_revision, AGENT_FRONTEND_FILES[4],
+            "invoke('agent.canvas.execution.start'",
+        ),
+    }
+    routes = {
+        "POST /api/flows/test-node": {
+            "candidate_capability": "agent.workflow.node.test.execute@1",
+            "provider_anchor": provider, "registration_evidence": registration,
+            "contract_evidence": {"input_output": contracts["queries"]},
+            "runtime_evidence": runtime, "durable_state_evidence": None,
+            "gateway_evidence": gateway,
+            "frontend_call_sites": [frontend["node_editor"], frontend["node_type"]],
+            "legacy_route_absent": True,
+        },
+        "POST /api/skills/canvas-options": {
+            "candidate_capability": "agent.canvas.options.resolve@1",
+            "provider_anchor": provider, "registration_evidence": registration,
+            "contract_evidence": {"input_output": contracts["queries"]},
+            "runtime_evidence": runtime, "durable_state_evidence": None,
+            "gateway_evidence": gateway, "frontend_call_sites": [frontend["options"]],
+            "legacy_route_absent": True,
+        },
+        "POST /api/skills/execute-canvas": {
+            "candidate_capability": "agent.canvas.execution.start@1",
+            "provider_anchor": provider, "registration_evidence": registration,
+            "contract_evidence": {"input_output": contracts["commands"]},
+            "runtime_evidence": runtime, "durable_state_evidence": durable_state,
+            "gateway_evidence": gateway, "frontend_call_sites": [frontend["start"]],
+            "legacy_route_absent": True,
+        },
+        "POST /api/skills/resume-canvas": {
+            "candidate_capability": "agent.canvas.execution.resume@1",
+            "provider_anchor": provider, "registration_evidence": registration,
+            "contract_evidence": {"input_output": contracts["commands"]},
+            "runtime_evidence": runtime, "durable_state_evidence": durable_state,
+            "gateway_evidence": gateway, "frontend_call_sites": [frontend["resume"]],
+            "legacy_route_absent": True,
+        },
+    }
+    return {
+        "backend_revision": backend_revision,
+        "backend_tree": _git_tree(ROOT, backend_revision),
+        "backend_files": dict(sorted(backend_files.items())),
+        "frontend_revision": frontend_revision,
+        "scanner_materialization": build_git_tree_scan_evidence(web_root, revision=frontend_revision),
+        "frontend_files": dict(sorted(frontend_files.items())),
+        "source_dist_semantic_match": True,
+        "routes": routes,
+    }
+
+
 def _bop_lifecycle_evidence(key: tuple[str, str]) -> dict[str, Any]:
     if key == ("GET", "/api/lists"):
         return {
@@ -974,6 +1178,47 @@ def _craft_migrated_entry(
     }
 
 
+def _agent_migrated_entry(
+    key: tuple[str, str], source: Mapping[str, Any], occurrences: list[dict[str, Any]],
+    closure: Mapping[str, Any],
+) -> dict[str, Any]:
+    route = closure["routes"][f"{key[0]} {key[1]}"]
+    provider = route["provider_anchor"]
+    return {
+        "method": key[0],
+        "normalized_route": key[1],
+        "owner_domain": source["owner_domain"],
+        "occurrences": occurrences,
+        "old_occurrences": source["occurrences"],
+        "old_route_evidence": source["backend_evidence"],
+        "authorization_and_scope": "Exact Agent provider restores authenticated actor/team scope before bounded runtime execution.",
+        "candidate_capability": route["candidate_capability"],
+        "provider_anchor": f"{provider['source_path']}:{provider['start_line']}-{provider['end_line']}",
+        "provider_source_sha256": provider["source_sha256"],
+        "owner_service_evidence": route["runtime_evidence"]["production_adapter"],
+        "registration_evidence": route["registration_evidence"],
+        "contract_evidence": route["contract_evidence"],
+        "input_output_contract": route["contract_evidence"],
+        "gateway_evidence": route["gateway_evidence"],
+        "durable_state_evidence": route["durable_state_evidence"],
+        "non_equivalence": None,
+        "lifecycle_confirmation_idempotency": "Resolved by the exact Agent contract, Gateway policy, production runtime, and durable command state where applicable.",
+        "runtime_execution": "bounded_production_runtime",
+        "bop_conditional_branch": False,
+        "lifecycle_evidence": (
+            route["durable_state_evidence"]["lifecycle"]
+            if route["durable_state_evidence"] is not None else None
+        ),
+        "approval_reject_evidence": None,
+        "frontend_call_sites": route["frontend_call_sites"],
+        "legacy_route_absent": route["legacy_route_absent"],
+        "final_occurrences": [],
+        "final_disposition": "migrated",
+        "unresolved_reason": None,
+        "final_inventory_mapping": "capability",
+    }
+
+
 def _removed_dead_entry(
     key: tuple[str, str], source: Mapping[str, Any], occurrences: list[dict[str, Any]],
     closure: Mapping[str, Any],
@@ -1042,10 +1287,11 @@ def _build_manifest(web_root: Path) -> dict[str, Any]:
         raise ValueError("closure baseline count drift")
     project_closure = build_project_closure_evidence(web_root)
     craft_closure = build_craft_closure_evidence(web_root)
+    agent_closure = build_agent_closure_evidence(web_root)
     report = json.loads(build_report(
-        web_root.resolve(), revision=CRAFT_FRONTEND_REVISION,
+        web_root.resolve(), revision=AGENT_FRONTEND_REVISION,
     ).json())
-    if report["frontend_revision"] != craft_closure["frontend_revision"]:
+    if report["frontend_revision"] != agent_closure["frontend_revision"]:
         raise ValueError("frontend closure/report revision drift")
     final_by_key: dict[tuple[str, str], list[dict[str, Any]]] = {}
     for raw in report["routes"]:
@@ -1054,8 +1300,8 @@ def _build_manifest(web_root: Path) -> dict[str, Any]:
             final_by_key.setdefault(key, []).append(
                 _final_occurrence(raw, web_root, report["frontend_revision"])
             )
-    if set(final_by_key) != AGENT_KEYS or sum(map(len, final_by_key.values())) != 5:
-        raise ValueError("final Agent inventory drift")
+    if final_by_key or report["counts"].get("unresolved") != 0:
+        raise ValueError("final structural inventory drift")
     entries = []
     for key in sorted(SCOPE):
         occurrences = sorted(prior_occurrences[key], key=lambda item: item["occurrence_id"])
@@ -1065,12 +1311,10 @@ def _build_manifest(web_root: Path) -> dict[str, Any]:
             entry = _craft_migrated_entry(key, sources[key], occurrences, craft_closure)
         elif key in CRAFT_REMOVED_SCOPE:
             entry = _removed_dead_entry(key, sources[key], occurrences, craft_closure)
+        elif key in AGENT_KEYS:
+            entry = _agent_migrated_entry(key, sources[key], occurrences, agent_closure)
         else:
-            current = sorted(final_by_key[key], key=lambda item: item["occurrence_id"])
-            if current != occurrences:
-                raise ValueError(f"unresolved occurrence identity drift: {key}")
-            entry = _entry(key, sources[key], contracts.get(key), current)
-            entry["occurrences"] = occurrences
+            raise ValueError(f"unclosed structural group: {key}")
         entries.append(entry)
     counts = {
         "groups": len(entries), "occurrences": sum(len(item["occurrences"]) for item in entries),
@@ -1087,7 +1331,7 @@ def _build_manifest(web_root: Path) -> dict[str, Any]:
             len(item["occurrences"]) for item in entries if item["final_disposition"] == "unresolved"
         ),
     }
-    if counts != {"groups": 14, "occurrences": 17, "migrated_groups": 5, "migrated_occurrences": 7, "removed_dead_entry_groups": 5, "removed_dead_entry_occurrences": 5, "unresolved_groups": 4, "unresolved_occurrences": 5}:
+    if counts != {"groups": 14, "occurrences": 17, "migrated_groups": 9, "migrated_occurrences": 12, "removed_dead_entry_groups": 5, "removed_dead_entry_occurrences": 5, "unresolved_groups": 0, "unresolved_occurrences": 0}:
         raise ValueError(f"three-domain count drift: {counts}")
     closure_arithmetic = {
         "baseline": {"groups": counts["groups"], "occurrences": counts["occurrences"]},
@@ -1109,7 +1353,7 @@ def _build_manifest(web_root: Path) -> dict[str, Any]:
     craft_closure_arithmetic = {
         "baseline": {"groups": 11, "occurrences": 14},
         "closed": {"groups": 7, "occurrences": 9},
-        "canonical_remainder": closure_arithmetic["canonical_remainder"],
+        "canonical_remainder": {"groups": 4, "occurrences": 5},
     }
     if any(
         craft_closure_arithmetic["baseline"][field] - craft_closure_arithmetic["closed"][field]
@@ -1117,6 +1361,17 @@ def _build_manifest(web_root: Path) -> dict[str, Any]:
         for field in ("groups", "occurrences")
     ):
         raise ValueError("Craft closure arithmetic drift")
+    agent_closure_arithmetic = {
+        "baseline": craft_closure_arithmetic["canonical_remainder"],
+        "closed": {"groups": 4, "occurrences": 5},
+        "canonical_remainder": closure_arithmetic["canonical_remainder"],
+    }
+    if any(
+        agent_closure_arithmetic["baseline"][field] - agent_closure_arithmetic["closed"][field]
+        != agent_closure_arithmetic["canonical_remainder"][field]
+        for field in ("groups", "occurrences")
+    ):
+        raise ValueError("Agent closure arithmetic drift")
     manifest = {
         "schema_version": "2.0.0",
         "artifact_id": "task-3b3e-craft-agent-project-structural-remediation",
@@ -1129,9 +1384,11 @@ def _build_manifest(web_root: Path) -> dict[str, Any]:
         "frontend_content_hash": report["content_hash"],
         "project_closure_evidence": project_closure,
         "craft_closure_evidence": craft_closure,
+        "agent_closure_evidence": agent_closure,
         "atomic_contract_manifest_sha256": _sha256(ATOMIC_PATH.read_bytes()),
         "closure_arithmetic": closure_arithmetic,
         "craft_closure_arithmetic": craft_closure_arithmetic,
+        "agent_closure_arithmetic": agent_closure_arithmetic,
         "counts": counts,
         "entries": entries,
     }

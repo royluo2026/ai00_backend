@@ -8,7 +8,7 @@ Execute the governed agent.interaction.request Agent outcome.
 - 不适用：The outcome belongs to another business domain; invoke that domain Capability instead.
 - 生命周期：`stable`
 - 所属领域：`agent`
-- Catalog Release：`rel_05bcccdde2e100f8dba2e9e85c3dab50`
+- Catalog Release：`rel_b79f7e734da4b72dbf4af4adbf91bb37`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -207,7 +207,7 @@ Execute the governed agent.interaction.request Agent outcome.
 ```json
 {
   "capability_id": "agent.interaction.request",
-  "catalog_release": "rel_05bcccdde2e100f8dba2e9e85c3dab50",
+  "catalog_release": "rel_b79f7e734da4b72dbf4af4adbf91bb37",
   "major_version": 1,
   "payload": {}
 }
@@ -384,6 +384,10 @@ Execute the governed agent.interaction.request Agent outcome.
 - `catalog_release_unavailable`：The pinned Catalog release is unavailable.（retryable=true）
 - `delegation_expired`：The Agent delegation is missing or expired.（retryable=false）
 - `approval_required`：The delegated operation requires Base approval.（retryable=false）
+- `provider_unavailable`：The Agent canvas runtime adapter is unavailable.（retryable=true）
+- `runtime_timeout`：The bounded Agent canvas runtime timed out.（retryable=true）
+- `idempotency_conflict`：The Agent canvas invocation conflicts with an earlier request.（retryable=false）
+- `outcome_unknown`：The Agent canvas outcome must be reconciled.（retryable=true）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

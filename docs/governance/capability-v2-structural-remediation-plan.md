@@ -3,7 +3,7 @@
 This plan preserves the reviewed historical Web source scope while reconciling each group to current canonical unresolved, migrated-capability, or removed-dead-entry evidence. It is an implementation sequence, not an operations or BFF exemption.
 
 - Historical scope: **45 occurrences / 37 root-cause groups**.
-- Current progress: **28 migrated groups**, **5 removed dead-entry groups**; unresolved groups are retained rather than erased.
+- Current progress: **32 migrated groups**, **5 removed dead-entry groups**; unresolved groups are retained rather than erased.
 - Implementation disposition: unresolved groups remain `owner_service_required`; source-proved dead controls are `removed_dead_entry` with no target Capability.
 - Global prohibitions: no private-router import; no direct SQL provider; no generic JSON contracts; no secret logging; no auto-confirm; no unbounded runtime execution; no fabricated atomicity; no silent REST fallback.
 
@@ -83,11 +83,11 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 
 ### 10. `agent_bounded_runtime`
 
-- Owner service: `plugins.agent.agent_backend.application.bounded_runtime_service` (agent).
-- Boundary: New public Agent bounded-runtime service with a fixed tool/node allowlist, sandbox executor, durable run records and audit lineage.
-- Dependencies: sandbox runtime, durable run/pause-token store, Agent execution audit.
+- Owner service: `plugins.agent.agent_backend.application.canvas_runtime.ProductionAgentCanvasRuntime` (agent).
+- Boundary: Existing finite AgentCanvasRuntime port backed by the shipped bounded process adapter; start/resume add durable invocation state and Registry lifecycle supervision.
+- Dependencies: existing CanvasExecutor, Agent canvas execution-control migration, Capability Registry lifecycle supervision.
 - Cross-domain links: Any Craft/Project data access is a bounded Gateway capability invocation, not direct SQL or imported routers.
-- Decision gate: Security/product must approve the executable allowlist, sandbox/resource policy, confirmation policy and recovery behavior before implementation.
+- Decision gate: No product/security decision is currently identified.
 
 ### 11. `project_approval`
 
@@ -438,15 +438,15 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 ### `POST /api/flows/test-node`
 
 - Historical occurrences: packages/agent-plugin/web/flow_canvas/flow_editor.js:754:36:POST:/api/flows/test-node, web/canvas/types/flow_type.js:145:29:POST:/api/flows/test-node
-- Current status: `unresolved` (`unresolved`).
-- Owner/service: `agent` / `plugins.agent.agent_backend.application.bounded_runtime_service`
-- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/agent/agent_backend/routers/flows.py`; No node-test handler or runtime service exists in the Agent provider.
-- Service boundary and transaction: New public Agent bounded-runtime service with a fixed tool/node allowlist, sandbox executor, durable run records and audit lineage. durable bounded sandbox run with timeout/resource limits and auditable result.
-- Target: `agent.workflow.node.test.execute@1`. Scope: no eval or browser supplied executable config.
-- Contract/security: no eval or browser supplied executable config; authorization, sandbox, timeout and resource limits; confirmation, pause-token integrity and outcome recovery.
-- Migration: Route through fixed node allowlist and public runtime service; never arbitrary dispatch.
-- Tests: allowlist/sandbox/timeout/resource limit; cross-workspace authorization; resume idempotency and audit lineage. Dependencies: sandbox runtime, durable run/pause-token store, Agent execution audit. Cross-domain links: Any Craft/Project data access is a bounded Gateway capability invocation, not direct SQL or imported routers..
-- Approval: Security/product must approve the executable allowlist, sandbox/resource policy, confirmation policy and recovery behavior before implementation.
+- Current status: `migrated` (`migrated`).
+- Owner/service: `agent` / `plugins.agent.agent_backend.application.canvas_runtime.ProductionAgentCanvasRuntime`
+- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/agent/agent_backend/capabilities/provider.py:21-41`; Migrated through the reviewed public owner service and generated capability evidence.
+- Service boundary and transaction: Existing finite AgentCanvasRuntime port backed by the shipped bounded process adapter; start/resume add durable invocation state and Registry lifecycle supervision. bounded confirmed synchronous execution with no durable command claim.
+- Target: `agent.workflow.node.test.execute@1`. Scope: stored flow/Skill identities and closed inputs only.
+- Contract/security: stored flow/Skill identities and closed inputs only; actor/team scope, timeout and input/output/concurrency bounds; confirmed durable start/resume with opaque revision-bound tokens and reconciliation.
+- Migration: Invoke the exact stored flow/node contract through the production runtime; never accept executable browser configuration.
+- Tests: closed contract and production-composition bounds; same-team/cross-team runtime authorization; start/resume replay, reconciliation and lifecycle health. Dependencies: existing CanvasExecutor, Agent canvas execution-control migration, Capability Registry lifecycle supervision. Cross-domain links: Any Craft/Project data access is a bounded Gateway capability invocation, not direct SQL or imported routers..
+- Approval: None; implement from existing source evidence.
 - Exit: public owner service and Gateway provider share this boundary; closed contract and scope tests pass; fresh canonical occurrence migrates without REST fallback; no operations/BFF/canonical-disposition relabeling.
 
 ### `POST /api/plugin/install`
@@ -508,43 +508,43 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 ### `POST /api/skills/canvas-options`
 
 - Historical occurrences: packages/agent-plugin/web/wfc_window/wfc_window.js:1599:35:POST:/api/skills/canvas-options
-- Current status: `unresolved` (`unresolved`).
-- Owner/service: `agent` / `plugins.agent.agent_backend.application.bounded_runtime_service`
-- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/agent/agent_backend/routers/skills_v2.py`; No bounded canvas-option resolver exists in the Agent provider.
-- Service boundary and transaction: New public Agent bounded-runtime service with a fixed tool/node allowlist, sandbox executor, durable run records and audit lineage. bounded deterministic resolver with actor/workspace audit.
-- Target: `agent.canvas.options.resolve@1`. Scope: no eval or browser supplied executable config.
-- Contract/security: no eval or browser supplied executable config; authorization, sandbox, timeout and resource limits; confirmation, pause-token integrity and outcome recovery.
-- Migration: Expose only approved option resolvers; browser configuration is data, never executable code.
-- Tests: allowlist/sandbox/timeout/resource limit; cross-workspace authorization; resume idempotency and audit lineage. Dependencies: sandbox runtime, durable run/pause-token store, Agent execution audit. Cross-domain links: Any Craft/Project data access is a bounded Gateway capability invocation, not direct SQL or imported routers..
-- Approval: Security/product must approve the executable allowlist, sandbox/resource policy, confirmation policy and recovery behavior before implementation.
+- Current status: `migrated` (`migrated`).
+- Owner/service: `agent` / `plugins.agent.agent_backend.application.canvas_runtime.ProductionAgentCanvasRuntime`
+- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/agent/agent_backend/capabilities/provider.py:21-41`; Migrated through the reviewed public owner service and generated capability evidence.
+- Service boundary and transaction: Existing finite AgentCanvasRuntime port backed by the shipped bounded process adapter; start/resume add durable invocation state and Registry lifecycle supervision. bounded deterministic synchronous read with no durable writes.
+- Target: `agent.canvas.options.resolve@1`. Scope: stored flow/Skill identities and closed inputs only.
+- Contract/security: stored flow/Skill identities and closed inputs only; actor/team scope, timeout and input/output/concurrency bounds; confirmed durable start/resume with opaque revision-bound tokens and reconciliation.
+- Migration: Resolve only the stored Skill/node/field source through the production runtime.
+- Tests: closed contract and production-composition bounds; same-team/cross-team runtime authorization; start/resume replay, reconciliation and lifecycle health. Dependencies: existing CanvasExecutor, Agent canvas execution-control migration, Capability Registry lifecycle supervision. Cross-domain links: Any Craft/Project data access is a bounded Gateway capability invocation, not direct SQL or imported routers..
+- Approval: None; implement from existing source evidence.
 - Exit: public owner service and Gateway provider share this boundary; closed contract and scope tests pass; fresh canonical occurrence migrates without REST fallback; no operations/BFF/canonical-disposition relabeling.
 
 ### `POST /api/skills/execute-canvas`
 
 - Historical occurrences: packages/agent-plugin/web/wfc_window/wfc_window.js:2264:40:POST:/api/skills/execute-canvas
-- Current status: `unresolved` (`unresolved`).
-- Owner/service: `agent` / `plugins.agent.agent_backend.application.bounded_runtime_service`
-- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/agent/agent_backend/routers/skills_v2.py`; No canvas execution provider exists; generic run mutation is not provider-equivalent.
-- Service boundary and transaction: New public Agent bounded-runtime service with a fixed tool/node allowlist, sandbox executor, durable run records and audit lineage. durable sandbox run with confirmation, idempotency, pause token and outcome recovery.
-- Target: `agent.canvas.execution.start@1`. Scope: no eval or browser supplied executable config.
-- Contract/security: no eval or browser supplied executable config; authorization, sandbox, timeout and resource limits; confirmation, pause-token integrity and outcome recovery.
-- Migration: Do not substitute generic agent.run mutation; build exact canvas runtime path.
-- Tests: allowlist/sandbox/timeout/resource limit; cross-workspace authorization; resume idempotency and audit lineage. Dependencies: sandbox runtime, durable run/pause-token store, Agent execution audit. Cross-domain links: Any Craft/Project data access is a bounded Gateway capability invocation, not direct SQL or imported routers..
-- Approval: Security/product must approve the executable allowlist, sandbox/resource policy, confirmation policy and recovery behavior before implementation.
+- Current status: `migrated` (`migrated`).
+- Owner/service: `agent` / `plugins.agent.agent_backend.application.canvas_runtime.ProductionAgentCanvasRuntime`
+- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/agent/agent_backend/capabilities/provider.py:21-41`; Migrated through the reviewed public owner service and generated capability evidence.
+- Service boundary and transaction: Existing finite AgentCanvasRuntime port backed by the shipped bounded process adapter; start/resume add durable invocation state and Registry lifecycle supervision. durable confirmed run creation with idempotency, lease claim and outcome reconciliation.
+- Target: `agent.canvas.execution.start@1`. Scope: stored flow/Skill identities and closed inputs only.
+- Contract/security: stored flow/Skill identities and closed inputs only; actor/team scope, timeout and input/output/concurrency bounds; confirmed durable start/resume with opaque revision-bound tokens and reconciliation.
+- Migration: Use the shipped Agent coordinator/runtime and opaque run identity; no generic run mutation.
+- Tests: closed contract and production-composition bounds; same-team/cross-team runtime authorization; start/resume replay, reconciliation and lifecycle health. Dependencies: existing CanvasExecutor, Agent canvas execution-control migration, Capability Registry lifecycle supervision. Cross-domain links: Any Craft/Project data access is a bounded Gateway capability invocation, not direct SQL or imported routers..
+- Approval: None; implement from existing source evidence.
 - Exit: public owner service and Gateway provider share this boundary; closed contract and scope tests pass; fresh canonical occurrence migrates without REST fallback; no operations/BFF/canonical-disposition relabeling.
 
 ### `POST /api/skills/resume-canvas`
 
 - Historical occurrences: packages/agent-plugin/web/wfc_window/wfc_window.js:1615:40:POST:/api/skills/resume-canvas
-- Current status: `unresolved` (`unresolved`).
-- Owner/service: `agent` / `plugins.agent.agent_backend.application.bounded_runtime_service`
-- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/agent/agent_backend/routers/skills_v2.py`; No pause-token resume provider exists; generic run mutation is not provider-equivalent.
-- Service boundary and transaction: New public Agent bounded-runtime service with a fixed tool/node allowlist, sandbox executor, durable run records and audit lineage. durable resume transaction locking validated pause token and run state.
-- Target: `agent.canvas.execution.resume@1`. Scope: no eval or browser supplied executable config.
-- Contract/security: no eval or browser supplied executable config; authorization, sandbox, timeout and resource limits; confirmation, pause-token integrity and outcome recovery.
-- Migration: Validate signed pause token, replay behavior and sandbox policy; no generic run mutation.
-- Tests: allowlist/sandbox/timeout/resource limit; cross-workspace authorization; resume idempotency and audit lineage. Dependencies: sandbox runtime, durable run/pause-token store, Agent execution audit. Cross-domain links: Any Craft/Project data access is a bounded Gateway capability invocation, not direct SQL or imported routers..
-- Approval: Security/product must approve the executable allowlist, sandbox/resource policy, confirmation policy and recovery behavior before implementation.
+- Current status: `migrated` (`migrated`).
+- Owner/service: `agent` / `plugins.agent.agent_backend.application.canvas_runtime.ProductionAgentCanvasRuntime`
+- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/agent/agent_backend/capabilities/provider.py:21-41`; Migrated through the reviewed public owner service and generated capability evidence.
+- Service boundary and transaction: Existing finite AgentCanvasRuntime port backed by the shipped bounded process adapter; start/resume add durable invocation state and Registry lifecycle supervision. durable confirmed single-use transition with revision-bound pause token and outcome reconciliation.
+- Target: `agent.canvas.execution.resume@1`. Scope: stored flow/Skill identities and closed inputs only.
+- Contract/security: stored flow/Skill identities and closed inputs only; actor/team scope, timeout and input/output/concurrency bounds; confirmed durable start/resume with opaque revision-bound tokens and reconciliation.
+- Migration: Use the shipped Agent coordinator/runtime with the same invocation identity on reconciliation.
+- Tests: closed contract and production-composition bounds; same-team/cross-team runtime authorization; start/resume replay, reconciliation and lifecycle health. Dependencies: existing CanvasExecutor, Agent canvas execution-control migration, Capability Registry lifecycle supervision. Cross-domain links: Any Craft/Project data access is a bounded Gateway capability invocation, not direct SQL or imported routers..
+- Approval: None; implement from existing source evidence.
 - Exit: public owner service and Gateway provider share this boundary; closed contract and scope tests pass; fresh canonical occurrence migrates without REST fallback; no operations/BFF/canonical-disposition relabeling.
 
 ### `POST /api/views`

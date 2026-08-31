@@ -8,7 +8,7 @@ Search bounded non-deleted BOP entries by title and node type.
 - 不适用：The consumer needs a revision-pinned detail, mutation, or complete execution structure.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_05bcccdde2e100f8dba2e9e85c3dab50`
+- Catalog Release：`rel_b79f7e734da4b72dbf4af4adbf91bb37`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -95,7 +95,7 @@ Search bounded non-deleted BOP entries by title and node type.
 ```json
 {
   "capability_id": "craft.bop.entry.search",
-  "catalog_release": "rel_05bcccdde2e100f8dba2e9e85c3dab50",
+  "catalog_release": "rel_b79f7e734da4b72dbf4af4adbf91bb37",
   "major_version": 1,
   "payload": {}
 }

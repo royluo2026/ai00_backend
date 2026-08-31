@@ -115,12 +115,12 @@ PACKAGES: dict[str, dict[str, Any]] = {
         approval="Product must confirm BOP-version archive/delete lifecycle and list projection; these are distinct from Project list semantics.",
     ),
     "agent_bounded_runtime": _package(
-        owner_domain="agent", owner_service="plugins.agent.agent_backend.application.bounded_runtime_service",
-        boundary="New public Agent bounded-runtime service with a fixed tool/node allowlist, sandbox executor, durable run records and audit lineage.",
-        security=["no eval or browser supplied executable config", "authorization, sandbox, timeout and resource limits", "confirmation, pause-token integrity and outcome recovery"],
-        tests=["allowlist/sandbox/timeout/resource limit", "cross-workspace authorization", "resume idempotency and audit lineage"],
-        dependencies=["sandbox runtime", "durable run/pause-token store", "Agent execution audit"],
-        approval="Security/product must approve the executable allowlist, sandbox/resource policy, confirmation policy and recovery behavior before implementation.",
+        owner_domain="agent", owner_service="plugins.agent.agent_backend.application.canvas_runtime.ProductionAgentCanvasRuntime",
+        owner_service_source="plugins/agent/agent_backend/application/canvas_runtime.py",
+        boundary="Existing finite AgentCanvasRuntime port backed by the shipped bounded process adapter; start/resume add durable invocation state and Registry lifecycle supervision.",
+        security=["stored flow/Skill identities and closed inputs only", "actor/team scope, timeout and input/output/concurrency bounds", "confirmed durable start/resume with opaque revision-bound tokens and reconciliation"],
+        tests=["closed contract and production-composition bounds", "same-team/cross-team runtime authorization", "start/resume replay, reconciliation and lifecycle health"],
+        dependencies=["existing CanvasExecutor", "Agent canvas execution-control migration", "Capability Registry lifecycle supervision"],
     ),
     "project_approval": _package(
         owner_domain="project_management", owner_service="plugins.project_management.project_management_backend.application.service.ProjectManagementApplication",
@@ -151,6 +151,14 @@ PACKAGE_CROSS_DOMAIN_LINKS = {
 def _spec(package_id: str, target: str | None, transaction: str, strategy: str, *, approval_required: bool = False) -> dict[str, Any]:
     return {"package_id": package_id, "target_capability": target, "transaction_model": transaction,
             "migration_strategy": strategy, "approval_required": approval_required}
+
+
+AGENT_STRUCTURAL_KEYS = {
+    ("POST", "/api/flows/test-node"),
+    ("POST", "/api/skills/canvas-options"),
+    ("POST", "/api/skills/execute-canvas"),
+    ("POST", "/api/skills/resume-canvas"),
+}
 
 
 GROUP_SPECS: dict[tuple[str, str], dict[str, Any]] = {
@@ -186,10 +194,10 @@ GROUP_SPECS: dict[tuple[str, str], dict[str, Any]] = {
     ("POST", "/api/rules/{dynamic}/suspend"): _spec("craft_rules", None, "not applicable; the dead browser action was removed", "Keep the removed action absent; do not invent a replacement capability."),
     ("GET", "/api/lists"): _spec("craft_bop_lifecycle", "craft.bop.version.list@1", "read-only Craft BOP-version query selected by item_type before Project dispatch", "Migrate only bop_version conditional branch; preserve Project list behavior.", approval_required=True),
     ("DELETE", "/api/lists/{dynamic}"): _spec("craft_bop_lifecycle", "craft.bop.version.archive@1", "one Craft BOP-version revision-locked archive transaction with audit", "Migrate only bop_version conditional branch with expected_revision; preserve Project delete behavior.", approval_required=True),
-    ("POST", "/api/flows/test-node"): _spec("agent_bounded_runtime", "agent.workflow.node.test.execute@1", "durable bounded sandbox run with timeout/resource limits and auditable result", "Route through fixed node allowlist and public runtime service; never arbitrary dispatch.", approval_required=True),
-    ("POST", "/api/skills/canvas-options"): _spec("agent_bounded_runtime", "agent.canvas.options.resolve@1", "bounded deterministic resolver with actor/workspace audit", "Expose only approved option resolvers; browser configuration is data, never executable code.", approval_required=True),
-    ("POST", "/api/skills/execute-canvas"): _spec("agent_bounded_runtime", "agent.canvas.execution.start@1", "durable sandbox run with confirmation, idempotency, pause token and outcome recovery", "Do not substitute generic agent.run mutation; build exact canvas runtime path.", approval_required=True),
-    ("POST", "/api/skills/resume-canvas"): _spec("agent_bounded_runtime", "agent.canvas.execution.resume@1", "durable resume transaction locking validated pause token and run state", "Validate signed pause token, replay behavior and sandbox policy; no generic run mutation.", approval_required=True),
+    ("POST", "/api/flows/test-node"): _spec("agent_bounded_runtime", "agent.workflow.node.test.execute@1", "bounded confirmed synchronous execution with no durable command claim", "Invoke the exact stored flow/node contract through the production runtime; never accept executable browser configuration."),
+    ("POST", "/api/skills/canvas-options"): _spec("agent_bounded_runtime", "agent.canvas.options.resolve@1", "bounded deterministic synchronous read with no durable writes", "Resolve only the stored Skill/node/field source through the production runtime."),
+    ("POST", "/api/skills/execute-canvas"): _spec("agent_bounded_runtime", "agent.canvas.execution.start@1", "durable confirmed run creation with idempotency, lease claim and outcome reconciliation", "Use the shipped Agent coordinator/runtime and opaque run identity; no generic run mutation."),
+    ("POST", "/api/skills/resume-canvas"): _spec("agent_bounded_runtime", "agent.canvas.execution.resume@1", "durable confirmed single-use transition with revision-bound pause token and outcome reconciliation", "Use the shipped Agent coordinator/runtime with the same invocation identity on reconciliation."),
     ("POST", "/api/approval/orders/{dynamic}/reject"): _spec("project_approval", "project.approval.order.reject@1", "one Project approval transition transaction with audit and transactional notification outbox", "Implement exact reject plus notification semantics; do not use candidate that omits notification.", approval_required=True),
 }
 

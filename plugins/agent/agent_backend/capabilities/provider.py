@@ -35,7 +35,7 @@ def descriptor_for(spec) -> CapabilityDescriptorV2:
         "agent_output_schema": base.output_schema,
         "execution_mode": ExecutionMode.CLOUD_ASYNC if interaction else base.execution_mode,
         "operation_policy": "required" if interaction else ("optional" if write and spec.id not in _CANVAS_SYNC else "none"),
-        "idempotency_policy": "required" if write and spec.id not in _CANVAS_SYNC else "none",
+        "idempotency_policy": "required" if write else "none",
         "consistency_policy": "strong",
         "evidence_policy": "required", "domain_errors": ERRORS, "domain_errors_complete": True,
     })

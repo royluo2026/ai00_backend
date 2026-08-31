@@ -30,14 +30,16 @@ def test_manifest_closes_exact_integration_scope_from_immutable_frontend_source(
         "unresolved_groups": 0,
         "unresolved_occurrences": 0,
     }
-    assert payload["frontend_revision"] == "a39751ec8e0f17b31dfa4244088b7a14ab3fa1eb"
+    assert payload["frontend_revision"] == "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78"
     assert payload["frontend_source"]["blob"] == "4c95a998bb2f1048183d063587526eb76238be53"
     assert payload["frontend_source"]["sha256"] == (
         "sha256:bf95202bca72d6c844864ef2c3ca285a4ee288770f3538c4bc63717ec0c2ee0f"
     )
     assert payload["frontend_dist"]["blob"] == payload["frontend_source"]["blob"]
     assert payload["frontend_dist"]["sha256"] == payload["frontend_source"]["sha256"]
-    assert payload["canonical_remainder"] == {"groups": 14, "occurrences": 17}
+    assert payload["canonical_remainder"] == {"groups": 0, "occurrences": 0}
+    assert len(payload["entries"]) == 12
+    assert sum(len(entry["occurrences"]) for entry in payload["entries"]) == 12
     for entry in payload["entries"]:
         assert entry["final_disposition"] == "migrated"
         assert entry["final_inventory_mapping"] == "capability"

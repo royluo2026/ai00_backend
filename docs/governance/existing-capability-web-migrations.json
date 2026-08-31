@@ -3,7 +3,7 @@
   "artifact_id": "existing-capability-web-migrations",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "baseline_revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-  "frontend_revision": "8ebc8de49b5d4f86c9360664fffa912c3d969102",
+  "frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
   "groups": [
     {
       "method": "DELETE",
@@ -2922,9 +2922,9 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/agent/agent_backend/capabilities/contracts.py",
-            "source_sha256": "75ee3219722ad974963b0a99382c416223ac707d2f3aded9790b91f8c3704ba4",
-            "start_line": 67,
-            "end_line": 67,
+            "source_sha256": "7ea052dc67d02ef815debeaf08c6e2030175ab81c0bd2d733ff3af70ef5010bf",
+            "start_line": 105,
+            "end_line": 105,
             "sha256": "73f36236da2d0cb00dd035edaac2fe9a3e4b501efab50f1b6dbb89b65149a8a8",
             "needle": "\"agent.run.change.apply\""
           }
@@ -2985,9 +2985,9 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/agent/agent_backend/capabilities/contracts.py",
-            "source_sha256": "75ee3219722ad974963b0a99382c416223ac707d2f3aded9790b91f8c3704ba4",
-            "start_line": 67,
-            "end_line": 67,
+            "source_sha256": "7ea052dc67d02ef815debeaf08c6e2030175ab81c0bd2d733ff3af70ef5010bf",
+            "start_line": 105,
+            "end_line": 105,
             "sha256": "73f36236da2d0cb00dd035edaac2fe9a3e4b501efab50f1b6dbb89b65149a8a8",
             "needle": "\"agent.run.change.apply\""
           }

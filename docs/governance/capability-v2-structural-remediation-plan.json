@@ -10,7 +10,7 @@
     "no silent REST fallback"
   ],
   "artifact_id": "capability-v2-structural-remediation-plan",
-  "content_sha256": "sha256:e3100a4097b4787d7b7ac00da11000274940cace8ad3855a06cfc6e43fb54b46",
+  "content_sha256": "sha256:6acb6f9434d1c61ac47ad56b9b074767fecbde99ced260989e2bf1eb070f18b0",
   "counts": {
     "groups": 37,
     "occurrences": 45
@@ -3370,60 +3370,66 @@
     },
     {
       "approval": {
-        "decision": "Security/product must approve the executable allowlist, sandbox/resource policy, confirmation policy and recovery behavior before implementation.",
-        "required": true
+        "decision": null,
+        "required": false
       },
       "contract_security_rules": [
-        "no eval or browser supplied executable config",
-        "authorization, sandbox, timeout and resource limits",
-        "confirmation, pause-token integrity and outcome recovery"
+        "stored flow/Skill identities and closed inputs only",
+        "actor/team scope, timeout and input/output/concurrency bounds",
+        "confirmed durable start/resume with opaque revision-bound tokens and reconciliation"
       ],
       "cross_domain_links": [
         "Any Craft/Project data access is a bounded Gateway capability invocation, not direct SQL or imported routers."
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-        "provider_anchor": "plugins/agent/agent_backend/routers/flows.py",
-        "provider_source_sha256": "sha256:b7451e4b3a5537ec078bad85d9c1131b6ce4e20d608d07b8cde116e159b48ad8",
-        "reason": "No node-test handler or runtime service exists in the Agent provider."
+        "provider_anchor": "plugins/agent/agent_backend/capabilities/provider.py:21-41",
+        "provider_source_sha256": "sha256:dc2fc6bf24b5a67dc8b16fff5c314b88bd81bf585d5840b1c6e9a71d6310da0e",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "migrated",
       "current_evidence": {
-        "canonical_occurrences": [
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "input_output": {
+            "end_line": 142,
+            "snippet_sha256": "sha256:b8eacb9684b5a0ee6a4d5f3fcf2dc8bea15e6a5b18bee29d77dcdf75127644b0",
+            "source_path": "plugins/agent/agent_backend/capabilities/contracts.py",
+            "source_sha256": "sha256:7ea052dc67d02ef815debeaf08c6e2030175ab81c0bd2d733ff3af70ef5010bf",
+            "start_line": 102
+          }
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
           {
-            "classification_prefix": "/api/flows",
-            "column": 36,
-            "disposition": "unresolved",
-            "line": 754,
-            "method": "POST",
-            "normalized_route": "/api/flows/test-node",
-            "occurrence_id": "packages/agent-plugin/web/flow_canvas/flow_editor.js:754:36:POST:/api/flows/test-node",
-            "raw_route": "/api/flows/test-node",
-            "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js"
+            "blob": "df2e7ae69cc266d7bb922c54734008ebd92c0b65",
+            "line": 763,
+            "snippet_sha256": "sha256:5b227e5af41fe59472f7262ffd803b01d551042898954f6b608c3c00ec4d398f",
+            "source_path": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
+            "source_sha256": "sha256:421d7e3c95c47ddd2cb045e5e66fba07d5e2b91556f072528ec0140518dd05f1"
           },
           {
-            "classification_prefix": "/api/flows",
-            "column": 29,
-            "disposition": "unresolved",
-            "line": 145,
-            "method": "POST",
-            "normalized_route": "/api/flows/test-node",
-            "occurrence_id": "web/canvas/types/flow_type.js:145:29:POST:/api/flows/test-node",
-            "raw_route": "/api/flows/test-node",
-            "source": "web/canvas/types/flow_type.js"
+            "blob": "bed005a6480948516cdfd1685a0481ea260d70d4",
+            "line": 123,
+            "snippet_sha256": "sha256:3960c14f8288f7dfae68d94962e79c2d754cec3c2de98b81347b7428ffba8593",
+            "source_path": "web/canvas/types/flow_type.js",
+            "source_sha256": "sha256:5765eeb3816c84fb6caedc58c845d87000592dec315f335ead9dbd7675f9ffcf"
           }
         ],
-        "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
-        "frontend_call_sites": [],
-        "owner_service_evidence": null,
-        "target_capability": null
+        "owner_service_evidence": {
+          "end_line": 1266,
+          "snippet_sha256": "sha256:e4c4d163fa6c5aabb1094d29fac914ba63829759a3c82de3e00564ac2920f6b0",
+          "source_path": "plugins/agent/agent_backend/application/canvas_runtime.py",
+          "source_sha256": "sha256:ba8cd2d1bd0f1e85c4da72d9fb727dc127719bbb878a944ba56b6ff0265dc954",
+          "start_line": 1095
+        },
+        "target_capability": "agent.workflow.node.test.execute@1"
       },
-      "current_status": "unresolved",
+      "current_status": "migrated",
       "dependencies": [
-        "sandbox runtime",
-        "durable run/pause-token store",
-        "Agent execution audit"
+        "existing CanvasExecutor",
+        "Agent canvas execution-control migration",
+        "Capability Registry lifecycle supervision"
       ],
       "exit_criteria": [
         "public owner service and Gateway provider share this boundary",
@@ -3434,7 +3440,7 @@
       "group_id": "POST /api/flows/test-node",
       "implementation_disposition": "owner_service_required",
       "method": "POST",
-      "migration_strategy": "Route through fixed node allowlist and public runtime service; never arbitrary dispatch.",
+      "migration_strategy": "Invoke the exact stored flow/node contract through the production runtime; never accept executable browser configuration.",
       "normalized_route": "/api/flows/test-node",
       "occurrences": [
         {
@@ -3453,18 +3459,18 @@
         }
       ],
       "owner_domain": "agent",
-      "owner_service": "plugins.agent.agent_backend.application.bounded_runtime_service",
-      "owner_service_source": null,
+      "owner_service": "plugins.agent.agent_backend.application.canvas_runtime.ProductionAgentCanvasRuntime",
+      "owner_service_source": "plugins/agent/agent_backend/application/canvas_runtime.py",
       "package_id": "agent_bounded_runtime",
-      "permission_object_scope": "no eval or browser supplied executable config",
-      "service_boundary": "New public Agent bounded-runtime service with a fixed tool/node allowlist, sandbox executor, durable run records and audit lineage.",
+      "permission_object_scope": "stored flow/Skill identities and closed inputs only",
+      "service_boundary": "Existing finite AgentCanvasRuntime port backed by the shipped bounded process adapter; start/resume add durable invocation state and Registry lifecycle supervision.",
       "target_capability": "agent.workflow.node.test.execute@1",
       "tests": [
-        "allowlist/sandbox/timeout/resource limit",
-        "cross-workspace authorization",
-        "resume idempotency and audit lineage"
+        "closed contract and production-composition bounds",
+        "same-team/cross-team runtime authorization",
+        "start/resume replay, reconciliation and lifecycle health"
       ],
-      "transaction_model": "durable bounded sandbox run with timeout/resource limits and auditable result"
+      "transaction_model": "bounded confirmed synchronous execution with no durable command claim"
     },
     {
       "approval": {
@@ -3766,48 +3772,59 @@
     },
     {
       "approval": {
-        "decision": "Security/product must approve the executable allowlist, sandbox/resource policy, confirmation policy and recovery behavior before implementation.",
-        "required": true
+        "decision": null,
+        "required": false
       },
       "contract_security_rules": [
-        "no eval or browser supplied executable config",
-        "authorization, sandbox, timeout and resource limits",
-        "confirmation, pause-token integrity and outcome recovery"
+        "stored flow/Skill identities and closed inputs only",
+        "actor/team scope, timeout and input/output/concurrency bounds",
+        "confirmed durable start/resume with opaque revision-bound tokens and reconciliation"
       ],
       "cross_domain_links": [
         "Any Craft/Project data access is a bounded Gateway capability invocation, not direct SQL or imported routers."
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-        "provider_anchor": "plugins/agent/agent_backend/routers/skills_v2.py",
-        "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
-        "reason": "No bounded canvas-option resolver exists in the Agent provider."
+        "provider_anchor": "plugins/agent/agent_backend/capabilities/provider.py:21-41",
+        "provider_source_sha256": "sha256:dc2fc6bf24b5a67dc8b16fff5c314b88bd81bf585d5840b1c6e9a71d6310da0e",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "migrated",
       "current_evidence": {
-        "canonical_occurrences": [
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "input_output": {
+            "end_line": 142,
+            "snippet_sha256": "sha256:b8eacb9684b5a0ee6a4d5f3fcf2dc8bea15e6a5b18bee29d77dcdf75127644b0",
+            "source_path": "plugins/agent/agent_backend/capabilities/contracts.py",
+            "source_sha256": "sha256:7ea052dc67d02ef815debeaf08c6e2030175ab81c0bd2d733ff3af70ef5010bf",
+            "start_line": 102
+          }
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
           {
-            "column": 35,
-            "disposition": "unresolved",
-            "line": 1599,
-            "method": "POST",
-            "normalized_route": "/api/skills/canvas-options",
-            "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1599:35:POST:/api/skills/canvas-options",
-            "raw_route": "/api/skills/canvas-options",
-            "source": "packages/agent-plugin/web/wfc_window/wfc_window.js"
+            "blob": "feac63e030dfee47c0a6a3006bed91244a796954",
+            "line": 1716,
+            "snippet_sha256": "sha256:034bea262a8d6546b5cc815209525b392f9e62de1d619f8fbd550dd640282812",
+            "source_path": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+            "source_sha256": "sha256:707c68c119ee354482fae75b5a4e79f5c81d210db26c13cfe7ccfd8ff8073794"
           }
         ],
-        "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
-        "frontend_call_sites": [],
-        "owner_service_evidence": null,
-        "target_capability": null
+        "owner_service_evidence": {
+          "end_line": 1266,
+          "snippet_sha256": "sha256:e4c4d163fa6c5aabb1094d29fac914ba63829759a3c82de3e00564ac2920f6b0",
+          "source_path": "plugins/agent/agent_backend/application/canvas_runtime.py",
+          "source_sha256": "sha256:ba8cd2d1bd0f1e85c4da72d9fb727dc127719bbb878a944ba56b6ff0265dc954",
+          "start_line": 1095
+        },
+        "target_capability": "agent.canvas.options.resolve@1"
       },
-      "current_status": "unresolved",
+      "current_status": "migrated",
       "dependencies": [
-        "sandbox runtime",
-        "durable run/pause-token store",
-        "Agent execution audit"
+        "existing CanvasExecutor",
+        "Agent canvas execution-control migration",
+        "Capability Registry lifecycle supervision"
       ],
       "exit_criteria": [
         "public owner service and Gateway provider share this boundary",
@@ -3818,7 +3835,7 @@
       "group_id": "POST /api/skills/canvas-options",
       "implementation_disposition": "owner_service_required",
       "method": "POST",
-      "migration_strategy": "Expose only approved option resolvers; browser configuration is data, never executable code.",
+      "migration_strategy": "Resolve only the stored Skill/node/field source through the production runtime.",
       "normalized_route": "/api/skills/canvas-options",
       "occurrences": [
         {
@@ -3830,63 +3847,74 @@
         }
       ],
       "owner_domain": "agent",
-      "owner_service": "plugins.agent.agent_backend.application.bounded_runtime_service",
-      "owner_service_source": null,
+      "owner_service": "plugins.agent.agent_backend.application.canvas_runtime.ProductionAgentCanvasRuntime",
+      "owner_service_source": "plugins/agent/agent_backend/application/canvas_runtime.py",
       "package_id": "agent_bounded_runtime",
-      "permission_object_scope": "no eval or browser supplied executable config",
-      "service_boundary": "New public Agent bounded-runtime service with a fixed tool/node allowlist, sandbox executor, durable run records and audit lineage.",
+      "permission_object_scope": "stored flow/Skill identities and closed inputs only",
+      "service_boundary": "Existing finite AgentCanvasRuntime port backed by the shipped bounded process adapter; start/resume add durable invocation state and Registry lifecycle supervision.",
       "target_capability": "agent.canvas.options.resolve@1",
       "tests": [
-        "allowlist/sandbox/timeout/resource limit",
-        "cross-workspace authorization",
-        "resume idempotency and audit lineage"
+        "closed contract and production-composition bounds",
+        "same-team/cross-team runtime authorization",
+        "start/resume replay, reconciliation and lifecycle health"
       ],
-      "transaction_model": "bounded deterministic resolver with actor/workspace audit"
+      "transaction_model": "bounded deterministic synchronous read with no durable writes"
     },
     {
       "approval": {
-        "decision": "Security/product must approve the executable allowlist, sandbox/resource policy, confirmation policy and recovery behavior before implementation.",
-        "required": true
+        "decision": null,
+        "required": false
       },
       "contract_security_rules": [
-        "no eval or browser supplied executable config",
-        "authorization, sandbox, timeout and resource limits",
-        "confirmation, pause-token integrity and outcome recovery"
+        "stored flow/Skill identities and closed inputs only",
+        "actor/team scope, timeout and input/output/concurrency bounds",
+        "confirmed durable start/resume with opaque revision-bound tokens and reconciliation"
       ],
       "cross_domain_links": [
         "Any Craft/Project data access is a bounded Gateway capability invocation, not direct SQL or imported routers."
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-        "provider_anchor": "plugins/agent/agent_backend/routers/skills_v2.py",
-        "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
-        "reason": "No canvas execution provider exists; generic run mutation is not provider-equivalent."
+        "provider_anchor": "plugins/agent/agent_backend/capabilities/provider.py:21-41",
+        "provider_source_sha256": "sha256:dc2fc6bf24b5a67dc8b16fff5c314b88bd81bf585d5840b1c6e9a71d6310da0e",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "migrated",
       "current_evidence": {
-        "canonical_occurrences": [
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "input_output": {
+            "end_line": 197,
+            "snippet_sha256": "sha256:6f51a410c1199f645166523acb88b12de30d4367d2d6b7746bae833620eeb875",
+            "source_path": "plugins/agent/agent_backend/capabilities/contracts.py",
+            "source_sha256": "sha256:7ea052dc67d02ef815debeaf08c6e2030175ab81c0bd2d733ff3af70ef5010bf",
+            "start_line": 143
+          }
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
           {
-            "column": 40,
-            "disposition": "unresolved",
-            "line": 2264,
-            "method": "POST",
-            "normalized_route": "/api/skills/execute-canvas",
-            "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2264:40:POST:/api/skills/execute-canvas",
-            "raw_route": "/api/skills/execute-canvas",
-            "source": "packages/agent-plugin/web/wfc_window/wfc_window.js"
+            "blob": "feac63e030dfee47c0a6a3006bed91244a796954",
+            "line": 2423,
+            "snippet_sha256": "sha256:55591194f3ab3c3a37396c2fb0aebf078f7f936b467c29e178f662c8c526f20b",
+            "source_path": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+            "source_sha256": "sha256:707c68c119ee354482fae75b5a4e79f5c81d210db26c13cfe7ccfd8ff8073794"
           }
         ],
-        "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
-        "frontend_call_sites": [],
-        "owner_service_evidence": null,
-        "target_capability": "agent.run.change.apply@1"
+        "owner_service_evidence": {
+          "end_line": 1266,
+          "snippet_sha256": "sha256:e4c4d163fa6c5aabb1094d29fac914ba63829759a3c82de3e00564ac2920f6b0",
+          "source_path": "plugins/agent/agent_backend/application/canvas_runtime.py",
+          "source_sha256": "sha256:ba8cd2d1bd0f1e85c4da72d9fb727dc127719bbb878a944ba56b6ff0265dc954",
+          "start_line": 1095
+        },
+        "target_capability": "agent.canvas.execution.start@1"
       },
-      "current_status": "unresolved",
+      "current_status": "migrated",
       "dependencies": [
-        "sandbox runtime",
-        "durable run/pause-token store",
-        "Agent execution audit"
+        "existing CanvasExecutor",
+        "Agent canvas execution-control migration",
+        "Capability Registry lifecycle supervision"
       ],
       "exit_criteria": [
         "public owner service and Gateway provider share this boundary",
@@ -3897,7 +3925,7 @@
       "group_id": "POST /api/skills/execute-canvas",
       "implementation_disposition": "owner_service_required",
       "method": "POST",
-      "migration_strategy": "Do not substitute generic agent.run mutation; build exact canvas runtime path.",
+      "migration_strategy": "Use the shipped Agent coordinator/runtime and opaque run identity; no generic run mutation.",
       "normalized_route": "/api/skills/execute-canvas",
       "occurrences": [
         {
@@ -3909,63 +3937,74 @@
         }
       ],
       "owner_domain": "agent",
-      "owner_service": "plugins.agent.agent_backend.application.bounded_runtime_service",
-      "owner_service_source": null,
+      "owner_service": "plugins.agent.agent_backend.application.canvas_runtime.ProductionAgentCanvasRuntime",
+      "owner_service_source": "plugins/agent/agent_backend/application/canvas_runtime.py",
       "package_id": "agent_bounded_runtime",
-      "permission_object_scope": "no eval or browser supplied executable config",
-      "service_boundary": "New public Agent bounded-runtime service with a fixed tool/node allowlist, sandbox executor, durable run records and audit lineage.",
+      "permission_object_scope": "stored flow/Skill identities and closed inputs only",
+      "service_boundary": "Existing finite AgentCanvasRuntime port backed by the shipped bounded process adapter; start/resume add durable invocation state and Registry lifecycle supervision.",
       "target_capability": "agent.canvas.execution.start@1",
       "tests": [
-        "allowlist/sandbox/timeout/resource limit",
-        "cross-workspace authorization",
-        "resume idempotency and audit lineage"
+        "closed contract and production-composition bounds",
+        "same-team/cross-team runtime authorization",
+        "start/resume replay, reconciliation and lifecycle health"
       ],
-      "transaction_model": "durable sandbox run with confirmation, idempotency, pause token and outcome recovery"
+      "transaction_model": "durable confirmed run creation with idempotency, lease claim and outcome reconciliation"
     },
     {
       "approval": {
-        "decision": "Security/product must approve the executable allowlist, sandbox/resource policy, confirmation policy and recovery behavior before implementation.",
-        "required": true
+        "decision": null,
+        "required": false
       },
       "contract_security_rules": [
-        "no eval or browser supplied executable config",
-        "authorization, sandbox, timeout and resource limits",
-        "confirmation, pause-token integrity and outcome recovery"
+        "stored flow/Skill identities and closed inputs only",
+        "actor/team scope, timeout and input/output/concurrency bounds",
+        "confirmed durable start/resume with opaque revision-bound tokens and reconciliation"
       ],
       "cross_domain_links": [
         "Any Craft/Project data access is a bounded Gateway capability invocation, not direct SQL or imported routers."
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-        "provider_anchor": "plugins/agent/agent_backend/routers/skills_v2.py",
-        "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
-        "reason": "No pause-token resume provider exists; generic run mutation is not provider-equivalent."
+        "provider_anchor": "plugins/agent/agent_backend/capabilities/provider.py:21-41",
+        "provider_source_sha256": "sha256:dc2fc6bf24b5a67dc8b16fff5c314b88bd81bf585d5840b1c6e9a71d6310da0e",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "migrated",
       "current_evidence": {
-        "canonical_occurrences": [
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "input_output": {
+            "end_line": 197,
+            "snippet_sha256": "sha256:6f51a410c1199f645166523acb88b12de30d4367d2d6b7746bae833620eeb875",
+            "source_path": "plugins/agent/agent_backend/capabilities/contracts.py",
+            "source_sha256": "sha256:7ea052dc67d02ef815debeaf08c6e2030175ab81c0bd2d733ff3af70ef5010bf",
+            "start_line": 143
+          }
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
           {
-            "column": 40,
-            "disposition": "unresolved",
-            "line": 1615,
-            "method": "POST",
-            "normalized_route": "/api/skills/resume-canvas",
-            "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1615:40:POST:/api/skills/resume-canvas",
-            "raw_route": "/api/skills/resume-canvas",
-            "source": "packages/agent-plugin/web/wfc_window/wfc_window.js"
+            "blob": "feac63e030dfee47c0a6a3006bed91244a796954",
+            "line": 1758,
+            "snippet_sha256": "sha256:300792d8f87d099fd010de26597a3649313172b80839370bd11c89f1ed16e64c",
+            "source_path": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+            "source_sha256": "sha256:707c68c119ee354482fae75b5a4e79f5c81d210db26c13cfe7ccfd8ff8073794"
           }
         ],
-        "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
-        "frontend_call_sites": [],
-        "owner_service_evidence": null,
-        "target_capability": "agent.run.change.apply@1"
+        "owner_service_evidence": {
+          "end_line": 1266,
+          "snippet_sha256": "sha256:e4c4d163fa6c5aabb1094d29fac914ba63829759a3c82de3e00564ac2920f6b0",
+          "source_path": "plugins/agent/agent_backend/application/canvas_runtime.py",
+          "source_sha256": "sha256:ba8cd2d1bd0f1e85c4da72d9fb727dc127719bbb878a944ba56b6ff0265dc954",
+          "start_line": 1095
+        },
+        "target_capability": "agent.canvas.execution.resume@1"
       },
-      "current_status": "unresolved",
+      "current_status": "migrated",
       "dependencies": [
-        "sandbox runtime",
-        "durable run/pause-token store",
-        "Agent execution audit"
+        "existing CanvasExecutor",
+        "Agent canvas execution-control migration",
+        "Capability Registry lifecycle supervision"
       ],
       "exit_criteria": [
         "public owner service and Gateway provider share this boundary",
@@ -3976,7 +4015,7 @@
       "group_id": "POST /api/skills/resume-canvas",
       "implementation_disposition": "owner_service_required",
       "method": "POST",
-      "migration_strategy": "Validate signed pause token, replay behavior and sandbox policy; no generic run mutation.",
+      "migration_strategy": "Use the shipped Agent coordinator/runtime with the same invocation identity on reconciliation.",
       "normalized_route": "/api/skills/resume-canvas",
       "occurrences": [
         {
@@ -3988,18 +4027,18 @@
         }
       ],
       "owner_domain": "agent",
-      "owner_service": "plugins.agent.agent_backend.application.bounded_runtime_service",
-      "owner_service_source": null,
+      "owner_service": "plugins.agent.agent_backend.application.canvas_runtime.ProductionAgentCanvasRuntime",
+      "owner_service_source": "plugins/agent/agent_backend/application/canvas_runtime.py",
       "package_id": "agent_bounded_runtime",
-      "permission_object_scope": "no eval or browser supplied executable config",
-      "service_boundary": "New public Agent bounded-runtime service with a fixed tool/node allowlist, sandbox executor, durable run records and audit lineage.",
+      "permission_object_scope": "stored flow/Skill identities and closed inputs only",
+      "service_boundary": "Existing finite AgentCanvasRuntime port backed by the shipped bounded process adapter; start/resume add durable invocation state and Registry lifecycle supervision.",
       "target_capability": "agent.canvas.execution.resume@1",
       "tests": [
-        "allowlist/sandbox/timeout/resource limit",
-        "cross-workspace authorization",
-        "resume idempotency and audit lineage"
+        "closed contract and production-composition bounds",
+        "same-team/cross-team runtime authorization",
+        "start/resume replay, reconciliation and lifecycle health"
       ],
-      "transaction_model": "durable resume transaction locking validated pause token and run state"
+      "transaction_model": "durable confirmed single-use transition with revision-bound pause token and outcome reconciliation"
     },
     {
       "approval": {
@@ -4807,26 +4846,26 @@
       ]
     },
     {
-      "approval_gate": "Security/product must approve the executable allowlist, sandbox/resource policy, confirmation policy and recovery behavior before implementation.",
+      "approval_gate": null,
       "contract_security_rules": [
-        "no eval or browser supplied executable config",
-        "authorization, sandbox, timeout and resource limits",
-        "confirmation, pause-token integrity and outcome recovery"
+        "stored flow/Skill identities and closed inputs only",
+        "actor/team scope, timeout and input/output/concurrency bounds",
+        "confirmed durable start/resume with opaque revision-bound tokens and reconciliation"
       ],
       "dependencies": [
-        "sandbox runtime",
-        "durable run/pause-token store",
-        "Agent execution audit"
+        "existing CanvasExecutor",
+        "Agent canvas execution-control migration",
+        "Capability Registry lifecycle supervision"
       ],
       "owner_domain": "agent",
-      "owner_service": "plugins.agent.agent_backend.application.bounded_runtime_service",
-      "owner_service_source": null,
+      "owner_service": "plugins.agent.agent_backend.application.canvas_runtime.ProductionAgentCanvasRuntime",
+      "owner_service_source": "plugins/agent/agent_backend/application/canvas_runtime.py",
       "package_id": "agent_bounded_runtime",
-      "service_boundary": "New public Agent bounded-runtime service with a fixed tool/node allowlist, sandbox executor, durable run records and audit lineage.",
+      "service_boundary": "Existing finite AgentCanvasRuntime port backed by the shipped bounded process adapter; start/resume add durable invocation state and Registry lifecycle supervision.",
       "tests": [
-        "allowlist/sandbox/timeout/resource limit",
-        "cross-workspace authorization",
-        "resume idempotency and audit lineage"
+        "closed contract and production-composition bounds",
+        "same-team/cross-team runtime authorization",
+        "start/resume replay, reconciliation and lifecycle health"
       ]
     },
     {
@@ -4856,19 +4895,19 @@
   "source_artifacts": [
     {
       "path": "docs/governance/base-structural-web-remediation.json",
-      "sha256": "sha256:fdf489c1815965c6e5e4f5934cfe39715842764709c4dec1c9e535b5ca414af9"
+      "sha256": "sha256:2ac76b08e8182bdaa2924b628c483770577e784415edcc39c5287a22b4b5c3cd"
     },
     {
       "path": "docs/governance/integration-structural-web-remediation.json",
-      "sha256": "sha256:d2d9b0cc90b0054c7e3fff422d4034945923235be19a106fa3dccf0875d0f3f3"
+      "sha256": "sha256:adb33e50fe35e3b09f1fb2760daa2c8ce47c630e554659653cadfbec868bb35a"
     },
     {
       "path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-      "sha256": "sha256:e5652c5b63f155dbce8322041c3156d65998f720989b37f380c0ec8f2eccbfc1"
+      "sha256": "sha256:fb09cdcb87508fb03ef8d4cc686ca100448af1884c925ea631bf367a5457d87a"
     },
     {
       "path": "docs\\governance\\capability-coverage-review\\generated\\web_route_inventory.json",
-      "sha256": "sha256:4b55531e1a825f5702b8775320fe153972a6cadead7fb2519959a646f3f0e6cb"
+      "sha256": "sha256:0caa92c2adfe5f23e197a9aec02882fb155046c42ff44ed4362434828610631c"
     }
   ]
 }

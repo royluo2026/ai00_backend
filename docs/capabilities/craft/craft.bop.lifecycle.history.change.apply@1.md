@@ -8,7 +8,7 @@ Undo or redo one governed BOP line operation-history batch.
 - 不适用：The request creates/restores a checkpoint, edits an entry directly, or changes lifecycle phase state.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_05bcccdde2e100f8dba2e9e85c3dab50`
+- Catalog Release：`rel_b79f7e734da4b72dbf4af4adbf91bb37`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -100,7 +100,7 @@ Undo or redo one governed BOP line operation-history batch.
 ```json
 {
   "capability_id": "craft.bop.lifecycle.history.change.apply",
-  "catalog_release": "rel_05bcccdde2e100f8dba2e9e85c3dab50",
+  "catalog_release": "rel_b79f7e734da4b72dbf4af4adbf91bb37",
   "major_version": 1,
   "payload": {
     "line_gid": "example",

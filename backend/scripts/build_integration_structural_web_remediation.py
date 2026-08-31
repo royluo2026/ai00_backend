@@ -158,7 +158,7 @@ def _build_manifest(web_root: Path) -> dict[str, Any]:
         "groups": len({(item["method"], item["normalized_route"]) for item in unresolved}),
         "occurrences": len(unresolved),
     }
-    if remainder != {"groups": 14, "occurrences": 17}:
+    if remainder != {"groups": 0, "occurrences": 0}:
         raise ValueError(f"canonical remainder drift: {remainder}")
     if any((item["method"], item["normalized_route"]) in SCOPE for item in unresolved):
         raise ValueError("Integration unresolved route remains")

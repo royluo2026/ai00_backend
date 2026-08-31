@@ -1,6 +1,6 @@
 {
-  "frontend_revision": "8ebc8de49b5d4f86c9360664fffa912c3d969102",
-  "content_hash": "9905775b994a8fed621ae74bd41b19ccc4779d73a0da1bd626ee324f5e4ea8ae",
+  "frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+  "content_hash": "d3154ce47292b3b9f4daabb5df6c611c3415790336f280b0e8630bb9d16e30b0",
   "wrapper_contracts_hash": "0f099242269e21253ae02e3c54184b8ff0ec2ade1f98b59dbe8937778178a760",
   "scan_roots": [
     "web",
@@ -27,12 +27,12 @@
     "legacy_registered": 310,
     "bff_registered": 2,
     "operations_excluded": 19,
-    "unresolved": 5
+    "unresolved": 0
   },
   "lexical_audit": {
-    "token_count": 392,
-    "token_hash": "f7e342d51ed625a8521f4bb0bf5966336fda554370e2ff752e3567b0861ccff6",
-    "mapped_count": 374,
+    "token_count": 387,
+    "token_hash": "4a11daf037446d5535aec4b3f056b0f66114bd5b2a9d28610405a1b389f48092",
+    "mapped_count": 369,
     "reviewed_non_route_count": 18,
     "reviewed_non_route_tokens": [
       "packages/craft-plugin/web/bop_nav/bop_nav.js:12:13:/api/",
@@ -320,166 +320,125 @@
     },
     {
       "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
-      "line": 75,
+      "line": 87,
       "column": 35,
       "raw_route": "/api/flows/capability-manifest",
       "normalized_route": "/api/flows/capability-manifest",
       "method": "GET",
       "disposition": "operations_excluded",
-      "occurrence_id": "packages/agent-plugin/web/flow_canvas/flow_editor.js:75:35:GET:/api/flows/capability-manifest",
+      "occurrence_id": "packages/agent-plugin/web/flow_canvas/flow_editor.js:87:35:GET:/api/flows/capability-manifest",
       "classification_prefix": "/api/flows"
     },
     {
       "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
-      "line": 754,
-      "column": 36,
-      "raw_route": "/api/flows/test-node",
-      "normalized_route": "/api/flows/test-node",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/agent-plugin/web/flow_canvas/flow_editor.js:754:36:POST:/api/flows/test-node",
-      "classification_prefix": "/api/flows"
-    },
-    {
-      "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
-      "line": 796,
+      "line": 809,
       "column": 36,
       "raw_route": "/api/flows/gen-script",
       "normalized_route": "/api/flows/gen-script",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "packages/agent-plugin/web/flow_canvas/flow_editor.js:796:36:POST:/api/flows/gen-script",
+      "occurrence_id": "packages/agent-plugin/web/flow_canvas/flow_editor.js:809:36:POST:/api/flows/gen-script",
       "classification_prefix": "/api/flows"
     },
     {
       "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
-      "line": 681,
+      "line": 755,
       "column": 25,
       "raw_route": "/api/ai/chat/stream",
       "normalized_route": "/api/ai/chat/stream",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:681:25:POST:/api/ai/chat/stream"
+      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:755:25:POST:/api/ai/chat/stream"
     },
     {
       "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
-      "line": 752,
+      "line": 826,
       "column": 38,
       "raw_route": "/api/skills",
       "normalized_route": "/api/skills",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:752:38:POST:/api/skills"
+      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:826:38:POST:/api/skills"
     },
     {
       "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
-      "line": 784,
+      "line": 858,
       "column": 38,
       "raw_route": "/api/skills/${_fixedSkill.gid}",
       "normalized_route": "/api/skills/{dynamic}",
       "method": "PUT",
       "disposition": "legacy_registered",
-      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:784:38:PUT:/api/skills/{dynamic}"
+      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:858:38:PUT:/api/skills/{dynamic}"
     },
     {
       "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
-      "line": 1463,
+      "line": 1537,
       "column": 24,
       "raw_route": "/api/ai/confirm",
       "normalized_route": "/api/ai/confirm",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1463:24:POST:/api/ai/confirm"
+      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1537:24:POST:/api/ai/confirm"
     },
     {
       "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
-      "line": 1599,
-      "column": 35,
-      "raw_route": "/api/skills/canvas-options",
-      "normalized_route": "/api/skills/canvas-options",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1599:35:POST:/api/skills/canvas-options"
-    },
-    {
-      "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
-      "line": 1615,
-      "column": 40,
-      "raw_route": "/api/skills/resume-canvas",
-      "normalized_route": "/api/skills/resume-canvas",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1615:40:POST:/api/skills/resume-canvas"
-    },
-    {
-      "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
-      "line": 1710,
+      "line": 1856,
       "column": 40,
       "raw_route": "/api/v1/capabilities/craft.bop.entry.legacy_read:invoke",
       "normalized_route": "/api/v1/capabilities/craft.bop.entry.legacy_read:invoke",
       "method": "POST",
       "disposition": "capability",
-      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1710:40:POST:/api/v1/capabilities/craft.bop.entry.legacy_read:invoke"
+      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1856:40:POST:/api/v1/capabilities/craft.bop.entry.legacy_read:invoke"
     },
     {
       "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
-      "line": 1953,
+      "line": 2099,
       "column": 24,
       "raw_route": "/api/ai/abort",
       "normalized_route": "/api/ai/abort",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1953:24:POST:/api/ai/abort"
+      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2099:24:POST:/api/ai/abort"
     },
     {
       "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
-      "line": 1974,
+      "line": 2120,
       "column": 20,
       "raw_route": "/api/ai/tools",
       "normalized_route": "/api/ai/tools",
       "method": "GET",
       "disposition": "operations_excluded",
-      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:1974:20:GET:/api/ai/tools"
+      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2120:20:GET:/api/ai/tools"
     },
     {
       "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
-      "line": 2015,
+      "line": 2161,
       "column": 20,
       "raw_route": "/api/skills?scope_filter=all",
       "normalized_route": "/api/skills",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2015:20:GET:/api/skills"
+      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2161:20:GET:/api/skills"
     },
     {
       "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
-      "line": 2226,
+      "line": 2372,
       "column": 40,
       "raw_route": "/api/skills/${_fixedSkill.gid}",
       "normalized_route": "/api/skills/{dynamic}",
       "method": "PUT",
       "disposition": "legacy_registered",
-      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2226:40:PUT:/api/skills/{dynamic}"
+      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2372:40:PUT:/api/skills/{dynamic}"
     },
     {
       "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
-      "line": 2264,
-      "column": 40,
-      "raw_route": "/api/skills/execute-canvas",
-      "normalized_route": "/api/skills/execute-canvas",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2264:40:POST:/api/skills/execute-canvas"
-    },
-    {
-      "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
-      "line": 2570,
+      "line": 2739,
       "column": 24,
       "raw_route": "/api/ai/abort",
       "normalized_route": "/api/ai/abort",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2570:24:POST:/api/ai/abort"
+      "occurrence_id": "packages/agent-plugin/web/wfc_window/wfc_window.js:2739:24:POST:/api/ai/abort"
     },
     {
       "source": "packages/craft-plugin/web/approval/approval.js",
@@ -1603,45 +1562,34 @@
     },
     {
       "source": "web/canvas/types/flow_type.js",
-      "line": 112,
+      "line": 132,
       "column": 43,
       "raw_route": "/api/v1/capabilities/${id}:invoke",
       "normalized_route": "/api/v1/capabilities/{dynamic}:invoke",
       "method": "POST",
       "disposition": "capability",
-      "occurrence_id": "web/canvas/types/flow_type.js:112:43:POST:/api/v1/capabilities/{dynamic}:invoke"
+      "occurrence_id": "web/canvas/types/flow_type.js:132:43:POST:/api/v1/capabilities/{dynamic}:invoke"
     },
     {
       "source": "web/canvas/types/flow_type.js",
-      "line": 129,
+      "line": 148,
       "column": 29,
       "raw_route": "/api/flows/capability-manifest",
       "normalized_route": "/api/flows/capability-manifest",
       "method": "GET",
       "disposition": "operations_excluded",
-      "occurrence_id": "web/canvas/types/flow_type.js:129:29:GET:/api/flows/capability-manifest",
+      "occurrence_id": "web/canvas/types/flow_type.js:148:29:GET:/api/flows/capability-manifest",
       "classification_prefix": "/api/flows"
     },
     {
       "source": "web/canvas/types/flow_type.js",
-      "line": 145,
-      "column": 29,
-      "raw_route": "/api/flows/test-node",
-      "normalized_route": "/api/flows/test-node",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "web/canvas/types/flow_type.js:145:29:POST:/api/flows/test-node",
-      "classification_prefix": "/api/flows"
-    },
-    {
-      "source": "web/canvas/types/flow_type.js",
-      "line": 783,
+      "line": 800,
       "column": 40,
       "raw_route": "/api/flows/gen-script",
       "normalized_route": "/api/flows/gen-script",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/canvas/types/flow_type.js:783:40:POST:/api/flows/gen-script",
+      "occurrence_id": "web/canvas/types/flow_type.js:800:40:POST:/api/flows/gen-script",
       "classification_prefix": "/api/flows"
     },
     {

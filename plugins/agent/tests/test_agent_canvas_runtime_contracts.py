@@ -329,7 +329,11 @@ def test_descriptors_publish_v1_with_exact_sync_and_write_policies():
         else:
             assert descriptor.execution_mode == "cloud_sync"
             assert descriptor.operation_policy == "none"
-            assert descriptor.idempotency_policy == "none"
+            assert descriptor.idempotency_policy == (
+                "required"
+                if capability_id == "agent.workflow.node.test.execute"
+                else "none"
+            )
 
 
 def test_application_fails_closed_without_canvas_runtime_adapter():

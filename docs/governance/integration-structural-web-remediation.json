@@ -1,11 +1,11 @@
 {
   "artifact_id": "integration-structural-remediation",
-  "atomic_contract_manifest_sha256": "sha256:a18366a3f5574e8acf570e36d3d785eecb54d280620100d4e92fae5b9ff0f58d",
+  "atomic_contract_manifest_sha256": "sha256:83ceda230ec20ed980652de729eccbaedbe1b980bb0520d8a613d2eb3935a9eb",
   "canonical_remainder": {
-    "groups": 14,
-    "occurrences": 17
+    "groups": 0,
+    "occurrences": 0
   },
-  "content_sha256": "sha256:74282ef98eb890ef7c9042f35b1a30d128e00c2bf38946930f3c6bb814b874c1",
+  "content_sha256": "sha256:4b1e2d28cc095a3a592f618b820622aad81bb0595bdb36fe9be87b11bbf24501",
   "counts": {
     "groups": 12,
     "migrated_groups": 12,
@@ -2143,13 +2143,13 @@
       }
     }
   ],
-  "frontend_content_hash": "9c9abc0a340ea25f4eb28ea60ab2577b50a5daf26424e62ba3ca174474c1aa4c",
+  "frontend_content_hash": "d3154ce47292b3b9f4daabb5df6c611c3415790336f280b0e8630bb9d16e30b0",
   "frontend_dist": {
     "blob": "4c95a998bb2f1048183d063587526eb76238be53",
     "path": "dist-production/web/ext_datasource/ext_ds.js",
     "sha256": "sha256:bf95202bca72d6c844864ef2c3ca285a4ee288770f3538c4bc63717ec0c2ee0f"
   },
-  "frontend_revision": "b1c0b0e25e895022c1e9ea12abf767ea2b7637c3",
+  "frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
   "frontend_source": {
     "blob": "4c95a998bb2f1048183d063587526eb76238be53",
     "path": "web/ext_datasource/ext_ds.js",
