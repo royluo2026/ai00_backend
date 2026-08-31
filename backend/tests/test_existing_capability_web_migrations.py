@@ -202,6 +202,21 @@ def test_later_remediation_rejects_forged_and_stale_documents() -> None:
         assert "migration_final_reclassification_mismatch:POST:/api/approval/orders/{dynamic}/reject" in issues
 
 
+def test_later_remediation_rejects_explicit_empty_document() -> None:
+    """Breaks if a falsey supplied candidate is replaced by the canonical rebuild."""
+    manifest = load_existing_capability_migrations(MANIFEST)
+
+    issues = audit_existing_capability_migrations(
+        ROOT, manifest, web_root=WEB_ROOT, remediation_document={},
+    )
+
+    assert "migration_structural_remediation_invalid:canonical_document_mismatch" in issues
+    assert (
+        "migration_final_reclassification_mismatch:POST:/api/approval/orders/{dynamic}/reject"
+        in issues
+    )
+
+
 def test_migrated_groups_are_only_the_provider_equivalent_families() -> None:
     manifest = load_existing_capability_migrations(MANIFEST)
     migrated = {(group.method, group.normalized_route) for group in manifest.groups if group.decision == "migrate"}

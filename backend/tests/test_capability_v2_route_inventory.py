@@ -7,6 +7,7 @@ from collections import Counter
 from dataclasses import replace
 from datetime import date, timedelta
 from pathlib import Path
+import subprocess
 
 from backend.capability_v2.consumer_routes import normalize_route, scan_web_routes
 from backend.capability_v2.catalog_targets import CatalogTargetIndex
@@ -19,13 +20,17 @@ from backend.capability_v2.route_root_cause_ledger import (
     audit_route_root_cause_ledger,
     load_route_root_cause_ledger,
 )
-from backend.scripts.check_web_capability_routes import build_report
+from backend.scripts.check_web_capability_routes import (
+    build_git_tree_scan_evidence,
+    build_report,
+)
 
 
 ROOT = Path(__file__).resolve().parents[2]
 LEDGER_PATH = ROOT / "docs/governance/web-route-root-cause-ledger.json"
 CANONICAL_WEB_INVENTORY = ROOT / "docs/governance/capability-coverage-review/generated/web_route_inventory.json"
 FRONTEND_ROOT = ROOT.parent / "workmanship-web-capability-governance"
+PINNED_FRONTEND_REVISION = "69e5e00054d3c1cff635fe41fcb96fbe150d25fb"
 STRUCTURAL_PLAN = ROOT / "docs/governance/capability-v2-structural-remediation-plan.json"
 BASELINE_BACKEND_REVISION = "800ec6ba559db3301221e674b2a5026d354214ff"
 BASELINE_INVENTORY_SHA256 = "55f3de074e060a71dc6acab4bee993d42d7af05026e6acd4c0e8d7f6d06b9694"
@@ -97,6 +102,56 @@ def test_canonical_web_inventory_ignores_untracked_frontend_sources() -> None:
         assert json.loads(build_report(FRONTEND_ROOT).json()) == baseline
     finally:
         probe.unlink(missing_ok=True)
+
+
+def test_canonical_web_inventory_is_bound_to_exact_pinned_git_tree() -> None:
+    """Breaks if the canonical scanner can fall back to mutable worktree bytes."""
+    baseline = json.loads(
+        build_report(FRONTEND_ROOT, revision=PINNED_FRONTEND_REVISION).json()
+    )
+    evidence = build_git_tree_scan_evidence(
+        FRONTEND_ROOT, revision=PINNED_FRONTEND_REVISION,
+    )
+
+    assert baseline["frontend_revision"] == PINNED_FRONTEND_REVISION
+    assert evidence == {
+        "method": "git-tree-blobs-v1",
+        "revision": PINNED_FRONTEND_REVISION,
+        "tree": "0eb308bf3f8ad300a584659a2d27c6b6de60bd95",
+        "roots": ["web", "packages"],
+        "document_count": 224,
+        "materialization_sha256": "sha256:2bf2b224b9a09396811ec61a9a067f60eff6a1ce400ff9f56710557106c28e55",
+    }
+
+
+def test_pinned_scanner_ignores_tracked_and_untracked_worktree_mutations(tmp_path) -> None:
+    """Breaks if scanning the same commit can consume any mutable checkout source."""
+    checkout = tmp_path / "frontend"
+    subprocess.run(
+        ["git", "clone", "--quiet", "--no-hardlinks", str(FRONTEND_ROOT), str(checkout)],
+        check=True,
+    )
+    subprocess.run(
+        ["git", "checkout", "--quiet", PINNED_FRONTEND_REVISION], cwd=checkout, check=True,
+    )
+    baseline = build_report(checkout, revision=PINNED_FRONTEND_REVISION).json()
+    evidence = build_git_tree_scan_evidence(
+        checkout, revision=PINNED_FRONTEND_REVISION,
+    )
+
+    tracked = checkout / "web/core/existing_capability_client.js"
+    tracked.write_text(
+        tracked.read_text(encoding="utf-8") + "\nfetch('/api/tracked-evidence-bypass');\n",
+        encoding="utf-8",
+    )
+    (checkout / "web/__untracked_evidence_bypass__.js").write_text(
+        "fetch('/api/untracked-evidence-bypass');\n", encoding="utf-8",
+    )
+
+    assert build_report(checkout, revision=PINNED_FRONTEND_REVISION).json() == baseline
+    assert build_git_tree_scan_evidence(
+        checkout, revision=PINNED_FRONTEND_REVISION,
+    ) == evidence
 
 
 def test_task3b3a_root_cause_ledger_covers_pinned_unresolved_evidence() -> None:

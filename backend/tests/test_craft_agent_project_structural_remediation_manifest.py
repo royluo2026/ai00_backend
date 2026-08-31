@@ -48,6 +48,14 @@ def test_project_closure_evidence_freezes_exact_frontend_commit_blobs_and_absenc
     evidence = _module().build_project_closure_evidence(WEB_ROOT)
 
     assert evidence["frontend_revision"] == "69e5e00054d3c1cff635fe41fcb96fbe150d25fb"
+    assert evidence["scanner_materialization"] == {
+        "method": "git-tree-blobs-v1",
+        "revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
+        "tree": "0eb308bf3f8ad300a584659a2d27c6b6de60bd95",
+        "roots": ["web", "packages"],
+        "document_count": 224,
+        "materialization_sha256": "sha256:2bf2b224b9a09396811ec61a9a067f60eff6a1ce400ff9f56710557106c28e55",
+    }
     assert {
         path: item["blob"] for path, item in evidence["frontend_files"].items()
     } == {
@@ -115,7 +123,7 @@ def test_list_dispatch_evidence_is_derived_from_complete_mapping_and_fail_closed
 
 
 def test_approval_outbound_evidence_rejects_notification_helpers_and_capabilities():
-    """Breaks if rejection publishes from Web through a renamed helper or notification capability."""
+    """Breaks unless every call in the complete rejection flow is classified fail-closed."""
     module = _module()
     source = _frontend_source("packages/craft-plugin/web/approval/approval.js")
 
@@ -124,6 +132,12 @@ def test_approval_outbound_evidence_rejects_notification_helpers_and_capabilitie
     assert evidence["allowed_outbound_calls"] == [
         "capability:project.approval.order.reject",
     ]
+    assert evidence["unknown_calls"] == []
+    assert {item["classification"] for item in evidence["classified_calls"]} == {
+        "local_pure",
+        "local_ui",
+        "allowed_outbound",
+    }
     assert evidence["flow_sha256"].startswith("sha256:")
 
     mutations = (
@@ -137,6 +151,11 @@ def test_approval_outbound_evidence_rejects_notification_helpers_and_capabilitie
             "capabilityClient.invoke('base.notification.change.apply'",
             1,
         ),
+        source.replace("let res;", "broadcastRejection(_selected.gid);\n  let res;", 1),
+        source.replace("let res;", "announceApplicant(result);\n  let res;", 1),
+        source.replace("let res;", "helpers.broadcastRejection(_selected.gid);\n  let res;", 1),
+        source.replace("let res;", "(0, announceApplicant)(result);\n  let res;", 1),
+        source.replace("let res;", "helpers['announceApplicant'](result);\n  let res;", 1),
     )
     for changed in mutations:
         with pytest.raises(ValueError, match="approval outbound call drift"):
@@ -295,3 +314,50 @@ def test_manifest_validator_rejects_tampered_provider_contract_and_final_occurre
         changed = json.loads(json.dumps(payload))
         changed[field] = "forged"
         assert "source_ledger_evidence_mismatch" in module.validate_manifest_against_expected(changed, payload)
+
+
+def _rehash(module, payload):
+    without_hash = {key: value for key, value in payload.items() if key != "content_sha256"}
+    payload["content_sha256"] = module._sha256(module._canonical(without_hash).encode())
+    return payload
+
+
+def test_manifest_validator_requires_exact_canonical_document_equality(manifest):
+    """Breaks if any self-rehashed decision field can differ from the independent rebuild."""
+    module, payload = manifest
+
+    def approval(document):
+        return next(
+            item for item in document["entries"]
+            if (item["method"], item["normalized_route"])
+            == ("POST", "/api/approval/orders/{dynamic}/reject")
+        )
+
+    mutations = []
+    changed = json.loads(json.dumps(payload))
+    approval(changed)["candidate_capability"] = "project.approval.order.withdraw@1"
+    mutations.append(changed)
+    changed = json.loads(json.dumps(payload))
+    approval(changed)["method"] = "PUT"
+    mutations.append(changed)
+    changed = json.loads(json.dumps(payload))
+    approval(changed)["normalized_route"] = "/api/approval/orders/{dynamic}/withdraw"
+    mutations.append(changed)
+    changed = json.loads(json.dumps(payload))
+    approval(changed)["occurrences"].append(dict(approval(changed)["occurrences"][0]))
+    mutations.append(changed)
+    changed = json.loads(json.dumps(payload))
+    approval(changed)["legacy_route_absent"] = False
+    mutations.append(changed)
+    changed = json.loads(json.dumps(payload))
+    changed["closure_arithmetic"]["canonical_remainder"]["occurrences"] = 13
+    mutations.append(changed)
+    changed = json.loads(json.dumps(payload))
+    approval(changed)["approval_reject_evidence"]["gateway_context"]["start_line"] += 1
+    mutations.append(changed)
+
+    for changed in (*mutations, {}):
+        if changed:
+            _rehash(module, changed)
+        issues = module.validate_manifest_against_expected(changed, payload)
+        assert "canonical_document_mismatch" in issues

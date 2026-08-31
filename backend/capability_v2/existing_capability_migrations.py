@@ -530,7 +530,11 @@ def audit_existing_capability_migrations(
                 expected_remediation = _canonical_structural_remediation(
                     str(web_root.resolve())
                 )
-                candidate_remediation = remediation_document or expected_remediation
+                candidate_remediation = (
+                    remediation_document
+                    if remediation_document is not None
+                    else expected_remediation
+                )
                 remediation_issues = validate_manifest_against_expected(
                     candidate_remediation, expected_remediation,
                 )

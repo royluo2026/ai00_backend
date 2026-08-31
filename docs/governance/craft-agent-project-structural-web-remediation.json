@@ -17,7 +17,7 @@
   },
   "closure_baseline_revision": "614805f59294006b8802ae01869dc9d7fe3cf694",
   "closure_baseline_sha256": "sha256:fca8beb006ff0fcac9fdad79d1ad19ef97633ed90217c45600e78c9e5e5754c0",
-  "content_sha256": "sha256:4d8817f56273d91b336938cde4e4f3df8896b090b5372be7b3213ee332a4074b",
+  "content_sha256": "sha256:e761e11ed1f9b1de134f539fd572dceaecbb026a8dc8f7985e8ae99f88443bbc",
   "counts": {
     "groups": 14,
     "migrated_groups": 3,
@@ -758,8 +758,88 @@
           "allowed_outbound_calls": [
             "capability:project.approval.order.reject"
           ],
+          "classified_calls": [
+            {
+              "callee": "document.getElementById",
+              "classification": "local_ui"
+            },
+            {
+              "callee": "value.trim",
+              "classification": "local_pure"
+            },
+            {
+              "callee": "alert",
+              "classification": "local_ui"
+            },
+            {
+              "callee": "Number.isInteger",
+              "classification": "local_pure"
+            },
+            {
+              "callee": "alert",
+              "classification": "local_ui"
+            },
+            {
+              "callee": "alert",
+              "classification": "local_ui"
+            },
+            {
+              "callee": "window.confirm",
+              "classification": "local_ui"
+            },
+            {
+              "callee": "window.crypto.randomUUID",
+              "classification": "local_pure"
+            },
+            {
+              "callee": "alert",
+              "classification": "local_ui"
+            },
+            {
+              "callee": "Object.freeze",
+              "classification": "local_pure"
+            },
+            {
+              "callee": "Object.freeze",
+              "classification": "local_pure"
+            },
+            {
+              "callee": "capabilityClient.invoke",
+              "capability": "project.approval.order.reject",
+              "classification": "allowed_outbound"
+            },
+            {
+              "callee": "alert",
+              "classification": "local_ui"
+            },
+            {
+              "callee": "alert",
+              "classification": "local_ui"
+            },
+            {
+              "callee": "Number.isInteger",
+              "classification": "local_pure"
+            },
+            {
+              "callee": "alert",
+              "classification": "local_ui"
+            },
+            {
+              "callee": "document.getElementById",
+              "classification": "local_ui"
+            },
+            {
+              "callee": "loadOrders",
+              "classification": "local_ui"
+            },
+            {
+              "callee": "selectOrder",
+              "classification": "local_ui"
+            }
+          ],
           "dist_flow_sha256": "sha256:5568f9d1d5da2bd95f9c1723010b9985fa0693c0951cb800b1ca1f84f034bf26",
-          "flow_sha256": "sha256:0d785d44a4ebf709625f39c7d2d05dadc1a8aa648aea37b9a54f398afbe18c0c"
+          "flow_sha256": "sha256:0d785d44a4ebf709625f39c7d2d05dadc1a8aa648aea37b9a54f398afbe18c0c",
+          "unknown_calls": []
         },
         "outbox_transaction": {
           "end_line": 119,
@@ -1495,8 +1575,88 @@
         "allowed_outbound_calls": [
           "capability:project.approval.order.reject"
         ],
+        "classified_calls": [
+          {
+            "callee": "document.getElementById",
+            "classification": "local_ui"
+          },
+          {
+            "callee": "value.trim",
+            "classification": "local_pure"
+          },
+          {
+            "callee": "alert",
+            "classification": "local_ui"
+          },
+          {
+            "callee": "Number.isInteger",
+            "classification": "local_pure"
+          },
+          {
+            "callee": "alert",
+            "classification": "local_ui"
+          },
+          {
+            "callee": "alert",
+            "classification": "local_ui"
+          },
+          {
+            "callee": "window.confirm",
+            "classification": "local_ui"
+          },
+          {
+            "callee": "window.crypto.randomUUID",
+            "classification": "local_pure"
+          },
+          {
+            "callee": "alert",
+            "classification": "local_ui"
+          },
+          {
+            "callee": "Object.freeze",
+            "classification": "local_pure"
+          },
+          {
+            "callee": "Object.freeze",
+            "classification": "local_pure"
+          },
+          {
+            "callee": "capabilityClient.invoke",
+            "capability": "project.approval.order.reject",
+            "classification": "allowed_outbound"
+          },
+          {
+            "callee": "alert",
+            "classification": "local_ui"
+          },
+          {
+            "callee": "alert",
+            "classification": "local_ui"
+          },
+          {
+            "callee": "Number.isInteger",
+            "classification": "local_pure"
+          },
+          {
+            "callee": "alert",
+            "classification": "local_ui"
+          },
+          {
+            "callee": "document.getElementById",
+            "classification": "local_ui"
+          },
+          {
+            "callee": "loadOrders",
+            "classification": "local_ui"
+          },
+          {
+            "callee": "selectOrder",
+            "classification": "local_ui"
+          }
+        ],
         "dist_flow_sha256": "sha256:5568f9d1d5da2bd95f9c1723010b9985fa0693c0951cb800b1ca1f84f034bf26",
-        "flow_sha256": "sha256:0d785d44a4ebf709625f39c7d2d05dadc1a8aa648aea37b9a54f398afbe18c0c"
+        "flow_sha256": "sha256:0d785d44a4ebf709625f39c7d2d05dadc1a8aa648aea37b9a54f398afbe18c0c",
+        "unknown_calls": []
       },
       "outbox_transaction": {
         "end_line": 119,
@@ -1705,6 +1865,17 @@
         ],
         "legacy_route_absent": true
       }
+    },
+    "scanner_materialization": {
+      "document_count": 224,
+      "materialization_sha256": "sha256:2bf2b224b9a09396811ec61a9a067f60eff6a1ce400ff9f56710557106c28e55",
+      "method": "git-tree-blobs-v1",
+      "revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
+      "roots": [
+        "web",
+        "packages"
+      ],
+      "tree": "0eb308bf3f8ad300a584659a2d27c6b6de60bd95"
     }
   },
   "schema_version": "2.0.0",

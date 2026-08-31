@@ -2,7 +2,10 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 from pathlib import Path, PurePosixPath
+import subprocess
 import sys
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
@@ -63,9 +66,9 @@ ROOT_CAUSE_LEDGER = (
 )
 
 
-def _frontend_revision(web_root: Path) -> str:
+def _frontend_revision(web_root: Path, revision: str = "HEAD") -> str:
     try:
-        return resolve_revision(web_root, "HEAD")
+        return resolve_revision(web_root, revision)
     except ValueError as exc:
         raise RouteScanConfigurationError(str(exc)) from exc
 
@@ -84,13 +87,18 @@ def _require_known_methods(report):
     return report
 
 
-def build_report(web_root: Path, prefixes: tuple[str, ...] = DEFAULT_LEGACY_PREFIXES):
+def _git_tree_documents(
+    web_root: Path,
+    revision: str,
+) -> tuple[str, dict[str, str], dict[str, object]]:
+    """Materialize every scanner-visible document from one immutable Git tree."""
     web_root = web_root.resolve()
-    revision = _frontend_revision(web_root)
+    resolved = _frontend_revision(web_root, revision)
     roots = ("web", "packages")
-    blobs = list_blobs(web_root, revision, roots)
+    blobs = list_blobs(web_root, resolved, roots)
     payloads = read_blobs(web_root, blobs)
-    documents = {}
+    documents: dict[str, str] = {}
+    materialized: list[dict[str, str]] = []
     for blob in blobs:
         path = Path(blob.path)
         if path.suffix.lower() not in _SOURCE_SUFFIXES or _is_excluded_file(path):
@@ -99,13 +107,62 @@ def build_report(web_root: Path, prefixes: tuple[str, ...] = DEFAULT_LEGACY_PREF
         relative_parts = PurePosixPath(blob.path).relative_to(root).parts
         if any(_is_skipped_directory(part) for part in relative_parts):
             continue
-        documents[blob.path] = decode_text(payloads[blob.oid])
+        payload = payloads[blob.oid]
+        documents[blob.path] = decode_text(payload)
+        materialized.append({
+            "path": blob.path,
+            "blob": blob.oid,
+            "sha256": "sha256:" + hashlib.sha256(payload).hexdigest(),
+        })
+    tree_result = subprocess.run(
+        ["git", "-C", str(web_root), "rev-parse", f"{resolved}^{{tree}}"],
+        check=False,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+    )
+    tree = tree_result.stdout.strip()
+    if tree_result.returncode or len(tree) != 40:
+        detail = tree_result.stderr.strip() or "tree object unavailable"
+        raise RouteScanConfigurationError(f"Git tree read failed: {detail}")
+    serialized = json.dumps(
+        materialized, ensure_ascii=False, sort_keys=True, separators=(",", ":"),
+    ).encode("utf-8")
+    evidence: dict[str, object] = {
+        "method": "git-tree-blobs-v1",
+        "revision": resolved,
+        "tree": tree,
+        "roots": list(roots),
+        "document_count": len(materialized),
+        "materialization_sha256": "sha256:" + hashlib.sha256(serialized).hexdigest(),
+    }
+    return resolved, documents, evidence
+
+
+def build_git_tree_scan_evidence(
+    web_root: Path,
+    *,
+    revision: str = "HEAD",
+) -> dict[str, object]:
+    """Return the exact commit/tree/content identity consumed by the scanner."""
+    return _git_tree_documents(web_root, revision)[2]
+
+
+def build_report(
+    web_root: Path,
+    prefixes: tuple[str, ...] = DEFAULT_LEGACY_PREFIXES,
+    *,
+    revision: str = "HEAD",
+):
+    web_root = web_root.resolve()
+    resolved, documents, _evidence = _git_tree_documents(web_root, revision)
+    roots = ("web", "packages")
     return _require_known_methods(scan_web_api_routes(
         (),
         legacy_index=_inventory_index(LEGACY_INVENTORY),
         bff_index=_inventory_index(BFF_INVENTORY),
         exclusions=load_operations_exclusions(OPERATIONS_EXCLUSIONS),
-        frontend_revision=revision,
+        frontend_revision=resolved,
         classification_prefixes=prefixes,
         lexical_non_routes=load_lexical_non_routes(LEXICAL_NON_ROUTES),
         wrapper_contracts=load_wrapper_contracts(WRAPPER_CONTRACTS),
@@ -117,6 +174,7 @@ def build_report(web_root: Path, prefixes: tuple[str, ...] = DEFAULT_LEGACY_PREF
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--web-root", type=Path, required=True)
+    parser.add_argument("--revision", default="HEAD")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--write", action="store_true")
     mode.add_argument("--check", action="store_true")
@@ -128,6 +186,7 @@ def main(argv: list[str] | None = None) -> int:
         report = build_report(
             args.web_root,
             tuple(args.legacy_prefixes or DEFAULT_LEGACY_PREFIXES),
+            revision=args.revision,
         )
     except (RouteScanConfigurationError, RouteInventoryConfigurationError) as exc:
         print(f"web-route-scan failed: {exc}", file=sys.stderr)
@@ -176,4 +235,4 @@ if __name__ == "__main__":
     raise SystemExit(main())
 
 
-__all__ = ["build_report", "main"]
+__all__ = ["build_git_tree_scan_evidence", "build_report", "main"]

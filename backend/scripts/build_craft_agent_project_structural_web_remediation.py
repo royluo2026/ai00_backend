@@ -15,8 +15,11 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from backend.scripts.check_web_capability_routes import build_report
-from backend.capability_v2.git_tree import read_path
+from backend.scripts.check_web_capability_routes import (
+    build_git_tree_scan_evidence,
+    build_report,
+)
+from backend.capability_v2.git_tree import read_path, resolve_revision
 
 
 BASELINE = "2db07be4"
@@ -186,30 +189,124 @@ def _list_dispatch_evidence(source: str) -> dict[str, Any]:
     }
 
 
+_JS_TOKEN = re.compile(
+    r"(?:\s+|//[^\r\n]*|/\*[\s\S]*?\*/)"
+    r"|(?:'(?:\\.|[^'\\])*'|\"(?:\\.|[^\"\\])*\"|`(?:\\.|[^`\\])*`)"
+    r"|(?:[A-Za-z_$][A-Za-z0-9_$]*)"
+    r"|(?:\?\.|===|!==|=>|==|!=|<=|>=|&&|\|\||\.\.\.)"
+    r"|(?:\d+(?:\.\d+)?)"
+    r"|(?:.)",
+)
+_JS_IDENT = re.compile(r"^[A-Za-z_$][A-Za-z0-9_$]*$")
+_NON_CALL_KEYWORDS = {"if", "for", "while", "switch", "catch", "with", "function"}
+
+
+def _javascript_tokens(source: str) -> list[str]:
+    return [
+        token for token in _JS_TOKEN.findall(source)
+        if not token.isspace() and not token.startswith("//") and not token.startswith("/*")
+    ]
+
+
+def _direct_call_callee(tokens: list[str], open_index: int) -> tuple[str, int] | None:
+    """Return a direct dotted callee, or a fail-closed expression marker."""
+    index = open_index - 1
+    if index < 0:
+        return None
+    if tokens[index] in {"?."}:
+        index -= 1
+    if index < 0:
+        return None
+    if tokens[index] in {")", "]"}:
+        marker = "parenthesized_expression" if tokens[index] == ")" else "computed_member"
+        return marker, index
+    if _JS_IDENT.fullmatch(tokens[index]) is None:
+        return None
+    parts = [tokens[index]]
+    start = index
+    index -= 1
+    while index >= 1 and tokens[index] in {".", "?."} and _JS_IDENT.fullmatch(tokens[index - 1]):
+        parts.insert(0, tokens[index - 1])
+        start = index - 1
+        index -= 2
+    callee = ".".join(parts)
+    if callee in _NON_CALL_KEYWORDS:
+        return None
+    if start > 0 and tokens[start - 1] == "function":
+        return None
+    return callee, start
+
+
+def _approval_call_expressions(flow: str) -> list[dict[str, Any]]:
+    """Classify every call expression; unfamiliar syntax and callees fail closed."""
+    tokens = _javascript_tokens(flow)
+    local_ui = {
+        "alert",
+        "document.getElementById",
+        "loadOrders",
+        "selectOrder",
+        "window.confirm",
+    }
+    local_pure = {
+        "Number.isInteger",
+        "Object.freeze",
+        "window.crypto.randomUUID",
+    }
+    calls: list[dict[str, Any]] = []
+    for index, token in enumerate(tokens):
+        if token != "(":
+            continue
+        parsed = _direct_call_callee(tokens, index)
+        if parsed is None:
+            continue
+        callee, _start = parsed
+        normalized = callee.replace("?.", ".")
+        if normalized == "capabilityClient.invoke":
+            first_argument = tokens[index + 1] if index + 1 < len(tokens) else ""
+            capability = (
+                first_argument[1:-1]
+                if len(first_argument) >= 2 and first_argument[0] in {'\"', "'"}
+                and first_argument[-1] == first_argument[0]
+                else None
+            )
+            classification = (
+                "allowed_outbound"
+                if capability == "project.approval.order.reject"
+                else "unknown"
+            )
+            item = {
+                "callee": normalized,
+                "classification": classification,
+                "capability": capability,
+            }
+        elif normalized in local_ui:
+            item = {"callee": normalized, "classification": "local_ui"}
+        elif normalized in local_pure or normalized.endswith(".trim"):
+            item = {"callee": normalized, "classification": "local_pure"}
+        else:
+            item = {"callee": normalized, "classification": "unknown"}
+        calls.append(item)
+    return calls
+
+
 def _approval_outbound_evidence(source: str) -> dict[str, Any]:
-    """Allow only the Project rejection capability as an outbound rejection call."""
+    """Allow only fully classified local calls and the exact Project rejection invoke."""
     flow = _source_block(
         source, "async function rejectOrder()", "async function withdrawOrder()",
         label="approval outbound call",
     )
+    classified = _approval_call_expressions(flow)
+    unknown = [item["callee"] for item in classified if item["classification"] == "unknown"]
     capability_calls = [
-        f"capability:{capability_id}"
-        for capability_id in re.findall(
-            r"\b[\w.]+\.invoke\(\s*['\"]([^'\"]+)['\"]", flow,
-        )
+        f"capability:{item['capability']}"
+        for item in classified if item["classification"] == "allowed_outbound"
     ]
-    forbidden_patterns = (
-        r"\bapi\s*\(",
-        r"\b(?:fetch|_cloudFetch|postMessage|dispatchEvent)\s*\(",
-        r"\b[\w.]+\.(?:publish|emit|send)\s*\(",
-        r"\b[\w.]*(?:notification|notify)[\w.]*\s*\(",
-    )
-    if capability_calls != ["capability:project.approval.order.reject"] or any(
-        re.search(pattern, flow, flags=re.IGNORECASE) for pattern in forbidden_patterns
-    ):
+    if capability_calls != ["capability:project.approval.order.reject"] or unknown:
         raise ValueError("approval outbound call drift")
     return {
         "allowed_outbound_calls": capability_calls,
+        "classified_calls": classified,
+        "unknown_calls": unknown,
         "flow_sha256": _sha256(flow.encode("utf-8")),
     }
 
@@ -217,10 +314,7 @@ def _approval_outbound_evidence(source: str) -> dict[str, Any]:
 def build_project_closure_evidence(web_root: Path) -> dict[str, Any]:
     """Bind the three closed Project-facing groups to immutable source evidence."""
     web_root = web_root.resolve()
-    revision = subprocess.run(
-        ["git", "rev-parse", "HEAD"], cwd=web_root,
-        check=True, capture_output=True, text=True,
-    ).stdout.strip()
+    revision = resolve_revision(web_root, EXPECTED_FRONTEND_REVISION)
     if revision != EXPECTED_FRONTEND_REVISION:
         raise ValueError(f"frontend closure revision drift: {revision}")
 
@@ -260,8 +354,8 @@ def build_project_closure_evidence(web_root: Path) -> dict[str, Any]:
     source_approval_outbound = _approval_outbound_evidence(texts[approval_paths[0]])
     dist_approval_outbound = _approval_outbound_evidence(texts[approval_paths[1]])
     if (
-        source_approval_outbound["allowed_outbound_calls"]
-        != dist_approval_outbound["allowed_outbound_calls"]
+        source_approval_outbound["classified_calls"]
+        != dist_approval_outbound["classified_calls"]
     ):
         raise ValueError("approval outbound source/dist drift")
     notification_side_effect_absent = True
@@ -380,6 +474,9 @@ def build_project_closure_evidence(web_root: Path) -> dict[str, Any]:
     }
     return {
         "frontend_revision": revision,
+        "scanner_materialization": build_git_tree_scan_evidence(
+            web_root, revision=revision,
+        ),
         "frontend_files": dict(sorted(frontend_files.items())),
         "list_dispatch": list_dispatch,
         "approval": approval,
@@ -624,7 +721,9 @@ def _build_manifest(web_root: Path) -> dict[str, Any]:
     ):
         raise ValueError("closure baseline count drift")
     closure = build_project_closure_evidence(web_root)
-    report = json.loads(build_report(web_root.resolve()).json())
+    report = json.loads(build_report(
+        web_root.resolve(), revision=EXPECTED_FRONTEND_REVISION,
+    ).json())
     if report["frontend_revision"] != closure["frontend_revision"]:
         raise ValueError("frontend closure/report revision drift")
     final_by_key: dict[tuple[str, str], list[dict[str, Any]]] = {}
@@ -702,48 +801,56 @@ def build_manifest(web_root: Path) -> dict[str, Any]:
 
 def validate_manifest_against_expected(payload: Mapping[str, Any], expected: Mapping[str, Any]) -> tuple[str, ...]:
     issues: list[str] = []
-    actual = {(item.get("method"), item.get("normalized_route")): item for item in payload.get("entries", []) if isinstance(item, Mapping)}
+    actual = {
+        (item.get("method"), item.get("normalized_route")): item
+        for item in payload.get("entries", []) if isinstance(item, Mapping)
+    }
     wanted = {(item["method"], item["normalized_route"]): item for item in expected["entries"]}
     if set(actual) != set(wanted):
-        return ("entry_scope_mismatch",)
-    for key, wanted_entry in wanted.items():
-        entry = actual[key]
-        if entry.get("provider_source_sha256") != wanted_entry["provider_source_sha256"]:
-            issues.append("provider_hash_mismatch")
-        if entry.get("non_equivalence") != wanted_entry["non_equivalence"]:
-            issues.append("non_equivalence_evidence_mismatch")
-        if entry.get("lifecycle_evidence") != wanted_entry["lifecycle_evidence"]:
-            issues.append("lifecycle_evidence_mismatch")
-        if entry.get("approval_reject_evidence") != wanted_entry["approval_reject_evidence"]:
-            issues.append("approval_evidence_mismatch")
-        if entry.get("occurrences") != wanted_entry["occurrences"]:
-            issues.append("occurrence_evidence_mismatch")
-        if entry.get("contract_evidence") != wanted_entry.get("contract_evidence"):
-            issues.append("contract_evidence_mismatch")
-        if entry.get("owner_service_evidence") != wanted_entry.get("owner_service_evidence"):
-            issues.append("owner_service_evidence_mismatch")
-        if entry.get("frontend_call_sites", []) != wanted_entry.get("frontend_call_sites", []):
-            issues.append("frontend_evidence_mismatch")
-        if entry.get("final_occurrences") != wanted_entry["final_occurrences"]:
-            issues.append("final_occurrence_mismatch")
-        if (
-            entry.get("final_disposition") != wanted_entry["final_disposition"]
-            or entry.get("final_inventory_mapping") != wanted_entry["final_inventory_mapping"]
-        ):
-            issues.append("final_inventory_mismatch")
+        issues.append("entry_scope_mismatch")
+    else:
+        for key, wanted_entry in wanted.items():
+            entry = actual[key]
+            if entry.get("provider_source_sha256") != wanted_entry["provider_source_sha256"]:
+                issues.append("provider_hash_mismatch")
+            if entry.get("non_equivalence") != wanted_entry["non_equivalence"]:
+                issues.append("non_equivalence_evidence_mismatch")
+            if entry.get("lifecycle_evidence") != wanted_entry["lifecycle_evidence"]:
+                issues.append("lifecycle_evidence_mismatch")
+            if entry.get("approval_reject_evidence") != wanted_entry["approval_reject_evidence"]:
+                issues.append("approval_evidence_mismatch")
+            if entry.get("occurrences") != wanted_entry["occurrences"]:
+                issues.append("occurrence_evidence_mismatch")
+            if entry.get("contract_evidence") != wanted_entry.get("contract_evidence"):
+                issues.append("contract_evidence_mismatch")
+            if entry.get("owner_service_evidence") != wanted_entry.get("owner_service_evidence"):
+                issues.append("owner_service_evidence_mismatch")
+            if entry.get("frontend_call_sites", []) != wanted_entry.get("frontend_call_sites", []):
+                issues.append("frontend_evidence_mismatch")
+            if entry.get("final_occurrences") != wanted_entry["final_occurrences"]:
+                issues.append("final_occurrence_mismatch")
+            if (
+                entry.get("final_disposition") != wanted_entry["final_disposition"]
+                or entry.get("final_inventory_mapping") != wanted_entry["final_inventory_mapping"]
+            ):
+                issues.append("final_inventory_mismatch")
     without_hash = dict(payload)
     supplied_hash = without_hash.pop("content_sha256", None)
     if supplied_hash != _sha256(_canonical(without_hash).encode()):
         issues.append("content_hash_mismatch")
     expected_without_hash = dict(expected)
-    expected_without_hash.pop("content_sha256")
+    expected_hash = expected_without_hash.pop("content_sha256", None)
+    if expected_hash != _sha256(_canonical(expected_without_hash).encode()):
+        issues.append("expected_content_hash_mismatch")
     if (
-        without_hash.get("source_ledger_revision") != expected_without_hash["source_ledger_revision"]
-        or without_hash.get("source_ledger_sha256") != expected_without_hash["source_ledger_sha256"]
+        without_hash.get("source_ledger_revision") != expected_without_hash.get("source_ledger_revision")
+        or without_hash.get("source_ledger_sha256") != expected_without_hash.get("source_ledger_sha256")
     ):
         issues.append("source_ledger_evidence_mismatch")
     if without_hash != expected_without_hash:
         issues.append("manifest_evidence_mismatch")
+    if dict(payload) != dict(expected):
+        issues.append("canonical_document_mismatch")
     return tuple(sorted(set(issues)))
 
 
