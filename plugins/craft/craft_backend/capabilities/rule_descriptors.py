@@ -1,17 +1,19 @@
 from __future__ import annotations
 from backend.capability_v2.provider_contracts import CapabilityOutput, CapabilitySpec
 
+RULE_DEFINITION_CHANGE_CAPABILITY_ID = "craft.rule.definition.change.apply"
+
 RULE_CAPABILITY_IDS = (
  "craft.rule.draft.create", "craft.rule.draft.get", "craft.rule.draft.search", "craft.rule.draft.revise", "craft.rule.draft.submit",
  "craft.rule.release.get", "craft.rule.release.search", "craft.rule.release.publish", "craft.rule.release.activate",
  "craft.rule.evaluate", "craft.rule.entry.evaluate", "craft.bop.validation.run", "craft.bop.validation.get",
- "craft.rule.waiver.create", "craft.rule.waiver.search", "craft.rule.waiver.revoke",
+ "craft.rule.waiver.create", "craft.rule.waiver.search", "craft.rule.waiver.revoke", RULE_DEFINITION_CHANGE_CAPABILITY_ID,
 )
 _READS = {item for item in RULE_CAPABILITY_IDS if item.endswith((".get", ".search", ".evaluate"))}
 
 def register_rule_capabilities(registry):
     for capability_id in RULE_CAPABILITY_IDS:
-        if capability_id == "craft.rule.entry.evaluate":
+        if capability_id in {"craft.rule.entry.evaluate", RULE_DEFINITION_CHANGE_CAPABILITY_ID}:
             continue
         read = capability_id in _READS
         def handler(payload, context, _id=capability_id):
@@ -22,4 +24,4 @@ def register_rule_capabilities(registry):
           permissions=() if read else ("craft.rule.write",), plugin_callable=True, input_schema={"type":"object"}, output_schema={"type":"object"},
           effects=(("read" if read else "write")+":craft.rule",), tags=("craft","rule")), handler)
 
-__all__ = ["RULE_CAPABILITY_IDS", "register_rule_capabilities"]
+__all__ = ["RULE_CAPABILITY_IDS", "RULE_DEFINITION_CHANGE_CAPABILITY_ID", "register_rule_capabilities"]

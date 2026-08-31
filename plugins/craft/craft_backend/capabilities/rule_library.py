@@ -7,11 +7,50 @@ from typing import Any
 from backend.capability_v2.provider_contracts import CapabilityContext, CapabilityOutput, CapabilitySpec
 from backend.platform_sdk.ids import next_display_id, next_gid
 
+from ..application.rules import (
+    MysqlRuleDefinitionRepository,
+    RULE_DEFINITION_FIELDS,
+    canonical_rule_definition_command,
+    validate_rule_definition_changes,
+)
 from ..data.connection import get_conn
 
 READ_OPERATIONS = ("list", "get")
 CHANGE_OPERATIONS = ("create", "update", "delete")
 _FIELDS = {"code", "name", "rule_type", "enforcement_level", "status", "share_scope", "list_gid", "context_class_gid", "rule_definition", "expression"}
+RULE_DEFINITION_INPUT_SCHEMA = {
+    "type": "object", "additionalProperties": False,
+    "properties": {
+        "rule_gid": {"type": "string", "minLength": 1, "maxLength": 255},
+        "expected_revision": {"type": "integer", "minimum": 1},
+        "changes": {
+            "type": "object", "minProperties": 1, "maxProperties": len(RULE_DEFINITION_FIELDS), "additionalProperties": False,
+            "properties": {
+                "name": {"type": "string", "minLength": 1, "maxLength": 2000},
+                "description": {"type": "string", "minLength": 1, "maxLength": 2000},
+                "severity": {"type": "string", "minLength": 1, "maxLength": 2000},
+                "enabled": {"type": "boolean"},
+                "condition": {"type": "string", "minLength": 1, "maxLength": 1024},
+                "message": {"type": "string", "minLength": 1, "maxLength": 2000},
+                "scope": {"type": "string", "minLength": 1, "maxLength": 2000},
+                "tags": {"type": "array", "maxItems": 32, "items": {"type": "string", "minLength": 1, "maxLength": 128}},
+                "priority": {"type": "integer", "minimum": 0, "maximum": 100},
+                "category": {"type": "string", "minLength": 1, "maxLength": 2000},
+            },
+        },
+    },
+    "required": ["rule_gid", "expected_revision", "changes"],
+}
+RULE_DEFINITION_OUTPUT_SCHEMA = {
+    "type": "object", "additionalProperties": False,
+    "properties": {
+        "rule_gid": {"type": "string", "minLength": 1}, "revision": {"type": "integer", "minimum": 1},
+        "name": {"type": "string"}, "description": {}, "severity": {}, "enabled": {}, "condition": {"type": "string"},
+        "message": {}, "scope": {}, "tags": {}, "priority": {}, "category": {},
+    },
+    "required": ["rule_gid", "revision", *sorted(RULE_DEFINITION_FIELDS)],
+}
+rule_definition_repository = MysqlRuleDefinitionRepository()
 
 
 def _row(row: dict[str, Any]) -> dict[str, Any]:
@@ -107,6 +146,37 @@ def change_rule_library(payload: dict[str, Any], context: CapabilityContext) -> 
     return CapabilityOutput(data={"success": True})
 
 
+def change_rule_definition(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+    """Apply exactly one owner-authorized, revision-pinned rule definition change."""
+    changes = validate_rule_definition_changes(payload.get("changes"))
+    rule_gid = str(payload.get("rule_gid") or "")
+    expected_revision = payload.get("expected_revision")
+    idempotency_key = str(getattr(context, "idempotency_key", "") or "")
+    if not rule_gid or not isinstance(expected_revision, int) or expected_revision < 1:
+        raise ValueError("invalid rule definition command")
+    if not idempotency_key:
+        from backend.capability_v2.provider_contracts import CapabilityBusinessError
+        raise CapabilityBusinessError("idempotency_key_required", "Rule definition changes require an idempotency key.")
+    return CapabilityOutput(data=rule_definition_repository.change(
+        rule_gid=rule_gid, expected_revision=expected_revision, changes=changes,
+        actor_gid=context.user_gid, team_gid=context.team_gid, idempotency_key=idempotency_key,
+        command_digest=canonical_rule_definition_command({"rule_gid": rule_gid, "expected_revision": expected_revision, "changes": changes}),
+    ))
+
+
+def register_rule_definition_change_capability(registry: Any) -> None:
+    registry.register(CapabilitySpec(
+        id="craft.rule.definition.change.apply", owner="craft",
+        description="Apply one closed, revision-pinned Craft rule definition change.",
+        use_when="A governed consumer changes an owned Craft rule definition.",
+        do_not_use_when="The caller supplies rule source, compiled artifacts, ownership, or audit fields.",
+        risk="write", confirmation="user", idempotent=True, permissions=("craft.rule.write",),
+        input_schema=RULE_DEFINITION_INPUT_SCHEMA, output_schema=RULE_DEFINITION_OUTPUT_SCHEMA,
+        tags=("craft", "rule", "definition", "write"),
+    ), change_rule_definition)
+
+
 def register_rule_library_capabilities(registry: Any) -> None:
     registry.register(CapabilitySpec(id="craft.rule.library.read", owner="craft", description="Read bounded Craft rule-library records.", use_when="A governed consumer needs Craft rule definitions or search results.", do_not_use_when="The request evaluates a rule or publishes a rule release.", risk="read", permissions=("craft.read",), input_schema={"type": "object", "required": ["operation"], "properties": {"operation": {"type": "string", "enum": list(READ_OPERATIONS)}, "gid": {"type": "string"}, "status": {"type": "string"}, "list_gid": {"type": "string"}, "q": {"type": "string", "maxLength": 200}, "limit": {"type": "integer", "minimum": 1, "maximum": 500}}, "additionalProperties": False}, output_schema={"type": "object", "required": ["success", "data"], "properties": {"success": {"type": "boolean"}, "data": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}}}, "additionalProperties": False}, tags=("craft", "rule", "library", "read")), read_rule_library)
     registry.register(CapabilitySpec(id="craft.rule.library.change.apply", owner="craft", description="Apply bounded Craft rule-library CRUD changes.", use_when="A governed consumer needs to create, update or delete a Craft rule definition.", do_not_use_when="The request evaluates a rule or changes a published rule release.", risk="write", confirmation="user", permissions=("craft.rule.write",), input_schema={"type": "object", "required": ["operation"], "properties": {"operation": {"type": "string", "enum": list(CHANGE_OPERATIONS)}, "gid": {"type": "string"}, "record": {"type": "object", "maxProperties": 20, "additionalProperties": True}}, "additionalProperties": False}, output_schema={"type": "object", "required": ["success"], "properties": {"success": {"type": "boolean"}, "data": {"type": "object", "additionalProperties": True}}, "additionalProperties": False}, tags=("craft", "rule", "library", "write")), change_rule_library)
+    register_rule_definition_change_capability(registry)

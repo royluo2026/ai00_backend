@@ -16,6 +16,7 @@ from backend.capability_v2.descriptor_adapter import descriptor_from_provider_sp
 
 from .contracts import input_schema_for, output_schema_for
 from .reviewed_ids import DEPRECATED_REVIEWED_CAPABILITIES
+from .rule_descriptors import RULE_DEFINITION_CHANGE_CAPABILITY_ID
 
 
 _RESOURCE_FIELDS: dict[str, tuple[tuple[str, str], ...]] = {
@@ -49,6 +50,7 @@ _EXPECTED_REVISION = {
     "craft.bop.draft.change.preview",
     "craft.bop.execution_structure.preview",
     "craft.bop.version.archive",
+    RULE_DEFINITION_CHANGE_CAPABILITY_ID,
 }
 
 _DOMAIN_ERRORS = tuple(
@@ -86,6 +88,8 @@ _DOMAIN_ERRORS = tuple(
 
 
 def _governed_spec(spec: Any) -> Any:
+    if spec.id == RULE_DEFINITION_CHANGE_CAPABILITY_ID:
+        return spec.model_copy(update={"plugin_callable": True})
     return spec.model_copy(update={
         "plugin_callable": True,
         "input_schema": input_schema_for(spec.id, spec.version),
