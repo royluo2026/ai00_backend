@@ -18,13 +18,13 @@ def _handler():
     return module, handler
 
 
-def _rule(*, team_gid: str = "team-a", revision: str = "rev-1", share_scope: str = "team"):
+def _rule(*, team_gid: str = "team-a", revision: int = 1, share_scope: str = "team"):
     return {
         "gid": "rule-1",
         "team_gid": team_gid,
         "owner_user_gid": "owner-1",
         "share_scope": share_scope,
-        "rule_revision": revision,
+        "rule_definition": {"_revision": revision},
         "expression": "quantity > 0",
     }
 
@@ -32,7 +32,7 @@ def _rule(*, team_gid: str = "team-a", revision: str = "rev-1", share_scope: str
 def _payload(entry=None):
     return {
         "rule_gid": "rule-1",
-        "rule_revision": "rev-1",
+        "rule_revision": 1,
         "entry": {"quantity": 2} if entry is None else entry,
     }
 
@@ -81,7 +81,7 @@ def test_rule_entry_evaluation_returns_only_the_closed_result(monkeypatch):
 
     result = handler(_payload(), _context()).data
 
-    assert result == {"passed": True, "rule_revision": "rev-1", "diagnostics": []}
+    assert result == {"passed": True, "rule_revision": 1, "diagnostics": []}
 
 
 @pytest.mark.parametrize(("row", "user_gid", "team_gid", "visible"), [
@@ -108,7 +108,7 @@ def test_rule_entry_evaluation_rejects_wrong_revision(monkeypatch):
     monkeypatch.setattr(module, "load_visible_rule", lambda *_: _rule())
 
     with pytest.raises(CapabilityBusinessError) as raised:
-        handler({**_payload(), "rule_revision": "rev-0"}, _context())
+        handler({**_payload(), "rule_revision": 2}, _context())
 
     assert raised.value.code == "revision_conflict"
 
@@ -132,7 +132,7 @@ def test_rule_entry_evaluation_times_out_without_exposing_checker_text(monkeypat
 
     result = handler(_payload(), _context()).data
 
-    assert result == {"passed": False, "rule_revision": "rev-1", "diagnostics": [{"code": "evaluation_timeout"}]}
+    assert result == {"passed": False, "rule_revision": 1, "diagnostics": [{"code": "evaluation_timeout"}]}
     assert "secret" not in json.dumps(result)
     assert "expression" not in json.dumps(result)
 
@@ -160,7 +160,7 @@ def test_rule_entry_evaluation_caps_diagnostics_and_never_returns_checker_messag
 
     result = handler(_payload(), _context()).data
 
-    assert result == {"passed": False, "rule_revision": "rev-1", "diagnostics": [{"code": "rule_failed"}]}
+    assert result == {"passed": False, "rule_revision": 1, "diagnostics": [{"code": "rule_failed"}]}
     assert set(result) == {"passed", "rule_revision", "diagnostics"}
     assert len(result["diagnostics"]) <= module.MAX_DIAGNOSTICS
     assert all(len(item["code"]) <= module.MAX_DIAGNOSTIC_CODE_LENGTH for item in result["diagnostics"])

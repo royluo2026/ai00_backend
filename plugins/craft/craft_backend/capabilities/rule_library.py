@@ -63,6 +63,12 @@ def _row(row: dict[str, Any]) -> dict[str, Any]:
             out["rule_definition"] = json.loads(out["rule_definition"])
         except Exception:
             out["rule_definition"] = {}
+    definition = out.get("rule_definition") if isinstance(out.get("rule_definition"), dict) else {}
+    revision = definition.get("_revision")
+    revision = revision if isinstance(revision, int) and not isinstance(revision, bool) and revision >= 1 else 1
+    out["rule_gid"] = str(out.get("gid") or "")
+    out["revision"] = revision
+    out["rule_reference"] = {"rule_gid": out["rule_gid"], "rule_revision": revision}
     return out
 
 
@@ -81,8 +87,8 @@ def read_rule_library(payload: dict[str, Any], context: CapabilityContext) -> Ca
                 if not row:
                     raise ValueError("rule not found")
                 return CapabilityOutput(data={"success": True, "data": _row(dict(row))})
-            conditions = ["(share_scope IN ('global','team') OR creator_gid=%s)"]
-            params: list[Any] = [context.user_gid]
+            conditions = ["(owner_user_gid=%s OR creator_gid=%s OR share_scope='global' OR (share_scope='team' AND JSON_UNQUOTE(JSON_EXTRACT(applicable_scope, '$.team_gid'))=%s))"]
+            params: list[Any] = [context.user_gid, context.user_gid, context.team_gid]
             status = payload.get("status")
             list_gid = payload.get("list_gid")
             query = payload.get("q")
@@ -116,8 +122,18 @@ def change_rule_library(payload: dict[str, Any], context: CapabilityContext) -> 
                 values.setdefault("enforcement_level", "advisory")
                 values.setdefault("status", "draft")
                 values.setdefault("share_scope", "team")
-                values.setdefault("rule_definition", {})
-                values.update({"gid": new_gid, "display_id": f"R-C{next_display_id('rules_display_seq'):08d}", "applicable_scope": "{}", "attachments": "[]", "creator_gid": context.user_gid})
+                if not isinstance(context.team_gid, str) or not context.team_gid:
+                    raise ValueError("team_gid is required to create a Craft rule")
+                definition = values.get("rule_definition")
+                if isinstance(definition, str):
+                    try:
+                        definition = json.loads(definition)
+                    except ValueError:
+                        definition = {}
+                definition = definition if isinstance(definition, dict) else {}
+                definition["_revision"] = 1
+                values["rule_definition"] = definition
+                values.update({"gid": new_gid, "display_id": f"R-C{next_display_id('rules_display_seq'):08d}", "applicable_scope": {"team_gid": context.team_gid}, "attachments": "[]", "creator_gid": context.user_gid, "owner_user_gid": context.user_gid})
                 columns = list(values)
                 cur.execute(f"INSERT INTO workmanship_know_craft_rules ({', '.join(columns)}) VALUES ({', '.join(['%s'] * len(columns))})", tuple(json.dumps(values[key], ensure_ascii=False) if key in {"rule_definition", "applicable_scope", "attachments"} and not isinstance(values[key], str) else values[key] for key in columns))
                 conn.commit()

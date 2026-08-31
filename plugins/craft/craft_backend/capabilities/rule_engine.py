@@ -32,7 +32,7 @@ RULE_ENTRY_INPUT_SCHEMA = {
     "type": "object",
     "properties": {
         "rule_gid": {"type": "string", "minLength": 1, "maxLength": 255},
-        "rule_revision": {"type": "string", "minLength": 1, "maxLength": 255},
+        "rule_revision": {"type": "integer", "minimum": 1, "maximum": 2147483647},
         "entry": {"type": "object", "properties": {field: _SCALAR for field in _ENTRY_FIELDS}, "maxProperties": len(_ENTRY_FIELDS), "additionalProperties": False},
     },
     "required": ["rule_gid", "rule_revision", "entry"],
@@ -42,7 +42,7 @@ RULE_ENTRY_OUTPUT_SCHEMA = {
     "type": "object",
     "properties": {
         "passed": {"type": "boolean"},
-        "rule_revision": {"type": "string", "minLength": 1, "maxLength": 255},
+        "rule_revision": {"type": "integer", "minimum": 1, "maximum": 2147483647},
         "diagnostics": {"type": "array", "maxItems": MAX_DIAGNOSTICS, "items": {"type": "object", "properties": {"code": {"type": "string", "minLength": 1, "maxLength": MAX_DIAGNOSTIC_CODE_LENGTH}}, "required": ["code"], "additionalProperties": False}},
     },
     "required": ["passed", "rule_revision", "diagnostics"],
@@ -72,7 +72,7 @@ def _bounded_entry(payload: dict[str, Any]) -> dict[str, Any]:
     return entry
 
 
-def _outcome(passed: bool, revision: str, code: str | None = None) -> CapabilityOutput:
+def _outcome(passed: bool, revision: int, code: str | None = None) -> CapabilityOutput:
     diagnostics = [] if code is None else [{"code": code[:MAX_DIAGNOSTIC_CODE_LENGTH]}]
     return CapabilityOutput(data={"passed": passed, "rule_revision": revision, "diagnostics": diagnostics[:MAX_DIAGNOSTICS]})
 

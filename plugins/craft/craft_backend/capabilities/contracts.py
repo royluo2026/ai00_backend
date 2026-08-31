@@ -548,7 +548,7 @@ OUTPUT_SCHEMAS[("craft.rule.engine.evaluate", 1)] = _object({
 })
 INPUT_SCHEMAS[("craft.rule.entry.evaluate", 1)] = _object({
     "rule_gid": {"type": "string", "minLength": 1, "maxLength": 255},
-    "rule_revision": {"type": "string", "minLength": 1, "maxLength": 255},
+    "rule_revision": {"type": "integer", "minimum": 1, "maximum": 2147483647},
     "entry": {**_object({name: {"type": ["string", "number", "integer", "boolean", "null"]} for name in (
         "gid", "node_type", "title", "name", "vpps", "version_no", "std_time", "torque", "qualification",
         "seq_no", "tools_calibrated", "headcount", "model_no", "certification_date", "calibration_interval",
@@ -558,7 +558,7 @@ INPUT_SCHEMAS[("craft.rule.entry.evaluate", 1)] = _object({
 }, required=("rule_gid", "rule_revision", "entry"))
 OUTPUT_SCHEMAS[("craft.rule.entry.evaluate", 1)] = _object({
     "passed": BOOLEAN,
-    "rule_revision": {"type": "string", "minLength": 1, "maxLength": 255},
+    "rule_revision": {"type": "integer", "minimum": 1, "maximum": 2147483647},
     "diagnostics": {"type": "array", "maxItems": 5, "items": _object({"code": {"type": "string", "minLength": 1, "maxLength": 64}}, required=("code",))},
 }, required=("passed", "rule_revision", "diagnostics"))
 INPUT_SCHEMAS[("craft.bop.pbom.change_point.get", 1)] = _object({

@@ -157,14 +157,27 @@ class MysqlRuleDefinitionRepository(RuleDefinitionRepository):
                 raise
 
 
+def _definition(rule):
+    value = rule.get("rule_definition") or {}
+    if isinstance(value, str):
+        try:
+            value = json.loads(value)
+        except ValueError:
+            value = {}
+    return value if isinstance(value, dict) else {}
+
+
+def rule_revision(rule):
+    value = _definition(rule).get("_revision")
+    return value if isinstance(value, int) and not isinstance(value, bool) and value >= 1 else 1
+
+
 def load_visible_rule(rule_gid, user_gid, team_gid):
     """Load one rule only when the caller can see its owner or team scope."""
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT gid, owner_user_gid, share_scope, expression, "
-                "JSON_UNQUOTE(JSON_EXTRACT(applicable_scope, '$.team_gid')) AS team_gid, "
-                "DATE_FORMAT(updated_at, '%Y-%m-%dT%H:%i:%s.%f') AS rule_revision "
+                "SELECT gid, owner_user_gid, creator_gid, share_scope, expression, rule_definition, applicable_scope "
                 "FROM workmanship_know_craft_rules WHERE gid=%s",
                 (rule_gid,),
             )
@@ -172,20 +185,24 @@ def load_visible_rule(rule_gid, user_gid, team_gid):
     if not row:
         raise LookupError("rule not found")
     rule = dict(row)
+    scope = rule.get("applicable_scope") or {}
+    if isinstance(scope, str):
+        try:
+            scope = json.loads(scope)
+        except ValueError:
+            scope = {}
+    stored_team_gid = scope.get("team_gid") if isinstance(scope, dict) else None
+    stored_team_gid = stored_team_gid or rule.get("team_gid")
+    owner_user_gid = rule.get("owner_user_gid") or rule.get("creator_gid")
     if not (
         rule.get("share_scope") == "global"
-        or rule.get("owner_user_gid") == user_gid
-        or (rule.get("share_scope") == "team" and team_gid and rule.get("team_gid") == team_gid)
+        or owner_user_gid == user_gid
+        or (rule.get("share_scope") == "team" and team_gid and stored_team_gid == team_gid)
     ):
         raise LookupError("rule not found")
+    rule["owner_user_gid"] = owner_user_gid
+    rule["team_gid"] = stored_team_gid
     return rule
-
-
-def rule_revision(rule):
-    value = rule.get("rule_revision") or rule.get("updated_at")
-    if hasattr(value, "isoformat"):
-        value = value.isoformat()
-    return str(value or "")
 
 class RuleService:
     def __init__(self, releases=()): self.releases = {r.ref: r for r in releases}; self.waivers = {}
