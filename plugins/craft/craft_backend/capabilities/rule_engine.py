@@ -1,15 +1,104 @@
 """Governed Craft rule evaluation and BOP audit outcome."""
 from __future__ import annotations
 
+import json
+from concurrent.futures import ThreadPoolExecutor, TimeoutError
 from typing import Any
 
-from backend.capability_v2.provider_contracts import CapabilityContext, CapabilityOutput, CapabilitySpec
+from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilityExecutionBudget, CapabilityOutput, CapabilitySpec
+from backend.capabilities.validation_next import validate_payload
 
+from ..application.rules import load_visible_rule, rule_revision
 from ..data.connection import get_conn
 from ..rule_engine.checker import check_entry_rules
-from ..rule_engine.executor import check_rule
+from ..rule_engine.executor import RuleResult, check_rule
 
 OPERATIONS = ("check", "audit")
+MAX_ENTRY_BYTES = 8 * 1024
+MAX_ENTRY_DEPTH = 4
+MAX_DIAGNOSTICS = 5
+MAX_DIAGNOSTIC_CODE_LENGTH = 64
+RULE_EVALUATION_TIMEOUT_SECONDS = 0.25
+_FORBIDDEN_ENTRY_FIELDS = {"expression", "source", "code", "sql", "provider", "secret", "script", "query"}
+_ENTRY_FIELDS = (
+    "gid", "node_type", "title", "name", "vpps", "version_no", "std_time", "torque", "qualification",
+    "seq_no", "tools_calibrated", "headcount", "model_no", "certification_date", "calibration_interval",
+    "calibrated", "vd_time", "total_time", "floor_height_need", "op_req_height", "spec", "quantity",
+    "status", "asset_no", "role_type",
+)
+_SCALAR = {"type": ["string", "number", "integer", "boolean", "null"]}
+RULE_ENTRY_INPUT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "rule_gid": {"type": "string", "minLength": 1, "maxLength": 255},
+        "rule_revision": {"type": "string", "minLength": 1, "maxLength": 255},
+        "entry": {"type": "object", "properties": {field: _SCALAR for field in _ENTRY_FIELDS}, "maxProperties": len(_ENTRY_FIELDS), "additionalProperties": False},
+    },
+    "required": ["rule_gid", "rule_revision", "entry"],
+    "additionalProperties": False,
+}
+RULE_ENTRY_OUTPUT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "passed": {"type": "boolean"},
+        "rule_revision": {"type": "string", "minLength": 1, "maxLength": 255},
+        "diagnostics": {"type": "array", "maxItems": MAX_DIAGNOSTICS, "items": {"type": "object", "properties": {"code": {"type": "string", "minLength": 1, "maxLength": MAX_DIAGNOSTIC_CODE_LENGTH}}, "required": ["code"], "additionalProperties": False}},
+    },
+    "required": ["passed", "rule_revision", "diagnostics"],
+    "additionalProperties": False,
+}
+
+
+def _depth(value: Any) -> int:
+    if isinstance(value, dict):
+        return 1 + max((_depth(item) for item in value.values()), default=0)
+    if isinstance(value, list):
+        return 1 + max((_depth(item) for item in value), default=0)
+    return 0
+
+
+def _bounded_entry(payload: dict[str, Any]) -> dict[str, Any]:
+    validate_payload(RULE_ENTRY_INPUT_SCHEMA, payload)
+    entry = dict(payload["entry"])
+    if _depth(entry) > MAX_ENTRY_DEPTH or any(key.lower() in _FORBIDDEN_ENTRY_FIELDS for key in entry):
+        raise ValueError("entry contains unsupported executable data")
+    try:
+        encoded = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    except (TypeError, ValueError) as exc:
+        raise ValueError("entry must be JSON-safe") from exc
+    if len(encoded.encode("utf-8")) > MAX_ENTRY_BYTES:
+        raise ValueError("entry exceeds the bounded input limit")
+    return entry
+
+
+def _outcome(passed: bool, revision: str, code: str | None = None) -> CapabilityOutput:
+    diagnostics = [] if code is None else [{"code": code[:MAX_DIAGNOSTIC_CODE_LENGTH]}]
+    return CapabilityOutput(data={"passed": passed, "rule_revision": revision, "diagnostics": diagnostics[:MAX_DIAGNOSTICS]})
+
+
+def evaluate_rule_entry(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+    """Evaluate one visible, revision-pinned Craft rule against a closed entry projection."""
+    entry = _bounded_entry(payload)
+    rule = load_visible_rule(payload["rule_gid"], context.user_gid, context.team_gid)
+    revision = rule_revision(rule)
+    if revision != payload["rule_revision"]:
+        raise CapabilityBusinessError("revision_conflict", "The requested rule revision is unavailable.")
+    executor = ThreadPoolExecutor(max_workers=1)
+    try:
+        future = executor.submit(check_rule, str(rule.get("expression") or ""), entry)
+        try:
+            result, _message = future.result(timeout=RULE_EVALUATION_TIMEOUT_SECONDS)
+        except TimeoutError:
+            return _outcome(False, revision, "evaluation_timeout")
+        except Exception:
+            return _outcome(False, revision, "evaluation_unavailable")
+    finally:
+        executor.shutdown(wait=False, cancel_futures=True)
+    if result is RuleResult.PASS:
+        return _outcome(True, revision)
+    if result is RuleResult.FAIL:
+        return _outcome(False, revision, "rule_failed")
+    return _outcome(False, revision, "evaluation_unavailable")
 
 
 def evaluate_rule_engine(payload: dict[str, Any], _context: CapabilityContext) -> CapabilityOutput:
@@ -47,3 +136,11 @@ def evaluate_rule_engine(payload: dict[str, Any], _context: CapabilityContext) -
 
 def register_rule_engine_capability(registry: Any) -> None:
     registry.register(CapabilitySpec(id="craft.rule.engine.evaluate", owner="craft", description="Evaluate a Craft CEL rule or audit a BOP version against Craft rules.", use_when="A governed consumer needs rule evaluation or bounded BOP rule audit.", do_not_use_when="The request publishes or mutates rule definitions.", risk="read", permissions=("craft.read",), input_schema={"type": "object", "required": ["operation"], "properties": {"operation": {"type": "string", "enum": list(OPERATIONS)}, "rule_gid": {"type": "string"}, "context": {"type": "object", "maxProperties": 50, "additionalProperties": True}, "version_gid": {"type": "string"}}, "additionalProperties": False}, output_schema={"type": "object", "additionalProperties": True}, tags=("craft", "rule", "evaluate")), evaluate_rule_engine)
+    registry.register(CapabilitySpec(
+        id="craft.rule.entry.evaluate", owner="craft", description="Evaluate one visible Craft rule against a bounded entry projection.",
+        use_when="A governed consumer needs a revision-pinned Craft rule decision for one entry.",
+        do_not_use_when="The caller supplies rule source, executable code, or a mutable rule definition.",
+        risk="read", permissions=("craft.read",), input_schema=RULE_ENTRY_INPUT_SCHEMA, output_schema=RULE_ENTRY_OUTPUT_SCHEMA,
+        execution_budget=CapabilityExecutionBudget(memory_class="small", max_input_bytes=MAX_ENTRY_BYTES, max_output_bytes=4 * 1024, max_parallel_per_consumer=1, max_parallel_per_tenant=8),
+        tags=("craft", "rule", "entry", "evaluate"),
+    ), evaluate_rule_entry)

@@ -78,6 +78,9 @@ _DOMAIN_ERRORS = tuple(
         ("scope_not_found", "The requested BOP scope does not exist in the version."),
         ("entry_not_found", "The requested BOP entry does not exist in the version."),
         ("entry_detail_too_large", "The BOP entry has too many links for bounded detail output."),
+        ("rule_not_found", "The requested rule was not found."),
+        ("evaluation_timeout", "Rule evaluation exceeded its bounded time limit."),
+        ("evaluation_unavailable", "Rule evaluation could not produce a bounded result."),
     )
 )
 
