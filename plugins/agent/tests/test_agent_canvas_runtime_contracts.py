@@ -371,7 +371,7 @@ def test_registered_handlers_fail_closed_for_all_four_capabilities_without_adapt
         team_gid = "team-1"
 
     registry = Registry()
-    register_capabilities(registry)
+    register_capabilities(registry, canvas_runtime=None)
     for capability_id, payload in _payloads().items():
         with pytest.raises(CapabilityBusinessError) as error:
             asyncio.run(registry.handlers[capability_id](payload, Context()))

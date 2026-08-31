@@ -117,6 +117,7 @@ def test_release_bindings_cover_manifest_and_every_domain_migration():
         for row in migration_bindings
     } == {
         ("agent", "0001_agent.sql"),
+        ("agent", "0002_canvas_query_tenant.sql"),
         ("base", "0001_base_platform.sql"),
         ("base", "0002_domain_inbox.sql"),
             ("craft", "0001_pbom.sql"),
@@ -124,12 +125,18 @@ def test_release_bindings_cover_manifest_and_every_domain_migration():
         ("digital_model", "0001_digital_model.sql"),
         ("factory", "0001_factory.sql"),
         ("integration", "0001_integration.sql"),
+        ("integration", "0002_integration_structural_operations.sql"),
+        ("integration", "0003_integration_mapping_target_bindings.sql"),
+        ("integration", "0004_integration_target_catalog.sql"),
+        ("integration", "0005_integration_execution_control.sql"),
+        ("integration", "0006_integration_binding_tenant_identity.sql"),
         ("knowledge", "0001_knowledge.sql"),
         ("knowledge", "0002_domain_outbox_delivery.sql"),
         ("knowledge", "0003_display_counters.sql"),
         ("device", "0001_device.sql"),
         ("ontology", "0001_ontology.sql"),
         ("project_management", "0001_project_management.sql"),
+        ("project_management", "0002_approval_notification_outbox.sql"),
         ("simulation", "0001_simulation.sql"),
     }
     assert all(row["sha256"].startswith("sha256:") for row in migration_bindings)

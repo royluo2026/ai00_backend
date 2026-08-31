@@ -1851,6 +1851,8 @@ CREATE INDEX idx_wb_overrides_user ON workmanship_app_workbench_member_overrides
 -- 流程引擎
 CREATE TABLE IF NOT EXISTS workmanship_app_flows (
     gid         CHAR(36) PRIMARY KEY,
+    owner_user_gid VARCHAR(191) NOT NULL DEFAULT (''),
+    team_gid    VARCHAR(191) NULL,
     name        TEXT NOT NULL,
     description VARCHAR(2048) DEFAULT (''),
     flowdef     LONGTEXT NULL,
@@ -1944,6 +1946,7 @@ CREATE TABLE IF NOT EXISTS workmanship_app_skills (
     scope       VARCHAR(255) NOT NULL DEFAULT ('private'),
     status      VARCHAR(255) NOT NULL DEFAULT ('draft'),
     owner_gid   VARCHAR(255) NOT NULL DEFAULT (''),
+    team_gid    VARCHAR(191) NULL,
     is_system   TINYINT(1) NOT NULL DEFAULT 0,
     content     JSON NOT NULL,
     icon        VARCHAR(255) NOT NULL DEFAULT (''),

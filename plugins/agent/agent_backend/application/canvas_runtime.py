@@ -2,12 +2,15 @@
 from __future__ import annotations
 
 import asyncio
+import importlib
 import inspect
 import json
 import math
+import multiprocessing
 import re
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from collections.abc import Callable, Mapping
+from queue import Empty
 from typing import Any, Literal, Protocol, Self
 
 from backend.capability_v2.provider_contracts import CapabilityBusinessError
@@ -509,19 +512,19 @@ class AgentCanvasRuntime(Protocol):
     async def resume(self, request: CanvasResumeRequest, principal: RunPrincipal) -> RuntimeDispatch: ...
 
 
-class ProductionAgentCanvasRuntime:
-    """One bounded adapter over the persisted Agent canvas and existing executor."""
+class _CanvasQueryEngine:
+    """Synchronous dependencies and closed projection, run only inside an isolated worker."""
 
     def __init__(
         self,
         *,
-        resource_loader: Callable[[str, str], Mapping[str, Any] | None] | None = None,
+        resource_loader: Callable[[str, str], Mapping[str, Any] | None],
         executor_factory: Callable[..., Any] | None = None,
         max_concurrency: int = DEFAULT_MAX_CONCURRENCY,
     ) -> None:
         if isinstance(max_concurrency, bool) or not isinstance(max_concurrency, int) or max_concurrency < 1:
             raise ValueError("max_concurrency must be a positive integer")
-        self._resource_loader = resource_loader or self._load_resource
+        self._resource_loader = resource_loader
         self._executor_factory = executor_factory or self._canvas_executor
         self._semaphore = asyncio.Semaphore(max_concurrency)
 
@@ -532,19 +535,9 @@ class ProductionAgentCanvasRuntime:
         return CanvasExecutor(**kwargs)
 
     @staticmethod
-    def _load_resource(kind: str, gid: str) -> Mapping[str, Any] | None:
-        from ..data.connection import get_agent_conn
-
-        table = "workmanship_app_flows" if kind == "flow" else "workmanship_app_skills"
-        with get_agent_conn() as connection, connection.cursor() as cursor:
-            cursor.execute(f"SELECT * FROM {table} WHERE gid=%s AND deleted_at IS NULL", (gid,))
-            row = cursor.fetchone()
-        return dict(row) if row else None
-
-    @staticmethod
     def _authorize(kind: str, row: Mapping[str, Any], principal: RunPrincipal) -> None:
         persisted_team = str(row.get("team_gid") or "")
-        if persisted_team and persisted_team != principal.team_gid:
+        if persisted_team != principal.team_gid:
             raise _not_found()
         if kind == "flow":
             if str(row.get("owner_user_gid") or "") != principal.actor_gid:
@@ -554,7 +547,7 @@ class ProductionAgentCanvasRuntime:
         owner = str(row.get("owner_gid") or "")
         if scope == "private" and owner == principal.actor_gid:
             return
-        if scope == "team" and owner == principal.team_gid and persisted_team in {"", principal.team_gid}:
+        if scope == "team":
             return
         if scope == "global" and str(row.get("status") or "") == "active":
             return
@@ -730,6 +723,168 @@ class ProductionAgentCanvasRuntime:
                 return CanvasOptionsResult(revision=revision, options=options)
             except ValueError as exc:
                 raise _invalid("persisted option revision is invalid") from exc
+
+def _factory_path(factory: Callable[..., Any] | None) -> str:
+    if factory is None:
+        return "plugins.agent.agent_backend.infrastructure.repository:AgentCapabilityRepository"
+    module = getattr(factory, "__module__", "")
+    name = getattr(factory, "__qualname__", "")
+    if not module or not name or "<locals>" in name:
+        raise ValueError("repository_factory must be a module-level callable")
+    return f"{module}:{name}"
+
+
+def _load_factory(path: str) -> Callable[..., Any]:
+    module_name, _, qualname = path.partition(":")
+    value: Any = importlib.import_module(module_name)
+    for part in qualname.split("."):
+        value = getattr(value, part)
+    return value
+
+
+def _worker_error(error: CapabilityBusinessError) -> dict[str, Any]:
+    return {
+        "code": error.code,
+        "message": error.message,
+        "retryable": error.retryable,
+        "details": _redact_recursive(error.details),
+    }
+
+
+def _canvas_query_worker(result_queue: Any, payload_json: str) -> None:
+    """Own the database connection and the one existing executor in a terminable process."""
+    try:
+        payload = json.loads(payload_json)
+        principal = RunPrincipal(**payload["principal"])
+        request_payload = payload["request"]
+        repository = _load_factory(payload["repository_factory"])()
+        engine = _CanvasQueryEngine(
+            resource_loader=lambda kind, gid: repository.load_canvas_resource(
+                kind, gid, principal.actor_gid, principal.team_gid,
+            ),
+        )
+        operation = payload["operation"]
+        if operation == "test_node":
+            result = asyncio.run(engine.test_node(NodeTestRequest.from_payload(request_payload), principal))
+        elif operation == "resolve_options":
+            result = asyncio.run(engine.resolve_options(CanvasOptionsRequest.from_payload(request_payload), principal))
+        else:
+            raise _invalid("unsupported Agent canvas query operation")
+        envelope = {"ok": True, "result": asdict(result)}
+    except CapabilityBusinessError as error:
+        envelope = {"ok": False, "error": _worker_error(error)}
+    except (TypeError, ValueError) as error:
+        envelope = {"ok": False, "error": _worker_error(_invalid(str(error)))}
+    except Exception:
+        envelope = {"ok": False, "error": _worker_error(CapabilityBusinessError(
+            "provider_unavailable", "Agent canvas query provider is unavailable", retryable=True,
+        ))}
+    result_queue.put(json.dumps(envelope, ensure_ascii=False, separators=(",", ":"), allow_nan=False))
+
+
+class ProductionAgentCanvasRuntime:
+    """Bounded async port supervising all blocking resource/executor work in a spawned process."""
+
+    def __init__(
+        self,
+        *,
+        repository_factory: Callable[..., Any] | None = None,
+        worker_target: Callable[[Any, str], None] = _canvas_query_worker,
+        worker_timeout: float = 2.5,
+        max_concurrency: int = DEFAULT_MAX_CONCURRENCY,
+    ) -> None:
+        if isinstance(worker_timeout, bool) or not isinstance(worker_timeout, (int, float)) or worker_timeout <= 0:
+            raise ValueError("worker_timeout must be positive")
+        if isinstance(max_concurrency, bool) or not isinstance(max_concurrency, int) or max_concurrency < 1:
+            raise ValueError("max_concurrency must be a positive integer")
+        self._repository_factory = _factory_path(repository_factory)
+        self._worker_target = worker_target
+        self._worker_timeout = float(worker_timeout)
+        self._semaphore = asyncio.Semaphore(max_concurrency)
+
+    @staticmethod
+    def _stop(process: Any) -> None:
+        if process.is_alive():
+            process.terminate()
+            process.join(1.0)
+        if process.is_alive():
+            process.kill()
+            process.join(1.0)
+
+    async def _run_process(self, operation: str, request: Any, principal: RunPrincipal) -> dict[str, Any]:
+        payload_json = json.dumps({
+            "operation": operation,
+            "request": asdict(request),
+            "principal": asdict(principal),
+            "repository_factory": self._repository_factory,
+        }, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
+        context = multiprocessing.get_context("spawn")
+        result_queue = context.Queue(maxsize=1)
+        process = context.Process(target=self._worker_target, args=(result_queue, payload_json))
+        started = False
+        try:
+            process.start()
+            started = True
+            loop = asyncio.get_running_loop()
+            deadline = loop.time() + self._worker_timeout
+            while process.is_alive() and loop.time() < deadline:
+                await asyncio.sleep(0.005)
+            if process.is_alive():
+                self._stop(process)
+                raise CapabilityBusinessError(
+                    "runtime_timeout", "Agent canvas runtime timed out", retryable=True,
+                )
+            process.join()
+            try:
+                raw = result_queue.get(timeout=0.1)
+            except Empty as exc:
+                raise CapabilityBusinessError(
+                    "provider_unavailable", "Agent canvas query provider is unavailable", retryable=True,
+                ) from exc
+            envelope = json.loads(raw)
+            if not envelope.get("ok"):
+                error = envelope.get("error") or {}
+                raise CapabilityBusinessError(
+                    str(error.get("code") or "provider_unavailable"),
+                    str(error.get("message") or "Agent canvas query provider is unavailable"),
+                    retryable=bool(error.get("retryable")),
+                    details=error.get("details") if isinstance(error.get("details"), Mapping) else {},
+                )
+            result = envelope.get("result")
+            if not isinstance(result, dict):
+                raise CapabilityBusinessError(
+                    "provider_unavailable", "Agent canvas query provider is unavailable", retryable=True,
+                )
+            return result
+        finally:
+            if started:
+                self._stop(process)
+                process.close()
+            result_queue.close()
+            result_queue.join_thread()
+
+    async def test_node(self, request: NodeTestRequest, principal: RunPrincipal) -> NodeTestResult:
+        async with self._semaphore:
+            result = await self._run_process("test_node", request, principal)
+        try:
+            output_values = tuple(OutputValue(**item) for item in result.get("output_values", ()))
+            return NodeTestResult(
+                status=result.get("status"), output_values=output_values,
+                summary=str(result.get("summary") or ""),
+            )
+        except (TypeError, ValueError) as exc:
+            raise _invalid("runtime output is invalid") from exc
+
+    async def resolve_options(
+        self, request: CanvasOptionsRequest, principal: RunPrincipal,
+    ) -> CanvasOptionsResult:
+        async with self._semaphore:
+            result = await self._run_process("resolve_options", request, principal)
+        try:
+            options = tuple(CanvasOption(**item) for item in result.get("options", ()))
+            return CanvasOptionsResult(revision=result.get("revision"), options=options)
+        except (TypeError, ValueError) as exc:
+            raise _invalid("runtime output is invalid") from exc
 
     async def start(self, request: CanvasStartRequest, principal: RunPrincipal) -> RuntimeDispatch:
         raise CapabilityBusinessError(

@@ -21,6 +21,10 @@ ProductionAgentCanvasRuntime = getattr(
     "ProductionAgentCanvasRuntime",
     None,
 )
+CanvasQueryEngine = getattr(
+    importlib.import_module("plugins.agent.agent_backend.application.canvas_runtime"),
+    "_CanvasQueryEngine",
+)
 PRINCIPAL = RunPrincipal("actor-1", "team-1")
 
 
@@ -91,7 +95,7 @@ class Executor:
 
 
 def _runtime(records, **kwargs):
-    return ProductionAgentCanvasRuntime(
+    return CanvasQueryEngine(
         resource_loader=lambda kind, gid: records.get((kind, gid)),
         executor_factory=Executor,
         **kwargs,
@@ -212,7 +216,7 @@ def test_graph_input_and_output_caps_apply_before_and_after_execution():
             return self.result
 
     oversized_graph = _flow(nodes=[{"id": f"n{i}", "type": "list"} for i in range(129)])
-    runtime = ProductionAgentCanvasRuntime(
+    runtime = CanvasQueryEngine(
         resource_loader=lambda kind, gid: oversized_graph,
         executor_factory=CountingExecutor,
     )
@@ -223,7 +227,7 @@ def test_graph_input_and_output_caps_apply_before_and_after_execution():
 
     declared = {f"v{i}": {} for i in range(17)}
     flow = _flow(nodes=[{"id": "node-1", "type": "list", "inputs_schema": declared}])
-    runtime = ProductionAgentCanvasRuntime(
+    runtime = CanvasQueryEngine(
         resource_loader=lambda kind, gid: flow,
         executor_factory=CountingExecutor,
     )
@@ -237,7 +241,7 @@ def test_graph_input_and_output_caps_apply_before_and_after_execution():
         "status": "completed",
         "node_results": {"node-1": {"_status": "ok", "_summary": "ok", "blob": "x" * 70_000}},
     }
-    runtime = ProductionAgentCanvasRuntime(
+    runtime = CanvasQueryEngine(
         resource_loader=lambda kind, gid: _flow(),
         executor_factory=CountingExecutor,
     )
@@ -278,7 +282,7 @@ def test_runtime_never_exceeds_its_concurrency_cap():
             finally:
                 active -= 1
 
-    runtime = ProductionAgentCanvasRuntime(
+    runtime = CanvasQueryEngine(
         resource_loader=lambda kind, gid: _flow(),
         executor_factory=AsyncExecutor,
         max_concurrency=2,
@@ -333,7 +337,7 @@ def test_option_inputs_must_be_declared_by_the_persisted_node_schema():
 
 
 def test_query_adapter_keeps_unimplemented_durable_commands_fail_closed():
-    runtime = _runtime({})
+    runtime = ProductionAgentCanvasRuntime()
     commands = (
         ("start", CanvasStartRequest("skill-1", 1)),
         ("resume", CanvasResumeRequest("run-1", "pause-1", 1, True)),

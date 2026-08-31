@@ -7,6 +7,24 @@ from ..data.connection import get_agent_conn
 
 
 class AgentCapabilityRepository:
+    def load_canvas_resource(
+        self, kind: str, gid: str, actor_gid: str, team_gid: str,
+    ) -> dict | None:
+        if kind not in {"flow", "skill"}:
+            raise ValueError("unsupported canvas resource kind")
+        table = "workmanship_app_flows" if kind == "flow" else "workmanship_app_skills"
+        if kind == "flow":
+            visibility = "owner_user_gid=%s"
+        else:
+            visibility = "(owner_gid=%s OR scope='team' OR (scope='global' AND status='active'))"
+        with get_agent_conn() as conn, conn.cursor() as cur:
+            cur.execute(
+                f"SELECT * FROM {table} WHERE gid=%s AND {visibility} AND team_gid=%s AND deleted_at IS NULL",
+                (gid, actor_gid, team_gid),
+            )
+            row = cur.fetchone()
+        return dict(row) if row else None
+
     def runtime_config(self, data: dict) -> dict:
         import os
 
@@ -121,6 +139,7 @@ class AgentCapabilityRepository:
     def flow_read(self, data: dict) -> dict:
         operation = data.get("operation", "list")
         owner = data["owner_gid"]
+        team = data["tenant_gid"]
         with get_agent_conn() as conn, conn.cursor() as cur:
             if operation == "manifest":
                 return {
@@ -129,14 +148,14 @@ class AgentCapabilityRepository:
                 }
             if operation == "list":
                 cur.execute(
-                    "SELECT * FROM workmanship_app_flows WHERE owner_user_gid=%s AND deleted_at IS NULL ORDER BY updated_at DESC",
-                    (owner,),
+                    "SELECT * FROM workmanship_app_flows WHERE owner_user_gid=%s AND team_gid=%s AND deleted_at IS NULL ORDER BY updated_at DESC",
+                    (owner, team),
                 )
                 return {"items": [self._flow_row(dict(row)) for row in cur.fetchall()]}
             if operation == "get":
                 cur.execute(
-                    "SELECT * FROM workmanship_app_flows WHERE gid=%s AND owner_user_gid=%s AND deleted_at IS NULL",
-                    (data["flow_gid"], owner),
+                    "SELECT * FROM workmanship_app_flows WHERE gid=%s AND owner_user_gid=%s AND team_gid=%s AND deleted_at IS NULL",
+                    (data["flow_gid"], owner, team),
                 )
                 row = cur.fetchone()
                 if not row:
@@ -146,14 +165,14 @@ class AgentCapabilityRepository:
                 return result
             if operation == "list_runs":
                 cur.execute(
-                    "SELECT r.* FROM workmanship_app_flow_runs r JOIN workmanship_app_flows f ON f.gid=r.flow_gid WHERE r.flow_gid=%s AND f.owner_user_gid=%s ORDER BY r.started_at DESC LIMIT %s",
-                    (data["flow_gid"], owner, min(max(int(data.get("limit", 10)), 1), 100)),
+                    "SELECT r.* FROM workmanship_app_flow_runs r JOIN workmanship_app_flows f ON f.gid=r.flow_gid WHERE r.flow_gid=%s AND f.owner_user_gid=%s AND f.team_gid=%s ORDER BY r.started_at DESC LIMIT %s",
+                    (data["flow_gid"], owner, team, min(max(int(data.get("limit", 10)), 1), 100)),
                 )
                 return {"items": [self._run_row(dict(row)) for row in cur.fetchall()]}
             if operation == "get_run":
                 cur.execute(
-                    "SELECT r.* FROM workmanship_app_flow_runs r JOIN workmanship_app_flows f ON f.gid=r.flow_gid WHERE r.gid=%s AND f.owner_user_gid=%s",
-                    (data["run_gid"], owner),
+                    "SELECT r.* FROM workmanship_app_flow_runs r JOIN workmanship_app_flows f ON f.gid=r.flow_gid WHERE r.gid=%s AND f.owner_user_gid=%s AND f.team_gid=%s",
+                    (data["run_gid"], owner, team),
                 )
                 row = cur.fetchone()
                 if not row:
@@ -164,12 +183,13 @@ class AgentCapabilityRepository:
     def flow_apply(self, data: dict) -> dict:
         operation = data.get("operation")
         owner = data["owner_gid"]
+        team = data["tenant_gid"]
         with get_agent_conn() as conn, conn.cursor() as cur:
             if operation == "create":
                 gid = str(data.get("resource_gid") or uuid.uuid4())
                 cur.execute(
-                    "INSERT INTO workmanship_app_flows (gid, owner_user_gid, name, description, flowdef, status, created_at, updated_at) VALUES (%s,%s,%s,%s,%s,%s,NOW(),NOW())",
-                    (gid, owner, data.get("name", ""), data.get("description", ""), data.get("flowdef", ""), data.get("status", "draft")),
+                    "INSERT INTO workmanship_app_flows (gid, owner_user_gid, team_gid, name, description, flowdef, status, created_at, updated_at) VALUES (%s,%s,%s,%s,%s,%s,%s,NOW(),NOW())",
+                    (gid, owner, team, data.get("name", ""), data.get("description", ""), data.get("flowdef", ""), data.get("status", "draft")),
                 )
                 return {"gid": gid, "name": data.get("name", "")}
             if operation == "update":
@@ -179,16 +199,16 @@ class AgentCapabilityRepository:
                     return {"success": True}
                 clause = ", ".join(f"{key}=%s" for key in updates)
                 cur.execute(
-                    f"UPDATE workmanship_app_flows SET {clause}, updated_at=NOW() WHERE gid=%s AND owner_user_gid=%s AND deleted_at IS NULL",
-                    [*updates.values(), data["flow_gid"], owner],
+                    f"UPDATE workmanship_app_flows SET {clause}, updated_at=NOW() WHERE gid=%s AND owner_user_gid=%s AND team_gid=%s AND deleted_at IS NULL",
+                    [*updates.values(), data["flow_gid"], owner, team],
                 )
                 if cur.rowcount != 1:
                     raise LookupError("flow 不存在")
                 return {"success": True}
             if operation == "delete":
                 cur.execute(
-                    "UPDATE workmanship_app_flows SET deleted_at=NOW() WHERE gid=%s AND owner_user_gid=%s AND deleted_at IS NULL",
-                    (data["flow_gid"], owner),
+                    "UPDATE workmanship_app_flows SET deleted_at=NOW() WHERE gid=%s AND owner_user_gid=%s AND team_gid=%s AND deleted_at IS NULL",
+                    (data["flow_gid"], owner, team),
                 )
                 if cur.rowcount != 1:
                     raise LookupError("flow 不存在")
@@ -196,8 +216,8 @@ class AgentCapabilityRepository:
             if operation == "run":
                 run_gid = str(data.get("run_gid") or uuid.uuid4())
                 cur.execute(
-                    "INSERT INTO workmanship_app_flow_runs (gid, flow_gid, status, mode, started_at) SELECT %s, gid, 'running', %s, NOW() FROM workmanship_app_flows WHERE gid=%s AND owner_user_gid=%s AND deleted_at IS NULL",
-                    (run_gid, data.get("mode", "auto"), data["flow_gid"], owner),
+                    "INSERT INTO workmanship_app_flow_runs (gid, flow_gid, status, mode, started_at) SELECT %s, gid, 'running', %s, NOW() FROM workmanship_app_flows WHERE gid=%s AND owner_user_gid=%s AND team_gid=%s AND deleted_at IS NULL",
+                    (run_gid, data.get("mode", "auto"), data["flow_gid"], owner, team),
                 )
                 if cur.rowcount != 1:
                     raise LookupError("flow 不存在")
@@ -221,11 +241,12 @@ class AgentCapabilityRepository:
     def skill_read(self, data: dict) -> dict:
         operation = data.get("operation", "list")
         owner = data["owner_gid"]
+        team = data["tenant_gid"]
         with get_agent_conn() as conn, conn.cursor() as cur:
             if operation == "list":
                 cur.execute(
-                    "SELECT * FROM workmanship_app_skills WHERE deleted_at IS NULL AND (owner_gid=%s OR owner_gid='__system__' OR scope='global') ORDER BY sort_order, created_at",
-                    (owner,),
+                    "SELECT * FROM workmanship_app_skills WHERE team_gid=%s AND deleted_at IS NULL AND (owner_gid=%s OR scope='team' OR (scope='global' AND status='active')) ORDER BY sort_order, created_at",
+                    (team, owner),
                 )
                 rows = [self._skill_row(dict(row)) for row in cur.fetchall()]
                 scope_filter = data.get("scope_filter", "all")
@@ -238,8 +259,8 @@ class AgentCapabilityRepository:
                 return rows
             if operation == "get":
                 cur.execute(
-                    "SELECT * FROM workmanship_app_skills WHERE gid=%s AND deleted_at IS NULL AND (owner_gid=%s OR owner_gid='__system__' OR scope='global')",
-                    (data["skill_gid"], owner),
+                    "SELECT * FROM workmanship_app_skills WHERE gid=%s AND team_gid=%s AND deleted_at IS NULL AND (owner_gid=%s OR scope='team' OR (scope='global' AND status='active'))",
+                    (data["skill_gid"], team, owner),
                 )
                 row = cur.fetchone()
                 if not row:
@@ -250,26 +271,23 @@ class AgentCapabilityRepository:
     def skill_apply(self, data: dict) -> dict:
         operation = data.get("operation")
         owner = data["owner_gid"]
+        team = data["tenant_gid"]
         is_admin = "super_admin" in set(data.get("active_roles", ()))
         with get_agent_conn() as conn, conn.cursor() as cur:
             if operation == "create":
                 scope = data.get("scope", "private")
-                if scope == "team":
-                    raise ValueError("团队 Skill 必须等待 team_gid/ACL 数据模型后启用")
                 if scope == "global" and not is_admin:
                     raise PermissionError("只有超级管理员可以创建全局 Skill")
                 gid = str(data.get("resource_gid") or uuid.uuid4())
                 cur.execute(
-                    "INSERT INTO workmanship_app_skills (gid,name,title,description,skill_type,scope,status,owner_gid,is_system,content,icon,tags,sort_order,is_pinned) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-                    (gid, data["name"], data["title"], data.get("description", ""), data.get("skill_type", "prompt"), scope, "draft", owner, False, json.dumps(data.get("content", {}), ensure_ascii=False), data.get("icon", ""), json.dumps(data.get("tags", []), ensure_ascii=False), data.get("sort_order", 0), False),
+                    "INSERT INTO workmanship_app_skills (gid,name,title,description,skill_type,scope,status,owner_gid,team_gid,is_system,content,icon,tags,sort_order,is_pinned) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                    (gid, data["name"], data["title"], data.get("description", ""), data.get("skill_type", "prompt"), scope, "draft", owner, team, False, json.dumps(data.get("content", {}), ensure_ascii=False), data.get("icon", ""), json.dumps(data.get("tags", []), ensure_ascii=False), data.get("sort_order", 0), False),
                 )
                 return {"gid": gid, "success": True}
             if operation == "update":
-                if data.get("scope") == "team":
-                    raise ValueError("团队 Skill 必须等待 team_gid/ACL 数据模型后启用")
                 if data.get("scope") == "global" and not is_admin:
                     raise PermissionError("只有超级管理员可以发布全局 Skill")
-                cur.execute("SELECT * FROM workmanship_app_skills WHERE gid=%s AND deleted_at IS NULL", (data["skill_gid"],))
+                cur.execute("SELECT * FROM workmanship_app_skills WHERE gid=%s AND team_gid=%s AND deleted_at IS NULL", (data["skill_gid"], team))
                 row = cur.fetchone()
                 if not row:
                     raise LookupError("Skill 不存在")
@@ -285,10 +303,10 @@ class AgentCapabilityRepository:
                     updates["tags"] = json.dumps(data["tags"], ensure_ascii=False)
                 if updates:
                     clause = ",".join(f"{field}=%s" for field in updates)
-                    cur.execute(f"UPDATE workmanship_app_skills SET {clause},updated_at=NOW() WHERE gid=%s", [*updates.values(), data["skill_gid"]])
+                    cur.execute(f"UPDATE workmanship_app_skills SET {clause},updated_at=NOW() WHERE gid=%s AND team_gid=%s", [*updates.values(), data["skill_gid"], team])
                 return {"success": True}
             if operation == "delete":
-                cur.execute("SELECT is_system, owner_gid FROM workmanship_app_skills WHERE gid=%s AND deleted_at IS NULL", (data["skill_gid"],))
+                cur.execute("SELECT is_system, owner_gid FROM workmanship_app_skills WHERE gid=%s AND team_gid=%s AND deleted_at IS NULL", (data["skill_gid"], team))
                 row = cur.fetchone()
                 if not row:
                     raise LookupError("Skill 不存在")
@@ -296,21 +314,21 @@ class AgentCapabilityRepository:
                     raise PermissionError("系统预设 Skill 不可删除")
                 if row["owner_gid"] != owner and not is_admin:
                     raise PermissionError("无权删除此 Skill")
-                cur.execute("UPDATE workmanship_app_skills SET deleted_at=NOW() WHERE gid=%s", (data["skill_gid"],))
+                cur.execute("UPDATE workmanship_app_skills SET deleted_at=NOW() WHERE gid=%s AND team_gid=%s", (data["skill_gid"], team))
                 return {"success": True}
             if operation == "seed_system":
                 seeded = []
                 for skill in data.get("system_skills", []):
                     content = skill.get("content", {})
                     tags = skill.get("tags", [])
-                    cur.execute("SELECT gid FROM workmanship_app_skills WHERE name=%s AND deleted_at IS NULL", (skill["name"],))
+                    cur.execute("SELECT gid FROM workmanship_app_skills WHERE name=%s AND team_gid=%s AND deleted_at IS NULL", (skill["name"], team))
                     existing = cur.fetchone()
                     if existing:
-                        cur.execute("UPDATE workmanship_app_skills SET title=%s,description=%s,content=%s,icon=%s,tags=%s,sort_order=%s,is_system=TRUE,scope='global',status='active',updated_at=NOW() WHERE gid=%s", (skill["title"], skill.get("description", ""), json.dumps(content, ensure_ascii=False), skill.get("icon", ""), json.dumps(tags, ensure_ascii=False), skill.get("sort_order", 0), existing["gid"]))
+                        cur.execute("UPDATE workmanship_app_skills SET title=%s,description=%s,content=%s,icon=%s,tags=%s,sort_order=%s,is_system=TRUE,scope='global',status='active',updated_at=NOW() WHERE gid=%s AND team_gid=%s", (skill["title"], skill.get("description", ""), json.dumps(content, ensure_ascii=False), skill.get("icon", ""), json.dumps(tags, ensure_ascii=False), skill.get("sort_order", 0), existing["gid"], team))
                         seeded.append({"name": skill["name"], "action": "updated", "gid": existing["gid"]})
                     else:
                         gid = str(uuid.uuid4())
-                        cur.execute("INSERT INTO workmanship_app_skills (gid,name,title,description,skill_type,scope,status,owner_gid,is_system,content,icon,tags,sort_order) VALUES (%s,%s,%s,%s,%s,'global','active','__system__',TRUE,%s,%s,%s,%s)", (gid, skill["name"], skill["title"], skill.get("description", ""), skill.get("skill_type", "prompt"), json.dumps(content, ensure_ascii=False), skill.get("icon", ""), json.dumps(tags, ensure_ascii=False), skill.get("sort_order", 0)))
+                        cur.execute("INSERT INTO workmanship_app_skills (gid,name,title,description,skill_type,scope,status,owner_gid,team_gid,is_system,content,icon,tags,sort_order) VALUES (%s,%s,%s,%s,%s,'global','active','__system__',%s,TRUE,%s,%s,%s,%s)", (gid, skill["name"], skill["title"], skill.get("description", ""), skill.get("skill_type", "prompt"), team, json.dumps(content, ensure_ascii=False), skill.get("icon", ""), json.dumps(tags, ensure_ascii=False), skill.get("sort_order", 0)))
                         seeded.append({"name": skill["name"], "action": "created", "gid": gid})
                 return {"success": True, "seeded": seeded}
         raise ValueError("unsupported skill write operation")

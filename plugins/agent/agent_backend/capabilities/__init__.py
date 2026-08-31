@@ -4,6 +4,7 @@ from __future__ import annotations
 import inspect
 
 from ..application import AgentApplication
+from ..application.canvas_runtime import ProductionAgentCanvasRuntime
 from ..infrastructure import AgentCapabilityRepository
 from ..data.audit_repository import AuditRepository
 from ..data.session_repository import SessionRepository
@@ -12,7 +13,7 @@ from .provider import descriptor_for
 from .interaction_chat_change import register_interaction_chat_change_capability
 
 
-application = AgentApplication(AgentCapabilityRepository(), AuditRepository(), SessionRepository())
+_DEFAULT_RUNTIME = object()
 _CANVAS_CAPABILITIES = {
     "agent.workflow.node.test.execute", "agent.canvas.options.resolve",
     "agent.canvas.execution.start", "agent.canvas.execution.resume",
@@ -25,12 +26,15 @@ def _validate_canvas_runtime(runtime) -> None:
         raise RuntimeError("Agent canvas runtime adapter must implement the finite async runtime port")
 
 
-def register_capabilities(registry, *, canvas_runtime=None) -> None:
-    if canvas_runtime is not None:
-        _validate_canvas_runtime(canvas_runtime)
-    provider = application if canvas_runtime is None else AgentApplication(
-        AgentCapabilityRepository(), AuditRepository(), SessionRepository(), canvas_runtime
+def register_capabilities(registry, *, canvas_runtime=_DEFAULT_RUNTIME) -> None:
+    repository = AgentCapabilityRepository()
+    runtime = (
+        ProductionAgentCanvasRuntime(repository_factory=type(repository))
+        if canvas_runtime is _DEFAULT_RUNTIME else canvas_runtime
     )
+    if runtime is not None:
+        _validate_canvas_runtime(runtime)
+    provider = AgentApplication(repository, AuditRepository(), SessionRepository(), runtime)
     for spec in specs():
         capability_id = spec.id
         if capability_id in _CANVAS_CAPABILITIES:

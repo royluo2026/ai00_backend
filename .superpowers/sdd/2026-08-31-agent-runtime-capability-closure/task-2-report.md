@@ -2,33 +2,29 @@
 
 ## Outcome
 
-Implemented the two query outcomes behind one `ProductionAgentCanvasRuntime` adapter:
+Implemented `agent.workflow.node.test.execute@1` and `agent.canvas.options.resolve@1` behind the single shipped `ProductionAgentCanvasRuntime`. Default provider registration now composes that runtime from the existing `AgentCapabilityRepository`; explicit absence still fails closed. Registered-handler tests cover both query capabilities through the production process boundary.
 
-- `agent.workflow.node.test.execute@1`
-- `agent.canvas.options.resolve@1`
+The runtime performs the database/resource load and the existing `CanvasExecutor` call in one spawned worker. Request and result envelopes are JSON-only. Internal and application timeouts both terminate and join the process, close process/queue handles, and leave no late marker or growing active-worker set across repeated timeouts. No thread-backed blocking work or second executor was added.
 
-The adapter loads the persisted flow/skill and selected node/field before use, applies actor/team/private/team/global visibility rules, and gives missing, cross-team, and missing-node cases the same `resource_not_found` result. The provider remains fail closed when no adapter is composed.
+Agent domain migration `0002_canvas_query_tenant.sql` adds nullable `team_gid` bindings and tenant/owner indexes to flows and skills. New flow, skill, and seeded-skill writes persist the context team. Repository reads and mutations require the persisted team plus the applicable actor/visibility rule; legacy NULL rows, cross-team rows, and missing rows fail closed. **Task 3 must use Agent migration `0003` or later.**
 
-Node testing constructs one bounded node for the existing `CanvasExecutor`; it does not add another executor. The finite allowed kinds are the executor's non-executable data/control/human kinds. Condition/eval, tool, agent/LLM, nested skill, source, import, environment, resolver, and arbitrary dynamic-option paths are not exposed by this query boundary.
-
-Both queries validate submitted values against the persisted Task 1 input declaration. Graph node/edge/byte size, aggregate input bytes, output bytes/counts, options, and active concurrency are capped. Query work is wrapped by an asyncio timeout that waits for cancellation, and tests prove no pending task remains.
-
-Outputs use the closed Task 1 dataclasses. Raw node values are deterministically ordered, nested structures are serialized canonically, sensitive and execution-control keys are recursively redacted, and option outputs expose only sorted `value`/`label` pairs. Query operations write no durable state. `start` and `resume` remain retryable unavailable for Task 3.
+Node/input/graph/output/option/concurrency bounds, Task 1 declared-input validation, finite non-executable node kinds, deterministic option ordering, closed output projection, and recursive canonical secret/control redaction remain enforced. Query paths do not write durable execution state; `start` and `resume` remain retryable unavailable for Task 3.
 
 ## TDD evidence
 
-- Initial RED: 12 expected failures for the missing adapter and timeout gate; the existing absent-adapter assertion passed.
-- Control-path RED: two failures proved `source_tool` was neither rejected nor recursively redacted.
-- Declared-option-input RED: an undeclared option input incorrectly reached resolution.
-- Command-boundary RED: the production adapter lacked explicit fail-closed Task 3 methods.
-- GREEN focused: 16 query tests pass.
+- RED: the default registered handler remained adapter-less; the repository lacked persisted tenant lookup; team skill creation was blocked; migration `0002` did not exist.
+- RED: the production adapter had no spawned-worker/timeout surface.
+- GREEN: real repository SQL tests prove actor/team predicates, create-time tenant persistence, and legacy-NULL denial.
+- GREEN: registered handlers prove same-team node/options success and uniform cross-team/missing denial.
+- GREEN: production process tests prove JSON result transport, internal timeout cleanup, application-cancellation cleanup, repeated-timeout worker stability, and concurrency capping.
 
 ## Verification evidence
 
-- Focused query suite: 16 passed.
-- Complete Agent plugin suite: 96 passed.
-- Task 1 query/provider/runtime combined suite: 89 passed before the final two regression tests were added.
-- Changed modules compile successfully.
+- Focused canvas query suites: `25 passed`.
+- Complete Agent provider/runtime/domain suite: `105 passed`.
+- Agent domain migration check: `domain=agent migrations=2 mode=check`.
+- Domain migration runner plus release bindings: `12 passed`.
 - Domain dependency gate: `Domain dependency check passed: 1 reviewed violations, no new dependencies`.
+- Changed Agent modules compile successfully.
 
-The shared `progress.md` ledger was not edited.
+Migration ruling: Task 2 owns `0002_canvas_query_tenant.sql`; Task 3's first available Agent migration number is `0003`.
