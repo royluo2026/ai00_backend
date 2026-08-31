@@ -113,9 +113,9 @@ class MysqlRuleDefinitionRepository(RuleDefinitionRepository):
                     replay = cur.fetchone()
                     if replay:
                         stored = json.loads(replay["result_json"]) if isinstance(replay["result_json"], str) else replay["result_json"]
-                        if stored.get("actor_gid") != actor_gid or stored.get("team_gid") != team_gid or stored.get("rule_gid") != rule_gid:
+                        if stored.get("actor_gid") != actor_gid or stored.get("team_gid") != team_gid:
                             raise LookupError("rule not found")
-                        if stored.get("command_digest") != command_digest:
+                        if stored.get("command_digest") != command_digest or stored.get("rule_gid") != rule_gid:
                             from backend.capability_v2.provider_contracts import CapabilityBusinessError
                             raise CapabilityBusinessError("idempotency_conflict", "The idempotency key is bound to another Craft rule command.")
                         conn.commit()

@@ -87,6 +87,54 @@ def _handler(monkeypatch, repository=None):
     return rule_library.change_rule_definition, repository
 
 
+def _mysql_repository_with_replay(monkeypatch, stored_replay, target_rules):
+    from plugins.craft.craft_backend.application import rules
+
+    class Cursor:
+        def __init__(self):
+            self.replay = stored_replay
+            self.rules = deepcopy(target_rules)
+            self.current = None
+
+        def __enter__(self): return self
+        def __exit__(self, *_): return False
+        def execute(self, sql, params=()):
+            if "SELECT result_json" in sql:
+                self.current = self.replay
+            elif "SELECT gid,name" in sql:
+                self.current = deepcopy(self.rules.get(params[0]))
+            else:
+                self.current = None
+            self.rowcount = 1
+        def fetchone(self): return self.current
+
+    class Connection:
+        def __init__(self): self.cursor_value = Cursor()
+        def cursor(self): return self.cursor_value
+        def commit(self): pass
+        def rollback(self): pass
+
+    connection = Connection()
+    @contextmanager
+    def factory(): yield connection
+    monkeypatch.setattr(rules, "get_conn", factory)
+    return rules.MysqlRuleDefinitionRepository()
+
+
+def _stored_rule_replay():
+    return {"result_json": json.dumps({
+        "actor_gid": "owner-1", "team_gid": "team-a", "rule_gid": "rule-1",
+        "command_digest": "digest-1", "result": {"rule_gid": "rule-1", "revision": 2},
+    })}
+
+
+def _stored_rule(rule_gid="rule-1", *, owner="owner-1", team="team-a"):
+    return {
+        **_rule(), "gid": rule_gid, "owner_user_gid": owner,
+        "applicable_scope": {"team_gid": team}, "rule_definition": {"_revision": 1},
+    }
+
+
 @pytest.mark.parametrize("field", sorted(ALLOWED_CHANGES))
 def test_rule_definition_change_accepts_each_frozen_field(monkeypatch, field):
     handler, repository = _handler(monkeypatch)
@@ -278,6 +326,34 @@ def test_mysql_rule_definition_replay_requires_the_current_team_scope(monkeypatc
 
     with pytest.raises(LookupError, match="rule not found"):
         repository.change(**command, team_gid="team-b")
+
+
+def test_mysql_rule_definition_conflicts_when_an_authorized_other_rule_reuses_key(monkeypatch):
+    repository = _mysql_repository_with_replay(
+        monkeypatch, _stored_rule_replay(), {"rule-2": _stored_rule("rule-2")},
+    )
+
+    with pytest.raises(CapabilityBusinessError) as raised:
+        repository.change(
+            rule_gid="rule-2", expected_revision=1, changes={"name": "Other"},
+            actor_gid="owner-1", team_gid="team-a", idempotency_key="idem-1", command_digest="digest-2",
+        )
+
+    assert raised.value.code == "idempotency_conflict"
+
+
+@pytest.mark.parametrize("target", [
+    _stored_rule("team-b-rule", team="team-b"),
+    _stored_rule("other-owner-rule", owner="owner-2"),
+])
+def test_mysql_rule_definition_hides_key_replay_for_cross_team_or_unowned_target(monkeypatch, target):
+    repository = _mysql_repository_with_replay(monkeypatch, _stored_rule_replay(), {target["gid"]: target})
+
+    with pytest.raises(LookupError, match="rule not found"):
+        repository.change(
+            rule_gid=target["gid"], expected_revision=1, changes={"name": "Other"},
+            actor_gid="owner-1", team_gid="team-a", idempotency_key="idem-1", command_digest="digest-2",
+        )
 
 
 @pytest.mark.parametrize("stored_scope", [{}, "", "{bad"])
