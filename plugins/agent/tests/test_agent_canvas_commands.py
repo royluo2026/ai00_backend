@@ -27,10 +27,12 @@ from plugins.agent.agent_backend.application.service import (
     CanvasExecutionDispatcher,
     CanvasExecutionWorker,
 )
+from plugins.agent.agent_backend.domain.canvas_tokens import canvas_result_template
 
 
 ROOT = Path(__file__).resolve().parents[3]
 PRINCIPAL = RunPrincipal("actor-1", "team-1")
+TOKEN_SECRET = b"task-3-test-secret"
 runtime_module = importlib.import_module("plugins.agent.agent_backend.application.canvas_runtime")
 CanvasCommandEngine = getattr(runtime_module, "_CanvasCommandEngine", None)
 ProductionAgentCanvasRuntime = runtime_module.ProductionAgentCanvasRuntime
@@ -102,13 +104,13 @@ class MemoryCanvasExecutionRepository:
                 return dict(existing), True
             request = data["request"]
             run = next((item for item in self.runs.values() if (
-                item["run_token"] == request["run_token"]
+                item["run_token"] == data["run_token"]
                 and item["actor_gid"] == data["actor_gid"]
                 and item["team_gid"] == data["team_gid"]
             )), None)
             if (
                 run is None or run["status"] != "paused"
-                or run["pause_token"] != request["pause_token"]
+                or run["pause_token"] != data["pause_token"]
                 or run["revision"] != request["expected_revision"]
             ):
                 raise CapabilityBusinessError(
@@ -224,18 +226,20 @@ class Runtime:
 
     async def start(self, request, principal):
         return await self.execute_canvas_command(
-            "start", request, principal, run_token="fallback", invocation_id="fallback",
+            "start", request, principal, run_token="fallback", run_id="fallback",
+            invocation_id="fallback",
         )
 
     async def resume(self, request, principal):
         return await self.execute_canvas_command(
-            "resume", request, principal, run_token=request.run_token, invocation_id="fallback",
+            "resume", request, principal, run_token=request.run_token, run_id="fallback",
+            invocation_id="fallback",
         )
 
     async def execute_canvas_command(
-        self, operation, request, principal, *, run_token, invocation_id,
+        self, operation, request, principal, *, run_token, run_id, invocation_id,
     ):
-        self.calls.append((operation, request, principal, run_token, invocation_id))
+        self.calls.append((operation, request, principal, run_token, run_id, invocation_id))
         if self.fail:
             raise self.fail
         return replace(
@@ -244,7 +248,7 @@ class Runtime:
         )
 
     async def reconcile_canvas_command(
-        self, operation, request, principal, *, run_token, invocation_id,
+        self, operation, request, principal, *, run_token, run_id, invocation_id,
     ):
         self.reconciliations.append((operation, principal, run_token, invocation_id))
         result = self.reconciled_result or _unknown(
@@ -254,7 +258,11 @@ class Runtime:
 
 
 def _coordinator(repository):
-    return CanvasExecutionCoordinator(repository, token_factory=lambda kind: f"{kind}-{len(repository.invocations) + 1}")
+    return CanvasExecutionCoordinator(repository, token_secret=TOKEN_SECRET)
+
+
+def _dispatcher(repository, runtime):
+    return CanvasExecutionDispatcher(repository, runtime, token_secret=TOKEN_SECRET)
 
 
 def test_start_idempotency_replays_one_run_and_changed_payload_conflicts():
@@ -265,9 +273,9 @@ def test_start_idempotency_replays_one_run_and_changed_payload_conflicts():
     first = coordinator.start(request, PRINCIPAL, "start-key")
     replay = coordinator.start(request, PRINCIPAL, "start-key")
 
-    assert first == replay == RuntimeDispatch(
-        status="accepted", run_token="run-1", revision=1,
-    )
+    assert first == replay
+    assert first.status == "accepted" and first.revision == 1
+    assert first.run_token.startswith("run_")
     assert len(repository.runs) == len(repository.invocations) == 1
     with pytest.raises(CapabilityBusinessError) as error:
         coordinator.start(
@@ -315,12 +323,14 @@ def test_dispatcher_restores_persisted_principal_and_terminal_replay_is_canonica
     runtime = Runtime()
     accepted = coordinator.start(CanvasStartRequest("skill-1", 7), PRINCIPAL, "start-key")
 
-    result = asyncio.run(CanvasExecutionDispatcher(repository, runtime).dispatch_next(worker_id="worker-1"))
+    result = asyncio.run(_dispatcher(repository, runtime).dispatch_next(worker_id="worker-1"))
     replay = coordinator.start(CanvasStartRequest("skill-1", 7), PRINCIPAL, "start-key")
 
     assert result.status == replay.status == "completed"
     assert runtime.calls[0][2] == PRINCIPAL
-    assert runtime.calls[0][3:] == (accepted.run_token, "invocation-1")
+    assert runtime.calls[0][3:] == (
+        accepted.run_token, next(iter(repository.runs)), next(iter(repository.invocations)),
+    )
     assert replay.run_token == accepted.run_token and replay.revision == 1
     assert replay.summary == "Bearer [redacted]"
     assert replay.node_results[0].summary == "[redacted-credential]"
@@ -331,7 +341,7 @@ def test_duplicate_workers_cannot_both_execute_one_claimed_invocation():
     repository = MemoryCanvasExecutionRepository()
     runtime = Runtime()
     _coordinator(repository).start(CanvasStartRequest("skill-1", 7), PRINCIPAL, "start-key")
-    dispatcher = CanvasExecutionDispatcher(repository, runtime)
+    dispatcher = _dispatcher(repository, runtime)
 
     async def run():
         return await asyncio.gather(*(
@@ -352,7 +362,7 @@ def test_pre_dispatch_crash_reclaims_but_post_dispatch_crash_reconciles_same_inv
     abandoned = repository.claim_next_canvas_invocation("dead-worker")
     repository.invocations[abandoned["invocation_id"]]["lease_expires_at"] = datetime.now(UTC) - timedelta(seconds=1)
 
-    reclaimed = asyncio.run(CanvasExecutionDispatcher(repository, runtime).dispatch_next(worker_id="worker-2"))
+    reclaimed = asyncio.run(_dispatcher(repository, runtime).dispatch_next(worker_id="worker-2"))
 
     assert reclaimed.status == "completed"
     assert [call[-1] for call in runtime.calls] == [abandoned["invocation_id"]]
@@ -365,7 +375,7 @@ def test_pre_dispatch_crash_reclaims_but_post_dispatch_crash_reconciles_same_inv
         status="completed", run_token="ignored", revision=1, summary="reconciled",
     )
 
-    reconciled = asyncio.run(CanvasExecutionDispatcher(repository, runtime).dispatch_next(worker_id="worker-3"))
+    reconciled = asyncio.run(_dispatcher(repository, runtime).dispatch_next(worker_id="worker-3"))
 
     assert reconciled.status == "completed"
     assert len(runtime.calls) == 1
@@ -379,7 +389,7 @@ def test_runtime_timeout_is_replayable_outcome_unknown_and_reclaim_reuses_invoca
     coordinator = _coordinator(repository)
     request = CanvasStartRequest("skill-1", 7)
     accepted = coordinator.start(request, PRINCIPAL, "start-key")
-    dispatcher = CanvasExecutionDispatcher(repository, runtime)
+    dispatcher = _dispatcher(repository, runtime)
 
     unknown = asyncio.run(dispatcher.dispatch_next(worker_id="worker-1"))
     replay = coordinator.start(request, PRINCIPAL, "start-key")
@@ -402,7 +412,7 @@ def test_worker_health_and_fatal_signal_use_registry_lifecycle_surface_without_a
     repository.fail_claim = ValueError("secret tenant configuration")
     signals = []
     worker = CanvasExecutionWorker(
-        CanvasExecutionDispatcher(repository, Runtime()),
+        _dispatcher(repository, Runtime()),
         supervision_signal=signals.append, idle_seconds=0.001,
     )
 
@@ -426,6 +436,7 @@ def test_default_provider_registers_canvas_worker_lifecycle_and_replays_terminal
 
     repository = MemoryCanvasExecutionRepository()
     runtime = Runtime()
+    monkeypatch.setenv("JWT_SECRET", TOKEN_SECRET.decode())
     monkeypatch.setattr(capabilities, "AgentCapabilityRepository", lambda: repository)
     monkeypatch.setattr(capabilities, "ProductionAgentCanvasRuntime", lambda **_kwargs: runtime)
     class Registry:
@@ -487,28 +498,6 @@ def test_default_provider_registers_canvas_worker_lifecycle_and_replays_terminal
     assert registry.lifecycle_health("agent.canvas-execution-worker")["status"] == "stopped"
 
 
-def test_agent_0003_and_sql_repository_pin_one_transaction_state_machine_and_atomic_claims():
-    migration = ROOT / "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
-    sql = migration.read_text(encoding="utf-8").lower()
-    repository_source = (
-        ROOT / "plugins/agent/agent_backend/infrastructure/repository.py"
-    ).read_text(encoding="utf-8").lower()
-
-    assert "workmanship_agent_canvas_runs" in sql
-    assert "workmanship_agent_canvas_invocations" in sql
-    assert "workmanship_agent_canvas_audit_events" in sql
-    assert "unique key uq_agent_canvas_invocation_idempotency" in sql
-    assert all(field in sql for field in (
-        "actor_gid", "team_gid", "payload_hash", "run_token_hash", "pause_token_hash",
-        "target_state", "revision", "lease_owner", "lease_token", "lease_expires_at",
-        "attempt_count", "result_json",
-    ))
-    assert "for update skip locked" in repository_source
-    assert "status='claimed'" in repository_source
-    assert "lease_token=%s" in repository_source
-    assert "target_dispatched_at" in repository_source
-
-
 class CommandExecutor:
     calls = []
     result = None
@@ -568,7 +557,7 @@ def test_production_command_engine_executes_persisted_skill_and_projects_bounded
 
     result = asyncio.run(engine.start(
         CanvasStartRequest("skill-1", 7, (InputValue("project_gid", "p1"),)),
-        PRINCIPAL, run_token="run-opaque",
+        PRINCIPAL, run_token="run-opaque", run_id="run-1", invocation_id="invocation-1",
     ))
 
     assert result.status == "paused" and result.run_token == "run-opaque"
@@ -581,7 +570,10 @@ def test_production_command_engine_executes_persisted_skill_and_projects_bounded
     assert result.collect_fields[0].key == "decision"
     assert result.canvas_layout.column_width == 280
     kwargs, canvas, init_params, restore = CommandExecutor.calls.pop()
-    assert kwargs == {"auth_mode": "feishu", "auth_token": "", "owner_gid": "actor-1"}
+    assert kwargs == {
+        "auth_mode": "feishu", "auth_token": "", "owner_gid": "actor-1",
+        "invocation_id": "invocation-1",
+    }
     assert canvas == _command_skill()["content"]
     assert init_params == {"project_gid": "p1"} and restore is None
 
@@ -609,16 +601,21 @@ def test_production_command_engine_restores_checkpoint_principal_and_resume_inpu
     }
     engine = CanvasCommandEngine(
         resource_loader=lambda kind, gid: _command_skill(),
-        execution_loader=lambda run, actor, team: state if (
-            run, actor, team
-        ) == ("run-opaque", "actor-1", "team-1") else None,
+        execution_loader=lambda invocation, actor, team: state if (
+            invocation, actor, team
+        ) in {
+            ("invocation-2", "actor-1", "team-1"),
+            ("invocation-3", "actor-1", "team-1"),
+        } else None,
         executor_factory=CommandExecutor,
     )
     request = CanvasResumeRequest(
         "run-opaque", "pause-opaque", 1, True, (InputValue("decision", "yes"),),
     )
 
-    result = asyncio.run(engine.resume(request, PRINCIPAL, run_token="run-opaque"))
+    result = asyncio.run(engine.resume(
+        request, PRINCIPAL, run_token="run-opaque", run_id="run-1", invocation_id="invocation-2",
+    ))
 
     assert result.status == "completed" and result.revision == 2
     _kwargs, _canvas, init_params, restore = CommandExecutor.calls.pop()
@@ -627,12 +624,52 @@ def test_production_command_engine_restores_checkpoint_principal_and_resume_inpu
         "_status": "ok", "_summary": "Approved", "api_key": "[redacted]", "decision": "yes",
     }
 
-    denied = asyncio.run(engine.resume(replace(request, approved=False), PRINCIPAL, run_token="run-opaque"))
+    denied = asyncio.run(engine.resume(
+        replace(request, approved=False), PRINCIPAL,
+        run_token="run-opaque", run_id="run-1", invocation_id="invocation-3",
+    ))
     assert denied.status == "halted" and denied.revision == 2
     assert CommandExecutor.calls == []
 
 
-def test_production_runtime_uses_existing_worker_boundary_with_stable_invocation_and_nonexecuting_reconcile():
+def test_command_engine_lost_reply_recovers_exact_invocation_without_second_executor_call():
+    stored = {}
+    CommandExecutor.calls = []
+    CommandExecutor.result = {
+        "status": "completed", "summary": "persisted-before-reply",
+        "node_results": {},
+    }
+
+    def record(invocation_id, run_id, principal, result):
+        stored[(invocation_id, principal.actor_gid, principal.team_gid)] = canvas_result_template(result)
+
+    engine = CanvasCommandEngine(
+        resource_loader=lambda kind, gid: _command_skill(),
+        execution_loader=lambda *_args: None,
+        invocation_result_recorder=record,
+        invocation_result_loader=lambda invocation_id, actor, team: stored.get((invocation_id, actor, team)),
+        executor_factory=CommandExecutor,
+    )
+    request = CanvasStartRequest("skill-1", 7)
+
+    asyncio.run(engine.start(
+        request, PRINCIPAL, run_token="run-opaque", run_id="run-1",
+        invocation_id="invocation-stable",
+    ))  # The caller loses this reply after the executor result is durably recorded.
+    recovered = asyncio.run(engine.reconcile(
+        PRINCIPAL, run_token="run-opaque", revision=1, invocation_id="invocation-stable",
+    ))
+
+    assert recovered == RuntimeDispatch(
+        status="completed", run_token="run-opaque", revision=1,
+        skill_title="Approval flow", summary="persisted-before-reply",
+    )
+    assert len(CommandExecutor.calls) == 1
+    assert CommandExecutor.calls[0][0]["invocation_id"] == "invocation-stable"
+    assert "run_token" not in next(iter(stored.values()))
+
+
+def test_production_runtime_uses_existing_worker_boundary_and_queries_stable_invocation_on_reconcile():
     runtime = ProductionAgentCanvasRuntime(worker_timeout=5.0)
     request = CanvasStartRequest("skill-1", 7)
     calls = []
@@ -650,23 +687,30 @@ def test_production_runtime_uses_existing_worker_boundary_with_stable_invocation
     runtime._run_process = run_process
 
     result = asyncio.run(runtime.execute_canvas_command(
-        "start", request, PRINCIPAL, run_token="run-opaque", invocation_id="invocation-stable",
+        "start", request, PRINCIPAL, run_token="run-opaque", run_id="run-1",
+        invocation_id="invocation-stable",
     ))
-    unknown = asyncio.run(runtime.reconcile_canvas_command(
-        "start", request, PRINCIPAL, run_token="run-opaque", invocation_id="invocation-stable",
+    recovered = asyncio.run(runtime.reconcile_canvas_command(
+        "start", request, PRINCIPAL, run_token="run-opaque", run_id="run-1",
+        invocation_id="invocation-stable",
     ))
 
     assert result == RuntimeDispatch(
         status="completed", run_token="run-opaque", revision=1, summary="invocation-stable",
     )
-    assert calls == [("start", request, PRINCIPAL, {
-        "run_token": "run-opaque", "invocation_id": "invocation-stable",
-    })]
-    assert unknown.status == "outcome_unknown"
-    assert unknown.run_token == "run-opaque" and unknown.revision == 1
+    assert recovered == result
+    assert calls == [
+        ("start", request, PRINCIPAL, {
+            "run_token": "run-opaque", "run_id": "run-1", "invocation_id": "invocation-stable",
+        }),
+        ("reconcile", request, PRINCIPAL, {
+            "run_token": "run-opaque", "run_id": "run-1",
+            "invocation_id": "invocation-stable", "target_state": "start",
+        }),
+    ]
 
 
-def test_sql_repository_serializes_slotted_terminal_result_inside_claim_transaction(monkeypatch):
+def test_sql_repository_persists_token_free_terminal_template_inside_claim_transaction(monkeypatch):
     from plugins.agent.agent_backend.infrastructure.repository import AgentCapabilityRepository
 
     class Cursor:
@@ -711,7 +755,7 @@ def test_sql_repository_serializes_slotted_terminal_result_inside_claim_transact
         status="completed", run_token="run-opaque", revision=1, summary="done",
     )
 
-    AgentCapabilityRepository().complete_canvas_invocation({
+    AgentCapabilityRepository(connection_factory=connection, token_secret=b"task-3-test-secret").complete_canvas_invocation({
         "invocation_id": "invocation-1", "lease_token": "lease-1",
     }, result)
 
@@ -719,8 +763,8 @@ def test_sql_repository_serializes_slotted_terminal_result_inside_claim_transact
     assert len(updates) == 2
     stored = json.loads(updates[0][1][1])
     assert stored == {
-        "status": "completed", "run_token": "run-opaque", "revision": 1,
-        "pause_token": None, "halted_node_id": None, "halted_label": None,
+        "status": "completed", "revision": 1,
+        "halted_node_id": None, "halted_label": None,
         "halt_reason": None, "skill_title": None, "summary": "done",
         "node_results": [], "context_summary": [], "collect_fields": [],
         "canvas_layout": None,

@@ -42,11 +42,13 @@ class CanvasExecutor:
         auth_token:  str = "",
         owner_gid:   str = "",
         progress_cb=None,
+        invocation_id: str = "",
     ):
         self.auth_mode   = auth_mode
         self.auth_token  = auth_token
         self.owner_gid   = owner_gid
         self.progress_cb = progress_cb
+        self.invocation_id = invocation_id
         self.node_results: dict[str, dict] = {}
         self._exec_log:    list[str] = []
         self._log_start_ts: str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")

@@ -6,7 +6,6 @@ from datetime import UTC, datetime, timedelta
 import hashlib
 import json
 import logging
-import secrets
 import uuid
 from backend.capability_v2.provider_contracts import CapabilityBusinessError
 from dataclasses import asdict, replace
@@ -16,6 +15,10 @@ from .canvas_runtime import (
     CanvasLayout, CanvasOption, CanvasOptionsRequest, CanvasResumeRequest, CanvasStartRequest,
     CollectField, ContextSummaryItem, NodeResult, NodeTestRequest, OutputValue, RunPrincipal,
     RuntimeDispatch, VisibilityRule,
+)
+from ..domain.canvas_tokens import (
+    canvas_result_template, canvas_token_secret, derive_canvas_token,
+    materialize_canvas_result,
 )
 
 
@@ -95,9 +98,12 @@ def _request_hash(capability_id: str, request: CanvasStartRequest | CanvasResume
 class CanvasExecutionCoordinator:
     """Create/replay durable commands; the Agent repository owns each transaction."""
 
-    def __init__(self, repository, *, token_factory: Callable[[str], str] | None = None):
+    def __init__(self, repository, *, token_secret: str | bytes | None = None):
         self._repository = repository
-        self._token = token_factory or (lambda kind: f"{kind}_{secrets.token_urlsafe(32)}")
+        self._token_secret = token_secret
+
+    def _secret(self) -> bytes:
+        return canvas_token_secret(self._token_secret)
 
     @staticmethod
     def _key(value: str) -> str:
@@ -105,29 +111,32 @@ class CanvasExecutionCoordinator:
             raise CapabilityBusinessError("invalid_input", "Agent canvas idempotency key is required")
         return value
 
-    @staticmethod
-    def _result(row: Mapping[str, Any]) -> RuntimeDispatch:
+    def _result(self, row: Mapping[str, Any]) -> RuntimeDispatch:
         value = row.get("result")
         if not isinstance(value, Mapping):
             raise CapabilityBusinessError(
                 "provider_unavailable", "Agent canvas durable result is unavailable", retryable=True,
             )
-        return _runtime_dispatch(value)
+        return _runtime_dispatch(materialize_canvas_result(
+            value, self._secret(), str(row.get("run_id") or ""),
+        ))
 
     def start(
         self, request: CanvasStartRequest, principal: RunPrincipal, idempotency_key: str,
     ) -> RuntimeDispatch:
         key = self._key(idempotency_key)
-        run_token = self._token("run")
-        invocation_id = self._token("invocation")
+        run_id = f"canvas_{uuid.uuid4().hex}"
+        run_token = derive_canvas_token(self._secret(), run_id, "run")
+        invocation_id = f"invocation_{uuid.uuid4().hex}"
         result = RuntimeDispatch("accepted", run_token, 1)
         row, _replayed = self._repository.create_canvas_start({
-            "run_id": f"canvas_{uuid.uuid4().hex}", "run_token": run_token,
+            "run_id": run_id, "run_token": run_token,
             "invocation_id": invocation_id, "actor_gid": principal.actor_gid,
             "team_gid": principal.team_gid, "capability_id": "agent.canvas.execution.start",
             "idempotency_key": key,
             "payload_hash": _request_hash("agent.canvas.execution.start", request),
-            "target_state": "start", "request": asdict(request), "result": asdict(result),
+            "target_state": "start", "request": asdict(request),
+            "result": canvas_result_template(result),
         })
         return self._result(row)
 
@@ -135,14 +144,20 @@ class CanvasExecutionCoordinator:
         self, request: CanvasResumeRequest, principal: RunPrincipal, idempotency_key: str,
     ) -> RuntimeDispatch:
         key = self._key(idempotency_key)
-        invocation_id = self._token("invocation")
+        invocation_id = f"invocation_{uuid.uuid4().hex}"
         result = RuntimeDispatch("accepted", request.run_token, request.expected_revision + 1)
         row, _replayed = self._repository.create_canvas_resume({
             "invocation_id": invocation_id, "actor_gid": principal.actor_gid,
             "team_gid": principal.team_gid, "capability_id": "agent.canvas.execution.resume",
             "idempotency_key": key,
             "payload_hash": _request_hash("agent.canvas.execution.resume", request),
-            "target_state": "resume", "request": asdict(request), "result": asdict(result),
+            "target_state": "resume", "run_token": request.run_token,
+            "pause_token": request.pause_token,
+            "request": {
+                "expected_revision": request.expected_revision, "approved": request.approved,
+                "input_values": [asdict(item) for item in request.input_values],
+            },
+            "result": canvas_result_template(result),
         })
         return self._result(row)
 
@@ -150,10 +165,13 @@ class CanvasExecutionCoordinator:
 class CanvasExecutionDispatcher:
     """Claim one invocation before dispatch and never repeat an uncertain side effect."""
 
-    def __init__(self, repository, runtime, *, token_factory: Callable[[str], str] | None = None):
+    def __init__(self, repository, runtime, *, token_secret: str | bytes | None = None):
         self._repository = repository
         self._runtime = runtime
-        self._token = token_factory or (lambda kind: f"{kind}_{secrets.token_urlsafe(32)}")
+        self._token_secret = token_secret
+
+    def _secret(self) -> bytes:
+        return canvas_token_secret(self._token_secret)
 
     @staticmethod
     def _request(claim):
@@ -181,7 +199,7 @@ class CanvasExecutionDispatcher:
         if method is not None:
             return await method(
                 claim["target_state"], request, principal, run_token=claim["run_token"],
-                invocation_id=claim["invocation_id"],
+                run_id=claim["run_id"], invocation_id=claim["invocation_id"],
             )
         return await getattr(self._runtime, claim["target_state"])(request, principal)
 
@@ -191,7 +209,7 @@ class CanvasExecutionDispatcher:
             return self._unknown(claim)
         return await method(
             claim["target_state"], request, principal, run_token=claim["run_token"],
-            invocation_id=claim["invocation_id"],
+            run_id=claim["run_id"], invocation_id=claim["invocation_id"],
         )
 
     async def dispatch_next(self, *, worker_id: str) -> RuntimeDispatch | None:
@@ -207,7 +225,11 @@ class CanvasExecutionDispatcher:
                 result = await self._execute(claim, request, principal)
             result = replace(
                 result, run_token=str(claim["run_token"]), revision=int(claim["revision"]),
-                pause_token=(self._token("pause") if result.status == "paused" else None),
+                pause_token=(
+                    derive_canvas_token(
+                        self._secret(), str(claim["run_id"]), "pause", int(claim["revision"]),
+                    ) if result.status == "paused" else None
+                ),
             )
             if result.status == "outcome_unknown":
                 self._repository.record_canvas_uncertainty(claim, result, "outcome_unknown")

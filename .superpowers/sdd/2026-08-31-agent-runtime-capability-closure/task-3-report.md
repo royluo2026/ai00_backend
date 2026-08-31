@@ -64,3 +64,53 @@ Implemented durable production handling for `agent.canvas.execution.start@1` and
   whitespace errors.
 
 The shared `progress.md` ledger was not edited.
+
+## Review round 1
+
+Addressed all three Important findings from `task-3-review.md`.
+
+- Durable JSON now stores token-free response templates and token-free resume
+  requests. Run and pause bearer values are deterministic HMACs of the opaque
+  run identity, purpose, and revision under the existing deployment
+  `JWT_SECRET`; only their hashes and control metadata are stored. Token and
+  payload-hash verification uses constant-time comparison after the scoped DB
+  lookup. Canonical replay injects the regenerated bearer values only at the
+  response boundary.
+- The stable invocation ID now reaches `CanvasExecutor`. The spawned command
+  worker records the sanitized result in
+  `workmanship_agent_canvas_runtime_results` before writing its pipe reply.
+  Reconciliation queries that exact actor/team-bound invocation; a recovered
+  completed, paused, halted, or error result is returned without invoking the
+  executor again, while a missing result remains `outcome_unknown`.
+- Added real PyMySQL repository tests for the concurrent idempotency unique-key
+  race, `FOR UPDATE SKIP LOCKED`, dispatch lease expiry/reclaim, concurrent
+  single-use resume, transaction rollback after injected failure, canonical
+  replay, and bearer absence in every durable JSON column after accepted,
+  paused, consumed/resumed, terminal, and replay states. These tests use the
+  actual `AgentCapabilityRepository` methods and independent DB connections;
+  no memory repository or source-text assertion supplies this evidence.
+
+The controlled SQL gate is:
+
+```powershell
+$env:AI00_AGENT_TEST_DB_URL='mysql+pymysql://USER:PASSWORD@HOST:3306/ai00_agent_test'
+$env:AI00_REQUIRE_AGENT_MYSQL_TESTS='1'
+python -m pytest plugins/agent/tests/test_agent_canvas_repository_mysql.py -q
+```
+
+The URL must name a dedicated database containing `test`; its account needs
+DDL and DML for the Agent tables. This workspace had no RC/test DB environment,
+local MySQL/OceanBase listener, Docker, or MySQL binaries. The required gate
+was therefore run without the URL and failed clearly with the provisioning
+instruction, while the ordinary suite skipped its four external-DB cases.
+
+Round-one verification:
+
+- RED: focused suite failed 11 tests on the missing HMAC boundary, command
+  invocation identity, durable result recorder/loader, and repository
+  connection injection.
+- GREEN: focused command/runtime/repository suite: `13 passed`.
+- Complete Agent suite: `120 passed, 4 skipped` (only the external SQL gate).
+- Required SQL gate without provisioning: `4 errors`, each explicitly stating
+  that `AI00_AGENT_TEST_DB_URL` and a dedicated DDL+DML test database are
+  required.

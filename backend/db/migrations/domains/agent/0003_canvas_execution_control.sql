@@ -64,3 +64,20 @@ CREATE TABLE IF NOT EXISTS workmanship_agent_canvas_audit_events (
   CONSTRAINT fk_agent_canvas_audit_invocation FOREIGN KEY (invocation_id)
     REFERENCES workmanship_agent_canvas_invocations(invocation_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS workmanship_agent_canvas_runtime_results (
+  invocation_id VARCHAR(128) PRIMARY KEY,
+  run_id VARCHAR(128) NOT NULL,
+  actor_gid VARCHAR(191) NOT NULL,
+  team_gid VARCHAR(191) NOT NULL,
+  status VARCHAR(32) NOT NULL,
+  revision BIGINT UNSIGNED NOT NULL,
+  result_json JSON NOT NULL,
+  completed_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  INDEX idx_agent_canvas_runtime_result_principal
+    (team_gid, actor_gid, completed_at),
+  CONSTRAINT fk_agent_canvas_runtime_result_invocation FOREIGN KEY (invocation_id)
+    REFERENCES workmanship_agent_canvas_invocations(invocation_id),
+  CONSTRAINT fk_agent_canvas_runtime_result_run FOREIGN KEY (run_id)
+    REFERENCES workmanship_agent_canvas_runs(run_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

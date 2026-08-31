@@ -1,18 +1,31 @@
 from __future__ import annotations
 
 import json
-import hashlib
+import hmac
 import secrets
 import uuid
 from backend.platform_sdk.ids import next_gid
 from backend.capability_v2.provider_contracts import CapabilityBusinessError
 from ..data.connection import get_agent_conn
+from ..domain.canvas_tokens import (
+    canvas_result_template, canvas_token_hash, canvas_token_matches,
+    canvas_token_secret, derive_canvas_token,
+)
 
 
 class AgentCapabilityRepository:
+    def __init__(self, connection_factory=get_agent_conn, *, token_secret: str | bytes | None = None):
+        self._connection_factory = connection_factory
+        self._canvas_token_secret = canvas_token_secret(token_secret) if token_secret is not None else None
+
+    def _secret(self) -> bytes:
+        if self._canvas_token_secret is None:
+            self._canvas_token_secret = canvas_token_secret()
+        return self._canvas_token_secret
+
     @staticmethod
     def _token_hash(value: str) -> str:
-        return hashlib.sha256(value.encode("utf-8")).hexdigest()
+        return canvas_token_hash(value)
 
     @staticmethod
     def _json(value):
@@ -20,12 +33,20 @@ class AgentCapabilityRepository:
             value = value.decode("utf-8")
         return json.loads(value) if isinstance(value, str) else value
 
-    @classmethod
-    def _canvas_invocation(cls, row) -> dict:
+    def _canvas_invocation(self, row) -> dict:
         value = dict(row)
-        value["request"] = cls._json(value.pop("request_json"))
-        value["result"] = cls._json(value.pop("result_json"))
-        value["run_token"] = str(value["result"].get("run_token") or "")
+        value["request"] = self._json(value.pop("request_json"))
+        value["result"] = self._json(value.pop("result_json"))
+        run_id = str(value["run_id"])
+        value["run_token"] = derive_canvas_token(self._secret(), run_id, "run")
+        if value.get("target_state") == "resume":
+            expected_revision = int(value["request"].get("expected_revision") or 0)
+            value["request"] = {
+                **value["request"], "run_token": value["run_token"],
+                "pause_token": derive_canvas_token(
+                    self._secret(), run_id, "pause", expected_revision,
+                ),
+            }
         value["principal"] = {
             "actor_gid": str(value["actor_gid"]), "team_gid": str(value["team_gid"]),
         }
@@ -52,8 +73,7 @@ class AgentCapabilityRepository:
     def _duplicate_key(exc: Exception) -> bool:
         return bool(exc.args and exc.args[0] == 1062) or "duplicate" in str(exc).casefold()
 
-    @classmethod
-    def _select_canvas_idempotency(cls, cur, data, *, lock=False):
+    def _select_canvas_idempotency(self, cur, data, *, lock=False):
         cur.execute(
             "SELECT i.*,r.result_json AS run_result_json FROM workmanship_agent_canvas_invocations i "
             "JOIN workmanship_agent_canvas_runs r ON r.run_id=i.run_id "
@@ -62,18 +82,18 @@ class AgentCapabilityRepository:
             (data["actor_gid"], data["team_gid"], data["capability_id"], data["idempotency_key"]),
         )
         row = cur.fetchone()
-        return cls._canvas_invocation(row) if row else None
+        return self._canvas_invocation(row) if row else None
 
     @staticmethod
     def _idempotent(existing, data):
-        if existing["payload_hash"] != data["payload_hash"]:
+        if not hmac.compare_digest(str(existing["payload_hash"]), str(data["payload_hash"])):
             raise CapabilityBusinessError(
                 "idempotency_conflict", "Agent canvas idempotency key conflicts with an earlier request",
             )
         return existing, True
 
     def _reload_canvas_idempotency(self, data, original):
-        with get_agent_conn() as conn, conn.cursor() as cur:
+        with self._connection_factory() as conn, conn.cursor() as cur:
             winner = self._select_canvas_idempotency(cur, data)
         if winner is None:
             raise RuntimeError("Agent canvas idempotency winner could not be reloaded") from original
@@ -81,7 +101,7 @@ class AgentCapabilityRepository:
 
     def create_canvas_start(self, data):
         try:
-            with get_agent_conn() as conn, conn.cursor() as cur:
+            with self._connection_factory() as conn, conn.cursor() as cur:
                 existing = self._select_canvas_idempotency(cur, data, lock=True)
                 if existing is not None:
                     return self._idempotent(existing, data)
@@ -103,7 +123,9 @@ class AgentCapabilityRepository:
                     "(run_id,run_token_hash,actor_gid,team_gid,skill_gid,skill_revision,status,revision,result_json) "
                     "VALUES (%s,%s,%s,%s,%s,%s,'accepted',1,%s)",
                     (
-                        data["run_id"], self._token_hash(data["run_token"]), data["actor_gid"],
+                        data["run_id"], self._token_hash(derive_canvas_token(
+                            self._secret(), data["run_id"], "run",
+                        )), data["actor_gid"],
                         data["team_gid"], request["skill_gid"], request["expected_revision"], result_json,
                     ),
                 )
@@ -133,7 +155,7 @@ class AgentCapabilityRepository:
 
     def create_canvas_resume(self, data):
         try:
-            with get_agent_conn() as conn, conn.cursor() as cur:
+            with self._connection_factory() as conn, conn.cursor() as cur:
                 existing = self._select_canvas_idempotency(cur, data, lock=True)
                 if existing is not None:
                     return self._idempotent(existing, data)
@@ -143,12 +165,19 @@ class AgentCapabilityRepository:
                     "AND pause_token_hash=%s AND actor_gid=%s AND team_gid=%s AND status='paused' "
                     "AND revision=%s FOR UPDATE",
                     (
-                        self._token_hash(request["run_token"]), self._token_hash(request["pause_token"]),
+                        self._token_hash(data["run_token"]), self._token_hash(data["pause_token"]),
                         data["actor_gid"], data["team_gid"], request["expected_revision"],
                     ),
                 )
                 run = cur.fetchone()
-                if run is None:
+                if run is None or not (
+                    canvas_token_matches(
+                        data["run_token"], self._secret(), str(run["run_id"]), "run",
+                    ) and canvas_token_matches(
+                        data["pause_token"], self._secret(), str(run["run_id"]), "pause",
+                        int(request["expected_revision"]),
+                    )
+                ):
                     raise self._canvas_not_found()
                 revision = int(request["expected_revision"]) + 1
                 result_json = json.dumps(data["result"], ensure_ascii=False, separators=(",", ":"))
@@ -160,7 +189,7 @@ class AgentCapabilityRepository:
                 if cur.rowcount != 1:
                     raise self._canvas_not_found()
                 row = {
-                    **data, "run_id": run["run_id"], "run_token": request["run_token"],
+                    **data, "run_id": run["run_id"], "run_token": data["run_token"],
                     "status": "accepted", "revision": revision, "attempt_count": 0,
                     "lease_owner": None, "lease_token": None, "lease_expires_at": None,
                     "target_dispatched_at": None, "next_attempt_at": None,
@@ -186,7 +215,7 @@ class AgentCapabilityRepository:
 
     def claim_next_canvas_invocation(self, worker_id: str):
         lease_token = f"{str(worker_id).strip()}:{secrets.token_urlsafe(24)}"
-        with get_agent_conn() as conn, conn.cursor() as cur:
+        with self._connection_factory() as conn, conn.cursor() as cur:
             cur.execute(
                 "SELECT i.*,r.result_json AS run_result_json FROM workmanship_agent_canvas_invocations i "
                 "JOIN workmanship_agent_canvas_runs r ON r.run_id=i.run_id WHERE "
@@ -212,7 +241,7 @@ class AgentCapabilityRepository:
         return self._canvas_invocation(row)
 
     def mark_canvas_invocation_dispatched(self, claim):
-        with get_agent_conn() as conn, conn.cursor() as cur:
+        with self._connection_factory() as conn, conn.cursor() as cur:
             cur.execute(
                 "UPDATE workmanship_agent_canvas_invocations SET target_dispatched_at=COALESCE("
                 "target_dispatched_at,NOW(6)),attempt_count=attempt_count+1 WHERE invocation_id=%s "
@@ -224,13 +253,14 @@ class AgentCapabilityRepository:
 
     def complete_canvas_invocation(self, claim, result):
         if isinstance(result, dict):
-            result_json = json.dumps(result, ensure_ascii=False, separators=(",", ":"))
-            status, revision, pause_token = result["status"], result["revision"], result.get("pause_token")
+            template = canvas_result_template(result)
+            result_json = json.dumps(template, ensure_ascii=False, separators=(",", ":"))
+            status, revision = result["status"], result["revision"]
         else:
-            from dataclasses import asdict
-            result_json = json.dumps(asdict(result), ensure_ascii=False, separators=(",", ":"))
-            status, revision, pause_token = result.status, result.revision, result.pause_token
-        with get_agent_conn() as conn, conn.cursor() as cur:
+            template = canvas_result_template(result)
+            result_json = json.dumps(template, ensure_ascii=False, separators=(",", ":"))
+            status, revision = result.status, result.revision
+        with self._connection_factory() as conn, conn.cursor() as cur:
             cur.execute(
                 "SELECT * FROM workmanship_agent_canvas_invocations WHERE invocation_id=%s "
                 "AND status='claimed' AND lease_token=%s FOR UPDATE",
@@ -245,21 +275,23 @@ class AgentCapabilityRepository:
                 "WHERE invocation_id=%s AND status='claimed' AND lease_token=%s",
                 (status, result_json, claim["invocation_id"], claim["lease_token"]),
             )
-            pause_hash = self._token_hash(pause_token) if pause_token else None
+            pause_hash = self._token_hash(derive_canvas_token(
+                self._secret(), str(invocation["run_id"]), "pause", int(revision),
+            )) if status == "paused" else None
             cur.execute(
                 "UPDATE workmanship_agent_canvas_runs SET status=%s,revision=%s,pause_token_hash=%s,"
                 "checkpoint_json=%s,result_json=%s WHERE run_id=%s",
                 (status, revision, pause_hash, result_json, result_json, invocation["run_id"]),
             )
             row = dict(invocation)
-            row.update(status=status, result=self._json(result_json))
+            row.update(status=status, result=template)
             self._canvas_audit(cur, row, status=status)
         return row
 
     def record_canvas_uncertainty(self, claim, result, error_code):
-        from dataclasses import asdict
-        result_json = json.dumps(asdict(result), ensure_ascii=False, separators=(",", ":"))
-        with get_agent_conn() as conn, conn.cursor() as cur:
+        template = canvas_result_template(result)
+        result_json = json.dumps(template, ensure_ascii=False, separators=(",", ":"))
+        with self._connection_factory() as conn, conn.cursor() as cur:
             cur.execute(
                 "SELECT * FROM workmanship_agent_canvas_invocations WHERE invocation_id=%s "
                 "AND status='claimed' AND lease_token=%s FOR UPDATE",
@@ -286,12 +318,12 @@ class AgentCapabilityRepository:
                 (result_json, invocation["run_id"]),
             )
             row = dict(invocation)
-            row.update(status=status, result=self._json(result_json), attempt_count=attempts)
+            row.update(status=status, result=template, attempt_count=attempts)
             self._canvas_audit(cur, row, status=status, error_code=str(error_code)[:128])
         return row
 
     def load_canvas_execution_state(self, run_token: str, actor_gid: str, team_gid: str):
-        with get_agent_conn() as conn, conn.cursor() as cur:
+        with self._connection_factory() as conn, conn.cursor() as cur:
             cur.execute(
                 "SELECT * FROM workmanship_agent_canvas_runs WHERE run_token_hash=%s "
                 "AND actor_gid=%s AND team_gid=%s",
@@ -300,10 +332,66 @@ class AgentCapabilityRepository:
             row = cur.fetchone()
         if row is None:
             return None
+        if not canvas_token_matches(run_token, self._secret(), str(row["run_id"]), "run"):
+            return None
         value = dict(row)
         value["checkpoint"] = self._json(value.pop("checkpoint_json"))
         value["result"] = self._json(value.pop("result_json"))
         return value
+
+    def load_canvas_execution_for_invocation(
+        self, invocation_id: str, actor_gid: str, team_gid: str,
+    ):
+        with self._connection_factory() as conn, conn.cursor() as cur:
+            cur.execute(
+                "SELECT r.* FROM workmanship_agent_canvas_runs r "
+                "JOIN workmanship_agent_canvas_invocations i ON i.run_id=r.run_id "
+                "WHERE i.invocation_id=%s AND i.actor_gid=%s AND i.team_gid=%s",
+                (invocation_id, actor_gid, team_gid),
+            )
+            row = cur.fetchone()
+        if row is None:
+            return None
+        value = dict(row)
+        value["checkpoint"] = self._json(value.pop("checkpoint_json"))
+        value["result"] = self._json(value.pop("result_json"))
+        return value
+
+    def record_canvas_runtime_result(
+        self, invocation_id: str, run_id: str, principal, result,
+    ) -> None:
+        template = canvas_result_template(result)
+        result_json = json.dumps(template, ensure_ascii=False, separators=(",", ":"))
+        with self._connection_factory() as conn, conn.cursor() as cur:
+            cur.execute(
+                "SELECT invocation_id FROM workmanship_agent_canvas_invocations "
+                "WHERE invocation_id=%s AND run_id=%s AND actor_gid=%s AND team_gid=%s FOR UPDATE",
+                (invocation_id, run_id, principal.actor_gid, principal.team_gid),
+            )
+            if cur.fetchone() is None:
+                raise self._canvas_not_found()
+            cur.execute(
+                "INSERT INTO workmanship_agent_canvas_runtime_results "
+                "(invocation_id,run_id,actor_gid,team_gid,status,revision,result_json) "
+                "VALUES (%s,%s,%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE "
+                "status=VALUES(status),revision=VALUES(revision),result_json=VALUES(result_json)",
+                (
+                    invocation_id, run_id, principal.actor_gid, principal.team_gid,
+                    template["status"], template["revision"], result_json,
+                ),
+            )
+
+    def load_canvas_runtime_result(
+        self, invocation_id: str, actor_gid: str, team_gid: str,
+    ) -> dict | None:
+        with self._connection_factory() as conn, conn.cursor() as cur:
+            cur.execute(
+                "SELECT result_json FROM workmanship_agent_canvas_runtime_results "
+                "WHERE invocation_id=%s AND actor_gid=%s AND team_gid=%s",
+                (invocation_id, actor_gid, team_gid),
+            )
+            row = cur.fetchone()
+        return self._json(row["result_json"]) if row else None
 
     def load_canvas_resource(
         self, kind: str, gid: str, actor_gid: str, team_gid: str,

@@ -731,6 +731,7 @@ class _CanvasCommandEngine(_CanvasQueryEngine):
 
     def __init__(
         self, *, resource_loader, execution_loader, executor_factory=None,
+        invocation_result_recorder=None, invocation_result_loader=None,
         max_concurrency: int = DEFAULT_MAX_CONCURRENCY,
     ) -> None:
         super().__init__(
@@ -738,6 +739,8 @@ class _CanvasCommandEngine(_CanvasQueryEngine):
             max_concurrency=max_concurrency,
         )
         self._execution_loader = execution_loader
+        self._invocation_result_recorder = invocation_result_recorder
+        self._invocation_result_loader = invocation_result_loader
 
     @staticmethod
     def _status(value: object) -> NodeStatus:
@@ -865,28 +868,36 @@ class _CanvasCommandEngine(_CanvasQueryEngine):
             restored[node_id] = raw
         return restored
 
-    async def start(self, request, principal, *, run_token):
+    def _record_result(self, invocation_id, run_id, principal, result):
+        if self._invocation_result_recorder is not None:
+            self._invocation_result_recorder(invocation_id, run_id, principal, result)
+
+    async def start(self, request, principal, *, run_token, run_id, invocation_id):
         async with self._semaphore:
             row = self._record("skill", request.skill_gid, principal)
             document = self._document("skill", row)
             if int(row.get("revision", document.get("revision", 1))) != request.expected_revision:
                 raise CapabilityBusinessError("version_conflict", "Agent canvas revision changed")
             init_params = self._init_params(document, {}, request.input_values)
-            executor = self._executor_factory(auth_mode="feishu", auth_token="", owner_gid=principal.actor_gid)
+            executor = self._executor_factory(
+                auth_mode="feishu", auth_token="", owner_gid=principal.actor_gid,
+                invocation_id=invocation_id,
+            )
             raw = executor.execute(document, init_params=init_params)
             if inspect.isawaitable(raw):
                 raw = await raw
-            return self._project(raw, document, row, run_token=run_token, revision=1)
+            result = self._project(raw, document, row, run_token=run_token, revision=1)
+            self._record_result(invocation_id, run_id, principal, result)
+            return result
 
-    async def resume(self, request, principal, *, run_token):
+    async def resume(self, request, principal, *, run_token, run_id, invocation_id):
         async with self._semaphore:
-            state = self._execution_loader(request.run_token, principal.actor_gid, principal.team_gid)
+            state = self._execution_loader(invocation_id, principal.actor_gid, principal.team_gid)
             checkpoint = state.get("checkpoint") if isinstance(state, Mapping) else None
             if not isinstance(state, Mapping) or not isinstance(checkpoint, Mapping):
                 raise _not_found()
             if (
-                checkpoint.get("pause_token") != request.pause_token
-                or int(checkpoint.get("revision") or 0) != request.expected_revision
+                int(checkpoint.get("revision") or 0) != request.expected_revision
                 or int(state.get("revision") or 0) not in {request.expected_revision, request.expected_revision + 1}
             ):
                 raise _not_found()
@@ -905,16 +916,42 @@ class _CanvasCommandEngine(_CanvasQueryEngine):
                     "halt_reason": "The human step was rejected.", "summary": "The flow was rejected.",
                     "node_results": restored,
                 }
-                return self._project(
+                result = self._project(
                     raw, document, row, run_token=run_token, revision=request.expected_revision + 1,
                 )
-            executor = self._executor_factory(auth_mode="feishu", auth_token="", owner_gid=principal.actor_gid)
+                self._record_result(invocation_id, run_id, principal, result)
+                return result
+            executor = self._executor_factory(
+                auth_mode="feishu", auth_token="", owner_gid=principal.actor_gid,
+                invocation_id=invocation_id,
+            )
             raw = executor.execute(document, restore_results=restored)
             if inspect.isawaitable(raw):
                 raw = await raw
-            return self._project(
+            result = self._project(
                 raw, document, row, run_token=run_token, revision=request.expected_revision + 1,
             )
+            self._record_result(invocation_id, run_id, principal, result)
+            return result
+
+    async def reconcile(self, principal, *, run_token, revision, invocation_id):
+        if self._invocation_result_loader is None:
+            return RuntimeDispatch(
+                "outcome_unknown", run_token, revision,
+                summary="The runtime outcome requires reconciliation.",
+            )
+        stored = self._invocation_result_loader(
+            invocation_id, principal.actor_gid, principal.team_gid,
+        )
+        if not isinstance(stored, Mapping):
+            return RuntimeDispatch(
+                "outcome_unknown", run_token, revision,
+                summary="The runtime outcome requires reconciliation.",
+            )
+        value = {**stored, "run_token": run_token}
+        if value.get("status") == "paused":
+            value["pause_token"] = "deferred_to_owner"
+        return _dispatch_from_worker(value)
 
 
 def _dispatch_from_worker(value: Mapping[str, Any]) -> RuntimeDispatch:
@@ -1012,20 +1049,32 @@ def _canvas_query_worker(result_connection: Any, payload_json: str) -> None:
             result = asyncio.run(engine.test_node(NodeTestRequest.from_payload(request_payload), principal))
         elif operation == "resolve_options":
             result = asyncio.run(engine.resolve_options(CanvasOptionsRequest.from_payload(request_payload), principal))
-        elif operation in {"start", "resume"}:
+        elif operation in {"start", "resume", "reconcile"}:
             command = _CanvasCommandEngine(
                 resource_loader=lambda kind, gid: repository.load_canvas_resource(
                     kind, gid, principal.actor_gid, principal.team_gid,
                 ),
-                execution_loader=repository.load_canvas_execution_state,
+                execution_loader=repository.load_canvas_execution_for_invocation,
+                invocation_result_recorder=repository.record_canvas_runtime_result,
+                invocation_result_loader=repository.load_canvas_runtime_result,
             )
-            request = (
-                CanvasStartRequest.from_payload(request_payload)
-                if operation == "start" else CanvasResumeRequest.from_payload(request_payload)
-            )
-            result = asyncio.run(getattr(command, operation)(
-                request, principal, run_token=str(payload.get("run_token") or request_payload.get("run_token") or ""),
-            ))
+            run_token = str(payload.get("run_token") or request_payload.get("run_token") or "")
+            if operation == "reconcile":
+                revision = 1 if payload.get("target_state") == "start" else int(request_payload["expected_revision"]) + 1
+                result = asyncio.run(command.reconcile(
+                    principal, run_token=run_token, revision=revision,
+                    invocation_id=str(payload.get("invocation_id") or ""),
+                ))
+            else:
+                request = (
+                    CanvasStartRequest.from_payload(request_payload)
+                    if operation == "start" else CanvasResumeRequest.from_payload(request_payload)
+                )
+                result = asyncio.run(getattr(command, operation)(
+                    request, principal, run_token=run_token,
+                    run_id=str(payload.get("run_id") or ""),
+                    invocation_id=str(payload.get("invocation_id") or ""),
+                ))
         else:
             raise _invalid("unsupported Agent canvas query operation")
         envelope = {"ok": True, "result": asdict(result)}
@@ -1074,7 +1123,8 @@ class ProductionAgentCanvasRuntime:
 
     async def _run_process(
         self, operation: str, request: Any, principal: RunPrincipal, *,
-        run_token: str | None = None, invocation_id: str | None = None,
+        run_token: str | None = None, run_id: str | None = None,
+        invocation_id: str | None = None, target_state: str | None = None,
     ) -> dict[str, Any]:
         payload_json = json.dumps({
             "operation": operation,
@@ -1082,7 +1132,9 @@ class ProductionAgentCanvasRuntime:
             "principal": asdict(principal),
             "repository_factory": self._repository_factory,
             "run_token": run_token,
+            "run_id": run_id,
             "invocation_id": invocation_id,
+            "target_state": target_state or operation,
         }, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
         context = multiprocessing.get_context("spawn")
         result_connection, worker_connection = context.Pipe(duplex=False)
@@ -1175,24 +1227,27 @@ class ProductionAgentCanvasRuntime:
     async def start(self, request: CanvasStartRequest, principal: RunPrincipal) -> RuntimeDispatch:
         return await self.execute_canvas_command(
             "start", request, principal, run_token=f"run_{secrets.token_urlsafe(32)}",
+            run_id=f"runtime_{secrets.token_urlsafe(24)}",
             invocation_id=f"invocation_{secrets.token_urlsafe(32)}",
         )
 
     async def resume(self, request: CanvasResumeRequest, principal: RunPrincipal) -> RuntimeDispatch:
         return await self.execute_canvas_command(
             "resume", request, principal, run_token=request.run_token,
+            run_id=request.run_token,
             invocation_id=f"invocation_{secrets.token_urlsafe(32)}",
         )
 
     async def execute_canvas_command(
         self, operation: str, request: CanvasStartRequest | CanvasResumeRequest,
-        principal: RunPrincipal, *, run_token: str, invocation_id: str,
+        principal: RunPrincipal, *, run_token: str, run_id: str, invocation_id: str,
     ) -> RuntimeDispatch:
         if operation not in {"start", "resume"}:
             raise _invalid("unsupported Agent canvas command operation")
         async with self._semaphore:
             result = await self._run_process(
                 operation, request, principal, run_token=run_token, invocation_id=invocation_id,
+                run_id=run_id,
             )
         try:
             return _dispatch_from_worker(result)
@@ -1201,14 +1256,17 @@ class ProductionAgentCanvasRuntime:
 
     async def reconcile_canvas_command(
         self, operation: str, request: CanvasStartRequest | CanvasResumeRequest,
-        principal: RunPrincipal, *, run_token: str, invocation_id: str,
+        principal: RunPrincipal, *, run_token: str, run_id: str, invocation_id: str,
     ) -> RuntimeDispatch:
-        del principal, invocation_id
-        revision = 1 if operation == "start" else request.expected_revision + 1
-        return RuntimeDispatch(
-            "outcome_unknown", run_token, revision,
-            summary="The runtime outcome requires reconciliation.",
-        )
+        async with self._semaphore:
+            result = await self._run_process(
+                "reconcile", request, principal, run_token=run_token, run_id=run_id,
+                invocation_id=invocation_id, target_state=operation,
+            )
+        try:
+            return _dispatch_from_worker(result)
+        except (KeyError, TypeError, ValueError) as exc:
+            raise _invalid("runtime output is invalid") from exc
 
 __all__ = [
     "AgentCanvasRuntime", "CanvasLayout", "CanvasOption", "CanvasOptionsRequest",
