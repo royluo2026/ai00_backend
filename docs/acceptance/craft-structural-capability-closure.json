@@ -8,8 +8,8 @@
     "stable_capabilities": 475,
     "validated_cases": 3325
   },
-  "catalog_hash": "sha256:d407979e8fe9737980e72058e3384b374a81dd3d8c6dfedd052f4b8ac93dee08",
-  "catalog_release": "rel_d407979e8fe9737980e72058e3384b37",
+  "catalog_hash": "sha256:05bcccdde2e100f8dba2e9e85c3dab50e7d129e839ba3a435880ab8617c709e9",
+  "catalog_release": "rel_05bcccdde2e100f8dba2e9e85c3dab50",
   "completion": {
     "async_production_paths": 1,
     "catalog_capabilities": 474,
@@ -47,7 +47,7 @@
   },
   "domain_manifest": {
     "filename": "backend/capability_v2/official_domains.json",
-    "sha256": "sha256:240b02b9716c8d0379bb12224a3c88a055ed0edee1ec285b757add8477f0f056"
+    "sha256": "sha256:691593036cb947a026ccb720ebd439f882b3fc87e0b65b63e8aac97990964d1a"
   },
   "domain_migrations": [
     {
@@ -199,12 +199,12 @@
     }
   ],
   "environment_id": "offline:PC-PC2L7VVE",
-  "generated_at": "2026-08-31T10:30:12.903914+00:00",
-  "git_commit": "840bcd6c8d1fd3c57942a65ce81e49cdc2cd5755",
+  "generated_at": "2026-08-31T11:29:59.959956+00:00",
+  "git_commit": "84f1e76a97b77c75c2f0bc29c6a1332eccdf21e3",
   "migration": {
-    "filename": "202608280006_base_historical_tenant_repair.sql",
-    "migration_id": "202608280006",
-    "sha256": "sha256:9d6dfb53e51ef89174fdd9a92ce0e175bbc47cfacb5379e9a0fc99e14ce1f30e"
+    "filename": "202608310001_craft_rule_identity_backfill.sql",
+    "migration_id": "202608310001",
+    "sha256": "sha256:531d9f9c5c656363449b6c6e8da6ac6aa56ad8590e870a5f89bfbfbd01d32836"
   },
   "mode": "offline",
   "provider_artifacts": [
@@ -221,7 +221,7 @@
       "version": "1.0.0"
     },
     {
-      "artifact_hash": "sha256:b8e1646e9101953406aadda749ec319a6339e741e30b5b5d6895ce1eada214a0",
+      "artifact_hash": "sha256:ebef086355e0584a847bfcd8f670f91e7d492af158739aa464d314d126fbb392",
       "module": "craft_backend.capabilities",
       "plugin_id": "official.craft",
       "version": "1.2.0"
@@ -257,7 +257,7 @@
       "version": "2.0.0"
     },
     {
-      "artifact_hash": "sha256:418acc6777f44d3c6c7a3718b81e54b3faa867937acd6a40b4bc57e6c0ad073b",
+      "artifact_hash": "sha256:a4a8fa9ee4ab329cd4a0cd9188b0171111e8600834d023ac5a3efcd8286fd06d",
       "module": "ontology_backend.capabilities",
       "plugin_id": "official.ontology",
       "version": "2.0.0"
@@ -275,7 +275,7 @@
       "version": "1.0.0"
     }
   ],
-  "report_id": "sha256:367e3056682ec24fca35e1dacb5545bc2010ec1198278cd892029c7ab85130dc",
+  "report_id": "sha256:91c988c75f40fc818ed92a15acbf26e80c8004d36850c0721672995af65ceee3",
   "runtime_evidence_hash": null,
   "schema_hashes": {
     "agent.audit.read@1": "sha256:45f8fda405c9189fafe9d82e74ee449a5c14c74b6fbc5a012713004538e02964",
@@ -470,7 +470,7 @@
     "craft.rule.draft.search@1": "sha256:e9f10f616bf8cd4abd963fe3d5762c30e8d66f63d06332b01ff0879e8a5f1a0b",
     "craft.rule.draft.submit@1": "sha256:e9f10f616bf8cd4abd963fe3d5762c30e8d66f63d06332b01ff0879e8a5f1a0b",
     "craft.rule.engine.evaluate@1": "sha256:0906609c967306db5ae94e0f4195b84211d9385b6265cd8d2eb9e711b6c70bbd",
-    "craft.rule.entry.evaluate@1": "sha256:c3b8e1328e7ab9f17d7f1222aedcd704920dfa84625d1015f2edd22ba0593c50",
+    "craft.rule.entry.evaluate@1": "sha256:b5a896ab0ff62413a8f4b7080c8c20ff392d6fa5ae9c4ef9ddb9830a9f085f49",
     "craft.rule.evaluate@1": "sha256:e9f10f616bf8cd4abd963fe3d5762c30e8d66f63d06332b01ff0879e8a5f1a0b",
     "craft.rule.library.change.apply@1": "sha256:5672eef335c3d3a7b8fa0f9101ad7f863ee983d75ee9cfd426a6cf0627ae60ff",
     "craft.rule.library.read@1": "sha256:bf535526e65d5d99314037f3adfe6eb5246aa8755b6ea8cd7fbbd80179182ae1",
@@ -773,9 +773,9 @@
   "schema_version": 1,
   "status": "passed",
   "test_run": {
-    "command": "C:\\Users\\luoyi8\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -m pytest backend/tests/acceptance -q -p no:cacheprovider --ignore backend/tests/acceptance/test_acceptance_runner.py --basetemp E:\\Projects\\ai00_v3\\.worktrees\\capability-v2-implementation\\.capability-acceptance-v2.tmp\\run-qikk2846\\pytest -p backend.tests.acceptance.outcome_plugin",
+    "command": "C:\\Users\\luoyi8\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -m pytest backend/tests/acceptance -q -p no:cacheprovider --ignore backend/tests/acceptance/test_acceptance_runner.py --basetemp E:\\Projects\\ai00_v3\\.worktrees\\capability-v2-implementation\\.capability-acceptance-v2.tmp\\run-7g26hg2y\\pytest -p backend.tests.acceptance.outcome_plugin",
     "exit_code": 0,
-    "summary": "3336 passed in 8.24s"
+    "summary": "3336 passed in 7.76s"
   },
   "validation_scope": "contract",
   "working_tree_clean": true
