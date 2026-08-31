@@ -1,0 +1,162 @@
+{
+  "acceptance_report_id": "sha256:e1fca15d22cad6b65c06d4868aca9a5a960d7661e2b1cb6cfb221610dbd84c59",
+  "acceptance_report_path": "docs/acceptance/agent-runtime-capability-closure.json",
+  "acceptance_report_sha256": "sha256:34ec7283af428e6fefd3297badd3b494660df1416a129b8cabe5500d718ca425",
+  "adapter_factory": "backend.tests.support.integration_catalog_factory:build",
+  "backend_source_revision": "d56c743dee03112b2a3211a4ccb659ebed9cfda5",
+  "catalog_hash": "sha256:b79f7e734da4b72dbf4af4adbf91bb3715b3ffe41e3c6252f0b2165152c211e5",
+  "catalog_release": "rel_b79f7e734da4b72dbf4af4adbf91bb37",
+  "closure_arithmetic": {
+    "baseline": {
+      "groups": 14,
+      "occurrences": 17
+    },
+    "canonical_remainder": {
+      "groups": 0,
+      "occurrences": 0
+    },
+    "closed": {
+      "groups": 14,
+      "occurrences": 17
+    }
+  },
+  "code_commit": "3bfbd3f6498364a248b6253e0362c3a087c6a1f4",
+  "controlled_agent_mysql_oceanbase_gate": {
+    "mandatory_probe_result": "4 errors",
+    "reason": "AI00_AGENT_TEST_DB_URL and a dedicated DDL+DML test database are unavailable on this host",
+    "scheduled": "tomorrow runtime acceptance",
+    "status": "pending"
+  },
+  "deployable_surface_report_path": ".superpowers/sdd/2026-08-31-agent-runtime-capability-closure/task-5-deployable-surface-report.json",
+  "deployable_surface_report_sha256": "sha256:b08457954e6ee66071db84e3d4024776eb2d2c50dd2760a34b1925f49675b7d3",
+  "dispositions": [
+    {
+      "candidate_capability": null,
+      "final_disposition": "removed_dead_entry",
+      "method": "DELETE",
+      "normalized_route": "/api/craft_lib/equipments/{dynamic}",
+      "occurrences": 1
+    },
+    {
+      "candidate_capability": null,
+      "final_disposition": "removed_dead_entry",
+      "method": "DELETE",
+      "normalized_route": "/api/craft_lib/fixtures/{dynamic}",
+      "occurrences": 1
+    },
+    {
+      "candidate_capability": "craft.bop.version.archive@1",
+      "final_disposition": "migrated",
+      "method": "DELETE",
+      "normalized_route": "/api/lists/{dynamic}",
+      "occurrences": 1
+    },
+    {
+      "candidate_capability": "craft.bop.version.list@1",
+      "final_disposition": "migrated",
+      "method": "GET",
+      "normalized_route": "/api/lists",
+      "occurrences": 1
+    },
+    {
+      "candidate_capability": "craft.rule.entry.evaluate@1",
+      "final_disposition": "migrated",
+      "method": "GET",
+      "normalized_route": "/api/rule-engine/check-entry",
+      "occurrences": 2
+    },
+    {
+      "candidate_capability": "project.approval.order.reject@1",
+      "final_disposition": "migrated",
+      "method": "POST",
+      "normalized_route": "/api/approval/orders/{dynamic}/reject",
+      "occurrences": 1
+    },
+    {
+      "candidate_capability": "agent.workflow.node.test.execute@1",
+      "final_disposition": "migrated",
+      "method": "POST",
+      "normalized_route": "/api/flows/test-node",
+      "occurrences": 2
+    },
+    {
+      "candidate_capability": null,
+      "final_disposition": "removed_dead_entry",
+      "method": "POST",
+      "normalized_route": "/api/rules/{dynamic}/activate",
+      "occurrences": 1
+    },
+    {
+      "candidate_capability": null,
+      "final_disposition": "removed_dead_entry",
+      "method": "POST",
+      "normalized_route": "/api/rules/{dynamic}/deviations",
+      "occurrences": 1
+    },
+    {
+      "candidate_capability": null,
+      "final_disposition": "removed_dead_entry",
+      "method": "POST",
+      "normalized_route": "/api/rules/{dynamic}/suspend",
+      "occurrences": 1
+    },
+    {
+      "candidate_capability": "agent.canvas.options.resolve@1",
+      "final_disposition": "migrated",
+      "method": "POST",
+      "normalized_route": "/api/skills/canvas-options",
+      "occurrences": 1
+    },
+    {
+      "candidate_capability": "agent.canvas.execution.start@1",
+      "final_disposition": "migrated",
+      "method": "POST",
+      "normalized_route": "/api/skills/execute-canvas",
+      "occurrences": 1
+    },
+    {
+      "candidate_capability": "agent.canvas.execution.resume@1",
+      "final_disposition": "migrated",
+      "method": "POST",
+      "normalized_route": "/api/skills/resume-canvas",
+      "occurrences": 1
+    },
+    {
+      "candidate_capability": "craft.rule.definition.change.apply@1",
+      "final_disposition": "migrated",
+      "method": "PUT",
+      "normalized_route": "/api/rules/{dynamic}",
+      "occurrences": 2
+    }
+  ],
+  "factory_sha256": "sha256:67009b68b2ca32693174cb017317904a76ae6a76ccb851d8a7a651f547b41882",
+  "frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
+  "frontend_tree": "3c3156841af0d4bf2833dba8184b071265993965",
+  "normalization_excluded_paths": [
+    "generated_at",
+    "environment_id",
+    "report_id",
+    "working_tree_clean",
+    "test_run.command",
+    "test_run.summary"
+  ],
+  "normalized_report_path": "docs/acceptance/agent-runtime-capability-closure.normalized.json",
+  "normalized_report_sha256": "sha256:1f2a9992ae121c4b3390b34b875240975e93fa2950b27c9126eb84f4ce43f56e",
+  "normalized_semantic_sha256": "sha256:1f2a9992ae121c4b3390b34b875240975e93fa2950b27c9126eb84f4ce43f56e",
+  "provider_manifest_sha256": "sha256:ba5483b5bfb0713e95556ae7360abdd95a33df86035e3cc871b8e4891b285ff2",
+  "retained_advisory": "coverage_invariant:stable_functions:922!=920",
+  "schema_version": "1.0.0",
+  "structural_content_sha256": "sha256:3e4daf840b1ab4e98786f602e8a9271ec38deb9a6c32db5639ac97a69fdc1cc8",
+  "structural_counts": {
+    "groups": 14,
+    "migrated_groups": 9,
+    "migrated_occurrences": 12,
+    "occurrences": 17,
+    "removed_dead_entry_groups": 5,
+    "removed_dead_entry_occurrences": 5,
+    "unresolved_groups": 0,
+    "unresolved_occurrences": 0
+  },
+  "structural_manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
+  "structural_manifest_sha256": "sha256:09c31126cfc0ae0619892548db1b5fd81bdb7fb37a08f93716adf3c4f274d3dc"
+}

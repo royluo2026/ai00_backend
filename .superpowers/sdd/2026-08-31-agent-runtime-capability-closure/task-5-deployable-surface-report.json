@@ -1,0 +1,1122 @@
+{
+  "schema_version": 2,
+  "scan_mode": "commit",
+  "frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
+  "roots": [
+    "dist-production/packages",
+    "dist-production/web",
+    "packages/core/electron"
+  ],
+  "extensions": [
+    ".cjs",
+    ".html",
+    ".js",
+    ".mjs"
+  ],
+  "exclusions": [],
+  "root_file_counts": {
+    "dist-production/packages": 69,
+    "dist-production/web": 140,
+    "packages/core/electron": 10
+  },
+  "scanned_files": 219,
+  "files": [
+    {
+      "path": "dist-production/packages/agent-plugin/web/ai_chat/index.html",
+      "blob_oid": "3c760e8483b034c0a2e4388f65cfe99d3d8928c7",
+      "sha256": "4133fa6354877c20cb48ed5febeb12ac693ed1b2742f598efcb975009166f1d0"
+    },
+    {
+      "path": "dist-production/packages/agent-plugin/web/automation_hub/ai_assistant.js",
+      "blob_oid": "855829112e6e89b29e72aa2fe1bf85b365022fac",
+      "sha256": "26841b431b38ecacf5e967f6d5c4bffb1d60bf8c46898b3173c30fb9b103cfa0"
+    },
+    {
+      "path": "dist-production/packages/agent-plugin/web/automation_hub/ai_settings.html",
+      "blob_oid": "ac042dd312382dec12fc468d5ee2b3e569f4b4c1",
+      "sha256": "e7337d9a5f4a4231b51adfe5748b0bcb38fd53921ceac4512d91acc6abb78961"
+    },
+    {
+      "path": "dist-production/packages/agent-plugin/web/automation_hub/index.html",
+      "blob_oid": "5249ec3dc75b45c6da98edc6bd16d65677be53e0",
+      "sha256": "dd746c91fefc3806ceed427bca83b8bd8794c6b72d28d4ddfbc479fee9ab7333"
+    },
+    {
+      "path": "dist-production/packages/agent-plugin/web/automation_hub/skill_lib.html",
+      "blob_oid": "e3811a94deb8e51defa74d98dc16455da31c91ad",
+      "sha256": "f75a1061f24cb9edea1963ed3c53d5868ba1a0f126bd84ad8785b6225d948577"
+    },
+    {
+      "path": "dist-production/packages/agent-plugin/web/automation_hub/skill_lib.js",
+      "blob_oid": "d98dfd2ac3d54c50e7f9082457f07ffa3a84f202",
+      "sha256": "9081ab754d34fcf247f3a67f565582940abb153d266ad0a1fb205c8d14046f6a"
+    },
+    {
+      "path": "dist-production/packages/agent-plugin/web/automation_hub/workflow_canvas.js",
+      "blob_oid": "472d5c32ec566aa39e9115d60c4520fc9f654ace",
+      "sha256": "af03b91f1ffb4e2443fb9292db142dd1c2dd329e84abc22c367a8893e44cbcf9"
+    },
+    {
+      "path": "dist-production/packages/agent-plugin/web/flow_canvas/flow_editor.js",
+      "blob_oid": "36c962e917d66d1347d1f890b2aaaabf2162a09d",
+      "sha256": "dc850c9f699b69e6ac6ccb16738d996466d66360b423b7db1a1efae98c243523"
+    },
+    {
+      "path": "dist-production/packages/agent-plugin/web/flow_canvas/index.html",
+      "blob_oid": "c072d534dd3c935bd49beb9d8d9edd93f7f16350",
+      "sha256": "e64338f812ee5df4f7ba864163d8749f9daab64d8fd7ddfdb298d3eefbcef760"
+    },
+    {
+      "path": "dist-production/packages/agent-plugin/web/wfc_window/avatar_preview.html",
+      "blob_oid": "bd050766a18d1e151942714d7f08dbf287a3b3ec",
+      "sha256": "2ec0f406ade6f9ef33f43f233487ad971b0bafeb9db2d0bd68e3144df2a0940c"
+    },
+    {
+      "path": "dist-production/packages/agent-plugin/web/wfc_window/index.html",
+      "blob_oid": "4e0e070954d2f5734a34aa746d83385adaaa7d0a",
+      "sha256": "2767744aa166b4593ced171a878f6d7083a6ae36834bb2bd5fcd47ac810cb183"
+    },
+    {
+      "path": "dist-production/packages/agent-plugin/web/wfc_window/wfc_window.js",
+      "blob_oid": "bdb262d6a60498e73f1add1854a7f518e3511948",
+      "sha256": "4d41000623917e5a32bc72002cc991aab7a194b084229068dbff559dfa2560dc"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/approval/approval.js",
+      "blob_oid": "67019bf6dec52d8be278b8dda44e76299269d870",
+      "sha256": "d2975a2db6081d2c1bc40dc4d9ffc750463c6ce002a8a2820b4517af52a669f1"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/approval/approval_config.html",
+      "blob_oid": "7455d36a4fd995364095192cbe2cc0ea658beded",
+      "sha256": "e733b6acd5a024d13b2cd90e2855711cb5ed9f8fea50240fe92a1b63955ba9ef"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/approval/approval_view.html",
+      "blob_oid": "5c352ede0a1c1c049e2dd958eee98cbddac8658c",
+      "sha256": "4bee1603bb73f720ef70334d2534d829aef2b00dbb2c4280ba0730dcb0688dd1"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/auto_canvas/index.html",
+      "blob_oid": "9d334cdefa50e66cb9e79666ce50863083b7fc33",
+      "sha256": "1b6b12a1bec955af3a8dbea8e585c7fcd1527441667dcb8f1d760801a1c5af17"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/auto_canvas/types/auto_canvas_type.js",
+      "blob_oid": "ba931beb18911255312af13a4eecc3a07a91ce94",
+      "sha256": "8ac4050023f51a4daa422a8a32654836a149896a3353c690ff8d9953cc883b18"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/bop/bop.html",
+      "blob_oid": "27f73037d636aa7e357a1552450cdd0514c03f2d",
+      "sha256": "9ee7be12f48ab2159c95f7897408d643d361d47a7f7836328cab60127fe117c0"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/bop/bop.js",
+      "blob_oid": "313b6f9c06920a8d905099e40f2754be71a5dba8",
+      "sha256": "c892c36448e023142b70daac71bfaa8e14820a3c88c28a86648e04c6d9fac5de"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/bop_nav/bop_nav.js",
+      "blob_oid": "c67497aafe94d17a2373b124150f9e43cd5466a5",
+      "sha256": "490454fa3018509cfea94c55c3020c70407269f8d43e018e376bb95033d35c97"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/bop_nav/index.html",
+      "blob_oid": "bf05dc4a84d7ec978bfec71be7da4c573423d524",
+      "sha256": "b8b9c6d4dd2d011ed2b225d8bac5811c7956298548f27e1fe64177138da7806d"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/craft_deliverables/index.html",
+      "blob_oid": "f5a5ada68129906cabad4f159a127247ee44c797",
+      "sha256": "dcc65b318fe290ed584e80b403f1dbfebaf29e2c5a8abcd30913d0f85a5e9b32"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/craft_element_lib/craft_element_lib.html",
+      "blob_oid": "d75a09a80fe159fbe1be74bfb137abd71f1a158e",
+      "sha256": "133818b42fbeb2a8644f050a2821abe07f34297cc5c2dc8452d89995f330b184"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/craft_element_lib/craft_element_lib.js",
+      "blob_oid": "ad6e5db6734876f763a23865c277d4b5d0279c8e",
+      "sha256": "fd9b2555940d8811877f04a18333d67134d2d2f86d2c25505fa5b336351e22f6"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/craft_hub/index.html",
+      "blob_oid": "de003dfaeae8c8e968421b71d759ed402dc8ce9d",
+      "sha256": "aecff4d5318c83065df22638d04103627e4f31a69f1c12a93afa4381bc0a45a2"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/craft_table/index.html",
+      "blob_oid": "f5524eb4af995bacc242db00ccc9bdae2502d730",
+      "sha256": "b0c971b54fc7d8d07451b2fc32800095cf7baa5215ab0dfa455e7ee5eb7dd8b2"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/craft_table/table.js",
+      "blob_oid": "66646407e7f93a31f18245bce6772a0feb7382d3",
+      "sha256": "7deaf38ccf3e50bd96abce7065e0029ac898d18377c5e6b3c5f4c8ca89874fcc"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/data_hub/index.html",
+      "blob_oid": "e0d7a1aa8e631c045eac517087305172ca7f7e4c",
+      "sha256": "3e5d922c07c41bb40ac4fbeef1cd325a040f6ba9fbef1cd5e98e616c486781a3"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/ebom/ebom.html",
+      "blob_oid": "42037e4895d6c61f721831d2d296de4c29773573",
+      "sha256": "a9a040c2ba98048a1088612f09061fd4469e15442f1e7dbd7dbe752bd4f24443"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/ebom/ebom.js",
+      "blob_oid": "5e6cc1a853f604ec2278a6fa37d37400e649c789",
+      "sha256": "21fd36b6adc3cd3234ab3cec06e1ca92e74e051db3ca231dd2d5256bbd289704"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/factory_resource/factory_resource.html",
+      "blob_oid": "156fbc973a7a25fd325f7997be94aedb253df980",
+      "sha256": "bcece5317e702be7f60f84b36fb39b76008bbc0941180a4104276d9c41d85cad"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/factory_resource/factory_resource.js",
+      "blob_oid": "ca23b2218fdb4eb1d330b3c07dd3d1f499291c7f",
+      "sha256": "e6aff37cabd83a3e4f700a643409d8ff2422d4de01a345a39b053f1c7b1c9cad"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/gbop/gbop.js",
+      "blob_oid": "58e06ae17f0c81a15d57dde3456eea6b5b7e80f4",
+      "sha256": "374f35ae76a40858cbff3c8987707eda95d3ac241698336cbd200b08131da605"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/gbop/index.html",
+      "blob_oid": "e992c0386204b0cecd4baddd2e076513715546a7",
+      "sha256": "f719eb83cf034c91dbad08ccc06bb3f33beb56dd45c8d0add7ed391ab4e36a8d"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/gbop_lineage/index.html",
+      "blob_oid": "82d7b0af8ce83b9eb4ca5d03756c88b444d05696",
+      "sha256": "59ca48d15f86f81e7e8220e08b2e7257b95a320b7e95c1ad7e5b7d6d46ef45d7"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/gbop_lineage/layout_mode.js",
+      "blob_oid": "34c3426f66788fce8ef5782678be5b690f93ee3f",
+      "sha256": "ef78891b2a10e4efd243c921712e77e58d51fcf0211e39394ee6f2dcbc154428"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/gbop_lineage/lineage.js",
+      "blob_oid": "7aa218979ebcec64d277e2570870c01c4b4fd014",
+      "sha256": "0de8895b6910d0c325f28f7457f3ae6d1f2ce4aa442c51877b31f049b45c6318"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/issue/index.html",
+      "blob_oid": "c1b865ee5283e448b78140fae923135fdb342f27",
+      "sha256": "3dab4abf736c11834f837b9b16e387f13cb76986bc1bc31f0c7a76a8a71436c9"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/issue/issue.js",
+      "blob_oid": "09acfcc932fc3ad1b2a5573c0621318a75eb64a2",
+      "sha256": "38fa9bce0fb028772cb274fe364ef98d11047bab13f58e294fa9d99521096ee1"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/lineage_view/assoc_panel.js",
+      "blob_oid": "b8e71ff68bde421920eba4baa032b15c9ac05e1e",
+      "sha256": "7a61502ee0db64bba92bfad3bf5abad6067a733ecc47ef0af0979dcd9853c299"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/lineage_view/index.html",
+      "blob_oid": "894c30e7b8fc4b444d9854fddf89bf44f84ead57",
+      "sha256": "81faf9ca252fefa7934811041ac86e68ddc11723c21311a9017b08bc5bfbd054"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+      "blob_oid": "790fa9303109bd4c914f043ea63e3d06a306ec91",
+      "sha256": "6570053ab9d2fdfd9cbcfcf5385c5d5705e4068ad76f2fc7c0bd3ada4792b92e"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/lineage_view/layout_mode.js",
+      "blob_oid": "dc059ee8bb7e1e0c28f01c331c994b2710f98211",
+      "sha256": "d741e57f4051cab9871415cd0131ffb232d48d7ca93b087bb4e76ed32ff10810"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/lineage_view/lifecycle_panel.js",
+      "blob_oid": "d13c5f9318a3f72a76507c547981607eb6ce9c57",
+      "sha256": "087b5ef2ce762f0b435485eb98f6d1e76e9e32b0bb7770e3d436abf5b75ecaca"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/lineage_view/lineage.js",
+      "blob_oid": "9800ef6b3b3d6d65084303be29adc692b5353f7f",
+      "sha256": "8307da58c257c93d0c31b2ee2d124cd6b12fd532d30d018dae4301db0d65dcd2"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/lineage_view/lineage.test.js",
+      "blob_oid": "1cb5c9dbf1cbd58d24c3c73825298db1f516983b",
+      "sha256": "a8ea162cb9b9f1c24b8edc2ba2cef6b1613359e2f6f3d4c82e63f9c800577e90"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/lineage_view/lineage_load_coordinator.js",
+      "blob_oid": "0f867206c586718c294b189d1da6bba4ab68296e",
+      "sha256": "a778e0980ea7dc070198c2cc2808a6234a51927ce8bea5cc40823d69c2377604"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/lineage_view/lineage_load_coordinator.test.js",
+      "blob_oid": "a44eac9689c1119d9dbd1ba89f5b74d365ae1493",
+      "sha256": "e33ae2cdb0cbf9a26835c591aa6a1212abffb91a0bb8a1ca0e3a969ed33bd693"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/lineage_view/lineage_progressive_loader.js",
+      "blob_oid": "3387efeac6d0087b5855d4e1055b5755f6ed3c4b",
+      "sha256": "2f1b74c3fc1617d44188d7733339125742a43d75aa777a30829e5adb54c3aba6"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/lineage_view/lineage_progressive_loading.test.js",
+      "blob_oid": "bb2551b64535a1118e0a9795abbbd5effbe13722",
+      "sha256": "70a7f973513e46fcbeef6a1656477454f132a57cbe6bdb92c9e0c96869b061bd"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/lineage_view/lineage_projection_store.js",
+      "blob_oid": "039f689e226107f0a449aeb43ed2ead7864aa6d8",
+      "sha256": "5ab7f7f84c79465ed019ca53f4e98becad687eb4ff196f6f597884b7da928eac"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/lineage_view/lineage_projection_store.test.js",
+      "blob_oid": "57a4d881531991161e02b47dc576f95199892e41",
+      "sha256": "6991ae0ca33c00b1b3a3fd9a2940d3c2df62c27edbaf7889f703279d7ea8f673"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/lineage_view/lineage_version_mgr.js",
+      "blob_oid": "44287e71114734c601d13427eaa2155b94160dda",
+      "sha256": "a53f3a9792c7866f8683da2d624b63c328b014cbe5d06c432d26999c37e645cb"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/lineage_view/staging_panel.js",
+      "blob_oid": "a6371ca7b9822872679fcd026c41be91a55fb95a",
+      "sha256": "3e9e419a70c27ee6c9168e88a2e7457e0d3f55c6a9b7e451b44056844c7ced9f"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/pbom_check/index.html",
+      "blob_oid": "80b4797878ba9b484d61f7456a4088385b988e24",
+      "sha256": "63ce6f2f469aa56e3b3e1770bb0399bb4eb9b59ffa53c07430548ecad81a29f7"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/pbom_check/pbom_check.js",
+      "blob_oid": "71ea157ba405002f7339477fd0e15edbff6ad961",
+      "sha256": "9efe33be4676e2eaf1fda9e897c083a3b603e7ce35c5b66a1f2cbc60c4bb8fdc"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/project/project.html",
+      "blob_oid": "74573ba343ba53002cddd303fddef736a096fe87",
+      "sha256": "ca39f0957f48af90deaeaab1df10db65b2b2d4e70c37a90409e462b84037b32d"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/project/project.js",
+      "blob_oid": "0afe2734a8b398be991335e7c86f38bedec0776a",
+      "sha256": "97c409486922325e9fbef88e38531ac6912a9413c945ae79222fc471ef57e47c"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/project_hub/index.html",
+      "blob_oid": "311d1a1c37d0b152863f77f09d9c0362b97d15ef",
+      "sha256": "87a85d2927d284276e7883f575fff3c1c85ce7195af48487e64c017b769fbcec"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/project_hub/kanban.html",
+      "blob_oid": "639986744388f62a18d2061b712f868cb2902aeb",
+      "sha256": "a0f262e51e779f5e7ffd33489beba13938102eaebec0690862485570b24b1725"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/std_op_lib/std_op_lib.html",
+      "blob_oid": "bbcb6aff865a087c4a9c7c43a65c1c4856ff1f0c",
+      "sha256": "f1dacf3d6c2a7bb3bbd724464fa2fc0e1b6171298475d3ac6641a677afb377b3"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/std_op_lib/std_op_lib.js",
+      "blob_oid": "97e30bdb98c07e9991886b465750530b72bbbbb3",
+      "sha256": "f18e575ac131bfc006c2adfc79694e5115979b0bfd4f4993468c05d09bb0b99b"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/task/index.html",
+      "blob_oid": "1c2eb841869f6e7110d1800bec0aef9db98f25be",
+      "sha256": "6a8f648609dd0ab640103498c3cc07e09d23d99563947899576d9afdcf15b498"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/task/task.js",
+      "blob_oid": "b2227dba678036ab6874c146b1995b6dba24539d",
+      "sha256": "81d55a9251852d9d8e5a82e2696943f90a265a6d6008312b420296e7759585e8"
+    },
+    {
+      "path": "dist-production/packages/craft-plugin/web/template_hub/index.html",
+      "blob_oid": "b58247b7339f86b0ac0914307fd42a2d269260ec",
+      "sha256": "a53f92352405acb86385053f50d18e2e0a23750474b428713f49db493632c404"
+    },
+    {
+      "path": "dist-production/packages/sim-plugin/web/cad_sim/cad_sim.js",
+      "blob_oid": "10fc9821840a1d732cf759e5bdef16e5d3e32b65",
+      "sha256": "31627df5c29c3e285cff5a55921de5799c2d8152ced6a3b038183863636d976e"
+    },
+    {
+      "path": "dist-production/packages/sim-plugin/web/cad_sim/index.html",
+      "blob_oid": "500d8d74446d995a0b2cd24e4410b950be7e875d",
+      "sha256": "45a52caecca291348b9c27a31689ca33e081d5a204911a2a79df26d00b7aae3c"
+    },
+    {
+      "path": "dist-production/packages/sim-plugin/web/cad_sim/structure_tree.js",
+      "blob_oid": "5c8b19f841baab1f0a08e76d8dfff89e062b534a",
+      "sha256": "762e2e7e599b8c0e8f32ed54da72c4046c6d9339402f1d25f7bf95e002ca7cba"
+    },
+    {
+      "path": "dist-production/packages/sim-plugin/web/cad_sim/viewer3d.js",
+      "blob_oid": "37175406c8e51bdd13959f1b0b859d95b666da71",
+      "sha256": "887a76d67c0966efdb7d9587b1fcf8ecd7c9660630ab1a1ed07c6422db85697d"
+    },
+    {
+      "path": "dist-production/web/about/index.html",
+      "blob_oid": "34c63ed69bf929be53e1d5189545e8b22e1938b3",
+      "sha256": "85582b1ff92954474649f7ada32d61f03a17d4b869ea4b88c7274bc7881d23a5"
+    },
+    {
+      "path": "dist-production/web/admin/ai_audit.html",
+      "blob_oid": "22f52e7ccba06f4f54d99cc4dc490b7cf2609280",
+      "sha256": "32ebefa00bb515cfafdf72a9036244b517baf50017d5242e914107bbc23a8429"
+    },
+    {
+      "path": "dist-production/web/admin/bug_tracker.html",
+      "blob_oid": "09bbce49a58b8508fcfb8db4af3b1f56b7dfe901",
+      "sha256": "6b63dbbc64f35b43411de3fb99f33675a288f8d224e1a1e43272f54ca4e7d4f0"
+    },
+    {
+      "path": "dist-production/web/admin/capabilities.html",
+      "blob_oid": "d201dcfddb46ab340453fa210a7062ce76cac67c",
+      "sha256": "a6db36f2a7f2c48b633e59de307f377c7a35178b1ceff25f2eb775d179e778de"
+    },
+    {
+      "path": "dist-production/web/admin/feature_flags.html",
+      "blob_oid": "8507dcdb0889870f9b0284c35893ca6c4c240538",
+      "sha256": "e04e7d3b0b7888509f8e22f74cc5967f2295c16cb50388dab49c437e1c26bb07"
+    },
+    {
+      "path": "dist-production/web/admin/lists_registry.html",
+      "blob_oid": "fccaec6114e347840ccaec96eb6fe4f5d7a757f1",
+      "sha256": "5e74ebe5197e05276bbc55ba8d2dba099eeec74f0a7c920d443cf88059dee969"
+    },
+    {
+      "path": "dist-production/web/admin/task_planning.html",
+      "blob_oid": "60e34bbbae2b1a348d3fa009702cebd49beaa883",
+      "sha256": "02a0043e888e94172997f380ea5442d93ee7cc6d2efb8dcde44e183335cc587e"
+    },
+    {
+      "path": "dist-production/web/admin_hub/index.html",
+      "blob_oid": "558bca39b924dd30b3855c9ddb4b1a170f6e0963",
+      "sha256": "c1043e0ac13358653dfa989ae0fab98b6a87b05433f2016e05e63de6e222fb40"
+    },
+    {
+      "path": "dist-production/web/assets/lib/drawflow.min.js",
+      "blob_oid": "012df79f1e06f0a75d720232b293d193f3a14a89",
+      "sha256": "b2f63a87ecdcceb9294ff287d2b29b1029aa263d4ed795785766c2894ef55c81"
+    },
+    {
+      "path": "dist-production/web/assets/lib/marked.min.js",
+      "blob_oid": "b4e0d73b2bdc93af14ec56ed661ecff3c9f78a2f",
+      "sha256": "3e7e7d7feb3e5d58cb6c804f68ab5c24cc7e5eb6270fd6e5cbb9124739217d0c"
+    },
+    {
+      "path": "dist-production/web/assets/lib/occt/o3dv.min.js",
+      "blob_oid": "71f769a70302c0567dfee757c30acb2fdc6011c9",
+      "sha256": "3b3bf3ad87a6bb697c001db40c0640674849b20e27c7e58abf29a64691c00b08"
+    },
+    {
+      "path": "dist-production/web/assets/lib/occt/occt-import-js-worker.js",
+      "blob_oid": "af06c3aca8e15e4afb04013e603993bef9bdf71e",
+      "sha256": "9a95f2d1aeed5a94a4ae90dadac043ad3c4d5b3162dd36356b06c0fcf746048a"
+    },
+    {
+      "path": "dist-production/web/assets/lib/occt/occt-import-js.js",
+      "blob_oid": "abec0c5eb45cc53e2bcb5a193dcab90f387de7bd",
+      "sha256": "8b090be386bc8ffba32222aa19f38742ae8ed35707819beb7f8ab4938a28c97a"
+    },
+    {
+      "path": "dist-production/web/assets/lib/three/OrbitControls.js",
+      "blob_oid": "504a1e8436a66b1b7fb0c1346dc6648092e322df",
+      "sha256": "c82ab5badf4f657c7f479f15be54c5b1d6b416d85fdeec585576614db94f17d4"
+    },
+    {
+      "path": "dist-production/web/assets/lib/three/STLLoader.js",
+      "blob_oid": "5c50fc2db0065b928e3aaa7e74d9414fdc5c2c18",
+      "sha256": "c392b93d1331e64082cbd76deb850fe5de11385472a3f4c5b7fe82ba216cb49e"
+    },
+    {
+      "path": "dist-production/web/assets/lib/three/three.min.js",
+      "blob_oid": "63e198b902bcf2cb2fd8662236bca7e318671e88",
+      "sha256": "74782bdbcf6518f7745ed77035968fcae95ed4ab5c9a0f90cf646a69c20785ec"
+    },
+    {
+      "path": "dist-production/web/assets/lib/tiptap/tiptap-bundle.umd.js",
+      "blob_oid": "7f63a1f5eef3fc940420a03f7ae99433c22e31cc",
+      "sha256": "8fa064f3be76406ae7f0e511d589131190e891bb7a61dada30bdd6a20649c9fb"
+    },
+    {
+      "path": "dist-production/web/assets/lib/xlsx.full.min.js",
+      "blob_oid": "21471af69ef0e4cda1613c2702c54101b92f48d2",
+      "sha256": "cc015130aa8521e7f088f88898eba949ccdcbfb38df0bd129b44b7273c3a6f41"
+    },
+    {
+      "path": "dist-production/web/canvas/canvas_connection.js",
+      "blob_oid": "e07f451f5b2077ecb85f4a3de684ab06bca18cb8",
+      "sha256": "a64e45ae892e24bd34af51730523d9256adc77fcc5917e66defea33145592b01"
+    },
+    {
+      "path": "dist-production/web/canvas/canvas_layers.js",
+      "blob_oid": "bd5f4c8ca81d0711e5f8963874620a0c6864b97a",
+      "sha256": "549e97bb80e83c9cb83dfcd99f61ca2bf75fd86487715e5c6157b100dd779739"
+    },
+    {
+      "path": "dist-production/web/canvas/canvas_search.js",
+      "blob_oid": "42298794ffdc4cf0dd97b16da093cebec3e06cf0",
+      "sha256": "7572e7467963108b0e90da47b8deffb15fa9adae55ce845dbd7d605373d7100b"
+    },
+    {
+      "path": "dist-production/web/canvas/canvas_shell.html",
+      "blob_oid": "ac9d5b56812dd52e677e2dc4182d3370c1555e54",
+      "sha256": "6263ea607323c0539314af3e886ef8855ba1cefd52fd13dfa5edaf61b513438e"
+    },
+    {
+      "path": "dist-production/web/canvas/canvas_shell.js",
+      "blob_oid": "650fbb3ea7f0668b46b3d0fb6722efeb3069d272",
+      "sha256": "ca1f37726bb76e8901fbeb05f07f2f55ebf11f75fe60bac8991078a64dec602f"
+    },
+    {
+      "path": "dist-production/web/canvas/canvas_template.js",
+      "blob_oid": "9b3b12288fe1030987dd0f025709f2e795c1c5b2",
+      "sha256": "af6bb4a84dffdca3e801db14b00851f97bb36e3132cda50bd4ce6e82d903f487"
+    },
+    {
+      "path": "dist-production/web/canvas/collab_ui.html",
+      "blob_oid": "dc7f867f41cd5b1b490f4af11a63f955bbc3881c",
+      "sha256": "e1d71cc16bd3943a73c3744e673312067fffba174461b0ba58c724f193903607"
+    },
+    {
+      "path": "dist-production/web/canvas/collab_ui.js",
+      "blob_oid": "aae2370ffe55b524caf2541d037d3686a1bcb243",
+      "sha256": "4a702ff87a12412d09bffba69883961f55aacc4bd40e8052e58cbabee92ff85a"
+    },
+    {
+      "path": "dist-production/web/canvas/types/flow_type.js",
+      "blob_oid": "16f80b53fa4db1090a5218f32b93a206d49d58fa",
+      "sha256": "800c3f9368b18fdbe342656dc44489c69d23770741e04f7cc1b01e37302c814e"
+    },
+    {
+      "path": "dist-production/web/common.js",
+      "blob_oid": "801dd76ea477caa76dd546255bf085ee1fe73947",
+      "sha256": "b43023ff9d5a5b75ae252c71d979a6114c261ac435758c72bb391a62c74261d8"
+    },
+    {
+      "path": "dist-production/web/components/app-ui.js",
+      "blob_oid": "b831f54b191c4ba7279a963db2a0298012920e23",
+      "sha256": "e9c7eac5c01d9097181cd03e3037ddaf7e07f8e12658c9f6dbd2c293bf123dcb"
+    },
+    {
+      "path": "dist-production/web/components/attachments_widget.js",
+      "blob_oid": "cb61c0ac0d4651e7ee8aac8fa22955bb2719e4a2",
+      "sha256": "19d19b64bbe58007f3355d78e2dcb1af142d1a46a819b9ff351a6994f5251733"
+    },
+    {
+      "path": "dist-production/web/components/bitable_sync_manager.js",
+      "blob_oid": "3c2cc14feea73beab9caf8f3abaf3c8691152715",
+      "sha256": "e310fd820fe2ff8dd996530062d79b91ff9496e312420a82ef877a00b4dd7e98"
+    },
+    {
+      "path": "dist-production/web/components/card_frame.js",
+      "blob_oid": "64901239e1bb9cdc9d64e36b64b26e34ecfbbcdf",
+      "sha256": "be020098c97c206142161c3074c080e5fe16d57eda5e1c2a1fd41da90c51f30c"
+    },
+    {
+      "path": "dist-production/web/components/data_registry.js",
+      "blob_oid": "3909fe5f07e3e3e99aa5c952fd63ab844db5a6d6",
+      "sha256": "e4ef50a3fd86ad5421f6fa1df37d0e85218806eae613bb890bb2cd1575964684"
+    },
+    {
+      "path": "dist-production/web/components/demo.html",
+      "blob_oid": "09315fb123cf6257d8700f8e9a0cc27d625e9b94",
+      "sha256": "f260ae5c70d7d643b021a76d994d8923f98af3a409754bd801bd4822ef8463bc"
+    },
+    {
+      "path": "dist-production/web/components/diff_manager.js",
+      "blob_oid": "799f855d51d177307d943406b60ac961fd43d4d9",
+      "sha256": "7e2c45bda1fe2db2ef309cc8a09e21537348bf08ccd4ea9307e189ee65a02649"
+    },
+    {
+      "path": "dist-production/web/components/diff_nav_tree.js",
+      "blob_oid": "b3f392b46468a401e38ed02abc2d33f095414e0d",
+      "sha256": "9e9a3880a3fb020a1dec3d0f1701605bd532ce0bf4ea9c320aa677177619c378"
+    },
+    {
+      "path": "dist-production/web/components/draw_primitives.js",
+      "blob_oid": "e0e2e6aef1e90eebe80622714c2385f4516b9eb0",
+      "sha256": "50a95f9467e0e061f935a4f7801860ad870791428eee2baa02a13a12bc8f97dd"
+    },
+    {
+      "path": "dist-production/web/components/entry_thread.js",
+      "blob_oid": "4c9130bd5e75b0f4b7c4d7961c9c94d8a6c9355e",
+      "sha256": "309d6870176bcf9117603df12444f2744687010972c91ddc63e29c0dd164bba3"
+    },
+    {
+      "path": "dist-production/web/components/export_template_editor.js",
+      "blob_oid": "68cdfe257f1c66b5a259e729a7d29d81a1ce67d0",
+      "sha256": "7cb0c907405330c3519890e4a5a691df4270f5085a01b3f7b7787f684c8b911f"
+    },
+    {
+      "path": "dist-production/web/components/feishu_mention_chip.js",
+      "blob_oid": "c788d65fdf26d63c071c4a3bac299e607d4d4598",
+      "sha256": "fc7caeee28bb22e5d286031c0fd6ccc2f943ca61acb964a405fe7aa8ab47c707"
+    },
+    {
+      "path": "dist-production/web/components/gantt.js",
+      "blob_oid": "9a311e1fdc1a025342e8540ccee68417c35e30bd",
+      "sha256": "94d915658337dd0da7c46918cbbb5fdbee589fcf1a359dad8bcfd8755e7798eb"
+    },
+    {
+      "path": "dist-production/web/components/grid_editor.js",
+      "blob_oid": "cda9d1b38ec9d46701970e2ef9f0a319db552008",
+      "sha256": "91917666ba620c1a16f20d8a7e990ce8d029a530eabd7b15f85cabb4b6b191a1"
+    },
+    {
+      "path": "dist-production/web/components/grid_system.js",
+      "blob_oid": "fcde03f1e68a4fe0f9051739e8787fe3d9d64997",
+      "sha256": "e78ff7f072a9f7d006a5ecc9370aab646d4a3d86ebb1e2e82887947ce8a2eafc"
+    },
+    {
+      "path": "dist-production/web/components/hub_shell.js",
+      "blob_oid": "b1e0c5c21c3009453dfecaf32cfcac83e5df037e",
+      "sha256": "addde6a7b12c46a93b5efdda50753feb2f8198f69bebf6cab5acd34f6eda4176"
+    },
+    {
+      "path": "dist-production/web/components/iframe_error_bridge.js",
+      "blob_oid": "f8bacd5089afcc0be7013aab1d4401841248c5e8",
+      "sha256": "4d02388305ee77d53e90f863ed9b2f301c8469cab1aba64590810b57b85d1686"
+    },
+    {
+      "path": "dist-production/web/components/import_export.js",
+      "blob_oid": "6966981fb5b7e4bfdce7ab3242ea177025c2b99c",
+      "sha256": "a6b293ee000c0587db050064ccdf23911ba3407db52b6bb875f983184cd29fe7"
+    },
+    {
+      "path": "dist-production/web/components/list_diff_shell.js",
+      "blob_oid": "3f92e3c6b52a38fb7b3a96171823ef9d5d09d954",
+      "sha256": "bb831b690093e6b47620460bf34feb84674936cb775489d3c76d84491902cac5"
+    },
+    {
+      "path": "dist-production/web/components/list_nav.html",
+      "blob_oid": "d87332548346c6e35780214497cddf53047da6c0",
+      "sha256": "4d27172c634a3ab9a86d2dff6dc965ba6c2789f76e8a2ac01892dc3441a5578d"
+    },
+    {
+      "path": "dist-production/web/components/list_shell.js",
+      "blob_oid": "d2c1cab75cc1d2b484ced290341e63c162497fa6",
+      "sha256": "edbd18e9d62deb45a23ff3b312df98848d5bc25c945ccd144b83f8fe5f9a0e9d"
+    },
+    {
+      "path": "dist-production/web/components/list_sidebar.js",
+      "blob_oid": "5441dcc79b2eddf24af8b87f0fa959e42f3e216f",
+      "sha256": "b4d8407129b51061b4b382b7070f190ec8ee80792e3d1ac0df5a71bb4808a2ff"
+    },
+    {
+      "path": "dist-production/web/components/list_tree.html",
+      "blob_oid": "23681f665af3f1120deed3b5c3898b0b99762703",
+      "sha256": "a6aed96bec87d418baf767589110e3708cb384c5f8be54305ed2ce5cbe7152f0"
+    },
+    {
+      "path": "dist-production/web/components/mention_input.js",
+      "blob_oid": "68247953e75f101a6aca9e7221a71b457c6aa0fe",
+      "sha256": "d57d258cdace6eb8665e97bfd2bc693905ef032d26154961e5abf62b4a02e349"
+    },
+    {
+      "path": "dist-production/web/components/miller_columns.js",
+      "blob_oid": "72f8a3662b226d0a8363682d716ccdeab4107a53",
+      "sha256": "8b3bd61039eb1971d8baf0e519d1e596606a199314cf070e09d7cdf1e316bb77"
+    },
+    {
+      "path": "dist-production/web/components/overlay_edit_modal.js",
+      "blob_oid": "d0f5be41a7ae408a43cc666ab11039d0fa82fd7c",
+      "sha256": "9ea2fe251b310a48103d2d6def7cd8ebfce8b255ad14c4abb0d9b92e2788d577"
+    },
+    {
+      "path": "dist-production/web/components/quick_list.html",
+      "blob_oid": "3cf444cb1880adf0ac925d9a26aef08f87ddabe4",
+      "sha256": "08744addb67b477dc1633cb9fb9efdacac69b2436d0c086b130d63e6f716de65"
+    },
+    {
+      "path": "dist-production/web/components/scope_badge.js",
+      "blob_oid": "175c709a21beca476267e19f35e5a0fb511fbda1",
+      "sha256": "b923fc0ff768e44fcf91cc8a8a7bb0497813aeabe67c28956a5e2656b2be554f"
+    },
+    {
+      "path": "dist-production/web/components/self_annotation_panel.js",
+      "blob_oid": "3ad0ae073fac0536f751674ee78ad0348d0176ce",
+      "sha256": "e5641d767398182ba7c409feed65e157c17db3434ed47dddb59265e43a9dd7be"
+    },
+    {
+      "path": "dist-production/web/components/sidebar_detail_panel.js",
+      "blob_oid": "7ea1328e41081ab23fd80707dba835d69d0849f4",
+      "sha256": "4169b9af0871faa93019542bb79653f1ae958f5f7b084baa364f6a556e7eb7c1"
+    },
+    {
+      "path": "dist-production/web/components/subscribe_button.js",
+      "blob_oid": "f244fb605d5f9b2eb5eb50531e1dbef3a48e69d8",
+      "sha256": "2826ce0d55e6112327ac45f4a851908ca8f36473b8970b93e2d27decf0d13382"
+    },
+    {
+      "path": "dist-production/web/components/tree_list_shell.js",
+      "blob_oid": "1e618e11abf123f69ba5ede2a57c80be0f0c85fa",
+      "sha256": "e69313142a01652c3827d7ff5cb6e630320de865f8368dc8f554c41d5a73524a"
+    },
+    {
+      "path": "dist-production/web/components/tree_shell.js",
+      "blob_oid": "e315f57f1ff806e5a2bbe9c4f6a1560de6003420",
+      "sha256": "2f5d733baf1937c2a80aee126f973a65e1809147a9fed036f6b73ee45948eeda"
+    },
+    {
+      "path": "dist-production/web/components/tree_view.js",
+      "blob_oid": "3195e9fefe8cdd294429b6e0b61ab3122ff92474",
+      "sha256": "e9c89e7cec9fbd0f38a79aae6e585654d7bd7c08f95e7daf1218e77befeb8d00"
+    },
+    {
+      "path": "dist-production/web/components/view_manager.js",
+      "blob_oid": "6b82d53561f6733992ee5b18b203808583b03dd4",
+      "sha256": "77d4177cdf9e2bd234f477eaabe9239fa6c619080ef8ae08c71f86f02c118e73"
+    },
+    {
+      "path": "dist-production/web/components/visibility_selector.js",
+      "blob_oid": "8f1d5c1ac4fcf829fcfd53c3ae4df55f4d073c10",
+      "sha256": "c8c26c85b43501e8a9c121469d5b7990c183dec61a0b5ea7fc9089dbed63ad7d"
+    },
+    {
+      "path": "dist-production/web/container_card/index.html",
+      "blob_oid": "a9d74d91f46bbe5d355699476be270c31ab4b0c8",
+      "sha256": "28a684ab46777b7e089431b846cc19a77dc336dcee70eaa7d4b8620faab02fb3"
+    },
+    {
+      "path": "dist-production/web/container_card/modes/container_item_detail.js",
+      "blob_oid": "f80b7f2f7168b3a1049989c21b93ef231b778b00",
+      "sha256": "28a46d2165359886127d9f70868bca20e2ca0f23b0424ad1a235ba72de30564e"
+    },
+    {
+      "path": "dist-production/web/container_card/modes/mode_field_detail.js",
+      "blob_oid": "8111a1cb22209beb708be2dea177004f13788f3b",
+      "sha256": "89d894166f5efa9d256d9e4e4540e4a2e93609d77f601a0027a06061fddca195"
+    },
+    {
+      "path": "dist-production/web/container_card/modes/mode_image_gallery.js",
+      "blob_oid": "26111ff6e9efe8c6e3e070cca7e73c3829ba2ed8",
+      "sha256": "98b1db7af031ed07f5f924f8e7126258f59073c5f7fa7aed1dde179e8b12eff8"
+    },
+    {
+      "path": "dist-production/web/container_card/modes/mode_markdown.js",
+      "blob_oid": "80f4879fc3a1061f9d82041392854c74768d8e4d",
+      "sha256": "4a9c566546f5935e66353d07059a7946615e7c4d2caf887cbf2d403b0d2311df"
+    },
+    {
+      "path": "dist-production/web/container_card/modes/mode_pdf.js",
+      "blob_oid": "a6eb151e776d36eaad8747db7e30e17973d7786e",
+      "sha256": "66cd7c8c749ee3c42d87f0cc558b8436f354a45d33e92ade204feef72c8bbb7d"
+    },
+    {
+      "path": "dist-production/web/container_card/modes/mode_richtext.js",
+      "blob_oid": "5f7720c00504cfb2ad73d3737e6f849efdd70e27",
+      "sha256": "83418f8d2013c4414820e240e1b3ec66f9b494d552f0cb0e8886474e6f5909a2"
+    },
+    {
+      "path": "dist-production/web/container_card/modes/mode_script.js",
+      "blob_oid": "221e81c729f185dbf1d81a8d3d0f345156533e83",
+      "sha256": "e5c9d51c4b62a9836b6efd9b2be10c20333225f1993c0b05ae8f4205393c5350"
+    },
+    {
+      "path": "dist-production/web/container_card/modes/mode_spreadsheet.js",
+      "blob_oid": "e915e64a1c468f09ce3b187258dbd514c71536e5",
+      "sha256": "543364b9cbd93c7f12db0bd8692d0e87cb6987c1a6f3f211a325d1002d574ba1"
+    },
+    {
+      "path": "dist-production/web/container_card/modes/mode_text_image.js",
+      "blob_oid": "54bd6f6d5003adfbd8e49dda7769fcc03082edb3",
+      "sha256": "7ef465d932908f214e1fb4291e7adbe1174b7847b6881d1b798032bd5feeaf65"
+    },
+    {
+      "path": "dist-production/web/container_card/modes/mode_webview.js",
+      "blob_oid": "5d888abd33d2cc74b124133465b1f6946247f0be",
+      "sha256": "e6f76bebcf496eef14b932e972125b005c333a44f8a0d3414a0fd4a162fd9134"
+    },
+    {
+      "path": "dist-production/web/container_card/viewer.js",
+      "blob_oid": "3cc8b26f0a4965381d155d57241a7ff6bb7e3ad7",
+      "sha256": "71f390229b9e201d4ad1a503c2c04e8ebadab586f9a4fc8cf772bf246f9f9c2b"
+    },
+    {
+      "path": "dist-production/web/content_tree/content_tree.js",
+      "blob_oid": "39442b13d3d8f222a0c38c578c509cea95bc7703",
+      "sha256": "ceea8f2b102c7581bc3981a848e6667b8438b3e4e36cc480d4a341fa6cb08096"
+    },
+    {
+      "path": "dist-production/web/content_tree/index.html",
+      "blob_oid": "d8dbaebda620e88768247c3ee0e384323add9b0d",
+      "sha256": "28b78b11bb407a72a63f37bd14793e5ede52f4322d171be8b12e34d59b4b29ac"
+    },
+    {
+      "path": "dist-production/web/core/auth_state.js",
+      "blob_oid": "8895f094b08040d02ce664edb2cbb40faf27f674",
+      "sha256": "92799f6fa417530bd9d77e4a93283c77ccec3f0a9174640c3c777711cce35ab8"
+    },
+    {
+      "path": "dist-production/web/core/auth_state.test.js",
+      "blob_oid": "bb099ef72fad3cefb98cdda14d79230200e74861",
+      "sha256": "8beab6317d251a983096b3e4262b09ad40270b3cb7f5f1aa07d3c6a6eb2cf10a"
+    },
+    {
+      "path": "dist-production/web/core/cmd_palette.js",
+      "blob_oid": "3ab5c5813252edf4267dcadd3a15f4db43cc6d23",
+      "sha256": "b51fc14e4811b14d6cdeabea8c24740c0361cc2198d4cab9ace86df32338d42b"
+    },
+    {
+      "path": "dist-production/web/core/existing_capability_client.js",
+      "blob_oid": "a179dc94009217bafb32b7f9571d3c052bb01d56",
+      "sha256": "0134b8752fdd00f56738c11b66fca90380abffe5ce7de74a1c222579c9f55979"
+    },
+    {
+      "path": "dist-production/web/core/global_search.js",
+      "blob_oid": "a23299f8a152c37c482136a72809ed1a00d28055",
+      "sha256": "bc08034fd76b42afb13de1e722b36c2e6da0b6379d7b908065219edba0ab12e5"
+    },
+    {
+      "path": "dist-production/web/core/notification_manager.js",
+      "blob_oid": "06312a9786cea448262ca114574adee5240998df",
+      "sha256": "ca3bc6d74da396554857ec8052e1cb046edda99bb6252dbc531454cf80676b98"
+    },
+    {
+      "path": "dist-production/web/core/theme_manager.js",
+      "blob_oid": "67a366337137109a9ac47d663d36c0cef73e113e",
+      "sha256": "70a7d325c82ab5cd1473ca1ae9153748a6da3324ddf79ed9cfb7a670262ebcaa"
+    },
+    {
+      "path": "dist-production/web/core/web_compat.js",
+      "blob_oid": "fa83c2a44b3586ac27ec862542b0ac11f1e4ca1f",
+      "sha256": "b755c18b31f170d74b1b703524e2cfc3bed14f8fc7e6119af57edb43f8b73d9b"
+    },
+    {
+      "path": "dist-production/web/debug/vpps_r4_matrix_explorer.html",
+      "blob_oid": "dd23b8180a529c775f05f77786ba9c210b1e9363",
+      "sha256": "918e888132ba381ddc0b4690c8e58f4ee3fa2216443685d52a38eeeaaddf551e"
+    },
+    {
+      "path": "dist-production/web/debug/vpps_r4_visualizer.html",
+      "blob_oid": "7dd4f0086e850f771420cda6c16fad26f172f1c3",
+      "sha256": "bf5f2b3ef073406bfcbffea276aa43c8820df9df4d26723d79291505c395e10f"
+    },
+    {
+      "path": "dist-production/web/debug_log/index.html",
+      "blob_oid": "398d33298a2bc36e982b330b0c78841b2723fa04",
+      "sha256": "d282028964319d4dd006ac3a1a52d789c2a13edb264d5ccf686212c2314c07f4"
+    },
+    {
+      "path": "dist-production/web/event_bus.js",
+      "blob_oid": "230690075a12a35db8ce71e9dce0e0d61478fcf9",
+      "sha256": "7994b8e6f84181c82ad37c6962374225efd43b09f1dcd666030299cf7448157d"
+    },
+    {
+      "path": "dist-production/web/ext_datasource/ext_ds.js",
+      "blob_oid": "4c95a998bb2f1048183d063587526eb76238be53",
+      "sha256": "bf95202bca72d6c844864ef2c3ca285a4ee288770f3538c4bc63717ec0c2ee0f"
+    },
+    {
+      "path": "dist-production/web/ext_datasource/index.html",
+      "blob_oid": "378a9a58dd1257f19bb15a9352161a3fddf12e7b",
+      "sha256": "616be3dc3ffa21723615273f8c65f618bd9d26a91755c144663efaf44b4edb09"
+    },
+    {
+      "path": "dist-production/web/feishu/chat_doc.html",
+      "blob_oid": "1e6e9d2b9af3055d7a6d259fd00c6acfdd04608b",
+      "sha256": "357a44723ed860ae5cf5e726ff3687acedd3bbdcd1b406b00f845f815a204469"
+    },
+    {
+      "path": "dist-production/web/feishu/feishu.js",
+      "blob_oid": "4a555c79db699dd93ac1aa1de8f99d71a6799864",
+      "sha256": "f37b70ae5bb0aaa836ab9b9a82e85af00a038f0d070dd7acbf11a0d49a7e1287"
+    },
+    {
+      "path": "dist-production/web/feishu/login.html",
+      "blob_oid": "0cdc97116d5f57798e5c0ca3ddc9ba98327e5cc3",
+      "sha256": "8fd3418a7692fa77e7c83713d94e292a8ea29373c5ac4a211ae9086739c0cf3c"
+    },
+    {
+      "path": "dist-production/web/float_window/float_ball.html",
+      "blob_oid": "9f7f333b5271c150deca1aa4f16158784f51b1e1",
+      "sha256": "663b4a22c0399bfa4bc80cd863bc7d9110d404fbff822c4425d12b192fc525f2"
+    },
+    {
+      "path": "dist-production/web/float_window/float_ball.js",
+      "blob_oid": "caef18eacc6b32b454632c13f28216d09f78a1d3",
+      "sha256": "b9833705d4f976c4a15d8ebe37573007382e912e71ff8a810672b1f6edbc63c6"
+    },
+    {
+      "path": "dist-production/web/float_window/float_shell.html",
+      "blob_oid": "ad617b73546e5157edb316d205beebb99d8587db",
+      "sha256": "7019e5033d89a001f0ebb38dd18ee90ad965e3e4a335c487e2fb55de6523a47c"
+    },
+    {
+      "path": "dist-production/web/float_window/float_shell.js",
+      "blob_oid": "99f3168a3b4b620c967dccbc4543a247b7e52115",
+      "sha256": "0fabed4c67e252e92726289dab7a6c9dc98c54ef6b50314082a9c124b9e59882"
+    },
+    {
+      "path": "dist-production/web/float_window/sidebar.html",
+      "blob_oid": "920660f091a2f43bf533a9d7b7fe28247880127f",
+      "sha256": "88239583631eb1f3a6d897ddd018c8856695a3c315555f1c4c53145b93b40f9a"
+    },
+    {
+      "path": "dist-production/web/float_window/sidebar.js",
+      "blob_oid": "2e82c918bf95c8d3d0d38402a2ce366a8c7b1efb",
+      "sha256": "32e1ac34eac30b7ed7d9e61b2c146a485900c1947f290dc7af1f47ee21b23890"
+    },
+    {
+      "path": "dist-production/web/icons.js",
+      "blob_oid": "8fad2897be43870ab035c5a8b98002f857987154",
+      "sha256": "e495db5c1f3ab1605cc576746369456fd4a866638571405f667188cfb281d1f2"
+    },
+    {
+      "path": "dist-production/web/index.html",
+      "blob_oid": "a2a2eb4ffcb853a881fe51da09d92530e91f082c",
+      "sha256": "1da40e009b38da58adcde4132c9424081206b85c98073ccdf1be1b78e08e5c85"
+    },
+    {
+      "path": "dist-production/web/knowledge/knowledge.html",
+      "blob_oid": "d853fa6f577817ed3ee041c2d494c7c6c00583da",
+      "sha256": "eee8a691fad56df045e48b62d5e74d17c9e48848aa467514fa4805445d190497"
+    },
+    {
+      "path": "dist-production/web/knowledge/knowledge.js",
+      "blob_oid": "3362db2ebbf0246646c055d00c48b0c22a9dbd60",
+      "sha256": "bdcd1f7ba03af4a745ad99ec6a87a8778c667f3231d3ad7f5060a4346a0ce38b"
+    },
+    {
+      "path": "dist-production/web/knowledge_hub/index.html",
+      "blob_oid": "50f284067fd7c06806a37424e75ef59125c45d07",
+      "sha256": "385064c7860fbf819919f4bca373fc96ca7d4f8a6c2dd333770fce1a6ebd27b9"
+    },
+    {
+      "path": "dist-production/web/knowledge_hub/knowledge_hub.js",
+      "blob_oid": "70278c12a32f5a2a0419b8df9413272616cac7e7",
+      "sha256": "c8454bfbb72276b6373ca72cc176dc2b83b5a88a5ade493596379f77d2f2e0de"
+    },
+    {
+      "path": "dist-production/web/knowledge_hub/pages/factory_info.html",
+      "blob_oid": "3fdecb20f05ff8ae63772c8971823dc0d5405479",
+      "sha256": "5018d264ffb761bec3ba0c36a938d984eaee97574055589b94eb4ef93bc9f967"
+    },
+    {
+      "path": "dist-production/web/knowledge_hub/pages/gbop_vpps.html",
+      "blob_oid": "b5f37566ebe00f00740691fb76a720aab3f46b87",
+      "sha256": "e2872a5d6f98ba0aa52e956b5d5b7b96316ff5fec11d43df47578b1477ec97a2"
+    },
+    {
+      "path": "dist-production/web/knowledge_hub/pages/project_info.html",
+      "blob_oid": "40dbbe515f914a24dc0211ba03c1181dc83ea929",
+      "sha256": "53b01847754afa1c8199cd0cb3dfa312939bcafea471b6b475a32539a5ee5347"
+    },
+    {
+      "path": "dist-production/web/login/index.html",
+      "blob_oid": "9b431cf259376aa7aae51e9c7052169be0bfc68f",
+      "sha256": "af3db19c0e6bd0d72e2db795e6e458c54c3e4d170a95a1918cf0c190d137af4e"
+    },
+    {
+      "path": "dist-production/web/login/login.js",
+      "blob_oid": "3f13f6fb94c1d76097461fbe975f7258832bd6da",
+      "sha256": "3b5768b12bd39306ba18b60abbb41edc7c200dfad7af3204403037ac6b8b31a5"
+    },
+    {
+      "path": "dist-production/web/main.js",
+      "blob_oid": "15a38fdd81e698fc5e0fe722a88d75ade6571b59",
+      "sha256": "bc10a9ae52f69aaf9e0f0edbd15ef882117d826666f6aa4df2e0d656a5365919"
+    },
+    {
+      "path": "dist-production/web/md_workspace/md_workspace.html",
+      "blob_oid": "dbe277663be91419c8349f98e8de92ada9aade7f",
+      "sha256": "68b8fc98c1d952c00d175f7cd95c2b2ab098997f153a7c3b0ee4a3fd3481ca86"
+    },
+    {
+      "path": "dist-production/web/md_workspace/md_workspace.js",
+      "blob_oid": "b758a2ac8bcc41f54ddfa4ab2894920ce12fddbd",
+      "sha256": "3ac28c956681a354b891f77a4ae6114ba8eaa813db30a036c70319b8692ff947"
+    },
+    {
+      "path": "dist-production/web/my_files/index.html",
+      "blob_oid": "4dd9b057903c74f535b8238617c2b321a5b23d54",
+      "sha256": "a02f7a73ae6d3a6b6b55d122f19ca7526b9c5696675ac840fee41b89ea56f527"
+    },
+    {
+      "path": "dist-production/web/my_files/my_files.js",
+      "blob_oid": "1a69a747d44282d333b56166747d791153c627a8",
+      "sha256": "5be68de765793fe013b26d493a2e5355180be55808161d89cb966893988e692a"
+    },
+    {
+      "path": "dist-production/web/ontology/index.html",
+      "blob_oid": "f709d98953b2687142566d598090eef50ff4fb8f",
+      "sha256": "0f9895da6939a7a7121563e24131b5162fa02258297a7153ab0b1629b1744fe6"
+    },
+    {
+      "path": "dist-production/web/ontology/onto_graph.js",
+      "blob_oid": "82c35b9a6b025d020ad50d00932ce59de7a7499f",
+      "sha256": "6b2b2ab7541b8dbbb730fdb32ab6138de691a7184ab09f1c2bdbded80f608533"
+    },
+    {
+      "path": "dist-production/web/ontology/ontology.js",
+      "blob_oid": "8a8155457c4f4b14340855369124ea519e38f831",
+      "sha256": "d1a126983597f60a58e1eb353e7a20133bce95cc9437643225f8164a0fac2482"
+    },
+    {
+      "path": "dist-production/web/org_mgmt/org_mgmt.html",
+      "blob_oid": "1dbc892cb558b18b5d22f8bc7c9576d3cbc9d25c",
+      "sha256": "efd16f54ee130cdc9c699dd0bbd38b8cc199b6e3f0a7ac1b80ad24f0392c13ed"
+    },
+    {
+      "path": "dist-production/web/org_mgmt/org_mgmt.js",
+      "blob_oid": "2e9d35fe3a68c379f6071f7da6b381db9b17c4e8",
+      "sha256": "1549a479b3dd453e8cbd31add5f1dd811e97857a97460e12c63ef6451b61fee2"
+    },
+    {
+      "path": "dist-production/web/rule_mgmt/rule_mgmt.html",
+      "blob_oid": "eb7f87f7347e88247bd30cf5b9a895d751bbee99",
+      "sha256": "1b6b78a62cfaa58fd71ad25fbc6c150033b9d987898c7efb42cbc6d7f5df8b7f"
+    },
+    {
+      "path": "dist-production/web/rule_mgmt/rule_mgmt.js",
+      "blob_oid": "ec66cdda6154ac2cf3af143befedd933b210b392",
+      "sha256": "8ece577ea8c421d354992b2e5c1b2dea38ac52750ae49f36c4fc147f668a52a6"
+    },
+    {
+      "path": "dist-production/web/settings/index.html",
+      "blob_oid": "b4a0d877ede7c5b7e495308cb6faa17ab895508d",
+      "sha256": "c55fcc38f47916200e641c3239c52df19572b29b49a5623736c4ea128af78f27"
+    },
+    {
+      "path": "dist-production/web/settings/settings.js",
+      "blob_oid": "885a1853c26ee27ccfcef417b053277c8c0b1a26",
+      "sha256": "b9c58fcf4de3982deadfac11605658a2826fb7ce7be4862a59cc2ab8b37d77e6"
+    },
+    {
+      "path": "dist-production/web/share/issues.html",
+      "blob_oid": "010144ce61b375029e0f2b059d8f0e37a2be5517",
+      "sha256": "e9ec0db96ef4460273171a9938d9ea71e84faa7639ad305b249c249ca48d13cb"
+    },
+    {
+      "path": "dist-production/web/shared/lv_utils.js",
+      "blob_oid": "d20240d67f416cea0f170e244c69d59b6761d278",
+      "sha256": "283d6bc13594d19bb9d402aa30546c9a85f232bca34815a8e4e8bcdf227f2191"
+    },
+    {
+      "path": "dist-production/web/shortcut.js",
+      "blob_oid": "77ea10abccaa6e87e151069a1bb1702d9a4c2918",
+      "sha256": "e582e6946a9d95f3e9d2eb54346c7f13b4b2d2cc40b36fb78de011e77bdfd435"
+    },
+    {
+      "path": "dist-production/web/team_space/index.html",
+      "blob_oid": "e5dc7bb4f0be35a8b249cd791c1e60cd203e3418",
+      "sha256": "bb66193f27b9e63622b6fbf3200a2e98506f613c3dace35088928deecafa7dcf"
+    },
+    {
+      "path": "dist-production/web/team_space/team_space.js",
+      "blob_oid": "07c5e6210fbc8e53e5417c527ecbbb171cacb459",
+      "sha256": "e5ccbadb1941104f7eae88777949f178c188478cb1d7e8cee9d52eb5c169a377"
+    },
+    {
+      "path": "dist-production/web/workbench/grid_widgets.html",
+      "blob_oid": "10c20d6803716fbca3e073ffa71e54f6ad7cfbba",
+      "sha256": "cd07210d38318922b92f7b371928db248159599c78c3a32e2da8147e85e43fcd"
+    },
+    {
+      "path": "dist-production/web/workbench/grid_widgets.js",
+      "blob_oid": "74164fe652eec1d2a089c54fbd5d32271060763f",
+      "sha256": "c76e119ae8d6eedf8da1ed370ae849f490616b0ff35f42d6266871ee1a935c53"
+    },
+    {
+      "path": "dist-production/web/workbench/workbench.html",
+      "blob_oid": "56ea5ae940eafb442a4fa44e4621dd07b22aa58f",
+      "sha256": "39acf1f6cae0629bcca3c5a2e05b82f50f733757ff732fb713dbd2d5f414acfd"
+    },
+    {
+      "path": "dist-production/web/workbench/workbench.js",
+      "blob_oid": "47279287a327431aacba8c104583d669315680ee",
+      "sha256": "a4970cf79cd4b0cd704db7479ecc23b8469d844944f67024cbe873def0a20424"
+    },
+    {
+      "path": "dist-production/web/workspace/nav_manager.js",
+      "blob_oid": "31f9af9fcf14fc9d2dd19a84ca02f30724c422db",
+      "sha256": "1b54ee1d74242f4341440bffc0023916fd84f200cc5c2b5316ed833c13ae41d0"
+    },
+    {
+      "path": "dist-production/web/workspace/popout.html",
+      "blob_oid": "1d572f1bd0d8649f85402306e933b3df2a40f29b",
+      "sha256": "66c04f2e924a27d06b0a18a7d7937515bdc36d9114c6e0c3b089f61a43e8d3b6"
+    },
+    {
+      "path": "dist-production/web/workspace/sidebar.js",
+      "blob_oid": "6e9e11e82f229e0efb73f69cf0929156ec271d8e",
+      "sha256": "58da2fbdcad2b7d397eeb4a1608f557ba4987d888fd8121e49d957ef5fec76bb"
+    },
+    {
+      "path": "dist-production/web/workspace/tab_manager.js",
+      "blob_oid": "853b2c41ae247399d13842dc1f74290e8cd5aafd",
+      "sha256": "b0adaa387b0b71b9a602c22b060f82c9183b40cd8efb0984d2bc1999ae6ce0e0"
+    },
+    {
+      "path": "dist-production/web/workspace/workspace.js",
+      "blob_oid": "d9a358b492004a0105d7100450f0f530612003a4",
+      "sha256": "945edadd9353aa0bb4ad7b0041bb19bfb89891d3faf9ab81f1e21a592af40701"
+    },
+    {
+      "path": "packages/core/electron/auth_manager.js",
+      "blob_oid": "1dd13713d73f54c5b46d753055e28a764703bef5",
+      "sha256": "5bd820d8bb440f5309e60f44fac7861d24cb8ba97f4ede72e0d6ed6891681c8b"
+    },
+    {
+      "path": "packages/core/electron/blank.html",
+      "blob_oid": "4303dd04aeefe3e45094217f86e56d67b0842434",
+      "sha256": "8a100d57b129a6fd4309ed62631b1efc2d99a9d92b6ff3449156c2d72004d7ea"
+    },
+    {
+      "path": "packages/core/electron/main.js",
+      "blob_oid": "aa9f9ed77ed923aa3e6dafe5607f53e5971510b6",
+      "sha256": "931a77295af0428dd66311426333609d62e57da1f50fdddc51e61e593b610b9c"
+    },
+    {
+      "path": "packages/core/electron/plugin_manager.js",
+      "blob_oid": "68b8969ac58610f79689bdef2297f4ca258a9b9d",
+      "sha256": "4c1e72e1e8d1d86cbba1003595933df5e0c3da52271543cb9a7ca6801e7f73b1"
+    },
+    {
+      "path": "packages/core/electron/plugin_preload.js",
+      "blob_oid": "49f25a9915875d28a465842b06e6bf9fae9b4a34",
+      "sha256": "bed3ad02fdd54d61df85fd9826c65236f34e97e5a3206825bdc884e7a673cd8d"
+    },
+    {
+      "path": "packages/core/electron/plugin_registry.js",
+      "blob_oid": "958e3722fd8da18598327a328e55d3330f19599a",
+      "sha256": "fe25c723d1d8a5c6a3c8ac047f3f34c1da0a5d4f9a087f398351b0db57ab9c73"
+    },
+    {
+      "path": "packages/core/electron/preload.js",
+      "blob_oid": "32a077251a9ca76b5b0bbeb25deceb60744ac47e",
+      "sha256": "5865230251332ff434aba4f8d1fcbe3928fa4badcea1a81c7bca75cca8a217b4"
+    },
+    {
+      "path": "packages/core/electron/shortcut_manager.js",
+      "blob_oid": "3d457cd843ead96fdded3b2eebdfbae66beddc6e",
+      "sha256": "b43dad381b9e0957d476724baceb7ddf0980b304451907a802621233235028cd"
+    },
+    {
+      "path": "packages/core/electron/tray.js",
+      "blob_oid": "0a0bdae8c9d5123fc14b78651c4a96591ce9d404",
+      "sha256": "af5bc7e72228cf1c0b29598056e2970545f042807289a1b777fc4ba5f1f15f7d"
+    },
+    {
+      "path": "packages/core/electron/windows.js",
+      "blob_oid": "9ab7ac6a45035a6fbc97fce9b9b1e1cefad73150",
+      "sha256": "b0ac93f3b03c79e0272c3b12cdaad0a2da87ccb313e25f6d544a7e38467ee9f9"
+    }
+  ],
+  "findings": [],
+  "content_sha256": "eb04a871878f77bf700a332dd568c6293e0f3f79de2e21acc21cebaef34b0ab1"
+}
