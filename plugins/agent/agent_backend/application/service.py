@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from backend.capability_v2.provider_contracts import CapabilityBusinessError
 from dataclasses import asdict
 
@@ -14,6 +15,7 @@ _CANVAS_REQUESTS = {
     "agent.canvas.execution.start": (CanvasStartRequest, "start"),
     "agent.canvas.execution.resume": (CanvasResumeRequest, "resume"),
 }
+_CANVAS_QUERIES = {"agent.workflow.node.test.execute", "agent.canvas.options.resolve"}
 
 
 def _json_projection(value):
@@ -25,11 +27,17 @@ def _json_projection(value):
 
 
 class AgentApplication:
-    def __init__(self, repository, audit_repository=None, session_repository=None, canvas_runtime=None):
+    def __init__(
+        self, repository, audit_repository=None, session_repository=None, canvas_runtime=None,
+        canvas_query_timeout=3.0,
+    ):
+        if isinstance(canvas_query_timeout, bool) or not isinstance(canvas_query_timeout, (int, float)) or canvas_query_timeout <= 0:
+            raise ValueError("canvas_query_timeout must be positive")
         self.repository = repository
         self.audit_repository = audit_repository
         self.session_repository = session_repository
         self.canvas_runtime = canvas_runtime
+        self.canvas_query_timeout = float(canvas_query_timeout)
 
     def invoke(self, capability_id: str, payload: dict, context):
         actor = getattr(context, "user_gid", None) or getattr(context, "actor_gid", None)
@@ -49,7 +57,16 @@ class AgentApplication:
             principal = RunPrincipal(actor_gid=str(actor), team_gid=str(tenant))
 
             async def invoke_canvas():
-                result = await getattr(self.canvas_runtime, method_name)(request, principal)
+                operation = getattr(self.canvas_runtime, method_name)(request, principal)
+                try:
+                    result = await (
+                        asyncio.wait_for(operation, timeout=self.canvas_query_timeout)
+                        if capability_id in _CANVAS_QUERIES else operation
+                    )
+                except TimeoutError as exc:
+                    raise CapabilityBusinessError(
+                        "runtime_timeout", "Agent canvas runtime timed out", retryable=True,
+                    ) from exc
                 return _json_projection(asdict(result))
 
             return invoke_canvas()

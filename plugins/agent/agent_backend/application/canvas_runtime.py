@@ -1,11 +1,16 @@
 """Finite Agent-owned boundary for persisted canvas execution."""
 from __future__ import annotations
 
+import asyncio
+import inspect
+import json
 import math
 import re
 from dataclasses import dataclass
-from typing import Literal, Protocol, Self
+from collections.abc import Callable, Mapping
+from typing import Any, Literal, Protocol, Self
 
+from backend.capability_v2.provider_contracts import CapabilityBusinessError
 from backend.capability_v2.secret_detection import is_sensitive_key, redact_text
 
 
@@ -17,6 +22,17 @@ MAX_CONTEXT_ITEMS = 64
 MAX_COLLECT_FIELDS = 32
 MAX_VALUE_TEXT = 4096
 MAX_ABS_NUMBER = 1_000_000_000_000
+MAX_GRAPH_NODES = 128
+MAX_GRAPH_EDGES = 256
+MAX_GRAPH_BYTES = 262_144
+MAX_INPUT_BYTES = 65_536
+MAX_OUTPUT_BYTES = 65_536
+DEFAULT_MAX_CONCURRENCY = 4
+
+ALLOWED_NODE_TEST_KINDS = frozenset({
+    "data_db", "data_mem", "data_file", "list", "human", "human_approval",
+    "human_task", "fork", "join",
+})
 
 ScalarValue = str | int | float | bool | None
 RuntimeValue = ScalarValue | tuple[ScalarValue, ...]
@@ -29,6 +45,9 @@ _RESERVED_INPUT_NAMES = frozenset({
     "sourcegid", "import", "importpath", "path", "code", "pythoncode", "script", "sql",
     "rawsql", "control", "controlflag", "command", "exec", "executable", "canvas",
     "graph", "nodes",
+})
+_RUNTIME_CONTROL_NAMES = _RESERVED_INPUT_NAMES | frozenset({
+    "sourcetool", "sourceparam", "optionsource", "optionresolver", "resolver", "resolverid",
 })
 _INPUT_NAME = re.compile(r"^[A-Za-z][A-Za-z0-9_.-]{0,127}$")
 
@@ -83,6 +102,49 @@ def _redacted_value(value: RuntimeValue) -> RuntimeValue:
     if isinstance(value, tuple):
         return tuple(_safe_text(item) if isinstance(item, str) else item for item in value)
     return _safe_text(value) if isinstance(value, str) else value
+
+
+def _normalized_name(value: object) -> str:
+    return re.sub(r"[^a-z0-9]", "", str(value).casefold())
+
+
+def _is_control_key(value: object) -> bool:
+    return _normalized_name(value) in _RUNTIME_CONTROL_NAMES
+
+
+def _redact_recursive(value: Any, *, key: object | None = None) -> Any:
+    """Canonical secret redaction plus the closed runtime-control vocabulary."""
+    if key is not None and (is_sensitive_key(key) or _is_control_key(key)):
+        return "[redacted]"
+    if isinstance(value, Mapping):
+        return {
+            str(child_key): _redact_recursive(child, key=child_key)
+            for child_key, child in sorted(value.items(), key=lambda item: str(item[0]))
+        }
+    if isinstance(value, (list, tuple)):
+        return [_redact_recursive(child) for child in value]
+    if isinstance(value, str):
+        return _safe_text(value)
+    if value is None or isinstance(value, (bool, int, float)):
+        return value
+    return _safe_text(str(value))
+
+
+def _json_bytes(value: Any) -> bytes:
+    try:
+        return json.dumps(
+            value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False,
+        ).encode("utf-8")
+    except (TypeError, ValueError) as exc:
+        raise ValueError("runtime value is not finite JSON data") from exc
+
+
+def _invalid(message: str) -> CapabilityBusinessError:
+    return CapabilityBusinessError("invalid_input", message)
+
+
+def _not_found() -> CapabilityBusinessError:
+    return CapabilityBusinessError("resource_not_found", "Agent canvas resource was not found")
 
 
 def _values(values: tuple["InputValue", ...], maximum: int = MAX_INPUT_VALUES) -> None:
@@ -447,9 +509,242 @@ class AgentCanvasRuntime(Protocol):
     async def resume(self, request: CanvasResumeRequest, principal: RunPrincipal) -> RuntimeDispatch: ...
 
 
+class ProductionAgentCanvasRuntime:
+    """One bounded adapter over the persisted Agent canvas and existing executor."""
+
+    def __init__(
+        self,
+        *,
+        resource_loader: Callable[[str, str], Mapping[str, Any] | None] | None = None,
+        executor_factory: Callable[..., Any] | None = None,
+        max_concurrency: int = DEFAULT_MAX_CONCURRENCY,
+    ) -> None:
+        if isinstance(max_concurrency, bool) or not isinstance(max_concurrency, int) or max_concurrency < 1:
+            raise ValueError("max_concurrency must be a positive integer")
+        self._resource_loader = resource_loader or self._load_resource
+        self._executor_factory = executor_factory or self._canvas_executor
+        self._semaphore = asyncio.Semaphore(max_concurrency)
+
+    @staticmethod
+    def _canvas_executor(**kwargs):
+        from ..ai_assistant.canvas_executor import CanvasExecutor
+
+        return CanvasExecutor(**kwargs)
+
+    @staticmethod
+    def _load_resource(kind: str, gid: str) -> Mapping[str, Any] | None:
+        from ..data.connection import get_agent_conn
+
+        table = "workmanship_app_flows" if kind == "flow" else "workmanship_app_skills"
+        with get_agent_conn() as connection, connection.cursor() as cursor:
+            cursor.execute(f"SELECT * FROM {table} WHERE gid=%s AND deleted_at IS NULL", (gid,))
+            row = cursor.fetchone()
+        return dict(row) if row else None
+
+    @staticmethod
+    def _authorize(kind: str, row: Mapping[str, Any], principal: RunPrincipal) -> None:
+        persisted_team = str(row.get("team_gid") or "")
+        if persisted_team and persisted_team != principal.team_gid:
+            raise _not_found()
+        if kind == "flow":
+            if str(row.get("owner_user_gid") or "") != principal.actor_gid:
+                raise _not_found()
+            return
+        scope = str(row.get("scope") or "private")
+        owner = str(row.get("owner_gid") or "")
+        if scope == "private" and owner == principal.actor_gid:
+            return
+        if scope == "team" and owner == principal.team_gid and persisted_team in {"", principal.team_gid}:
+            return
+        if scope == "global" and str(row.get("status") or "") == "active":
+            return
+        raise _not_found()
+
+    def _record(self, kind: str, gid: str, principal: RunPrincipal) -> Mapping[str, Any]:
+        row = self._resource_loader(kind, gid)
+        if not isinstance(row, Mapping):
+            raise _not_found()
+        self._authorize(kind, row, principal)
+        return row
+
+    @staticmethod
+    def _document(kind: str, row: Mapping[str, Any]) -> dict[str, Any]:
+        raw = row.get("flowdef") if kind == "flow" else row.get("content")
+        if isinstance(raw, str):
+            if len(raw.encode("utf-8")) > MAX_GRAPH_BYTES:
+                raise _invalid("persisted canvas graph exceeds the size limit")
+            try:
+                raw = json.loads(raw)
+            except json.JSONDecodeError:
+                try:
+                    import yaml
+
+                    raw = yaml.safe_load(raw)
+                except Exception as exc:
+                    raise _invalid("persisted canvas graph is invalid") from exc
+        if not isinstance(raw, Mapping):
+            raise _invalid("persisted canvas graph is invalid")
+        nested = raw.get("canvas")
+        document = dict(nested if isinstance(nested, Mapping) else raw)
+        if len(_json_bytes(document)) > MAX_GRAPH_BYTES:
+            raise _invalid("persisted canvas graph exceeds the size limit")
+        nodes = document.get("nodes", [])
+        edges = document.get("edges", document.get("connections", []))
+        if not isinstance(nodes, list) or len(nodes) > MAX_GRAPH_NODES:
+            raise _invalid(f"persisted canvas graph must contain at most {MAX_GRAPH_NODES} nodes")
+        if not isinstance(edges, list) or len(edges) > MAX_GRAPH_EDGES:
+            raise _invalid(f"persisted canvas graph must contain at most {MAX_GRAPH_EDGES} edges")
+        if any(not isinstance(node, Mapping) for node in nodes):
+            raise _invalid("persisted canvas graph contains an invalid node")
+        return document
+
+    @staticmethod
+    def _node(document: Mapping[str, Any], node_id: str) -> Mapping[str, Any]:
+        matches = [node for node in document.get("nodes", []) if str(node.get("id") or "") == node_id]
+        if len(matches) != 1:
+            raise _not_found()
+        return matches[0]
+
+    @staticmethod
+    def _declared_input_names(document: Mapping[str, Any], node: Mapping[str, Any]) -> tuple[str, ...]:
+        schema = node.get("inputs_schema") or node.get("input_schema")
+        if schema is None:
+            schema = document.get("inputs_schema") or document.get("input_schema") or {}
+        if not isinstance(schema, Mapping):
+            raise _invalid("persisted input schema is invalid")
+        properties = schema.get("properties")
+        names = properties.keys() if isinstance(properties, Mapping) else schema.keys()
+        return tuple(str(name) for name in names)
+
+    @classmethod
+    def _init_params(
+        cls,
+        document: Mapping[str, Any],
+        node: Mapping[str, Any],
+        values: tuple[InputValue, ...],
+    ) -> dict[str, ScalarValue | list[ScalarValue]]:
+        try:
+            params = validated_init_params(values, cls._declared_input_names(document, node))
+        except ValueError as exc:
+            raise _invalid(str(exc)) from exc
+        if len(_json_bytes(params)) > MAX_INPUT_BYTES:
+            raise _invalid("runtime input exceeds the size limit")
+        return params
+
+    @staticmethod
+    def _project_value(name: str, value: Any) -> RuntimeValue:
+        safe = _redact_recursive(value, key=name)
+        if safe is None or isinstance(safe, (str, bool, int, float)):
+            return safe
+        if isinstance(safe, list) and len(safe) <= MAX_INPUT_VALUES and all(
+            child is None or isinstance(child, (str, bool, int, float)) for child in safe
+        ):
+            return tuple(safe)
+        return _json_bytes(safe).decode("utf-8")
+
+    @classmethod
+    def _node_result(cls, raw: Any, node_id: str) -> NodeTestResult:
+        if not isinstance(raw, Mapping):
+            raise _invalid("runtime output is invalid")
+        safe_raw = _redact_recursive(raw)
+        if len(_json_bytes(safe_raw)) > MAX_OUTPUT_BYTES:
+            raise _invalid("runtime output exceeds the size limit")
+        results = raw.get("node_results")
+        node_result = results.get(node_id) if isinstance(results, Mapping) else None
+        if not isinstance(node_result, Mapping):
+            raise _invalid("runtime output omitted the requested node")
+        public = [(str(key), value) for key, value in node_result.items() if not str(key).startswith("_")]
+        if len(public) > MAX_OUTPUT_VALUES:
+            raise _invalid("runtime output contains too many values")
+        try:
+            output_values = tuple(
+                OutputValue(name, cls._project_value(name, value))
+                for name, value in sorted(public, key=lambda item: item[0])
+            )
+            summary = str(node_result.get("_summary") or raw.get("summary") or "")
+            rejected = node_result.get("_status") == "error" or raw.get("status") == "error"
+            return NodeTestResult("rejected" if rejected else "completed", output_values, summary)
+        except ValueError as exc:
+            raise _invalid("runtime output exceeded the closed projection limits") from exc
+
+    async def test_node(self, request: NodeTestRequest, principal: RunPrincipal) -> NodeTestResult:
+        async with self._semaphore:
+            row = self._record("flow", request.flow_gid, principal)
+            document = self._document("flow", row)
+            node = self._node(document, request.node_id)
+            kind = str(node.get("type") or "")
+            if kind not in ALLOWED_NODE_TEST_KINDS:
+                raise _invalid("persisted node kind is not allowed for bounded testing")
+            init_params = self._init_params(document, node, request.input_values)
+            raw_params = node.get("params") if isinstance(node.get("params"), Mapping) else node.get("config", {})
+            params = dict(raw_params) if isinstance(raw_params, Mapping) else {}
+            bounded_node = {
+                "id": request.node_id,
+                "type": kind,
+                "label": str(node.get("label") or kind),
+                "params": params,
+            }
+            executor = self._executor_factory(
+                auth_mode="feishu", auth_token="", owner_gid=principal.actor_gid,
+            )
+            result = executor.execute({"nodes": [bounded_node]}, init_params=init_params)
+            if inspect.isawaitable(result):
+                result = await result
+            return self._node_result(result, request.node_id)
+
+    async def resolve_options(
+        self, request: CanvasOptionsRequest, principal: RunPrincipal
+    ) -> CanvasOptionsResult:
+        async with self._semaphore:
+            row = self._record("skill", request.skill_gid, principal)
+            document = self._document("skill", row)
+            node = self._node(document, request.node_id)
+            self._init_params(document, node, request.input_values)
+            params = node.get("params") if isinstance(node.get("params"), Mapping) else node.get("config", {})
+            fields = params.get("collect_fields", []) if isinstance(params, Mapping) else []
+            if not isinstance(fields, list) or len(fields) > MAX_COLLECT_FIELDS:
+                raise _invalid("persisted option fields are invalid")
+            matches = [field for field in fields if isinstance(field, Mapping) and field.get("key") == request.field_key]
+            if len(matches) != 1:
+                raise _not_found()
+            field = matches[0]
+            if any(_is_control_key(key) for key in field if key not in {"key", "label", "type", "options"}):
+                raise _invalid("persisted option field requests an executable resolver")
+            raw_options = field.get("options", [])
+            if not isinstance(raw_options, list) or len(raw_options) > MAX_OPTIONS:
+                raise _invalid(f"persisted options must contain at most {MAX_OPTIONS} values")
+            try:
+                options = tuple(CanvasOption(str(option["value"]), str(option["label"])) for option in raw_options)
+            except (KeyError, TypeError, ValueError) as exc:
+                raise _invalid("persisted options are invalid") from exc
+            options = tuple(sorted(
+                options,
+                key=lambda option: (
+                    option.label.casefold(), option.value.casefold(), option.label, option.value,
+                ),
+            ))
+            if len(_json_bytes([{"value": item.value, "label": item.label} for item in options])) > MAX_OUTPUT_BYTES:
+                raise _invalid("runtime output exceeds the size limit")
+            revision = row.get("revision", document.get("revision", 1))
+            try:
+                return CanvasOptionsResult(revision=revision, options=options)
+            except ValueError as exc:
+                raise _invalid("persisted option revision is invalid") from exc
+
+    async def start(self, request: CanvasStartRequest, principal: RunPrincipal) -> RuntimeDispatch:
+        raise CapabilityBusinessError(
+            "provider_unavailable", "Agent canvas command runtime is not configured", retryable=True,
+        )
+
+    async def resume(self, request: CanvasResumeRequest, principal: RunPrincipal) -> RuntimeDispatch:
+        raise CapabilityBusinessError(
+            "provider_unavailable", "Agent canvas command runtime is not configured", retryable=True,
+        )
+
 __all__ = [
     "AgentCanvasRuntime", "CanvasLayout", "CanvasOption", "CanvasOptionsRequest",
     "CanvasOptionsResult", "CanvasResumeRequest", "CanvasStartRequest", "CollectField",
     "ContextSummaryItem", "InputValue", "NodeResult", "NodeTestRequest", "NodeTestResult",
-    "OutputValue", "RunPrincipal", "RuntimeDispatch", "VisibilityRule", "validated_init_params",
+    "OutputValue", "ProductionAgentCanvasRuntime", "RunPrincipal", "RuntimeDispatch",
+    "VisibilityRule", "validated_init_params",
 ]
