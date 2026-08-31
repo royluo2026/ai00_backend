@@ -28,14 +28,14 @@ RULE_DEFINITION_INPUT_SCHEMA = {
             "properties": {
                 "name": {"type": "string", "minLength": 1, "maxLength": 2000},
                 "description": {"type": "string", "minLength": 1, "maxLength": 2000},
-                "severity": {"type": "string", "minLength": 1, "maxLength": 2000},
+                "severity": {"type": "string", "minLength": 1, "maxLength": 64},
                 "enabled": {"type": "boolean"},
                 "condition": {"type": "string", "minLength": 1, "maxLength": 1024},
                 "message": {"type": "string", "minLength": 1, "maxLength": 2000},
-                "scope": {"type": "string", "minLength": 1, "maxLength": 2000},
+                "scope": {"type": "string", "minLength": 1, "maxLength": 128},
                 "tags": {"type": "array", "maxItems": 32, "items": {"type": "string", "minLength": 1, "maxLength": 128}},
                 "priority": {"type": "integer", "minimum": 0, "maximum": 100},
-                "category": {"type": "string", "minLength": 1, "maxLength": 2000},
+                "category": {"type": "string", "minLength": 1, "maxLength": 128},
             },
         },
     },
@@ -44,9 +44,9 @@ RULE_DEFINITION_INPUT_SCHEMA = {
 RULE_DEFINITION_OUTPUT_SCHEMA = {
     "type": "object", "additionalProperties": False,
     "properties": {
-        "rule_gid": {"type": "string", "minLength": 1}, "revision": {"type": "integer", "minimum": 1},
-        "name": {"type": "string"}, "description": {}, "severity": {}, "enabled": {}, "condition": {"type": "string"},
-        "message": {}, "scope": {}, "tags": {}, "priority": {}, "category": {},
+        "rule_gid": {"type": "string", "minLength": 1, "maxLength": 255}, "revision": {"type": "integer", "minimum": 1, "maximum": 2147483647},
+        "name": {"type": "string", "maxLength": 2000}, "description": {"type": "string", "maxLength": 2000}, "severity": {"type": "string", "maxLength": 64}, "enabled": {"type": "boolean"}, "condition": {"type": "string", "maxLength": 1024},
+        "message": {"type": "string", "maxLength": 2000}, "scope": {"type": "string", "maxLength": 128}, "tags": {"type": "array", "maxItems": 32, "items": {"type": "string", "minLength": 1, "maxLength": 128}}, "priority": {"type": "integer", "minimum": 0, "maximum": 100}, "category": {"type": "string", "maxLength": 128},
     },
     "required": ["rule_gid", "revision", *sorted(RULE_DEFINITION_FIELDS)],
 }

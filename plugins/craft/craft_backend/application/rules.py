@@ -4,6 +4,7 @@ import json
 import uuid
 from ..domain.rules import RuleRelease, RuleWaiver
 from ..data.connection import get_conn
+from ..rule_engine.executor import validate_cel_expression
 
 
 RULE_DEFINITION_FIELDS = frozenset({
@@ -11,10 +12,10 @@ RULE_DEFINITION_FIELDS = frozenset({
     "scope", "tags", "priority", "category",
 })
 _RULE_DEFINITION_VALUE_FIELDS = RULE_DEFINITION_FIELDS - {"name", "condition"}
-_FORBIDDEN_CONDITION_TOKENS = (
-    "__", "\n", "\r", ";", "`", "sql", "script", "source", "compiled",
-    "provider", "eval", "exec", "import",
-)
+_STRING_LIMITS = {
+    "name": 2000, "description": 2000, "severity": 64, "message": 2000,
+    "scope": 128, "category": 128,
+}
 
 
 def canonical_rule_definition_command(payload):
@@ -27,8 +28,8 @@ def validate_rule_definition_changes(changes):
         raise ValueError("unsupported rule definition changes")
     result = dict(changes)
     for key, value in result.items():
-        if key in {"name", "description", "severity", "message", "scope", "category"}:
-            if not isinstance(value, str) or not value or len(value) > 2000:
+        if key in _STRING_LIMITS:
+            if not isinstance(value, str) or not value or len(value) > _STRING_LIMITS[key]:
                 raise ValueError(f"invalid rule {key}")
         elif key == "enabled":
             if not isinstance(value, bool):
@@ -40,7 +41,7 @@ def validate_rule_definition_changes(changes):
             if not isinstance(value, list) or len(value) > 32 or any(not isinstance(item, str) or not item or len(item) > 128 for item in value):
                 raise ValueError("invalid rule tags")
         elif key == "condition":
-            if not isinstance(value, str) or not value or len(value) > 1024 or any(token in value.lower() for token in _FORBIDDEN_CONDITION_TOKENS):
+            if not validate_cel_expression(value):
                 raise ValueError("unsafe rule condition")
     return result
 
@@ -52,19 +53,24 @@ def closed_rule_projection(rule):
             definition = json.loads(definition)
         except ValueError:
             definition = {}
+    if not isinstance(definition, dict):
+        definition = {}
+    def text(value, limit): return value if isinstance(value, str) and len(value) <= limit else ""
+    def revision(value): return value if isinstance(value, int) and not isinstance(value, bool) and 1 <= value <= 2_147_483_647 else 1
+    tags = definition.get("tags")
     return {
-        "rule_gid": str(rule["gid"]),
-        "revision": int(rule.get("revision") or definition.get("_revision") or 1),
-        "name": rule.get("name") or "",
-        "description": definition.get("description"),
-        "severity": definition.get("severity"),
-        "enabled": definition.get("enabled"),
-        "condition": rule.get("expression") or "",
-        "message": definition.get("message"),
-        "scope": definition.get("scope"),
-        "tags": definition.get("tags"),
-        "priority": definition.get("priority"),
-        "category": definition.get("category"),
+        "rule_gid": text(rule.get("gid"), 255),
+        "revision": revision(rule.get("revision") or definition.get("_revision")),
+        "name": text(rule.get("name"), _STRING_LIMITS["name"]),
+        "description": text(definition.get("description"), _STRING_LIMITS["description"]),
+        "severity": text(definition.get("severity"), _STRING_LIMITS["severity"]),
+        "enabled": definition.get("enabled") if isinstance(definition.get("enabled"), bool) else False,
+        "condition": rule.get("expression") if validate_cel_expression(rule.get("expression")) else "",
+        "message": text(definition.get("message"), _STRING_LIMITS["message"]),
+        "scope": text(definition.get("scope"), _STRING_LIMITS["scope"]),
+        "tags": [item for item in tags[:32] if isinstance(item, str) and 0 < len(item) <= 128] if isinstance(tags, list) else [],
+        "priority": definition.get("priority") if isinstance(definition.get("priority"), int) and not isinstance(definition.get("priority"), bool) and 0 <= definition["priority"] <= 100 else 0,
+        "category": text(definition.get("category"), _STRING_LIMITS["category"]),
     }
 
 
@@ -81,20 +87,6 @@ class MysqlRuleDefinitionRepository(RuleDefinitionRepository):
             try:
                 with conn.cursor() as cur:
                     cur.execute(
-                        "SELECT result_json FROM workmanship_craft_bop_write_idempotency WHERE idempotency_key=%s AND capability_id=%s FOR UPDATE",
-                        (idempotency_key, "craft.rule.definition.change.apply"),
-                    )
-                    replay = cur.fetchone()
-                    if replay:
-                        stored = json.loads(replay["result_json"]) if isinstance(replay["result_json"], str) else replay["result_json"]
-                        if stored.get("actor_gid") != actor_gid:
-                            raise LookupError("rule not found")
-                        if stored.get("command_digest") != command_digest:
-                            from backend.capability_v2.provider_contracts import CapabilityBusinessError
-                            raise CapabilityBusinessError("idempotency_conflict", "The idempotency key is bound to another Craft rule command.")
-                        conn.commit()
-                        return stored["result"]
-                    cur.execute(
                         "SELECT gid,name,expression,rule_definition,applicable_scope,owner_user_gid,creator_gid "
                         "FROM workmanship_know_craft_rules WHERE gid=%s FOR UPDATE",
                         (rule_gid,),
@@ -108,9 +100,26 @@ class MysqlRuleDefinitionRepository(RuleDefinitionRepository):
                         definition = json.loads(definition)
                     scope = rule.get("applicable_scope") or {}
                     if isinstance(scope, str):
-                        scope = json.loads(scope)
-                    if (rule.get("owner_user_gid") or rule.get("creator_gid")) != actor_gid or (scope.get("team_gid") and scope.get("team_gid") != team_gid):
+                        try:
+                            scope = json.loads(scope)
+                        except ValueError:
+                            scope = {}
+                    if not isinstance(scope, dict) or not isinstance(scope.get("team_gid"), str) or not scope["team_gid"] or (rule.get("owner_user_gid") or rule.get("creator_gid")) != actor_gid or scope["team_gid"] != team_gid:
                         raise LookupError("rule not found")
+                    cur.execute(
+                        "SELECT result_json FROM workmanship_craft_bop_write_idempotency WHERE idempotency_key=%s AND capability_id=%s FOR UPDATE",
+                        (idempotency_key, "craft.rule.definition.change.apply"),
+                    )
+                    replay = cur.fetchone()
+                    if replay:
+                        stored = json.loads(replay["result_json"]) if isinstance(replay["result_json"], str) else replay["result_json"]
+                        if stored.get("actor_gid") != actor_gid or stored.get("team_gid") != team_gid or stored.get("rule_gid") != rule_gid:
+                            raise LookupError("rule not found")
+                        if stored.get("command_digest") != command_digest:
+                            from backend.capability_v2.provider_contracts import CapabilityBusinessError
+                            raise CapabilityBusinessError("idempotency_conflict", "The idempotency key is bound to another Craft rule command.")
+                        conn.commit()
+                        return stored["result"]
                     revision = int(definition.get("_revision") or 1)
                     if revision != expected_revision:
                         from backend.capability_v2.provider_contracts import CapabilityBusinessError
@@ -131,7 +140,7 @@ class MysqlRuleDefinitionRepository(RuleDefinitionRepository):
                         raise LookupError("rule not found")
                     cur.execute(
                         "INSERT INTO workmanship_craft_bop_write_idempotency (idempotency_key,capability_id,version_gid,result_json,created_by) VALUES (%s,%s,%s,%s,%s)",
-                        (idempotency_key, "craft.rule.definition.change.apply", rule_gid, json.dumps({"actor_gid": actor_gid, "command_digest": command_digest, "result": result}, ensure_ascii=False), actor_gid),
+                        (idempotency_key, "craft.rule.definition.change.apply", rule_gid, json.dumps({"actor_gid": actor_gid, "team_gid": team_gid, "rule_gid": rule_gid, "command_digest": command_digest, "result": result}, ensure_ascii=False), actor_gid),
                     )
                     cur.execute(
                         "INSERT INTO workmanship_app_capability_audit (event_type,capability_id,version,user_gid,source,request_id,payload_hash,status) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",

@@ -175,7 +175,11 @@ def test_mysql_rule_definition_repository_replays_before_revision_check(monkeypa
 
     class Cursor:
         def __init__(self):
-            self.rule = {**_rule(), "rule_definition": {"_revision": 1}}
+            self.rule = {
+                **_rule(),
+                "rule_definition": {"_revision": 1},
+                "applicable_scope": {"team_gid": "team-a"},
+            }
             self.replay = None
             self.current = None
             self.calls = []
@@ -228,6 +232,124 @@ def test_mysql_rule_definition_repository_replays_before_revision_check(monkeypa
     assert connection.rollbacks == 0
     events = [params[0] for sql, params in connection.cursor_value.calls if "INSERT INTO workmanship_app_capability_audit" in sql]
     assert events == ["rule_definition_operation", "rule_definition_changed"]
+
+
+def test_mysql_rule_definition_replay_requires_the_current_team_scope(monkeypatch):
+    from plugins.craft.craft_backend.application import rules
+
+    class Cursor:
+        def __init__(self):
+            self.rule = {**_rule(), "applicable_scope": {"team_gid": "team-a"}, "rule_definition": {"_revision": 1}}
+            self.replay = None
+            self.current = None
+            self.rowcount = 1
+
+        def __enter__(self): return self
+        def __exit__(self, *_): return False
+        def execute(self, sql, params=()):
+            if "SELECT result_json" in sql:
+                self.current = self.replay
+            elif "SELECT gid,name" in sql:
+                self.current = deepcopy(self.rule)
+            elif sql.startswith("UPDATE workmanship_know_craft_rules"):
+                self.rule.update({"name": params[0], "expression": params[1], "rule_definition": json.loads(params[2])})
+                self.current = None
+            elif "INSERT INTO workmanship_craft_bop_write_idempotency" in sql:
+                self.replay = {"result_json": params[3]}
+                self.current = None
+            else:
+                self.current = None
+
+        def fetchone(self): return self.current
+
+    class Connection:
+        def __init__(self): self.cursor_value = Cursor()
+        def cursor(self): return self.cursor_value
+        def commit(self): pass
+        def rollback(self): pass
+
+    connection = Connection()
+    @contextmanager
+    def factory(): yield connection
+    monkeypatch.setattr(rules, "get_conn", factory)
+    repository = rules.MysqlRuleDefinitionRepository()
+    command = dict(rule_gid="rule-1", expected_revision=1, changes={"name": "Stable"}, actor_gid="owner-1", idempotency_key="idem-1", command_digest="digest-1")
+    repository.change(**command, team_gid="team-a")
+
+    with pytest.raises(LookupError, match="rule not found"):
+        repository.change(**command, team_gid="team-b")
+
+
+@pytest.mark.parametrize("stored_scope", [{}, "", "{bad"])
+def test_mysql_rule_definition_rejects_empty_or_malformed_team_scope(monkeypatch, stored_scope):
+    from plugins.craft.craft_backend.application import rules
+
+    class Cursor:
+        def __enter__(self): return self
+        def __exit__(self, *_): return False
+        rowcount = 1
+        def execute(self, sql, _params=()):
+            self.sql = sql
+        def fetchone(self):
+            if "result_json" in self.sql:
+                return None
+            return {**_rule(), "applicable_scope": stored_scope, "rule_definition": {"_revision": 1}}
+
+    class Connection:
+        def cursor(self): return Cursor()
+        def commit(self): raise AssertionError("must not commit")
+        def rollback(self): pass
+
+    @contextmanager
+    def factory(): yield Connection()
+    monkeypatch.setattr(rules, "get_conn", factory)
+
+    with pytest.raises(LookupError, match="rule not found"):
+        rules.MysqlRuleDefinitionRepository().change(
+            rule_gid="rule-1", expected_revision=1, changes={"name": "Stable"},
+            actor_gid="owner-1", team_gid="team-a", idempotency_key="empty-scope", command_digest="digest",
+        )
+
+
+@pytest.mark.parametrize("condition", [
+    "os.system('calc')", "subprocess.call('x')", "open('/secret')", "eval('x')",
+    "x => x > 0", "function(x) { return x > 0; }", "quantity > 0; DROP TABLE rules",
+    "quantity > 0 // comment", "quantity > 0 /* comment */",
+])
+def test_rule_definition_change_rejects_non_cel_executable_condition_shapes(monkeypatch, condition):
+    handler, repository = _handler(monkeypatch)
+
+    with pytest.raises(ValueError):
+        handler(_payload({"condition": condition}), _context())
+
+    assert repository.commits == 0
+
+
+def test_rule_definition_change_accepts_the_approved_cel_boolean_surface(monkeypatch):
+    handler, _repository = _handler(monkeypatch)
+
+    result = handler(_payload({"condition": "quantity >= 2 && enabled"}), _context()).data
+
+    assert result["condition"] == "quantity >= 2 && enabled"
+
+
+def test_closed_rule_projection_drops_legacy_compiled_and_audit_poison():
+    from plugins.craft.craft_backend.application.rules import closed_rule_projection
+
+    projection = closed_rule_projection({
+        "gid": "rule-1", "name": {"source": "forged"}, "expression": "open('/secret')",
+        "rule_definition": {
+            "_revision": "bad", "description": {"compiled": "payload"}, "severity": ["block"],
+            "enabled": {"audit": "forged"}, "message": {"source": "leak"}, "scope": {"team_gid": "team-a"},
+            "tags": ["safe", {"compiled": "payload"}], "priority": {"audit": 1}, "category": ["process"],
+        },
+    })
+
+    assert projection == {
+        "rule_gid": "rule-1", "revision": 1, "name": "", "description": "", "severity": "",
+        "enabled": False, "condition": "", "message": "", "scope": "", "tags": ["safe"],
+        "priority": 0, "category": "",
+    }
 
 
 def test_rule_definition_change_registration_is_exact_closed_and_governed():
