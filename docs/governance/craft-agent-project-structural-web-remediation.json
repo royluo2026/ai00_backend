@@ -17,7 +17,7 @@
   },
   "closure_baseline_revision": "614805f59294006b8802ae01869dc9d7fe3cf694",
   "closure_baseline_sha256": "sha256:fca8beb006ff0fcac9fdad79d1ad19ef97633ed90217c45600e78c9e5e5754c0",
-  "content_sha256": "sha256:f978d320b6e088b533fff6ad6f288113224e8c0609eaf41bbd0d019eabfb1ac6",
+  "content_sha256": "sha256:4d8817f56273d91b336938cde4e4f3df8896b090b5372be7b3213ee332a4074b",
   "counts": {
     "groups": 14,
     "migrated_groups": 3,
@@ -754,6 +754,13 @@
           "source_sha256": "sha256:8f9d437b414d1d4e1231ee5069f6f702e5698ec2a43247bda84bc7c59456ca40",
           "start_line": 34
         },
+        "outbound_call_evidence": {
+          "allowed_outbound_calls": [
+            "capability:project.approval.order.reject"
+          ],
+          "dist_flow_sha256": "sha256:5568f9d1d5da2bd95f9c1723010b9985fa0693c0951cb800b1ca1f84f034bf26",
+          "flow_sha256": "sha256:0d785d44a4ebf709625f39c7d2d05dadc1a8aa648aea37b9a54f398afbe18c0c"
+        },
         "outbox_transaction": {
           "end_line": 119,
           "snippet_sha256": "sha256:21dc028a0c1952d0ae4085d8d4650a4aa8904bcbd388e680093bcc087d04286c",
@@ -1484,6 +1491,13 @@
         "source_sha256": "sha256:8f9d437b414d1d4e1231ee5069f6f702e5698ec2a43247bda84bc7c59456ca40",
         "start_line": 34
       },
+      "outbound_call_evidence": {
+        "allowed_outbound_calls": [
+          "capability:project.approval.order.reject"
+        ],
+        "dist_flow_sha256": "sha256:5568f9d1d5da2bd95f9c1723010b9985fa0693c0951cb800b1ca1f84f034bf26",
+        "flow_sha256": "sha256:0d785d44a4ebf709625f39c7d2d05dadc1a8aa648aea37b9a54f398afbe18c0c"
+      },
       "outbox_transaction": {
         "end_line": 119,
         "snippet_sha256": "sha256:21dc028a0c1952d0ae4085d8d4650a4aa8904bcbd388e680093bcc087d04286c",
@@ -1602,6 +1616,7 @@
         "source_sha256": "sha256:183bb5dfe17d4e743c2118d9d9035e678aef11b55dcf82a4d24fff73b7410486",
         "start_line": 368
       },
+      "dist_source_block_sha256": "sha256:47365c6e8b0147765c76b2e7bb330a454763c7147b0ad1744416fcfe486a1903",
       "frontend_anchor": {
         "blob": "a179dc94009217bafb32b7f9571d3c052bb01d56",
         "line": 43,
@@ -1629,6 +1644,11 @@
         "source_path": "plugins/project_management/project_management_backend/application/service.py",
         "source_sha256": "sha256:bfb874c131fb9c882982118c6d2914ddc2993b6409b6117aa483bba29a74631f",
         "start_line": 516
+      },
+      "source_block_sha256": "sha256:47365c6e8b0147765c76b2e7bb330a454763c7147b0ad1744416fcfe486a1903",
+      "unknown_item_type": {
+        "behavior": "throw",
+        "error_code": "capability_not_bound"
       }
     },
     "routes": {

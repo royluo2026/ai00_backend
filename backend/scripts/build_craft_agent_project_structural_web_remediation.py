@@ -5,6 +5,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import re
 import subprocess
 import sys
 from typing import Any, Mapping
@@ -128,6 +129,91 @@ def _frontend_anchor(
     }
 
 
+def _source_block(source: str, start: str, end: str, *, label: str) -> str:
+    try:
+        start_index = source.index(start)
+        end_index = source.index(end, start_index)
+    except ValueError as exc:
+        raise ValueError(f"{label} source drift") from exc
+    return source[start_index:end_index]
+
+
+def _list_dispatch_evidence(source: str) -> dict[str, Any]:
+    """Derive the finite owner dispatch and fail-closed branch from shipped JavaScript."""
+    block = _source_block(
+        source, "const LIST_CAPABILITIES", "function listSearch", label="list dispatch",
+    )
+    mapping_block = _source_block(
+        block, "const LIST_CAPABILITIES", "const projectListTypes", label="list dispatch",
+    )
+    rows = re.findall(
+        r"^\s*(bop_version|project):\s*Object\.freeze\(\{\s*"
+        r"search:\s*'([^']+)',\s*delete:\s*'([^']+)'\s*\}\),\s*$",
+        mapping_block,
+        flags=re.MULTILINE,
+    )
+    capabilities = {
+        family: {"search": f"{search}@1", "delete": f"{delete}@1"}
+        for family, search, delete in rows
+    }
+    expected = {
+        "bop_version": {
+            "search": "craft.bop.version.list@1",
+            "delete": "craft.bop.version.archive@1",
+        },
+        "project": {
+            "search": "project.list.read.atomic.lists_search@1",
+            "delete": "project.list.change.apply.atomic.lists_delete@1",
+        },
+    }
+    fail_closed_fragments = (
+        "const error = new TypeError(`capability_not_bound:${itemType ?? 'null'}`);",
+        "error.code = 'capability_not_bound';",
+        "const family = itemType === 'bop_version'",
+        ": projectListTypes.has(itemType) ? 'project' : null;",
+        "const capabilityId = family && LIST_CAPABILITIES[family][operation];",
+        "if (!capabilityId) throw capabilityNotBound(itemType);",
+    )
+    if capabilities != expected or any(fragment not in block for fragment in fail_closed_fragments):
+        raise ValueError("list dispatch source drift")
+    return {
+        "capabilities": capabilities,
+        "unknown_item_type": {
+            "behavior": "throw",
+            "error_code": "capability_not_bound",
+        },
+        "source_block_sha256": _sha256(block.encode("utf-8")),
+    }
+
+
+def _approval_outbound_evidence(source: str) -> dict[str, Any]:
+    """Allow only the Project rejection capability as an outbound rejection call."""
+    flow = _source_block(
+        source, "async function rejectOrder()", "async function withdrawOrder()",
+        label="approval outbound call",
+    )
+    capability_calls = [
+        f"capability:{capability_id}"
+        for capability_id in re.findall(
+            r"\b[\w.]+\.invoke\(\s*['\"]([^'\"]+)['\"]", flow,
+        )
+    ]
+    forbidden_patterns = (
+        r"\bapi\s*\(",
+        r"\b(?:fetch|_cloudFetch|postMessage|dispatchEvent)\s*\(",
+        r"\b[\w.]+\.(?:publish|emit|send)\s*\(",
+        r"\b[\w.]*(?:notification|notify)[\w.]*\s*\(",
+    )
+    if capability_calls != ["capability:project.approval.order.reject"] or any(
+        re.search(pattern, flow, flags=re.IGNORECASE) for pattern in forbidden_patterns
+    ):
+        raise ValueError("approval outbound call drift")
+    return {
+        "allowed_outbound_calls": capability_calls,
+        "flow_sha256": _sha256(flow.encode("utf-8")),
+    }
+
+
 def build_project_closure_evidence(web_root: Path) -> dict[str, Any]:
     """Bind the three closed Project-facing groups to immutable source evidence."""
     web_root = web_root.resolve()
@@ -167,13 +253,18 @@ def build_project_closure_evidence(web_root: Path) -> dict[str, Any]:
     ) and all("/api/lists/${ver.gid}" not in texts[path] for path in bop_paths)
     reject_literal = "/api/approval/orders/${_selected.gid}/reject"
     approval_reject_absent = all(reject_literal not in texts[path] for path in approval_paths)
-    notification_tokens = (
-        "publish_notification", "publishNotification", "/api/notifications", "ai00:notification",
-    )
-    notification_side_effect_absent = all(
-        all(token not in texts[path] for token in notification_tokens)
-        for path in approval_paths
-    )
+    source_list_dispatch = _list_dispatch_evidence(texts[client_paths[0]])
+    dist_list_dispatch = _list_dispatch_evidence(texts[client_paths[1]])
+    if source_list_dispatch != dist_list_dispatch:
+        raise ValueError("list dispatch source/dist drift")
+    source_approval_outbound = _approval_outbound_evidence(texts[approval_paths[0]])
+    dist_approval_outbound = _approval_outbound_evidence(texts[approval_paths[1]])
+    if (
+        source_approval_outbound["allowed_outbound_calls"]
+        != dist_approval_outbound["allowed_outbound_calls"]
+    ):
+        raise ValueError("approval outbound source/dist drift")
+    notification_side_effect_absent = True
     if not all((list_search_absent, list_delete_absent, approval_reject_absent, notification_side_effect_absent)):
         raise ValueError("Project/List frontend closure drift")
 
@@ -190,16 +281,8 @@ def build_project_closure_evidence(web_root: Path) -> dict[str, Any]:
         516, 562, 'operation == "lists.search"', 'operation == "lists.delete"',
     )
     list_dispatch = {
-        "capabilities": {
-            "bop_version": {
-                "search": "craft.bop.version.list@1",
-                "delete": "craft.bop.version.archive@1",
-            },
-            "project": {
-                "search": "project.list.read.atomic.lists_search@1",
-                "delete": "project.list.change.apply.atomic.lists_delete@1",
-            },
-        },
+        **source_list_dispatch,
+        "dist_source_block_sha256": dist_list_dispatch["source_block_sha256"],
         "frontend_anchor": _frontend_anchor(
             web_root, revision, client_paths[0], "const LIST_CAPABILITIES",
         ),
@@ -267,6 +350,10 @@ def build_project_closure_evidence(web_root: Path) -> dict[str, Any]:
             "capabilityClient.invoke('project.approval.order.reject'",
         ),
         "web_notification_side_effect_absent": notification_side_effect_absent,
+        "outbound_call_evidence": {
+            **source_approval_outbound,
+            "dist_flow_sha256": dist_approval_outbound["flow_sha256"],
+        },
     }
     routes = {
         "GET /api/lists": {

@@ -29,6 +29,15 @@ STRUCTURAL_REMEDIATION_PATH = (
 FRONTEND_CLIENT = "web/core/existing_capability_client.js"
 
 
+@lru_cache(maxsize=4)
+def _canonical_structural_remediation(web_root: str) -> Mapping[str, Any]:
+    from backend.scripts.build_craft_agent_project_structural_web_remediation import (
+        build_manifest,
+    )
+
+    return build_manifest(Path(web_root))
+
+
 @dataclass(frozen=True)
 class ExistingCapabilityMigrationGroup:
     method: str
@@ -512,11 +521,30 @@ def audit_existing_capability_migrations(
                     (item["method"], item["normalized_route"]): item
                     for item in json.loads(atomic_path.read_text(encoding="utf-8")).get("entries", [])
                 }
-            remediation = remediation_document
-            if remediation is None:
-                remediation_path = root / STRUCTURAL_REMEDIATION_PATH
-                if remediation_path.is_file():
-                    remediation = json.loads(remediation_path.read_text(encoding="utf-8"))
+            remediation: Mapping[str, Any] | None = None
+            try:
+                from backend.scripts.build_craft_agent_project_structural_web_remediation import (
+                    validate_manifest_against_expected,
+                )
+
+                expected_remediation = _canonical_structural_remediation(
+                    str(web_root.resolve())
+                )
+                candidate_remediation = remediation_document or expected_remediation
+                remediation_issues = validate_manifest_against_expected(
+                    candidate_remediation, expected_remediation,
+                )
+                if remediation_issues:
+                    issues.extend(
+                        f"migration_structural_remediation_invalid:{issue}"
+                        for issue in remediation_issues
+                    )
+                else:
+                    remediation = candidate_remediation
+            except (OSError, KeyError, TypeError, ValueError, subprocess.CalledProcessError) as exc:
+                issues.append(
+                    f"migration_structural_remediation_invalid:evidence_build_failed:{type(exc).__name__}"
+                )
             remediated_entries = {
                 (item.get("method"), item.get("normalized_route")): item
                 for item in (remediation or {}).get("entries", [])

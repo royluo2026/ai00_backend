@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import subprocess
 
+import backend.capability_v2.existing_capability_migrations as migration_audit
 from backend.capability_v2.existing_capability_migrations import (
     audit_existing_capability_migrations,
     load_existing_capability_migrations,
@@ -154,6 +155,51 @@ def test_later_source_proved_remediation_may_close_a_reclassified_occurrence() -
         ROOT, manifest, web_root=WEB_ROOT, remediation_document=remediation,
     )
     assert "migration_final_reclassification_mismatch:POST:/api/approval/orders/{dynamic}/reject" in issues
+
+
+def test_later_remediation_is_rebuilt_without_a_stored_generated_manifest(monkeypatch) -> None:
+    """Breaks if clean replay requires a previously generated remediation artifact."""
+    manifest = load_existing_capability_migrations(MANIFEST)
+    monkeypatch.setattr(migration_audit, "STRUCTURAL_REMEDIATION_PATH", "does/not/exist.json")
+
+    issues = audit_existing_capability_migrations(ROOT, manifest, web_root=WEB_ROOT)
+
+    assert "migration_final_reclassification_mismatch:POST:/api/approval/orders/{dynamic}/reject" not in issues
+
+
+def test_later_remediation_rejects_forged_and_stale_documents() -> None:
+    """Breaks if plausible self-declared JSON can silence a historical migration mismatch."""
+    manifest = load_existing_capability_migrations(MANIFEST)
+    stored = json.loads(
+        (ROOT / "docs/governance/craft-agent-project-structural-web-remediation.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    approval = next(
+        item for item in stored["entries"]
+        if (item["method"], item["normalized_route"])
+        == ("POST", "/api/approval/orders/{dynamic}/reject")
+    )
+    forged = {
+        "schema_version": stored["schema_version"],
+        "frontend_revision": stored["frontend_revision"],
+        "content_sha256": stored["content_sha256"],
+        "entries": [approval],
+    }
+    stale = json.loads(json.dumps(stored))
+    stale["frontend_revision"] = "0" * 40
+    without_hash = {key: value for key, value in stale.items() if key != "content_sha256"}
+    import hashlib
+    stale["content_sha256"] = "sha256:" + hashlib.sha256(
+        (json.dumps(without_hash, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode()
+    ).hexdigest()
+
+    for document in (forged, stale):
+        issues = audit_existing_capability_migrations(
+            ROOT, manifest, web_root=WEB_ROOT, remediation_document=document,
+        )
+        assert any(issue.startswith("migration_structural_remediation_invalid:") for issue in issues)
+        assert "migration_final_reclassification_mismatch:POST:/api/approval/orders/{dynamic}/reject" in issues
 
 
 def test_migrated_groups_are_only_the_provider_equivalent_families() -> None:

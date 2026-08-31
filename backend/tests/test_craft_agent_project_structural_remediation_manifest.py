@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 import json
 from pathlib import Path
+import subprocess
 
 import pytest
 
@@ -26,6 +27,13 @@ def _plan_module():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def _frontend_source(path: str) -> str:
+    return subprocess.run(
+        ["git", "show", f"69e5e00054d3c1cff635fe41fcb96fbe150d25fb:{path}"],
+        cwd=WEB_ROOT, check=True, capture_output=True, text=True, encoding="utf-8",
+    ).stdout
 
 
 def test_structural_plan_uses_the_registered_craft_list_capability_identity():
@@ -64,6 +72,75 @@ def test_project_closure_evidence_freezes_exact_frontend_commit_blobs_and_absenc
             "delete": "project.list.change.apply.atomic.lists_delete@1",
         },
     }
+
+
+def test_list_dispatch_evidence_is_derived_from_complete_mapping_and_fail_closed_source():
+    """Breaks on a wrong owner mapping or an unknown-item branch that no longer fails closed."""
+    module = _module()
+    source = _frontend_source("web/core/existing_capability_client.js")
+
+    evidence = module._list_dispatch_evidence(source)
+
+    assert evidence["capabilities"] == {
+        "bop_version": {
+            "search": "craft.bop.version.list@1",
+            "delete": "craft.bop.version.archive@1",
+        },
+        "project": {
+            "search": "project.list.read.atomic.lists_search@1",
+            "delete": "project.list.change.apply.atomic.lists_delete@1",
+        },
+    }
+    assert evidence["unknown_item_type"] == {
+        "behavior": "throw",
+        "error_code": "capability_not_bound",
+    }
+    assert evidence["source_block_sha256"].startswith("sha256:")
+
+    mutations = (
+        source.replace(
+            "search: 'project.list.read.atomic.lists_search'",
+            "search: 'project.project.read.atomic.projects_search'",
+            1,
+        ),
+        source.replace(
+            "if (!capabilityId) throw capabilityNotBound(itemType);",
+            "if (!capabilityId) return { capabilityId: null, write: false };",
+            1,
+        ),
+    )
+    for changed in mutations:
+        with pytest.raises(ValueError, match="list dispatch source drift"):
+            module._list_dispatch_evidence(changed)
+
+
+def test_approval_outbound_evidence_rejects_notification_helpers_and_capabilities():
+    """Breaks if rejection publishes from Web through a renamed helper or notification capability."""
+    module = _module()
+    source = _frontend_source("packages/craft-plugin/web/approval/approval.js")
+
+    evidence = module._approval_outbound_evidence(source)
+
+    assert evidence["allowed_outbound_calls"] == [
+        "capability:project.approval.order.reject",
+    ]
+    assert evidence["flow_sha256"].startswith("sha256:")
+
+    mutations = (
+        source.replace(
+            "let res;",
+            "notificationClient.publish({ order_gid: _selected.gid });\n  let res;",
+            1,
+        ),
+        source.replace(
+            "capabilityClient.invoke('project.approval.order.reject'",
+            "capabilityClient.invoke('base.notification.change.apply'",
+            1,
+        ),
+    )
+    for changed in mutations:
+        with pytest.raises(ValueError, match="approval outbound call drift"):
+            module._approval_outbound_evidence(changed)
 
 
 def test_project_closure_evidence_pins_provider_contract_outbox_and_gateway_anchors():

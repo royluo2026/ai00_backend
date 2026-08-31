@@ -10,7 +10,7 @@
     "no silent REST fallback"
   ],
   "artifact_id": "capability-v2-structural-remediation-plan",
-  "content_sha256": "sha256:87a53691ad355fc73694775296ffcba92b0caeca37594251daa4ac53de6ec5c9",
+  "content_sha256": "sha256:835ffc78dee3d16f42571075336f2596480a07145d38a9f8c3b89214dd67c524",
   "counts": {
     "groups": 37,
     "occurrences": 45
@@ -4883,7 +4883,7 @@
     },
     {
       "path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-      "sha256": "sha256:38382b6ae0802be0175a13d25723fe7d68f7073f571857d2b0a429b3e05ffaad"
+      "sha256": "sha256:dfc2a436847263a8de0e21f2c360262656243acec73e02e59e8b09cfe4263db1"
     },
     {
       "path": "docs\\governance\\capability-coverage-review\\generated\\web_route_inventory.json",
