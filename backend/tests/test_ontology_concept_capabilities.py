@@ -83,6 +83,24 @@ def test_get_schema_is_version_pinned_and_does_not_return_arbitrary_graph():
     assert result.data["ontology_version_ref"]["release_gid"] == "rel1"
 
 
+def test_get_schema_projects_only_durable_craft_rule_references():
+    Repository.objects.append({
+        "kind": "concept", "stable_gid": "c-rule", "name": "Rule host",
+        "rules": [
+            {"rule_gid": "craft-rule-1", "revision": 1},
+            {"gid": "legacy-name-only", "revision": 1},
+        ],
+    })
+    try:
+        with _repository():
+            result = get_concept({"stable_gid": "c-rule", "kind": "concept", "view": "schema"}, CONTEXT)
+    finally:
+        Repository.objects.pop()
+    rules = result.data["concept"]["rules"]
+    assert rules[0]["rule_reference"] == {"rule_gid": "craft-rule-1", "rule_revision": 1}
+    assert rules[1]["rule_reference_unbound"] is True
+
+
 def test_list_objects_is_bounded_and_version_pinned():
     from backend.capabilities.ontology_concepts_next import list_objects
 
