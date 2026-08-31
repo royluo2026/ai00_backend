@@ -3,7 +3,7 @@
   "artifact_id": "existing-capability-web-migrations",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "baseline_revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-  "frontend_revision": "43a650ab35cba99c6788ce3622a46e08404e7731",
+  "frontend_revision": "8ebc8de49b5d4f86c9360664fffa912c3d969102",
   "groups": [
     {
       "method": "DELETE",
@@ -802,17 +802,17 @@
       "frontend_call_sites": [
         {
           "source_path": "web/container_card/modes/container_item_detail.js",
-          "line": 153,
+          "line": 155,
           "column": 140,
           "operation": "knowledge.get",
-          "source_sha256": "a95c48aee7fcfe802e0d0dc197d5115ee4ab3e439e86dfcab00a3aa48f9d8b81"
+          "source_sha256": "28a46d2165359886127d9f70868bca20e2ca0f23b0424ad1a235ba72de30564e"
         },
         {
           "source_path": "web/container_card/modes/mode_field_detail.js",
-          "line": 65,
+          "line": 67,
           "column": 141,
           "operation": "knowledge.get",
-          "source_sha256": "a2fb6903665f9ca608a23a3cdef99ce7309bcb578ec63e0c08e05c44e9ad3af2"
+          "source_sha256": "89d894166f5efa9d256d9e4e4540e4a2e93609d77f601a0027a06061fddca195"
         },
         {
           "source_path": "web/container_card/modes/mode_text_image.js",
@@ -1061,7 +1061,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/craft/craft_backend/capabilities/rule_engine.py",
-            "source_sha256": "3f7cdfe1036ce95c00ee8548725e94bb0876c7ca5430984c79c94cc773850455",
+            "source_sha256": "989185e4b82b89f2864846c88157881d86fe1bacb495da8ef8d05ce6a7037e88",
             "start_line": 175,
             "end_line": 175,
             "sha256": "70894c43c2c5b0f52bb6a3a20e53eab6c624f41ef91801052aa58b2caf9b7390",
@@ -2603,10 +2603,10 @@
       "frontend_call_sites": [
         {
           "source_path": "web/container_card/modes/container_item_detail.js",
-          "line": 198,
+          "line": 200,
           "column": 140,
           "operation": "knowledge.create",
-          "source_sha256": "a95c48aee7fcfe802e0d0dc197d5115ee4ab3e439e86dfcab00a3aa48f9d8b81"
+          "source_sha256": "28a46d2165359886127d9f70868bca20e2ca0f23b0424ad1a235ba72de30564e"
         }
       ],
       "equivalence_evidence": {
@@ -3369,17 +3369,17 @@
       "frontend_call_sites": [
         {
           "source_path": "web/container_card/modes/container_item_detail.js",
-          "line": 178,
+          "line": 180,
           "column": 134,
           "operation": "knowledge.update",
-          "source_sha256": "a95c48aee7fcfe802e0d0dc197d5115ee4ab3e439e86dfcab00a3aa48f9d8b81"
+          "source_sha256": "28a46d2165359886127d9f70868bca20e2ca0f23b0424ad1a235ba72de30564e"
         },
         {
           "source_path": "web/container_card/modes/mode_field_detail.js",
-          "line": 77,
+          "line": 79,
           "column": 130,
           "operation": "knowledge.update",
-          "source_sha256": "a2fb6903665f9ca608a23a3cdef99ce7309bcb578ec63e0c08e05c44e9ad3af2"
+          "source_sha256": "89d894166f5efa9d256d9e4e4540e4a2e93609d77f601a0027a06061fddca195"
         }
       ],
       "equivalence_evidence": {
@@ -3455,7 +3455,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+            "source_sha256": "c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
             "start_line": 577,
             "end_line": 577,
             "sha256": "87996e6eb263b446ffb01e10d1cdbd92be0299705262028f64b237aa97d299d9",

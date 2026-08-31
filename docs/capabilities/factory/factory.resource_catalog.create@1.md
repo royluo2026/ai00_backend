@@ -8,7 +8,7 @@ Execute the governed factory.resource_catalog.create Factory outcome.
 - 不适用：The resource is a BOP plan node or production schedule.
 - 生命周期：`stable`
 - 所属领域：`factory`
-- Catalog Release：`rel_d407979e8fe9737980e72058e3384b37`
+- Catalog Release：`rel_05bcccdde2e100f8dba2e9e85c3dab50`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -175,7 +175,7 @@ Execute the governed factory.resource_catalog.create Factory outcome.
 ```json
 {
   "capability_id": "factory.resource_catalog.create",
-  "catalog_release": "rel_d407979e8fe9737980e72058e3384b37",
+  "catalog_release": "rel_05bcccdde2e100f8dba2e9e85c3dab50",
   "major_version": 1,
   "payload": {}
 }

@@ -17,7 +17,7 @@
   },
   "closure_baseline_revision": "614805f59294006b8802ae01869dc9d7fe3cf694",
   "closure_baseline_sha256": "sha256:fca8beb006ff0fcac9fdad79d1ad19ef97633ed90217c45600e78c9e5e5754c0",
-  "content_sha256": "sha256:cb4020ec76b6716a610a7fbdbf95f2775d807bdfe7e445a89c4ef725647c97b9",
+  "content_sha256": "sha256:e1726da651dbbec0b16112451c8cc4522aebf806930ca52bbfdd1d7a09b33d79",
   "counts": {
     "groups": 14,
     "migrated_groups": 5,
@@ -49,24 +49,24 @@
         "sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33"
       },
       "plugins/craft/craft_backend/capabilities/contracts.py": {
-        "blob": "cfd066edb1605e7d0ab0a855601a8387b38625ec",
-        "sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b"
+        "blob": "9017729fc91e93aa5705a8e31c67df6f785ac158",
+        "sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea"
       },
       "plugins/craft/craft_backend/capabilities/provider.py": {
-        "blob": "f8323436d4642d238aa26a3b548ce87d7cbf4db8",
-        "sha256": "sha256:d86f0fcd4a247cd51970d44fcf7ec3a889af64f47fb79f7ebe9b93ab8a433f42"
+        "blob": "00cdb00477d4e87130ee14d00e9341c253a94b62",
+        "sha256": "sha256:43c1c93d81b6eae851d2f609b0967b12fc6979138f4fd06a7aa4ebba0504d4fd"
       },
       "plugins/craft/craft_backend/capabilities/rule_engine.py": {
-        "blob": "1bfc3853483c16ef69c5074391fa8c1d5736b8e3",
-        "sha256": "sha256:3f7cdfe1036ce95c00ee8548725e94bb0876c7ca5430984c79c94cc773850455"
+        "blob": "46f5ddca0b57e875b3a16221873b31aa6d8b6fcf",
+        "sha256": "sha256:989185e4b82b89f2864846c88157881d86fe1bacb495da8ef8d05ce6a7037e88"
       },
       "plugins/craft/craft_backend/capabilities/rule_library.py": {
-        "blob": "aa9cab3ca3585e67626be447aea3f92acd50b3e6",
-        "sha256": "sha256:8667724722a2be77f58d69ce9815ab8bc603dbb196fd04009ef6bd635ce3e5d6"
+        "blob": "c0c069acde34a8e4f967c5441d3ff24485f807d9",
+        "sha256": "sha256:351f031131abd75feb076ab0181c2a16c560c49b9bb26a214fe0d716349dbc68"
       }
     },
-    "backend_revision": "076ed4348a066c59b6852f75d479fa08c2a49f14",
-    "backend_tree": "e76fbe8b6f42ad5cfd8e9de67995fac233559cb2",
+    "backend_revision": "9cda07080f3e27b10d30ec6492ea875c31c82492",
+    "backend_tree": "1c31a434c78243f163d3a1b7914ce64221a20796",
     "dead_actions": {
       "DELETE /api/craft_lib/equipments/{dynamic}": {
         "frontend_anchor": {
@@ -149,16 +149,16 @@
     },
     "frontend_files": {
       "dist-production/packages/craft-plugin/web/lineage_view/layout_detail_panel.js": {
-        "blob": "bbcf3cbd696750393c8a046c97eab90945b31a84",
-        "sha256": "sha256:a1112e94d725031009a3e0b9bedce125e8f938b076aad753b84bcba79b11022e"
+        "blob": "790fa9303109bd4c914f043ea63e3d06a306ec91",
+        "sha256": "sha256:6570053ab9d2fdfd9cbcfcf5385c5d5705e4068ad76f2fc7c0bd3ada4792b92e"
       },
       "dist-production/web/container_card/modes/container_item_detail.js": {
-        "blob": "b249dffbe1e68cbdfe8045b5b09d894b168ba536",
-        "sha256": "sha256:a95c48aee7fcfe802e0d0dc197d5115ee4ab3e439e86dfcab00a3aa48f9d8b81"
+        "blob": "f80b7f2f7168b3a1049989c21b93ef231b778b00",
+        "sha256": "sha256:28a46d2165359886127d9f70868bca20e2ca0f23b0424ad1a235ba72de30564e"
       },
       "dist-production/web/container_card/modes/mode_field_detail.js": {
-        "blob": "b99a26505ff9b67450d3fc63faa6910c0b0fe386",
-        "sha256": "sha256:a2fb6903665f9ca608a23a3cdef99ce7309bcb578ec63e0c08e05c44e9ad3af2"
+        "blob": "8111a1cb22209beb708be2dea177004f13788f3b",
+        "sha256": "sha256:89d894166f5efa9d256d9e4e4540e4a2e93609d77f601a0027a06061fddca195"
       },
       "dist-production/web/knowledge_hub/pages/gbop_vpps.html": {
         "blob": "b5f37566ebe00f00740691fb76a720aab3f46b87",
@@ -173,16 +173,16 @@
         "sha256": "sha256:8ece577ea8c421d354992b2e5c1b2dea38ac52750ae49f36c4fc147f668a52a6"
       },
       "packages/craft-plugin/web/lineage_view/layout_detail_panel.js": {
-        "blob": "bbcf3cbd696750393c8a046c97eab90945b31a84",
-        "sha256": "sha256:a1112e94d725031009a3e0b9bedce125e8f938b076aad753b84bcba79b11022e"
+        "blob": "790fa9303109bd4c914f043ea63e3d06a306ec91",
+        "sha256": "sha256:6570053ab9d2fdfd9cbcfcf5385c5d5705e4068ad76f2fc7c0bd3ada4792b92e"
       },
       "web/container_card/modes/container_item_detail.js": {
-        "blob": "e7ba1bf677970fa450e8a91fe4e318a448cbeced",
-        "sha256": "sha256:add044132e94a7728b49194e1e02716b935b7e807d6aba2b34a5251ad773d963"
+        "blob": "7c72c1908cebea8d8cbdf72743f37366fc432f1c",
+        "sha256": "sha256:fec2a8bcb11d148bd891a378b17128ef8073af0f8d732e16544c05f1fc170e61"
       },
       "web/container_card/modes/mode_field_detail.js": {
-        "blob": "bb0436187c725c13e3805d81cb103dfd87fd0aa0",
-        "sha256": "sha256:fc415a2e4a1af8b8a24d5099296351fb7624e73caa2463ce603954847ab7dc65"
+        "blob": "84f8f8a083169bc9d32870b539d739f50fd34adc",
+        "sha256": "sha256:e454ac47277c2270558542d40e37527b2b830a2539f1f349257f143cdb984858"
       },
       "web/knowledge_hub/pages/gbop_vpps.html": {
         "blob": "2ea909184bf3d6e7c67791eb9f258e04ca62a34f",
@@ -197,33 +197,33 @@
         "sha256": "sha256:fdf6212073b4cdc26051dcfd82282cfb2ae8e40e7f8d7f9ff47cffbd761d8be9"
       }
     },
-    "frontend_revision": "43a650ab35cba99c6788ce3622a46e08404e7731",
+    "frontend_revision": "8ebc8de49b5d4f86c9360664fffa912c3d969102",
     "routes": {
       "GET /api/rule-engine/check-entry": {
         "candidate_capability": "craft.rule.entry.evaluate@1",
         "contract_evidence": {
           "input_output": {
             "end_line": 563,
-            "snippet_sha256": "sha256:1b285d11d13df69b7e4399b4e2c70449c7ce6eb5a02945490bde5f114cae63a6",
+            "snippet_sha256": "sha256:3f92d0ce0e0a126194894968ce9bf05c12547a49bac61eae524d07f6bb29eb01",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+            "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
             "start_line": 549
           }
         },
         "frontend_call_sites": [
           {
-            "blob": "bbcf3cbd696750393c8a046c97eab90945b31a84",
-            "line": 2210,
+            "blob": "790fa9303109bd4c914f043ea63e3d06a306ec91",
+            "line": 2212,
             "snippet_sha256": "sha256:9fa1fadce51dda5b2a5765c27c336af849a477ed070016346684c30306d17661",
             "source_path": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-            "source_sha256": "sha256:a1112e94d725031009a3e0b9bedce125e8f938b076aad753b84bcba79b11022e"
+            "source_sha256": "sha256:6570053ab9d2fdfd9cbcfcf5385c5d5705e4068ad76f2fc7c0bd3ada4792b92e"
           },
           {
-            "blob": "bbcf3cbd696750393c8a046c97eab90945b31a84",
-            "line": 3552,
+            "blob": "790fa9303109bd4c914f043ea63e3d06a306ec91",
+            "line": 3556,
             "snippet_sha256": "sha256:9fa1fadce51dda5b2a5765c27c336af849a477ed070016346684c30306d17661",
             "source_path": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-            "source_sha256": "sha256:a1112e94d725031009a3e0b9bedce125e8f938b076aad753b84bcba79b11022e"
+            "source_sha256": "sha256:6570053ab9d2fdfd9cbcfcf5385c5d5705e4068ad76f2fc7c0bd3ada4792b92e"
           }
         ],
         "gateway_anchor": {
@@ -242,10 +242,10 @@
             "start_line": 134
           },
           "provider_descriptor": {
-            "end_line": 137,
-            "snippet_sha256": "sha256:d8422898cfdb295e8def126090ff8953acda4689c4fa3c57ae5914aed02b8041",
+            "end_line": 140,
+            "snippet_sha256": "sha256:f1014f9f18273363dc4de5077304ec054cc8be6ed9d3e9d4b7110f51ef54c8b2",
             "source_path": "plugins/craft/craft_backend/capabilities/provider.py",
-            "source_sha256": "sha256:d86f0fcd4a247cd51970d44fcf7ec3a889af64f47fb79f7ebe9b93ab8a433f42",
+            "source_sha256": "sha256:43c1c93d81b6eae851d2f609b0967b12fc6979138f4fd06a7aa4ebba0504d4fd",
             "start_line": 90
           }
         },
@@ -254,7 +254,7 @@
           "end_line": 183,
           "snippet_sha256": "sha256:5e26b15637963ae5cedc244ab113431069cae0e9045526a2401fe17688db9bf2",
           "source_path": "plugins/craft/craft_backend/capabilities/rule_engine.py",
-          "source_sha256": "sha256:3f7cdfe1036ce95c00ee8548725e94bb0876c7ca5430984c79c94cc773850455",
+          "source_sha256": "sha256:989185e4b82b89f2864846c88157881d86fe1bacb495da8ef8d05ce6a7037e88",
           "start_line": 174
         }
       },
@@ -265,24 +265,24 @@
             "end_line": 52,
             "snippet_sha256": "sha256:9554a70a7d6d4b8987ad6e4c9246f28d8c45fa80261365c63ab910c276f11479",
             "source_path": "plugins/craft/craft_backend/capabilities/rule_library.py",
-            "source_sha256": "sha256:8667724722a2be77f58d69ce9815ab8bc603dbb196fd04009ef6bd635ce3e5d6",
+            "source_sha256": "sha256:351f031131abd75feb076ab0181c2a16c560c49b9bb26a214fe0d716349dbc68",
             "start_line": 21
           }
         },
         "frontend_call_sites": [
           {
-            "blob": "e7ba1bf677970fa450e8a91fe4e318a448cbeced",
-            "line": 137,
+            "blob": "7c72c1908cebea8d8cbdf72743f37366fc432f1c",
+            "line": 139,
             "snippet_sha256": "sha256:c8d31b5cd95bf332a05c7147edf945b62f9fc7d5e5079c50f2e3a141acaaaf4c",
             "source_path": "web/container_card/modes/container_item_detail.js",
-            "source_sha256": "sha256:add044132e94a7728b49194e1e02716b935b7e807d6aba2b34a5251ad773d963"
+            "source_sha256": "sha256:fec2a8bcb11d148bd891a378b17128ef8073af0f8d732e16544c05f1fc170e61"
           },
           {
-            "blob": "bb0436187c725c13e3805d81cb103dfd87fd0aa0",
-            "line": 46,
+            "blob": "84f8f8a083169bc9d32870b539d739f50fd34adc",
+            "line": 48,
             "snippet_sha256": "sha256:c8d31b5cd95bf332a05c7147edf945b62f9fc7d5e5079c50f2e3a141acaaaf4c",
             "source_path": "web/container_card/modes/mode_field_detail.js",
-            "source_sha256": "sha256:fc415a2e4a1af8b8a24d5099296351fb7624e73caa2463ce603954847ab7dc65"
+            "source_sha256": "sha256:e454ac47277c2270558542d40e37527b2b830a2539f1f349257f143cdb984858"
           }
         ],
         "gateway_anchor": {
@@ -301,33 +301,33 @@
             "start_line": 134
           },
           "provider_descriptor": {
-            "end_line": 137,
-            "snippet_sha256": "sha256:d8422898cfdb295e8def126090ff8953acda4689c4fa3c57ae5914aed02b8041",
+            "end_line": 140,
+            "snippet_sha256": "sha256:f1014f9f18273363dc4de5077304ec054cc8be6ed9d3e9d4b7110f51ef54c8b2",
             "source_path": "plugins/craft/craft_backend/capabilities/provider.py",
-            "source_sha256": "sha256:d86f0fcd4a247cd51970d44fcf7ec3a889af64f47fb79f7ebe9b93ab8a433f42",
+            "source_sha256": "sha256:43c1c93d81b6eae851d2f609b0967b12fc6979138f4fd06a7aa4ebba0504d4fd",
             "start_line": 90
           }
         },
         "legacy_route_absent": true,
         "provider_anchor": {
-          "end_line": 176,
-          "snippet_sha256": "sha256:4f934a75333955d4579d85dfe9922a9c556c50c894386ebb0de7f6112bad4090",
+          "end_line": 194,
+          "snippet_sha256": "sha256:966dcc51d5392dd168e031736ec80f8dac3a33054de1cf046dd08a27a682274d",
           "source_path": "plugins/craft/craft_backend/capabilities/rule_library.py",
-          "source_sha256": "sha256:8667724722a2be77f58d69ce9815ab8bc603dbb196fd04009ef6bd635ce3e5d6",
-          "start_line": 149
+          "source_sha256": "sha256:351f031131abd75feb076ab0181c2a16c560c49b9bb26a214fe0d716349dbc68",
+          "start_line": 165
         }
       }
     },
     "scanner_materialization": {
       "document_count": 224,
-      "materialization_sha256": "sha256:eb5541221452299947240ab9cafe6901bb8931ba3b608a5efe22df14acaa05c7",
+      "materialization_sha256": "sha256:76e0efa1eb50caa5bdcba9223964ff7494932f8c2f7ddeb38e71e57898a85d9c",
       "method": "git-tree-blobs-v1",
-      "revision": "43a650ab35cba99c6788ce3622a46e08404e7731",
+      "revision": "8ebc8de49b5d4f86c9360664fffa912c3d969102",
       "roots": [
         "web",
         "packages"
       ],
-      "tree": "93ad56a6830dd29f1c504f3bce8f6ad24c5543b4"
+      "tree": "8ffe4dde53f1b12f2a4cd55c2f7a1cf49aeb6992"
     }
   },
   "entries": [
@@ -495,14 +495,14 @@
           "end_line": 127,
           "snippet_sha256": "sha256:5f9ed937924d85be4b24a9232e57060e554d36997185df61f581a7b87a8b20f4",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+          "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
           "start_line": 118
         },
         "output": {
           "end_line": 247,
           "snippet_sha256": "sha256:ca535816e2e539c3ff631a470d974a9000a06fce80a92cea0dcce59d729c2bdf",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+          "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
           "start_line": 237
         }
       },
@@ -537,14 +537,14 @@
           "end_line": 127,
           "snippet_sha256": "sha256:5f9ed937924d85be4b24a9232e57060e554d36997185df61f581a7b87a8b20f4",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+          "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
           "start_line": 118
         },
         "output": {
           "end_line": 247,
           "snippet_sha256": "sha256:ca535816e2e539c3ff631a470d974a9000a06fce80a92cea0dcce59d729c2bdf",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+          "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
           "start_line": 237
         }
       },
@@ -561,14 +561,14 @@
             "end_line": 127,
             "snippet_sha256": "sha256:5f9ed937924d85be4b24a9232e57060e554d36997185df61f581a7b87a8b20f4",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+            "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
             "start_line": 118
           },
           "output": {
             "end_line": 247,
             "snippet_sha256": "sha256:ca535816e2e539c3ff631a470d974a9000a06fce80a92cea0dcce59d729c2bdf",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+            "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
             "start_line": 237
           }
         },
@@ -689,14 +689,14 @@
           "end_line": 52,
           "snippet_sha256": "sha256:46237d107dc7b2c14a3a9693472d9a0b6a4ad619ad4b52cc6862025eadf6fdb8",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+          "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
           "start_line": 43
         },
         "output": {
           "end_line": 196,
           "snippet_sha256": "sha256:bc7b40d0bc7e9c9178feb7316c934e4a5068ef0dbe5df0b38c74c0a65858ca65",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+          "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
           "start_line": 180
         }
       },
@@ -717,14 +717,14 @@
           "end_line": 52,
           "snippet_sha256": "sha256:46237d107dc7b2c14a3a9693472d9a0b6a4ad619ad4b52cc6862025eadf6fdb8",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+          "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
           "start_line": 43
         },
         "output": {
           "end_line": 196,
           "snippet_sha256": "sha256:bc7b40d0bc7e9c9178feb7316c934e4a5068ef0dbe5df0b38c74c0a65858ca65",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+          "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
           "start_line": 180
         }
       },
@@ -741,14 +741,14 @@
             "end_line": 52,
             "snippet_sha256": "sha256:46237d107dc7b2c14a3a9693472d9a0b6a4ad619ad4b52cc6862025eadf6fdb8",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+            "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
             "start_line": 43
           },
           "output": {
             "end_line": 196,
             "snippet_sha256": "sha256:bc7b40d0bc7e9c9178feb7316c934e4a5068ef0dbe5df0b38c74c0a65858ca65",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+            "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
             "start_line": 180
           }
         },
@@ -970,9 +970,9 @@
       "contract_evidence": {
         "input_output": {
           "end_line": 563,
-          "snippet_sha256": "sha256:1b285d11d13df69b7e4399b4e2c70449c7ce6eb5a02945490bde5f114cae63a6",
+          "snippet_sha256": "sha256:3f92d0ce0e0a126194894968ce9bf05c12547a49bac61eae524d07f6bb29eb01",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+          "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
           "start_line": 549
         }
       },
@@ -981,18 +981,18 @@
       "final_occurrences": [],
       "frontend_call_sites": [
         {
-          "blob": "bbcf3cbd696750393c8a046c97eab90945b31a84",
-          "line": 2210,
+          "blob": "790fa9303109bd4c914f043ea63e3d06a306ec91",
+          "line": 2212,
           "snippet_sha256": "sha256:9fa1fadce51dda5b2a5765c27c336af849a477ed070016346684c30306d17661",
           "source_path": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-          "source_sha256": "sha256:a1112e94d725031009a3e0b9bedce125e8f938b076aad753b84bcba79b11022e"
+          "source_sha256": "sha256:6570053ab9d2fdfd9cbcfcf5385c5d5705e4068ad76f2fc7c0bd3ada4792b92e"
         },
         {
-          "blob": "bbcf3cbd696750393c8a046c97eab90945b31a84",
-          "line": 3552,
+          "blob": "790fa9303109bd4c914f043ea63e3d06a306ec91",
+          "line": 3556,
           "snippet_sha256": "sha256:9fa1fadce51dda5b2a5765c27c336af849a477ed070016346684c30306d17661",
           "source_path": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-          "source_sha256": "sha256:a1112e94d725031009a3e0b9bedce125e8f938b076aad753b84bcba79b11022e"
+          "source_sha256": "sha256:6570053ab9d2fdfd9cbcfcf5385c5d5705e4068ad76f2fc7c0bd3ada4792b92e"
         }
       ],
       "gateway_evidence": {
@@ -1011,19 +1011,19 @@
           "start_line": 134
         },
         "provider_descriptor": {
-          "end_line": 137,
-          "snippet_sha256": "sha256:d8422898cfdb295e8def126090ff8953acda4689c4fa3c57ae5914aed02b8041",
+          "end_line": 140,
+          "snippet_sha256": "sha256:f1014f9f18273363dc4de5077304ec054cc8be6ed9d3e9d4b7110f51ef54c8b2",
           "source_path": "plugins/craft/craft_backend/capabilities/provider.py",
-          "source_sha256": "sha256:d86f0fcd4a247cd51970d44fcf7ec3a889af64f47fb79f7ebe9b93ab8a433f42",
+          "source_sha256": "sha256:43c1c93d81b6eae851d2f609b0967b12fc6979138f4fd06a7aa4ebba0504d4fd",
           "start_line": 90
         }
       },
       "input_output_contract": {
         "input_output": {
           "end_line": 563,
-          "snippet_sha256": "sha256:1b285d11d13df69b7e4399b4e2c70449c7ce6eb5a02945490bde5f114cae63a6",
+          "snippet_sha256": "sha256:3f92d0ce0e0a126194894968ce9bf05c12547a49bac61eae524d07f6bb29eb01",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+          "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
           "start_line": 549
         }
       },
@@ -1085,11 +1085,11 @@
         "end_line": 183,
         "snippet_sha256": "sha256:5e26b15637963ae5cedc244ab113431069cae0e9045526a2401fe17688db9bf2",
         "source_path": "plugins/craft/craft_backend/capabilities/rule_engine.py",
-        "source_sha256": "sha256:3f7cdfe1036ce95c00ee8548725e94bb0876c7ca5430984c79c94cc773850455",
+        "source_sha256": "sha256:989185e4b82b89f2864846c88157881d86fe1bacb495da8ef8d05ce6a7037e88",
         "start_line": 174
       },
       "provider_anchor": "plugins/craft/craft_backend/capabilities/rule_engine.py:174-183",
-      "provider_source_sha256": "sha256:3f7cdfe1036ce95c00ee8548725e94bb0876c7ca5430984c79c94cc773850455",
+      "provider_source_sha256": "sha256:989185e4b82b89f2864846c88157881d86fe1bacb495da8ef8d05ce6a7037e88",
       "runtime_execution": "bounded_provider",
       "unresolved_reason": null
     },
@@ -1866,7 +1866,7 @@
           "end_line": 52,
           "snippet_sha256": "sha256:9554a70a7d6d4b8987ad6e4c9246f28d8c45fa80261365c63ab910c276f11479",
           "source_path": "plugins/craft/craft_backend/capabilities/rule_library.py",
-          "source_sha256": "sha256:8667724722a2be77f58d69ce9815ab8bc603dbb196fd04009ef6bd635ce3e5d6",
+          "source_sha256": "sha256:351f031131abd75feb076ab0181c2a16c560c49b9bb26a214fe0d716349dbc68",
           "start_line": 21
         }
       },
@@ -1875,18 +1875,18 @@
       "final_occurrences": [],
       "frontend_call_sites": [
         {
-          "blob": "e7ba1bf677970fa450e8a91fe4e318a448cbeced",
-          "line": 137,
+          "blob": "7c72c1908cebea8d8cbdf72743f37366fc432f1c",
+          "line": 139,
           "snippet_sha256": "sha256:c8d31b5cd95bf332a05c7147edf945b62f9fc7d5e5079c50f2e3a141acaaaf4c",
           "source_path": "web/container_card/modes/container_item_detail.js",
-          "source_sha256": "sha256:add044132e94a7728b49194e1e02716b935b7e807d6aba2b34a5251ad773d963"
+          "source_sha256": "sha256:fec2a8bcb11d148bd891a378b17128ef8073af0f8d732e16544c05f1fc170e61"
         },
         {
-          "blob": "bb0436187c725c13e3805d81cb103dfd87fd0aa0",
-          "line": 46,
+          "blob": "84f8f8a083169bc9d32870b539d739f50fd34adc",
+          "line": 48,
           "snippet_sha256": "sha256:c8d31b5cd95bf332a05c7147edf945b62f9fc7d5e5079c50f2e3a141acaaaf4c",
           "source_path": "web/container_card/modes/mode_field_detail.js",
-          "source_sha256": "sha256:fc415a2e4a1af8b8a24d5099296351fb7624e73caa2463ce603954847ab7dc65"
+          "source_sha256": "sha256:e454ac47277c2270558542d40e37527b2b830a2539f1f349257f143cdb984858"
         }
       ],
       "gateway_evidence": {
@@ -1905,10 +1905,10 @@
           "start_line": 134
         },
         "provider_descriptor": {
-          "end_line": 137,
-          "snippet_sha256": "sha256:d8422898cfdb295e8def126090ff8953acda4689c4fa3c57ae5914aed02b8041",
+          "end_line": 140,
+          "snippet_sha256": "sha256:f1014f9f18273363dc4de5077304ec054cc8be6ed9d3e9d4b7110f51ef54c8b2",
           "source_path": "plugins/craft/craft_backend/capabilities/provider.py",
-          "source_sha256": "sha256:d86f0fcd4a247cd51970d44fcf7ec3a889af64f47fb79f7ebe9b93ab8a433f42",
+          "source_sha256": "sha256:43c1c93d81b6eae851d2f609b0967b12fc6979138f4fd06a7aa4ebba0504d4fd",
           "start_line": 90
         }
       },
@@ -1917,7 +1917,7 @@
           "end_line": 52,
           "snippet_sha256": "sha256:9554a70a7d6d4b8987ad6e4c9246f28d8c45fa80261365c63ab910c276f11479",
           "source_path": "plugins/craft/craft_backend/capabilities/rule_library.py",
-          "source_sha256": "sha256:8667724722a2be77f58d69ce9815ab8bc603dbb196fd04009ef6bd635ce3e5d6",
+          "source_sha256": "sha256:351f031131abd75feb076ab0181c2a16c560c49b9bb26a214fe0d716349dbc68",
           "start_line": 21
         }
       },
@@ -1976,20 +1976,20 @@
       },
       "owner_domain": "craft",
       "owner_service_evidence": {
-        "end_line": 176,
-        "snippet_sha256": "sha256:4f934a75333955d4579d85dfe9922a9c556c50c894386ebb0de7f6112bad4090",
+        "end_line": 194,
+        "snippet_sha256": "sha256:966dcc51d5392dd168e031736ec80f8dac3a33054de1cf046dd08a27a682274d",
         "source_path": "plugins/craft/craft_backend/capabilities/rule_library.py",
-        "source_sha256": "sha256:8667724722a2be77f58d69ce9815ab8bc603dbb196fd04009ef6bd635ce3e5d6",
-        "start_line": 149
+        "source_sha256": "sha256:351f031131abd75feb076ab0181c2a16c560c49b9bb26a214fe0d716349dbc68",
+        "start_line": 165
       },
-      "provider_anchor": "plugins/craft/craft_backend/capabilities/rule_library.py:149-176",
-      "provider_source_sha256": "sha256:8667724722a2be77f58d69ce9815ab8bc603dbb196fd04009ef6bd635ce3e5d6",
+      "provider_anchor": "plugins/craft/craft_backend/capabilities/rule_library.py:165-194",
+      "provider_source_sha256": "sha256:351f031131abd75feb076ab0181c2a16c560c49b9bb26a214fe0d716349dbc68",
       "runtime_execution": "not_applicable",
       "unresolved_reason": null
     }
   ],
-  "frontend_content_hash": "d9c9a1cecb1657b7322adf3e621176c9f5ae6ea2f00d84883ec51bbf1d7aa56a",
-  "frontend_revision": "43a650ab35cba99c6788ce3622a46e08404e7731",
+  "frontend_content_hash": "9905775b994a8fed621ae74bd41b19ccc4779d73a0da1bd626ee324f5e4ea8ae",
+  "frontend_revision": "8ebc8de49b5d4f86c9360664fffa912c3d969102",
   "project_closure_evidence": {
     "approval": {
       "frontend_anchor": {
@@ -2187,14 +2187,14 @@
         "end_line": 127,
         "snippet_sha256": "sha256:5f9ed937924d85be4b24a9232e57060e554d36997185df61f581a7b87a8b20f4",
         "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-        "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+        "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
         "start_line": 118
       },
       "craft_archive_output_contract": {
         "end_line": 247,
         "snippet_sha256": "sha256:ca535816e2e539c3ff631a470d974a9000a06fce80a92cea0dcce59d729c2bdf",
         "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-        "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+        "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
         "start_line": 237
       },
       "craft_archive_provider": {
@@ -2208,14 +2208,14 @@
         "end_line": 52,
         "snippet_sha256": "sha256:46237d107dc7b2c14a3a9693472d9a0b6a4ad619ad4b52cc6862025eadf6fdb8",
         "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-        "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+        "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
         "start_line": 43
       },
       "craft_list_output_contract": {
         "end_line": 196,
         "snippet_sha256": "sha256:bc7b40d0bc7e9c9178feb7316c934e4a5068ef0dbe5df0b38c74c0a65858ca65",
         "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-        "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+        "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
         "start_line": 180
       },
       "craft_list_provider": {

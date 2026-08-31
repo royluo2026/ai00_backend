@@ -12,7 +12,7 @@ SCRIPT = ROOT / "backend/scripts/build_craft_agent_project_structural_web_remedi
 PLAN_SCRIPT = ROOT / "backend/scripts/check_structural_remediation_plan.py"
 LEDGER_SCRIPT = ROOT / "backend/scripts/build_web_route_root_cause_ledger.py"
 WEB_ROOT = ROOT.parent / "workmanship-web-capability-governance"
-CRAFT_FRONTEND_REVISION = "43a650ab35cba99c6788ce3622a46e08404e7731"
+CRAFT_FRONTEND_REVISION = "8ebc8de49b5d4f86c9360664fffa912c3d969102"
 
 
 def _module():
@@ -57,29 +57,29 @@ def test_craft_closure_evidence_freezes_exact_source_identities_and_anchors():
     """Breaks if Craft closure drifts from the reviewed backend or frozen Web tree."""
     evidence = _module().build_craft_closure_evidence(WEB_ROOT)
 
-    assert evidence["backend_revision"] == "076ed4348a066c59b6852f75d479fa08c2a49f14"
-    assert evidence["backend_tree"] == "e76fbe8b6f42ad5cfd8e9de67995fac233559cb2"
+    assert evidence["backend_revision"] == "9cda07080f3e27b10d30ec6492ea875c31c82492"
+    assert evidence["backend_tree"] == "1c31a434c78243f163d3a1b7914ce64221a20796"
     assert evidence["frontend_revision"] == CRAFT_FRONTEND_REVISION
     assert evidence["scanner_materialization"] == {
         "method": "git-tree-blobs-v1",
         "revision": CRAFT_FRONTEND_REVISION,
-        "tree": "93ad56a6830dd29f1c504f3bce8f6ad24c5543b4",
+        "tree": "8ffe4dde53f1b12f2a4cd55c2f7a1cf49aeb6992",
         "roots": ["web", "packages"],
         "document_count": 224,
-        "materialization_sha256": "sha256:eb5541221452299947240ab9cafe6901bb8931ba3b608a5efe22df14acaa05c7",
+        "materialization_sha256": "sha256:76e0efa1eb50caa5bdcba9223964ff7494932f8c2f7ddeb38e71e57898a85d9c",
     }
     assert {
         path: item["blob"] for path, item in evidence["frontend_files"].items()
     } == {
-        "dist-production/packages/craft-plugin/web/lineage_view/layout_detail_panel.js": "bbcf3cbd696750393c8a046c97eab90945b31a84",
-        "dist-production/web/container_card/modes/container_item_detail.js": "b249dffbe1e68cbdfe8045b5b09d894b168ba536",
-        "dist-production/web/container_card/modes/mode_field_detail.js": "b99a26505ff9b67450d3fc63faa6910c0b0fe386",
+        "dist-production/packages/craft-plugin/web/lineage_view/layout_detail_panel.js": "790fa9303109bd4c914f043ea63e3d06a306ec91",
+        "dist-production/web/container_card/modes/container_item_detail.js": "f80b7f2f7168b3a1049989c21b93ef231b778b00",
+        "dist-production/web/container_card/modes/mode_field_detail.js": "8111a1cb22209beb708be2dea177004f13788f3b",
         "dist-production/web/knowledge_hub/pages/gbop_vpps.html": "b5f37566ebe00f00740691fb76a720aab3f46b87",
         "dist-production/web/rule_mgmt/rule_mgmt.html": "eb7f87f7347e88247bd30cf5b9a895d751bbee99",
         "dist-production/web/rule_mgmt/rule_mgmt.js": "ec66cdda6154ac2cf3af143befedd933b210b392",
-        "packages/craft-plugin/web/lineage_view/layout_detail_panel.js": "bbcf3cbd696750393c8a046c97eab90945b31a84",
-        "web/container_card/modes/container_item_detail.js": "e7ba1bf677970fa450e8a91fe4e318a448cbeced",
-        "web/container_card/modes/mode_field_detail.js": "bb0436187c725c13e3805d81cb103dfd87fd0aa0",
+        "packages/craft-plugin/web/lineage_view/layout_detail_panel.js": "790fa9303109bd4c914f043ea63e3d06a306ec91",
+        "web/container_card/modes/container_item_detail.js": "7c72c1908cebea8d8cbdf72743f37366fc432f1c",
+        "web/container_card/modes/mode_field_detail.js": "84f8f8a083169bc9d32870b539d739f50fd34adc",
         "web/knowledge_hub/pages/gbop_vpps.html": "2ea909184bf3d6e7c67791eb9f258e04ca62a34f",
         "web/rule_mgmt/rule_mgmt.html": "d4c58f1e74117a7cac19cdd141bbabbfd876c6bb",
         "web/rule_mgmt/rule_mgmt.js": "f6b03514744aece0c572090d8601865bb5df03a9",

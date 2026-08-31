@@ -8,7 +8,7 @@ Execute the governed agent.audit.read Agent outcome.
 - 不适用：The outcome belongs to another business domain; invoke that domain Capability instead.
 - 生命周期：`stable`
 - 所属领域：`agent`
-- Catalog Release：`rel_d407979e8fe9737980e72058e3384b37`
+- Catalog Release：`rel_05bcccdde2e100f8dba2e9e85c3dab50`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -207,7 +207,7 @@ Execute the governed agent.audit.read Agent outcome.
 ```json
 {
   "capability_id": "agent.audit.read",
-  "catalog_release": "rel_d407979e8fe9737980e72058e3384b37",
+  "catalog_release": "rel_05bcccdde2e100f8dba2e9e85c3dab50",
   "major_version": 1,
   "payload": {}
 }

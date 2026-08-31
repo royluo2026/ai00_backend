@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_d407979e8fe9737980e72058e3384b37",
-  "catalog_hash": "sha256:d407979e8fe9737980e72058e3384b374a81dd3d8c6dfedd052f4b8ac93dee08",
+  "release_id": "rel_05bcccdde2e100f8dba2e9e85c3dab50",
+  "catalog_hash": "sha256:05bcccdde2e100f8dba2e9e85c3dab50e7d129e839ba3a435880ab8617c709e9",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -81568,7 +81568,7 @@
       "concurrency_policy": "expected_version",
       "expected_version_payload_path": "expected_revision",
       "idempotency_policy": "required",
-      "replay_data_policy": "metadata_only",
+      "replay_data_policy": "projected",
       "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
@@ -85018,9 +85018,9 @@
             "maxLength": 255
           },
           "rule_revision": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 255
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
           },
           "entry": {
             "type": "object",
@@ -85269,9 +85269,9 @@
             "type": "boolean"
           },
           "rule_revision": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 255
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
           },
           "diagnostics": {
             "type": "array",
@@ -85306,9 +85306,9 @@
             "type": "boolean"
           },
           "rule_revision": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 255
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
           },
           "diagnostics": {
             "type": "array",
@@ -85336,7 +85336,7 @@
           "diagnostics"
         ]
       },
-      "schema_hash": "sha256:c3b8e1328e7ab9f17d7f1222aedcd704920dfa84625d1015f2edd22ba0593c50",
+      "schema_hash": "sha256:b5a896ab0ff62413a8f4b7080c8c20ff392d6fa5ae9c4ef9ddb9830a9f085f49",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -196357,7 +196357,7 @@
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
       "version": "1.2.0",
-      "artifact_hash": "sha256:b8e1646e9101953406aadda749ec319a6339e741e30b5b5d6895ce1eada214a0"
+      "artifact_hash": "sha256:ebef086355e0584a847bfcd8f670f91e7d492af158739aa464d314d126fbb392"
     },
     {
       "plugin_id": "official.device",
@@ -196393,7 +196393,7 @@
       "plugin_id": "official.ontology",
       "module": "ontology_backend.capabilities",
       "version": "2.0.0",
-      "artifact_hash": "sha256:418acc6777f44d3c6c7a3718b81e54b3faa867937acd6a40b4bc57e6c0ad073b"
+      "artifact_hash": "sha256:a4a8fa9ee4ab329cd4a0cd9188b0171111e8600834d023ac5a3efcd8286fd06d"
     },
     {
       "plugin_id": "official.project-management",
@@ -196408,5 +196408,5 @@
       "artifact_hash": "sha256:5c1fccaa2219f6833c24237667039685e322cefcffc7ca6f0287d28cfc0a2b39"
     }
   ],
-  "created_at": "2026-08-31T10:19:33.691697Z"
+  "created_at": "2026-08-31T11:18:06.517181Z"
 }

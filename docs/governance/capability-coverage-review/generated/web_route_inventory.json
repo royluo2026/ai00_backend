@@ -1,6 +1,6 @@
 {
-  "frontend_revision": "43a650ab35cba99c6788ce3622a46e08404e7731",
-  "content_hash": "d9c9a1cecb1657b7322adf3e621176c9f5ae6ea2f00d84883ec51bbf1d7aa56a",
+  "frontend_revision": "8ebc8de49b5d4f86c9360664fffa912c3d969102",
+  "content_hash": "9905775b994a8fed621ae74bd41b19ccc4779d73a0da1bd626ee324f5e4ea8ae",
   "wrapper_contracts_hash": "0f099242269e21253ae02e3c54184b8ff0ec2ade1f98b59dbe8937778178a760",
   "scan_roots": [
     "web",
@@ -31,7 +31,7 @@
   },
   "lexical_audit": {
     "token_count": 392,
-    "token_hash": "cebf2767c58e4126d8e8b450480459b4b78b8a9ce2792bc01e6450c7dfa0f5ad",
+    "token_hash": "f7e342d51ed625a8521f4bb0bf5966336fda554370e2ff752e3567b0861ccff6",
     "mapped_count": 374,
     "reviewed_non_route_count": 18,
     "reviewed_non_route_tokens": [
@@ -2116,153 +2116,153 @@
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 151,
+      "line": 153,
       "column": 54,
       "raw_route": "/api/tasks/${gid}",
       "normalized_route": "/api/tasks/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:151:54:GET:/api/tasks/{dynamic}"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:153:54:GET:/api/tasks/{dynamic}"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 152,
+      "line": 154,
       "column": 60,
       "raw_route": "/api/issues/${gid}",
       "normalized_route": "/api/issues/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:152:60:GET:/api/issues/{dynamic}"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:154:60:GET:/api/issues/{dynamic}"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 154,
+      "line": 156,
       "column": 59,
       "raw_route": "/api/rules/${gid}",
       "normalized_route": "/api/rules/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:154:59:GET:/api/rules/{dynamic}"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:156:59:GET:/api/rules/{dynamic}"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 164,
+      "line": 166,
       "column": 36,
       "raw_route": "/api/item-entries/${itemType}/${gid}",
       "normalized_route": "/api/item-entries/{dynamic}/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:164:36:GET:/api/item-entries/{dynamic}/{dynamic}"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:166:36:GET:/api/item-entries/{dynamic}/{dynamic}"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 169,
+      "line": 171,
       "column": 23,
       "raw_route": "/api/item-entries/${itemType}/${gid}",
       "normalized_route": "/api/item-entries/{dynamic}/{dynamic}",
       "method": "PUT",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:169:23:PUT:/api/item-entries/{dynamic}/{dynamic}"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:171:23:PUT:/api/item-entries/{dynamic}/{dynamic}"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 176,
+      "line": 178,
       "column": 48,
       "raw_route": "/api/tasks/${gid}",
       "normalized_route": "/api/tasks/{dynamic}",
       "method": "PUT",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:176:48:PUT:/api/tasks/{dynamic}"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:178:48:PUT:/api/tasks/{dynamic}"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 177,
+      "line": 179,
       "column": 54,
       "raw_route": "/api/issues/${gid}",
       "normalized_route": "/api/issues/{dynamic}",
       "method": "PUT",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:177:54:PUT:/api/issues/{dynamic}"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:179:54:PUT:/api/issues/{dynamic}"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 196,
+      "line": 198,
       "column": 55,
       "raw_route": "/api/tasks",
       "normalized_route": "/api/tasks",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:196:55:POST:/api/tasks"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:198:55:POST:/api/tasks"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 197,
+      "line": 199,
       "column": 61,
       "raw_route": "/api/issues",
       "normalized_route": "/api/issues",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:197:61:POST:/api/issues"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:199:61:POST:/api/issues"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 199,
+      "line": 201,
       "column": 60,
       "raw_route": "/api/rules",
       "normalized_route": "/api/rules",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:199:60:POST:/api/rules"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:201:60:POST:/api/rules"
     },
     {
       "source": "web/container_card/modes/mode_field_detail.js",
-      "line": 63,
+      "line": 65,
       "column": 56,
       "raw_route": "/api/tasks/${gid}",
       "normalized_route": "/api/tasks/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/mode_field_detail.js:63:56:GET:/api/tasks/{dynamic}"
+      "occurrence_id": "web/container_card/modes/mode_field_detail.js:65:56:GET:/api/tasks/{dynamic}"
     },
     {
       "source": "web/container_card/modes/mode_field_detail.js",
-      "line": 64,
+      "line": 66,
       "column": 62,
       "raw_route": "/api/issues/${gid}",
       "normalized_route": "/api/issues/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/mode_field_detail.js:64:62:GET:/api/issues/{dynamic}"
+      "occurrence_id": "web/container_card/modes/mode_field_detail.js:66:62:GET:/api/issues/{dynamic}"
     },
     {
       "source": "web/container_card/modes/mode_field_detail.js",
-      "line": 66,
+      "line": 68,
       "column": 61,
       "raw_route": "/api/rules/${gid}",
       "normalized_route": "/api/rules/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/mode_field_detail.js:66:61:GET:/api/rules/{dynamic}"
+      "occurrence_id": "web/container_card/modes/mode_field_detail.js:68:61:GET:/api/rules/{dynamic}"
     },
     {
       "source": "web/container_card/modes/mode_field_detail.js",
-      "line": 75,
+      "line": 77,
       "column": 50,
       "raw_route": "/api/tasks/${gid}",
       "normalized_route": "/api/tasks/{dynamic}",
       "method": "PUT",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/mode_field_detail.js:75:50:PUT:/api/tasks/{dynamic}"
+      "occurrence_id": "web/container_card/modes/mode_field_detail.js:77:50:PUT:/api/tasks/{dynamic}"
     },
     {
       "source": "web/container_card/modes/mode_field_detail.js",
-      "line": 76,
+      "line": 78,
       "column": 51,
       "raw_route": "/api/issues/${gid}",
       "normalized_route": "/api/issues/{dynamic}",
       "method": "PUT",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/mode_field_detail.js:76:51:PUT:/api/issues/{dynamic}"
+      "occurrence_id": "web/container_card/modes/mode_field_detail.js:78:51:PUT:/api/issues/{dynamic}"
     },
     {
       "source": "web/container_card/modes/mode_image_gallery.js",

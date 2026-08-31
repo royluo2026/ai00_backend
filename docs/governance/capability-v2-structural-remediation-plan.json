@@ -10,7 +10,7 @@
     "no silent REST fallback"
   ],
   "artifact_id": "capability-v2-structural-remediation-plan",
-  "content_sha256": "sha256:c14683fcf6733e378f6c358473178d5fe5810f483f5f971053d034fa7f2967d0",
+  "content_sha256": "sha256:e3100a4097b4787d7b7ac00da11000274940cace8ad3855a06cfc6e43fb54b46",
   "counts": {
     "groups": 37,
     "occurrences": 45
@@ -185,14 +185,14 @@
             "end_line": 127,
             "snippet_sha256": "sha256:5f9ed937924d85be4b24a9232e57060e554d36997185df61f581a7b87a8b20f4",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+            "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
             "start_line": 118
           },
           "output": {
             "end_line": 247,
             "snippet_sha256": "sha256:ca535816e2e539c3ff631a470d974a9000a06fce80a92cea0dcce59d729c2bdf",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+            "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
             "start_line": 237
           }
         },
@@ -1583,14 +1583,14 @@
             "end_line": 52,
             "snippet_sha256": "sha256:46237d107dc7b2c14a3a9693472d9a0b6a4ad619ad4b52cc6862025eadf6fdb8",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+            "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
             "start_line": 43
           },
           "output": {
             "end_line": 196,
             "snippet_sha256": "sha256:bc7b40d0bc7e9c9178feb7316c934e4a5068ef0dbe5df0b38c74c0a65858ca65",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+            "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
             "start_line": 180
           }
         },
@@ -1668,7 +1668,7 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
         "provider_anchor": "plugins/craft/craft_backend/capabilities/rule_engine.py:174-183",
-        "provider_source_sha256": "sha256:3f7cdfe1036ce95c00ee8548725e94bb0876c7ca5430984c79c94cc773850455",
+        "provider_source_sha256": "sha256:989185e4b82b89f2864846c88157881d86fe1bacb495da8ef8d05ce6a7037e88",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -1677,34 +1677,34 @@
         "contract_evidence": {
           "input_output": {
             "end_line": 563,
-            "snippet_sha256": "sha256:1b285d11d13df69b7e4399b4e2c70449c7ce6eb5a02945490bde5f114cae63a6",
+            "snippet_sha256": "sha256:3f92d0ce0e0a126194894968ce9bf05c12547a49bac61eae524d07f6bb29eb01",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+            "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
             "start_line": 549
           }
         },
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
           {
-            "blob": "bbcf3cbd696750393c8a046c97eab90945b31a84",
-            "line": 2210,
+            "blob": "790fa9303109bd4c914f043ea63e3d06a306ec91",
+            "line": 2212,
             "snippet_sha256": "sha256:9fa1fadce51dda5b2a5765c27c336af849a477ed070016346684c30306d17661",
             "source_path": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-            "source_sha256": "sha256:a1112e94d725031009a3e0b9bedce125e8f938b076aad753b84bcba79b11022e"
+            "source_sha256": "sha256:6570053ab9d2fdfd9cbcfcf5385c5d5705e4068ad76f2fc7c0bd3ada4792b92e"
           },
           {
-            "blob": "bbcf3cbd696750393c8a046c97eab90945b31a84",
-            "line": 3552,
+            "blob": "790fa9303109bd4c914f043ea63e3d06a306ec91",
+            "line": 3556,
             "snippet_sha256": "sha256:9fa1fadce51dda5b2a5765c27c336af849a477ed070016346684c30306d17661",
             "source_path": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-            "source_sha256": "sha256:a1112e94d725031009a3e0b9bedce125e8f938b076aad753b84bcba79b11022e"
+            "source_sha256": "sha256:6570053ab9d2fdfd9cbcfcf5385c5d5705e4068ad76f2fc7c0bd3ada4792b92e"
           }
         ],
         "owner_service_evidence": {
           "end_line": 183,
           "snippet_sha256": "sha256:5e26b15637963ae5cedc244ab113431069cae0e9045526a2401fe17688db9bf2",
           "source_path": "plugins/craft/craft_backend/capabilities/rule_engine.py",
-          "source_sha256": "sha256:3f7cdfe1036ce95c00ee8548725e94bb0876c7ca5430984c79c94cc773850455",
+          "source_sha256": "sha256:989185e4b82b89f2864846c88157881d86fe1bacb495da8ef8d05ce6a7037e88",
           "start_line": 174
         },
         "target_capability": "craft.rule.entry.evaluate@1"
@@ -4428,8 +4428,8 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-        "provider_anchor": "plugins/craft/craft_backend/capabilities/rule_library.py:149-176",
-        "provider_source_sha256": "sha256:8667724722a2be77f58d69ce9815ab8bc603dbb196fd04009ef6bd635ce3e5d6",
+        "provider_anchor": "plugins/craft/craft_backend/capabilities/rule_library.py:165-194",
+        "provider_source_sha256": "sha256:351f031131abd75feb076ab0181c2a16c560c49b9bb26a214fe0d716349dbc68",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -4440,33 +4440,33 @@
             "end_line": 52,
             "snippet_sha256": "sha256:9554a70a7d6d4b8987ad6e4c9246f28d8c45fa80261365c63ab910c276f11479",
             "source_path": "plugins/craft/craft_backend/capabilities/rule_library.py",
-            "source_sha256": "sha256:8667724722a2be77f58d69ce9815ab8bc603dbb196fd04009ef6bd635ce3e5d6",
+            "source_sha256": "sha256:351f031131abd75feb076ab0181c2a16c560c49b9bb26a214fe0d716349dbc68",
             "start_line": 21
           }
         },
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
           {
-            "blob": "e7ba1bf677970fa450e8a91fe4e318a448cbeced",
-            "line": 137,
+            "blob": "7c72c1908cebea8d8cbdf72743f37366fc432f1c",
+            "line": 139,
             "snippet_sha256": "sha256:c8d31b5cd95bf332a05c7147edf945b62f9fc7d5e5079c50f2e3a141acaaaf4c",
             "source_path": "web/container_card/modes/container_item_detail.js",
-            "source_sha256": "sha256:add044132e94a7728b49194e1e02716b935b7e807d6aba2b34a5251ad773d963"
+            "source_sha256": "sha256:fec2a8bcb11d148bd891a378b17128ef8073af0f8d732e16544c05f1fc170e61"
           },
           {
-            "blob": "bb0436187c725c13e3805d81cb103dfd87fd0aa0",
-            "line": 46,
+            "blob": "84f8f8a083169bc9d32870b539d739f50fd34adc",
+            "line": 48,
             "snippet_sha256": "sha256:c8d31b5cd95bf332a05c7147edf945b62f9fc7d5e5079c50f2e3a141acaaaf4c",
             "source_path": "web/container_card/modes/mode_field_detail.js",
-            "source_sha256": "sha256:fc415a2e4a1af8b8a24d5099296351fb7624e73caa2463ce603954847ab7dc65"
+            "source_sha256": "sha256:e454ac47277c2270558542d40e37527b2b830a2539f1f349257f143cdb984858"
           }
         ],
         "owner_service_evidence": {
-          "end_line": 176,
-          "snippet_sha256": "sha256:4f934a75333955d4579d85dfe9922a9c556c50c894386ebb0de7f6112bad4090",
+          "end_line": 194,
+          "snippet_sha256": "sha256:966dcc51d5392dd168e031736ec80f8dac3a33054de1cf046dd08a27a682274d",
           "source_path": "plugins/craft/craft_backend/capabilities/rule_library.py",
-          "source_sha256": "sha256:8667724722a2be77f58d69ce9815ab8bc603dbb196fd04009ef6bd635ce3e5d6",
-          "start_line": 149
+          "source_sha256": "sha256:351f031131abd75feb076ab0181c2a16c560c49b9bb26a214fe0d716349dbc68",
+          "start_line": 165
         },
         "target_capability": "craft.rule.definition.change.apply@1"
       },
@@ -4864,11 +4864,11 @@
     },
     {
       "path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-      "sha256": "sha256:b2c06d9793d7919f73b4e90c2c4dfa9ec8708bba1258361e5d3118a6e3f7146a"
+      "sha256": "sha256:e5652c5b63f155dbce8322041c3156d65998f720989b37f380c0ec8f2eccbfc1"
     },
     {
       "path": "docs\\governance\\capability-coverage-review\\generated\\web_route_inventory.json",
-      "sha256": "sha256:a57096e798725b62320616a786463728caefcba466d2a6a9f4a422e9f88d12d1"
+      "sha256": "sha256:4b55531e1a825f5702b8775320fe153972a6cadead7fb2519959a646f3f0e6cb"
     }
   ]
 }

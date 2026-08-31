@@ -594,7 +594,7 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 - Historical occurrences: web/container_card/modes/container_item_detail.js:137:53:PUT:/api/rules/{dynamic}, web/container_card/modes/mode_field_detail.js:47:50:PUT:/api/rules/{dynamic}
 - Current status: `migrated` (`migrated`).
 - Owner/service: `craft` / `plugins.craft.craft_backend.application.rules.RuleService`
-- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/capabilities/rule_library.py:149-176`; Migrated through the reviewed public owner service and generated capability evidence.
+- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/capabilities/rule_library.py:165-194`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it. one revision-locked rule-definition transaction plus audit.
 - Target: `craft.rule.definition.change.apply@1`. Scope: workspace rule ownership.
 - Contract/security: workspace rule ownership; closed rule-definition grammar; audit, revision lock, explicit confirmation and no generic JSON.

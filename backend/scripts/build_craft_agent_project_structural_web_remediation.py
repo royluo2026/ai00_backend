@@ -57,8 +57,8 @@ APPROVAL_SOURCE = "plugins/craft/craft_backend/routers/approval.py"
 PROJECT_SERVICE_SOURCE = "plugins/project_management/project_management_backend/application/service.py"
 PROJECT_PROVIDER_SOURCE = "plugins/project_management/project_management_backend/capabilities/provider.py"
 PROJECT_FRONTEND_REVISION = "69e5e00054d3c1cff635fe41fcb96fbe150d25fb"
-CRAFT_FRONTEND_REVISION = "43a650ab35cba99c6788ce3622a46e08404e7731"
-CRAFT_BACKEND_REVISION = "076ed4348a066c59b6852f75d479fa08c2a49f14"
+CRAFT_FRONTEND_REVISION = "8ebc8de49b5d4f86c9360664fffa912c3d969102"
+CRAFT_BACKEND_REVISION = "9cda07080f3e27b10d30ec6492ea875c31c82492"
 PROJECT_CLOSURE_SCOPE = {
     ("GET", "/api/lists"),
     ("DELETE", "/api/lists/{dynamic}"),
@@ -670,7 +670,7 @@ def build_craft_closure_evidence(web_root: Path) -> dict[str, Any]:
             "validate_payload", "idempotency_key_mismatch", "transaction_participant_required",
         ),
         "provider_descriptor": _anchor(
-            "plugins/craft/craft_backend/capabilities/provider.py", 90, 137,
+            "plugins/craft/craft_backend/capabilities/provider.py", 90, 140,
             "descriptor_for", "expected_revision", "idempotency_policy", "domain_errors_complete",
         ),
         "context": _anchor(
@@ -702,7 +702,7 @@ def build_craft_closure_evidence(web_root: Path) -> dict[str, Any]:
         "PUT /api/rules/{dynamic}": {
             "candidate_capability": "craft.rule.definition.change.apply@1",
             "provider_anchor": _anchor(
-                "plugins/craft/craft_backend/capabilities/rule_library.py", 149, 176,
+                "plugins/craft/craft_backend/capabilities/rule_library.py", 165, 194,
                 "def change_rule_definition", 'id="craft.rule.definition.change.apply"',
                 "expected_revision", "idempotency_key",
             ),
