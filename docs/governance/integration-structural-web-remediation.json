@@ -5,7 +5,7 @@
     "groups": 0,
     "occurrences": 0
   },
-  "content_sha256": "sha256:4b1e2d28cc095a3a592f618b820622aad81bb0595bdb36fe9be87b11bbf24501",
+  "content_sha256": "sha256:f0bdf4e196bc9cff78f876f93cce2decc89ebf551b5c60fc51a346e2e4035960",
   "counts": {
     "groups": 12,
     "migrated_groups": 12,
@@ -2143,13 +2143,13 @@
       }
     }
   ],
-  "frontend_content_hash": "d3154ce47292b3b9f4daabb5df6c611c3415790336f280b0e8630bb9d16e30b0",
+  "frontend_content_hash": "fef7c11b292ce2762dbeb06e6a7d6a3ee8a54d41c2a8986846dd388ff2812818",
   "frontend_dist": {
     "blob": "4c95a998bb2f1048183d063587526eb76238be53",
     "path": "dist-production/web/ext_datasource/ext_ds.js",
     "sha256": "sha256:bf95202bca72d6c844864ef2c3ca285a4ee288770f3538c4bc63717ec0c2ee0f"
   },
-  "frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+  "frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
   "frontend_source": {
     "blob": "4c95a998bb2f1048183d063587526eb76238be53",
     "path": "web/ext_datasource/ext_ds.js",

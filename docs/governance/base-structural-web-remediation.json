@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3e-base-structural-remediation",
   "atomic_contract_manifest_sha256": "sha256:83ceda230ec20ed980652de729eccbaedbe1b980bb0520d8a613d2eb3935a9eb",
-  "content_sha256": "sha256:7a18f0ecf86d0fc0dc1f9b2972a02cddce2e8452b685abfd5bddbb33702a2875",
+  "content_sha256": "sha256:b335dd3fc903c75f845dd4db0b14335297db0fd743a63b374fbb3ed4b1ef1107",
   "counts": {
     "groups": 16,
     "migrated_groups": 16,
@@ -4022,8 +4022,8 @@
       "unresolved_reason": null
     }
   ],
-  "frontend_content_hash": "d3154ce47292b3b9f4daabb5df6c611c3415790336f280b0e8630bb9d16e30b0",
-  "frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+  "frontend_content_hash": "fef7c11b292ce2762dbeb06e6a7d6a3ee8a54d41c2a8986846dd388ff2812818",
+  "frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
   "schema_version": "1.0.0",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "source_ledger_revision": "8ee5dc2340a9e77c5d84e8f84f733bb5415e9d08",

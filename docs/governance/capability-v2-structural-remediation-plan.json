@@ -10,7 +10,7 @@
     "no silent REST fallback"
   ],
   "artifact_id": "capability-v2-structural-remediation-plan",
-  "content_sha256": "sha256:6acb6f9434d1c61ac47ad56b9b074767fecbde99ced260989e2bf1eb070f18b0",
+  "content_sha256": "sha256:93c57a789a066a833fec1ca1bc06369573acc59f4eb98038c3fe0ddbd7525cf0",
   "counts": {
     "groups": 37,
     "occurrences": 45
@@ -3384,7 +3384,7 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
         "provider_anchor": "plugins/agent/agent_backend/capabilities/provider.py:21-41",
-        "provider_source_sha256": "sha256:dc2fc6bf24b5a67dc8b16fff5c314b88bd81bf585d5840b1c6e9a71d6310da0e",
+        "provider_source_sha256": "sha256:93fd5356efc70657893f51c69012d19b9a9393502fcc5f0f1c8a1c36ab6dda02",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -3402,18 +3402,18 @@
         "final_inventory_mapping": "capability",
         "frontend_call_sites": [
           {
-            "blob": "df2e7ae69cc266d7bb922c54734008ebd92c0b65",
-            "line": 763,
-            "snippet_sha256": "sha256:5b227e5af41fe59472f7262ffd803b01d551042898954f6b608c3c00ec4d398f",
+            "blob": "0635d8017aee32367e1c75d311c94b11e65ef952",
+            "line": 787,
+            "snippet_sha256": "sha256:a2724c7175f132d58b553f835f2f63e92b2671c107ff7fb956b20eda1ec8c00d",
             "source_path": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
-            "source_sha256": "sha256:421d7e3c95c47ddd2cb045e5e66fba07d5e2b91556f072528ec0140518dd05f1"
+            "source_sha256": "sha256:12dabd6637be9fd41e88dd4ea974998685b1f1e326ffb130274af721b41d8831"
           },
           {
-            "blob": "bed005a6480948516cdfd1685a0481ea260d70d4",
-            "line": 123,
-            "snippet_sha256": "sha256:3960c14f8288f7dfae68d94962e79c2d754cec3c2de98b81347b7428ffba8593",
+            "blob": "c50f142483240694822bde303c703a27993eec0a",
+            "line": 149,
+            "snippet_sha256": "sha256:0167d07e32869b51a7a14ac1024fca783ca3d31499e485d89ab10a192dc0a076",
             "source_path": "web/canvas/types/flow_type.js",
-            "source_sha256": "sha256:5765eeb3816c84fb6caedc58c845d87000592dec315f335ead9dbd7675f9ffcf"
+            "source_sha256": "sha256:fc73e43f7479e1265e2645bff2e46f212bf7e4f6826245374cc28b20b8d9d811"
           }
         ],
         "owner_service_evidence": {
@@ -3786,7 +3786,7 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
         "provider_anchor": "plugins/agent/agent_backend/capabilities/provider.py:21-41",
-        "provider_source_sha256": "sha256:dc2fc6bf24b5a67dc8b16fff5c314b88bd81bf585d5840b1c6e9a71d6310da0e",
+        "provider_source_sha256": "sha256:93fd5356efc70657893f51c69012d19b9a9393502fcc5f0f1c8a1c36ab6dda02",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -3876,7 +3876,7 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
         "provider_anchor": "plugins/agent/agent_backend/capabilities/provider.py:21-41",
-        "provider_source_sha256": "sha256:dc2fc6bf24b5a67dc8b16fff5c314b88bd81bf585d5840b1c6e9a71d6310da0e",
+        "provider_source_sha256": "sha256:93fd5356efc70657893f51c69012d19b9a9393502fcc5f0f1c8a1c36ab6dda02",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -3966,7 +3966,7 @@
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
         "provider_anchor": "plugins/agent/agent_backend/capabilities/provider.py:21-41",
-        "provider_source_sha256": "sha256:dc2fc6bf24b5a67dc8b16fff5c314b88bd81bf585d5840b1c6e9a71d6310da0e",
+        "provider_source_sha256": "sha256:93fd5356efc70657893f51c69012d19b9a9393502fcc5f0f1c8a1c36ab6dda02",
         "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
       "current_disposition": "migrated",
@@ -4895,15 +4895,15 @@
   "source_artifacts": [
     {
       "path": "docs/governance/base-structural-web-remediation.json",
-      "sha256": "sha256:2ac76b08e8182bdaa2924b628c483770577e784415edcc39c5287a22b4b5c3cd"
+      "sha256": "sha256:3fc52d17b2761705c100f52d165fe643fc5e749275ca902a05edc99cac828b26"
     },
     {
       "path": "docs/governance/integration-structural-web-remediation.json",
-      "sha256": "sha256:adb33e50fe35e3b09f1fb2760daa2c8ce47c630e554659653cadfbec868bb35a"
+      "sha256": "sha256:84172cdd49daab7f0041bb12a1ae8346c59c198d6eb3abf41e4d7515f67cf07f"
     },
     {
       "path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-      "sha256": "sha256:fb09cdcb87508fb03ef8d4cc686ca100448af1884c925ea631bf367a5457d87a"
+      "sha256": "sha256:09c31126cfc0ae0619892548db1b5fd81bdb7fb37a08f93716adf3c4f274d3dc"
     },
     {
       "path": "docs\\governance\\capability-coverage-review\\generated\\web_route_inventory.json",

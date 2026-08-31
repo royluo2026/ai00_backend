@@ -13,8 +13,8 @@ PLAN_SCRIPT = ROOT / "backend/scripts/check_structural_remediation_plan.py"
 LEDGER_SCRIPT = ROOT / "backend/scripts/build_web_route_root_cause_ledger.py"
 WEB_ROOT = ROOT.parent / "workmanship-web-capability-governance"
 CRAFT_FRONTEND_REVISION = "8ebc8de49b5d4f86c9360664fffa912c3d969102"
-AGENT_BACKEND_REVISION = "4256276cecda3cda45d33c3ee670b8dace6fbfdc"
-AGENT_FRONTEND_REVISION = "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78"
+AGENT_BACKEND_REVISION = "d56c743dee03112b2a3211a4ccb659ebed9cfda5"
+AGENT_FRONTEND_REVISION = "08359de59e756ce73c61df9818c7e7bcaeb86975"
 
 
 def _module():
@@ -60,15 +60,15 @@ def test_agent_closure_evidence_freezes_exact_source_identities_and_anchors():
     evidence = _module().build_agent_closure_evidence(WEB_ROOT)
 
     assert evidence["backend_revision"] == AGENT_BACKEND_REVISION
-    assert evidence["backend_tree"] == "c02b9ce18d5402988ef6474bafb7da1340fa85d9"
+    assert evidence["backend_tree"] == "9ec7401102fc337bd2b1a77361eae9e52b817478"
     assert evidence["frontend_revision"] == AGENT_FRONTEND_REVISION
     assert evidence["scanner_materialization"] == {
         "method": "git-tree-blobs-v1",
         "revision": AGENT_FRONTEND_REVISION,
-        "tree": "e70eae1b052f88a63de6a1b4a94c9903a143e089",
+        "tree": "3c3156841af0d4bf2833dba8184b071265993965",
         "roots": ["web", "packages"],
         "document_count": 224,
-        "materialization_sha256": "sha256:d694dcaaf698d6db0486bfea4147962e76e8ae597114dfa368ceb904c9e5f682",
+        "materialization_sha256": "sha256:2fe79af7f2d8b15397230b0c5383ea421e4ccff9e4581959e8da03ef206df992",
     }
     assert {
         path: item["blob"] for path, item in evidence["backend_files"].items()
@@ -80,18 +80,18 @@ def test_agent_closure_evidence_freezes_exact_source_identities_and_anchors():
         "plugins/agent/agent_backend/capabilities/__init__.py": "0b81093263520cf2a44670053562020a3ff858e9",
         "plugins/agent/agent_backend/capabilities/contracts.py": "749473ea8336267cca1bd4b8bf884ed8e38e293f",
         "plugins/agent/agent_backend/capabilities/descriptors.py": "5795da4f92eab51e982ff53788b0524e03ac2422",
-        "plugins/agent/agent_backend/capabilities/provider.py": "4817682fa6d35540aab8af0c8830d5e10927e1ae",
+        "plugins/agent/agent_backend/capabilities/provider.py": "78db671e0192d8d63226be6287d9aece312f444a",
         "plugins/agent/agent_backend/infrastructure/repository.py": "594e9c7fd5e37e7518d18871891f86087aae8b5b",
     }
     assert {
         path: item["blob"] for path, item in evidence["frontend_files"].items()
     } == {
-        "dist-production/packages/agent-plugin/web/flow_canvas/flow_editor.js": "0b8238b8749bb876d5d52e105ae54c8a0c326566",
+        "dist-production/packages/agent-plugin/web/flow_canvas/flow_editor.js": "36c962e917d66d1347d1f890b2aaaabf2162a09d",
         "dist-production/packages/agent-plugin/web/wfc_window/wfc_window.js": "bdb262d6a60498e73f1add1854a7f518e3511948",
-        "dist-production/web/canvas/types/flow_type.js": "d933ac511e7e0c9ade64b53edb8b86f1fdf3b341",
-        "packages/agent-plugin/web/flow_canvas/flow_editor.js": "df2e7ae69cc266d7bb922c54734008ebd92c0b65",
+        "dist-production/web/canvas/types/flow_type.js": "16f80b53fa4db1090a5218f32b93a206d49d58fa",
+        "packages/agent-plugin/web/flow_canvas/flow_editor.js": "0635d8017aee32367e1c75d311c94b11e65ef952",
         "packages/agent-plugin/web/wfc_window/wfc_window.js": "feac63e030dfee47c0a6a3006bed91244a796954",
-        "web/canvas/types/flow_type.js": "bed005a6480948516cdfd1685a0481ea260d70d4",
+        "web/canvas/types/flow_type.js": "c50f142483240694822bde303c703a27993eec0a",
     }
     assert set(evidence["routes"]) == {
         "POST /api/flows/test-node",
@@ -108,8 +108,21 @@ def test_agent_closure_evidence_freezes_exact_source_identities_and_anchors():
         "POST /api/skills/resume-canvas": "agent.canvas.execution.resume@1",
     }
     assert sum(len(item["frontend_call_sites"]) for item in evidence["routes"].values()) == 5
+    assert [
+        item["source_path"]
+        for item in evidence["routes"]["POST /api/flows/test-node"][
+            "idempotency_caller_evidence"
+        ]
+    ] == [
+        "packages/agent-plugin/web/flow_canvas/flow_editor.js",
+        "web/canvas/types/flow_type.js",
+    ]
+    pinned_provider_hash = evidence["backend_files"][
+        "plugins/agent/agent_backend/capabilities/provider.py"
+    ]["sha256"]
     for item in evidence["routes"].values():
         assert item["provider_anchor"]
+        assert item["provider_anchor"]["source_sha256"] == pinned_provider_hash
         assert item["contract_evidence"]
         assert item["runtime_evidence"]
         assert item["gateway_evidence"]

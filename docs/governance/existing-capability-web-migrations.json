@@ -3,7 +3,7 @@
   "artifact_id": "existing-capability-web-migrations",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "baseline_revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-  "frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+  "frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
   "groups": [
     {
       "method": "DELETE",

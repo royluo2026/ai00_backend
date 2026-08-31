@@ -58,8 +58,8 @@
     "web/workspace/nav_manager.js": "e229fb407361c139cfc265cd438f929a944cd1919c321c4b6a1cf5bf57cfcd7d"
   },
   "final_evidence": {
-    "frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
-    "content_hash": "d3154ce47292b3b9f4daabb5df6c611c3415790336f280b0e8630bb9d16e30b0",
+    "frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
+    "content_hash": "fef7c11b292ce2762dbeb06e6a7d6a3ee8a54d41c2a8986846dd388ff2812818",
     "unresolved_count": 0,
     "unresolved_group_count": 0
   },
@@ -102,7 +102,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+        "removed_in_frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -653,7 +653,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+        "removed_in_frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
         "retirement_proof": {
           "kind": "http_410",
           "rationale": "The registered AI balance compatibility endpoint is permanently gone and returns HTTP 410, so polling it cannot yield a supported outcome.",
@@ -722,7 +722,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+        "removed_in_frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -784,7 +784,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+        "removed_in_frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -846,7 +846,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+        "removed_in_frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -919,7 +919,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+        "removed_in_frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -993,7 +993,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+        "removed_in_frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -1066,7 +1066,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+        "removed_in_frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -1591,7 +1591,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+        "removed_in_frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
         "retirement_proof": {
           "kind": "backend_route_absent",
           "rationale": "The standalone Feishu UI had no matching API-prefixed configuration handler; it now uses a bounded local default configuration.",
@@ -2124,7 +2124,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+        "removed_in_frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
         "retirement_proof": {
           "kind": "sample_template_only",
           "rationale": "The only caller lived in the distributable plugin SDK template and represented placeholder sample data rather than a shipped product route.",
@@ -3928,7 +3928,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+        "removed_in_frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -3990,7 +3990,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+        "removed_in_frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4052,7 +4052,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+        "removed_in_frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4114,7 +4114,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+        "removed_in_frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4176,7 +4176,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+        "removed_in_frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -4731,7 +4731,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+        "removed_in_frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
         "retirement_proof": {
           "kind": "sample_template_only",
           "rationale": "The only caller lived in the distributable plugin SDK template and represented placeholder sample data rather than a shipped product route.",
@@ -5255,7 +5255,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
+        "removed_in_frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
         "retirement_proof": {
           "kind": "http_410",
           "rationale": "The registered V1 standard-operation clone compatibility endpoint raises HTTP 410 and instructs callers to use the current BOP entry surface.",

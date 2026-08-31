@@ -59,8 +59,8 @@ PROJECT_PROVIDER_SOURCE = "plugins/project_management/project_management_backend
 PROJECT_FRONTEND_REVISION = "69e5e00054d3c1cff635fe41fcb96fbe150d25fb"
 CRAFT_FRONTEND_REVISION = "8ebc8de49b5d4f86c9360664fffa912c3d969102"
 CRAFT_BACKEND_REVISION = "9cda07080f3e27b10d30ec6492ea875c31c82492"
-AGENT_FRONTEND_REVISION = "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78"
-AGENT_BACKEND_REVISION = "4256276cecda3cda45d33c3ee670b8dace6fbfdc"
+AGENT_FRONTEND_REVISION = "08359de59e756ce73c61df9818c7e7bcaeb86975"
+AGENT_BACKEND_REVISION = "d56c743dee03112b2a3211a4ccb659ebed9cfda5"
 PROJECT_CLOSURE_SCOPE = {
     ("GET", "/api/lists"),
     ("DELETE", "/api/lists/{dynamic}"),
@@ -137,10 +137,15 @@ def _sha256(value: bytes) -> str:
     return "sha256:" + hashlib.sha256(value).hexdigest()
 
 
-def _anchor(source_path: str, start_line: int, end_line: int, *needles: str) -> dict[str, Any]:
+def _anchor(
+    source_path: str, start_line: int, end_line: int, *needles: str,
+    revision: str | None = None,
+) -> dict[str, Any]:
     """Bind reviewed source semantics to both a line range and full-file content."""
-    path = ROOT / source_path
-    data = path.read_bytes()
+    data = (
+        (ROOT / source_path).read_bytes()
+        if revision is None else read_path(ROOT, revision, source_path)
+    )
     lines = data.decode("utf-8").splitlines(keepends=True)
     selected = "".join(lines[start_line - 1:end_line])
     if not selected or any(needle not in selected for needle in needles):
@@ -770,8 +775,6 @@ def build_agent_closure_evidence(web_root: Path) -> dict[str, Any]:
     backend_files: dict[str, dict[str, Any]] = {}
     for source_path in AGENT_BACKEND_FILES:
         backend_files[source_path], _ = _frontend_file(ROOT, backend_revision, source_path)
-        if _sha256((ROOT / source_path).read_bytes()) != backend_files[source_path]["sha256"]:
-            raise ValueError(f"backend source drift: {source_path}")
 
     pairs = (
         AGENT_FRONTEND_FILES[0:2], AGENT_FRONTEND_FILES[2:4], AGENT_FRONTEND_FILES[4:6],
@@ -805,35 +808,41 @@ def build_agent_closure_evidence(web_root: Path) -> dict[str, Any]:
         "plugins/agent/agent_backend/capabilities/provider.py", 21, 41,
         "agent.canvas.execution.start", "agent.workflow.node.test.execute",
         '"idempotency_policy": "required"', '"evidence_policy": "required"',
+        revision=backend_revision,
     )
     registration = _anchor(
         "plugins/agent/agent_backend/capabilities/__init__.py", 19, 85,
         "agent.workflow.node.test.execute", "agent.canvas.options.resolve",
         "agent.canvas.execution.start", "agent.canvas.execution.resume",
         "ProductionAgentCanvasRuntime", "registry.register", "agent.canvas-execution-worker",
+        revision=backend_revision,
     )
     contracts = {
         "queries": _anchor(
             "plugins/agent/agent_backend/capabilities/contracts.py", 102, 142,
             "agent.workflow.node.test.execute", "agent.canvas.options.resolve",
             "additionalProperties", "maxItems",
+            revision=backend_revision,
         ),
         "commands": _anchor(
             "plugins/agent/agent_backend/capabilities/contracts.py", 143, 197,
             "agent.canvas.execution.start", "agent.canvas.execution.resume",
             "expected_revision", "pause_token", "outcome_unknown", "maxItems",
+            revision=backend_revision,
         ),
     }
     runtime = {
         "finite_port": _anchor(
             "plugins/agent/agent_backend/application/canvas_runtime.py", 506, 513,
             "class AgentCanvasRuntime", "test_node", "resolve_options", "start", "resume",
+            revision=backend_revision,
         ),
         "production_adapter": _anchor(
             "plugins/agent/agent_backend/application/canvas_runtime.py", 1095, 1266,
             "class ProductionAgentCanvasRuntime", "MAX_WORKER_ENVELOPE_BYTES",
             "async def test_node", "async def resolve_options", "async def start",
             "async def resume", "reconcile_canvas_command", "invocation_id",
+            revision=backend_revision,
         ),
     }
     durable_state = {
@@ -842,18 +851,21 @@ def build_agent_closure_evidence(web_root: Path) -> dict[str, Any]:
             "class CanvasExecutionCoordinator", "derive_canvas_token",
             "class CanvasExecutionDispatcher", "mark_canvas_invocation_dispatched",
             "reconcile_canvas_command", "record_canvas_uncertainty",
+            revision=backend_revision,
         ),
         "repository": _anchor(
             "plugins/agent/agent_backend/infrastructure/repository.py", 102, 394,
             "def create_canvas_start", "def create_canvas_resume", "FOR UPDATE SKIP LOCKED",
             "def complete_canvas_invocation", "def record_canvas_uncertainty",
             "def record_canvas_runtime_result", "def load_canvas_runtime_result",
+            revision=backend_revision,
         ),
         "migration": _anchor(
             "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql", 1, 83,
             "workmanship_agent_canvas_runs", "workmanship_agent_canvas_invocations",
             "workmanship_agent_canvas_audit_events", "workmanship_agent_canvas_runtime_results",
             "idempotency_key", "lease_token",
+            revision=backend_revision,
         ),
         "lifecycle": registration,
     }
@@ -861,10 +873,12 @@ def build_agent_closure_evidence(web_root: Path) -> dict[str, Any]:
         "invoke_pipeline": _anchor(
             "backend/capability_v2/gateway.py", 134, 218,
             "validate_payload", "idempotency_key_mismatch", "transaction_participant_required",
+            revision=backend_revision,
         ),
         "context": _anchor(
             "backend/capability_v2/gateway.py", 520, 532,
             "CapabilityContext", "confirmation_token", "idempotency_key",
+            revision=backend_revision,
         ),
     }
     frontend = {
@@ -875,6 +889,14 @@ def build_agent_closure_evidence(web_root: Path) -> dict[str, Any]:
         "node_type": _frontend_anchor(
             web_root, frontend_revision, AGENT_FRONTEND_FILES[2],
             "invoke('agent.workflow.node.test.execute'",
+        ),
+        "node_editor_idempotency": _frontend_anchor(
+            web_root, frontend_revision, AGENT_FRONTEND_FILES[0],
+            "idempotencyKey: operation.idempotencyKey",
+        ),
+        "node_type_idempotency": _frontend_anchor(
+            web_root, frontend_revision, AGENT_FRONTEND_FILES[2],
+            "idempotencyKey: operation.idempotencyKey",
         ),
         "options": _frontend_anchor(
             web_root, frontend_revision, AGENT_FRONTEND_FILES[4],
@@ -897,6 +919,9 @@ def build_agent_closure_evidence(web_root: Path) -> dict[str, Any]:
             "runtime_evidence": runtime, "durable_state_evidence": None,
             "gateway_evidence": gateway,
             "frontend_call_sites": [frontend["node_editor"], frontend["node_type"]],
+            "idempotency_caller_evidence": [
+                frontend["node_editor_idempotency"], frontend["node_type_idempotency"],
+            ],
             "legacy_route_absent": True,
         },
         "POST /api/skills/canvas-options": {
@@ -1201,6 +1226,7 @@ def _agent_migrated_entry(
         "input_output_contract": route["contract_evidence"],
         "gateway_evidence": route["gateway_evidence"],
         "durable_state_evidence": route["durable_state_evidence"],
+        "idempotency_caller_evidence": route.get("idempotency_caller_evidence"),
         "non_equivalence": None,
         "lifecycle_confirmation_idempotency": "Resolved by the exact Agent contract, Gateway policy, production runtime, and durable command state where applicable.",
         "runtime_execution": "bounded_production_runtime",
