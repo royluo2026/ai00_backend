@@ -35,7 +35,7 @@ The structural-plan regression then exposed its stale target (`craft.bop.version
 migration_final_reclassification_mismatch:POST:/api/approval/orders/{dynamic}/reject
 ```
 
-The fixes were constrained to source-proved closure evidence, the exact Craft list capability target, and an evidence-gated transition from reclassified to migrated. The final focused Project/Web suite finished with `65 passed in 59.20s`.
+Round-one review tests then failed on six intended integrity boundaries: the missing source-derived list/outbound parsers, clean replay without a stored remediation artifact, forged/stale remediation acceptance, the missing committed Integration factory, and the missing machine acceptance result. The repair derives the complete list mapping and fail-closed branch from source/dist Git blobs, validates the rejection flow's exact allowed outbound call set, and rebuilds the canonical remediation manifest before historical migration audit. The final focused/adversarial Project/Web suite finished with `71 passed in 93.63s`.
 
 ## Regeneration and check commands
 
@@ -43,11 +43,11 @@ The fixes were constrained to source-proved closure evidence, the exact Craft li
 
 ```powershell
 python backend\scripts\refresh_web_wrapper_contracts.py --web-root $WEB_ROOT --write
-python backend\scripts\build_existing_capability_web_migrations.py --web-root $WEB_ROOT --write
-python backend\scripts\build_web_route_root_cause_ledger.py --web-root $WEB_ROOT --write
 python backend\scripts\check_web_capability_routes.py --web-root $WEB_ROOT --write
+python backend\scripts\build_web_route_root_cause_ledger.py --web-root $WEB_ROOT --write
 python backend\scripts\build_atomic_web_contracts.py --write
 python backend\scripts\build_craft_agent_project_structural_web_remediation.py --web-root $WEB_ROOT --write
+python backend\scripts\build_existing_capability_web_migrations.py --web-root $WEB_ROOT --write
 python backend\scripts\check_structural_remediation_plan.py --write
 python backend\scripts\build_special_web_residual_contracts.py
 python backend\scripts\freeze_official_domains.py
@@ -56,11 +56,11 @@ python backend\scripts\generate_capability_docs.py --write
 python backend\scripts\build_capability_acceptance_manifest.py --write
 
 python backend\scripts\refresh_web_wrapper_contracts.py --web-root $WEB_ROOT --check
-python backend\scripts\build_existing_capability_web_migrations.py --web-root $WEB_ROOT
-python backend\scripts\build_web_route_root_cause_ledger.py --web-root $WEB_ROOT --check
 python backend\scripts\check_web_capability_routes.py --web-root $WEB_ROOT --check
+python backend\scripts\build_web_route_root_cause_ledger.py --web-root $WEB_ROOT --check
 python backend\scripts\build_atomic_web_contracts.py --check
 python backend\scripts\build_craft_agent_project_structural_web_remediation.py --web-root $WEB_ROOT --check
+python backend\scripts\build_existing_capability_web_migrations.py --web-root $WEB_ROOT
 python backend\scripts\build_special_web_residual_contracts.py --check
 python backend\scripts\check_structural_remediation_plan.py --check
 python backend\scripts\freeze_official_domains.py --check
@@ -69,7 +69,14 @@ python backend\scripts\generate_capability_docs.py --check
 python backend\scripts\build_capability_acceptance_manifest.py --check
 ```
 
-Provider-dependent Catalog/acceptance commands used `AI00_INTEGRATION_ADAPTER_FACTORY=task4_integration_catalog_factory:build`, a temporary external test factory that instantiates the repository's own `IntegrationProviderAdapters` with validated no-op ports. The factory was not added to the repository.
+Before provider-dependent commands, set:
+
+```powershell
+$env:PYTHONPATH="$PWD\plugins\integration"
+$env:AI00_INTEGRATION_ADAPTER_FACTORY='backend.tests.support.integration_catalog_factory:build'
+```
+
+The committed no-I/O factory is `backend/tests/support/integration_catalog_factory.py`, SHA-256 `sha256:67009b68b2ca32693174cb017317904a76ae6a76ccb851d8a7a651f547b41882`. It is test support only and has no production runtime registration.
 
 ## Verification
 
@@ -86,25 +93,25 @@ All three passed at the frozen frontend revision.
 Backend focused suite:
 
 ```powershell
-python -m pytest backend\tests\test_craft_agent_project_structural_remediation_manifest.py backend\tests\test_existing_capability_web_migrations.py backend\tests\test_special_web_residuals.py backend\tests\test_web_compatibility_confirmation.py plugins\project_management\tests\test_project_approval_reject_capability.py plugins\project_management\tests\test_project_approval_reject_gateway_integration.py plugins\project_management\tests\test_project_application.py plugins\project_management\tests\test_project_capabilities.py -q
+python -m pytest backend\tests\test_craft_agent_project_structural_remediation_manifest.py backend\tests\test_existing_capability_web_migrations.py backend\tests\test_special_web_residuals.py backend\tests\test_web_compatibility_confirmation.py backend\tests\test_project_list_approval_closure_acceptance.py plugins\project_management\tests\test_project_approval_reject_capability.py plugins\project_management\tests\test_project_approval_reject_gateway_integration.py plugins\project_management\tests\test_project_application.py plugins\project_management\tests\test_project_capabilities.py -q
 ```
 
-Result: `65 passed in 59.20s`.
+Result: `71 passed in 93.63s`, including the committed factory/report identity assertions. Adversarial cases mutate both Project mapping and fail-closed source, add a renamed notification publisher, substitute a notification capability, supply a superficially plausible partial remediation document, and supply a stale revision with a recomputed self-hash.
 
 Domain gates:
 
 ```powershell
 python backend\scripts\check_domain_dependencies.py
 python backend\scripts\run_domain_migrations.py --domain project_management --check
-python -m pytest backend\tests\test_domain_migrations.py plugins\project_management\tests\test_project_management_migrations.py -q
+python -m pytest backend\tests\test_domain_migration_runner.py plugins\project_management\tests\test_database_isolation.py -q
 ```
 
-Results: dependency check passed with one explicitly reviewed test-only Gateway harness dependency and no new production dependency; Project Management reports two migrations; migration suite reports `11 passed in 0.65s`.
+Results: dependency check passed with one explicitly reviewed test-only Gateway harness dependency and no new production dependency; Project Management reports two migrations; migration suite reports `13 passed in 0.60s`.
 
 Strict acceptance:
 
 ```powershell
-python backend\scripts\run_capability_v2_acceptance.py --mode offline --strict
+python backend\scripts\run_capability_v2_acceptance.py --mode offline --strict --report docs\acceptance\project-list-approval-capability-closure.json
 ```
 
 - Status/scope: `passed` / `contract`
@@ -112,8 +119,12 @@ python backend\scripts\run_capability_v2_acceptance.py --mode offline --strict
 - Stable capabilities: `473`
 - Declared/validated: `3311 / 3311`
 - Failed/skipped: `0 / 0`
-- Acceptance pytest summary: `3322 passed in 7.84s`
-- Report ID: `sha256:2f665f2428738ff48f4866d553086ef48c14a886f9996d269870a924102a66de`
+- Code commit / clean tracked tree: `553e2b7f02dfe07fd2a93330c5eeab31c6dacc26` / `true`
+- Acceptance pytest summary: `3322 passed in 7.80s`
+- Report ID: `sha256:60bd375b1d8410bf3518aa518c696d4f7ecd28d4ff859059fcb642756c31c84c`
+- Machine report: `docs/acceptance/project-list-approval-capability-closure.json`
+- Machine report SHA-256: `sha256:4b9d7f5eae8f73c3f53cfbccab200ea6c4595399fcd0466ca723b5d398779419`
+- Identity manifest: `docs/acceptance/project-list-approval-capability-closure-evidence.json`
 - Provider manifest: `sha256:9edaee5e8c239a586b104ceeca362045e12df6ca64c63761841549416f04065f`
 - Unsuppressed global completion advisory: `coverage_invariant:stable_functions:922!=920`
 

@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0.0",
+  "code_commit": "553e2b7f02dfe07fd2a93330c5eeab31c6dacc26",
+  "frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
+  "adapter_factory": "backend.tests.support.integration_catalog_factory:build",
+  "factory_path": "backend/tests/support/integration_catalog_factory.py",
+  "factory_sha256": "sha256:67009b68b2ca32693174cb017317904a76ae6a76ccb851d8a7a651f547b41882",
+  "acceptance_report_path": "docs/acceptance/project-list-approval-capability-closure.json",
+  "acceptance_report_sha256": "sha256:4b9d7f5eae8f73c3f53cfbccab200ea6c4595399fcd0466ca723b5d398779419",
+  "acceptance_report_id": "sha256:60bd375b1d8410bf3518aa518c696d4f7ecd28d4ff859059fcb642756c31c84c",
+  "provider_manifest_sha256": "sha256:9edaee5e8c239a586b104ceeca362045e12df6ca64c63761841549416f04065f",
+  "catalog_release": "rel_570b28961bd996541523b75c90e3e769",
+  "replay_command": "python backend/scripts/run_capability_v2_acceptance.py --mode offline --strict --report docs/acceptance/project-list-approval-capability-closure.json"
+}
