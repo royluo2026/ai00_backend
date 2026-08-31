@@ -45,10 +45,15 @@ class _PersistedRepository:
         return None
 
 
-def _successful_worker(result_queue, payload_json):
+def _send(channel, envelope):
+    raw = json.dumps(envelope, separators=(",", ":"))
+    channel.send_bytes(raw.encode("utf-8"))
+
+
+def _successful_worker(channel, payload_json):
     payload = json.loads(payload_json)
     node_id = payload["request"]["node_id"]
-    result_queue.put(json.dumps({
+    _send(channel, {
         "ok": True,
         "result": {
             "status": "completed",
@@ -56,10 +61,38 @@ def _successful_worker(result_queue, payload_json):
             "summary": "ok",
         },
         "node_id": node_id,
-    }))
+    })
 
 
-def _slow_marker_worker(_result_queue, payload_json):
+def _near_limit_worker(channel, _payload_json):
+    _send(channel, {
+        "ok": True,
+        "result": {
+            "status": "completed",
+            "output_values": [
+                {"name": f"field-{index}", "value": "x" * 4000}
+                for index in range(16)
+            ],
+            "summary": "near limit",
+        },
+    })
+
+
+def _oversize_worker(channel, _payload_json):
+    _send(channel, {
+        "ok": True,
+        "result": {
+            "status": "completed",
+            "output_values": [
+                {"name": f"field-{index}", "value": "x" * 4000}
+                for index in range(24)
+            ],
+            "summary": "too large",
+        },
+    })
+
+
+def _slow_marker_worker(_result_connection, payload_json):
     marker = Path(json.loads(payload_json)["request"]["flow_gid"])
     time.sleep(0.25)
     marker.write_text("orphan", encoding="utf-8")
@@ -75,6 +108,33 @@ def test_production_adapter_returns_json_only_spawned_worker_result():
     assert result.status == "completed"
     assert [(item.name, item.value) for item in result.output_values] == [("count", 1)]
     assert result.summary == "ok"
+
+
+def test_near_limit_worker_output_is_drained_before_join_and_repeated_runs_leave_no_workers():
+    runtime = ProductionAgentCanvasRuntime(worker_target=_near_limit_worker, worker_timeout=3.0)
+    before = {child.pid for child in multiprocessing.active_children()}
+
+    for _ in range(3):
+        result = asyncio.run(runtime.test_node(
+            NodeTestRequest("flow-1", "node-1"), RunPrincipal("actor-1", "team-1"),
+        ))
+        assert len(result.output_values) == 16
+        assert all(len(item.value) == 4000 for item in result.output_values)
+
+    assert {child.pid for child in multiprocessing.active_children()} <= before
+
+
+def test_worker_output_larger_than_transport_ceiling_is_rejected_and_cleaned_up():
+    runtime = ProductionAgentCanvasRuntime(worker_target=_oversize_worker, worker_timeout=3.0)
+    before = {child.pid for child in multiprocessing.active_children()}
+
+    with pytest.raises(CapabilityBusinessError) as error:
+        asyncio.run(runtime.test_node(
+            NodeTestRequest("flow-1", "node-1"), RunPrincipal("actor-1", "team-1"),
+        ))
+
+    assert error.value.code == "invalid_input"
+    assert {child.pid for child in multiprocessing.active_children()} <= before
 
 
 def test_default_registered_handlers_use_production_repository_and_executor_path(monkeypatch):

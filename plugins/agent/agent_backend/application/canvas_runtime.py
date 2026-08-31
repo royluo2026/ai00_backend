@@ -10,7 +10,6 @@ import multiprocessing
 import re
 from dataclasses import asdict, dataclass
 from collections.abc import Callable, Mapping
-from queue import Empty
 from typing import Any, Literal, Protocol, Self
 
 from backend.capability_v2.provider_contracts import CapabilityBusinessError
@@ -31,6 +30,7 @@ MAX_GRAPH_BYTES = 262_144
 MAX_INPUT_BYTES = 65_536
 MAX_OUTPUT_BYTES = 65_536
 DEFAULT_MAX_CONCURRENCY = 4
+MAX_WORKER_ENVELOPE_BYTES = MAX_OUTPUT_BYTES + 8192
 
 ALLOWED_NODE_TEST_KINDS = frozenset({
     "data_db", "data_mem", "data_file", "list", "human", "human_approval",
@@ -751,7 +751,19 @@ def _worker_error(error: CapabilityBusinessError) -> dict[str, Any]:
     }
 
 
-def _canvas_query_worker(result_queue: Any, payload_json: str) -> None:
+def _worker_envelope_bytes(envelope: Mapping[str, Any]) -> bytes:
+    raw = json.dumps(
+        envelope, ensure_ascii=False, separators=(",", ":"), allow_nan=False,
+    ).encode("utf-8")
+    if len(raw) <= MAX_WORKER_ENVELOPE_BYTES:
+        return raw
+    return json.dumps({
+        "ok": False,
+        "error": _worker_error(_invalid("runtime output exceeds the size limit")),
+    }, separators=(",", ":")).encode("utf-8")
+
+
+def _canvas_query_worker(result_connection: Any, payload_json: str) -> None:
     """Own the database connection and the one existing executor in a terminable process."""
     try:
         payload = json.loads(payload_json)
@@ -779,7 +791,10 @@ def _canvas_query_worker(result_queue: Any, payload_json: str) -> None:
         envelope = {"ok": False, "error": _worker_error(CapabilityBusinessError(
             "provider_unavailable", "Agent canvas query provider is unavailable", retryable=True,
         ))}
-    result_queue.put(json.dumps(envelope, ensure_ascii=False, separators=(",", ":"), allow_nan=False))
+    try:
+        result_connection.send_bytes(_worker_envelope_bytes(envelope))
+    finally:
+        result_connection.close()
 
 
 class ProductionAgentCanvasRuntime:
@@ -819,14 +834,35 @@ class ProductionAgentCanvasRuntime:
             "repository_factory": self._repository_factory,
         }, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
         context = multiprocessing.get_context("spawn")
-        result_queue = context.Queue(maxsize=1)
-        process = context.Process(target=self._worker_target, args=(result_queue, payload_json))
+        result_connection, worker_connection = context.Pipe(duplex=False)
+        process = context.Process(target=self._worker_target, args=(worker_connection, payload_json))
         started = False
         try:
             process.start()
             started = True
+            worker_connection.close()
             loop = asyncio.get_running_loop()
             deadline = loop.time() + self._worker_timeout
+            raw = None
+            while loop.time() < deadline:
+                if result_connection.poll(0):
+                    try:
+                        raw = result_connection.recv_bytes(MAX_WORKER_ENVELOPE_BYTES)
+                    except OSError as exc:
+                        raise _invalid("runtime output exceeds the size limit") from exc
+                    break
+                if not process.is_alive():
+                    if result_connection.poll(0.05):
+                        continue
+                    raise CapabilityBusinessError(
+                        "provider_unavailable", "Agent canvas query provider is unavailable", retryable=True,
+                    )
+                await asyncio.sleep(0.005)
+            if raw is None:
+                self._stop(process)
+                raise CapabilityBusinessError(
+                    "runtime_timeout", "Agent canvas runtime timed out", retryable=True,
+                )
             while process.is_alive() and loop.time() < deadline:
                 await asyncio.sleep(0.005)
             if process.is_alive():
@@ -836,12 +872,11 @@ class ProductionAgentCanvasRuntime:
                 )
             process.join()
             try:
-                raw = result_queue.get(timeout=0.1)
-            except Empty as exc:
+                envelope = json.loads(raw.decode("utf-8"))
+            except (UnicodeDecodeError, json.JSONDecodeError) as exc:
                 raise CapabilityBusinessError(
                     "provider_unavailable", "Agent canvas query provider is unavailable", retryable=True,
                 ) from exc
-            envelope = json.loads(raw)
             if not envelope.get("ok"):
                 error = envelope.get("error") or {}
                 raise CapabilityBusinessError(
@@ -860,8 +895,8 @@ class ProductionAgentCanvasRuntime:
             if started:
                 self._stop(process)
                 process.close()
-            result_queue.close()
-            result_queue.join_thread()
+            worker_connection.close()
+            result_connection.close()
 
     async def test_node(self, request: NodeTestRequest, principal: RunPrincipal) -> NodeTestResult:
         async with self._semaphore:
