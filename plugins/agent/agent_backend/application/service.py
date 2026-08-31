@@ -16,6 +16,14 @@ _CANVAS_REQUESTS = {
 }
 
 
+def _json_projection(value):
+    if isinstance(value, dict):
+        return {key: _json_projection(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_projection(item) for item in value]
+    return value
+
+
 class AgentApplication:
     def __init__(self, repository, audit_repository=None, session_repository=None, canvas_runtime=None):
         self.repository = repository
@@ -42,7 +50,7 @@ class AgentApplication:
 
             async def invoke_canvas():
                 result = await getattr(self.canvas_runtime, method_name)(request, principal)
-                return asdict(result)
+                return _json_projection(asdict(result))
 
             return invoke_canvas()
         family = capability_id.split(".")[1]

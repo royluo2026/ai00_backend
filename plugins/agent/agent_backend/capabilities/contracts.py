@@ -11,14 +11,39 @@ STRING = {"type": "string", "minLength": 1}
 IDENTITY = {"type": "string", "minLength": 1, "maxLength": 255}
 TOKEN = {"type": "string", "minLength": 1, "maxLength": 512}
 REVISION = {"type": "integer", "minimum": 1}
-SCALAR = {"type": ["string", "number", "integer", "boolean", "null"], "maxLength": 4096}
-VALUE = {"oneOf": [SCALAR, {"type": "array", "maxItems": 64, "items": SCALAR}]}
+_RESERVED_INPUT_PARTS = (
+    "auth", "authorization", "token", "credential", "password", "passwd", "pwd",
+    "secret", "apikey", "accesskey", "privatekey", "tool", "environment", "env",
+    "source", "import", "path", "code", "script", "sql", "control", "command",
+    "exec", "executable",
+)
+
+
+def _format_insensitive_pattern(value: str) -> str:
+    return "".join(f"[{char.lower()}{char.upper()}][^A-Za-z0-9]*" for char in value)
+
+
+INPUT_NAME = {
+    "type": "string", "minLength": 1, "maxLength": 128,
+    "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,127}$",
+    "not": {"pattern": "(" + "|".join(map(_format_insensitive_pattern, _RESERVED_INPUT_PARTS)) + ")"},
+}
+SCALAR = {"anyOf": [
+    {"type": "string", "maxLength": 4096},
+    {"type": "number", "minimum": -1_000_000_000_000, "maximum": 1_000_000_000_000},
+    {"type": "boolean"}, {"type": "null"},
+]}
+VALUE = {"anyOf": [SCALAR, {"type": "array", "maxItems": 64, "items": SCALAR}]}
 NAMED_VALUE = obj({
+    "name": INPUT_NAME,
+    "value": VALUE,
+}, required=("name", "value"))
+OUTPUT_NAMED_VALUE = obj({
     "name": {"type": "string", "minLength": 1, "maxLength": 128},
     "value": VALUE,
 }, required=("name", "value"))
 INPUT_VALUES = {"type": "array", "maxItems": 64, "uniqueItems": True, "items": NAMED_VALUE}
-OUTPUT_VALUES = {"type": "array", "maxItems": 128, "items": NAMED_VALUE}
+OUTPUT_VALUES = {"type": "array", "maxItems": 128, "items": OUTPUT_NAMED_VALUE}
 INPUT = obj({
     "resource_gid": STRING, "expected_version": {"type": "integer", "minimum": 0},
     "status": STRING, "content": {"type": "object", "additionalProperties": True},
@@ -103,7 +128,7 @@ OUTPUT_SCHEMAS["agent.workflow.node.test.execute"] = obj({
 }, required=("status", "output_values", "summary"))
 INPUT_SCHEMAS["agent.canvas.options.resolve"] = obj({
     "skill_gid": IDENTITY, "node_id": IDENTITY,
-    "field_key": {"type": "string", "minLength": 1, "maxLength": 128},
+    "field_key": INPUT_NAME,
     "input_values": INPUT_VALUES,
 }, required=("skill_gid", "node_id", "field_key", "input_values"))
 OUTPUT_SCHEMAS["agent.canvas.options.resolve"] = obj({
@@ -120,11 +145,52 @@ INPUT_SCHEMAS["agent.canvas.execution.resume"] = obj({
     "run_token": TOKEN, "pause_token": TOKEN, "expected_revision": REVISION,
     "approved": {"type": "boolean"}, "input_values": INPUT_VALUES,
 }, required=("run_token", "pause_token", "expected_revision", "approved", "input_values"))
+OPTION = obj({
+    "value": {"type": "string", "minLength": 1, "maxLength": 512},
+    "label": {"type": "string", "minLength": 1, "maxLength": 512},
+}, required=("value", "label"))
+NODE_RESULT = obj({
+    "node_id": IDENTITY,
+    "status": {"type": "string", "enum": ["ok", "error", "skipped", "warning", "pending_approval"]},
+    "summary": {"type": "string", "maxLength": 1000},
+    "output_values": OUTPUT_VALUES,
+}, required=("node_id", "status", "summary", "output_values"))
+CONTEXT_ITEM = obj({
+    "node_id": IDENTITY, "text": {"type": "string", "maxLength": 500},
+}, required=("node_id", "text"))
+VISIBILITY_RULE = obj({"field_key": INPUT_NAME, "value": SCALAR}, required=("field_key", "value"))
+COLLECT_FIELD = obj({
+    "key": INPUT_NAME, "label": {"type": "string", "maxLength": 256},
+    "type": {"type": "string", "enum": ["hidden", "radio", "select", "select_multi", "cascade"]},
+    "options": {"type": "array", "maxItems": 200, "items": OPTION},
+    "default": VALUE,
+    "depends_on": {"anyOf": [INPUT_NAME, {"type": "null"}]},
+    "show_when": {"type": "array", "maxItems": 64, "items": VISIBILITY_RULE},
+}, required=("key", "label", "type", "options", "default", "depends_on", "show_when"))
+CANVAS_LAYOUT = obj({
+    "column_labels": {"type": "array", "maxItems": 32, "items": {"type": "string", "maxLength": 128}},
+    "column_width": {"type": "integer", "minimum": 120, "maximum": 1000},
+    "lane_height": {"type": "integer", "minimum": 40, "maximum": 500},
+    "hide_lane_labels": {"type": "boolean"},
+}, required=("column_labels", "column_width", "lane_height", "hide_lane_labels"))
 RUNTIME_DISPATCH = obj({
-    "status": {"type": "string", "enum": ["accepted", "completed", "paused", "outcome_unknown"]},
-    "run_token": TOKEN, "revision": REVISION, "pause_token": TOKEN,
+    "status": {"type": "string", "enum": ["accepted", "completed", "paused", "halted", "error", "outcome_unknown"]},
+    "run_token": TOKEN, "revision": REVISION,
+    "pause_token": {"anyOf": [TOKEN, {"type": "null"}]},
+    "halted_node_id": {"anyOf": [IDENTITY, {"type": "null"}]},
+    "halted_label": {"anyOf": [{"type": "string", "minLength": 1, "maxLength": 256}, {"type": "null"}]},
+    "halt_reason": {"anyOf": [{"type": "string", "minLength": 1, "maxLength": 4000}, {"type": "null"}]},
+    "skill_title": {"anyOf": [{"type": "string", "minLength": 1, "maxLength": 256}, {"type": "null"}]},
     "summary": {"type": "string", "maxLength": 4000},
-}, required=("status", "run_token", "revision", "summary"))
+    "node_results": {"type": "array", "maxItems": 128, "items": NODE_RESULT},
+    "context_summary": {"type": "array", "maxItems": 64, "items": CONTEXT_ITEM},
+    "collect_fields": {"type": "array", "maxItems": 32, "items": COLLECT_FIELD},
+    "canvas_layout": {"anyOf": [CANVAS_LAYOUT, {"type": "null"}]},
+}, required=(
+    "status", "run_token", "revision", "pause_token", "halted_node_id", "halted_label",
+    "halt_reason", "skill_title", "summary", "node_results", "context_summary",
+    "collect_fields", "canvas_layout",
+))
 OUTPUT_SCHEMAS["agent.canvas.execution.start"] = RUNTIME_DISPATCH
 OUTPUT_SCHEMAS["agent.canvas.execution.resume"] = RUNTIME_DISPATCH
 INPUT_SCHEMAS["agent.interaction.cancel"] = obj({"session_gid": STRING}, required=("session_gid",))
