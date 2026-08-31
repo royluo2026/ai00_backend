@@ -199,8 +199,8 @@
     }
   ],
   "environment_id": "offline:PC-PC2L7VVE",
-  "generated_at": "2026-08-31T07:07:50.179515+00:00",
-  "git_commit": "553e2b7f02dfe07fd2a93330c5eeab31c6dacc26",
+  "generated_at": "2026-08-31T07:37:46.399065+00:00",
+  "git_commit": "5092b8e6bbc97e4a16574a6c50a6fc5fb897efcd",
   "migration": {
     "filename": "202608280006_base_historical_tenant_repair.sql",
     "migration_id": "202608280006",
@@ -275,7 +275,7 @@
       "version": "1.0.0"
     }
   ],
-  "report_id": "sha256:60bd375b1d8410bf3518aa518c696d4f7ecd28d4ff859059fcb642756c31c84c",
+  "report_id": "sha256:03a7f1466c19fff41447750d4c04d5f432598edf035aafa528403ba7550140e0",
   "runtime_evidence_hash": null,
   "schema_hashes": {
     "agent.audit.read@1": "sha256:45f8fda405c9189fafe9d82e74ee449a5c14c74b6fbc5a012713004538e02964",
@@ -771,9 +771,9 @@
   "schema_version": 1,
   "status": "passed",
   "test_run": {
-    "command": "C:\\Users\\luoyi8\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -m pytest backend/tests/acceptance -q -p no:cacheprovider --ignore backend/tests/acceptance/test_acceptance_runner.py --basetemp E:\\Projects\\ai00_v3\\.worktrees\\capability-v2-implementation\\.capability-acceptance-v2.tmp\\run-76aqw7s7\\pytest -p backend.tests.acceptance.outcome_plugin",
+    "command": "C:\\Users\\luoyi8\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -m pytest backend/tests/acceptance -q -p no:cacheprovider --ignore backend/tests/acceptance/test_acceptance_runner.py --basetemp E:\\Projects\\ai00_v3\\.worktrees\\capability-v2-implementation\\.capability-acceptance-v2.tmp\\run-lyims2zl\\pytest -p backend.tests.acceptance.outcome_plugin",
     "exit_code": 0,
-    "summary": "3322 passed in 7.80s"
+    "summary": "3322 passed in 7.68s"
   },
   "validation_scope": "contract",
   "working_tree_clean": true

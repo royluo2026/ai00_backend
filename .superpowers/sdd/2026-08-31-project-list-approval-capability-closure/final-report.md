@@ -146,3 +146,40 @@ Strict contract acceptance passes; the independent completion audit remains inco
 - The repository-wide stable-function count remains `922` while the frozen completion invariant expects `920`. This is reported, not hidden, and is outside this three-group closure.
 - The reviewed Project test dependency exists only so the integration test can exercise the real shared Gateway. Production Project code introduces no Base Platform import.
 - Eleven structural groups/fourteen occurrences remain deliberately unresolved in the canonical Craft/Agent remainder; this task neither relabels nor suppresses them.
+
+## Round-two evidence-integrity closure
+
+Implementation commit `5092b8e6bbc97e4a16574a6c50a6fc5fb897efcd` resolves all three Important review findings and the non-blocking machine-evidence Minor.
+
+- Canonical remediation validation independently rebuilds the expected document, validates both content hashes, and then requires exact full-document equality. Explicit falsey candidates are validated and rejected. Self-rehashed mutations of capability, method, route, count, absence, arithmetic, and source-anchor fields all fail.
+- The complete pinned `rejectOrder` function is tokenized in source and dist. All 19 call expressions are classified as local/pure, local/UI, or the sole allowed outbound call `capabilityClient.invoke('project.approval.order.reject', ...)`; every unknown direct, member, computed-member, or indirect call fails closed.
+- The scanner consumes only the pinned Git tree: commit `69e5e00054d3c1cff635fe41fcb96fbe150d25fb`, tree `0eb308bf3f8ad300a584659a2d27c6b6de60bd95`, 224 scanner-visible documents, materialization `sha256:2bf2b224b9a09396811ec61a9a067f60eff6a1ce400ff9f56710557106c28e55`. An isolated clone test proves tracked and untracked worktree mutations do not change report bytes or materialization identity.
+- Raw acceptance bytes remain a frozen run snapshot; the normalized projection removes only the six documented runtime fields. The committed replay command sets both `PYTHONPATH` and `AI00_INTEGRATION_ADAPTER_FACTORY`.
+
+Round-two RED evidence was four intended failures plus the missing scanner API import. The adversarial green gate was `6 passed in 132.95s`; the complete focused Project/Web gate was `74 passed in 99.77s`. Frontend list dispatch, approval rejection, and existing-capability migration scripts all passed. Domain dependency and Project migration checks passed; the migration/isolation suite was `13 passed in 0.62s` after rerunning with a task-local pytest base temp because the host-wide pytest temp directory denied access. All thirteen generator/check commands passed.
+
+The corrected clean replay order is:
+
+```powershell
+$WEB_ROOT='E:\Projects\ai00_v3\.worktrees\workmanship-web-capability-governance'
+python backend\scripts\refresh_web_wrapper_contracts.py --web-root $WEB_ROOT --write
+python backend\scripts\check_web_capability_routes.py --web-root $WEB_ROOT --revision 69e5e00054d3c1cff635fe41fcb96fbe150d25fb --write
+python backend\scripts\build_web_route_root_cause_ledger.py --web-root $WEB_ROOT --write
+python backend\scripts\build_atomic_web_contracts.py --write
+python backend\scripts\build_craft_agent_project_structural_web_remediation.py --web-root $WEB_ROOT --write
+python backend\scripts\build_existing_capability_web_migrations.py --web-root $WEB_ROOT --write
+python backend\scripts\check_structural_remediation_plan.py --write
+python backend\scripts\build_special_web_residual_contracts.py
+$env:PYTHONPATH=(Join-Path $PWD 'plugins\integration')
+$env:AI00_INTEGRATION_ADAPTER_FACTORY='backend.tests.support.integration_catalog_factory:build'
+python backend\scripts\freeze_official_domains.py
+python backend\scripts\build_capability_catalog.py --write
+python backend\scripts\generate_capability_docs.py --write
+python backend\scripts\build_capability_acceptance_manifest.py --write
+python backend\scripts\run_capability_v2_acceptance.py --mode offline --strict --report docs\acceptance\project-list-approval-capability-closure.json
+python backend\scripts\build_project_list_approval_acceptance_evidence.py --write
+```
+
+Final strict offline acceptance is `passed` / `contract` at code commit `5092b8e6bbc97e4a16574a6c50a6fc5fb897efcd`, with Catalog `rel_570b28961bd996541523b75c90e3e769`, provider manifest `sha256:9edaee5e8c239a586b104ceeca362045e12df6ca64c63761841549416f04065f`, 473 stable capabilities, `3311/3311` validated, `0/0` failed/skipped, and report ID `sha256:03a7f1466c19fff41447750d4c04d5f432598edf035aafa528403ba7550140e0`. The raw snapshot is `docs/acceptance/project-list-approval-capability-closure.json`, SHA-256 `sha256:a83ce6d100febb7b58d62de26bb4da668b9e024e742e1137e6d3678331ca3f88`. The replay-stable projection is `docs/acceptance/project-list-approval-capability-closure.normalized.json`, semantic/file SHA-256 `sha256:6b3a9ce33c33b7033ed03db7c3fb58a1956a98d15b96836c838320817226aaf8`. The committed factory remains `backend.tests.support.integration_catalog_factory:build`, SHA-256 `sha256:67009b68b2ca32693174cb017317904a76ae6a76ccb851d8a7a651f547b41882`.
+
+The closure remains exactly `14/17 - 3/3 = 11/14`; every unresolved Craft/Agent item is unchanged. The sole retained advisory is still `coverage_invariant:stable_functions:922!=920` and is not suppressed.

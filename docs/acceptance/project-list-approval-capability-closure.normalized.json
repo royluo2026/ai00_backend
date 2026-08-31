@@ -210,7 +210,7 @@
         "sha256": "sha256:ca094946dd333f904ca84cfad5c8ba7be8399cb48c88c6eda6201e49fcdc85ab"
       }
     ],
-    "git_commit": "553e2b7f02dfe07fd2a93330c5eeab31c6dacc26",
+    "git_commit": "5092b8e6bbc97e4a16574a6c50a6fc5fb897efcd",
     "migration": {
       "filename": "202608280006_base_historical_tenant_repair.sql",
       "migration_id": "202608280006",
