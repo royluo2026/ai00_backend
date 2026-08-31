@@ -115,6 +115,18 @@ def _version_ref(release: dict[str, Any]) -> OntologyVersionRef:
 
 def _project_with_ref(item: dict[str, Any], view: str, version: OntologyVersionRef) -> dict[str, Any]:
     projected = project_concept(item, view)
+    if view == "schema" and isinstance(projected.get("rules"), list):
+        for rule in projected["rules"]:
+            if not isinstance(rule, dict):
+                continue
+            reference = rule.get("rule_reference")
+            if not isinstance(reference, dict):
+                reference = {"rule_gid": rule.get("rule_gid"), "rule_revision": rule.get("revision")}
+            gid, revision = reference.get("rule_gid"), reference.get("rule_revision")
+            if isinstance(gid, str) and gid and isinstance(revision, int) and not isinstance(revision, bool) and revision >= 1:
+                rule["rule_reference"] = {"rule_gid": gid, "rule_revision": revision}
+            else:
+                rule["rule_reference_unbound"] = True
     projected["concept_ref"] = ConceptRef(
         concept_id=str(item["stable_gid"]),
         kind=str(item["kind"]),
