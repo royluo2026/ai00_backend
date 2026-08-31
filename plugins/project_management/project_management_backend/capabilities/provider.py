@@ -63,7 +63,8 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             "data_classification": "confidential",
             "delegation_policy": "scoped",
             "agent_output_schema": descriptor.output_schema,
-            "operation_policy": "required" if is_approval_rejection else ("optional" if is_write else "none"),
+            "operation_policy": "none" if is_approval_rejection else ("optional" if is_write else "none"),
+            "replay_data_policy": "projected" if is_approval_rejection else "metadata_only",
             "idempotency_policy": "required" if is_write else "none",
             # The domain commits its own OceanBase transaction and cannot
             # enlist the platform outcome store in that same connection.

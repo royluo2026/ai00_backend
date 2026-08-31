@@ -527,6 +527,7 @@ class CapabilityGatewayService:
             source=envelope.identity.consumer.type.value,
             request_id=envelope.request_id,
             confirmation_token=envelope.approval_reference,
+            idempotency_key=envelope.idempotency_key,
             operation_id=operation_id,
             agent_run_id=envelope.identity.consumer.agent_run_id,
             # Plugin storage uses a server-derived consumer namespace. Agents receive
