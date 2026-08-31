@@ -2988,6 +2988,15 @@
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[project.approval.change.apply@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[project.approval.change.apply@1]"
     },
+    "project.approval.order.reject@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[project.approval.order.reject@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[project.approval.order.reject@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[project.approval.order.reject@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[project.approval.order.reject@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[project.approval.order.reject@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[project.approval.order.reject@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[project.approval.order.reject@1]"
+    },
     "project.approval.read.atomic.approval_orders_get@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[project.approval.read.atomic.approval_orders_get@1]",
       "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[project.approval.read.atomic.approval_orders_get@1]",
@@ -4249,7 +4258,7 @@
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[vismockup.visibility@1]"
     }
   },
-  "catalog_release": "rel_fd5e91d036d31863b94dd01f1dce6fad",
+  "catalog_release": "rel_570b28961bd996541523b75c90e3e769",
   "mandatory_cases": [
     "success",
     "invalid_input",

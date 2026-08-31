@@ -23,6 +23,9 @@ BASELINE_LEDGER_PATH = "docs/governance/web-route-root-cause-ledger.json"
 CANONICAL_INVENTORY_PATH = (
     "docs/governance/capability-coverage-review/generated/web_route_inventory.json"
 )
+STRUCTURAL_REMEDIATION_PATH = (
+    "docs/governance/craft-agent-project-structural-web-remediation.json"
+)
 FRONTEND_CLIENT = "web/core/existing_capability_client.js"
 
 
@@ -342,6 +345,7 @@ def audit_existing_capability_migrations(
     web_root: Path | None = None,
     ledger_path: Path | None = None,
     ledger_document: Mapping[str, Any] | None = None,
+    remediation_document: Mapping[str, Any] | None = None,
     frontend_source_overrides: Mapping[str, str] | None = None,
     check_final_inventory: bool = True,
 ) -> tuple[str, ...]:
@@ -508,14 +512,39 @@ def audit_existing_capability_migrations(
                     (item["method"], item["normalized_route"]): item
                     for item in json.loads(atomic_path.read_text(encoding="utf-8")).get("entries", [])
                 }
+            remediation = remediation_document
+            if remediation is None:
+                remediation_path = root / STRUCTURAL_REMEDIATION_PATH
+                if remediation_path.is_file():
+                    remediation = json.loads(remediation_path.read_text(encoding="utf-8"))
+            remediated_entries = {
+                (item.get("method"), item.get("normalized_route")): item
+                for item in (remediation or {}).get("entries", [])
+                if isinstance(item, Mapping)
+                and item.get("final_disposition") == "migrated"
+                and item.get("final_inventory_mapping") == "capability"
+                and item.get("legacy_route_absent") is True
+                and isinstance(item.get("candidate_capability"), str)
+                and item["candidate_capability"].endswith("@1")
+                and isinstance(item.get("frontend_call_sites"), list)
+                and item["frontend_call_sites"]
+                and isinstance(item.get("contract_evidence"), Mapping)
+                and isinstance(item.get("owner_service_evidence"), Mapping)
+            }
             for key, group in groups.items():
                 if group.decision == "migrate" and key in final_keys:
                     issues.append(f"migration_final_route_remains:{key[0]}:{key[1]}")
                 atomic = atomic_entries.get(key)
                 atomic_migrated = atomic is not None and atomic.get("final_disposition") == "migrated"
-                if group.decision == "reclassify" and not atomic_migrated and final_keys[key] != group.occurrence_count:
+                remediated = remediated_entries.get(key)
+                later_migrated = (
+                    remediated is not None
+                    and isinstance(remediated.get("occurrences"), list)
+                    and len(remediated["occurrences"]) == group.occurrence_count
+                )
+                if group.decision == "reclassify" and not atomic_migrated and not later_migrated and final_keys[key] != group.occurrence_count:
                     issues.append(f"migration_final_reclassification_mismatch:{key[0]}:{key[1]}")
-                if atomic_migrated and key in final_keys:
+                if (atomic_migrated or later_migrated) and key in final_keys:
                     issues.append(f"migration_final_route_remains:{key[0]}:{key[1]}")
     return tuple(sorted(set(issues)))
 

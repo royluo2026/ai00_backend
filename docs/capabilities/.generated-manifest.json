@@ -368,6 +368,7 @@
     "project-management/project.approval.change.apply.atomic.approval_orders_withdraw@1.md",
     "project-management/project.approval.change.apply.atomic.approval_scope_upgrade_create@1.md",
     "project-management/project.approval.change.apply@1.md",
+    "project-management/project.approval.order.reject@1.md",
     "project-management/project.approval.read.atomic.approval_orders_get@1.md",
     "project-management/project.approval.read.atomic.approval_orders_search@1.md",
     "project-management/project.approval.read@1.md",

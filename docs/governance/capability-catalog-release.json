@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_fd5e91d036d31863b94dd01f1dce6fad",
-  "catalog_hash": "sha256:fd5e91d036d31863b94dd01f1dce6fad38a5cf152353694463bba6af2f5cd1cd",
+  "release_id": "rel_570b28961bd996541523b75c90e3e769",
+  "catalog_hash": "sha256:570b28961bd996541523b75c90e3e7696a98e7d1bd6c7409c8d2f34858bb914a",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -132098,6 +132098,227 @@
       ]
     },
     {
+      "id": "project.approval.order.reject",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.approval.order.reject",
+      "description": "Reject one Project approval order and durably enqueue its notification.",
+      "use_when": "A confirmed reviewer rejects an in-review Project approval order.",
+      "do_not_use_when": "The caller needs another approval transition or a Craft-owned outcome.",
+      "business_effect": "Business outcome: Reject one Project approval order and durably enqueue its notification.",
+      "side_effect_level": "write",
+      "side_effects": "Writes project_management domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "project_management.v2:project.manage_any",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "order_gid",
+          "comment",
+          "expected_revision"
+        ],
+        "properties": {
+          "order_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "comment": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "order_gid",
+          "status",
+          "revision",
+          "notification_event_gid"
+        ],
+        "properties": {
+          "order_gid": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "rejected"
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "notification_event_gid": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "order_gid",
+          "status",
+          "revision",
+          "notification_event_gid"
+        ],
+        "properties": {
+          "order_gid": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "rejected"
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "notification_event_gid": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:1f344095ef5c070e364016c8e53bb82e403e53cb2b2c6408d3fd4e875d962745",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "expected_version",
+      "expected_version_payload_path": "expected_revision",
+      "idempotency_policy": "required",
+      "replay_data_policy": "projected",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_45dcaa977360db557d8e7559",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested project resource is unavailable.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller cannot access the project resource.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The project change requires Base approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The project resource changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "The Project Management provider is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "project_management.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/project.approval.order.reject:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
+          "code_revision": "sha256:b65e9d803fb07882c2c092f902991807d23836f43974544a92d3703fc5375e1e",
+          "result": "pass",
+          "path": "backend/tests/test_capability_v2_contracts.py"
+        }
+      ]
+    },
+    {
       "id": "project.approval.read",
       "major_version": 1,
       "owner_domain": "project_management",
@@ -190097,7 +190318,7 @@
       "plugin_id": "official.project-management",
       "module": "project_management_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:a3f08494ad47b6d85270f788c4baff6d280ba2262583b7f3d08a4532046f80bc"
+      "artifact_hash": "sha256:5c7427b832c18a10adc55cfc6ada09a96c377111c0df7c060fd1f779e42c8bbb"
     },
     {
       "plugin_id": "official.simulation",
@@ -190106,5 +190327,5 @@
       "artifact_hash": "sha256:5c1fccaa2219f6833c24237667039685e322cefcffc7ca6f0287d28cfc0a2b39"
     }
   ],
-  "created_at": "2026-08-28T21:14:29.745660Z"
+  "created_at": "2026-08-31T06:27:55.073156Z"
 }

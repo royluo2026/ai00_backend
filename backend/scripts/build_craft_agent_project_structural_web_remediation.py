@@ -19,7 +19,9 @@ from backend.capability_v2.git_tree import read_path
 
 
 BASELINE = "2db07be4"
+CLOSURE_BASELINE = "614805f59294006b8802ae01869dc9d7fe3cf694"
 LEDGER_PATH = "docs/governance/web-route-root-cause-ledger.json"
+REMEDIATION_PATH = "docs/governance/craft-agent-project-structural-web-remediation.json"
 ATOMIC_PATH = ROOT / "docs/governance/atomic-web-capability-contracts.json"
 OUTPUT = ROOT / "docs/governance/craft-agent-project-structural-web-remediation.json"
 SCOPE = {
@@ -50,6 +52,22 @@ LISTS_SOURCE = "plugins/craft/craft_backend/routers/lists.py"
 APPROVAL_SOURCE = "plugins/craft/craft_backend/routers/approval.py"
 PROJECT_SERVICE_SOURCE = "plugins/project_management/project_management_backend/application/service.py"
 PROJECT_PROVIDER_SOURCE = "plugins/project_management/project_management_backend/capabilities/provider.py"
+EXPECTED_FRONTEND_REVISION = "69e5e00054d3c1cff635fe41fcb96fbe150d25fb"
+PROJECT_CLOSURE_SCOPE = {
+    ("GET", "/api/lists"),
+    ("DELETE", "/api/lists/{dynamic}"),
+    ("POST", "/api/approval/orders/{dynamic}/reject"),
+}
+FRONTEND_FILES = (
+    "web/core/existing_capability_client.js",
+    "dist-production/web/core/existing_capability_client.js",
+    "web/components/list_sidebar.js",
+    "dist-production/web/components/list_sidebar.js",
+    "packages/craft-plugin/web/bop/bop.js",
+    "dist-production/packages/craft-plugin/web/bop/bop.js",
+    "packages/craft-plugin/web/approval/approval.js",
+    "dist-production/packages/craft-plugin/web/approval/approval.js",
+)
 
 
 def _canonical(value: Any) -> str:
@@ -74,6 +92,211 @@ def _anchor(source_path: str, start_line: int, end_line: int, *needles: str) -> 
         "end_line": end_line,
         "source_sha256": _sha256(data),
         "snippet_sha256": _sha256(selected.encode("utf-8")),
+    }
+
+
+def _git_blob(root: Path, revision: str, source_path: str) -> str:
+    return subprocess.run(
+        ["git", "rev-parse", f"{revision}:{source_path}"], cwd=root,
+        check=True, capture_output=True, text=True,
+    ).stdout.strip()
+
+
+def _frontend_file(web_root: Path, revision: str, source_path: str) -> tuple[dict[str, Any], str]:
+    data = read_path(web_root, revision, source_path)
+    return ({
+        "blob": _git_blob(web_root, revision, source_path),
+        "sha256": _sha256(data),
+    }, data.decode("utf-8"))
+
+
+def _frontend_anchor(
+    web_root: Path, revision: str, source_path: str, needle: str, occurrence: int = 0,
+) -> dict[str, Any]:
+    data = read_path(web_root, revision, source_path)
+    lines = data.decode("utf-8").splitlines(keepends=True)
+    matches = [index for index, line in enumerate(lines) if needle in line]
+    if len(matches) <= occurrence:
+        raise ValueError(f"frontend source anchor drift: {source_path}:{needle}")
+    index = matches[occurrence]
+    return {
+        "source_path": source_path,
+        "line": index + 1,
+        "source_sha256": _sha256(data),
+        "snippet_sha256": _sha256(lines[index].encode("utf-8")),
+        "blob": _git_blob(web_root, revision, source_path),
+    }
+
+
+def build_project_closure_evidence(web_root: Path) -> dict[str, Any]:
+    """Bind the three closed Project-facing groups to immutable source evidence."""
+    web_root = web_root.resolve()
+    revision = subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=web_root,
+        check=True, capture_output=True, text=True,
+    ).stdout.strip()
+    if revision != EXPECTED_FRONTEND_REVISION:
+        raise ValueError(f"frontend closure revision drift: {revision}")
+
+    frontend_files: dict[str, dict[str, Any]] = {}
+    texts: dict[str, str] = {}
+    for source_path in FRONTEND_FILES:
+        frontend_files[source_path], texts[source_path] = _frontend_file(
+            web_root, revision, source_path,
+        )
+
+    client_paths = (
+        "web/core/existing_capability_client.js",
+        "dist-production/web/core/existing_capability_client.js",
+    )
+    sidebar_paths = (
+        "web/components/list_sidebar.js",
+        "dist-production/web/components/list_sidebar.js",
+    )
+    bop_paths = (
+        "packages/craft-plugin/web/bop/bop.js",
+        "dist-production/packages/craft-plugin/web/bop/bop.js",
+    )
+    approval_paths = (
+        "packages/craft-plugin/web/approval/approval.js",
+        "dist-production/packages/craft-plugin/web/approval/approval.js",
+    )
+    list_search_absent = all("/api/lists" not in texts[path] for path in client_paths)
+    list_delete_absent = list_search_absent and all(
+        "/api/lists/${gid}" not in texts[path] for path in sidebar_paths
+    ) and all("/api/lists/${ver.gid}" not in texts[path] for path in bop_paths)
+    reject_literal = "/api/approval/orders/${_selected.gid}/reject"
+    approval_reject_absent = all(reject_literal not in texts[path] for path in approval_paths)
+    notification_tokens = (
+        "publish_notification", "publishNotification", "/api/notifications", "ai00:notification",
+    )
+    notification_side_effect_absent = all(
+        all(token not in texts[path] for token in notification_tokens)
+        for path in approval_paths
+    )
+    if not all((list_search_absent, list_delete_absent, approval_reject_absent, notification_side_effect_absent)):
+        raise ValueError("Project/List frontend closure drift")
+
+    list_provider = _anchor(
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py",
+        207, 235, "atomic_id =", "register_capability",
+    )
+    list_operations = _anchor(
+        "plugins/project_management/project_management_backend/application/service.py",
+        179, 182, '"lists.search"', '"lists.delete"',
+    )
+    list_service = _anchor(
+        "plugins/project_management/project_management_backend/application/service.py",
+        516, 562, 'operation == "lists.search"', 'operation == "lists.delete"',
+    )
+    list_dispatch = {
+        "capabilities": {
+            "bop_version": {
+                "search": "craft.bop.version.list@1",
+                "delete": "craft.bop.version.archive@1",
+            },
+            "project": {
+                "search": "project.list.read.atomic.lists_search@1",
+                "delete": "project.list.change.apply.atomic.lists_delete@1",
+            },
+        },
+        "frontend_anchor": _frontend_anchor(
+            web_root, revision, client_paths[0], "const LIST_CAPABILITIES",
+        ),
+        "project_provider": list_provider,
+        "project_operations": list_operations,
+        "project_service": list_service,
+        "craft_list_provider": _anchor(
+            "plugins/craft/craft_backend/capabilities/bop_versions.py",
+            368, 395, 'id="craft.bop.version.list"', "list_bop_versions",
+        ),
+        "craft_list_input_contract": _anchor(
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            43, 52, '"craft.bop.version.list"', "page_size",
+        ),
+        "craft_list_output_contract": _anchor(
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            180, 196, '"craft.bop.version.list"', "next_cursor",
+        ),
+        "craft_archive_provider": _anchor(
+            "plugins/craft/craft_backend/capabilities/bop_writes.py",
+            462, 484, "def archive_bop_version", 'id="craft.bop.version.archive"',
+        ),
+        "craft_archive_input_contract": _anchor(
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            118, 127, '"craft.bop.version.archive"', "expected_revision",
+        ),
+        "craft_archive_output_contract": _anchor(
+            "plugins/craft/craft_backend/capabilities/contracts.py",
+            237, 247, '"craft.bop.version.archive"', "after_hash",
+        ),
+    }
+    approval = {
+        "provider_contract": _anchor(
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py",
+            244, 281, "APPROVAL_REJECT_CAPABILITY_ID", "notification_event_gid",
+        ),
+        "provider_policy": _anchor(
+            PROJECT_PROVIDER_SOURCE, 42, 75,
+            'spec.id == "project.approval.order.reject"', '"replay_data_policy"',
+            '"concurrency_policy"',
+        ),
+        "owner_service": _anchor(
+            PROJECT_SERVICE_SOURCE, 459, 511, "def reject_order", "canonical_rejection_result",
+            "enqueue_approval_rejection_notification", "audit_approval_rejection",
+        ),
+        "outbox_transaction": _anchor(
+            "plugins/project_management/project_management_backend/infrastructure/repository.py",
+            16, 119, "claim_approval_rejection", "reject_approval_order",
+            "workmanship_proj_notification_outbox", "complete_approval_rejection", "audit_approval_rejection",
+        ),
+        "migration": _anchor(
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql",
+            34, 46, "workmanship_proj_notification_outbox", "idx_proj_notification_outbox_delivery",
+        ),
+        "gateway_context": _anchor(
+            "backend/capability_v2/gateway.py", 518, 532,
+            "CapabilityContext", "idempotency_key=envelope.idempotency_key",
+        ),
+        "gateway_integration": _anchor(
+            "plugins/project_management/tests/test_project_approval_reject_gateway_integration.py",
+            51, 140, "CapabilityGatewayService", "request_approval", "count_notifications",
+        ),
+        "frontend_anchor": _frontend_anchor(
+            web_root, revision, approval_paths[0],
+            "capabilityClient.invoke('project.approval.order.reject'",
+        ),
+        "web_notification_side_effect_absent": notification_side_effect_absent,
+    }
+    routes = {
+        "GET /api/lists": {
+            "candidate_capability": "craft.bop.version.list@1",
+            "legacy_route_absent": list_search_absent,
+            "frontend_call_sites": [
+                _frontend_anchor(web_root, revision, client_paths[0], "craft.bop.version.list"),
+            ],
+        },
+        "DELETE /api/lists/{dynamic}": {
+            "candidate_capability": "craft.bop.version.archive@1",
+            "legacy_route_absent": list_delete_absent,
+            "frontend_call_sites": [
+                _frontend_anchor(web_root, revision, client_paths[0], "craft.bop.version.archive"),
+                _frontend_anchor(web_root, revision, sidebar_paths[0], ".call('project.lists.delete'"),
+                _frontend_anchor(web_root, revision, bop_paths[0], ".call('project.lists.delete'"),
+            ],
+        },
+        "POST /api/approval/orders/{dynamic}/reject": {
+            "candidate_capability": "project.approval.order.reject@1",
+            "legacy_route_absent": approval_reject_absent,
+            "frontend_call_sites": [approval["frontend_anchor"]],
+        },
+    }
+    return {
+        "frontend_revision": revision,
+        "frontend_files": dict(sorted(frontend_files.items())),
+        "list_dispatch": list_dispatch,
+        "approval": approval,
+        "routes": routes,
     }
 
 
@@ -125,6 +348,14 @@ def _approval_reject_evidence() -> dict[str, Any]:
 def _baseline() -> tuple[dict[str, Any], bytes]:
     result = subprocess.run(
         ["git", "show", f"{BASELINE}:{LEDGER_PATH}"], cwd=ROOT,
+        check=True, capture_output=True,
+    )
+    return json.loads(result.stdout), result.stdout
+
+
+def _closure_baseline() -> tuple[dict[str, Any], bytes]:
+    result = subprocess.run(
+        ["git", "show", f"{CLOSURE_BASELINE}:{REMEDIATION_PATH}"], cwd=ROOT,
         check=True, capture_output=True,
     )
     return json.loads(result.stdout), result.stdout
@@ -201,8 +432,83 @@ def _entry(
     }
 
 
+def _migrated_entry(
+    key: tuple[str, str], source: Mapping[str, Any], occurrences: list[dict[str, Any]],
+    closure: Mapping[str, Any],
+) -> dict[str, Any]:
+    route_key = f"{key[0]} {key[1]}"
+    route = closure["routes"][route_key]
+    if key == ("GET", "/api/lists"):
+        provider = closure["list_dispatch"]["craft_list_provider"]
+        contract = {
+            "input": closure["list_dispatch"]["craft_list_input_contract"],
+            "output": closure["list_dispatch"]["craft_list_output_contract"],
+        }
+        lifecycle = {
+            **_bop_lifecycle_evidence(key),
+            "provider": provider,
+            "contract": contract,
+            "finite_dispatch": closure["list_dispatch"]["capabilities"],
+        }
+        approval = None
+    elif key == ("DELETE", "/api/lists/{dynamic}"):
+        provider = closure["list_dispatch"]["craft_archive_provider"]
+        contract = {
+            "input": closure["list_dispatch"]["craft_archive_input_contract"],
+            "output": closure["list_dispatch"]["craft_archive_output_contract"],
+        }
+        lifecycle = {
+            **_bop_lifecycle_evidence(key),
+            "provider": provider,
+            "contract": contract,
+            "finite_dispatch": closure["list_dispatch"]["capabilities"],
+        }
+        approval = None
+    elif key == ("POST", "/api/approval/orders/{dynamic}/reject"):
+        provider = closure["approval"]["provider_contract"]
+        contract = {
+            "provider_contract": closure["approval"]["provider_contract"],
+            "provider_policy": closure["approval"]["provider_policy"],
+        }
+        lifecycle = None
+        approval = closure["approval"]
+    else:
+        raise ValueError(f"not a Project closure route: {key}")
+    return {
+        "method": key[0],
+        "normalized_route": key[1],
+        "owner_domain": source["owner_domain"],
+        "occurrences": occurrences,
+        "old_occurrences": source["occurrences"],
+        "old_route_evidence": source["backend_evidence"],
+        "authorization_and_scope": "Exact owner Capability applies authenticated actor/team and resource policy before provider execution.",
+        "candidate_capability": route["candidate_capability"],
+        "provider_anchor": f"{provider['source_path']}:{provider['start_line']}-{provider['end_line']}",
+        "provider_source_sha256": provider["source_sha256"],
+        "owner_service_evidence": (
+            closure["approval"]["owner_service"]
+            if approval is not None else provider
+        ),
+        "contract_evidence": contract,
+        "input_output_contract": contract,
+        "non_equivalence": None,
+        "lifecycle_confirmation_idempotency": "Resolved by the exact owner contract, Gateway policy, and source-anchored replay/concurrency evidence.",
+        "runtime_execution": "not_applicable",
+        "bop_conditional_branch": key in BOP_KEYS,
+        "lifecycle_evidence": lifecycle,
+        "approval_reject_evidence": approval,
+        "frontend_call_sites": route["frontend_call_sites"],
+        "legacy_route_absent": route["legacy_route_absent"],
+        "final_occurrences": [],
+        "final_disposition": "migrated",
+        "unresolved_reason": None,
+        "final_inventory_mapping": "capability",
+    }
+
+
 def _build_manifest(web_root: Path) -> dict[str, Any]:
     ledger, ledger_blob = _baseline()
+    closure_baseline, closure_baseline_blob = _closure_baseline()
     sources = {
         (item["method"], item["normalized_route"]): item for item in ledger["entries"]
         if (item["method"], item["normalized_route"]) in SCOPE
@@ -213,7 +519,27 @@ def _build_manifest(web_root: Path) -> dict[str, Any]:
     contracts = {(item["method"], item["normalized_route"]): item for item in atomic["entries"]}
     if any(key not in contracts for key in SCOPE - BOP_KEYS):
         raise ValueError("atomic contract scope drift")
+    prior_entries = {
+        (item["method"], item["normalized_route"]): item
+        for item in closure_baseline["entries"]
+        if (item["method"], item["normalized_route"]) in SCOPE
+    }
+    if set(prior_entries) != SCOPE:
+        raise ValueError("closure baseline scope drift")
+    prior_occurrences = {
+        key: [dict(item) for item in entry["final_occurrences"]]
+        for key, entry in prior_entries.items()
+    }
+    if (
+        len(prior_occurrences) != 14
+        or sum(map(len, prior_occurrences.values())) != 17
+        or any(entry.get("final_disposition") != "unresolved" for entry in prior_entries.values())
+    ):
+        raise ValueError("closure baseline count drift")
+    closure = build_project_closure_evidence(web_root)
     report = json.loads(build_report(web_root.resolve()).json())
+    if report["frontend_revision"] != closure["frontend_revision"]:
+        raise ValueError("frontend closure/report revision drift")
     final_by_key: dict[tuple[str, str], list[dict[str, Any]]] = {}
     for raw in report["routes"]:
         key = raw["method"], raw["normalized_route"]
@@ -221,28 +547,61 @@ def _build_manifest(web_root: Path) -> dict[str, Any]:
             final_by_key.setdefault(key, []).append(
                 _final_occurrence(raw, web_root, report["frontend_revision"])
             )
-    if set(final_by_key) != SCOPE or sum(map(len, final_by_key.values())) != 17:
+    expected_remainder = SCOPE - PROJECT_CLOSURE_SCOPE
+    if set(final_by_key) != expected_remainder or sum(map(len, final_by_key.values())) != 14:
         raise ValueError("final three-domain inventory drift")
-    entries = [
-        _entry(key, sources[key], contracts.get(key), sorted(final_by_key[key], key=lambda item: item["occurrence_id"]))
-        for key in sorted(SCOPE)
-    ]
+    entries = []
+    for key in sorted(SCOPE):
+        occurrences = sorted(prior_occurrences[key], key=lambda item: item["occurrence_id"])
+        if key in PROJECT_CLOSURE_SCOPE:
+            entry = _migrated_entry(key, sources[key], occurrences, closure)
+        else:
+            current = sorted(final_by_key[key], key=lambda item: item["occurrence_id"])
+            if current != occurrences:
+                raise ValueError(f"unresolved occurrence identity drift: {key}")
+            entry = _entry(key, sources[key], contracts.get(key), current)
+            entry["occurrences"] = occurrences
+        entries.append(entry)
     counts = {
-        "groups": len(entries), "occurrences": sum(len(item["final_occurrences"]) for item in entries),
-        "migrated_groups": 0, "migrated_occurrences": 0,
-        "unresolved_groups": len(entries), "unresolved_occurrences": sum(len(item["final_occurrences"]) for item in entries),
+        "groups": len(entries), "occurrences": sum(len(item["occurrences"]) for item in entries),
+        "migrated_groups": sum(item["final_disposition"] == "migrated" for item in entries),
+        "migrated_occurrences": sum(
+            len(item["occurrences"]) for item in entries if item["final_disposition"] == "migrated"
+        ),
+        "unresolved_groups": sum(item["final_disposition"] == "unresolved" for item in entries),
+        "unresolved_occurrences": sum(
+            len(item["occurrences"]) for item in entries if item["final_disposition"] == "unresolved"
+        ),
     }
-    if counts != {"groups": 14, "occurrences": 17, "migrated_groups": 0, "migrated_occurrences": 0, "unresolved_groups": 14, "unresolved_occurrences": 17}:
+    if counts != {"groups": 14, "occurrences": 17, "migrated_groups": 3, "migrated_occurrences": 3, "unresolved_groups": 11, "unresolved_occurrences": 14}:
         raise ValueError(f"three-domain count drift: {counts}")
+    closure_arithmetic = {
+        "baseline": {"groups": counts["groups"], "occurrences": counts["occurrences"]},
+        "closed": {"groups": counts["migrated_groups"], "occurrences": counts["migrated_occurrences"]},
+        "canonical_remainder": {
+            "groups": len(final_by_key),
+            "occurrences": sum(map(len, final_by_key.values())),
+        },
+    }
+    if any(
+        closure_arithmetic["baseline"][field] - closure_arithmetic["closed"][field]
+        != closure_arithmetic["canonical_remainder"][field]
+        for field in ("groups", "occurrences")
+    ):
+        raise ValueError("Project closure arithmetic drift")
     manifest = {
-        "schema_version": "1.0.0",
+        "schema_version": "2.0.0",
         "artifact_id": "task-3b3e-craft-agent-project-structural-remediation",
         "source_ledger": LEDGER_PATH,
         "source_ledger_revision": BASELINE,
         "source_ledger_sha256": _sha256(ledger_blob),
+        "closure_baseline_revision": CLOSURE_BASELINE,
+        "closure_baseline_sha256": _sha256(closure_baseline_blob),
         "frontend_revision": report["frontend_revision"],
         "frontend_content_hash": report["content_hash"],
+        "project_closure_evidence": closure,
         "atomic_contract_manifest_sha256": _sha256(ATOMIC_PATH.read_bytes()),
+        "closure_arithmetic": closure_arithmetic,
         "counts": counts,
         "entries": entries,
     }
@@ -270,9 +629,20 @@ def validate_manifest_against_expected(payload: Mapping[str, Any], expected: Map
             issues.append("lifecycle_evidence_mismatch")
         if entry.get("approval_reject_evidence") != wanted_entry["approval_reject_evidence"]:
             issues.append("approval_evidence_mismatch")
+        if entry.get("occurrences") != wanted_entry["occurrences"]:
+            issues.append("occurrence_evidence_mismatch")
+        if entry.get("contract_evidence") != wanted_entry.get("contract_evidence"):
+            issues.append("contract_evidence_mismatch")
+        if entry.get("owner_service_evidence") != wanted_entry.get("owner_service_evidence"):
+            issues.append("owner_service_evidence_mismatch")
+        if entry.get("frontend_call_sites", []) != wanted_entry.get("frontend_call_sites", []):
+            issues.append("frontend_evidence_mismatch")
         if entry.get("final_occurrences") != wanted_entry["final_occurrences"]:
             issues.append("final_occurrence_mismatch")
-        if entry.get("final_disposition") != "unresolved" or entry.get("final_inventory_mapping") != "unresolved":
+        if (
+            entry.get("final_disposition") != wanted_entry["final_disposition"]
+            or entry.get("final_inventory_mapping") != wanted_entry["final_inventory_mapping"]
+        ):
             issues.append("final_inventory_mismatch")
     without_hash = dict(payload)
     supplied_hash = without_hash.pop("content_sha256", None)

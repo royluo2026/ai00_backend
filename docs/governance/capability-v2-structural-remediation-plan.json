@@ -10,7 +10,7 @@
     "no silent REST fallback"
   ],
   "artifact_id": "capability-v2-structural-remediation-plan",
-  "content_sha256": "sha256:d6dcdbcf0cf0968cfd79ae76474c07ccd3ddd4417003c15e2651079bc0b5afc2",
+  "content_sha256": "sha256:87a53691ad355fc73694775296ffcba92b0caeca37594251daa4ac53de6ec5c9",
   "counts": {
     "groups": 37,
     "occurrences": 45
@@ -187,31 +187,63 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-        "provider_anchor": "plugins/craft/craft_backend/routers/lists.py",
-        "provider_source_sha256": "sha256:af843b6c197bf6434836a15bb387068f89910db7c984c1191e96e4e329e1f1a7",
-        "reason": "The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch."
+        "provider_anchor": "plugins/craft/craft_backend/capabilities/bop_writes.py:462-484",
+        "provider_source_sha256": "sha256:8882ce9a1f7f1c91d1add3b2db9c1f03cd01c0948600cde1650bbcd77f0495a9",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "migrated",
       "current_evidence": {
-        "canonical_occurrences": [
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "input": {
+            "end_line": 127,
+            "snippet_sha256": "sha256:5f9ed937924d85be4b24a9232e57060e554d36997185df61f581a7b87a8b20f4",
+            "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
+            "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+            "start_line": 118
+          },
+          "output": {
+            "end_line": 247,
+            "snippet_sha256": "sha256:ca535816e2e539c3ff631a470d974a9000a06fce80a92cea0dcce59d729c2bdf",
+            "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
+            "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+            "start_line": 237
+          }
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
           {
-            "column": 12,
-            "disposition": "unresolved",
-            "line": 331,
-            "method": "DELETE",
-            "normalized_route": "/api/lists/{dynamic}",
-            "occurrence_id": "web/core/existing_capability_client.js:331:12:DELETE:/api/lists/{dynamic}",
-            "raw_route": "/api/lists/${encodeURIComponent(gid)}?item_type=bop_version&expected_revision=${revision}",
-            "source": "web/core/existing_capability_client.js"
+            "blob": "a179dc94009217bafb32b7f9571d3c052bb01d56",
+            "line": 44,
+            "snippet_sha256": "sha256:358c488e5955dbd88dd3f83207bb6d8cbb4383ff06cdbdb0bfb510726f176636",
+            "source_path": "web/core/existing_capability_client.js",
+            "source_sha256": "sha256:0134b8752fdd00f56738c11b66fca90380abffe5ce7de74a1c222579c9f55979"
+          },
+          {
+            "blob": "5441dcc79b2eddf24af8b87f0fa959e42f3e216f",
+            "line": 1113,
+            "snippet_sha256": "sha256:45ea2515fd59afe274bfce3f94844774b3d57006c17a7de211c3b0cb7a5fd129",
+            "source_path": "web/components/list_sidebar.js",
+            "source_sha256": "sha256:b4d8407129b51061b4b382b7070f190ec8ee80792e3d1ac0df5a71bb4808a2ff"
+          },
+          {
+            "blob": "9f99585bb577e331241743027a631e84bf77ec4b",
+            "line": 705,
+            "snippet_sha256": "sha256:10f0735d96060b30ff77af098bc5a54419bd8a38b7b2349ffb8691bb595385d4",
+            "source_path": "packages/craft-plugin/web/bop/bop.js",
+            "source_sha256": "sha256:eebb2d15589d3ace5725e4464737154690d14cf5cb3b4feee6a7d24f1e59add7"
           }
         ],
-        "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
-        "frontend_call_sites": [],
-        "owner_service_evidence": null,
-        "target_capability": null
+        "owner_service_evidence": {
+          "end_line": 484,
+          "snippet_sha256": "sha256:e6661c80c7f6eb3cf433182b05fdc98053176efc3c09031909b58f8d9edd1dc2",
+          "source_path": "plugins/craft/craft_backend/capabilities/bop_writes.py",
+          "source_sha256": "sha256:8882ce9a1f7f1c91d1add3b2db9c1f03cd01c0948600cde1650bbcd77f0495a9",
+          "start_line": 462
+        },
+        "target_capability": "craft.bop.version.archive@1"
       },
-      "current_status": "unresolved",
+      "current_status": "migrated",
       "dependencies": [
         "BOP version aggregate",
         "conditional dispatch adapter"
@@ -1553,31 +1585,49 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-        "provider_anchor": "plugins/craft/craft_backend/routers/lists.py",
-        "provider_source_sha256": "sha256:af843b6c197bf6434836a15bb387068f89910db7c984c1191e96e4e329e1f1a7",
-        "reason": "The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch."
+        "provider_anchor": "plugins/craft/craft_backend/capabilities/bop_versions.py:368-395",
+        "provider_source_sha256": "sha256:183bb5dfe17d4e743c2118d9d9035e678aef11b55dcf82a4d24fff73b7410486",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "migrated",
       "current_evidence": {
-        "canonical_occurrences": [
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "input": {
+            "end_line": 52,
+            "snippet_sha256": "sha256:46237d107dc7b2c14a3a9693472d9a0b6a4ad619ad4b52cc6862025eadf6fdb8",
+            "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
+            "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+            "start_line": 43
+          },
+          "output": {
+            "end_line": 196,
+            "snippet_sha256": "sha256:bc7b40d0bc7e9c9178feb7316c934e4a5068ef0dbe5df0b38c74c0a65858ca65",
+            "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
+            "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+            "start_line": 180
+          }
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
           {
-            "column": 51,
-            "disposition": "unresolved",
-            "line": 326,
-            "method": "GET",
-            "normalized_route": "/api/lists",
-            "occurrence_id": "web/core/existing_capability_client.js:326:51:GET:/api/lists",
-            "raw_route": "/api/lists?item_type=bop_version",
-            "source": "web/core/existing_capability_client.js"
+            "blob": "a179dc94009217bafb32b7f9571d3c052bb01d56",
+            "line": 44,
+            "snippet_sha256": "sha256:358c488e5955dbd88dd3f83207bb6d8cbb4383ff06cdbdb0bfb510726f176636",
+            "source_path": "web/core/existing_capability_client.js",
+            "source_sha256": "sha256:0134b8752fdd00f56738c11b66fca90380abffe5ce7de74a1c222579c9f55979"
           }
         ],
-        "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
-        "frontend_call_sites": [],
-        "owner_service_evidence": null,
-        "target_capability": null
+        "owner_service_evidence": {
+          "end_line": 395,
+          "snippet_sha256": "sha256:d77b31b2ea90a278d0b33515687cd536d9be34f07d6611dd4debbc31635a60b2",
+          "source_path": "plugins/craft/craft_backend/capabilities/bop_versions.py",
+          "source_sha256": "sha256:183bb5dfe17d4e743c2118d9d9035e678aef11b55dcf82a4d24fff73b7410486",
+          "start_line": 368
+        },
+        "target_capability": "craft.bop.version.list@1"
       },
-      "current_status": "unresolved",
+      "current_status": "migrated",
       "dependencies": [
         "BOP version aggregate",
         "conditional dispatch adapter"
@@ -1608,7 +1658,7 @@
       "package_id": "craft_bop_lifecycle",
       "permission_object_scope": "Craft version scope and expected revision",
       "service_boundary": "New public Craft BOP-version lifecycle service selected before Project list dispatch; it owns the conditional bop_version branch only.",
-      "target_capability": "craft.bop.version.search@1",
+      "target_capability": "craft.bop.version.list@1",
       "tests": [
         "conditional branch selection",
         "BOP revision/authorization",
@@ -2461,31 +2511,49 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-        "provider_anchor": "plugins/craft/craft_backend/routers/approval.py",
-        "provider_source_sha256": "sha256:1b6d618b9562ad4509f81a848234af9c02f75e17392fe26ed9ca203bf1c7569a",
-        "reason": "The Project outcome omits the legacy notification publication side effect."
+        "provider_anchor": "plugins/project_management/project_management_backend/capabilities/reviewed.py:244-281",
+        "provider_source_sha256": "sha256:af0a539e6faebdb5e861318e9c8e38018f95cb3708578dd1e6cc1ecb7c56a091",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "migrated",
       "current_evidence": {
-        "canonical_occurrences": [
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "provider_contract": {
+            "end_line": 281,
+            "snippet_sha256": "sha256:0d655febbfe0e66ea4304dc17c08542368095461299c5fe5c26e237e4ae1609c",
+            "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
+            "source_sha256": "sha256:af0a539e6faebdb5e861318e9c8e38018f95cb3708578dd1e6cc1ecb7c56a091",
+            "start_line": 244
+          },
+          "provider_policy": {
+            "end_line": 75,
+            "snippet_sha256": "sha256:c9012303c682b9853b495c2d811e437c4604e6a95a75102c4e562734bba8b3c1",
+            "source_path": "plugins/project_management/project_management_backend/capabilities/provider.py",
+            "source_sha256": "sha256:bf43ce7886a3de4037a17d9fd312f23e86ad6c47ee291b5b425cbb40463ff4bf",
+            "start_line": 42
+          }
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
           {
-            "column": 26,
-            "disposition": "unresolved",
-            "line": 153,
-            "method": "POST",
-            "normalized_route": "/api/approval/orders/{dynamic}/reject",
-            "occurrence_id": "packages/craft-plugin/web/approval/approval.js:153:26:POST:/api/approval/orders/{dynamic}/reject",
-            "raw_route": "/api/approval/orders/${_selected.gid}/reject",
-            "source": "packages/craft-plugin/web/approval/approval.js"
+            "blob": "7903b987d7f27b5d05b94181cf0361eca0abad6f",
+            "line": 187,
+            "snippet_sha256": "sha256:a480648dcc9949b29b5ccf784cfcf19012e4e718afe6eabb43f7ee7a921e7138",
+            "source_path": "packages/craft-plugin/web/approval/approval.js",
+            "source_sha256": "sha256:6637310898336502c3e6e875b8925b31b968a7ccaff07997ef8bf32ab3dc78cc"
           }
         ],
-        "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
-        "frontend_call_sites": [],
-        "owner_service_evidence": null,
-        "target_capability": "project.approval.change.apply.atomic.approval_orders_reject@1"
+        "owner_service_evidence": {
+          "end_line": 511,
+          "snippet_sha256": "sha256:76eb104b247a45bb17a70a951829ea071548a09ffa3c8ca61453f74268238426",
+          "source_path": "plugins/project_management/project_management_backend/application/service.py",
+          "source_sha256": "sha256:bfb874c131fb9c882982118c6d2914ddc2993b6409b6117aa483bba29a74631f",
+          "start_line": 459
+        },
+        "target_capability": "project.approval.order.reject@1"
       },
-      "current_status": "unresolved",
+      "current_status": "migrated",
       "dependencies": [
         "Project approval aggregate",
         "notification outbox migration"
@@ -4815,11 +4883,11 @@
     },
     {
       "path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-      "sha256": "sha256:fca8beb006ff0fcac9fdad79d1ad19ef97633ed90217c45600e78c9e5e5754c0"
+      "sha256": "sha256:38382b6ae0802be0175a13d25723fe7d68f7073f571857d2b0a429b3e05ffaad"
     },
     {
       "path": "docs\\governance\\capability-coverage-review\\generated\\web_route_inventory.json",
-      "sha256": "sha256:f9d3b229f2e0bf760613d013f2cc3ec5ab1c790cffa8e9aaf56f998df532d951"
+      "sha256": "sha256:1759b080326e4e5fcfd1f031b14d0303a53d7fbf556c951f32b4518ec8f689b0"
     }
   ]
 }

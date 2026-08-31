@@ -3,7 +3,7 @@
   "entries": [
     {
       "source": "packages/craft-plugin/web/approval/approval.js",
-      "source_sha256": "18a4a09a2d1a8d2d250d39aa085df097fd2b05e14e909f2a56f4f8fb3eb25379",
+      "source_sha256": "d2975a2db6081d2c1bc40dc4d9ffc750463c6ce002a8a2820b4517af52a669f1",
       "callee": "api",
       "signature": {
         "route_argument": 0,
@@ -28,59 +28,43 @@
       "call_sites": [
         {
           "source_path": "packages/craft-plugin/web/approval/approval.js",
-          "line": 45,
+          "line": 46,
           "column": 26,
           "raw_route": "/api/approval/orders",
           "normalized_route": "/api/approval/orders",
-          "source_sha256": "18a4a09a2d1a8d2d250d39aa085df097fd2b05e14e909f2a56f4f8fb3eb25379"
+          "source_sha256": "d2975a2db6081d2c1bc40dc4d9ffc750463c6ce002a8a2820b4517af52a669f1"
         },
         {
           "source_path": "packages/craft-plugin/web/approval/approval.js",
-          "line": 68,
+          "line": 69,
           "column": 26,
           "raw_route": "/api/approval/orders/${gid}",
           "normalized_route": "/api/approval/orders/{dynamic}",
-          "source_sha256": "18a4a09a2d1a8d2d250d39aa085df097fd2b05e14e909f2a56f4f8fb3eb25379"
+          "source_sha256": "d2975a2db6081d2c1bc40dc4d9ffc750463c6ce002a8a2820b4517af52a669f1"
         },
         {
           "source_path": "packages/craft-plugin/web/approval/approval.js",
-          "line": 131,
+          "line": 132,
           "column": 16,
           "raw_route": "/api/approval/orders/${_selected.gid}/start",
           "normalized_route": "/api/approval/orders/{dynamic}/start",
-          "source_sha256": "18a4a09a2d1a8d2d250d39aa085df097fd2b05e14e909f2a56f4f8fb3eb25379"
+          "source_sha256": "d2975a2db6081d2c1bc40dc4d9ffc750463c6ce002a8a2820b4517af52a669f1"
         },
         {
           "source_path": "packages/craft-plugin/web/approval/approval.js",
-          "line": 133,
+          "line": 134,
           "column": 26,
           "raw_route": "/api/approval/orders/${_selected.gid}/approve",
           "normalized_route": "/api/approval/orders/{dynamic}/approve",
-          "source_sha256": "18a4a09a2d1a8d2d250d39aa085df097fd2b05e14e909f2a56f4f8fb3eb25379"
+          "source_sha256": "d2975a2db6081d2c1bc40dc4d9ffc750463c6ce002a8a2820b4517af52a669f1"
         },
         {
           "source_path": "packages/craft-plugin/web/approval/approval.js",
-          "line": 151,
-          "column": 16,
-          "raw_route": "/api/approval/orders/${_selected.gid}/start",
-          "normalized_route": "/api/approval/orders/{dynamic}/start",
-          "source_sha256": "18a4a09a2d1a8d2d250d39aa085df097fd2b05e14e909f2a56f4f8fb3eb25379"
-        },
-        {
-          "source_path": "packages/craft-plugin/web/approval/approval.js",
-          "line": 153,
-          "column": 26,
-          "raw_route": "/api/approval/orders/${_selected.gid}/reject",
-          "normalized_route": "/api/approval/orders/{dynamic}/reject",
-          "source_sha256": "18a4a09a2d1a8d2d250d39aa085df097fd2b05e14e909f2a56f4f8fb3eb25379"
-        },
-        {
-          "source_path": "packages/craft-plugin/web/approval/approval.js",
-          "line": 168,
+          "line": 212,
           "column": 26,
           "raw_route": "/api/approval/orders/${_selected.gid}/withdraw",
           "normalized_route": "/api/approval/orders/{dynamic}/withdraw",
-          "source_sha256": "18a4a09a2d1a8d2d250d39aa085df097fd2b05e14e909f2a56f4f8fb3eb25379"
+          "source_sha256": "d2975a2db6081d2c1bc40dc4d9ffc750463c6ce002a8a2820b4517af52a669f1"
         }
       ]
     },

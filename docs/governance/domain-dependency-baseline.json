@@ -1,4 +1,12 @@
 {
   "schema_version": 1,
-  "violations": []
+  "violations": [
+    {
+      "source": "plugins/project_management/tests/test_project_approval_reject_gateway_integration.py",
+      "imported_module": "backend.capabilities.registry_next",
+      "source_domain": "Project Management",
+      "target_domain": "Base Platform",
+      "reason": "Domain code imports an implementation outside its owned package or approved shared contract."
+    }
+  ]
 }

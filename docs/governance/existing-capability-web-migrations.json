@@ -3,7 +3,7 @@
   "artifact_id": "existing-capability-web-migrations",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "baseline_revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-  "frontend_revision": "b1c0b0e25e895022c1e9ea12abf767ea2b7637c3",
+  "frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
   "groups": [
     {
       "method": "DELETE",
@@ -1391,9 +1391,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-          "source_sha256": "7d3b676ee23cddeb64ed071a611c1730ab027017115366c8a57398c9c8d1c040",
-          "start_line": 150,
-          "end_line": 150,
+          "source_sha256": "af0a539e6faebdb5e861318e9c8e38018f95cb3708578dd1e6cc1ecb7c56a091",
+          "start_line": 156,
+          "end_line": 156,
           "sha256": "521d0e298f3386b9d55e96c07369fbe02fde966f3967252b2396eee162f3ccd5",
           "needle": "payload.get(\"arguments\", payload)"
         }
@@ -2220,9 +2220,9 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/project_management/project_management_backend/application/service.py",
-            "source_sha256": "f79ee2ca70ad2fe56a4fa11f91a5756b63e5f948657e727c08fee34568d6be4c",
-            "start_line": 148,
-            "end_line": 148,
+            "source_sha256": "bfb874c131fb9c882982118c6d2914ddc2993b6409b6117aa483bba29a74631f",
+            "start_line": 198,
+            "end_line": 198,
             "sha256": "7d0c4ce19b5a7f27f52c026c4f5d643ec320f98e8c445e0e496810063d178963",
             "needle": "\"approval.orders.reject\""
           }
@@ -3262,9 +3262,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-          "source_sha256": "7d3b676ee23cddeb64ed071a611c1730ab027017115366c8a57398c9c8d1c040",
-          "start_line": 150,
-          "end_line": 150,
+          "source_sha256": "af0a539e6faebdb5e861318e9c8e38018f95cb3708578dd1e6cc1ecb7c56a091",
+          "start_line": 156,
+          "end_line": 156,
           "sha256": "521d0e298f3386b9d55e96c07369fbe02fde966f3967252b2396eee162f3ccd5",
           "needle": "payload.get(\"arguments\", payload)"
         }
@@ -3591,9 +3591,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-          "source_sha256": "7d3b676ee23cddeb64ed071a611c1730ab027017115366c8a57398c9c8d1c040",
-          "start_line": 150,
-          "end_line": 150,
+          "source_sha256": "af0a539e6faebdb5e861318e9c8e38018f95cb3708578dd1e6cc1ecb7c56a091",
+          "start_line": 156,
+          "end_line": 156,
           "sha256": "521d0e298f3386b9d55e96c07369fbe02fde966f3967252b2396eee162f3ccd5",
           "needle": "payload.get(\"arguments\", payload)"
         }
@@ -3644,9 +3644,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-          "source_sha256": "7d3b676ee23cddeb64ed071a611c1730ab027017115366c8a57398c9c8d1c040",
-          "start_line": 150,
-          "end_line": 150,
+          "source_sha256": "af0a539e6faebdb5e861318e9c8e38018f95cb3708578dd1e6cc1ecb7c56a091",
+          "start_line": 156,
+          "end_line": 156,
           "sha256": "521d0e298f3386b9d55e96c07369fbe02fde966f3967252b2396eee162f3ccd5",
           "needle": "payload.get(\"arguments\", payload)"
         }

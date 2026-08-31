@@ -69,7 +69,7 @@
     },
     {
       "source": "web/components/list_sidebar.js",
-      "line": 903,
+      "line": 905,
       "column": 14,
       "reason": "Comment describes the adjacent project selector; it is not executable."
     },

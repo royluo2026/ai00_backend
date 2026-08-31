@@ -269,7 +269,7 @@
         "plugin_id": "official.project-management",
         "module": "project_management_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:a3f08494ad47b6d85270f788c4baff6d280ba2262583b7f3d08a4532046f80bc"
+        "artifact_hash": "sha256:5c7427b832c18a10adc55cfc6ada09a96c377111c0df7c060fd1f779e42c8bbb"
       },
       "artifact_path": "plugins/project_management/project_management_backend",
       "allowed_owners": [

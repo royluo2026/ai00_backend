@@ -135,6 +135,27 @@ def test_manifest_targets_are_stable_owned_and_decisions_have_evidence() -> None
     )
 
 
+def test_later_source_proved_remediation_may_close_a_reclassified_occurrence() -> None:
+    """Breaks if the historical migration audit ignores a later exact owner-capability closure."""
+    manifest = load_existing_capability_migrations(MANIFEST)
+
+    issues = audit_existing_capability_migrations(ROOT, manifest, web_root=WEB_ROOT)
+
+    assert "migration_final_reclassification_mismatch:POST:/api/approval/orders/{dynamic}/reject" not in issues
+
+    remediation = json.loads((ROOT / "docs/governance/craft-agent-project-structural-web-remediation.json").read_text(encoding="utf-8"))
+    approval = next(
+        item for item in remediation["entries"]
+        if (item["method"], item["normalized_route"])
+        == ("POST", "/api/approval/orders/{dynamic}/reject")
+    )
+    approval["final_disposition"] = "unresolved"
+    issues = audit_existing_capability_migrations(
+        ROOT, manifest, web_root=WEB_ROOT, remediation_document=remediation,
+    )
+    assert "migration_final_reclassification_mismatch:POST:/api/approval/orders/{dynamic}/reject" in issues
+
+
 def test_migrated_groups_are_only_the_provider_equivalent_families() -> None:
     manifest = load_existing_capability_migrations(MANIFEST)
     migrated = {(group.method, group.normalized_route) for group in manifest.groups if group.decision == "migrate"}

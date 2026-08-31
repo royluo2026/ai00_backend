@@ -3,7 +3,7 @@
 This plan preserves the reviewed historical Web source scope while reconciling each group to current canonical unresolved evidence or current generated migrated-capability evidence. It is an implementation sequence, not an operations or BFF exemption.
 
 - Historical scope: **45 occurrences / 37 root-cause groups**.
-- Current progress: **23 migrated groups**; remaining groups are retained rather than erased.
+- Current progress: **26 migrated groups**; remaining groups are retained rather than erased.
 - Implementation disposition for every group: `owner_service_required`.
 - Global prohibitions: no private-router import; no direct SQL provider; no generic JSON contracts; no secret logging; no auto-confirm; no unbounded runtime execution; no fabricated atomicity; no silent REST fallback.
 
@@ -130,9 +130,9 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 ### `DELETE /api/lists/{dynamic}`
 
 - Historical occurrences: web/core/existing_capability_client.js:331:12:DELETE:/api/lists/{dynamic}
-- Current status: `unresolved` (`unresolved`).
+- Current status: `migrated` (`migrated`).
 - Owner/service: `craft` / `plugins.craft.craft_backend.application.bop_version_lifecycle_service`
-- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/lists.py`; The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch.
+- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/capabilities/bop_writes.py:462-484`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: New public Craft BOP-version lifecycle service selected before Project list dispatch; it owns the conditional bop_version branch only. one Craft BOP-version revision-locked archive transaction with audit.
 - Target: `craft.bop.version.archive@1`. Scope: Craft version scope and expected revision.
 - Contract/security: Craft version scope and expected revision; archive lifecycle/audit; no Project-list relabeling or direct SQL dispatch.
@@ -256,11 +256,11 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 ### `GET /api/lists`
 
 - Historical occurrences: web/core/existing_capability_client.js:326:51:GET:/api/lists
-- Current status: `unresolved` (`unresolved`).
+- Current status: `migrated` (`migrated`).
 - Owner/service: `craft` / `plugins.craft.craft_backend.application.bop_version_lifecycle_service`
-- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/lists.py`; The BOP conditional branch is a Craft version lifecycle outcome, not a Project list operation or direct SQL dispatch.
+- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/capabilities/bop_versions.py:368-395`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: New public Craft BOP-version lifecycle service selected before Project list dispatch; it owns the conditional bop_version branch only. read-only Craft BOP-version query selected by item_type before Project dispatch.
-- Target: `craft.bop.version.search@1`. Scope: Craft version scope and expected revision.
+- Target: `craft.bop.version.list@1`. Scope: Craft version scope and expected revision.
 - Contract/security: Craft version scope and expected revision; archive lifecycle/audit; no Project-list relabeling or direct SQL dispatch.
 - Migration: Migrate only bop_version conditional branch; preserve Project list behavior.
 - Tests: conditional branch selection; BOP revision/authorization; Project list branch remains unchanged. Dependencies: BOP version aggregate, conditional dispatch adapter. Cross-domain links: Project compatibility adapter selects item_type=bop_version then invokes Craft; it neither owns nor queries BOP tables..
@@ -368,9 +368,9 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 ### `POST /api/approval/orders/{dynamic}/reject`
 
 - Historical occurrences: packages/craft-plugin/web/approval/approval.js:153:26:POST:/api/approval/orders/{dynamic}/reject
-- Current status: `unresolved` (`unresolved`).
+- Current status: `migrated` (`migrated`).
 - Owner/service: `project_management` / `plugins.project_management.project_management_backend.application.service.ProjectManagementApplication`
-- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/approval.py`; The Project outcome omits the legacy notification publication side effect.
+- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/project_management/project_management_backend/capabilities/reviewed.py:244-281`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: Existing ProjectManagementApplication approval.orders.reject boundary, extended in-package with notification outbox, audit and idempotency rather than a fabricated Project service. one Project approval transition transaction with audit and transactional notification outbox.
 - Target: `project.approval.order.reject@1`. Scope: tenant/order scope and approver authorization.
 - Contract/security: tenant/order scope and approver authorization; revision/idempotency; transactional audit plus durable notification outbox.

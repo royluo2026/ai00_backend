@@ -1,7 +1,7 @@
 {
-  "frontend_revision": "b1c0b0e25e895022c1e9ea12abf767ea2b7637c3",
-  "content_hash": "9c9abc0a340ea25f4eb28ea60ab2577b50a5daf26424e62ba3ca174474c1aa4c",
-  "wrapper_contracts_hash": "33e0e1b6378d642ab2fb6131a3cd02fde4895615709a5a82aa7ea1a6bffc0db0",
+  "frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
+  "content_hash": "47e7ff0fddcd4ad7ef7597b96ba6688f9f316fac73290b3439576e78ffae4e19",
+  "wrapper_contracts_hash": "0f099242269e21253ae02e3c54184b8ff0ec2ade1f98b59dbe8937778178a760",
   "scan_roots": [
     "web",
     "packages"
@@ -24,15 +24,15 @@
   ],
   "counts": {
     "capability": 38,
-    "legacy_registered": 311,
+    "legacy_registered": 310,
     "bff_registered": 2,
     "operations_excluded": 19,
-    "unresolved": 17
+    "unresolved": 14
   },
   "lexical_audit": {
-    "token_count": 405,
-    "token_hash": "6b8c5556c69d04a85ac8f4ee2a85a4f103fdb13233341050366d8803556fd32a",
-    "mapped_count": 387,
+    "token_count": 401,
+    "token_hash": "39fa809a8bd563437b3250d265fe571658883fcaea78e630751b5d01dc344d2c",
+    "mapped_count": 383,
     "reviewed_non_route_count": 18,
     "reviewed_non_route_tokens": [
       "packages/craft-plugin/web/bop_nav/bop_nav.js:12:13:/api/",
@@ -46,7 +46,7 @@
       "packages/plugin-sdk/frontend/plugin-sdk.js:8:20:/api/",
       "web/components/attachments_widget.js:119:21:/api/",
       "web/components/list_shell.js:1192:37:/api/",
-      "web/components/list_sidebar.js:903:14:/api/",
+      "web/components/list_sidebar.js:905:14:/api/",
       "web/components/list_tree.html:626:18:/api/",
       "web/container_card/modes/mode_spreadsheet.js:53:19:/api/",
       "web/handbook/index.html:477:58:/api/",
@@ -483,73 +483,53 @@
     },
     {
       "source": "packages/craft-plugin/web/approval/approval.js",
-      "line": 45,
+      "line": 46,
       "column": 26,
       "raw_route": "/api/approval/orders",
       "normalized_route": "/api/approval/orders",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "packages/craft-plugin/web/approval/approval.js:45:26:GET:/api/approval/orders"
+      "occurrence_id": "packages/craft-plugin/web/approval/approval.js:46:26:GET:/api/approval/orders"
     },
     {
       "source": "packages/craft-plugin/web/approval/approval.js",
-      "line": 68,
+      "line": 69,
       "column": 26,
       "raw_route": "/api/approval/orders/${gid}",
       "normalized_route": "/api/approval/orders/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "packages/craft-plugin/web/approval/approval.js:68:26:GET:/api/approval/orders/{dynamic}"
+      "occurrence_id": "packages/craft-plugin/web/approval/approval.js:69:26:GET:/api/approval/orders/{dynamic}"
     },
     {
       "source": "packages/craft-plugin/web/approval/approval.js",
-      "line": 131,
+      "line": 132,
       "column": 16,
       "raw_route": "/api/approval/orders/${_selected.gid}/start",
       "normalized_route": "/api/approval/orders/{dynamic}/start",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "packages/craft-plugin/web/approval/approval.js:131:16:POST:/api/approval/orders/{dynamic}/start"
+      "occurrence_id": "packages/craft-plugin/web/approval/approval.js:132:16:POST:/api/approval/orders/{dynamic}/start"
     },
     {
       "source": "packages/craft-plugin/web/approval/approval.js",
-      "line": 133,
+      "line": 134,
       "column": 26,
       "raw_route": "/api/approval/orders/${_selected.gid}/approve",
       "normalized_route": "/api/approval/orders/{dynamic}/approve",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "packages/craft-plugin/web/approval/approval.js:133:26:POST:/api/approval/orders/{dynamic}/approve"
+      "occurrence_id": "packages/craft-plugin/web/approval/approval.js:134:26:POST:/api/approval/orders/{dynamic}/approve"
     },
     {
       "source": "packages/craft-plugin/web/approval/approval.js",
-      "line": 151,
-      "column": 16,
-      "raw_route": "/api/approval/orders/${_selected.gid}/start",
-      "normalized_route": "/api/approval/orders/{dynamic}/start",
-      "method": "POST",
-      "disposition": "legacy_registered",
-      "occurrence_id": "packages/craft-plugin/web/approval/approval.js:151:16:POST:/api/approval/orders/{dynamic}/start"
-    },
-    {
-      "source": "packages/craft-plugin/web/approval/approval.js",
-      "line": 153,
-      "column": 26,
-      "raw_route": "/api/approval/orders/${_selected.gid}/reject",
-      "normalized_route": "/api/approval/orders/{dynamic}/reject",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/craft-plugin/web/approval/approval.js:153:26:POST:/api/approval/orders/{dynamic}/reject"
-    },
-    {
-      "source": "packages/craft-plugin/web/approval/approval.js",
-      "line": 168,
+      "line": 212,
       "column": 26,
       "raw_route": "/api/approval/orders/${_selected.gid}/withdraw",
       "normalized_route": "/api/approval/orders/{dynamic}/withdraw",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "packages/craft-plugin/web/approval/approval.js:168:26:POST:/api/approval/orders/{dynamic}/withdraw"
+      "occurrence_id": "packages/craft-plugin/web/approval/approval.js:212:26:POST:/api/approval/orders/{dynamic}/withdraw"
     },
     {
       "source": "packages/craft-plugin/web/bop/bop.js",
@@ -2416,33 +2396,13 @@
     },
     {
       "source": "web/core/existing_capability_client.js",
-      "line": 292,
+      "line": 315,
       "column": 27,
       "raw_route": "/api/v1/capabilities/${capabilityId}:${action}",
       "normalized_route": "/api/v1/capabilities/{dynamic}:{dynamic}",
       "method": "POST",
       "disposition": "capability",
-      "occurrence_id": "web/core/existing_capability_client.js:292:27:POST:/api/v1/capabilities/{dynamic}:{dynamic}"
-    },
-    {
-      "source": "web/core/existing_capability_client.js",
-      "line": 326,
-      "column": 51,
-      "raw_route": "/api/lists?item_type=bop_version",
-      "normalized_route": "/api/lists",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "web/core/existing_capability_client.js:326:51:GET:/api/lists"
-    },
-    {
-      "source": "web/core/existing_capability_client.js",
-      "line": 331,
-      "column": 12,
-      "raw_route": "/api/lists/${encodeURIComponent(gid)}?item_type=bop_version&expected_revision=${revision}",
-      "normalized_route": "/api/lists/{dynamic}",
-      "method": "DELETE",
-      "disposition": "unresolved",
-      "occurrence_id": "web/core/existing_capability_client.js:331:12:DELETE:/api/lists/{dynamic}"
+      "occurrence_id": "web/core/existing_capability_client.js:315:27:POST:/api/v1/capabilities/{dynamic}:{dynamic}"
     },
     {
       "source": "web/core/global_search.js",

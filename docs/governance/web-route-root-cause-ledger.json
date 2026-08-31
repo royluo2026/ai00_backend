@@ -58,10 +58,10 @@
     "web/workspace/nav_manager.js": "e229fb407361c139cfc265cd438f929a944cd1919c321c4b6a1cf5bf57cfcd7d"
   },
   "final_evidence": {
-    "frontend_revision": "b1c0b0e25e895022c1e9ea12abf767ea2b7637c3",
-    "content_hash": "9c9abc0a340ea25f4eb28ea60ab2577b50a5daf26424e62ba3ca174474c1aa4c",
-    "unresolved_count": 17,
-    "unresolved_group_count": 14
+    "frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
+    "content_hash": "47e7ff0fddcd4ad7ef7597b96ba6688f9f316fac73290b3439576e78ffae4e19",
+    "unresolved_count": 14,
+    "unresolved_group_count": 11
   },
   "final_unresolved_groups": [
     {
@@ -77,27 +77,9 @@
       "disposition": "new_atomic_capability_required"
     },
     {
-      "method": "DELETE",
-      "normalized_route": "/api/lists/{dynamic}",
-      "occurrence_count": 1,
-      "disposition": "conditional_dispatch_partially_migrated"
-    },
-    {
-      "method": "GET",
-      "normalized_route": "/api/lists",
-      "occurrence_count": 1,
-      "disposition": "conditional_dispatch_partially_migrated"
-    },
-    {
       "method": "GET",
       "normalized_route": "/api/rule-engine/check-entry",
       "occurrence_count": 2,
-      "disposition": "existing_capability_reclassified"
-    },
-    {
-      "method": "POST",
-      "normalized_route": "/api/approval/orders/{dynamic}/reject",
-      "occurrence_count": 1,
       "disposition": "existing_capability_reclassified"
     },
     {
@@ -187,7 +169,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "b1c0b0e25e895022c1e9ea12abf767ea2b7637c3",
+        "removed_in_frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -738,7 +720,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "b1c0b0e25e895022c1e9ea12abf767ea2b7637c3",
+        "removed_in_frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
         "retirement_proof": {
           "kind": "http_410",
           "rationale": "The registered AI balance compatibility endpoint is permanently gone and returns HTTP 410, so polling it cannot yield a supported outcome.",
@@ -807,7 +789,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "b1c0b0e25e895022c1e9ea12abf767ea2b7637c3",
+        "removed_in_frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -869,7 +851,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "b1c0b0e25e895022c1e9ea12abf767ea2b7637c3",
+        "removed_in_frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -931,7 +913,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "b1c0b0e25e895022c1e9ea12abf767ea2b7637c3",
+        "removed_in_frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -1004,7 +986,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "b1c0b0e25e895022c1e9ea12abf767ea2b7637c3",
+        "removed_in_frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -1078,7 +1060,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "b1c0b0e25e895022c1e9ea12abf767ea2b7637c3",
+        "removed_in_frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -1151,7 +1133,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "b1c0b0e25e895022c1e9ea12abf767ea2b7637c3",
+        "removed_in_frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -1395,11 +1377,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-            "start_line": 43,
-            "end_line": 43,
+            "start_line": 42,
+            "end_line": 42,
             "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
           },
-          "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+          "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -1442,11 +1424,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-            "start_line": 43,
-            "end_line": 43,
+            "start_line": 42,
+            "end_line": 42,
             "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
           },
-          "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+          "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -1489,11 +1471,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-            "start_line": 43,
-            "end_line": 43,
+            "start_line": 42,
+            "end_line": 42,
             "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
           },
-          "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+          "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -1536,11 +1518,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-            "start_line": 43,
-            "end_line": 43,
+            "start_line": 42,
+            "end_line": 42,
             "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
           },
-          "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+          "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -1583,11 +1565,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-            "start_line": 43,
-            "end_line": 43,
+            "start_line": 42,
+            "end_line": 42,
             "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
           },
-          "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+          "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -1630,11 +1612,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-            "start_line": 43,
-            "end_line": 43,
+            "start_line": 42,
+            "end_line": 42,
             "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
           },
-          "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+          "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -1676,7 +1658,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "b1c0b0e25e895022c1e9ea12abf767ea2b7637c3",
+        "removed_in_frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
         "retirement_proof": {
           "kind": "backend_route_absent",
           "rationale": "The standalone Feishu UI had no matching API-prefixed configuration handler; it now uses a bounded local default configuration.",
@@ -2209,7 +2191,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "b1c0b0e25e895022c1e9ea12abf767ea2b7637c3",
+        "removed_in_frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
         "retirement_proof": {
           "kind": "sample_template_only",
           "rationale": "The only caller lived in the distributable plugin SDK template and represented placeholder sample data rather than a shipped product route.",
@@ -2789,9 +2771,9 @@
           "proof_kind": "provider_equivalent_adapter",
           "provider_contract": {
             "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-            "source_sha256": "7d3b676ee23cddeb64ed071a611c1730ab027017115366c8a57398c9c8d1c040",
-            "start_line": 150,
-            "end_line": 150,
+            "source_sha256": "af0a539e6faebdb5e861318e9c8e38018f95cb3708578dd1e6cc1ecb7c56a091",
+            "start_line": 156,
+            "end_line": 156,
             "sha256": "521d0e298f3386b9d55e96c07369fbe02fde966f3967252b2396eee162f3ccd5",
             "needle": "payload.get(\"arguments\", payload)"
           }
@@ -3439,11 +3421,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-            "start_line": 43,
-            "end_line": 43,
+            "start_line": 42,
+            "end_line": 42,
             "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
           },
-          "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+          "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -3962,9 +3944,9 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/project_management/project_management_backend/application/service.py",
-            "source_sha256": "f79ee2ca70ad2fe56a4fa11f91a5756b63e5f948657e727c08fee34568d6be4c",
-            "start_line": 148,
-            "end_line": 148,
+            "source_sha256": "bfb874c131fb9c882982118c6d2914ddc2993b6409b6117aa483bba29a74631f",
+            "start_line": 198,
+            "end_line": 198,
             "sha256": "7d0c4ce19b5a7f27f52c026c4f5d643ec320f98e8c445e0e496810063d178963",
             "needle": "\"approval.orders.reject\""
           }
@@ -4013,7 +3995,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "b1c0b0e25e895022c1e9ea12abf767ea2b7637c3",
+        "removed_in_frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4075,7 +4057,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "b1c0b0e25e895022c1e9ea12abf767ea2b7637c3",
+        "removed_in_frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4137,7 +4119,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "b1c0b0e25e895022c1e9ea12abf767ea2b7637c3",
+        "removed_in_frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4199,7 +4181,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "b1c0b0e25e895022c1e9ea12abf767ea2b7637c3",
+        "removed_in_frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
         "retirement_proof": {
           "kind": "explicit_product_retirement",
           "rationale": "The Bitable synchronization product surface was explicitly retired with its V1 backend and the compatibility shell now makes no request.",
@@ -4261,7 +4243,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "b1c0b0e25e895022c1e9ea12abf767ea2b7637c3",
+        "removed_in_frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
         "retirement_proof": {
           "kind": "backend_route_retired",
           "rationale": "The V1 craft work-plan, section, and operation-flat backend family is an explicit tombstone after schema retirement.",
@@ -4468,11 +4450,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-            "start_line": 43,
-            "end_line": 43,
+            "start_line": 42,
+            "end_line": 42,
             "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
           },
-          "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+          "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -4515,11 +4497,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-            "start_line": 43,
-            "end_line": 43,
+            "start_line": 42,
+            "end_line": 42,
             "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
           },
-          "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+          "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -4562,11 +4544,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-            "start_line": 43,
-            "end_line": 43,
+            "start_line": 42,
+            "end_line": 42,
             "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
           },
-          "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+          "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -4609,11 +4591,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-            "start_line": 43,
-            "end_line": 43,
+            "start_line": 42,
+            "end_line": 42,
             "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
           },
-          "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+          "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -4816,7 +4798,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "b1c0b0e25e895022c1e9ea12abf767ea2b7637c3",
+        "removed_in_frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
         "retirement_proof": {
           "kind": "sample_template_only",
           "rationale": "The only caller lived in the distributable plugin SDK template and represented placeholder sample data rather than a shipped product route.",
@@ -5340,7 +5322,7 @@
       "lifecycle_conclusion": "The baseline caller existed, its final source hash proves removal, and an independent lifecycle proof supports retirement.",
       "disposition": "frontend_retire",
       "disposition_details": {
-        "removed_in_frontend_revision": "b1c0b0e25e895022c1e9ea12abf767ea2b7637c3",
+        "removed_in_frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
         "retirement_proof": {
           "kind": "http_410",
           "rationale": "The registered V1 standard-operation clone compatibility endpoint raises HTTP 410 and instructs callers to use the current BOP entry surface.",
@@ -5561,11 +5543,11 @@
           "provider_contract": {
             "repository": "backend",
             "source_path": "plugins/integration/integration_backend/capabilities/provider.py",
-            "start_line": 43,
-            "end_line": 43,
+            "start_line": 42,
+            "end_line": 42,
             "sha256": "fe1bfdd9844a78f786f85287e44d451fc0bf96b4538c37411558624b2aec7d0d"
           },
-          "provider_source_sha256": "sha256:5dc0db4317e2557e5122921b7a8adeebfc787fcf02db8945981d4b8cdc92bada",
+          "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
           "manifest": "docs/governance/atomic-web-capability-contracts.json"
         }
       }
@@ -5618,9 +5600,9 @@
           "proof_kind": "provider_equivalent_adapter",
           "provider_contract": {
             "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-            "source_sha256": "7d3b676ee23cddeb64ed071a611c1730ab027017115366c8a57398c9c8d1c040",
-            "start_line": 150,
-            "end_line": 150,
+            "source_sha256": "af0a539e6faebdb5e861318e9c8e38018f95cb3708578dd1e6cc1ecb7c56a091",
+            "start_line": 156,
+            "end_line": 156,
             "sha256": "521d0e298f3386b9d55e96c07369fbe02fde966f3967252b2396eee162f3ccd5",
             "needle": "payload.get(\"arguments\", payload)"
           }
@@ -5902,9 +5884,9 @@
           "proof_kind": "provider_equivalent_adapter",
           "provider_contract": {
             "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-            "source_sha256": "7d3b676ee23cddeb64ed071a611c1730ab027017115366c8a57398c9c8d1c040",
-            "start_line": 150,
-            "end_line": 150,
+            "source_sha256": "af0a539e6faebdb5e861318e9c8e38018f95cb3708578dd1e6cc1ecb7c56a091",
+            "start_line": 156,
+            "end_line": 156,
             "sha256": "521d0e298f3386b9d55e96c07369fbe02fde966f3967252b2396eee162f3ccd5",
             "needle": "payload.get(\"arguments\", payload)"
           }
@@ -5948,9 +5930,9 @@
           "proof_kind": "provider_equivalent_adapter",
           "provider_contract": {
             "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-            "source_sha256": "7d3b676ee23cddeb64ed071a611c1730ab027017115366c8a57398c9c8d1c040",
-            "start_line": 150,
-            "end_line": 150,
+            "source_sha256": "af0a539e6faebdb5e861318e9c8e38018f95cb3708578dd1e6cc1ecb7c56a091",
+            "start_line": 156,
+            "end_line": 156,
             "sha256": "521d0e298f3386b9d55e96c07369fbe02fde966f3967252b2396eee162f3ccd5",
             "needle": "payload.get(\"arguments\", payload)"
           }
