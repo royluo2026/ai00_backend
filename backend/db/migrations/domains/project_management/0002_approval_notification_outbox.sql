@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS workmanship_proj_approval_rejection_operations (
   payload_hash CHAR(64) NOT NULL,
   order_gid CHAR(36) NULL,
   status VARCHAR(32) NOT NULL,
-  result_json JSON NULL,
+  -- Canonical compact JSON response text; JSON columns may normalize object representation.
+  result_text TEXT NULL,
   created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   completed_at DATETIME(6) NULL,
   PRIMARY KEY (actor_gid, team_gid, capability_id, idempotency_key),

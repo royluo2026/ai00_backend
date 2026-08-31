@@ -16,7 +16,7 @@ class _ApprovalRejectionTransaction:
 
     def claim_approval_rejection(
         self, *, actor_gid: str, team_gid: str, idempotency_key: str, payload_hash: str
-    ) -> dict[str, Any] | None:
+    ) -> str | None:
         with self._connection.cursor() as cursor:
             cursor.execute(
                 "INSERT INTO workmanship_proj_approval_rejection_operations "
@@ -26,7 +26,7 @@ class _ApprovalRejectionTransaction:
                 (actor_gid, team_gid, idempotency_key, payload_hash),
             )
             cursor.execute(
-                "SELECT payload_hash,status,result_json FROM workmanship_proj_approval_rejection_operations "
+                "SELECT payload_hash,status,result_text FROM workmanship_proj_approval_rejection_operations "
                 "WHERE actor_gid=%s AND team_gid=%s AND capability_id='project.approval.order.reject@1' "
                 "AND idempotency_key=%s FOR UPDATE",
                 (actor_gid, team_gid, idempotency_key),
@@ -36,8 +36,10 @@ class _ApprovalRejectionTransaction:
             raise CapabilityBusinessError("idempotency_conflict", "idempotency key payload differs")
         if row["status"] != "completed":
             return None
-        result = row.get("result_json")
-        return json.loads(result) if isinstance(result, str) else dict(result)
+        result = row.get("result_text")
+        if not isinstance(result, str):
+            raise CapabilityBusinessError("invalid_result", "stored approval rejection result is invalid")
+        return result
 
     def require_rejectable_approval_order(
         self, *, order_gid: str, actor_gid: str, team_gid: str
@@ -90,15 +92,15 @@ class _ApprovalRejectionTransaction:
             )
 
     def complete_approval_rejection(
-        self, *, actor_gid: str, team_gid: str, idempotency_key: str, result: dict[str, Any]
+        self, *, actor_gid: str, team_gid: str, idempotency_key: str, canonical_result: str
     ) -> None:
         with self._connection.cursor() as cursor:
             cursor.execute(
                 "UPDATE workmanship_proj_approval_rejection_operations "
-                "SET status='completed',order_gid=%s,result_json=%s,completed_at=CURRENT_TIMESTAMP(6) "
+                "SET status='completed',order_gid=%s,result_text=%s,completed_at=CURRENT_TIMESTAMP(6) "
                 "WHERE actor_gid=%s AND team_gid=%s AND capability_id='project.approval.order.reject@1' "
                 "AND idempotency_key=%s",
-                (result["order_gid"], json.dumps(result, ensure_ascii=False), actor_gid, team_gid, idempotency_key),
+                (json.loads(canonical_result)["order_gid"], canonical_result, actor_gid, team_gid, idempotency_key),
             )
 
     def audit_approval_rejection(self, **event: Any) -> None:

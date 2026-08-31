@@ -16,6 +16,24 @@ from backend.capability_v2.provider_contracts import CapabilityBusinessError
 
 APPROVAL_REJECT_CAPABILITY_ID = "project.approval.order.reject"
 APPROVAL_REJECT_CAPABILITY_VERSION = 1
+_REJECTION_RESULT_KEYS = frozenset({"order_gid", "status", "revision", "notification_event_gid"})
+
+
+def canonical_rejection_result(result: Mapping[str, Any]) -> str:
+    """Encode the exact rejection response with stable UTF-8 JSON semantics."""
+    if set(result) != _REJECTION_RESULT_KEYS:
+        raise CapabilityBusinessError("invalid_result", "approval rejection result is not closed")
+    return json.dumps(dict(result), ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def rejection_result_from_canonical(serialized: str) -> dict[str, Any]:
+    try:
+        result = json.loads(serialized)
+    except (TypeError, ValueError) as exc:
+        raise CapabilityBusinessError("invalid_result", "stored approval rejection result is invalid") from exc
+    if not isinstance(result, dict) or set(result) != _REJECTION_RESULT_KEYS:
+        raise CapabilityBusinessError("invalid_result", "stored approval rejection result is not closed")
+    return result
 
 
 @dataclass(frozen=True)
@@ -459,7 +477,7 @@ class ProjectManagementApplication:
                 payload_hash=command.payload_hash(),
             )
             if replay is not None:
-                return replay
+                return rejection_result_from_canonical(replay)
             order = transaction.require_rejectable_approval_order(
                 order_gid=command.order_gid, actor_gid=actor_gid, team_gid=team_gid,
             )
@@ -478,16 +496,17 @@ class ProjectManagementApplication:
                 "revision": int(order["revision"]),
                 "notification_event_gid": notification_event_gid,
             }
+            canonical_result = canonical_rejection_result(result)
             transaction.complete_approval_rejection(
                 actor_gid=actor_gid, team_gid=team_gid,
-                idempotency_key=idempotency_key, result=result,
+                idempotency_key=idempotency_key, canonical_result=canonical_result,
             )
             transaction.audit_approval_rejection(
                 event_gid=self._next_id(), order_gid=command.order_gid,
                 actor_gid=actor_gid, team_gid=team_gid, idempotency_key=idempotency_key,
                 revision=result["revision"],
             )
-            return result
+            return rejection_result_from_canonical(canonical_result)
 
     def _list(self, operation: str, arguments: Mapping[str, Any], context: object) -> dict[str, Any]:
         user_gid = str(getattr(context, "user_gid", "") or "")
@@ -1017,4 +1036,4 @@ class ProjectManagementApplication:
         }}
 
 
-__all__ = ["APPROVAL_REJECT_CAPABILITY_ID", "APPROVAL_REJECT_CAPABILITY_VERSION", "ItemEntryRepository", "ProjectManagementApplication", "RejectOrder"]
+__all__ = ["APPROVAL_REJECT_CAPABILITY_ID", "APPROVAL_REJECT_CAPABILITY_VERSION", "ItemEntryRepository", "ProjectManagementApplication", "RejectOrder", "canonical_rejection_result", "rejection_result_from_canonical"]
