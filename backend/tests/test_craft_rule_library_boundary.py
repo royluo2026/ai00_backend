@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ast
 import json
+import hashlib
 from pathlib import Path
 
 from backend.capability_v2.provider_contracts import CapabilityContext
@@ -37,6 +38,17 @@ def test_rule_library_read_projects_the_canonical_rule_reference():
     assert row["rule_gid"] == "rule-1"
     assert row["revision"] == 1
     assert row["rule_reference"] == {"rule_gid": "rule-1", "rule_revision": 1}
+
+
+def test_committed_rule_reference_fixture_is_the_backend_projection():
+    from plugins.craft.craft_backend.capabilities.rule_library import _row
+
+    fixture = ROOT / "backend/tests/fixtures/craft_rule_reference_projection.json"
+    value = json.loads(fixture.read_text(encoding="utf-8"))
+    projection = _row({"gid": "rule-1", "rule_definition": {"_revision": 1}})
+
+    assert value == {key: projection[key] for key in value}
+    assert hashlib.sha256(fixture.read_bytes()).hexdigest() == "3fecc9bf124fcb8c279c3bf4c90dea25acf5bbe333bf63638149b81e75aa0da9"
 
 
 def test_rule_library_create_then_read_preserves_owner_team_and_rule_reference(monkeypatch):
