@@ -8,8 +8,8 @@
     "stable_capabilities": 475,
     "validated_cases": 3325
   },
-  "catalog_hash": "sha256:a889d9ac9615e655cd42c11d2856b644dcbe259634dbe23d04af7895de10fa82",
-  "catalog_release": "rel_a889d9ac9615e655cd42c11d2856b644",
+  "catalog_hash": "sha256:d407979e8fe9737980e72058e3384b374a81dd3d8c6dfedd052f4b8ac93dee08",
+  "catalog_release": "rel_d407979e8fe9737980e72058e3384b37",
   "completion": {
     "async_production_paths": 1,
     "catalog_capabilities": 474,
@@ -47,7 +47,7 @@
   },
   "domain_manifest": {
     "filename": "backend/capability_v2/official_domains.json",
-    "sha256": "sha256:e0a2e8384d580acb87d9af6cf0fc758e387460339c9a3253834d76b929185744"
+    "sha256": "sha256:240b02b9716c8d0379bb12224a3c88a055ed0edee1ec285b757add8477f0f056"
   },
   "domain_migrations": [
     {
@@ -199,8 +199,8 @@
     }
   ],
   "environment_id": "offline:PC-PC2L7VVE",
-  "generated_at": "2026-08-31T09:56:01.791644+00:00",
-  "git_commit": "e96642fe9de52feee1fa1b57a73635961b8f6d6f",
+  "generated_at": "2026-08-31T10:30:12.903914+00:00",
+  "git_commit": "840bcd6c8d1fd3c57942a65ce81e49cdc2cd5755",
   "migration": {
     "filename": "202608280006_base_historical_tenant_repair.sql",
     "migration_id": "202608280006",
@@ -221,7 +221,7 @@
       "version": "1.0.0"
     },
     {
-      "artifact_hash": "sha256:a094857b74aec4844a6e2e31a560cec4af5ce964bbc172bc72b515a6469d96f9",
+      "artifact_hash": "sha256:b8e1646e9101953406aadda749ec319a6339e741e30b5b5d6895ce1eada214a0",
       "module": "craft_backend.capabilities",
       "plugin_id": "official.craft",
       "version": "1.2.0"
@@ -275,7 +275,7 @@
       "version": "1.0.0"
     }
   ],
-  "report_id": "sha256:31eb68475361ac6270411a797f8fd70730626174b2a7410192f98d39d9525c1e",
+  "report_id": "sha256:367e3056682ec24fca35e1dacb5545bc2010ec1198278cd892029c7ab85130dc",
   "runtime_evidence_hash": null,
   "schema_hashes": {
     "agent.audit.read@1": "sha256:45f8fda405c9189fafe9d82e74ee449a5c14c74b6fbc5a012713004538e02964",
@@ -773,9 +773,9 @@
   "schema_version": 1,
   "status": "passed",
   "test_run": {
-    "command": "C:\\Users\\luoyi8\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -m pytest backend/tests/acceptance -q -p no:cacheprovider --ignore backend/tests/acceptance/test_acceptance_runner.py --basetemp E:\\Projects\\ai00_v3\\.worktrees\\capability-v2-implementation\\.capability-acceptance-v2.tmp\\run-s4yfq8qr\\pytest -p backend.tests.acceptance.outcome_plugin",
+    "command": "C:\\Users\\luoyi8\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -m pytest backend/tests/acceptance -q -p no:cacheprovider --ignore backend/tests/acceptance/test_acceptance_runner.py --basetemp E:\\Projects\\ai00_v3\\.worktrees\\capability-v2-implementation\\.capability-acceptance-v2.tmp\\run-qikk2846\\pytest -p backend.tests.acceptance.outcome_plugin",
     "exit_code": 0,
-    "summary": "3336 passed in 8.42s"
+    "summary": "3336 passed in 8.24s"
   },
   "validation_scope": "contract",
   "working_tree_clean": true

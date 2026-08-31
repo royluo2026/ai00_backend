@@ -1,0 +1,31 @@
+{
+  "schema_version": "2.0.0",
+  "code_commit": "840bcd6c8d1fd3c57942a65ce81e49cdc2cd5755",
+  "backend_source_revision": "076ed4348a066c59b6852f75d479fa08c2a49f14",
+  "frontend_revision": "43a650ab35cba99c6788ce3622a46e08404e7731",
+  "adapter_factory": "backend.tests.support.integration_catalog_factory:build",
+  "factory_path": "backend/tests/support/integration_catalog_factory.py",
+  "factory_sha256": "sha256:67009b68b2ca32693174cb017317904a76ae6a76ccb851d8a7a651f547b41882",
+  "acceptance_report_path": "docs/acceptance/craft-structural-capability-closure.json",
+  "acceptance_report_sha256": "sha256:f569da815913a4f739807bd2a55be2c2101016a2a3ac974d35e7ab5c5ae682c5",
+  "raw_snapshot_sha256": "sha256:f569da815913a4f739807bd2a55be2c2101016a2a3ac974d35e7ab5c5ae682c5",
+  "acceptance_report_id": "sha256:367e3056682ec24fca35e1dacb5545bc2010ec1198278cd892029c7ab85130dc",
+  "normalized_report_path": "docs/acceptance/craft-structural-capability-closure.normalized.json",
+  "normalized_report_sha256": "sha256:1eaf23970e3cc622cf123b118ffa920c5262a3b38a377a4f154eae94644547a4",
+  "normalized_semantic_sha256": "sha256:1eaf23970e3cc622cf123b118ffa920c5262a3b38a377a4f154eae94644547a4",
+  "normalization_method": "remove-documented-runtime-fields-v1",
+  "normalization_source": "backend.scripts.build_project_list_approval_acceptance_evidence.normalize_acceptance_report",
+  "normalization_excluded_paths": [
+    "generated_at",
+    "environment_id",
+    "report_id",
+    "working_tree_clean",
+    "test_run.command",
+    "test_run.summary"
+  ],
+  "provider_manifest_sha256": "sha256:240b02b9716c8d0379bb12224a3c88a055ed0edee1ec285b757add8477f0f056",
+  "craft_provider_artifact_sha256": "sha256:b8e1646e9101953406aadda749ec319a6339e741e30b5b5d6895ce1eada214a0",
+  "catalog_release": "rel_d407979e8fe9737980e72058e3384b37",
+  "catalog_sha256": "sha256:d407979e8fe9737980e72058e3384b374a81dd3d8c6dfedd052f4b8ac93dee08",
+  "replay_command": "$env:PYTHONPATH=(Join-Path $PWD 'plugins\\integration'); $env:AI00_INTEGRATION_ADAPTER_FACTORY='backend.tests.support.integration_catalog_factory:build'; python backend\\scripts\\run_capability_v2_acceptance.py --mode offline --strict --report docs\\acceptance\\craft-structural-capability-closure.json"
+}
