@@ -39,6 +39,7 @@ DEPRECATED_CAPABILITY_IDS = frozenset({
 def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
     descriptor = descriptor_from_provider_spec(spec)
     is_write = descriptor.side_effect_level is not SideEffectLevel.READ
+    is_approval_rejection = spec.id == "project.approval.order.reject" and spec.version == 1
     return CapabilityDescriptorV2.model_validate(
         {
             **descriptor.model_dump(),
@@ -62,13 +63,15 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             "data_classification": "confidential",
             "delegation_policy": "scoped",
             "agent_output_schema": descriptor.output_schema,
-            "operation_policy": "optional" if is_write else "none",
+            "operation_policy": "required" if is_approval_rejection else ("optional" if is_write else "none"),
             "idempotency_policy": "required" if is_write else "none",
             # The domain commits its own OceanBase transaction and cannot
             # enlist the platform outcome store in that same connection.
             "consistency_policy": "external" if is_write else "strong",
             "evidence_policy": "optional",
             "audit_policy": "standard",
+            "concurrency_policy": "expected_version" if is_approval_rejection else "none",
+            "expected_version_payload_path": "expected_revision" if is_approval_rejection else None,
             "domain_errors": DOMAIN_ERRORS,
             "domain_errors_complete": True,
         }

@@ -7,7 +7,11 @@ from backend.capability_v2.provider_contracts import CapabilityRisk, CapabilityS
 from backend.platform_sdk.access import build_access_scope
 
 from ..application.outcomes import project_outcome_port
-from ..application.service import SUPPORTED_OPERATIONS
+from ..application.service import (
+    APPROVAL_REJECT_CAPABILITY_ID,
+    APPROVAL_REJECT_CAPABILITY_VERSION,
+    SUPPORTED_OPERATIONS,
+)
 from .provider import DEPRECATED_CAPABILITY_IDS, register_capability
 
 
@@ -46,6 +50,8 @@ PROJECT_CAPABILITY_IDS = frozenset(
         "project.workbench.read",
     }
 )
+
+EXACT_CAPABILITY_IDS = frozenset({APPROVAL_REJECT_CAPABILITY_ID})
 
 _ARGUMENT_FIELDS = {
     name: {"description": "Operation-specific value validated by the Project application layer."}
@@ -163,6 +169,10 @@ def _atomic_handler(capability_id: str, operation: str):
     return invoke
 
 
+def _approval_reject_handler(payload: dict[str, Any], context: object) -> dict[str, Any]:
+    return project_outcome_port.invoke(APPROVAL_REJECT_CAPABILITY_ID, payload, context)
+
+
 def register_reviewed_capabilities(registry: Any) -> None:
     for capability_id in sorted(PROJECT_CAPABILITY_IDS):
         is_write = capability_id.endswith(".change.apply")
@@ -230,8 +240,48 @@ def register_reviewed_capabilities(registry: Any) -> None:
                 _atomic_handler(capability_id, operation),
             )
 
+    register_capability(
+        registry,
+        CapabilitySpec(
+            id=APPROVAL_REJECT_CAPABILITY_ID,
+            version=APPROVAL_REJECT_CAPABILITY_VERSION,
+            owner="project_management",
+            description="Reject one Project approval order and durably enqueue its notification.",
+            use_when="A confirmed reviewer rejects an in-review Project approval order.",
+            do_not_use_when="The caller needs another approval transition or a Craft-owned outcome.",
+            risk=CapabilityRisk.WRITE,
+            confirmation="user",
+            idempotent=True,
+            permissions=("project.manage_any",),
+            input_schema={
+                "type": "object",
+                "required": ["order_gid", "comment", "expected_revision"],
+                "properties": {
+                    "order_gid": {"type": "string", "minLength": 1, "maxLength": 128},
+                    "comment": {"type": "string", "minLength": 1, "maxLength": 2000},
+                    "expected_revision": {"type": "integer", "minimum": 1},
+                },
+                "additionalProperties": False,
+            },
+            output_schema={
+                "type": "object",
+                "required": ["order_gid", "status", "revision", "notification_event_gid"],
+                "properties": {
+                    "order_gid": {"type": "string"},
+                    "status": {"type": "string", "enum": ["rejected"]},
+                    "revision": {"type": "integer", "minimum": 1},
+                    "notification_event_gid": {"type": "string"},
+                },
+                "additionalProperties": False,
+            },
+            tags=("project_management", "approval", "reject", "write"),
+        ),
+        _approval_reject_handler,
+    )
+
 
 __all__ = [
+    "EXACT_CAPABILITY_IDS",
     "OPERATION_INPUT_SCHEMA",
     "PROJECT_CAPABILITY_IDS",
     "register_reviewed_capabilities",

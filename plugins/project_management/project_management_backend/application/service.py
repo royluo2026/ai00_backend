@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
+from dataclasses import dataclass
+import hashlib
 from typing import Any, Protocol
 from uuid import uuid4
 import secrets
@@ -10,6 +12,35 @@ import json
 from datetime import date, timedelta
 
 from backend.capability_v2.provider_contracts import CapabilityBusinessError
+
+
+APPROVAL_REJECT_CAPABILITY_ID = "project.approval.order.reject"
+APPROVAL_REJECT_CAPABILITY_VERSION = 1
+
+
+@dataclass(frozen=True)
+class RejectOrder:
+    order_gid: str
+    comment: str
+    expected_revision: int
+
+    @classmethod
+    def from_payload(cls, payload: Mapping[str, Any]) -> "RejectOrder":
+        if set(payload) != {"order_gid", "comment", "expected_revision"}:
+            raise CapabilityBusinessError("invalid_input", "reject order input is closed")
+        order_gid = _required_text(payload, "order_gid")
+        comment = _required_text(payload, "comment")
+        expected_revision = payload["expected_revision"]
+        if isinstance(expected_revision, bool) or not isinstance(expected_revision, int) or expected_revision < 1:
+            raise CapabilityBusinessError("invalid_input", "expected_revision must be a positive integer")
+        return cls(order_gid=order_gid, comment=comment, expected_revision=expected_revision)
+
+    def payload_hash(self) -> str:
+        encoded = json.dumps(
+            {"order_gid": self.order_gid, "comment": self.comment, "expected_revision": self.expected_revision},
+            ensure_ascii=False, sort_keys=True, separators=(",", ":"),
+        ).encode("utf-8")
+        return hashlib.sha256(encoded).hexdigest()
 
 
 class ItemEntryRepository(Protocol):
@@ -81,6 +112,7 @@ class ItemEntryRepository(Protocol):
     def create_approval_order(self, gid: str, values: dict[str, Any]) -> None: ...
     def get_approval_order(self, gid: str) -> dict[str, Any] | None: ...
     def transition_approval_order(self, gid: str, action: str, actor_gid: str, comment: str) -> dict[str, Any] | None: ...
+    def transaction(self): ...
     def apply_scope_upgrade(self, item_type: str, item_gid: str, target_scope: str) -> bool: ...
     def list_workbenches(self, user_gid: str, team_gid: str | None) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[Any, Any]]: ...
     def count_workbenches(self, owner_type: str, owner_gid: str) -> int: ...
@@ -337,6 +369,10 @@ class ProjectManagementApplication:
         payload: dict[str, Any],
         _context: object,
     ) -> Any:
+        if capability_id == APPROVAL_REJECT_CAPABILITY_ID:
+            if not isinstance(payload, Mapping):
+                raise CapabilityBusinessError("invalid_input", "payload must be an object")
+            return self.reject_order(RejectOrder.from_payload(payload), _context)
         operation = str(payload.get("operation") or "")
         if operation not in _OPERATIONS.get(capability_id, frozenset()):
             raise CapabilityBusinessError(
@@ -401,6 +437,57 @@ class ProjectManagementApplication:
             raise CapabilityBusinessError("invalid_input", "every entry must be an object")
         self._repository.replace_item_entries(item_type, item_gid, saved)
         return {"success": True, "count": len(saved), "entries": saved}
+
+    def reject_order(self, command: RejectOrder, context: object) -> dict[str, Any]:
+        actor_gid = str(getattr(context, "user_gid", "") or "")
+        team_gid = str(getattr(context, "team_gid", "") or "")
+        confirmation = str(getattr(context, "confirmation_token", "") or "")
+        idempotency_key = str(
+            getattr(context, "idempotency_key", "") or getattr(context, "operation_id", "") or ""
+        )
+        if not actor_gid or not team_gid:
+            raise CapabilityBusinessError("unauthenticated", "actor and team scope are required")
+        if not confirmation:
+            raise CapabilityBusinessError("confirmation_required", "approval rejection requires confirmation")
+        if not idempotency_key:
+            raise CapabilityBusinessError("idempotency_required", "idempotency key is required")
+        with self._repository.transaction() as transaction:
+            replay = transaction.claim_approval_rejection(
+                actor_gid=actor_gid,
+                team_gid=team_gid,
+                idempotency_key=idempotency_key,
+                payload_hash=command.payload_hash(),
+            )
+            if replay is not None:
+                return replay
+            order = transaction.require_rejectable_approval_order(
+                order_gid=command.order_gid, actor_gid=actor_gid, team_gid=team_gid,
+            )
+            order = transaction.reject_approval_order(
+                order=order,
+                comment=command.comment,
+                expected_revision=command.expected_revision,
+            )
+            notification_event_gid = self._next_id()
+            transaction.enqueue_approval_rejection_notification(
+                event_gid=notification_event_gid, order=order, team_gid=team_gid,
+            )
+            result = {
+                "order_gid": command.order_gid,
+                "status": "rejected",
+                "revision": int(order["revision"]),
+                "notification_event_gid": notification_event_gid,
+            }
+            transaction.complete_approval_rejection(
+                actor_gid=actor_gid, team_gid=team_gid,
+                idempotency_key=idempotency_key, result=result,
+            )
+            transaction.audit_approval_rejection(
+                event_gid=self._next_id(), order_gid=command.order_gid,
+                actor_gid=actor_gid, team_gid=team_gid, idempotency_key=idempotency_key,
+                revision=result["revision"],
+            )
+            return result
 
     def _list(self, operation: str, arguments: Mapping[str, Any], context: object) -> dict[str, Any]:
         user_gid = str(getattr(context, "user_gid", "") or "")
@@ -472,13 +559,13 @@ class ProjectManagementApplication:
             if not isinstance(scope, Mapping) or str(scope.get("user_gid") or "") != user_gid: raise CapabilityBusinessError("invalid_input", "server-derived scope is required")
             return {"success": True, "data": self._repository.search_approval_orders({"status": str(arguments.get("status") or "") or None, "project_gid": str(arguments.get("project_gid") or "") or None}, dict(scope))}
         if operation == "approval.orders.create":
-            gid = self._next_id(); self._repository.create_approval_order(gid, {"title": _required_text(arguments, "title"), "order_type": str(arguments.get("order_type") or "general"), "project_gid": arguments.get("project_gid"), "applicant_gid": user_gid, "reviewer_gid": arguments.get("reviewer_gid"), "source_ref": arguments.get("source_ref"), "content": dict(arguments.get("content") or {})})
+            gid = self._next_id(); self._repository.create_approval_order(gid, {"title": _required_text(arguments, "title"), "order_type": str(arguments.get("order_type") or "general"), "project_gid": arguments.get("project_gid"), "team_gid": getattr(context, "team_gid", None), "applicant_gid": user_gid, "reviewer_gid": arguments.get("reviewer_gid"), "source_ref": arguments.get("source_ref"), "content": dict(arguments.get("content") or {})})
             return {"success": True, "data": {"gid": gid}}
         if operation == "approval.scope_upgrade.create":
             current_scope = _required_text(arguments, "current_scope"); target_scope = _required_text(arguments, "target_scope"); order = ["local", "project", "team", "global"]
             if target_scope not in order or current_scope not in order or order.index(target_scope) <= order.index(current_scope): raise CapabilityBusinessError("invalid_input", "target scope must be higher than current scope")
             content = {key: arguments.get(key) for key in ("item_type", "item_gid", "item_title", "current_scope", "target_scope", "reason")}
-            gid = self._next_id(); self._repository.create_approval_order(gid, {"title": f"范围提升申请：{content['item_title']}（{current_scope} → {target_scope}）", "order_type": "scope_upgrade", "project_gid": None, "applicant_gid": user_gid, "reviewer_gid": arguments.get("reviewer_gid"), "source_ref": None, "content": content})
+            gid = self._next_id(); self._repository.create_approval_order(gid, {"title": f"范围提升申请：{content['item_title']}（{current_scope} → {target_scope}）", "order_type": "scope_upgrade", "project_gid": None, "team_gid": getattr(context, "team_gid", None), "applicant_gid": user_gid, "reviewer_gid": arguments.get("reviewer_gid"), "source_ref": None, "content": content})
             return {"success": True, "data": {"gid": gid, "reviewer_gid": arguments.get("reviewer_gid")}}
         gid = _required_text(arguments, "gid")
         if operation == "approval.orders.get":
@@ -930,4 +1017,4 @@ class ProjectManagementApplication:
         }}
 
 
-__all__ = ["ItemEntryRepository", "ProjectManagementApplication"]
+__all__ = ["APPROVAL_REJECT_CAPABILITY_ID", "APPROVAL_REJECT_CAPABILITY_VERSION", "ItemEntryRepository", "ProjectManagementApplication", "RejectOrder"]

@@ -16,6 +16,9 @@ from plugins.project_management.project_management_backend.capabilities import (
 from plugins.project_management.project_management_backend.capabilities.provider import (
     DEPRECATED_CAPABILITY_IDS,
 )
+from plugins.project_management.project_management_backend.capabilities.reviewed import (
+    EXACT_CAPABILITY_IDS,
+)
 from plugins.project_management.project_management_backend.capabilities.projects import (
     register_project_capabilities,
     search_projects,
@@ -55,7 +58,7 @@ def test_project_provider_is_complete_against_frozen_review():
     register_capabilities(registry)
     actual = {
         descriptor.id for _, _, descriptor in registry.items
-        if ".atomic." not in descriptor.id
+        if ".atomic." not in descriptor.id and descriptor.id not in EXACT_CAPABILITY_IDS
     }
 
     assert actual == _frozen_project_capability_ids()
@@ -87,6 +90,7 @@ def test_consolidated_project_capabilities_accept_a_bounded_operation_envelope()
         spec.id: descriptor.input_schema
         for spec, _, descriptor in registry.items
         if spec.id.startswith("project.") and ".atomic." not in spec.id
+        and spec.id not in EXACT_CAPABILITY_IDS
     }
 
     assert generic

@@ -1,10 +1,117 @@
 """Domain-owned SQL repository boundary."""
 from __future__ import annotations
 
+from contextlib import contextmanager
 import json
 from typing import Any
 
+from backend.capability_v2.provider_contracts import CapabilityBusinessError
+
 from ..data.connection import get_project_management_conn
+
+
+class _ApprovalRejectionTransaction:
+    def __init__(self, connection) -> None:
+        self._connection = connection
+
+    def claim_approval_rejection(
+        self, *, actor_gid: str, team_gid: str, idempotency_key: str, payload_hash: str
+    ) -> dict[str, Any] | None:
+        with self._connection.cursor() as cursor:
+            cursor.execute(
+                "INSERT INTO workmanship_proj_approval_rejection_operations "
+                "(actor_gid,team_gid,capability_id,idempotency_key,payload_hash,status) "
+                "VALUES (%s,%s,'project.approval.order.reject@1',%s,%s,'pending') "
+                "ON DUPLICATE KEY UPDATE actor_gid=VALUES(actor_gid)",
+                (actor_gid, team_gid, idempotency_key, payload_hash),
+            )
+            cursor.execute(
+                "SELECT payload_hash,status,result_json FROM workmanship_proj_approval_rejection_operations "
+                "WHERE actor_gid=%s AND team_gid=%s AND capability_id='project.approval.order.reject@1' "
+                "AND idempotency_key=%s FOR UPDATE",
+                (actor_gid, team_gid, idempotency_key),
+            )
+            row = cursor.fetchone()
+        if not row or str(row["payload_hash"]) != payload_hash:
+            raise CapabilityBusinessError("idempotency_conflict", "idempotency key payload differs")
+        if row["status"] != "completed":
+            return None
+        result = row.get("result_json")
+        return json.loads(result) if isinstance(result, str) else dict(result)
+
+    def require_rejectable_approval_order(
+        self, *, order_gid: str, actor_gid: str, team_gid: str
+    ) -> dict[str, Any]:
+        with self._connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT o.gid,o.applicant_gid,o.status,o.revision,o.opinions "
+                "FROM workmanship_proj_approval_orders o "
+                "LEFT JOIN workmanship_proj_projects p ON p.gid=o.project_gid "
+                "WHERE o.gid=%s AND o.reviewer_gid=%s "
+                "AND COALESCE(o.team_gid,p.team_id)=%s FOR UPDATE",
+                (order_gid, actor_gid, team_gid),
+            )
+            row = cursor.fetchone()
+        if not row:
+            raise CapabilityBusinessError("not_found", "approval order not found")
+        return dict(row)
+
+    def reject_approval_order(
+        self, *, order: dict[str, Any], comment: str, expected_revision: int
+    ) -> dict[str, Any]:
+        if int(order["revision"]) != expected_revision:
+            raise CapabilityBusinessError("version_conflict", "approval order revision changed")
+        if order["status"] != "in_review":
+            raise CapabilityBusinessError("invalid_state", "approval order cannot be rejected")
+        opinion = json.dumps([{"action": "reject", "comment": comment}], ensure_ascii=False)
+        with self._connection.cursor() as cursor:
+            cursor.execute(
+                "UPDATE workmanship_proj_approval_orders SET status='rejected',revision=revision+1,"
+                "opinions=JSON_MERGE_PRESERVE(COALESCE(opinions,JSON_ARRAY()),%s),updated_at=NOW() "
+                "WHERE gid=%s AND revision=%s",
+                (opinion, order["gid"], expected_revision),
+            )
+            if cursor.rowcount != 1:
+                raise CapabilityBusinessError("version_conflict", "approval order revision changed")
+        return {**order, "status": "rejected", "revision": expected_revision + 1}
+
+    def enqueue_approval_rejection_notification(
+        self, *, event_gid: str, order: dict[str, Any], team_gid: str
+    ) -> None:
+        with self._connection.cursor() as cursor:
+            cursor.execute(
+                "INSERT INTO workmanship_proj_notification_outbox "
+                "(gid,event_type,order_gid,team_gid,recipient_gid,payload) VALUES "
+                "(%s,'project.approval.order.rejected',%s,%s,%s,%s)",
+                (
+                    event_gid, order["gid"], team_gid, order["applicant_gid"],
+                    json.dumps({"order_gid": order["gid"], "status": "rejected"}, ensure_ascii=False),
+                ),
+            )
+
+    def complete_approval_rejection(
+        self, *, actor_gid: str, team_gid: str, idempotency_key: str, result: dict[str, Any]
+    ) -> None:
+        with self._connection.cursor() as cursor:
+            cursor.execute(
+                "UPDATE workmanship_proj_approval_rejection_operations "
+                "SET status='completed',order_gid=%s,result_json=%s,completed_at=CURRENT_TIMESTAMP(6) "
+                "WHERE actor_gid=%s AND team_gid=%s AND capability_id='project.approval.order.reject@1' "
+                "AND idempotency_key=%s",
+                (result["order_gid"], json.dumps(result, ensure_ascii=False), actor_gid, team_gid, idempotency_key),
+            )
+
+    def audit_approval_rejection(self, **event: Any) -> None:
+        with self._connection.cursor() as cursor:
+            cursor.execute(
+                "INSERT INTO workmanship_proj_approval_audit_events "
+                "(gid,order_gid,actor_gid,team_gid,operation,idempotency_key,status,revision) "
+                "VALUES (%s,%s,%s,%s,'reject',%s,'succeeded',%s)",
+                (
+                    event["event_gid"], event["order_gid"], event["actor_gid"], event["team_gid"],
+                    event["idempotency_key"], event["revision"],
+                ),
+            )
 
 
 class ProjectManagementRepository:
@@ -30,6 +137,16 @@ class ProjectManagementRepository:
                     affected = cursor.execute(sql, params)
                 connection.commit()
                 return int(affected)
+            except Exception:
+                connection.rollback()
+                raise
+
+    @contextmanager
+    def transaction(self):
+        with get_project_management_conn() as connection:
+            try:
+                yield _ApprovalRejectionTransaction(connection)
+                connection.commit()
             except Exception:
                 connection.rollback()
                 raise
@@ -458,7 +575,7 @@ class ProjectManagementRepository:
         return self.fetch_all("SELECT gid,project_gid,order_type,title,applicant_gid,reviewer_gid,status,source_ref,share_scope,created_at,updated_at FROM workmanship_proj_approval_orders WHERE " + " AND ".join(clauses) + " ORDER BY updated_at DESC", tuple(params))
 
     def create_approval_order(self, gid: str, values: dict[str, Any]) -> None:
-        self.execute("INSERT INTO workmanship_proj_approval_orders (gid,title,order_type,project_gid,applicant_gid,reviewer_gid,source_ref,content) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (gid, values["title"], values["order_type"], values["project_gid"], values["applicant_gid"], values["reviewer_gid"], values["source_ref"], json.dumps(values["content"], ensure_ascii=False)))
+        self.execute("INSERT INTO workmanship_proj_approval_orders (gid,title,order_type,project_gid,team_gid,applicant_gid,reviewer_gid,source_ref,content) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)", (gid, values["title"], values["order_type"], values["project_gid"], values.get("team_gid"), values["applicant_gid"], values["reviewer_gid"], values["source_ref"], json.dumps(values["content"], ensure_ascii=False)))
 
     def get_approval_order(self, gid: str) -> dict[str, Any] | None:
         return self.fetch_one("SELECT gid,project_gid,order_type,title,applicant_gid,reviewer_gid,status,source_ref,content,opinions,meta,created_at,updated_at FROM workmanship_proj_approval_orders WHERE gid=%s", (gid,))
