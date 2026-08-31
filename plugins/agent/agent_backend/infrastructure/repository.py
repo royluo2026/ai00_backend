@@ -1,12 +1,310 @@
 from __future__ import annotations
 
 import json
+import hashlib
+import secrets
 import uuid
 from backend.platform_sdk.ids import next_gid
+from backend.capability_v2.provider_contracts import CapabilityBusinessError
 from ..data.connection import get_agent_conn
 
 
 class AgentCapabilityRepository:
+    @staticmethod
+    def _token_hash(value: str) -> str:
+        return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+    @staticmethod
+    def _json(value):
+        if isinstance(value, (bytes, bytearray)):
+            value = value.decode("utf-8")
+        return json.loads(value) if isinstance(value, str) else value
+
+    @classmethod
+    def _canvas_invocation(cls, row) -> dict:
+        value = dict(row)
+        value["request"] = cls._json(value.pop("request_json"))
+        value["result"] = cls._json(value.pop("result_json"))
+        value["run_token"] = str(value["result"].get("run_token") or "")
+        value["principal"] = {
+            "actor_gid": str(value["actor_gid"]), "team_gid": str(value["team_gid"]),
+        }
+        value["reconcile"] = value.get("target_dispatched_at") is not None
+        return value
+
+    @staticmethod
+    def _canvas_not_found() -> CapabilityBusinessError:
+        return CapabilityBusinessError("resource_not_found", "Agent canvas execution was not found")
+
+    @staticmethod
+    def _canvas_audit(cur, row, *, status=None, error_code=None) -> None:
+        cur.execute(
+            "INSERT INTO workmanship_agent_canvas_audit_events "
+            "(event_id,invocation_id,run_id,actor_gid,team_gid,status,revision,error_code) "
+            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+            (
+                str(next_gid()), row["invocation_id"], row["run_id"], row["actor_gid"],
+                row["team_gid"], status or row["status"], row["revision"], error_code,
+            ),
+        )
+
+    @staticmethod
+    def _duplicate_key(exc: Exception) -> bool:
+        return bool(exc.args and exc.args[0] == 1062) or "duplicate" in str(exc).casefold()
+
+    @classmethod
+    def _select_canvas_idempotency(cls, cur, data, *, lock=False):
+        cur.execute(
+            "SELECT i.*,r.result_json AS run_result_json FROM workmanship_agent_canvas_invocations i "
+            "JOIN workmanship_agent_canvas_runs r ON r.run_id=i.run_id "
+            "WHERE i.actor_gid=%s AND i.team_gid=%s AND i.capability_id=%s AND i.idempotency_key=%s"
+            + (" FOR UPDATE" if lock else ""),
+            (data["actor_gid"], data["team_gid"], data["capability_id"], data["idempotency_key"]),
+        )
+        row = cur.fetchone()
+        return cls._canvas_invocation(row) if row else None
+
+    @staticmethod
+    def _idempotent(existing, data):
+        if existing["payload_hash"] != data["payload_hash"]:
+            raise CapabilityBusinessError(
+                "idempotency_conflict", "Agent canvas idempotency key conflicts with an earlier request",
+            )
+        return existing, True
+
+    def _reload_canvas_idempotency(self, data, original):
+        with get_agent_conn() as conn, conn.cursor() as cur:
+            winner = self._select_canvas_idempotency(cur, data)
+        if winner is None:
+            raise RuntimeError("Agent canvas idempotency winner could not be reloaded") from original
+        return self._idempotent(winner, data)
+
+    def create_canvas_start(self, data):
+        try:
+            with get_agent_conn() as conn, conn.cursor() as cur:
+                existing = self._select_canvas_idempotency(cur, data, lock=True)
+                if existing is not None:
+                    return self._idempotent(existing, data)
+                request = data["request"]
+                cur.execute(
+                    "SELECT gid,revision FROM workmanship_app_skills WHERE gid=%s AND team_gid=%s "
+                    "AND deleted_at IS NULL AND (owner_gid=%s OR scope='team' OR "
+                    "(scope='global' AND status='active')) FOR UPDATE",
+                    (request["skill_gid"], data["team_gid"], data["actor_gid"]),
+                )
+                skill = cur.fetchone()
+                if skill is None:
+                    raise self._canvas_not_found()
+                if int(skill.get("revision") or 1) != int(request["expected_revision"]):
+                    raise CapabilityBusinessError("version_conflict", "Agent canvas revision changed")
+                result_json = json.dumps(data["result"], ensure_ascii=False, separators=(",", ":"))
+                cur.execute(
+                    "INSERT INTO workmanship_agent_canvas_runs "
+                    "(run_id,run_token_hash,actor_gid,team_gid,skill_gid,skill_revision,status,revision,result_json) "
+                    "VALUES (%s,%s,%s,%s,%s,%s,'accepted',1,%s)",
+                    (
+                        data["run_id"], self._token_hash(data["run_token"]), data["actor_gid"],
+                        data["team_gid"], request["skill_gid"], request["expected_revision"], result_json,
+                    ),
+                )
+                row = {
+                    **data, "status": "accepted", "revision": 1, "attempt_count": 0,
+                    "lease_owner": None, "lease_token": None, "lease_expires_at": None,
+                    "target_dispatched_at": None, "next_attempt_at": None,
+                }
+                cur.execute(
+                    "INSERT INTO workmanship_agent_canvas_invocations "
+                    "(invocation_id,run_id,actor_gid,team_gid,capability_id,idempotency_key,payload_hash,"
+                    "target_state,request_json,status,revision,result_json) "
+                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,'accepted',1,%s)",
+                    (
+                        data["invocation_id"], data["run_id"], data["actor_gid"], data["team_gid"],
+                        data["capability_id"], data["idempotency_key"], data["payload_hash"],
+                        data["target_state"], json.dumps(request, ensure_ascii=False), result_json,
+                    ),
+                )
+                self._canvas_audit(cur, row)
+                row["result"] = dict(data["result"])
+                return row, False
+        except Exception as exc:
+            if not self._duplicate_key(exc):
+                raise
+            return self._reload_canvas_idempotency(data, exc)
+
+    def create_canvas_resume(self, data):
+        try:
+            with get_agent_conn() as conn, conn.cursor() as cur:
+                existing = self._select_canvas_idempotency(cur, data, lock=True)
+                if existing is not None:
+                    return self._idempotent(existing, data)
+                request = data["request"]
+                cur.execute(
+                    "SELECT * FROM workmanship_agent_canvas_runs WHERE run_token_hash=%s "
+                    "AND pause_token_hash=%s AND actor_gid=%s AND team_gid=%s AND status='paused' "
+                    "AND revision=%s FOR UPDATE",
+                    (
+                        self._token_hash(request["run_token"]), self._token_hash(request["pause_token"]),
+                        data["actor_gid"], data["team_gid"], request["expected_revision"],
+                    ),
+                )
+                run = cur.fetchone()
+                if run is None:
+                    raise self._canvas_not_found()
+                revision = int(request["expected_revision"]) + 1
+                result_json = json.dumps(data["result"], ensure_ascii=False, separators=(",", ":"))
+                cur.execute(
+                    "UPDATE workmanship_agent_canvas_runs SET status='accepted',revision=%s,"
+                    "pause_token_hash=NULL,result_json=%s WHERE run_id=%s AND status='paused' AND revision=%s",
+                    (revision, result_json, run["run_id"], request["expected_revision"]),
+                )
+                if cur.rowcount != 1:
+                    raise self._canvas_not_found()
+                row = {
+                    **data, "run_id": run["run_id"], "run_token": request["run_token"],
+                    "status": "accepted", "revision": revision, "attempt_count": 0,
+                    "lease_owner": None, "lease_token": None, "lease_expires_at": None,
+                    "target_dispatched_at": None, "next_attempt_at": None,
+                }
+                cur.execute(
+                    "INSERT INTO workmanship_agent_canvas_invocations "
+                    "(invocation_id,run_id,actor_gid,team_gid,capability_id,idempotency_key,payload_hash,"
+                    "target_state,request_json,status,revision,result_json) "
+                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,'accepted',%s,%s)",
+                    (
+                        data["invocation_id"], run["run_id"], data["actor_gid"], data["team_gid"],
+                        data["capability_id"], data["idempotency_key"], data["payload_hash"],
+                        data["target_state"], json.dumps(request, ensure_ascii=False), revision, result_json,
+                    ),
+                )
+                self._canvas_audit(cur, row)
+                row["result"] = dict(data["result"])
+                return row, False
+        except Exception as exc:
+            if not self._duplicate_key(exc):
+                raise
+            return self._reload_canvas_idempotency(data, exc)
+
+    def claim_next_canvas_invocation(self, worker_id: str):
+        lease_token = f"{str(worker_id).strip()}:{secrets.token_urlsafe(24)}"
+        with get_agent_conn() as conn, conn.cursor() as cur:
+            cur.execute(
+                "SELECT i.*,r.result_json AS run_result_json FROM workmanship_agent_canvas_invocations i "
+                "JOIN workmanship_agent_canvas_runs r ON r.run_id=i.run_id WHERE "
+                "i.status='accepted' OR "
+                "(i.status='reconcile_pending' AND i.next_attempt_at<=NOW(6) AND i.attempt_count<3) OR "
+                "(i.status='claimed' AND i.lease_expires_at<NOW(6)) "
+                "ORDER BY i.created_at,i.invocation_id LIMIT 1 FOR UPDATE SKIP LOCKED"
+            )
+            row = cur.fetchone()
+            if row is None:
+                return None
+            cur.execute(
+                "UPDATE workmanship_agent_canvas_invocations SET status='claimed',lease_owner=%s,"
+                "lease_token=%s,lease_expires_at=DATE_ADD(NOW(6),INTERVAL 30 SECOND) "
+                "WHERE invocation_id=%s AND (status='accepted' OR status='reconcile_pending' OR "
+                "(status='claimed' AND lease_expires_at<NOW(6)))",
+                (worker_id, lease_token, row["invocation_id"]),
+            )
+            if cur.rowcount != 1:
+                return None
+        row = dict(row)
+        row.update(status="claimed", lease_owner=worker_id, lease_token=lease_token)
+        return self._canvas_invocation(row)
+
+    def mark_canvas_invocation_dispatched(self, claim):
+        with get_agent_conn() as conn, conn.cursor() as cur:
+            cur.execute(
+                "UPDATE workmanship_agent_canvas_invocations SET target_dispatched_at=COALESCE("
+                "target_dispatched_at,NOW(6)),attempt_count=attempt_count+1 WHERE invocation_id=%s "
+                "AND status='claimed' AND lease_token=%s",
+                (claim["invocation_id"], claim["lease_token"]),
+            )
+            if cur.rowcount != 1:
+                raise CapabilityBusinessError("version_conflict", "Agent canvas invocation claim changed")
+
+    def complete_canvas_invocation(self, claim, result):
+        if isinstance(result, dict):
+            result_json = json.dumps(result, ensure_ascii=False, separators=(",", ":"))
+            status, revision, pause_token = result["status"], result["revision"], result.get("pause_token")
+        else:
+            from dataclasses import asdict
+            result_json = json.dumps(asdict(result), ensure_ascii=False, separators=(",", ":"))
+            status, revision, pause_token = result.status, result.revision, result.pause_token
+        with get_agent_conn() as conn, conn.cursor() as cur:
+            cur.execute(
+                "SELECT * FROM workmanship_agent_canvas_invocations WHERE invocation_id=%s "
+                "AND status='claimed' AND lease_token=%s FOR UPDATE",
+                (claim["invocation_id"], claim["lease_token"]),
+            )
+            invocation = cur.fetchone()
+            if invocation is None or int(invocation["revision"]) != int(revision):
+                raise CapabilityBusinessError("version_conflict", "Agent canvas invocation claim changed")
+            cur.execute(
+                "UPDATE workmanship_agent_canvas_invocations SET status=%s,result_json=%s,error_code=NULL,"
+                "lease_owner=NULL,lease_token=NULL,lease_expires_at=NULL,next_attempt_at=NULL "
+                "WHERE invocation_id=%s AND status='claimed' AND lease_token=%s",
+                (status, result_json, claim["invocation_id"], claim["lease_token"]),
+            )
+            pause_hash = self._token_hash(pause_token) if pause_token else None
+            cur.execute(
+                "UPDATE workmanship_agent_canvas_runs SET status=%s,revision=%s,pause_token_hash=%s,"
+                "checkpoint_json=%s,result_json=%s WHERE run_id=%s",
+                (status, revision, pause_hash, result_json, result_json, invocation["run_id"]),
+            )
+            row = dict(invocation)
+            row.update(status=status, result=self._json(result_json))
+            self._canvas_audit(cur, row, status=status)
+        return row
+
+    def record_canvas_uncertainty(self, claim, result, error_code):
+        from dataclasses import asdict
+        result_json = json.dumps(asdict(result), ensure_ascii=False, separators=(",", ":"))
+        with get_agent_conn() as conn, conn.cursor() as cur:
+            cur.execute(
+                "SELECT * FROM workmanship_agent_canvas_invocations WHERE invocation_id=%s "
+                "AND status='claimed' AND lease_token=%s FOR UPDATE",
+                (claim["invocation_id"], claim["lease_token"]),
+            )
+            invocation = cur.fetchone()
+            if invocation is None:
+                raise CapabilityBusinessError("version_conflict", "Agent canvas invocation claim changed")
+            attempts = max(1, int(invocation.get("attempt_count") or 0) + (1 if claim.get("reconcile") else 0))
+            status = "outcome_unknown" if attempts >= 3 else "reconcile_pending"
+            cur.execute(
+                "UPDATE workmanship_agent_canvas_invocations SET status=%s,attempt_count=%s,result_json=%s,"
+                "error_code=%s,lease_owner=NULL,lease_token=NULL,lease_expires_at=NULL,"
+                "next_attempt_at=DATE_ADD(NOW(6),INTERVAL %s SECOND) WHERE invocation_id=%s "
+                "AND status='claimed' AND lease_token=%s",
+                (
+                    status, attempts, result_json, str(error_code)[:128], min(60, 2 ** attempts),
+                    claim["invocation_id"], claim["lease_token"],
+                ),
+            )
+            cur.execute(
+                "UPDATE workmanship_agent_canvas_runs SET status='outcome_unknown',result_json=%s "
+                "WHERE run_id=%s",
+                (result_json, invocation["run_id"]),
+            )
+            row = dict(invocation)
+            row.update(status=status, result=self._json(result_json), attempt_count=attempts)
+            self._canvas_audit(cur, row, status=status, error_code=str(error_code)[:128])
+        return row
+
+    def load_canvas_execution_state(self, run_token: str, actor_gid: str, team_gid: str):
+        with get_agent_conn() as conn, conn.cursor() as cur:
+            cur.execute(
+                "SELECT * FROM workmanship_agent_canvas_runs WHERE run_token_hash=%s "
+                "AND actor_gid=%s AND team_gid=%s",
+                (self._token_hash(run_token), actor_gid, team_gid),
+            )
+            row = cur.fetchone()
+        if row is None:
+            return None
+        value = dict(row)
+        value["checkpoint"] = self._json(value.pop("checkpoint_json"))
+        value["result"] = self._json(value.pop("result_json"))
+        return value
+
     def load_canvas_resource(
         self, kind: str, gid: str, actor_gid: str, team_gid: str,
     ) -> dict | None:
@@ -303,7 +601,7 @@ class AgentCapabilityRepository:
                     updates["tags"] = json.dumps(data["tags"], ensure_ascii=False)
                 if updates:
                     clause = ",".join(f"{field}=%s" for field in updates)
-                    cur.execute(f"UPDATE workmanship_app_skills SET {clause},updated_at=NOW() WHERE gid=%s AND team_gid=%s", [*updates.values(), data["skill_gid"], team])
+                    cur.execute(f"UPDATE workmanship_app_skills SET {clause},revision=revision+1,updated_at=NOW() WHERE gid=%s AND team_gid=%s", [*updates.values(), data["skill_gid"], team])
                 return {"success": True}
             if operation == "delete":
                 cur.execute("SELECT is_system, owner_gid FROM workmanship_app_skills WHERE gid=%s AND team_gid=%s AND deleted_at IS NULL", (data["skill_gid"], team))
@@ -324,7 +622,7 @@ class AgentCapabilityRepository:
                     cur.execute("SELECT gid FROM workmanship_app_skills WHERE name=%s AND team_gid=%s AND deleted_at IS NULL", (skill["name"], team))
                     existing = cur.fetchone()
                     if existing:
-                        cur.execute("UPDATE workmanship_app_skills SET title=%s,description=%s,content=%s,icon=%s,tags=%s,sort_order=%s,is_system=TRUE,scope='global',status='active',updated_at=NOW() WHERE gid=%s AND team_gid=%s", (skill["title"], skill.get("description", ""), json.dumps(content, ensure_ascii=False), skill.get("icon", ""), json.dumps(tags, ensure_ascii=False), skill.get("sort_order", 0), existing["gid"], team))
+                        cur.execute("UPDATE workmanship_app_skills SET title=%s,description=%s,content=%s,icon=%s,tags=%s,sort_order=%s,is_system=TRUE,scope='global',status='active',revision=revision+1,updated_at=NOW() WHERE gid=%s AND team_gid=%s", (skill["title"], skill.get("description", ""), json.dumps(content, ensure_ascii=False), skill.get("icon", ""), json.dumps(tags, ensure_ascii=False), skill.get("sort_order", 0), existing["gid"], team))
                         seeded.append({"name": skill["name"], "action": "updated", "gid": existing["gid"]})
                     else:
                         gid = str(uuid.uuid4())

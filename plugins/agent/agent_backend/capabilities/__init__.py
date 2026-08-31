@@ -5,6 +5,9 @@ import inspect
 
 from ..application import AgentApplication
 from ..application.canvas_runtime import ProductionAgentCanvasRuntime
+from ..application.service import (
+    CanvasExecutionCoordinator, CanvasExecutionDispatcher, CanvasExecutionWorker,
+)
 from ..infrastructure import AgentCapabilityRepository
 from ..data.audit_repository import AuditRepository
 from ..data.session_repository import SessionRepository
@@ -28,13 +31,48 @@ def _validate_canvas_runtime(runtime) -> None:
 
 def register_capabilities(registry, *, canvas_runtime=_DEFAULT_RUNTIME) -> None:
     repository = AgentCapabilityRepository()
+    production_composition = canvas_runtime is _DEFAULT_RUNTIME
     runtime = (
         ProductionAgentCanvasRuntime(repository_factory=type(repository))
-        if canvas_runtime is _DEFAULT_RUNTIME else canvas_runtime
+        if production_composition else canvas_runtime
     )
     if runtime is not None:
         _validate_canvas_runtime(runtime)
-    provider = AgentApplication(repository, AuditRepository(), SessionRepository(), runtime)
+    execution = CanvasExecutionCoordinator(repository) if runtime is not None and production_composition else None
+    if execution is not None and hasattr(registry, "register_lifecycle"):
+        state = {"last_health": {
+            "status": "stopped", "consecutive_errors": 0, "last_error_code": None,
+            "retry_delay_seconds": 0.0, "last_poll_at": None,
+            "last_success_at": None, "next_retry_at": None,
+        }}
+
+        def health():
+            worker = state.get("worker")
+            return worker.health if worker is not None else dict(state["last_health"])
+
+        def supervise(signal):
+            registry.publish_lifecycle_signal("agent.canvas-execution-worker", signal)
+
+        async def start():
+            worker = CanvasExecutionWorker(
+                CanvasExecutionDispatcher(repository, runtime), supervision_signal=supervise,
+            )
+            state["worker"] = worker
+            await worker.start()
+
+        async def stop():
+            worker = state.pop("worker", None)
+            if worker is not None:
+                await worker.stop()
+                state["last_health"] = dict(worker.health)
+
+        registry.register_lifecycle(
+            "agent.canvas-execution-worker", start, stop, health=health,
+        )
+    provider = AgentApplication(
+        repository, AuditRepository(), SessionRepository(), runtime,
+        canvas_execution=execution,
+    )
     for spec in specs():
         capability_id = spec.id
         if capability_id in _CANVAS_CAPABILITIES:

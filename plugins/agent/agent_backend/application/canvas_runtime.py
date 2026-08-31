@@ -8,6 +8,7 @@ import json
 import math
 import multiprocessing
 import re
+import secrets
 from dataclasses import asdict, dataclass
 from collections.abc import Callable, Mapping
 from typing import Any, Literal, Protocol, Self
@@ -724,6 +725,237 @@ class _CanvasQueryEngine:
             except ValueError as exc:
                 raise _invalid("persisted option revision is invalid") from exc
 
+
+class _CanvasCommandEngine(_CanvasQueryEngine):
+    """Run a stored skill and rebuild only the bounded checkpoint needed by resume."""
+
+    def __init__(
+        self, *, resource_loader, execution_loader, executor_factory=None,
+        max_concurrency: int = DEFAULT_MAX_CONCURRENCY,
+    ) -> None:
+        super().__init__(
+            resource_loader=resource_loader, executor_factory=executor_factory,
+            max_concurrency=max_concurrency,
+        )
+        self._execution_loader = execution_loader
+
+    @staticmethod
+    def _status(value: object) -> NodeStatus:
+        normalized = str(value or "ok")
+        return normalized if normalized in {"ok", "error", "skipped", "warning", "pending_approval"} else "warning"
+
+    @classmethod
+    def _node_results(cls, raw: Mapping[str, Any]) -> tuple[NodeResult, ...]:
+        values = raw.get("node_results")
+        if not isinstance(values, Mapping) or len(values) > MAX_NODE_RESULTS:
+            raise _invalid("runtime output contains invalid node results")
+        result = []
+        for node_id, item in sorted(values.items(), key=lambda pair: str(pair[0])):
+            if not isinstance(item, Mapping):
+                raise _invalid("runtime output contains an invalid node result")
+            public = [(str(key), value) for key, value in item.items() if not str(key).startswith("_")]
+            if len(public) > MAX_OUTPUT_VALUES:
+                raise _invalid("runtime node output contains too many values")
+            result.append(NodeResult(
+                str(node_id), cls._status(item.get("_status")),
+                str(item.get("_summary") or ""),
+                tuple(OutputValue(name, cls._project_value(name, value)) for name, value in public),
+            ))
+        return tuple(result)
+
+    @staticmethod
+    def _paused_node(document: Mapping[str, Any], node_id: str | None) -> Mapping[str, Any] | None:
+        if not node_id:
+            return None
+        matches = [node for node in document.get("nodes", ()) if str(node.get("id") or "") == node_id]
+        return matches[0] if len(matches) == 1 else None
+
+    @classmethod
+    def _pause_projection(cls, document, raw):
+        node = cls._paused_node(document, str(raw.get("halted_node_id") or ""))
+        if node is None:
+            return (), None
+        params = node.get("params") if isinstance(node.get("params"), Mapping) else {}
+        raw_fields = params.get("collect_fields") or []
+        if not isinstance(raw_fields, list) or len(raw_fields) > MAX_COLLECT_FIELDS:
+            raise _invalid("persisted collect fields are invalid")
+        fields = []
+        for item in raw_fields:
+            if not isinstance(item, Mapping):
+                raise _invalid("persisted collect field is invalid")
+            options = item.get("options") or []
+            if not isinstance(options, list) or len(options) > MAX_OPTIONS:
+                raise _invalid("persisted collect field options are invalid")
+            show_when = item.get("show_when") or []
+            if isinstance(show_when, Mapping):
+                show_when = [
+                    {"field_key": str(key), "value": value}
+                    for key, value in show_when.items()
+                ]
+            if not isinstance(show_when, list):
+                raise _invalid("persisted collect field visibility is invalid")
+            default = item.get("default")
+            try:
+                fields.append(CollectField(
+                    key=str(item.get("key") or ""), label=str(item.get("label") or ""),
+                    type=item.get("type"),
+                    options=tuple(CanvasOption(str(value["value"]), str(value["label"])) for value in options),
+                    default=tuple(default) if isinstance(default, list) else default,
+                    depends_on=item.get("depends_on"),
+                    show_when=tuple(VisibilityRule(
+                        str(value.get("field_key") or ""), value.get("value"),
+                    ) for value in show_when),
+                ))
+            except (KeyError, TypeError, ValueError) as exc:
+                raise _invalid("persisted collect field is invalid") from exc
+        layout = params.get("canvas_layout")
+        if layout is None:
+            return tuple(fields), None
+        if not isinstance(layout, Mapping):
+            raise _invalid("persisted canvas layout is invalid")
+        try:
+            public_layout = CanvasLayout(
+                column_labels=tuple(layout.get("column_labels") or ()),
+                column_width=layout.get("column_width", 320),
+                lane_height=layout.get("lane_height", 60),
+                hide_lane_labels=layout.get("hide_lane_labels", False),
+            )
+        except ValueError as exc:
+            raise _invalid("persisted canvas layout is invalid") from exc
+        return tuple(fields), public_layout
+
+    @classmethod
+    def _project(cls, raw, document, row, *, run_token, revision):
+        if not isinstance(raw, Mapping):
+            raise _invalid("runtime output is invalid")
+        safe = _redact_recursive(raw)
+        if len(_json_bytes(safe)) > MAX_OUTPUT_BYTES:
+            raise _invalid("runtime output exceeds the size limit")
+        status = str(raw.get("status") or "error")
+        if status not in {"completed", "paused", "halted", "error"}:
+            raise _invalid("runtime output has an invalid status")
+        fields, layout = cls._pause_projection(document, raw) if status == "paused" else ((), None)
+        return RuntimeDispatch(
+            status=status, run_token=run_token, revision=revision,
+            pause_token=(secrets.token_urlsafe(32) if status == "paused" else None),
+            halted_node_id=(str(raw.get("halted_node_id")) if raw.get("halted_node_id") else None),
+            halted_label=(str(raw.get("halted_label")) if raw.get("halted_label") else None),
+            halt_reason=(str(raw.get("halt_reason")) if raw.get("halt_reason") else None),
+            skill_title=(str(row.get("title")) if row.get("title") else None),
+            summary=str(raw.get("summary") or ""), node_results=cls._node_results(raw),
+            collect_fields=fields, canvas_layout=layout,
+        )
+
+    @staticmethod
+    def _restore(checkpoint: Mapping[str, Any], halted_node_id: str, values) -> dict[str, dict]:
+        restored = {}
+        for item in checkpoint.get("node_results") or ():
+            if not isinstance(item, Mapping):
+                raise _invalid("stored canvas checkpoint is invalid")
+            node_id = str(item.get("node_id") or "")
+            raw = {
+                "_status": "ok" if node_id == halted_node_id else str(item.get("status") or "warning"),
+                "_summary": "Approved" if node_id == halted_node_id else str(item.get("summary") or ""),
+            }
+            for output in item.get("output_values") or ():
+                if isinstance(output, Mapping):
+                    raw[str(output.get("name") or "")] = output.get("value")
+            if node_id == halted_node_id:
+                raw.update({item.name: list(item.value) if isinstance(item.value, tuple) else item.value for item in values})
+            restored[node_id] = raw
+        return restored
+
+    async def start(self, request, principal, *, run_token):
+        async with self._semaphore:
+            row = self._record("skill", request.skill_gid, principal)
+            document = self._document("skill", row)
+            if int(row.get("revision", document.get("revision", 1))) != request.expected_revision:
+                raise CapabilityBusinessError("version_conflict", "Agent canvas revision changed")
+            init_params = self._init_params(document, {}, request.input_values)
+            executor = self._executor_factory(auth_mode="feishu", auth_token="", owner_gid=principal.actor_gid)
+            raw = executor.execute(document, init_params=init_params)
+            if inspect.isawaitable(raw):
+                raw = await raw
+            return self._project(raw, document, row, run_token=run_token, revision=1)
+
+    async def resume(self, request, principal, *, run_token):
+        async with self._semaphore:
+            state = self._execution_loader(request.run_token, principal.actor_gid, principal.team_gid)
+            checkpoint = state.get("checkpoint") if isinstance(state, Mapping) else None
+            if not isinstance(state, Mapping) or not isinstance(checkpoint, Mapping):
+                raise _not_found()
+            if (
+                checkpoint.get("pause_token") != request.pause_token
+                or int(checkpoint.get("revision") or 0) != request.expected_revision
+                or int(state.get("revision") or 0) not in {request.expected_revision, request.expected_revision + 1}
+            ):
+                raise _not_found()
+            row = self._record("skill", str(state.get("skill_gid") or ""), principal)
+            document = self._document("skill", row)
+            if int(row.get("revision", document.get("revision", 1))) != int(state.get("skill_revision") or 0):
+                raise CapabilityBusinessError("version_conflict", "Agent canvas revision changed")
+            halted_node_id = str(checkpoint.get("halted_node_id") or "")
+            node = self._node(document, halted_node_id)
+            self._init_params(document, node, request.input_values)
+            restored = self._restore(checkpoint, halted_node_id, request.input_values)
+            if not request.approved:
+                raw = {
+                    "status": "halted", "halted_node_id": halted_node_id,
+                    "halted_label": checkpoint.get("halted_label"),
+                    "halt_reason": "The human step was rejected.", "summary": "The flow was rejected.",
+                    "node_results": restored,
+                }
+                return self._project(
+                    raw, document, row, run_token=run_token, revision=request.expected_revision + 1,
+                )
+            executor = self._executor_factory(auth_mode="feishu", auth_token="", owner_gid=principal.actor_gid)
+            raw = executor.execute(document, restore_results=restored)
+            if inspect.isawaitable(raw):
+                raw = await raw
+            return self._project(
+                raw, document, row, run_token=run_token, revision=request.expected_revision + 1,
+            )
+
+
+def _dispatch_from_worker(value: Mapping[str, Any]) -> RuntimeDispatch:
+    def output(item):
+        raw = item.get("value")
+        return OutputValue(str(item.get("name") or ""), tuple(raw) if isinstance(raw, list) else raw)
+
+    layout = value.get("canvas_layout")
+    fields = []
+    for item in value.get("collect_fields") or ():
+        default = item.get("default")
+        fields.append(CollectField(
+            key=str(item.get("key") or ""), label=str(item.get("label") or ""), type=item.get("type"),
+            options=tuple(CanvasOption(str(child["value"]), str(child["label"])) for child in item.get("options") or ()),
+            default=tuple(default) if isinstance(default, list) else default,
+            depends_on=item.get("depends_on"),
+            show_when=tuple(VisibilityRule(
+                str(child.get("field_key") or ""), child.get("value"),
+            ) for child in item.get("show_when") or ()),
+        ))
+    return RuntimeDispatch(
+        status=value.get("status"), run_token=str(value.get("run_token") or ""),
+        revision=value.get("revision"), pause_token=value.get("pause_token"),
+        halted_node_id=value.get("halted_node_id"), halted_label=value.get("halted_label"),
+        halt_reason=value.get("halt_reason"), skill_title=value.get("skill_title"),
+        summary=str(value.get("summary") or ""),
+        node_results=tuple(NodeResult(
+            str(item.get("node_id") or ""), item.get("status"), str(item.get("summary") or ""),
+            tuple(output(child) for child in item.get("output_values") or ()),
+        ) for item in value.get("node_results") or ()),
+        context_summary=tuple(ContextSummaryItem(
+            str(item.get("node_id") or ""), str(item.get("text") or ""),
+        ) for item in value.get("context_summary") or ()),
+        collect_fields=tuple(fields),
+        canvas_layout=(CanvasLayout(
+            column_labels=tuple(layout.get("column_labels") or ()),
+            column_width=layout.get("column_width", 320), lane_height=layout.get("lane_height", 60),
+            hide_lane_labels=layout.get("hide_lane_labels", False),
+        ) if isinstance(layout, Mapping) else None),
+    )
+
 def _factory_path(factory: Callable[..., Any] | None) -> str:
     if factory is None:
         return "plugins.agent.agent_backend.infrastructure.repository:AgentCapabilityRepository"
@@ -780,6 +1012,20 @@ def _canvas_query_worker(result_connection: Any, payload_json: str) -> None:
             result = asyncio.run(engine.test_node(NodeTestRequest.from_payload(request_payload), principal))
         elif operation == "resolve_options":
             result = asyncio.run(engine.resolve_options(CanvasOptionsRequest.from_payload(request_payload), principal))
+        elif operation in {"start", "resume"}:
+            command = _CanvasCommandEngine(
+                resource_loader=lambda kind, gid: repository.load_canvas_resource(
+                    kind, gid, principal.actor_gid, principal.team_gid,
+                ),
+                execution_loader=repository.load_canvas_execution_state,
+            )
+            request = (
+                CanvasStartRequest.from_payload(request_payload)
+                if operation == "start" else CanvasResumeRequest.from_payload(request_payload)
+            )
+            result = asyncio.run(getattr(command, operation)(
+                request, principal, run_token=str(payload.get("run_token") or request_payload.get("run_token") or ""),
+            ))
         else:
             raise _invalid("unsupported Agent canvas query operation")
         envelope = {"ok": True, "result": asdict(result)}
@@ -826,12 +1072,17 @@ class ProductionAgentCanvasRuntime:
             process.kill()
             process.join(1.0)
 
-    async def _run_process(self, operation: str, request: Any, principal: RunPrincipal) -> dict[str, Any]:
+    async def _run_process(
+        self, operation: str, request: Any, principal: RunPrincipal, *,
+        run_token: str | None = None, invocation_id: str | None = None,
+    ) -> dict[str, Any]:
         payload_json = json.dumps({
             "operation": operation,
             "request": asdict(request),
             "principal": asdict(principal),
             "repository_factory": self._repository_factory,
+            "run_token": run_token,
+            "invocation_id": invocation_id,
         }, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
         context = multiprocessing.get_context("spawn")
         result_connection, worker_connection = context.Pipe(duplex=False)
@@ -922,13 +1173,41 @@ class ProductionAgentCanvasRuntime:
             raise _invalid("runtime output is invalid") from exc
 
     async def start(self, request: CanvasStartRequest, principal: RunPrincipal) -> RuntimeDispatch:
-        raise CapabilityBusinessError(
-            "provider_unavailable", "Agent canvas command runtime is not configured", retryable=True,
+        return await self.execute_canvas_command(
+            "start", request, principal, run_token=f"run_{secrets.token_urlsafe(32)}",
+            invocation_id=f"invocation_{secrets.token_urlsafe(32)}",
         )
 
     async def resume(self, request: CanvasResumeRequest, principal: RunPrincipal) -> RuntimeDispatch:
-        raise CapabilityBusinessError(
-            "provider_unavailable", "Agent canvas command runtime is not configured", retryable=True,
+        return await self.execute_canvas_command(
+            "resume", request, principal, run_token=request.run_token,
+            invocation_id=f"invocation_{secrets.token_urlsafe(32)}",
+        )
+
+    async def execute_canvas_command(
+        self, operation: str, request: CanvasStartRequest | CanvasResumeRequest,
+        principal: RunPrincipal, *, run_token: str, invocation_id: str,
+    ) -> RuntimeDispatch:
+        if operation not in {"start", "resume"}:
+            raise _invalid("unsupported Agent canvas command operation")
+        async with self._semaphore:
+            result = await self._run_process(
+                operation, request, principal, run_token=run_token, invocation_id=invocation_id,
+            )
+        try:
+            return _dispatch_from_worker(result)
+        except (KeyError, TypeError, ValueError) as exc:
+            raise _invalid("runtime output is invalid") from exc
+
+    async def reconcile_canvas_command(
+        self, operation: str, request: CanvasStartRequest | CanvasResumeRequest,
+        principal: RunPrincipal, *, run_token: str, invocation_id: str,
+    ) -> RuntimeDispatch:
+        del principal, invocation_id
+        revision = 1 if operation == "start" else request.expected_revision + 1
+        return RuntimeDispatch(
+            "outcome_unknown", run_token, revision,
+            summary="The runtime outcome requires reconciliation.",
         )
 
 __all__ = [

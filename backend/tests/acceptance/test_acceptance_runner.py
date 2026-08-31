@@ -118,6 +118,7 @@ def test_release_bindings_cover_manifest_and_every_domain_migration():
     } == {
         ("agent", "0001_agent.sql"),
         ("agent", "0002_canvas_query_tenant.sql"),
+        ("agent", "0003_canvas_execution_control.sql"),
         ("base", "0001_base_platform.sql"),
         ("base", "0002_domain_inbox.sql"),
             ("craft", "0001_pbom.sql"),
