@@ -101,9 +101,13 @@ def test_request_dataclasses_are_bounded_and_reject_legacy_executable_payloads()
 
 
 @pytest.mark.parametrize("name", [
-    "auth_token", "Auth-Token", "a.u.t.h_t-o-k-e-n", "credentialRef", "TOOL.NAME",
-    "environment_id", "env", "source_gid", "IMPORT-path", "python_code", "rawSQL",
-    "controlFlag", "api-key", "pass_word",
+    "auth", "authorization", "auth_token", "Auth-Token", "a.u.t.h_t-o-k-e-n",
+    "token", "credential", "credentials", "credentialRef", "password", "passwd",
+    "pwd", "secret", "api-key", "access_key", "private-key", "tool", "tool_name",
+    "TOOL.NAME", "environment", "environment_id", "env", "source", "source_gid",
+    "import", "import_path", "IMPORT-path", "path", "code", "python_code", "script",
+    "sql", "rawSQL", "control", "controlFlag", "command", "exec", "executable",
+    "pass_word", "canvas", "graph", "nodes",
 ])
 def test_input_value_rejects_semantic_execution_control_aliases(name):
     module = importlib.import_module(
@@ -118,6 +122,27 @@ def test_input_value_rejects_semantic_execution_control_aliases(name):
             {"flow_gid": "flow-1", "node_id": "node-1", "input_values": [{"name": name, "value": "blocked"}]},
             INPUT_SCHEMAS["agent.workflow.node.test.execute"],
         )
+
+
+@pytest.mark.parametrize("name", [
+    "resource_gid", "author_gid", "tooling_notes", "environmental_score",
+    "sourcebook_gid", "codebook_gid", "graphical_label", "node_id",
+])
+def test_input_value_allows_declared_business_names_containing_control_fragments(name):
+    module = importlib.import_module(
+        "plugins.agent.agent_backend.application.canvas_runtime"
+    )
+    from plugins.agent.agent_backend.capabilities.contracts import INPUT_SCHEMAS
+
+    value = module.InputValue(name=name, value="business-value")
+    assert module.validated_init_params((value,), (name,)) == {name: "business-value"}
+    assert module.CanvasOptionsRequest(
+        skill_gid="skill-1", node_id="node-1", field_key=name,
+    ).field_key == name
+    validate(
+        {"flow_gid": "flow-1", "node_id": "node-1", "input_values": [{"name": name, "value": "business-value"}]},
+        INPUT_SCHEMAS["agent.workflow.node.test.execute"],
+    )
 
 
 def test_adapter_helper_allows_only_persisted_declared_inputs():
@@ -218,6 +243,51 @@ def test_runtime_dispatch_preserves_closed_bounded_safe_pause_projection():
     assert module.OutputValue(name="api_token", value="opaque-secret").value == "[redacted]"
     for status in ("accepted", "completed", "halted", "error", "outcome_unknown"):
         assert module.RuntimeDispatch(status=status, run_token="run-1", revision=2).status == status
+
+
+@pytest.mark.parametrize("field,value", [
+    ("column_width", 320.5), ("lane_height", 60.5),
+    ("column_width", True), ("lane_height", True),
+])
+def test_canvas_layout_rejects_non_integer_dimensions_in_dataclass_and_schema(field, value):
+    module = importlib.import_module(
+        "plugins.agent.agent_backend.application.canvas_runtime"
+    )
+    from plugins.agent.agent_backend.capabilities.contracts import OUTPUT_SCHEMAS
+
+    with pytest.raises(ValueError, match=field):
+        module.CanvasLayout(**{field: value})
+    layout = {
+        "column_labels": [], "column_width": 320, "lane_height": 60,
+        "hide_lane_labels": False, field: value,
+    }
+    result = {
+        "status": "accepted", "run_token": "run-1", "revision": 1,
+        "pause_token": None, "halted_node_id": None, "halted_label": None,
+        "halt_reason": None, "skill_title": None, "summary": "",
+        "node_results": [], "context_summary": [], "collect_fields": [],
+        "canvas_layout": layout,
+    }
+    with pytest.raises(ValidationError):
+        validate(result, OUTPUT_SCHEMAS["agent.canvas.execution.start"])
+
+
+@pytest.mark.parametrize("field,values", [
+    ("column_width", (120, 1000)), ("lane_height", (40, 500)),
+])
+def test_canvas_layout_accepts_integer_boundaries(field, values):
+    module = importlib.import_module(
+        "plugins.agent.agent_backend.application.canvas_runtime"
+    )
+    from plugins.agent.agent_backend.capabilities.contracts import CANVAS_LAYOUT
+
+    for value in values:
+        assert getattr(module.CanvasLayout(**{field: value}), field) == value
+        layout = {
+            "column_labels": [], "column_width": 320, "lane_height": 60,
+            "hide_lane_labels": False, field: value,
+        }
+        validate(layout, CANVAS_LAYOUT)
 
 
 def test_capability_contracts_are_exact_closed_and_bounded():

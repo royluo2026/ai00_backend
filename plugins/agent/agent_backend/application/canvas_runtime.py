@@ -22,12 +22,14 @@ ScalarValue = str | int | float | bool | None
 RuntimeValue = ScalarValue | tuple[ScalarValue, ...]
 NodeStatus = Literal["ok", "error", "skipped", "warning", "pending_approval"]
 
-_RESERVED_INPUT_PARTS = (
-    "auth", "authorization", "token", "credential", "password", "passwd", "pwd",
-    "secret", "apikey", "accesskey", "privatekey", "tool", "environment", "env",
-    "source", "import", "path", "code", "script", "sql", "control", "command",
-    "exec", "executable",
-)
+_RESERVED_INPUT_NAMES = frozenset({
+    "auth", "authorization", "authtoken", "token", "credential", "credentials",
+    "credentialref", "password", "passwd", "pwd", "secret", "apikey", "accesskey",
+    "privatekey", "tool", "toolname", "environment", "environmentid", "env", "source",
+    "sourcegid", "import", "importpath", "path", "code", "pythoncode", "script", "sql",
+    "rawsql", "control", "controlflag", "command", "exec", "executable", "canvas",
+    "graph", "nodes",
+})
 _INPUT_NAME = re.compile(r"^[A-Za-z][A-Za-z0-9_.-]{0,127}$")
 
 
@@ -46,7 +48,7 @@ def _input_name(value: str) -> None:
     if not _INPUT_NAME.fullmatch(value):
         raise ValueError("input value name has an invalid format")
     normalized = re.sub(r"[^a-z0-9]", "", value.casefold())
-    if any(part in normalized for part in _RESERVED_INPUT_PARTS):
+    if normalized in _RESERVED_INPUT_NAMES:
         raise ValueError("input value name uses a reserved execution-control name")
 
 
@@ -375,9 +377,9 @@ class CanvasLayout:
             raise ValueError("column_labels must contain at most 32 labels")
         if any(not isinstance(label, str) or len(label) > 128 for label in self.column_labels):
             raise ValueError("column labels must contain at most 128 characters")
-        if isinstance(self.column_width, bool) or not 120 <= self.column_width <= 1000:
+        if type(self.column_width) is not int or not 120 <= self.column_width <= 1000:
             raise ValueError("column_width must be between 120 and 1000")
-        if isinstance(self.lane_height, bool) or not 40 <= self.lane_height <= 500:
+        if type(self.lane_height) is not int or not 40 <= self.lane_height <= 500:
             raise ValueError("lane_height must be between 40 and 500")
         if not isinstance(self.hide_lane_labels, bool):
             raise ValueError("hide_lane_labels must be a boolean")

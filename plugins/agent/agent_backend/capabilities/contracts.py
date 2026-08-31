@@ -11,12 +11,14 @@ STRING = {"type": "string", "minLength": 1}
 IDENTITY = {"type": "string", "minLength": 1, "maxLength": 255}
 TOKEN = {"type": "string", "minLength": 1, "maxLength": 512}
 REVISION = {"type": "integer", "minimum": 1}
-_RESERVED_INPUT_PARTS = (
-    "auth", "authorization", "token", "credential", "password", "passwd", "pwd",
-    "secret", "apikey", "accesskey", "privatekey", "tool", "environment", "env",
-    "source", "import", "path", "code", "script", "sql", "control", "command",
-    "exec", "executable",
-)
+_RESERVED_INPUT_NAMES = frozenset({
+    "auth", "authorization", "authtoken", "token", "credential", "credentials",
+    "credentialref", "password", "passwd", "pwd", "secret", "apikey", "accesskey",
+    "privatekey", "tool", "toolname", "environment", "environmentid", "env", "source",
+    "sourcegid", "import", "importpath", "path", "code", "pythoncode", "script", "sql",
+    "rawsql", "control", "controlflag", "command", "exec", "executable", "canvas",
+    "graph", "nodes",
+})
 
 
 def _format_insensitive_pattern(value: str) -> str:
@@ -26,7 +28,7 @@ def _format_insensitive_pattern(value: str) -> str:
 INPUT_NAME = {
     "type": "string", "minLength": 1, "maxLength": 128,
     "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,127}$",
-    "not": {"pattern": "(" + "|".join(map(_format_insensitive_pattern, _RESERVED_INPUT_PARTS)) + ")"},
+    "not": {"pattern": "^(?:" + "|".join(map(_format_insensitive_pattern, sorted(_RESERVED_INPUT_NAMES))) + ")$"},
 }
 SCALAR = {"anyOf": [
     {"type": "string", "maxLength": 4096},
