@@ -148,7 +148,7 @@ PACKAGE_CROSS_DOMAIN_LINKS = {
 }
 
 
-def _spec(package_id: str, target: str, transaction: str, strategy: str, *, approval_required: bool = False) -> dict[str, Any]:
+def _spec(package_id: str, target: str | None, transaction: str, strategy: str, *, approval_required: bool = False) -> dict[str, Any]:
     return {"package_id": package_id, "target_capability": target, "transaction_model": transaction,
             "migration_strategy": strategy, "approval_required": approval_required}
 
@@ -177,13 +177,13 @@ GROUP_SPECS: dict[tuple[str, str], dict[str, Any]] = {
     ("GET", "/api/ext-mappings/{dynamic}/columns"): _spec("integration_mapping", "integration.mapping.source_columns.discover@1", "bounded external discovery through connector runtime", "Bind mapping to connector, cap result and apply runtime timeout policy.", approval_required=True),
     ("POST", "/api/ext-mappings/{dynamic}/import"): _spec("integration_mapping", "integration.mapping.import.start@1", "durable asynchronous import operation with idempotency and recoverable status", "Replace synthetic sync.start response with a real run/outcome resource.", approval_required=True),
     ("GET", "/api/ext-mappings/{dynamic}/preview"): _spec("integration_mapping", "integration.mapping.preview@1", "bounded external preview through runtime port", "Cap preview rows, redact values and expose structured timeout/outcome status.", approval_required=True),
-    ("DELETE", "/api/craft_lib/equipments/{dynamic}"): _spec("craft_library", "craft.library.equipment.retire@1", "one Craft library transaction locking item and references plus audit", "Implement approved lifecycle outcome; do not map delete to an unrelated obsolete call.", approval_required=True),
-    ("DELETE", "/api/craft_lib/fixtures/{dynamic}"): _spec("craft_library", "craft.library.fixture.retire@1", "one Craft library transaction locking item and references plus audit", "Implement approved lifecycle outcome; do not map delete to an unrelated obsolete call.", approval_required=True),
+    ("DELETE", "/api/craft_lib/equipments/{dynamic}"): _spec("craft_library", None, "not applicable; the dead browser action was removed", "Keep the removed action absent; do not invent a replacement capability."),
+    ("DELETE", "/api/craft_lib/fixtures/{dynamic}"): _spec("craft_library", None, "not applicable; the dead browser action was removed", "Keep the removed action absent; do not invent a replacement capability."),
     ("GET", "/api/rule-engine/check-entry"): _spec("craft_rules", "craft.rule.entry.evaluate@1", "bounded read/evaluation with audit record; no arbitrary executable expression", "Implement exact entry-check semantics, not CEL or BOP audit substitution.", approval_required=True),
     ("PUT", "/api/rules/{dynamic}"): _spec("craft_rules", "craft.rule.definition.change.apply@1", "one revision-locked rule-definition transaction plus audit", "Define finite rule grammar before migration; reject arbitrary rule_definition JSON.", approval_required=True),
-    ("POST", "/api/rules/{dynamic}/activate"): _spec("craft_rules", "craft.rule.lifecycle.activate@1", "one rule lifecycle transition with audit and expected state", "Implement mutable-rule activation only after its distinct lifecycle contract is approved.", approval_required=True),
-    ("POST", "/api/rules/{dynamic}/deviations"): _spec("craft_rules", "craft.rule.deviation.create@1", "one rule deviation/waiver transaction with evidence and audit", "Do not substitute release waiver; model legacy deviation evidence exactly.", approval_required=True),
-    ("POST", "/api/rules/{dynamic}/suspend"): _spec("craft_rules", "craft.rule.lifecycle.suspend@1", "one rule lifecycle transition with audit and expected state", "Implement a mutable-rule suspension service; no missing-handler adapter.", approval_required=True),
+    ("POST", "/api/rules/{dynamic}/activate"): _spec("craft_rules", None, "not applicable; the dead browser action was removed", "Keep the removed action absent; do not invent a replacement capability."),
+    ("POST", "/api/rules/{dynamic}/deviations"): _spec("craft_rules", None, "not applicable; the dead browser action was removed", "Keep the removed action absent; do not invent a replacement capability."),
+    ("POST", "/api/rules/{dynamic}/suspend"): _spec("craft_rules", None, "not applicable; the dead browser action was removed", "Keep the removed action absent; do not invent a replacement capability."),
     ("GET", "/api/lists"): _spec("craft_bop_lifecycle", "craft.bop.version.list@1", "read-only Craft BOP-version query selected by item_type before Project dispatch", "Migrate only bop_version conditional branch; preserve Project list behavior.", approval_required=True),
     ("DELETE", "/api/lists/{dynamic}"): _spec("craft_bop_lifecycle", "craft.bop.version.archive@1", "one Craft BOP-version revision-locked archive transaction with audit", "Migrate only bop_version conditional branch with expected_revision; preserve Project delete behavior.", approval_required=True),
     ("POST", "/api/flows/test-node"): _spec("agent_bounded_runtime", "agent.workflow.node.test.execute@1", "durable bounded sandbox run with timeout/resource limits and auditable result", "Route through fixed node allowlist and public runtime service; never arbitrary dispatch.", approval_required=True),
@@ -226,7 +226,7 @@ def source_groups(root: Path) -> dict[tuple[str, str], dict[str, Any]]:
             if not all(isinstance(value, str) and value for value in key) or key in manifests:
                 raise ValueError("manifest group identity invalid or duplicate")
             disposition = entry.get("final_disposition")
-            if disposition not in {"unresolved", "migrated"}:
+            if disposition not in {"unresolved", "migrated", "removed_dead_entry"}:
                 raise ValueError(f"structural group disposition invalid: {key}")
             occurrences = _occurrences(entry)
             manifests[key] = {
@@ -269,6 +269,17 @@ def _current_evidence(source: Mapping[str, Any], spec: Mapping[str, Any]) -> dic
             raise ValueError(f"migrated target evidence invalid: {(entry.get('method'), entry.get('normalized_route'))}")
         if not isinstance(evidence["frontend_call_sites"], list) or not evidence["frontend_call_sites"]:
             raise ValueError(f"migrated frontend evidence missing: {(entry.get('method'), entry.get('normalized_route'))}")
+    elif disposition == "removed_dead_entry":
+        dead = entry.get("dead_action_evidence")
+        if (
+            evidence["target_capability"] is not None
+            or evidence["final_inventory_mapping"] != "removed_dead_entry"
+            or evidence["frontend_call_sites"] != []
+            or not isinstance(dead, Mapping)
+            or dead.get("network_path_absent") is not True
+            or dead.get("interactive_control_absent") is not True
+        ):
+            raise ValueError(f"removed dead-entry evidence invalid: {(entry.get('method'), entry.get('normalized_route'))}")
     return evidence
 
 
@@ -282,22 +293,26 @@ def build_plan(root: Path) -> dict[str, Any]:
         package = PACKAGES[spec["package_id"]]
         entry = source["entry"]
         current_disposition = source["current_disposition"]
+        removed = current_disposition == "removed_dead_entry"
         blocker = entry.get("unresolved_reason") or entry.get("non_equivalence") or (
             "Migrated through the reviewed public owner service and generated capability evidence."
-            if current_disposition == "migrated" else "No provider-equivalent source boundary exists."
+            if current_disposition == "migrated" else (
+                "The non-functional browser control and network path were removed; no replacement capability exists."
+                if removed else "No provider-equivalent source boundary exists."
+            )
         )
         groups.append({
             "group_id": f"{key[0]} {key[1]}", "package_id": spec["package_id"],
             "method": key[0], "normalized_route": key[1], "occurrences": source["occurrences"],
             "owner_domain": package["owner_domain"], "owner_service": package["owner_service"], "owner_service_source": package["owner_service_source"],
             "current_blocker_evidence": {"manifest_path": source["manifest_path"], "provider_anchor": entry.get("provider_anchor"), "provider_source_sha256": entry.get("provider_source_sha256"), "reason": blocker},
-            "service_boundary": package["service_boundary"], "transaction_model": spec["transaction_model"],
-            "target_capability": spec["target_capability"], "permission_object_scope": package["contract_security_rules"][0],
-            "contract_security_rules": package["contract_security_rules"], "migration_strategy": spec["migration_strategy"],
+            "service_boundary": package["service_boundary"], "transaction_model": "not_applicable" if removed else spec["transaction_model"],
+            "target_capability": None if removed else spec["target_capability"], "permission_object_scope": package["contract_security_rules"][0],
+            "contract_security_rules": package["contract_security_rules"], "migration_strategy": "No migration: retain source-derived removal evidence." if removed else spec["migration_strategy"],
             "tests": package["tests"], "dependencies": package["dependencies"], "cross_domain_links": PACKAGE_CROSS_DOMAIN_LINKS[spec["package_id"]],
-            "approval": {"required": spec["approval_required"], "decision": package["approval_gate"] if spec["approval_required"] else None},
-            "exit_criteria": ["public owner service and Gateway provider share this boundary", "closed contract and scope tests pass", "fresh canonical occurrence migrates without REST fallback", "no operations/BFF/canonical-disposition relabeling"],
-            "implementation_disposition": "owner_service_required",
+            "approval": {"required": False if removed else spec["approval_required"], "decision": None if removed else (package["approval_gate"] if spec["approval_required"] else None)},
+            "exit_criteria": (["interactive control absent", "network path absent", "no candidate capability", "canonical inventory has no occurrence"] if removed else ["public owner service and Gateway provider share this boundary", "closed contract and scope tests pass", "fresh canonical occurrence migrates without REST fallback", "no operations/BFF/canonical-disposition relabeling"]),
+            "implementation_disposition": "removed_dead_entry" if removed else "owner_service_required",
             "current_status": current_disposition,
             "current_disposition": current_disposition,
             "current_evidence": _current_evidence(source, spec),
@@ -351,11 +366,14 @@ def validate_plan(root: Path, payload: Mapping[str, Any]) -> tuple[str, ...]:
         source_path = group.get("owner_service_source")
         if source_path is not None and (not isinstance(source_path, str) or not (root / source_path).is_file()):
             issues.add("owner_service_source_missing")
-        if group.get("package_id") != spec["package_id"] or group.get("target_capability") != spec["target_capability"]:
+        removed = sources[key]["current_disposition"] == "removed_dead_entry"
+        expected_target = None if removed else spec["target_capability"]
+        if group.get("package_id") != spec["package_id"] or group.get("target_capability") != expected_target:
             issues.add("owner_service_mismatch")
         if group.get("implementation_disposition") in PROHIBITED_DISPOSITIONS:
             issues.add("forbidden_disposition")
-        if group.get("implementation_disposition") != "owner_service_required":
+        expected_implementation = "removed_dead_entry" if removed else "owner_service_required"
+        if group.get("implementation_disposition") != expected_implementation:
             issues.add("implementation_disposition_mismatch")
         occurrences = group.get("occurrences")
         if not isinstance(occurrences, list):
@@ -381,7 +399,7 @@ def validate_plan(root: Path, payload: Mapping[str, Any]) -> tuple[str, ...]:
 
 
 def render_markdown(plan: Mapping[str, Any]) -> str:
-    lines = ["# Capability V2 Structural Owner-Service Remediation Plan", "", "This plan preserves the reviewed historical Web source scope while reconciling each group to current canonical unresolved evidence or current generated migrated-capability evidence. It is an implementation sequence, not an operations or BFF exemption.", "", f"- Historical scope: **{plan['counts']['occurrences']} occurrences / {plan['counts']['groups']} root-cause groups**.", f"- Current progress: **{sum(group['current_status'] == 'migrated' for group in plan['groups'])} migrated groups**; remaining groups are retained rather than erased.", "- Implementation disposition for every group: `owner_service_required`.", "- Global prohibitions: " + "; ".join(plan["anti_patterns"]) + ".", "", "## Ordered packages", ""]
+    lines = ["# Capability V2 Structural Owner-Service Remediation Plan", "", "This plan preserves the reviewed historical Web source scope while reconciling each group to current canonical unresolved, migrated-capability, or removed-dead-entry evidence. It is an implementation sequence, not an operations or BFF exemption.", "", f"- Historical scope: **{plan['counts']['occurrences']} occurrences / {plan['counts']['groups']} root-cause groups**.", f"- Current progress: **{sum(group['current_status'] == 'migrated' for group in plan['groups'])} migrated groups**, **{sum(group['current_status'] == 'removed_dead_entry' for group in plan['groups'])} removed dead-entry groups**; unresolved groups are retained rather than erased.", "- Implementation disposition: unresolved groups remain `owner_service_required`; source-proved dead controls are `removed_dead_entry` with no target Capability.", "- Global prohibitions: " + "; ".join(plan["anti_patterns"]) + ".", "", "## Ordered packages", ""]
     for number, package in enumerate(plan["packages"], 1):
         approval = package["approval_gate"] or "No product/security decision is currently identified."
         links = PACKAGE_CROSS_DOMAIN_LINKS[package["package_id"]]

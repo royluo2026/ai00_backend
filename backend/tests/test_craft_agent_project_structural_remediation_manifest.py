@@ -10,7 +10,9 @@ import pytest
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / "backend/scripts/build_craft_agent_project_structural_web_remediation.py"
 PLAN_SCRIPT = ROOT / "backend/scripts/check_structural_remediation_plan.py"
+LEDGER_SCRIPT = ROOT / "backend/scripts/build_web_route_root_cause_ledger.py"
 WEB_ROOT = ROOT.parent / "workmanship-web-capability-governance"
+CRAFT_FRONTEND_REVISION = "43a650ab35cba99c6788ce3622a46e08404e7731"
 
 
 def _module():
@@ -29,11 +31,153 @@ def _plan_module():
     return module
 
 
+def _ledger_module():
+    spec = importlib.util.spec_from_file_location("web_route_root_cause_ledger", LEDGER_SCRIPT)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def _frontend_source(path: str) -> str:
     return subprocess.run(
         ["git", "show", f"69e5e00054d3c1cff635fe41fcb96fbe150d25fb:{path}"],
         cwd=WEB_ROOT, check=True, capture_output=True, text=True, encoding="utf-8",
     ).stdout
+
+
+def _craft_frontend_source(path: str) -> str:
+    return subprocess.run(
+        ["git", "show", f"{CRAFT_FRONTEND_REVISION}:{path}"],
+        cwd=WEB_ROOT, check=True, capture_output=True, text=True, encoding="utf-8",
+    ).stdout
+
+
+def test_craft_closure_evidence_freezes_exact_source_identities_and_anchors():
+    """Breaks if Craft closure drifts from the reviewed backend or frozen Web tree."""
+    evidence = _module().build_craft_closure_evidence(WEB_ROOT)
+
+    assert evidence["backend_revision"] == "045124def4de6742fb99d8d7c436624c8fdee1e9"
+    assert evidence["backend_tree"] == "c1e39bac2f7500cdc0f49711ab02bac01ab878b4"
+    assert evidence["frontend_revision"] == CRAFT_FRONTEND_REVISION
+    assert evidence["scanner_materialization"] == {
+        "method": "git-tree-blobs-v1",
+        "revision": CRAFT_FRONTEND_REVISION,
+        "tree": "93ad56a6830dd29f1c504f3bce8f6ad24c5543b4",
+        "roots": ["web", "packages"],
+        "document_count": 224,
+        "materialization_sha256": "sha256:eb5541221452299947240ab9cafe6901bb8931ba3b608a5efe22df14acaa05c7",
+    }
+    assert {
+        path: item["blob"] for path, item in evidence["frontend_files"].items()
+    } == {
+        "dist-production/packages/craft-plugin/web/lineage_view/layout_detail_panel.js": "bbcf3cbd696750393c8a046c97eab90945b31a84",
+        "dist-production/web/container_card/modes/container_item_detail.js": "b249dffbe1e68cbdfe8045b5b09d894b168ba536",
+        "dist-production/web/container_card/modes/mode_field_detail.js": "b99a26505ff9b67450d3fc63faa6910c0b0fe386",
+        "dist-production/web/knowledge_hub/pages/gbop_vpps.html": "b5f37566ebe00f00740691fb76a720aab3f46b87",
+        "dist-production/web/rule_mgmt/rule_mgmt.html": "eb7f87f7347e88247bd30cf5b9a895d751bbee99",
+        "dist-production/web/rule_mgmt/rule_mgmt.js": "ec66cdda6154ac2cf3af143befedd933b210b392",
+        "packages/craft-plugin/web/lineage_view/layout_detail_panel.js": "bbcf3cbd696750393c8a046c97eab90945b31a84",
+        "web/container_card/modes/container_item_detail.js": "e7ba1bf677970fa450e8a91fe4e318a448cbeced",
+        "web/container_card/modes/mode_field_detail.js": "bb0436187c725c13e3805d81cb103dfd87fd0aa0",
+        "web/knowledge_hub/pages/gbop_vpps.html": "2ea909184bf3d6e7c67791eb9f258e04ca62a34f",
+        "web/rule_mgmt/rule_mgmt.html": "d4c58f1e74117a7cac19cdd141bbabbfd876c6bb",
+        "web/rule_mgmt/rule_mgmt.js": "f6b03514744aece0c572090d8601865bb5df03a9",
+    }
+    assert set(evidence["dead_actions"]) == {
+        "DELETE /api/craft_lib/equipments/{dynamic}",
+        "DELETE /api/craft_lib/fixtures/{dynamic}",
+        "POST /api/rules/{dynamic}/activate",
+        "POST /api/rules/{dynamic}/deviations",
+        "POST /api/rules/{dynamic}/suspend",
+    }
+    assert all(item["network_path_absent"] for item in evidence["dead_actions"].values())
+    assert all(item["interactive_control_absent"] for item in evidence["dead_actions"].values())
+    assert evidence["routes"]["GET /api/rule-engine/check-entry"]["candidate_capability"] == "craft.rule.entry.evaluate@1"
+    assert evidence["routes"]["PUT /api/rules/{dynamic}"]["candidate_capability"] == "craft.rule.definition.change.apply@1"
+    for item in evidence["routes"].values():
+        assert item["provider_anchor"]
+        assert item["contract_evidence"]
+        assert item["gateway_anchor"]
+        assert item["frontend_call_sites"]
+        assert item["legacy_route_absent"] is True
+
+
+def test_craft_dead_action_evidence_fails_closed_on_network_or_control_reintroduction():
+    """Breaks if a dead action can regain a route or interactive control without failing evidence."""
+    module = _module()
+    sources = {
+        path: _craft_frontend_source(path)
+        for path in (
+            "web/knowledge_hub/pages/gbop_vpps.html",
+            "dist-production/web/knowledge_hub/pages/gbop_vpps.html",
+            "web/rule_mgmt/rule_mgmt.js",
+            "dist-production/web/rule_mgmt/rule_mgmt.js",
+            "web/rule_mgmt/rule_mgmt.html",
+            "dist-production/web/rule_mgmt/rule_mgmt.html",
+        )
+    }
+    evidence = module._dead_action_evidence(sources)
+    assert all(item["network_path_absent"] for item in evidence.values())
+    assert all(item["interactive_control_absent"] for item in evidence.values())
+
+    mutations = (
+        ("web/knowledge_hub/pages/gbop_vpps.html", "\n_cloudFetch(`/api/craft_lib/equipments/${gid}`, { method:'DELETE' });"),
+        ("web/rule_mgmt/rule_mgmt.js", "\n<button data-action=\"activate\"></button>"),
+        ("web/rule_mgmt/rule_mgmt.js", "\ndocument.addEventListener('click', saveDeviation);"),
+        ("web/rule_mgmt/rule_mgmt.html", "\n<div id=\"modal-deviation\"></div>"),
+    )
+    for path, addition in mutations:
+        changed = dict(sources)
+        changed[path] += addition
+        with pytest.raises(ValueError, match="dead Craft action source drift"):
+            module._dead_action_evidence(changed)
+
+
+def test_root_cause_ledger_retains_removed_derived_occurrence_from_canonical_craft_evidence():
+    """Breaks if clean regeneration requires a fake migration for removed rule suspend."""
+    document = _ledger_module().build_document(WEB_ROOT)
+
+    assert document["final_evidence"]["frontend_revision"] == CRAFT_FRONTEND_REVISION
+    assert document["final_evidence"]["unresolved_group_count"] == 4
+    assert document["final_evidence"]["unresolved_count"] == 5
+    suspend = next(
+        item for item in document["entries"]
+        if (item["method"], item["normalized_route"])
+        == ("POST", "/api/rules/{dynamic}/suspend")
+    )
+    assert suspend["occurrence_count"] == 1
+    assert suspend["occurrences"][0]["method"] == "POST"
+    assert suspend["occurrences"][0]["raw_route"] == "/api/rules/${gid}/suspend"
+
+
+def test_existing_migration_audit_accepts_canonical_removed_dead_entries(manifest):
+    """Breaks if dead actions must be mislabeled migrated to leave final inventory."""
+    from backend.capability_v2.existing_capability_migrations import (
+        audit_existing_capability_migrations,
+        load_existing_capability_migrations,
+    )
+
+    _, remediation = manifest
+    migrations = load_existing_capability_migrations(
+        ROOT / "docs/governance/existing-capability-web-migrations.json"
+    )
+    issues = audit_existing_capability_migrations(
+        ROOT, migrations, web_root=WEB_ROOT, remediation_document=remediation,
+    )
+    assert "migration_final_reclassification_mismatch:POST:/api/rules/{dynamic}/activate" not in issues
+    assert "migration_final_reclassification_mismatch:POST:/api/rules/{dynamic}/deviations" not in issues
+
+
+def test_structural_plan_records_removed_dead_entries_without_fake_targets():
+    """Breaks if a removed control is turned back into a candidate capability card."""
+    payload = _plan_module().build_plan(ROOT)
+    dead = [group for group in payload["groups"] if group["current_disposition"] == "removed_dead_entry"]
+
+    assert len(dead) == 5
+    assert all(group["target_capability"] is None for group in dead)
+    assert all(group["implementation_disposition"] == "removed_dead_entry" for group in dead)
+    assert all(group["approval"] == {"required": False, "decision": None} for group in dead)
 
 
 def test_structural_plan_uses_the_registered_craft_list_capability_identity():
@@ -214,22 +358,24 @@ def manifest():
     return module, module.build_manifest(WEB_ROOT)
 
 
-def test_manifest_closes_three_source_proved_groups_and_conserves_the_remainder(manifest):
+def test_manifest_conserves_all_source_proved_closures_and_the_agent_remainder(manifest):
     """Breaks if closure counts are hand-authored instead of conserved from immutable evidence."""
     _, payload = manifest
 
     assert payload["counts"] == {
         "groups": 14,
         "occurrences": 17,
-        "migrated_groups": 3,
-        "migrated_occurrences": 3,
-        "unresolved_groups": 11,
-        "unresolved_occurrences": 14,
+        "migrated_groups": 5,
+        "migrated_occurrences": 7,
+        "removed_dead_entry_groups": 5,
+        "removed_dead_entry_occurrences": 5,
+        "unresolved_groups": 4,
+        "unresolved_occurrences": 5,
     }
     assert payload["closure_arithmetic"] == {
         "baseline": {"groups": 14, "occurrences": 17},
-        "closed": {"groups": 3, "occurrences": 3},
-        "canonical_remainder": {"groups": 11, "occurrences": 14},
+        "closed": {"groups": 10, "occurrences": 12},
+        "canonical_remainder": {"groups": 4, "occurrences": 5},
     }
     assert payload["closure_arithmetic"]["baseline"]["groups"] - payload["closure_arithmetic"]["closed"]["groups"] == payload["closure_arithmetic"]["canonical_remainder"]["groups"]
     assert payload["closure_arithmetic"]["baseline"]["occurrences"] - payload["closure_arithmetic"]["closed"]["occurrences"] == payload["closure_arithmetic"]["canonical_remainder"]["occurrences"]
@@ -240,15 +386,82 @@ def test_manifest_closes_three_source_proved_groups_and_conserves_the_remainder(
     unresolved = [entry for entry in payload["entries"] if entry["final_disposition"] == "unresolved"]
     assert {(entry["method"], entry["normalized_route"]) for entry in migrated} == {
         ("GET", "/api/lists"),
+        ("GET", "/api/rule-engine/check-entry"),
         ("DELETE", "/api/lists/{dynamic}"),
         ("POST", "/api/approval/orders/{dynamic}/reject"),
+        ("PUT", "/api/rules/{dynamic}"),
     }
-    assert sum(len(entry["occurrences"]) for entry in migrated) == 3
-    assert sum(len(entry["occurrences"]) for entry in unresolved) == 14
+    assert sum(len(entry["occurrences"]) for entry in migrated) == 7
+    assert sum(len(entry["occurrences"]) for entry in unresolved) == 5
     for entry in unresolved:
         assert entry["final_disposition"] == "unresolved"
         assert entry["final_inventory_mapping"] == "unresolved"
         assert entry["non_equivalence"]
+
+
+def test_manifest_closes_craft_from_source_and_preserves_exact_agent_remainder(manifest):
+    """Breaks on fake migration, hand-authored counts, or drift in any Agent occurrence."""
+    module, payload = manifest
+    prior = module._build_manifest.__globals__["_closure_baseline"]()[0]
+    prior_agent = {
+        (item["method"], item["normalized_route"]): item["final_occurrences"]
+        for item in prior["entries"] if item["owner_domain"] == "agent"
+    }
+    entries = {
+        (item["method"], item["normalized_route"]): item
+        for item in payload["entries"]
+    }
+
+    assert payload["counts"] == {
+        "groups": 14,
+        "occurrences": 17,
+        "migrated_groups": 5,
+        "migrated_occurrences": 7,
+        "removed_dead_entry_groups": 5,
+        "removed_dead_entry_occurrences": 5,
+        "unresolved_groups": 4,
+        "unresolved_occurrences": 5,
+    }
+    assert payload["craft_closure_arithmetic"] == {
+        "baseline": {"groups": 11, "occurrences": 14},
+        "closed": {"groups": 7, "occurrences": 9},
+        "canonical_remainder": {"groups": 4, "occurrences": 5},
+    }
+
+    dead = {
+        ("DELETE", "/api/craft_lib/equipments/{dynamic}"),
+        ("DELETE", "/api/craft_lib/fixtures/{dynamic}"),
+        ("POST", "/api/rules/{dynamic}/activate"),
+        ("POST", "/api/rules/{dynamic}/deviations"),
+        ("POST", "/api/rules/{dynamic}/suspend"),
+    }
+    for key in dead:
+        entry = entries[key]
+        assert entry["final_disposition"] == "removed_dead_entry"
+        assert entry["final_inventory_mapping"] == "removed_dead_entry"
+        assert entry["candidate_capability"] is None
+        assert entry["final_occurrences"] == []
+        assert entry["dead_action_evidence"]["network_path_absent"] is True
+        assert entry["dead_action_evidence"]["interactive_control_absent"] is True
+
+    assert entries[("GET", "/api/rule-engine/check-entry")]["candidate_capability"] == "craft.rule.entry.evaluate@1"
+    assert entries[("PUT", "/api/rules/{dynamic}")]["candidate_capability"] == "craft.rule.definition.change.apply@1"
+    for key in (
+        ("GET", "/api/rule-engine/check-entry"),
+        ("PUT", "/api/rules/{dynamic}"),
+    ):
+        entry = entries[key]
+        assert entry["final_disposition"] == "migrated"
+        assert entry["provider_anchor"]
+        assert entry["contract_evidence"]
+        assert entry["gateway_evidence"]
+        assert entry["frontend_call_sites"]
+
+    current_agent = {
+        key: entries[key]["final_occurrences"] for key in prior_agent
+    }
+    assert current_agent == prior_agent
+    assert all(entries[key]["runtime_execution"] == "unresolved_no_bounded_runtime_service" for key in prior_agent)
 
 
 def test_manifest_preserves_agent_findings_and_closes_only_exact_bop_and_approval_outcomes(manifest):
@@ -308,7 +521,8 @@ def test_manifest_validator_rejects_tampered_provider_contract_and_final_occurre
 
     for field, value in (("occurrence_id", "forged"), ("source", "web/forged.js"), ("line", 999), ("column", 999), ("source_sha256", "0" * 64)):
         changed = json.loads(json.dumps(payload))
-        changed["entries"][0]["final_occurrences"][0][field] = value
+        entry = next(item for item in changed["entries"] if item["final_occurrences"])
+        entry["final_occurrences"][0][field] = value
         assert "final_occurrence_mismatch" in module.validate_manifest_against_expected(changed, payload)
     for field in ("source_ledger_revision", "source_ledger_sha256"):
         changed = json.loads(json.dumps(payload))

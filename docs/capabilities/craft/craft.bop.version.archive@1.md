@@ -8,7 +8,7 @@ Archive a BOP version without deleting its snapshot or references.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_570b28961bd996541523b75c90e3e769`
+- Catalog Release：`rel_a889d9ac9615e655cd42c11d2856b644`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -92,7 +92,7 @@ Archive a BOP version without deleting its snapshot or references.
 ```json
 {
   "capability_id": "craft.bop.version.archive",
-  "catalog_release": "rel_570b28961bd996541523b75c90e3e769",
+  "catalog_release": "rel_a889d9ac9615e655cd42c11d2856b644",
   "major_version": 1,
   "payload": {
     "expected_revision": 1,
@@ -192,6 +192,9 @@ Archive a BOP version without deleting its snapshot or references.
 - `scope_not_found`：The requested BOP scope does not exist in the version.（retryable=false）
 - `entry_not_found`：The requested BOP entry does not exist in the version.（retryable=false）
 - `entry_detail_too_large`：The BOP entry has too many links for bounded detail output.（retryable=false）
+- `rule_not_found`：The requested rule was not found.（retryable=false）
+- `evaluation_timeout`：Rule evaluation exceeded its bounded time limit.（retryable=false）
+- `evaluation_unavailable`：Rule evaluation could not produce a bounded result.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

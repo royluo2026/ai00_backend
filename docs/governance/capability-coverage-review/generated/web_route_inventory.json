@@ -1,6 +1,6 @@
 {
-  "frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
-  "content_hash": "47e7ff0fddcd4ad7ef7597b96ba6688f9f316fac73290b3439576e78ffae4e19",
+  "frontend_revision": "43a650ab35cba99c6788ce3622a46e08404e7731",
+  "content_hash": "d9c9a1cecb1657b7322adf3e621176c9f5ae6ea2f00d84883ec51bbf1d7aa56a",
   "wrapper_contracts_hash": "0f099242269e21253ae02e3c54184b8ff0ec2ade1f98b59dbe8937778178a760",
   "scan_roots": [
     "web",
@@ -27,12 +27,12 @@
     "legacy_registered": 310,
     "bff_registered": 2,
     "operations_excluded": 19,
-    "unresolved": 14
+    "unresolved": 5
   },
   "lexical_audit": {
-    "token_count": 401,
-    "token_hash": "39fa809a8bd563437b3250d265fe571658883fcaea78e630751b5d01dc344d2c",
-    "mapped_count": 383,
+    "token_count": 392,
+    "token_hash": "cebf2767c58e4126d8e8b450480459b4b78b8a9ce2792bc01e6450c7dfa0f5ad",
+    "mapped_count": 374,
     "reviewed_non_route_count": 18,
     "reviewed_non_route_tokens": [
       "packages/craft-plugin/web/bop_nav/bop_nav.js:12:13:/api/",
@@ -1063,33 +1063,13 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 230,
+      "line": 243,
       "column": 54,
       "raw_route": "/api/v1/capabilities/${id}:${suffix}",
       "normalized_route": "/api/v1/capabilities/{dynamic}:{dynamic}",
       "method": "POST",
       "disposition": "capability",
-      "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:230:54:POST:/api/v1/capabilities/{dynamic}:{dynamic}"
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 2192,
-      "column": 40,
-      "raw_route": "/api/rule-engine/check-entry?entry_gid=${encodeURIComponent(gid)}",
-      "normalized_route": "/api/rule-engine/check-entry",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:2192:40:GET:/api/rule-engine/check-entry"
-    },
-    {
-      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 3524,
-      "column": 40,
-      "raw_route": "/api/rule-engine/check-entry?entry_gid=${encodeURIComponent(gid)}",
-      "normalized_route": "/api/rule-engine/check-entry",
-      "method": "GET",
-      "disposition": "unresolved",
-      "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:3524:40:GET:/api/rule-engine/check-entry"
+      "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:243:54:POST:/api/v1/capabilities/{dynamic}:{dynamic}"
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/layout_mode.js",
@@ -2136,173 +2116,153 @@
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 109,
+      "line": 151,
       "column": 54,
       "raw_route": "/api/tasks/${gid}",
       "normalized_route": "/api/tasks/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:109:54:GET:/api/tasks/{dynamic}"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:151:54:GET:/api/tasks/{dynamic}"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 110,
+      "line": 152,
       "column": 60,
       "raw_route": "/api/issues/${gid}",
       "normalized_route": "/api/issues/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:110:60:GET:/api/issues/{dynamic}"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:152:60:GET:/api/issues/{dynamic}"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 112,
+      "line": 154,
       "column": 59,
       "raw_route": "/api/rules/${gid}",
       "normalized_route": "/api/rules/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:112:59:GET:/api/rules/{dynamic}"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:154:59:GET:/api/rules/{dynamic}"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 122,
+      "line": 164,
       "column": 36,
       "raw_route": "/api/item-entries/${itemType}/${gid}",
       "normalized_route": "/api/item-entries/{dynamic}/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:122:36:GET:/api/item-entries/{dynamic}/{dynamic}"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:164:36:GET:/api/item-entries/{dynamic}/{dynamic}"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 127,
+      "line": 169,
       "column": 23,
       "raw_route": "/api/item-entries/${itemType}/${gid}",
       "normalized_route": "/api/item-entries/{dynamic}/{dynamic}",
       "method": "PUT",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:127:23:PUT:/api/item-entries/{dynamic}/{dynamic}"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:169:23:PUT:/api/item-entries/{dynamic}/{dynamic}"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 134,
+      "line": 176,
       "column": 48,
       "raw_route": "/api/tasks/${gid}",
       "normalized_route": "/api/tasks/{dynamic}",
       "method": "PUT",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:134:48:PUT:/api/tasks/{dynamic}"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:176:48:PUT:/api/tasks/{dynamic}"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 135,
+      "line": 177,
       "column": 54,
       "raw_route": "/api/issues/${gid}",
       "normalized_route": "/api/issues/{dynamic}",
       "method": "PUT",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:135:54:PUT:/api/issues/{dynamic}"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:177:54:PUT:/api/issues/{dynamic}"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 137,
-      "column": 53,
-      "raw_route": "/api/rules/${gid}",
-      "normalized_route": "/api/rules/{dynamic}",
-      "method": "PUT",
-      "disposition": "unresolved",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:137:53:PUT:/api/rules/{dynamic}"
-    },
-    {
-      "source": "web/container_card/modes/container_item_detail.js",
-      "line": 154,
+      "line": 196,
       "column": 55,
       "raw_route": "/api/tasks",
       "normalized_route": "/api/tasks",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:154:55:POST:/api/tasks"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:196:55:POST:/api/tasks"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 155,
+      "line": 197,
       "column": 61,
       "raw_route": "/api/issues",
       "normalized_route": "/api/issues",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:155:61:POST:/api/issues"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:197:61:POST:/api/issues"
     },
     {
       "source": "web/container_card/modes/container_item_detail.js",
-      "line": 157,
+      "line": 199,
       "column": 60,
       "raw_route": "/api/rules",
       "normalized_route": "/api/rules",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/container_item_detail.js:157:60:POST:/api/rules"
+      "occurrence_id": "web/container_card/modes/container_item_detail.js:199:60:POST:/api/rules"
     },
     {
       "source": "web/container_card/modes/mode_field_detail.js",
-      "line": 32,
+      "line": 63,
       "column": 56,
       "raw_route": "/api/tasks/${gid}",
       "normalized_route": "/api/tasks/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/mode_field_detail.js:32:56:GET:/api/tasks/{dynamic}"
+      "occurrence_id": "web/container_card/modes/mode_field_detail.js:63:56:GET:/api/tasks/{dynamic}"
     },
     {
       "source": "web/container_card/modes/mode_field_detail.js",
-      "line": 33,
+      "line": 64,
       "column": 62,
       "raw_route": "/api/issues/${gid}",
       "normalized_route": "/api/issues/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/mode_field_detail.js:33:62:GET:/api/issues/{dynamic}"
+      "occurrence_id": "web/container_card/modes/mode_field_detail.js:64:62:GET:/api/issues/{dynamic}"
     },
     {
       "source": "web/container_card/modes/mode_field_detail.js",
-      "line": 35,
+      "line": 66,
       "column": 61,
       "raw_route": "/api/rules/${gid}",
       "normalized_route": "/api/rules/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/mode_field_detail.js:35:61:GET:/api/rules/{dynamic}"
+      "occurrence_id": "web/container_card/modes/mode_field_detail.js:66:61:GET:/api/rules/{dynamic}"
     },
     {
       "source": "web/container_card/modes/mode_field_detail.js",
-      "line": 44,
+      "line": 75,
       "column": 50,
       "raw_route": "/api/tasks/${gid}",
       "normalized_route": "/api/tasks/{dynamic}",
       "method": "PUT",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/mode_field_detail.js:44:50:PUT:/api/tasks/{dynamic}"
+      "occurrence_id": "web/container_card/modes/mode_field_detail.js:75:50:PUT:/api/tasks/{dynamic}"
     },
     {
       "source": "web/container_card/modes/mode_field_detail.js",
-      "line": 45,
+      "line": 76,
       "column": 51,
       "raw_route": "/api/issues/${gid}",
       "normalized_route": "/api/issues/{dynamic}",
       "method": "PUT",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/container_card/modes/mode_field_detail.js:45:51:PUT:/api/issues/{dynamic}"
-    },
-    {
-      "source": "web/container_card/modes/mode_field_detail.js",
-      "line": 47,
-      "column": 50,
-      "raw_route": "/api/rules/${gid}",
-      "normalized_route": "/api/rules/{dynamic}",
-      "method": "PUT",
-      "disposition": "unresolved",
-      "occurrence_id": "web/container_card/modes/mode_field_detail.js:47:50:PUT:/api/rules/{dynamic}"
+      "occurrence_id": "web/container_card/modes/mode_field_detail.js:76:51:PUT:/api/issues/{dynamic}"
     },
     {
       "source": "web/container_card/modes/mode_image_gallery.js",
@@ -3156,83 +3116,63 @@
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 714,
-      "column": 58,
-      "raw_route": "/api/craft_lib/fixtures/${gid}",
-      "normalized_route": "/api/craft_lib/fixtures/{dynamic}",
-      "method": "DELETE",
-      "disposition": "unresolved",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:714:58:DELETE:/api/craft_lib/fixtures/{dynamic}"
-    },
-    {
-      "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 721,
+      "line": 719,
       "column": 62,
       "raw_route": "/api/craft_lib/fixtures",
       "normalized_route": "/api/craft_lib/fixtures",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:721:62:POST:/api/craft_lib/fixtures"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:719:62:POST:/api/craft_lib/fixtures"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 730,
+      "line": 728,
       "column": 36,
       "raw_route": "/api/craft_lib/equipments",
       "normalized_route": "/api/craft_lib/equipments",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:730:36:GET:/api/craft_lib/equipments"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:728:36:GET:/api/craft_lib/equipments"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 769,
+      "line": 767,
       "column": 59,
       "raw_route": "/api/craft_lib/equipments",
       "normalized_route": "/api/craft_lib/equipments",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:769:59:POST:/api/craft_lib/equipments"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:767:59:POST:/api/craft_lib/equipments"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 770,
+      "line": 768,
       "column": 64,
       "raw_route": "/api/craft_lib/equipments/${gid}",
       "normalized_route": "/api/craft_lib/equipments/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:770:64:PATCH:/api/craft_lib/equipments/{dynamic}"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:768:64:PATCH:/api/craft_lib/equipments/{dynamic}"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 771,
-      "column": 58,
-      "raw_route": "/api/craft_lib/equipments/${gid}",
-      "normalized_route": "/api/craft_lib/equipments/{dynamic}",
-      "method": "DELETE",
-      "disposition": "unresolved",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:771:58:DELETE:/api/craft_lib/equipments/{dynamic}"
-    },
-    {
-      "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 778,
+      "line": 774,
       "column": 62,
       "raw_route": "/api/craft_lib/equipments",
       "normalized_route": "/api/craft_lib/equipments",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:778:62:POST:/api/craft_lib/equipments"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:774:62:POST:/api/craft_lib/equipments"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 1073,
+      "line": 1071,
       "column": 36,
       "raw_route": "/api/import-export/import/parse-excel",
       "normalized_route": "/api/import-export/import/parse-excel",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:1073:36:POST:/api/import-export/import/parse-excel"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:1071:36:POST:/api/import-export/import/parse-excel"
     },
     {
       "source": "web/knowledge_hub/pages/project_info.html",
@@ -3346,113 +3286,83 @@
     },
     {
       "source": "web/rule_mgmt/rule_mgmt.js",
-      "line": 56,
+      "line": 55,
       "column": 37,
       "raw_route": "/api/v1/capabilities/ontology.object.list:invoke",
       "normalized_route": "/api/v1/capabilities/ontology.object.list:invoke",
       "method": "POST",
       "disposition": "capability",
-      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:56:37:POST:/api/v1/capabilities/ontology.object.list:invoke"
+      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:55:37:POST:/api/v1/capabilities/ontology.object.list:invoke"
     },
     {
       "source": "web/rule_mgmt/rule_mgmt.js",
-      "line": 137,
+      "line": 130,
       "column": 44,
       "raw_route": "/api/rules?${query}",
       "normalized_route": "/api/rules",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:137:44:GET:/api/rules"
+      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:130:44:GET:/api/rules"
     },
     {
       "source": "web/rule_mgmt/rule_mgmt.js",
-      "line": 148,
+      "line": 141,
       "column": 52,
       "raw_route": "/api/rules/${gid}",
       "normalized_route": "/api/rules/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:148:52:PATCH:/api/rules/{dynamic}"
+      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:141:52:PATCH:/api/rules/{dynamic}"
     },
     {
       "source": "web/rule_mgmt/rule_mgmt.js",
-      "line": 149,
+      "line": 142,
       "column": 46,
       "raw_route": "/api/rules",
       "normalized_route": "/api/rules",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:149:46:POST:/api/rules"
+      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:142:46:POST:/api/rules"
     },
     {
       "source": "web/rule_mgmt/rule_mgmt.js",
-      "line": 173,
-      "column": 26,
-      "raw_route": "/api/rules/${gid}/activate",
-      "normalized_route": "/api/rules/{dynamic}/activate",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:173:26:POST:/api/rules/{dynamic}/activate"
-    },
-    {
-      "source": "web/rule_mgmt/rule_mgmt.js",
-      "line": 175,
-      "column": 26,
-      "raw_route": "/api/rules/${gid}/suspend",
-      "normalized_route": "/api/rules/{dynamic}/suspend",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:175:26:POST:/api/rules/{dynamic}/suspend"
-    },
-    {
-      "source": "web/rule_mgmt/rule_mgmt.js",
-      "line": 190,
+      "line": 167,
       "column": 37,
       "raw_route": "/api/rule-engine/check",
       "normalized_route": "/api/rule-engine/check",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:190:37:POST:/api/rule-engine/check"
+      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:167:37:POST:/api/rule-engine/check"
     },
     {
       "source": "web/rule_mgmt/rule_mgmt.js",
-      "line": 220,
-      "column": 36,
-      "raw_route": "/api/rules/${_devRuleGid}/deviations",
-      "normalized_route": "/api/rules/{dynamic}/deviations",
-      "method": "POST",
-      "disposition": "unresolved",
-      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:220:36:POST:/api/rules/{dynamic}/deviations"
-    },
-    {
-      "source": "web/rule_mgmt/rule_mgmt.js",
-      "line": 262,
+      "line": 207,
       "column": 108,
       "raw_route": "/api/rules/${row.gid}",
       "normalized_route": "/api/rules/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:262:108:PATCH:/api/rules/{dynamic}"
+      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:207:108:PATCH:/api/rules/{dynamic}"
     },
     {
       "source": "web/rule_mgmt/rule_mgmt.js",
-      "line": 267,
+      "line": 212,
       "column": 30,
       "raw_route": "/api/rules",
       "normalized_route": "/api/rules",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:267:30:POST:/api/rules"
+      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:212:30:POST:/api/rules"
     },
     {
       "source": "web/rule_mgmt/rule_mgmt.js",
-      "line": 332,
+      "line": 268,
       "column": 27,
       "raw_route": "/api/rules/${row.gid}",
       "normalized_route": "/api/rules/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:332:27:PATCH:/api/rules/{dynamic}"
+      "occurrence_id": "web/rule_mgmt/rule_mgmt.js:268:27:PATCH:/api/rules/{dynamic}"
     },
     {
       "source": "web/settings/settings.js",

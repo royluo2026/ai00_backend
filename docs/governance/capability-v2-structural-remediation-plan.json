@@ -10,7 +10,7 @@
     "no silent REST fallback"
   ],
   "artifact_id": "capability-v2-structural-remediation-plan",
-  "content_sha256": "sha256:830efa63cc1110155142fff40c67e99cd88477232e8ef6a55e3f90e4114d34d5",
+  "content_sha256": "sha256:b8da99565a835e00641361f6454a047604d1bf1de8d7c2ee93d5f112f19749cc",
   "counts": {
     "groups": 37,
     "occurrences": 45
@@ -18,8 +18,8 @@
   "groups": [
     {
       "approval": {
-        "decision": "Product must decide hard-delete versus obsolete/archive behavior because the only existing outcome is obsolete, not delete.",
-        "required": true
+        "decision": null,
+        "required": false
       },
       "contract_security_rules": [
         "Craft workspace/object scope",
@@ -31,45 +31,38 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-        "provider_anchor": "plugins/craft/craft_backend/routers/craft_library.py",
-        "provider_source_sha256": "sha256:30c275048c808550f27bbdcf2da96871936a4b6a53f7eda3aefa0ee3d522eed3",
-        "reason": "No delete provider exists; the available obsolete transition is a different lifecycle outcome."
+        "provider_anchor": null,
+        "provider_source_sha256": null,
+        "reason": {
+          "input": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+          "output": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+          "side_effects": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected."
+        }
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "removed_dead_entry",
       "current_evidence": {
-        "canonical_occurrences": [
-          {
-            "column": 58,
-            "disposition": "unresolved",
-            "line": 771,
-            "method": "DELETE",
-            "normalized_route": "/api/craft_lib/equipments/{dynamic}",
-            "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:771:58:DELETE:/api/craft_lib/equipments/{dynamic}",
-            "raw_route": "/api/craft_lib/equipments/${gid}",
-            "source": "web/knowledge_hub/pages/gbop_vpps.html"
-          }
-        ],
+        "canonical_occurrences": [],
         "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
+        "final_inventory_mapping": "removed_dead_entry",
         "frontend_call_sites": [],
         "owner_service_evidence": null,
         "target_capability": null
       },
-      "current_status": "unresolved",
+      "current_status": "removed_dead_entry",
       "dependencies": [
         "library reference index",
         "Craft lifecycle audit migration"
       ],
       "exit_criteria": [
-        "public owner service and Gateway provider share this boundary",
-        "closed contract and scope tests pass",
-        "fresh canonical occurrence migrates without REST fallback",
-        "no operations/BFF/canonical-disposition relabeling"
+        "interactive control absent",
+        "network path absent",
+        "no candidate capability",
+        "canonical inventory has no occurrence"
       ],
       "group_id": "DELETE /api/craft_lib/equipments/{dynamic}",
-      "implementation_disposition": "owner_service_required",
+      "implementation_disposition": "removed_dead_entry",
       "method": "DELETE",
-      "migration_strategy": "Implement approved lifecycle outcome; do not map delete to an unrelated obsolete call.",
+      "migration_strategy": "No migration: retain source-derived removal evidence.",
       "normalized_route": "/api/craft_lib/equipments/{dynamic}",
       "occurrences": [
         {
@@ -86,18 +79,18 @@
       "package_id": "craft_library",
       "permission_object_scope": "Craft workspace/object scope",
       "service_boundary": "New public Craft library lifecycle service that validates references and performs one lifecycle transition; no route-shaped SQL provider.",
-      "target_capability": "craft.library.equipment.retire@1",
+      "target_capability": null,
       "tests": [
         "referenced/unreferenced delete behavior",
         "owner/non-owner authorization",
         "replay and lifecycle conflict"
       ],
-      "transaction_model": "one Craft library transaction locking item and references plus audit"
+      "transaction_model": "not_applicable"
     },
     {
       "approval": {
-        "decision": "Product must decide hard-delete versus obsolete/archive behavior because the only existing outcome is obsolete, not delete.",
-        "required": true
+        "decision": null,
+        "required": false
       },
       "contract_security_rules": [
         "Craft workspace/object scope",
@@ -109,45 +102,38 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-        "provider_anchor": "plugins/craft/craft_backend/routers/craft_library.py",
-        "provider_source_sha256": "sha256:30c275048c808550f27bbdcf2da96871936a4b6a53f7eda3aefa0ee3d522eed3",
-        "reason": "No delete provider exists; the available obsolete transition is a different lifecycle outcome."
+        "provider_anchor": null,
+        "provider_source_sha256": null,
+        "reason": {
+          "input": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+          "output": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+          "side_effects": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected."
+        }
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "removed_dead_entry",
       "current_evidence": {
-        "canonical_occurrences": [
-          {
-            "column": 58,
-            "disposition": "unresolved",
-            "line": 714,
-            "method": "DELETE",
-            "normalized_route": "/api/craft_lib/fixtures/{dynamic}",
-            "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:714:58:DELETE:/api/craft_lib/fixtures/{dynamic}",
-            "raw_route": "/api/craft_lib/fixtures/${gid}",
-            "source": "web/knowledge_hub/pages/gbop_vpps.html"
-          }
-        ],
+        "canonical_occurrences": [],
         "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
+        "final_inventory_mapping": "removed_dead_entry",
         "frontend_call_sites": [],
         "owner_service_evidence": null,
         "target_capability": null
       },
-      "current_status": "unresolved",
+      "current_status": "removed_dead_entry",
       "dependencies": [
         "library reference index",
         "Craft lifecycle audit migration"
       ],
       "exit_criteria": [
-        "public owner service and Gateway provider share this boundary",
-        "closed contract and scope tests pass",
-        "fresh canonical occurrence migrates without REST fallback",
-        "no operations/BFF/canonical-disposition relabeling"
+        "interactive control absent",
+        "network path absent",
+        "no candidate capability",
+        "canonical inventory has no occurrence"
       ],
       "group_id": "DELETE /api/craft_lib/fixtures/{dynamic}",
-      "implementation_disposition": "owner_service_required",
+      "implementation_disposition": "removed_dead_entry",
       "method": "DELETE",
-      "migration_strategy": "Implement approved lifecycle outcome; do not map delete to an unrelated obsolete call.",
+      "migration_strategy": "No migration: retain source-derived removal evidence.",
       "normalized_route": "/api/craft_lib/fixtures/{dynamic}",
       "occurrences": [
         {
@@ -164,13 +150,13 @@
       "package_id": "craft_library",
       "permission_object_scope": "Craft workspace/object scope",
       "service_boundary": "New public Craft library lifecycle service that validates references and performs one lifecycle transition; no route-shaped SQL provider.",
-      "target_capability": "craft.library.fixture.retire@1",
+      "target_capability": null,
       "tests": [
         "referenced/unreferenced delete behavior",
         "owner/non-owner authorization",
         "replay and lifecycle conflict"
       ],
-      "transaction_model": "one Craft library transaction locking item and references plus audit"
+      "transaction_model": "not_applicable"
     },
     {
       "approval": {
@@ -199,14 +185,14 @@
             "end_line": 127,
             "snippet_sha256": "sha256:5f9ed937924d85be4b24a9232e57060e554d36997185df61f581a7b87a8b20f4",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+            "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
             "start_line": 118
           },
           "output": {
             "end_line": 247,
             "snippet_sha256": "sha256:ca535816e2e539c3ff631a470d974a9000a06fce80a92cea0dcce59d729c2bdf",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+            "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
             "start_line": 237
           }
         },
@@ -1597,14 +1583,14 @@
             "end_line": 52,
             "snippet_sha256": "sha256:46237d107dc7b2c14a3a9693472d9a0b6a4ad619ad4b52cc6862025eadf6fdb8",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+            "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
             "start_line": 43
           },
           "output": {
             "end_line": 196,
             "snippet_sha256": "sha256:bc7b40d0bc7e9c9178feb7316c934e4a5068ef0dbe5df0b38c74c0a65858ca65",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+            "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
             "start_line": 180
           }
         },
@@ -1681,41 +1667,49 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-        "provider_anchor": "plugins/craft/craft_backend/routers/rule_engine.py",
-        "provider_source_sha256": "sha256:ac258d5ffc6531a5da259750f8b637fea6e467c0a50d4f64a379069aa660f86a",
-        "reason": "No entry-check provider exists; CEL evaluation and BOP audit are different outcomes."
+        "provider_anchor": "plugins/craft/craft_backend/capabilities/rule_engine.py:174-183",
+        "provider_source_sha256": "sha256:c8ac721a01fe3bfb22ffab47e859b19097bf9f5524309e16356d2dc02259bec5",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "migrated",
       "current_evidence": {
-        "canonical_occurrences": [
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "input_output": {
+            "end_line": 563,
+            "snippet_sha256": "sha256:1b285d11d13df69b7e4399b4e2c70449c7ce6eb5a02945490bde5f114cae63a6",
+            "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
+            "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+            "start_line": 549
+          }
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
           {
-            "column": 40,
-            "disposition": "unresolved",
-            "line": 2192,
-            "method": "GET",
-            "normalized_route": "/api/rule-engine/check-entry",
-            "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:2192:40:GET:/api/rule-engine/check-entry",
-            "raw_route": "/api/rule-engine/check-entry?entry_gid=${encodeURIComponent(gid)}",
-            "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js"
+            "blob": "bbcf3cbd696750393c8a046c97eab90945b31a84",
+            "line": 2210,
+            "snippet_sha256": "sha256:9fa1fadce51dda5b2a5765c27c336af849a477ed070016346684c30306d17661",
+            "source_path": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+            "source_sha256": "sha256:a1112e94d725031009a3e0b9bedce125e8f938b076aad753b84bcba79b11022e"
           },
           {
-            "column": 40,
-            "disposition": "unresolved",
-            "line": 3524,
-            "method": "GET",
-            "normalized_route": "/api/rule-engine/check-entry",
-            "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:3524:40:GET:/api/rule-engine/check-entry",
-            "raw_route": "/api/rule-engine/check-entry?entry_gid=${encodeURIComponent(gid)}",
-            "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js"
+            "blob": "bbcf3cbd696750393c8a046c97eab90945b31a84",
+            "line": 3552,
+            "snippet_sha256": "sha256:9fa1fadce51dda5b2a5765c27c336af849a477ed070016346684c30306d17661",
+            "source_path": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+            "source_sha256": "sha256:a1112e94d725031009a3e0b9bedce125e8f938b076aad753b84bcba79b11022e"
           }
         ],
-        "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
-        "frontend_call_sites": [],
-        "owner_service_evidence": null,
-        "target_capability": "craft.rule.engine.evaluate@1"
+        "owner_service_evidence": {
+          "end_line": 183,
+          "snippet_sha256": "sha256:5e26b15637963ae5cedc244ab113431069cae0e9045526a2401fe17688db9bf2",
+          "source_path": "plugins/craft/craft_backend/capabilities/rule_engine.py",
+          "source_sha256": "sha256:c8ac721a01fe3bfb22ffab47e859b19097bf9f5524309e16356d2dc02259bec5",
+          "start_line": 174
+        },
+        "target_capability": "craft.rule.entry.evaluate@1"
       },
-      "current_status": "unresolved",
+      "current_status": "migrated",
       "dependencies": [
         "rule aggregate migration",
         "approved closed rule-definition vocabulary"
@@ -3559,8 +3553,8 @@
     },
     {
       "approval": {
-        "decision": "Product/security must approve the finite rule-definition and mutable lifecycle semantics; existing routes have no equivalent public service.",
-        "required": true
+        "decision": null,
+        "required": false
       },
       "contract_security_rules": [
         "workspace rule ownership",
@@ -3572,45 +3566,38 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-        "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
-        "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
-        "reason": "No mutable-rule activation provider exists; immutable release activation is a different lifecycle outcome."
+        "provider_anchor": null,
+        "provider_source_sha256": null,
+        "reason": {
+          "input": "/api/rules/{dynamic}/activate: REST activates mutable rule gid; candidate activates a published immutable release contract.",
+          "output": "/api/rules/{dynamic}/activate: REST returns rule status; candidate returns accepted release outcome.",
+          "side_effects": "/api/rules/{dynamic}/activate: Candidate lifecycle handler does not mutate the legacy rule record."
+        }
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "removed_dead_entry",
       "current_evidence": {
-        "canonical_occurrences": [
-          {
-            "column": 26,
-            "disposition": "unresolved",
-            "line": 173,
-            "method": "POST",
-            "normalized_route": "/api/rules/{dynamic}/activate",
-            "occurrence_id": "web/rule_mgmt/rule_mgmt.js:173:26:POST:/api/rules/{dynamic}/activate",
-            "raw_route": "/api/rules/${gid}/activate",
-            "source": "web/rule_mgmt/rule_mgmt.js"
-          }
-        ],
+        "canonical_occurrences": [],
         "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
+        "final_inventory_mapping": "removed_dead_entry",
         "frontend_call_sites": [],
         "owner_service_evidence": null,
-        "target_capability": "craft.rule.release.activate@1"
+        "target_capability": null
       },
-      "current_status": "unresolved",
+      "current_status": "removed_dead_entry",
       "dependencies": [
         "rule aggregate migration",
         "approved closed rule-definition vocabulary"
       ],
       "exit_criteria": [
-        "public owner service and Gateway provider share this boundary",
-        "closed contract and scope tests pass",
-        "fresh canonical occurrence migrates without REST fallback",
-        "no operations/BFF/canonical-disposition relabeling"
+        "interactive control absent",
+        "network path absent",
+        "no candidate capability",
+        "canonical inventory has no occurrence"
       ],
       "group_id": "POST /api/rules/{dynamic}/activate",
-      "implementation_disposition": "owner_service_required",
+      "implementation_disposition": "removed_dead_entry",
       "method": "POST",
-      "migration_strategy": "Implement mutable-rule activation only after its distinct lifecycle contract is approved.",
+      "migration_strategy": "No migration: retain source-derived removal evidence.",
       "normalized_route": "/api/rules/{dynamic}/activate",
       "occurrences": [
         {
@@ -3627,18 +3614,18 @@
       "package_id": "craft_rules",
       "permission_object_scope": "workspace rule ownership",
       "service_boundary": "Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it.",
-      "target_capability": "craft.rule.lifecycle.activate@1",
+      "target_capability": null,
       "tests": [
         "rule lifecycle authorization and revision conflict",
         "definition/schema rejection",
         "evaluation/waiver audit and idempotency"
       ],
-      "transaction_model": "one rule lifecycle transition with audit and expected state"
+      "transaction_model": "not_applicable"
     },
     {
       "approval": {
-        "decision": "Product/security must approve the finite rule-definition and mutable lifecycle semantics; existing routes have no equivalent public service.",
-        "required": true
+        "decision": null,
+        "required": false
       },
       "contract_security_rules": [
         "workspace rule ownership",
@@ -3650,45 +3637,38 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-        "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
-        "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
-        "reason": "No legacy deviation provider exists; governed release waiver creation has a different evidence contract."
+        "provider_anchor": null,
+        "provider_source_sha256": null,
+        "reason": {
+          "input": "/api/rules/{dynamic}/deviations: REST deviation body is tied to rule gid; candidate waiver contract expects governed release/evidence fields.",
+          "output": "/api/rules/{dynamic}/deviations: REST returns deviation record; candidate returns accepted waiver outcome.",
+          "side_effects": "/api/rules/{dynamic}/deviations: Candidate does not persist the legacy deviation model."
+        }
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "removed_dead_entry",
       "current_evidence": {
-        "canonical_occurrences": [
-          {
-            "column": 36,
-            "disposition": "unresolved",
-            "line": 220,
-            "method": "POST",
-            "normalized_route": "/api/rules/{dynamic}/deviations",
-            "occurrence_id": "web/rule_mgmt/rule_mgmt.js:220:36:POST:/api/rules/{dynamic}/deviations",
-            "raw_route": "/api/rules/${_devRuleGid}/deviations",
-            "source": "web/rule_mgmt/rule_mgmt.js"
-          }
-        ],
+        "canonical_occurrences": [],
         "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
+        "final_inventory_mapping": "removed_dead_entry",
         "frontend_call_sites": [],
         "owner_service_evidence": null,
-        "target_capability": "craft.rule.waiver.create@1"
+        "target_capability": null
       },
-      "current_status": "unresolved",
+      "current_status": "removed_dead_entry",
       "dependencies": [
         "rule aggregate migration",
         "approved closed rule-definition vocabulary"
       ],
       "exit_criteria": [
-        "public owner service and Gateway provider share this boundary",
-        "closed contract and scope tests pass",
-        "fresh canonical occurrence migrates without REST fallback",
-        "no operations/BFF/canonical-disposition relabeling"
+        "interactive control absent",
+        "network path absent",
+        "no candidate capability",
+        "canonical inventory has no occurrence"
       ],
       "group_id": "POST /api/rules/{dynamic}/deviations",
-      "implementation_disposition": "owner_service_required",
+      "implementation_disposition": "removed_dead_entry",
       "method": "POST",
-      "migration_strategy": "Do not substitute release waiver; model legacy deviation evidence exactly.",
+      "migration_strategy": "No migration: retain source-derived removal evidence.",
       "normalized_route": "/api/rules/{dynamic}/deviations",
       "occurrences": [
         {
@@ -3705,18 +3685,18 @@
       "package_id": "craft_rules",
       "permission_object_scope": "workspace rule ownership",
       "service_boundary": "Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it.",
-      "target_capability": "craft.rule.deviation.create@1",
+      "target_capability": null,
       "tests": [
         "rule lifecycle authorization and revision conflict",
         "definition/schema rejection",
         "evaluation/waiver audit and idempotency"
       ],
-      "transaction_model": "one rule deviation/waiver transaction with evidence and audit"
+      "transaction_model": "not_applicable"
     },
     {
       "approval": {
-        "decision": "Product/security must approve the finite rule-definition and mutable lifecycle semantics; existing routes have no equivalent public service.",
-        "required": true
+        "decision": null,
+        "required": false
       },
       "contract_security_rules": [
         "workspace rule ownership",
@@ -3728,45 +3708,38 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-        "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
-        "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
-        "reason": "No mutable-rule suspension handler or domain service exists."
+        "provider_anchor": null,
+        "provider_source_sha256": null,
+        "reason": {
+          "input": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+          "output": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
+          "side_effects": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected."
+        }
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "removed_dead_entry",
       "current_evidence": {
-        "canonical_occurrences": [
-          {
-            "column": 26,
-            "disposition": "unresolved",
-            "line": 175,
-            "method": "POST",
-            "normalized_route": "/api/rules/{dynamic}/suspend",
-            "occurrence_id": "web/rule_mgmt/rule_mgmt.js:175:26:POST:/api/rules/{dynamic}/suspend",
-            "raw_route": "/api/rules/${gid}/suspend",
-            "source": "web/rule_mgmt/rule_mgmt.js"
-          }
-        ],
+        "canonical_occurrences": [],
         "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
+        "final_inventory_mapping": "removed_dead_entry",
         "frontend_call_sites": [],
         "owner_service_evidence": null,
         "target_capability": null
       },
-      "current_status": "unresolved",
+      "current_status": "removed_dead_entry",
       "dependencies": [
         "rule aggregate migration",
         "approved closed rule-definition vocabulary"
       ],
       "exit_criteria": [
-        "public owner service and Gateway provider share this boundary",
-        "closed contract and scope tests pass",
-        "fresh canonical occurrence migrates without REST fallback",
-        "no operations/BFF/canonical-disposition relabeling"
+        "interactive control absent",
+        "network path absent",
+        "no candidate capability",
+        "canonical inventory has no occurrence"
       ],
       "group_id": "POST /api/rules/{dynamic}/suspend",
-      "implementation_disposition": "owner_service_required",
+      "implementation_disposition": "removed_dead_entry",
       "method": "POST",
-      "migration_strategy": "Implement a mutable-rule suspension service; no missing-handler adapter.",
+      "migration_strategy": "No migration: retain source-derived removal evidence.",
       "normalized_route": "/api/rules/{dynamic}/suspend",
       "occurrences": [
         {
@@ -3783,13 +3756,13 @@
       "package_id": "craft_rules",
       "permission_object_scope": "workspace rule ownership",
       "service_boundary": "Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it.",
-      "target_capability": "craft.rule.lifecycle.suspend@1",
+      "target_capability": null,
       "tests": [
         "rule lifecycle authorization and revision conflict",
         "definition/schema rejection",
         "evaluation/waiver audit and idempotency"
       ],
-      "transaction_model": "one rule lifecycle transition with audit and expected state"
+      "transaction_model": "not_applicable"
     },
     {
       "approval": {
@@ -4455,41 +4428,49 @@
       ],
       "current_blocker_evidence": {
         "manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-        "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
-        "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
-        "reason": "Rule definition changes contain dynamic rule_definition data without a governed closed nested contract."
+        "provider_anchor": "plugins/craft/craft_backend/capabilities/rule_library.py:149-176",
+        "provider_source_sha256": "sha256:8667724722a2be77f58d69ce9815ab8bc603dbb196fd04009ef6bd635ce3e5d6",
+        "reason": "Migrated through the reviewed public owner service and generated capability evidence."
       },
-      "current_disposition": "unresolved",
+      "current_disposition": "migrated",
       "current_evidence": {
-        "canonical_occurrences": [
+        "canonical_occurrences": [],
+        "contract_evidence": {
+          "input_output": {
+            "end_line": 52,
+            "snippet_sha256": "sha256:9554a70a7d6d4b8987ad6e4c9246f28d8c45fa80261365c63ab910c276f11479",
+            "source_path": "plugins/craft/craft_backend/capabilities/rule_library.py",
+            "source_sha256": "sha256:8667724722a2be77f58d69ce9815ab8bc603dbb196fd04009ef6bd635ce3e5d6",
+            "start_line": 21
+          }
+        },
+        "final_inventory_mapping": "capability",
+        "frontend_call_sites": [
           {
-            "column": 53,
-            "disposition": "unresolved",
+            "blob": "e7ba1bf677970fa450e8a91fe4e318a448cbeced",
             "line": 137,
-            "method": "PUT",
-            "normalized_route": "/api/rules/{dynamic}",
-            "occurrence_id": "web/container_card/modes/container_item_detail.js:137:53:PUT:/api/rules/{dynamic}",
-            "raw_route": "/api/rules/${gid}",
-            "source": "web/container_card/modes/container_item_detail.js"
+            "snippet_sha256": "sha256:c8d31b5cd95bf332a05c7147edf945b62f9fc7d5e5079c50f2e3a141acaaaf4c",
+            "source_path": "web/container_card/modes/container_item_detail.js",
+            "source_sha256": "sha256:add044132e94a7728b49194e1e02716b935b7e807d6aba2b34a5251ad773d963"
           },
           {
-            "column": 50,
-            "disposition": "unresolved",
-            "line": 47,
-            "method": "PUT",
-            "normalized_route": "/api/rules/{dynamic}",
-            "occurrence_id": "web/container_card/modes/mode_field_detail.js:47:50:PUT:/api/rules/{dynamic}",
-            "raw_route": "/api/rules/${gid}",
-            "source": "web/container_card/modes/mode_field_detail.js"
+            "blob": "bb0436187c725c13e3805d81cb103dfd87fd0aa0",
+            "line": 46,
+            "snippet_sha256": "sha256:c8d31b5cd95bf332a05c7147edf945b62f9fc7d5e5079c50f2e3a141acaaaf4c",
+            "source_path": "web/container_card/modes/mode_field_detail.js",
+            "source_sha256": "sha256:fc415a2e4a1af8b8a24d5099296351fb7624e73caa2463ce603954847ab7dc65"
           }
         ],
-        "contract_evidence": null,
-        "final_inventory_mapping": "unresolved",
-        "frontend_call_sites": [],
-        "owner_service_evidence": null,
-        "target_capability": "craft.rule.library.change.apply@1"
+        "owner_service_evidence": {
+          "end_line": 176,
+          "snippet_sha256": "sha256:4f934a75333955d4579d85dfe9922a9c556c50c894386ebb0de7f6112bad4090",
+          "source_path": "plugins/craft/craft_backend/capabilities/rule_library.py",
+          "source_sha256": "sha256:8667724722a2be77f58d69ce9815ab8bc603dbb196fd04009ef6bd635ce3e5d6",
+          "start_line": 149
+        },
+        "target_capability": "craft.rule.definition.change.apply@1"
       },
-      "current_status": "unresolved",
+      "current_status": "migrated",
       "dependencies": [
         "rule aggregate migration",
         "approved closed rule-definition vocabulary"
@@ -4883,11 +4864,11 @@
     },
     {
       "path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-      "sha256": "sha256:b34079ecae70bbe7959ca85032749cb8efc80ef95cf2935339797b4c4af1e446"
+      "sha256": "sha256:e59951d3868d39238d6dab9d254df12e9e9bb57691e24c4dd65d76afe8b593cb"
     },
     {
       "path": "docs\\governance\\capability-coverage-review\\generated\\web_route_inventory.json",
-      "sha256": "sha256:1759b080326e4e5fcfd1f031b14d0303a53d7fbf556c951f32b4518ec8f689b0"
+      "sha256": "sha256:a57096e798725b62320616a786463728caefcba466d2a6a9f4a422e9f88d12d1"
     }
   ]
 }

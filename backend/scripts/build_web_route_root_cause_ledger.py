@@ -643,8 +643,16 @@ def build_document(web_root: Path) -> dict[str, Any]:
         (group.method, group.normalized_route): [dict(raw) for raw in group.occurrences]
         for group in load_existing_capability_migrations(MIGRATION_MANIFEST).groups
     }
+    from backend.scripts.build_craft_agent_project_structural_web_remediation import (
+        build_manifest as build_structural_remediation,
+    )
+    remediation_occurrences = {
+        (item["method"], item["normalized_route"]): [dict(raw) for raw in item["old_occurrences"]]
+        for item in build_structural_remediation(web_root)["entries"]
+        if item["final_disposition"] == "removed_dead_entry"
+    }
     post_normalization_groups = {
-        key: final_grouped.get(key) or migration_occurrences[key]
+        key: final_grouped.get(key) or migration_occurrences.get(key) or remediation_occurrences[key]
         for key in DERIVED_KEYS
     }
 

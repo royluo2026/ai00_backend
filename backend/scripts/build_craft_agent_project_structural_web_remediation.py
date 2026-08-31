@@ -56,13 +56,26 @@ LISTS_SOURCE = "plugins/craft/craft_backend/routers/lists.py"
 APPROVAL_SOURCE = "plugins/craft/craft_backend/routers/approval.py"
 PROJECT_SERVICE_SOURCE = "plugins/project_management/project_management_backend/application/service.py"
 PROJECT_PROVIDER_SOURCE = "plugins/project_management/project_management_backend/capabilities/provider.py"
-EXPECTED_FRONTEND_REVISION = "69e5e00054d3c1cff635fe41fcb96fbe150d25fb"
+PROJECT_FRONTEND_REVISION = "69e5e00054d3c1cff635fe41fcb96fbe150d25fb"
+CRAFT_FRONTEND_REVISION = "43a650ab35cba99c6788ce3622a46e08404e7731"
+CRAFT_BACKEND_REVISION = "045124def4de6742fb99d8d7c436624c8fdee1e9"
 PROJECT_CLOSURE_SCOPE = {
     ("GET", "/api/lists"),
     ("DELETE", "/api/lists/{dynamic}"),
     ("POST", "/api/approval/orders/{dynamic}/reject"),
 }
-FRONTEND_FILES = (
+CRAFT_MIGRATED_SCOPE = {
+    ("GET", "/api/rule-engine/check-entry"),
+    ("PUT", "/api/rules/{dynamic}"),
+}
+CRAFT_REMOVED_SCOPE = {
+    ("DELETE", "/api/craft_lib/equipments/{dynamic}"),
+    ("DELETE", "/api/craft_lib/fixtures/{dynamic}"),
+    ("POST", "/api/rules/{dynamic}/activate"),
+    ("POST", "/api/rules/{dynamic}/deviations"),
+    ("POST", "/api/rules/{dynamic}/suspend"),
+}
+PROJECT_FRONTEND_FILES = (
     "web/core/existing_capability_client.js",
     "dist-production/web/core/existing_capability_client.js",
     "web/components/list_sidebar.js",
@@ -71,6 +84,27 @@ FRONTEND_FILES = (
     "dist-production/packages/craft-plugin/web/bop/bop.js",
     "packages/craft-plugin/web/approval/approval.js",
     "dist-production/packages/craft-plugin/web/approval/approval.js",
+)
+CRAFT_FRONTEND_FILES = (
+    "web/knowledge_hub/pages/gbop_vpps.html",
+    "dist-production/web/knowledge_hub/pages/gbop_vpps.html",
+    "web/rule_mgmt/rule_mgmt.js",
+    "dist-production/web/rule_mgmt/rule_mgmt.js",
+    "web/rule_mgmt/rule_mgmt.html",
+    "dist-production/web/rule_mgmt/rule_mgmt.html",
+    "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+    "dist-production/packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+    "web/container_card/modes/container_item_detail.js",
+    "dist-production/web/container_card/modes/container_item_detail.js",
+    "web/container_card/modes/mode_field_detail.js",
+    "dist-production/web/container_card/modes/mode_field_detail.js",
+)
+CRAFT_BACKEND_FILES = (
+    "plugins/craft/craft_backend/capabilities/rule_engine.py",
+    "plugins/craft/craft_backend/capabilities/rule_library.py",
+    "plugins/craft/craft_backend/capabilities/contracts.py",
+    "plugins/craft/craft_backend/capabilities/provider.py",
+    "backend/capability_v2/gateway.py",
 )
 
 
@@ -102,6 +136,13 @@ def _anchor(source_path: str, start_line: int, end_line: int, *needles: str) -> 
 def _git_blob(root: Path, revision: str, source_path: str) -> str:
     return subprocess.run(
         ["git", "rev-parse", f"{revision}:{source_path}"], cwd=root,
+        check=True, capture_output=True, text=True,
+    ).stdout.strip()
+
+
+def _git_tree(root: Path, revision: str) -> str:
+    return subprocess.run(
+        ["git", "rev-parse", f"{revision}^{{tree}}"], cwd=root,
         check=True, capture_output=True, text=True,
     ).stdout.strip()
 
@@ -314,13 +355,13 @@ def _approval_outbound_evidence(source: str) -> dict[str, Any]:
 def build_project_closure_evidence(web_root: Path) -> dict[str, Any]:
     """Bind the three closed Project-facing groups to immutable source evidence."""
     web_root = web_root.resolve()
-    revision = resolve_revision(web_root, EXPECTED_FRONTEND_REVISION)
-    if revision != EXPECTED_FRONTEND_REVISION:
+    revision = resolve_revision(web_root, PROJECT_FRONTEND_REVISION)
+    if revision != PROJECT_FRONTEND_REVISION:
         raise ValueError(f"frontend closure revision drift: {revision}")
 
     frontend_files: dict[str, dict[str, Any]] = {}
     texts: dict[str, str] = {}
-    for source_path in FRONTEND_FILES:
+    for source_path in PROJECT_FRONTEND_FILES:
         frontend_files[source_path], texts[source_path] = _frontend_file(
             web_root, revision, source_path,
         )
@@ -480,6 +521,213 @@ def build_project_closure_evidence(web_root: Path) -> dict[str, Any]:
         "frontend_files": dict(sorted(frontend_files.items())),
         "list_dispatch": list_dispatch,
         "approval": approval,
+        "routes": routes,
+    }
+
+
+def _dead_action_evidence(sources: Mapping[str, str]) -> dict[str, Any]:
+    """Derive five removed actions from complete pinned source/dist files."""
+    vpps_paths = (
+        "web/knowledge_hub/pages/gbop_vpps.html",
+        "dist-production/web/knowledge_hub/pages/gbop_vpps.html",
+    )
+    rule_paths = (
+        "web/rule_mgmt/rule_mgmt.js",
+        "dist-production/web/rule_mgmt/rule_mgmt.js",
+    )
+    page_paths = (
+        "web/rule_mgmt/rule_mgmt.html",
+        "dist-production/web/rule_mgmt/rule_mgmt.html",
+    )
+    if any(path not in sources for path in (*vpps_paths, *rule_paths, *page_paths)):
+        raise ValueError("dead Craft action source drift")
+
+    vpps_blocks = [
+        _source_block(sources[path], "rowContextMenu: (row) => {", "categoryField:", label="Craft row actions")
+        for path in vpps_paths
+    ]
+    vpps_guard = "if (key !== 'vpps_fixtures' && key !== 'vpps_equipments') {"
+    if any(vpps_guard not in block for block in vpps_blocks):
+        raise ValueError("dead Craft action source drift")
+    forbidden_vpps = {
+        "DELETE /api/craft_lib/equipments/{dynamic}": "/api/craft_lib/equipments/${gid}`, { method:'DELETE'",
+        "DELETE /api/craft_lib/fixtures/{dynamic}": "/api/craft_lib/fixtures/${gid}`, { method:'DELETE'",
+    }
+    rule_action_block = [
+        _source_block(sources[path], "_actions: (_v, row) => {", "// ── 数据加载", label="Craft rule actions")
+        for path in rule_paths
+    ]
+    rule_label = "状态变更和背离记录不支持"
+    forbidden_rule_fragments = (
+        "/api/rules/${gid}/activate",
+        "/api/rules/${gid}/suspend",
+        "/api/rules/${_devRuleGid}/deviations",
+        ".btn-rule-action",
+        ".btn-rule-dev",
+        "add_deviation",
+        "saveDeviation",
+        'data-action="activate"',
+        'data-action="suspend"',
+    )
+    if (
+        any(rule_label not in block for block in rule_action_block)
+        or any(fragment in sources[path] for path in rule_paths for fragment in forbidden_rule_fragments)
+        or any('id="modal-deviation"' in sources[path] for path in page_paths)
+    ):
+        raise ValueError("dead Craft action source drift")
+
+    result: dict[str, Any] = {}
+    for route_key, fragment in forbidden_vpps.items():
+        if any(fragment in sources[path] for path in vpps_paths):
+            raise ValueError("dead Craft action source drift")
+        result[route_key] = {
+            "network_path_absent": True,
+            "interactive_control_absent": True,
+            "source_block_sha256": [_sha256(block.encode()) for block in vpps_blocks],
+        }
+    for route_key in (
+        "POST /api/rules/{dynamic}/activate",
+        "POST /api/rules/{dynamic}/deviations",
+        "POST /api/rules/{dynamic}/suspend",
+    ):
+        result[route_key] = {
+            "network_path_absent": True,
+            "interactive_control_absent": True,
+            "unsupported_state_explicit": True,
+            "source_block_sha256": [_sha256(block.encode()) for block in rule_action_block],
+        }
+    return result
+
+
+def build_craft_closure_evidence(web_root: Path) -> dict[str, Any]:
+    """Bind the seven closed Craft groups to reviewed immutable source."""
+    web_root = web_root.resolve()
+    frontend_revision = resolve_revision(web_root, CRAFT_FRONTEND_REVISION)
+    backend_revision = resolve_revision(ROOT, CRAFT_BACKEND_REVISION)
+    if frontend_revision != CRAFT_FRONTEND_REVISION or backend_revision != CRAFT_BACKEND_REVISION:
+        raise ValueError("Craft closure revision drift")
+
+    frontend_files: dict[str, dict[str, Any]] = {}
+    texts: dict[str, str] = {}
+    for source_path in CRAFT_FRONTEND_FILES:
+        frontend_files[source_path], texts[source_path] = _frontend_file(
+            web_root, frontend_revision, source_path,
+        )
+    backend_files: dict[str, dict[str, Any]] = {}
+    for source_path in CRAFT_BACKEND_FILES:
+        backend_files[source_path], _ = _frontend_file(ROOT, backend_revision, source_path)
+        if _sha256((ROOT / source_path).read_bytes()) != backend_files[source_path]["sha256"]:
+            raise ValueError(f"backend source drift: {source_path}")
+
+    dead_actions = _dead_action_evidence(texts)
+    vpps_anchor = _frontend_anchor(
+        web_root, frontend_revision, "web/knowledge_hub/pages/gbop_vpps.html",
+        "if (key !== 'vpps_fixtures' && key !== 'vpps_equipments')",
+    )
+    rule_anchor = _frontend_anchor(
+        web_root, frontend_revision, "web/rule_mgmt/rule_mgmt.js",
+        "状态变更和背离记录不支持",
+    )
+    for route_key in (
+        "DELETE /api/craft_lib/equipments/{dynamic}",
+        "DELETE /api/craft_lib/fixtures/{dynamic}",
+    ):
+        dead_actions[route_key]["frontend_anchor"] = vpps_anchor
+    for route_key in (
+        "POST /api/rules/{dynamic}/activate",
+        "POST /api/rules/{dynamic}/deviations",
+        "POST /api/rules/{dynamic}/suspend",
+    ):
+        dead_actions[route_key]["frontend_anchor"] = rule_anchor
+
+    evaluation_paths = (
+        "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+        "dist-production/packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+    )
+    change_paths = (
+        "web/container_card/modes/container_item_detail.js",
+        "dist-production/web/container_card/modes/container_item_detail.js",
+        "web/container_card/modes/mode_field_detail.js",
+        "dist-production/web/container_card/modes/mode_field_detail.js",
+    )
+    if any(texts[path].count("client.invoke('craft.rule.entry.evaluate'") != 2 for path in evaluation_paths):
+        raise ValueError("Craft rule evaluation frontend drift")
+    if any("/api/rule-engine/check-entry" in texts[path] for path in evaluation_paths):
+        raise ValueError("Craft rule evaluation legacy path drift")
+    if any(texts[path].count("'craft.rule.definition.change.apply'") != 1 for path in change_paths):
+        raise ValueError("Craft rule definition frontend drift")
+    legacy_rule_updates = (
+        "`/api/rules/${gid}`, { method: 'PUT'",
+        "`/api/rules/${gid}`, { method:'PUT'",
+        "_cf('PUT', `/api/rules/${gid}`",
+    )
+    if any(fragment in texts[path] for path in change_paths for fragment in legacy_rule_updates):
+        raise ValueError("Craft rule definition legacy path drift")
+
+    gateway_anchor = {
+        "invoke_pipeline": _anchor(
+            "backend/capability_v2/gateway.py", 134, 218,
+            "validate_payload", "idempotency_key_mismatch", "transaction_participant_required",
+        ),
+        "provider_descriptor": _anchor(
+            "plugins/craft/craft_backend/capabilities/provider.py", 90, 137,
+            "descriptor_for", "expected_revision", "idempotency_policy", "domain_errors_complete",
+        ),
+        "context": _anchor(
+            "backend/capability_v2/gateway.py", 520, 532,
+            "CapabilityContext", "confirmation_token", "idempotency_key",
+        ),
+    }
+    routes = {
+        "GET /api/rule-engine/check-entry": {
+            "candidate_capability": "craft.rule.entry.evaluate@1",
+            "provider_anchor": _anchor(
+                "plugins/craft/craft_backend/capabilities/rule_engine.py", 174, 183,
+                'id="craft.rule.entry.evaluate"', "RULE_ENTRY_INPUT_SCHEMA", "evaluate_rule_entry",
+            ),
+            "contract_evidence": {
+                "input_output": _anchor(
+                    "plugins/craft/craft_backend/capabilities/contracts.py", 549, 563,
+                    'INPUT_SCHEMAS[("craft.rule.entry.evaluate", 1)]',
+                    'OUTPUT_SCHEMAS[("craft.rule.entry.evaluate", 1)]', "maxItems",
+                ),
+            },
+            "gateway_anchor": gateway_anchor,
+            "frontend_call_sites": [
+                _frontend_anchor(web_root, frontend_revision, evaluation_paths[0], "client.invoke('craft.rule.entry.evaluate'", occurrence)
+                for occurrence in (0, 1)
+            ],
+            "legacy_route_absent": True,
+        },
+        "PUT /api/rules/{dynamic}": {
+            "candidate_capability": "craft.rule.definition.change.apply@1",
+            "provider_anchor": _anchor(
+                "plugins/craft/craft_backend/capabilities/rule_library.py", 149, 176,
+                "def change_rule_definition", 'id="craft.rule.definition.change.apply"',
+                "expected_revision", "idempotency_key",
+            ),
+            "contract_evidence": {
+                "input_output": _anchor(
+                    "plugins/craft/craft_backend/capabilities/rule_library.py", 21, 52,
+                    "RULE_DEFINITION_INPUT_SCHEMA", "additionalProperties", "RULE_DEFINITION_OUTPUT_SCHEMA",
+                ),
+            },
+            "gateway_anchor": gateway_anchor,
+            "frontend_call_sites": [
+                _frontend_anchor(web_root, frontend_revision, path, "'craft.rule.definition.change.apply'")
+                for path in (change_paths[0], change_paths[2])
+            ],
+            "legacy_route_absent": True,
+        },
+    }
+    return {
+        "backend_revision": backend_revision,
+        "backend_tree": _git_tree(ROOT, backend_revision),
+        "backend_files": dict(sorted(backend_files.items())),
+        "frontend_revision": frontend_revision,
+        "scanner_materialization": build_git_tree_scan_evidence(web_root, revision=frontend_revision),
+        "frontend_files": dict(sorted(frontend_files.items())),
+        "dead_actions": dict(sorted(dead_actions.items())),
         "routes": routes,
     }
 
@@ -690,6 +938,78 @@ def _migrated_entry(
     }
 
 
+def _craft_migrated_entry(
+    key: tuple[str, str], source: Mapping[str, Any], occurrences: list[dict[str, Any]],
+    closure: Mapping[str, Any],
+) -> dict[str, Any]:
+    route = closure["routes"][f"{key[0]} {key[1]}"]
+    provider = route["provider_anchor"]
+    return {
+        "method": key[0],
+        "normalized_route": key[1],
+        "owner_domain": source["owner_domain"],
+        "occurrences": occurrences,
+        "old_occurrences": source["occurrences"],
+        "old_route_evidence": source["backend_evidence"],
+        "authorization_and_scope": "Exact Craft provider and Gateway policy apply authenticated actor/team scope before execution.",
+        "candidate_capability": route["candidate_capability"],
+        "provider_anchor": f"{provider['source_path']}:{provider['start_line']}-{provider['end_line']}",
+        "provider_source_sha256": provider["source_sha256"],
+        "owner_service_evidence": provider,
+        "contract_evidence": route["contract_evidence"],
+        "input_output_contract": route["contract_evidence"],
+        "gateway_evidence": route["gateway_anchor"],
+        "non_equivalence": None,
+        "lifecycle_confirmation_idempotency": "Resolved by the exact Craft contract and source-anchored Gateway policy.",
+        "runtime_execution": "bounded_provider" if key == ("GET", "/api/rule-engine/check-entry") else "not_applicable",
+        "bop_conditional_branch": False,
+        "lifecycle_evidence": None,
+        "approval_reject_evidence": None,
+        "frontend_call_sites": route["frontend_call_sites"],
+        "legacy_route_absent": route["legacy_route_absent"],
+        "final_occurrences": [],
+        "final_disposition": "migrated",
+        "unresolved_reason": None,
+        "final_inventory_mapping": "capability",
+    }
+
+
+def _removed_dead_entry(
+    key: tuple[str, str], source: Mapping[str, Any], occurrences: list[dict[str, Any]],
+    closure: Mapping[str, Any],
+) -> dict[str, Any]:
+    evidence = closure["dead_actions"][f"{key[0]} {key[1]}"]
+    return {
+        "method": key[0],
+        "normalized_route": key[1],
+        "owner_domain": source["owner_domain"],
+        "occurrences": occurrences,
+        "old_occurrences": source["occurrences"],
+        "old_route_evidence": source["backend_evidence"],
+        "authorization_and_scope": "Not applicable: the non-functional browser action and its dispatch path were removed.",
+        "candidate_capability": None,
+        "provider_anchor": None,
+        "provider_source_sha256": None,
+        "owner_service_evidence": None,
+        "contract_evidence": None,
+        "input_output_contract": _non_equivalence(source, key),
+        "gateway_evidence": None,
+        "non_equivalence": _non_equivalence(source, key),
+        "lifecycle_confirmation_idempotency": "Not applicable: no replacement mutation or control path exists.",
+        "runtime_execution": "not_applicable",
+        "bop_conditional_branch": False,
+        "lifecycle_evidence": None,
+        "approval_reject_evidence": None,
+        "dead_action_evidence": evidence,
+        "frontend_call_sites": [],
+        "legacy_route_absent": evidence["network_path_absent"],
+        "final_occurrences": [],
+        "final_disposition": "removed_dead_entry",
+        "unresolved_reason": None,
+        "final_inventory_mapping": "removed_dead_entry",
+    }
+
+
 def _build_manifest(web_root: Path) -> dict[str, Any]:
     ledger, ledger_blob = _baseline()
     closure_baseline, closure_baseline_blob = _closure_baseline()
@@ -720,11 +1040,12 @@ def _build_manifest(web_root: Path) -> dict[str, Any]:
         or any(entry.get("final_disposition") != "unresolved" for entry in prior_entries.values())
     ):
         raise ValueError("closure baseline count drift")
-    closure = build_project_closure_evidence(web_root)
+    project_closure = build_project_closure_evidence(web_root)
+    craft_closure = build_craft_closure_evidence(web_root)
     report = json.loads(build_report(
-        web_root.resolve(), revision=EXPECTED_FRONTEND_REVISION,
+        web_root.resolve(), revision=CRAFT_FRONTEND_REVISION,
     ).json())
-    if report["frontend_revision"] != closure["frontend_revision"]:
+    if report["frontend_revision"] != craft_closure["frontend_revision"]:
         raise ValueError("frontend closure/report revision drift")
     final_by_key: dict[tuple[str, str], list[dict[str, Any]]] = {}
     for raw in report["routes"]:
@@ -733,14 +1054,17 @@ def _build_manifest(web_root: Path) -> dict[str, Any]:
             final_by_key.setdefault(key, []).append(
                 _final_occurrence(raw, web_root, report["frontend_revision"])
             )
-    expected_remainder = SCOPE - PROJECT_CLOSURE_SCOPE
-    if set(final_by_key) != expected_remainder or sum(map(len, final_by_key.values())) != 14:
-        raise ValueError("final three-domain inventory drift")
+    if set(final_by_key) != AGENT_KEYS or sum(map(len, final_by_key.values())) != 5:
+        raise ValueError("final Agent inventory drift")
     entries = []
     for key in sorted(SCOPE):
         occurrences = sorted(prior_occurrences[key], key=lambda item: item["occurrence_id"])
         if key in PROJECT_CLOSURE_SCOPE:
-            entry = _migrated_entry(key, sources[key], occurrences, closure)
+            entry = _migrated_entry(key, sources[key], occurrences, project_closure)
+        elif key in CRAFT_MIGRATED_SCOPE:
+            entry = _craft_migrated_entry(key, sources[key], occurrences, craft_closure)
+        elif key in CRAFT_REMOVED_SCOPE:
+            entry = _removed_dead_entry(key, sources[key], occurrences, craft_closure)
         else:
             current = sorted(final_by_key[key], key=lambda item: item["occurrence_id"])
             if current != occurrences:
@@ -754,16 +1078,23 @@ def _build_manifest(web_root: Path) -> dict[str, Any]:
         "migrated_occurrences": sum(
             len(item["occurrences"]) for item in entries if item["final_disposition"] == "migrated"
         ),
+        "removed_dead_entry_groups": sum(item["final_disposition"] == "removed_dead_entry" for item in entries),
+        "removed_dead_entry_occurrences": sum(
+            len(item["occurrences"]) for item in entries if item["final_disposition"] == "removed_dead_entry"
+        ),
         "unresolved_groups": sum(item["final_disposition"] == "unresolved" for item in entries),
         "unresolved_occurrences": sum(
             len(item["occurrences"]) for item in entries if item["final_disposition"] == "unresolved"
         ),
     }
-    if counts != {"groups": 14, "occurrences": 17, "migrated_groups": 3, "migrated_occurrences": 3, "unresolved_groups": 11, "unresolved_occurrences": 14}:
+    if counts != {"groups": 14, "occurrences": 17, "migrated_groups": 5, "migrated_occurrences": 7, "removed_dead_entry_groups": 5, "removed_dead_entry_occurrences": 5, "unresolved_groups": 4, "unresolved_occurrences": 5}:
         raise ValueError(f"three-domain count drift: {counts}")
     closure_arithmetic = {
         "baseline": {"groups": counts["groups"], "occurrences": counts["occurrences"]},
-        "closed": {"groups": counts["migrated_groups"], "occurrences": counts["migrated_occurrences"]},
+        "closed": {
+            "groups": counts["migrated_groups"] + counts["removed_dead_entry_groups"],
+            "occurrences": counts["migrated_occurrences"] + counts["removed_dead_entry_occurrences"],
+        },
         "canonical_remainder": {
             "groups": len(final_by_key),
             "occurrences": sum(map(len, final_by_key.values())),
@@ -774,7 +1105,18 @@ def _build_manifest(web_root: Path) -> dict[str, Any]:
         != closure_arithmetic["canonical_remainder"][field]
         for field in ("groups", "occurrences")
     ):
-        raise ValueError("Project closure arithmetic drift")
+        raise ValueError("three-domain closure arithmetic drift")
+    craft_closure_arithmetic = {
+        "baseline": {"groups": 11, "occurrences": 14},
+        "closed": {"groups": 7, "occurrences": 9},
+        "canonical_remainder": closure_arithmetic["canonical_remainder"],
+    }
+    if any(
+        craft_closure_arithmetic["baseline"][field] - craft_closure_arithmetic["closed"][field]
+        != craft_closure_arithmetic["canonical_remainder"][field]
+        for field in ("groups", "occurrences")
+    ):
+        raise ValueError("Craft closure arithmetic drift")
     manifest = {
         "schema_version": "2.0.0",
         "artifact_id": "task-3b3e-craft-agent-project-structural-remediation",
@@ -785,9 +1127,11 @@ def _build_manifest(web_root: Path) -> dict[str, Any]:
         "closure_baseline_sha256": _sha256(closure_baseline_blob),
         "frontend_revision": report["frontend_revision"],
         "frontend_content_hash": report["content_hash"],
-        "project_closure_evidence": closure,
+        "project_closure_evidence": project_closure,
+        "craft_closure_evidence": craft_closure,
         "atomic_contract_manifest_sha256": _sha256(ATOMIC_PATH.read_bytes()),
         "closure_arithmetic": closure_arithmetic,
+        "craft_closure_arithmetic": craft_closure_arithmetic,
         "counts": counts,
         "entries": entries,
     }

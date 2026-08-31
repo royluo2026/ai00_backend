@@ -563,6 +563,19 @@ def audit_existing_capability_migrations(
                 and isinstance(item.get("contract_evidence"), Mapping)
                 and isinstance(item.get("owner_service_evidence"), Mapping)
             }
+            removed_dead_entries = {
+                (item.get("method"), item.get("normalized_route")): item
+                for item in (remediation or {}).get("entries", [])
+                if isinstance(item, Mapping)
+                and item.get("final_disposition") == "removed_dead_entry"
+                and item.get("final_inventory_mapping") == "removed_dead_entry"
+                and item.get("legacy_route_absent") is True
+                and item.get("candidate_capability") is None
+                and item.get("frontend_call_sites") == []
+                and isinstance(item.get("dead_action_evidence"), Mapping)
+                and item["dead_action_evidence"].get("network_path_absent") is True
+                and item["dead_action_evidence"].get("interactive_control_absent") is True
+            }
             for key, group in groups.items():
                 if group.decision == "migrate" and key in final_keys:
                     issues.append(f"migration_final_route_remains:{key[0]}:{key[1]}")
@@ -574,9 +587,15 @@ def audit_existing_capability_migrations(
                     and isinstance(remediated.get("occurrences"), list)
                     and len(remediated["occurrences"]) == group.occurrence_count
                 )
-                if group.decision == "reclassify" and not atomic_migrated and not later_migrated and final_keys[key] != group.occurrence_count:
+                removed = removed_dead_entries.get(key)
+                later_removed = (
+                    removed is not None
+                    and isinstance(removed.get("occurrences"), list)
+                    and len(removed["occurrences"]) == group.occurrence_count
+                )
+                if group.decision == "reclassify" and not atomic_migrated and not later_migrated and not later_removed and final_keys[key] != group.occurrence_count:
                     issues.append(f"migration_final_reclassification_mismatch:{key[0]}:{key[1]}")
-                if (atomic_migrated or later_migrated) and key in final_keys:
+                if (atomic_migrated or later_migrated or later_removed) and key in final_keys:
                     issues.append(f"migration_final_route_remains:{key[0]}:{key[1]}")
     return tuple(sorted(set(issues)))
 

@@ -7,48 +7,363 @@
       "occurrences": 17
     },
     "canonical_remainder": {
-      "groups": 11,
-      "occurrences": 14
+      "groups": 4,
+      "occurrences": 5
     },
     "closed": {
-      "groups": 3,
-      "occurrences": 3
+      "groups": 10,
+      "occurrences": 12
     }
   },
   "closure_baseline_revision": "614805f59294006b8802ae01869dc9d7fe3cf694",
   "closure_baseline_sha256": "sha256:fca8beb006ff0fcac9fdad79d1ad19ef97633ed90217c45600e78c9e5e5754c0",
-  "content_sha256": "sha256:e761e11ed1f9b1de134f539fd572dceaecbb026a8dc8f7985e8ae99f88443bbc",
+  "content_sha256": "sha256:36d328ed575dadd5d8f5e7c5bd8c307ad2e5fbe599dd6fec74ccb51cbfe8466e",
   "counts": {
     "groups": 14,
-    "migrated_groups": 3,
-    "migrated_occurrences": 3,
+    "migrated_groups": 5,
+    "migrated_occurrences": 7,
     "occurrences": 17,
-    "unresolved_groups": 11,
-    "unresolved_occurrences": 14
+    "removed_dead_entry_groups": 5,
+    "removed_dead_entry_occurrences": 5,
+    "unresolved_groups": 4,
+    "unresolved_occurrences": 5
+  },
+  "craft_closure_arithmetic": {
+    "baseline": {
+      "groups": 11,
+      "occurrences": 14
+    },
+    "canonical_remainder": {
+      "groups": 4,
+      "occurrences": 5
+    },
+    "closed": {
+      "groups": 7,
+      "occurrences": 9
+    }
+  },
+  "craft_closure_evidence": {
+    "backend_files": {
+      "backend/capability_v2/gateway.py": {
+        "blob": "6d8a3e052901df5bff607889b4163250b5c6370d",
+        "sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33"
+      },
+      "plugins/craft/craft_backend/capabilities/contracts.py": {
+        "blob": "cfd066edb1605e7d0ab0a855601a8387b38625ec",
+        "sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b"
+      },
+      "plugins/craft/craft_backend/capabilities/provider.py": {
+        "blob": "f8323436d4642d238aa26a3b548ce87d7cbf4db8",
+        "sha256": "sha256:d86f0fcd4a247cd51970d44fcf7ec3a889af64f47fb79f7ebe9b93ab8a433f42"
+      },
+      "plugins/craft/craft_backend/capabilities/rule_engine.py": {
+        "blob": "416826716c10a8ea1abdc43d39872dd777a2d8cc",
+        "sha256": "sha256:c8ac721a01fe3bfb22ffab47e859b19097bf9f5524309e16356d2dc02259bec5"
+      },
+      "plugins/craft/craft_backend/capabilities/rule_library.py": {
+        "blob": "aa9cab3ca3585e67626be447aea3f92acd50b3e6",
+        "sha256": "sha256:8667724722a2be77f58d69ce9815ab8bc603dbb196fd04009ef6bd635ce3e5d6"
+      }
+    },
+    "backend_revision": "045124def4de6742fb99d8d7c436624c8fdee1e9",
+    "backend_tree": "c1e39bac2f7500cdc0f49711ab02bac01ab878b4",
+    "dead_actions": {
+      "DELETE /api/craft_lib/equipments/{dynamic}": {
+        "frontend_anchor": {
+          "blob": "2ea909184bf3d6e7c67791eb9f258e04ca62a34f",
+          "line": 917,
+          "snippet_sha256": "sha256:0227cc92af0417111f53139a955c2cd7e339558ca7b18e18dcc9673d48ed925d",
+          "source_path": "web/knowledge_hub/pages/gbop_vpps.html",
+          "source_sha256": "sha256:25a4dd5b7863b16c7dfe97c42b7b9b63835e287fe5165b4eeedefe014b69c0a6"
+        },
+        "interactive_control_absent": true,
+        "network_path_absent": true,
+        "source_block_sha256": [
+          "sha256:118443b48c1b55307e1a09d5d64ccc0e9dccca1f4317c7a91695ad1b8942365f",
+          "sha256:118443b48c1b55307e1a09d5d64ccc0e9dccca1f4317c7a91695ad1b8942365f"
+        ]
+      },
+      "DELETE /api/craft_lib/fixtures/{dynamic}": {
+        "frontend_anchor": {
+          "blob": "2ea909184bf3d6e7c67791eb9f258e04ca62a34f",
+          "line": 917,
+          "snippet_sha256": "sha256:0227cc92af0417111f53139a955c2cd7e339558ca7b18e18dcc9673d48ed925d",
+          "source_path": "web/knowledge_hub/pages/gbop_vpps.html",
+          "source_sha256": "sha256:25a4dd5b7863b16c7dfe97c42b7b9b63835e287fe5165b4eeedefe014b69c0a6"
+        },
+        "interactive_control_absent": true,
+        "network_path_absent": true,
+        "source_block_sha256": [
+          "sha256:118443b48c1b55307e1a09d5d64ccc0e9dccca1f4317c7a91695ad1b8942365f",
+          "sha256:118443b48c1b55307e1a09d5d64ccc0e9dccca1f4317c7a91695ad1b8942365f"
+        ]
+      },
+      "POST /api/rules/{dynamic}/activate": {
+        "frontend_anchor": {
+          "blob": "f6b03514744aece0c572090d8601865bb5df03a9",
+          "line": 122,
+          "snippet_sha256": "sha256:86999b527a2a22a31f1870c934fd961c055743607f38c9f2b8153476d30d7257",
+          "source_path": "web/rule_mgmt/rule_mgmt.js",
+          "source_sha256": "sha256:fdf6212073b4cdc26051dcfd82282cfb2ae8e40e7f8d7f9ff47cffbd761d8be9"
+        },
+        "interactive_control_absent": true,
+        "network_path_absent": true,
+        "source_block_sha256": [
+          "sha256:b27c9bea053590705a5e86151d508890b3752cec496cb4167c5e9127fd80e4c5",
+          "sha256:a9d21ab35cec9977cf33bca5f642bcf7e25c325af100682263fc6e0fc1037a77"
+        ],
+        "unsupported_state_explicit": true
+      },
+      "POST /api/rules/{dynamic}/deviations": {
+        "frontend_anchor": {
+          "blob": "f6b03514744aece0c572090d8601865bb5df03a9",
+          "line": 122,
+          "snippet_sha256": "sha256:86999b527a2a22a31f1870c934fd961c055743607f38c9f2b8153476d30d7257",
+          "source_path": "web/rule_mgmt/rule_mgmt.js",
+          "source_sha256": "sha256:fdf6212073b4cdc26051dcfd82282cfb2ae8e40e7f8d7f9ff47cffbd761d8be9"
+        },
+        "interactive_control_absent": true,
+        "network_path_absent": true,
+        "source_block_sha256": [
+          "sha256:b27c9bea053590705a5e86151d508890b3752cec496cb4167c5e9127fd80e4c5",
+          "sha256:a9d21ab35cec9977cf33bca5f642bcf7e25c325af100682263fc6e0fc1037a77"
+        ],
+        "unsupported_state_explicit": true
+      },
+      "POST /api/rules/{dynamic}/suspend": {
+        "frontend_anchor": {
+          "blob": "f6b03514744aece0c572090d8601865bb5df03a9",
+          "line": 122,
+          "snippet_sha256": "sha256:86999b527a2a22a31f1870c934fd961c055743607f38c9f2b8153476d30d7257",
+          "source_path": "web/rule_mgmt/rule_mgmt.js",
+          "source_sha256": "sha256:fdf6212073b4cdc26051dcfd82282cfb2ae8e40e7f8d7f9ff47cffbd761d8be9"
+        },
+        "interactive_control_absent": true,
+        "network_path_absent": true,
+        "source_block_sha256": [
+          "sha256:b27c9bea053590705a5e86151d508890b3752cec496cb4167c5e9127fd80e4c5",
+          "sha256:a9d21ab35cec9977cf33bca5f642bcf7e25c325af100682263fc6e0fc1037a77"
+        ],
+        "unsupported_state_explicit": true
+      }
+    },
+    "frontend_files": {
+      "dist-production/packages/craft-plugin/web/lineage_view/layout_detail_panel.js": {
+        "blob": "bbcf3cbd696750393c8a046c97eab90945b31a84",
+        "sha256": "sha256:a1112e94d725031009a3e0b9bedce125e8f938b076aad753b84bcba79b11022e"
+      },
+      "dist-production/web/container_card/modes/container_item_detail.js": {
+        "blob": "b249dffbe1e68cbdfe8045b5b09d894b168ba536",
+        "sha256": "sha256:a95c48aee7fcfe802e0d0dc197d5115ee4ab3e439e86dfcab00a3aa48f9d8b81"
+      },
+      "dist-production/web/container_card/modes/mode_field_detail.js": {
+        "blob": "b99a26505ff9b67450d3fc63faa6910c0b0fe386",
+        "sha256": "sha256:a2fb6903665f9ca608a23a3cdef99ce7309bcb578ec63e0c08e05c44e9ad3af2"
+      },
+      "dist-production/web/knowledge_hub/pages/gbop_vpps.html": {
+        "blob": "b5f37566ebe00f00740691fb76a720aab3f46b87",
+        "sha256": "sha256:e2872a5d6f98ba0aa52e956b5d5b7b96316ff5fec11d43df47578b1477ec97a2"
+      },
+      "dist-production/web/rule_mgmt/rule_mgmt.html": {
+        "blob": "eb7f87f7347e88247bd30cf5b9a895d751bbee99",
+        "sha256": "sha256:1b6b78a62cfaa58fd71ad25fbc6c150033b9d987898c7efb42cbc6d7f5df8b7f"
+      },
+      "dist-production/web/rule_mgmt/rule_mgmt.js": {
+        "blob": "ec66cdda6154ac2cf3af143befedd933b210b392",
+        "sha256": "sha256:8ece577ea8c421d354992b2e5c1b2dea38ac52750ae49f36c4fc147f668a52a6"
+      },
+      "packages/craft-plugin/web/lineage_view/layout_detail_panel.js": {
+        "blob": "bbcf3cbd696750393c8a046c97eab90945b31a84",
+        "sha256": "sha256:a1112e94d725031009a3e0b9bedce125e8f938b076aad753b84bcba79b11022e"
+      },
+      "web/container_card/modes/container_item_detail.js": {
+        "blob": "e7ba1bf677970fa450e8a91fe4e318a448cbeced",
+        "sha256": "sha256:add044132e94a7728b49194e1e02716b935b7e807d6aba2b34a5251ad773d963"
+      },
+      "web/container_card/modes/mode_field_detail.js": {
+        "blob": "bb0436187c725c13e3805d81cb103dfd87fd0aa0",
+        "sha256": "sha256:fc415a2e4a1af8b8a24d5099296351fb7624e73caa2463ce603954847ab7dc65"
+      },
+      "web/knowledge_hub/pages/gbop_vpps.html": {
+        "blob": "2ea909184bf3d6e7c67791eb9f258e04ca62a34f",
+        "sha256": "sha256:25a4dd5b7863b16c7dfe97c42b7b9b63835e287fe5165b4eeedefe014b69c0a6"
+      },
+      "web/rule_mgmt/rule_mgmt.html": {
+        "blob": "d4c58f1e74117a7cac19cdd141bbabbfd876c6bb",
+        "sha256": "sha256:8d7b7381ef6bdcaa414331de024ef557e8f0bdf763dbbce5b8283d8f7447be48"
+      },
+      "web/rule_mgmt/rule_mgmt.js": {
+        "blob": "f6b03514744aece0c572090d8601865bb5df03a9",
+        "sha256": "sha256:fdf6212073b4cdc26051dcfd82282cfb2ae8e40e7f8d7f9ff47cffbd761d8be9"
+      }
+    },
+    "frontend_revision": "43a650ab35cba99c6788ce3622a46e08404e7731",
+    "routes": {
+      "GET /api/rule-engine/check-entry": {
+        "candidate_capability": "craft.rule.entry.evaluate@1",
+        "contract_evidence": {
+          "input_output": {
+            "end_line": 563,
+            "snippet_sha256": "sha256:1b285d11d13df69b7e4399b4e2c70449c7ce6eb5a02945490bde5f114cae63a6",
+            "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
+            "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+            "start_line": 549
+          }
+        },
+        "frontend_call_sites": [
+          {
+            "blob": "bbcf3cbd696750393c8a046c97eab90945b31a84",
+            "line": 2210,
+            "snippet_sha256": "sha256:9fa1fadce51dda5b2a5765c27c336af849a477ed070016346684c30306d17661",
+            "source_path": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+            "source_sha256": "sha256:a1112e94d725031009a3e0b9bedce125e8f938b076aad753b84bcba79b11022e"
+          },
+          {
+            "blob": "bbcf3cbd696750393c8a046c97eab90945b31a84",
+            "line": 3552,
+            "snippet_sha256": "sha256:9fa1fadce51dda5b2a5765c27c336af849a477ed070016346684c30306d17661",
+            "source_path": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+            "source_sha256": "sha256:a1112e94d725031009a3e0b9bedce125e8f938b076aad753b84bcba79b11022e"
+          }
+        ],
+        "gateway_anchor": {
+          "context": {
+            "end_line": 532,
+            "snippet_sha256": "sha256:5c35f96e8355a82de0e8edf2b203a076ce3eb4eb056423eb3b81d6027de0ff9d",
+            "source_path": "backend/capability_v2/gateway.py",
+            "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+            "start_line": 520
+          },
+          "invoke_pipeline": {
+            "end_line": 218,
+            "snippet_sha256": "sha256:1d6ceda33092888e3c0336a18ba3dbd097241ef83b6cb45fab743c9af2080214",
+            "source_path": "backend/capability_v2/gateway.py",
+            "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+            "start_line": 134
+          },
+          "provider_descriptor": {
+            "end_line": 137,
+            "snippet_sha256": "sha256:d8422898cfdb295e8def126090ff8953acda4689c4fa3c57ae5914aed02b8041",
+            "source_path": "plugins/craft/craft_backend/capabilities/provider.py",
+            "source_sha256": "sha256:d86f0fcd4a247cd51970d44fcf7ec3a889af64f47fb79f7ebe9b93ab8a433f42",
+            "start_line": 90
+          }
+        },
+        "legacy_route_absent": true,
+        "provider_anchor": {
+          "end_line": 183,
+          "snippet_sha256": "sha256:5e26b15637963ae5cedc244ab113431069cae0e9045526a2401fe17688db9bf2",
+          "source_path": "plugins/craft/craft_backend/capabilities/rule_engine.py",
+          "source_sha256": "sha256:c8ac721a01fe3bfb22ffab47e859b19097bf9f5524309e16356d2dc02259bec5",
+          "start_line": 174
+        }
+      },
+      "PUT /api/rules/{dynamic}": {
+        "candidate_capability": "craft.rule.definition.change.apply@1",
+        "contract_evidence": {
+          "input_output": {
+            "end_line": 52,
+            "snippet_sha256": "sha256:9554a70a7d6d4b8987ad6e4c9246f28d8c45fa80261365c63ab910c276f11479",
+            "source_path": "plugins/craft/craft_backend/capabilities/rule_library.py",
+            "source_sha256": "sha256:8667724722a2be77f58d69ce9815ab8bc603dbb196fd04009ef6bd635ce3e5d6",
+            "start_line": 21
+          }
+        },
+        "frontend_call_sites": [
+          {
+            "blob": "e7ba1bf677970fa450e8a91fe4e318a448cbeced",
+            "line": 137,
+            "snippet_sha256": "sha256:c8d31b5cd95bf332a05c7147edf945b62f9fc7d5e5079c50f2e3a141acaaaf4c",
+            "source_path": "web/container_card/modes/container_item_detail.js",
+            "source_sha256": "sha256:add044132e94a7728b49194e1e02716b935b7e807d6aba2b34a5251ad773d963"
+          },
+          {
+            "blob": "bb0436187c725c13e3805d81cb103dfd87fd0aa0",
+            "line": 46,
+            "snippet_sha256": "sha256:c8d31b5cd95bf332a05c7147edf945b62f9fc7d5e5079c50f2e3a141acaaaf4c",
+            "source_path": "web/container_card/modes/mode_field_detail.js",
+            "source_sha256": "sha256:fc415a2e4a1af8b8a24d5099296351fb7624e73caa2463ce603954847ab7dc65"
+          }
+        ],
+        "gateway_anchor": {
+          "context": {
+            "end_line": 532,
+            "snippet_sha256": "sha256:5c35f96e8355a82de0e8edf2b203a076ce3eb4eb056423eb3b81d6027de0ff9d",
+            "source_path": "backend/capability_v2/gateway.py",
+            "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+            "start_line": 520
+          },
+          "invoke_pipeline": {
+            "end_line": 218,
+            "snippet_sha256": "sha256:1d6ceda33092888e3c0336a18ba3dbd097241ef83b6cb45fab743c9af2080214",
+            "source_path": "backend/capability_v2/gateway.py",
+            "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+            "start_line": 134
+          },
+          "provider_descriptor": {
+            "end_line": 137,
+            "snippet_sha256": "sha256:d8422898cfdb295e8def126090ff8953acda4689c4fa3c57ae5914aed02b8041",
+            "source_path": "plugins/craft/craft_backend/capabilities/provider.py",
+            "source_sha256": "sha256:d86f0fcd4a247cd51970d44fcf7ec3a889af64f47fb79f7ebe9b93ab8a433f42",
+            "start_line": 90
+          }
+        },
+        "legacy_route_absent": true,
+        "provider_anchor": {
+          "end_line": 176,
+          "snippet_sha256": "sha256:4f934a75333955d4579d85dfe9922a9c556c50c894386ebb0de7f6112bad4090",
+          "source_path": "plugins/craft/craft_backend/capabilities/rule_library.py",
+          "source_sha256": "sha256:8667724722a2be77f58d69ce9815ab8bc603dbb196fd04009ef6bd635ce3e5d6",
+          "start_line": 149
+        }
+      }
+    },
+    "scanner_materialization": {
+      "document_count": 224,
+      "materialization_sha256": "sha256:eb5541221452299947240ab9cafe6901bb8931ba3b608a5efe22df14acaa05c7",
+      "method": "git-tree-blobs-v1",
+      "revision": "43a650ab35cba99c6788ce3622a46e08404e7731",
+      "roots": [
+        "web",
+        "packages"
+      ],
+      "tree": "93ad56a6830dd29f1c504f3bce8f6ad24c5543b4"
+    }
   },
   "entries": [
     {
       "approval_reject_evidence": null,
-      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "authorization_and_scope": "Not applicable: the non-functional browser action and its dispatch path were removed.",
       "bop_conditional_branch": false,
       "candidate_capability": null,
-      "final_disposition": "unresolved",
-      "final_inventory_mapping": "unresolved",
-      "final_occurrences": [
-        {
-          "column": 58,
-          "line": 771,
-          "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:771:58:DELETE:/api/craft_lib/equipments/{dynamic}",
-          "source": "web/knowledge_hub/pages/gbop_vpps.html",
-          "source_sha256": "db5265ec700318095f663c2571b1e5c734b37d8a51b200bf33aeea3b7c20e2f8"
-        }
-      ],
+      "contract_evidence": null,
+      "dead_action_evidence": {
+        "frontend_anchor": {
+          "blob": "2ea909184bf3d6e7c67791eb9f258e04ca62a34f",
+          "line": 917,
+          "snippet_sha256": "sha256:0227cc92af0417111f53139a955c2cd7e339558ca7b18e18dcc9673d48ed925d",
+          "source_path": "web/knowledge_hub/pages/gbop_vpps.html",
+          "source_sha256": "sha256:25a4dd5b7863b16c7dfe97c42b7b9b63835e287fe5165b4eeedefe014b69c0a6"
+        },
+        "interactive_control_absent": true,
+        "network_path_absent": true,
+        "source_block_sha256": [
+          "sha256:118443b48c1b55307e1a09d5d64ccc0e9dccca1f4317c7a91695ad1b8942365f",
+          "sha256:118443b48c1b55307e1a09d5d64ccc0e9dccca1f4317c7a91695ad1b8942365f"
+        ]
+      },
+      "final_disposition": "removed_dead_entry",
+      "final_inventory_mapping": "removed_dead_entry",
+      "final_occurrences": [],
+      "frontend_call_sites": [],
+      "gateway_evidence": null,
       "input_output_contract": {
         "input": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
         "output": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
         "side_effects": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected."
       },
-      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "legacy_route_absent": true,
+      "lifecycle_confirmation_idempotency": "Not applicable: no replacement mutation or control path exists.",
       "lifecycle_evidence": null,
       "method": "DELETE",
       "non_equivalence": {
@@ -87,33 +402,45 @@
         "source_path": "plugins/craft/craft_backend/routers/craft_library.py"
       },
       "owner_domain": "craft",
-      "provider_anchor": "plugins/craft/craft_backend/routers/craft_library.py",
-      "provider_source_sha256": "sha256:30c275048c808550f27bbdcf2da96871936a4b6a53f7eda3aefa0ee3d522eed3",
+      "owner_service_evidence": null,
+      "provider_anchor": null,
+      "provider_source_sha256": null,
       "runtime_execution": "not_applicable",
-      "unresolved_reason": "No delete provider exists; the available obsolete transition is a different lifecycle outcome."
+      "unresolved_reason": null
     },
     {
       "approval_reject_evidence": null,
-      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "authorization_and_scope": "Not applicable: the non-functional browser action and its dispatch path were removed.",
       "bop_conditional_branch": false,
       "candidate_capability": null,
-      "final_disposition": "unresolved",
-      "final_inventory_mapping": "unresolved",
-      "final_occurrences": [
-        {
-          "column": 58,
-          "line": 714,
-          "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:714:58:DELETE:/api/craft_lib/fixtures/{dynamic}",
-          "source": "web/knowledge_hub/pages/gbop_vpps.html",
-          "source_sha256": "db5265ec700318095f663c2571b1e5c734b37d8a51b200bf33aeea3b7c20e2f8"
-        }
-      ],
+      "contract_evidence": null,
+      "dead_action_evidence": {
+        "frontend_anchor": {
+          "blob": "2ea909184bf3d6e7c67791eb9f258e04ca62a34f",
+          "line": 917,
+          "snippet_sha256": "sha256:0227cc92af0417111f53139a955c2cd7e339558ca7b18e18dcc9673d48ed925d",
+          "source_path": "web/knowledge_hub/pages/gbop_vpps.html",
+          "source_sha256": "sha256:25a4dd5b7863b16c7dfe97c42b7b9b63835e287fe5165b4eeedefe014b69c0a6"
+        },
+        "interactive_control_absent": true,
+        "network_path_absent": true,
+        "source_block_sha256": [
+          "sha256:118443b48c1b55307e1a09d5d64ccc0e9dccca1f4317c7a91695ad1b8942365f",
+          "sha256:118443b48c1b55307e1a09d5d64ccc0e9dccca1f4317c7a91695ad1b8942365f"
+        ]
+      },
+      "final_disposition": "removed_dead_entry",
+      "final_inventory_mapping": "removed_dead_entry",
+      "final_occurrences": [],
+      "frontend_call_sites": [],
+      "gateway_evidence": null,
       "input_output_contract": {
         "input": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
         "output": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
         "side_effects": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected."
       },
-      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "legacy_route_absent": true,
+      "lifecycle_confirmation_idempotency": "Not applicable: no replacement mutation or control path exists.",
       "lifecycle_evidence": null,
       "method": "DELETE",
       "non_equivalence": {
@@ -152,10 +479,11 @@
         "source_path": "plugins/craft/craft_backend/routers/craft_library.py"
       },
       "owner_domain": "craft",
-      "provider_anchor": "plugins/craft/craft_backend/routers/craft_library.py",
-      "provider_source_sha256": "sha256:30c275048c808550f27bbdcf2da96871936a4b6a53f7eda3aefa0ee3d522eed3",
+      "owner_service_evidence": null,
+      "provider_anchor": null,
+      "provider_source_sha256": null,
       "runtime_execution": "not_applicable",
-      "unresolved_reason": "No delete provider exists; the available obsolete transition is a different lifecycle outcome."
+      "unresolved_reason": null
     },
     {
       "approval_reject_evidence": null,
@@ -167,14 +495,14 @@
           "end_line": 127,
           "snippet_sha256": "sha256:5f9ed937924d85be4b24a9232e57060e554d36997185df61f581a7b87a8b20f4",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+          "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
           "start_line": 118
         },
         "output": {
           "end_line": 247,
           "snippet_sha256": "sha256:ca535816e2e539c3ff631a470d974a9000a06fce80a92cea0dcce59d729c2bdf",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+          "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
           "start_line": 237
         }
       },
@@ -209,14 +537,14 @@
           "end_line": 127,
           "snippet_sha256": "sha256:5f9ed937924d85be4b24a9232e57060e554d36997185df61f581a7b87a8b20f4",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+          "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
           "start_line": 118
         },
         "output": {
           "end_line": 247,
           "snippet_sha256": "sha256:ca535816e2e539c3ff631a470d974a9000a06fce80a92cea0dcce59d729c2bdf",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+          "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
           "start_line": 237
         }
       },
@@ -233,14 +561,14 @@
             "end_line": 127,
             "snippet_sha256": "sha256:5f9ed937924d85be4b24a9232e57060e554d36997185df61f581a7b87a8b20f4",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+            "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
             "start_line": 118
           },
           "output": {
             "end_line": 247,
             "snippet_sha256": "sha256:ca535816e2e539c3ff631a470d974a9000a06fce80a92cea0dcce59d729c2bdf",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+            "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
             "start_line": 237
           }
         },
@@ -361,14 +689,14 @@
           "end_line": 52,
           "snippet_sha256": "sha256:46237d107dc7b2c14a3a9693472d9a0b6a4ad619ad4b52cc6862025eadf6fdb8",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+          "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
           "start_line": 43
         },
         "output": {
           "end_line": 196,
           "snippet_sha256": "sha256:bc7b40d0bc7e9c9178feb7316c934e4a5068ef0dbe5df0b38c74c0a65858ca65",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+          "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
           "start_line": 180
         }
       },
@@ -389,14 +717,14 @@
           "end_line": 52,
           "snippet_sha256": "sha256:46237d107dc7b2c14a3a9693472d9a0b6a4ad619ad4b52cc6862025eadf6fdb8",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+          "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
           "start_line": 43
         },
         "output": {
           "end_line": 196,
           "snippet_sha256": "sha256:bc7b40d0bc7e9c9178feb7316c934e4a5068ef0dbe5df0b38c74c0a65858ca65",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+          "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
           "start_line": 180
         }
       },
@@ -413,14 +741,14 @@
             "end_line": 52,
             "snippet_sha256": "sha256:46237d107dc7b2c14a3a9693472d9a0b6a4ad619ad4b52cc6862025eadf6fdb8",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+            "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
             "start_line": 43
           },
           "output": {
             "end_line": 196,
             "snippet_sha256": "sha256:bc7b40d0bc7e9c9178feb7316c934e4a5068ef0dbe5df0b38c74c0a65858ca65",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+            "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
             "start_line": 180
           }
         },
@@ -636,40 +964,74 @@
     },
     {
       "approval_reject_evidence": null,
-      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "authorization_and_scope": "Exact Craft provider and Gateway policy apply authenticated actor/team scope before execution.",
       "bop_conditional_branch": false,
-      "candidate_capability": "craft.rule.engine.evaluate@1",
-      "final_disposition": "unresolved",
-      "final_inventory_mapping": "unresolved",
-      "final_occurrences": [
+      "candidate_capability": "craft.rule.entry.evaluate@1",
+      "contract_evidence": {
+        "input_output": {
+          "end_line": 563,
+          "snippet_sha256": "sha256:1b285d11d13df69b7e4399b4e2c70449c7ce6eb5a02945490bde5f114cae63a6",
+          "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
+          "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+          "start_line": 549
+        }
+      },
+      "final_disposition": "migrated",
+      "final_inventory_mapping": "capability",
+      "final_occurrences": [],
+      "frontend_call_sites": [
         {
-          "column": 40,
-          "line": 2192,
-          "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:2192:40:GET:/api/rule-engine/check-entry",
-          "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-          "source_sha256": "36bb20338757c77fcfe80f4d0f84449f2928df7183989efeb2798adbc9abc00a"
+          "blob": "bbcf3cbd696750393c8a046c97eab90945b31a84",
+          "line": 2210,
+          "snippet_sha256": "sha256:9fa1fadce51dda5b2a5765c27c336af849a477ed070016346684c30306d17661",
+          "source_path": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+          "source_sha256": "sha256:a1112e94d725031009a3e0b9bedce125e8f938b076aad753b84bcba79b11022e"
         },
         {
-          "column": 40,
-          "line": 3524,
-          "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:3524:40:GET:/api/rule-engine/check-entry",
-          "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-          "source_sha256": "36bb20338757c77fcfe80f4d0f84449f2928df7183989efeb2798adbc9abc00a"
+          "blob": "bbcf3cbd696750393c8a046c97eab90945b31a84",
+          "line": 3552,
+          "snippet_sha256": "sha256:9fa1fadce51dda5b2a5765c27c336af849a477ed070016346684c30306d17661",
+          "source_path": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+          "source_sha256": "sha256:a1112e94d725031009a3e0b9bedce125e8f938b076aad753b84bcba79b11022e"
         }
       ],
-      "input_output_contract": {
-        "input": "/api/rule-engine/check-entry: REST accepts entry audit query; candidate requires operation plus rule/context or version.",
-        "output": "/api/rule-engine/check-entry: REST returns entry check findings; candidate returns evaluate/audit outcome.",
-        "side_effects": "/api/rule-engine/check-entry: Candidate evaluates CEL or bounded BOP audit, not the legacy entry check."
+      "gateway_evidence": {
+        "context": {
+          "end_line": 532,
+          "snippet_sha256": "sha256:5c35f96e8355a82de0e8edf2b203a076ce3eb4eb056423eb3b81d6027de0ff9d",
+          "source_path": "backend/capability_v2/gateway.py",
+          "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+          "start_line": 520
+        },
+        "invoke_pipeline": {
+          "end_line": 218,
+          "snippet_sha256": "sha256:1d6ceda33092888e3c0336a18ba3dbd097241ef83b6cb45fab743c9af2080214",
+          "source_path": "backend/capability_v2/gateway.py",
+          "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+          "start_line": 134
+        },
+        "provider_descriptor": {
+          "end_line": 137,
+          "snippet_sha256": "sha256:d8422898cfdb295e8def126090ff8953acda4689c4fa3c57ae5914aed02b8041",
+          "source_path": "plugins/craft/craft_backend/capabilities/provider.py",
+          "source_sha256": "sha256:d86f0fcd4a247cd51970d44fcf7ec3a889af64f47fb79f7ebe9b93ab8a433f42",
+          "start_line": 90
+        }
       },
-      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "input_output_contract": {
+        "input_output": {
+          "end_line": 563,
+          "snippet_sha256": "sha256:1b285d11d13df69b7e4399b4e2c70449c7ce6eb5a02945490bde5f114cae63a6",
+          "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
+          "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+          "start_line": 549
+        }
+      },
+      "legacy_route_absent": true,
+      "lifecycle_confirmation_idempotency": "Resolved by the exact Craft contract and source-anchored Gateway policy.",
       "lifecycle_evidence": null,
       "method": "GET",
-      "non_equivalence": {
-        "input": "/api/rule-engine/check-entry: REST accepts entry audit query; candidate requires operation plus rule/context or version.",
-        "output": "/api/rule-engine/check-entry: REST returns entry check findings; candidate returns evaluate/audit outcome.",
-        "side_effects": "/api/rule-engine/check-entry: Candidate evaluates CEL or bounded BOP audit, not the legacy entry check."
-      },
+      "non_equivalence": null,
       "normalized_route": "/api/rule-engine/check-entry",
       "occurrences": [
         {
@@ -719,10 +1081,17 @@
         "source_path": "plugins/craft/craft_backend/routers/rule_engine.py"
       },
       "owner_domain": "craft",
-      "provider_anchor": "plugins/craft/craft_backend/routers/rule_engine.py",
-      "provider_source_sha256": "sha256:ac258d5ffc6531a5da259750f8b637fea6e467c0a50d4f64a379069aa660f86a",
-      "runtime_execution": "not_applicable",
-      "unresolved_reason": "No entry-check provider exists; CEL evaluation and BOP audit are different outcomes."
+      "owner_service_evidence": {
+        "end_line": 183,
+        "snippet_sha256": "sha256:5e26b15637963ae5cedc244ab113431069cae0e9045526a2401fe17688db9bf2",
+        "source_path": "plugins/craft/craft_backend/capabilities/rule_engine.py",
+        "source_sha256": "sha256:c8ac721a01fe3bfb22ffab47e859b19097bf9f5524309e16356d2dc02259bec5",
+        "start_line": 174
+      },
+      "provider_anchor": "plugins/craft/craft_backend/capabilities/rule_engine.py:174-183",
+      "provider_source_sha256": "sha256:c8ac721a01fe3bfb22ffab47e859b19097bf9f5524309e16356d2dc02259bec5",
+      "runtime_execution": "bounded_provider",
+      "unresolved_reason": null
     },
     {
       "approval_reject_evidence": {
@@ -1060,26 +1429,38 @@
     },
     {
       "approval_reject_evidence": null,
-      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "authorization_and_scope": "Not applicable: the non-functional browser action and its dispatch path were removed.",
       "bop_conditional_branch": false,
-      "candidate_capability": "craft.rule.release.activate@1",
-      "final_disposition": "unresolved",
-      "final_inventory_mapping": "unresolved",
-      "final_occurrences": [
-        {
-          "column": 26,
-          "line": 173,
-          "occurrence_id": "web/rule_mgmt/rule_mgmt.js:173:26:POST:/api/rules/{dynamic}/activate",
-          "source": "web/rule_mgmt/rule_mgmt.js",
-          "source_sha256": "bd55a892edbaa2a50722415783b68419a52452d6a72f305048935275106a2994"
-        }
-      ],
+      "candidate_capability": null,
+      "contract_evidence": null,
+      "dead_action_evidence": {
+        "frontend_anchor": {
+          "blob": "f6b03514744aece0c572090d8601865bb5df03a9",
+          "line": 122,
+          "snippet_sha256": "sha256:86999b527a2a22a31f1870c934fd961c055743607f38c9f2b8153476d30d7257",
+          "source_path": "web/rule_mgmt/rule_mgmt.js",
+          "source_sha256": "sha256:fdf6212073b4cdc26051dcfd82282cfb2ae8e40e7f8d7f9ff47cffbd761d8be9"
+        },
+        "interactive_control_absent": true,
+        "network_path_absent": true,
+        "source_block_sha256": [
+          "sha256:b27c9bea053590705a5e86151d508890b3752cec496cb4167c5e9127fd80e4c5",
+          "sha256:a9d21ab35cec9977cf33bca5f642bcf7e25c325af100682263fc6e0fc1037a77"
+        ],
+        "unsupported_state_explicit": true
+      },
+      "final_disposition": "removed_dead_entry",
+      "final_inventory_mapping": "removed_dead_entry",
+      "final_occurrences": [],
+      "frontend_call_sites": [],
+      "gateway_evidence": null,
       "input_output_contract": {
         "input": "/api/rules/{dynamic}/activate: REST activates mutable rule gid; candidate activates a published immutable release contract.",
         "output": "/api/rules/{dynamic}/activate: REST returns rule status; candidate returns accepted release outcome.",
         "side_effects": "/api/rules/{dynamic}/activate: Candidate lifecycle handler does not mutate the legacy rule record."
       },
-      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "legacy_route_absent": true,
+      "lifecycle_confirmation_idempotency": "Not applicable: no replacement mutation or control path exists.",
       "lifecycle_evidence": null,
       "method": "POST",
       "non_equivalence": {
@@ -1118,33 +1499,46 @@
         "source_path": "plugins/craft/craft_backend/routers/rules.py"
       },
       "owner_domain": "craft",
-      "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
-      "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
+      "owner_service_evidence": null,
+      "provider_anchor": null,
+      "provider_source_sha256": null,
       "runtime_execution": "not_applicable",
-      "unresolved_reason": "No mutable-rule activation provider exists; immutable release activation is a different lifecycle outcome."
+      "unresolved_reason": null
     },
     {
       "approval_reject_evidence": null,
-      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "authorization_and_scope": "Not applicable: the non-functional browser action and its dispatch path were removed.",
       "bop_conditional_branch": false,
-      "candidate_capability": "craft.rule.waiver.create@1",
-      "final_disposition": "unresolved",
-      "final_inventory_mapping": "unresolved",
-      "final_occurrences": [
-        {
-          "column": 36,
-          "line": 220,
-          "occurrence_id": "web/rule_mgmt/rule_mgmt.js:220:36:POST:/api/rules/{dynamic}/deviations",
-          "source": "web/rule_mgmt/rule_mgmt.js",
-          "source_sha256": "bd55a892edbaa2a50722415783b68419a52452d6a72f305048935275106a2994"
-        }
-      ],
+      "candidate_capability": null,
+      "contract_evidence": null,
+      "dead_action_evidence": {
+        "frontend_anchor": {
+          "blob": "f6b03514744aece0c572090d8601865bb5df03a9",
+          "line": 122,
+          "snippet_sha256": "sha256:86999b527a2a22a31f1870c934fd961c055743607f38c9f2b8153476d30d7257",
+          "source_path": "web/rule_mgmt/rule_mgmt.js",
+          "source_sha256": "sha256:fdf6212073b4cdc26051dcfd82282cfb2ae8e40e7f8d7f9ff47cffbd761d8be9"
+        },
+        "interactive_control_absent": true,
+        "network_path_absent": true,
+        "source_block_sha256": [
+          "sha256:b27c9bea053590705a5e86151d508890b3752cec496cb4167c5e9127fd80e4c5",
+          "sha256:a9d21ab35cec9977cf33bca5f642bcf7e25c325af100682263fc6e0fc1037a77"
+        ],
+        "unsupported_state_explicit": true
+      },
+      "final_disposition": "removed_dead_entry",
+      "final_inventory_mapping": "removed_dead_entry",
+      "final_occurrences": [],
+      "frontend_call_sites": [],
+      "gateway_evidence": null,
       "input_output_contract": {
         "input": "/api/rules/{dynamic}/deviations: REST deviation body is tied to rule gid; candidate waiver contract expects governed release/evidence fields.",
         "output": "/api/rules/{dynamic}/deviations: REST returns deviation record; candidate returns accepted waiver outcome.",
         "side_effects": "/api/rules/{dynamic}/deviations: Candidate does not persist the legacy deviation model."
       },
-      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "legacy_route_absent": true,
+      "lifecycle_confirmation_idempotency": "Not applicable: no replacement mutation or control path exists.",
       "lifecycle_evidence": null,
       "method": "POST",
       "non_equivalence": {
@@ -1183,33 +1577,46 @@
         "source_path": "plugins/craft/craft_backend/routers/rules.py"
       },
       "owner_domain": "craft",
-      "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
-      "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
+      "owner_service_evidence": null,
+      "provider_anchor": null,
+      "provider_source_sha256": null,
       "runtime_execution": "not_applicable",
-      "unresolved_reason": "No legacy deviation provider exists; governed release waiver creation has a different evidence contract."
+      "unresolved_reason": null
     },
     {
       "approval_reject_evidence": null,
-      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "authorization_and_scope": "Not applicable: the non-functional browser action and its dispatch path were removed.",
       "bop_conditional_branch": false,
       "candidate_capability": null,
-      "final_disposition": "unresolved",
-      "final_inventory_mapping": "unresolved",
-      "final_occurrences": [
-        {
-          "column": 26,
-          "line": 175,
-          "occurrence_id": "web/rule_mgmt/rule_mgmt.js:175:26:POST:/api/rules/{dynamic}/suspend",
-          "source": "web/rule_mgmt/rule_mgmt.js",
-          "source_sha256": "bd55a892edbaa2a50722415783b68419a52452d6a72f305048935275106a2994"
-        }
-      ],
+      "contract_evidence": null,
+      "dead_action_evidence": {
+        "frontend_anchor": {
+          "blob": "f6b03514744aece0c572090d8601865bb5df03a9",
+          "line": 122,
+          "snippet_sha256": "sha256:86999b527a2a22a31f1870c934fd961c055743607f38c9f2b8153476d30d7257",
+          "source_path": "web/rule_mgmt/rule_mgmt.js",
+          "source_sha256": "sha256:fdf6212073b4cdc26051dcfd82282cfb2ae8e40e7f8d7f9ff47cffbd761d8be9"
+        },
+        "interactive_control_absent": true,
+        "network_path_absent": true,
+        "source_block_sha256": [
+          "sha256:b27c9bea053590705a5e86151d508890b3752cec496cb4167c5e9127fd80e4c5",
+          "sha256:a9d21ab35cec9977cf33bca5f642bcf7e25c325af100682263fc6e0fc1037a77"
+        ],
+        "unsupported_state_explicit": true
+      },
+      "final_disposition": "removed_dead_entry",
+      "final_inventory_mapping": "removed_dead_entry",
+      "final_occurrences": [],
+      "frontend_call_sites": [],
+      "gateway_evidence": null,
       "input_output_contract": {
         "input": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
         "output": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.",
         "side_effects": "Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected."
       },
-      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "legacy_route_absent": true,
+      "lifecycle_confirmation_idempotency": "Not applicable: no replacement mutation or control path exists.",
       "lifecycle_evidence": null,
       "method": "POST",
       "non_equivalence": {
@@ -1248,10 +1655,11 @@
         "source_path": "plugins/craft/craft_backend/routers/rules.py"
       },
       "owner_domain": "craft",
-      "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
-      "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
+      "owner_service_evidence": null,
+      "provider_anchor": null,
+      "provider_source_sha256": null,
       "runtime_execution": "not_applicable",
-      "unresolved_reason": "No mutable-rule suspension handler or domain service exists."
+      "unresolved_reason": null
     },
     {
       "approval_reject_evidence": null,
@@ -1450,40 +1858,74 @@
     },
     {
       "approval_reject_evidence": null,
-      "authorization_and_scope": "No public owner service proves legacy actor, tenant, object, or workspace scope equivalence.",
+      "authorization_and_scope": "Exact Craft provider and Gateway policy apply authenticated actor/team scope before execution.",
       "bop_conditional_branch": false,
-      "candidate_capability": "craft.rule.library.change.apply@1",
-      "final_disposition": "unresolved",
-      "final_inventory_mapping": "unresolved",
-      "final_occurrences": [
+      "candidate_capability": "craft.rule.definition.change.apply@1",
+      "contract_evidence": {
+        "input_output": {
+          "end_line": 52,
+          "snippet_sha256": "sha256:9554a70a7d6d4b8987ad6e4c9246f28d8c45fa80261365c63ab910c276f11479",
+          "source_path": "plugins/craft/craft_backend/capabilities/rule_library.py",
+          "source_sha256": "sha256:8667724722a2be77f58d69ce9815ab8bc603dbb196fd04009ef6bd635ce3e5d6",
+          "start_line": 21
+        }
+      },
+      "final_disposition": "migrated",
+      "final_inventory_mapping": "capability",
+      "final_occurrences": [],
+      "frontend_call_sites": [
         {
-          "column": 53,
+          "blob": "e7ba1bf677970fa450e8a91fe4e318a448cbeced",
           "line": 137,
-          "occurrence_id": "web/container_card/modes/container_item_detail.js:137:53:PUT:/api/rules/{dynamic}",
-          "source": "web/container_card/modes/container_item_detail.js",
-          "source_sha256": "80d6527fda0872ecb118a8a06cb11066956feed460b190f257e6b6a3016d530a"
+          "snippet_sha256": "sha256:c8d31b5cd95bf332a05c7147edf945b62f9fc7d5e5079c50f2e3a141acaaaf4c",
+          "source_path": "web/container_card/modes/container_item_detail.js",
+          "source_sha256": "sha256:add044132e94a7728b49194e1e02716b935b7e807d6aba2b34a5251ad773d963"
         },
         {
-          "column": 50,
-          "line": 47,
-          "occurrence_id": "web/container_card/modes/mode_field_detail.js:47:50:PUT:/api/rules/{dynamic}",
-          "source": "web/container_card/modes/mode_field_detail.js",
-          "source_sha256": "1751d2f01f071191219fd19cdb59b477f96abd93725905398d9d8a6ddfcc3c99"
+          "blob": "bb0436187c725c13e3805d81cb103dfd87fd0aa0",
+          "line": 46,
+          "snippet_sha256": "sha256:c8d31b5cd95bf332a05c7147edf945b62f9fc7d5e5079c50f2e3a141acaaaf4c",
+          "source_path": "web/container_card/modes/mode_field_detail.js",
+          "source_sha256": "sha256:fc415a2e4a1af8b8a24d5099296351fb7624e73caa2463ce603954847ab7dc65"
         }
       ],
-      "input_output_contract": {
-        "input": "/api/rules/{dynamic}: REST accepts a non-empty update record; the published stable candidate closes record with no allowed properties.",
-        "output": "/api/rules/{dynamic}: REST returns the updated rule projection; the candidate cannot be invoked with any meaningful update record.",
-        "side_effects": "/api/rules/{dynamic}: REST reaches the rule provider with one of its ten supported fields; the Gateway rejects that same non-empty record before provider execution."
+      "gateway_evidence": {
+        "context": {
+          "end_line": 532,
+          "snippet_sha256": "sha256:5c35f96e8355a82de0e8edf2b203a076ce3eb4eb056423eb3b81d6027de0ff9d",
+          "source_path": "backend/capability_v2/gateway.py",
+          "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+          "start_line": 520
+        },
+        "invoke_pipeline": {
+          "end_line": 218,
+          "snippet_sha256": "sha256:1d6ceda33092888e3c0336a18ba3dbd097241ef83b6cb45fab743c9af2080214",
+          "source_path": "backend/capability_v2/gateway.py",
+          "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
+          "start_line": 134
+        },
+        "provider_descriptor": {
+          "end_line": 137,
+          "snippet_sha256": "sha256:d8422898cfdb295e8def126090ff8953acda4689c4fa3c57ae5914aed02b8041",
+          "source_path": "plugins/craft/craft_backend/capabilities/provider.py",
+          "source_sha256": "sha256:d86f0fcd4a247cd51970d44fcf7ec3a889af64f47fb79f7ebe9b93ab8a433f42",
+          "start_line": 90
+        }
       },
-      "lifecycle_confirmation_idempotency": "Unresolved: no exact provider proves lifecycle, confirmation, idempotency, rollback, or outcome recovery equivalence.",
+      "input_output_contract": {
+        "input_output": {
+          "end_line": 52,
+          "snippet_sha256": "sha256:9554a70a7d6d4b8987ad6e4c9246f28d8c45fa80261365c63ab910c276f11479",
+          "source_path": "plugins/craft/craft_backend/capabilities/rule_library.py",
+          "source_sha256": "sha256:8667724722a2be77f58d69ce9815ab8bc603dbb196fd04009ef6bd635ce3e5d6",
+          "start_line": 21
+        }
+      },
+      "legacy_route_absent": true,
+      "lifecycle_confirmation_idempotency": "Resolved by the exact Craft contract and source-anchored Gateway policy.",
       "lifecycle_evidence": null,
       "method": "PUT",
-      "non_equivalence": {
-        "input": "/api/rules/{dynamic}: REST accepts a non-empty update record; the published stable candidate closes record with no allowed properties.",
-        "output": "/api/rules/{dynamic}: REST returns the updated rule projection; the candidate cannot be invoked with any meaningful update record.",
-        "side_effects": "/api/rules/{dynamic}: REST reaches the rule provider with one of its ten supported fields; the Gateway rejects that same non-empty record before provider execution."
-      },
+      "non_equivalence": null,
       "normalized_route": "/api/rules/{dynamic}",
       "occurrences": [
         {
@@ -1533,14 +1975,21 @@
         "source_path": "plugins/craft/craft_backend/routers/rules.py"
       },
       "owner_domain": "craft",
-      "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
-      "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
+      "owner_service_evidence": {
+        "end_line": 176,
+        "snippet_sha256": "sha256:4f934a75333955d4579d85dfe9922a9c556c50c894386ebb0de7f6112bad4090",
+        "source_path": "plugins/craft/craft_backend/capabilities/rule_library.py",
+        "source_sha256": "sha256:8667724722a2be77f58d69ce9815ab8bc603dbb196fd04009ef6bd635ce3e5d6",
+        "start_line": 149
+      },
+      "provider_anchor": "plugins/craft/craft_backend/capabilities/rule_library.py:149-176",
+      "provider_source_sha256": "sha256:8667724722a2be77f58d69ce9815ab8bc603dbb196fd04009ef6bd635ce3e5d6",
       "runtime_execution": "not_applicable",
-      "unresolved_reason": "Rule definition changes contain dynamic rule_definition data without a governed closed nested contract."
+      "unresolved_reason": null
     }
   ],
-  "frontend_content_hash": "47e7ff0fddcd4ad7ef7597b96ba6688f9f316fac73290b3439576e78ffae4e19",
-  "frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
+  "frontend_content_hash": "d9c9a1cecb1657b7322adf3e621176c9f5ae6ea2f00d84883ec51bbf1d7aa56a",
+  "frontend_revision": "43a650ab35cba99c6788ce3622a46e08404e7731",
   "project_closure_evidence": {
     "approval": {
       "frontend_anchor": {
@@ -1738,14 +2187,14 @@
         "end_line": 127,
         "snippet_sha256": "sha256:5f9ed937924d85be4b24a9232e57060e554d36997185df61f581a7b87a8b20f4",
         "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-        "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+        "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
         "start_line": 118
       },
       "craft_archive_output_contract": {
         "end_line": 247,
         "snippet_sha256": "sha256:ca535816e2e539c3ff631a470d974a9000a06fce80a92cea0dcce59d729c2bdf",
         "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-        "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+        "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
         "start_line": 237
       },
       "craft_archive_provider": {
@@ -1759,14 +2208,14 @@
         "end_line": 52,
         "snippet_sha256": "sha256:46237d107dc7b2c14a3a9693472d9a0b6a4ad619ad4b52cc6862025eadf6fdb8",
         "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-        "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+        "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
         "start_line": 43
       },
       "craft_list_output_contract": {
         "end_line": 196,
         "snippet_sha256": "sha256:bc7b40d0bc7e9c9178feb7316c934e4a5068ef0dbe5df0b38c74c0a65858ca65",
         "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-        "source_sha256": "sha256:da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
+        "source_sha256": "sha256:30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
         "start_line": 180
       },
       "craft_list_provider": {

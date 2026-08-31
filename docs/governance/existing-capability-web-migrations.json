@@ -3,7 +3,7 @@
   "artifact_id": "existing-capability-web-migrations",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "baseline_revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-  "frontend_revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
+  "frontend_revision": "43a650ab35cba99c6788ce3622a46e08404e7731",
   "groups": [
     {
       "method": "DELETE",
@@ -802,17 +802,17 @@
       "frontend_call_sites": [
         {
           "source_path": "web/container_card/modes/container_item_detail.js",
-          "line": 111,
+          "line": 153,
           "column": 140,
           "operation": "knowledge.get",
-          "source_sha256": "2707d0dfb871b339c28c587d03adabf464882b2095c62a364b32e77682e6dad9"
+          "source_sha256": "a95c48aee7fcfe802e0d0dc197d5115ee4ab3e439e86dfcab00a3aa48f9d8b81"
         },
         {
           "source_path": "web/container_card/modes/mode_field_detail.js",
-          "line": 34,
+          "line": 65,
           "column": 141,
           "operation": "knowledge.get",
-          "source_sha256": "f8656483caefc979f5f23be6e2c6ad84c0c053a4c3f0acb7821ffc9516fb790d"
+          "source_sha256": "a2fb6903665f9ca608a23a3cdef99ce7309bcb578ec63e0c08e05c44e9ad3af2"
         },
         {
           "source_path": "web/container_card/modes/mode_text_image.js",
@@ -1061,9 +1061,9 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/craft/craft_backend/capabilities/rule_engine.py",
-            "source_sha256": "4836f323520241ca8cb679d986ee462575652375f561528997c9e561d5d5888d",
-            "start_line": 49,
-            "end_line": 49,
+            "source_sha256": "c8ac721a01fe3bfb22ffab47e859b19097bf9f5524309e16356d2dc02259bec5",
+            "start_line": 175,
+            "end_line": 175,
             "sha256": "70894c43c2c5b0f52bb6a3a20e53eab6c624f41ef91801052aa58b2caf9b7390",
             "needle": "id=\"craft.rule.engine.evaluate\""
           }
@@ -2603,10 +2603,10 @@
       "frontend_call_sites": [
         {
           "source_path": "web/container_card/modes/container_item_detail.js",
-          "line": 156,
+          "line": 198,
           "column": 140,
           "operation": "knowledge.create",
-          "source_sha256": "2707d0dfb871b339c28c587d03adabf464882b2095c62a364b32e77682e6dad9"
+          "source_sha256": "a95c48aee7fcfe802e0d0dc197d5115ee4ab3e439e86dfcab00a3aa48f9d8b81"
         }
       ],
       "equivalence_evidence": {
@@ -2796,9 +2796,9 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/craft/craft_backend/capabilities/rule_descriptors.py",
-            "source_sha256": "d16a01fec54eaf15122fb47304cda15412024732976abedd32c90cd43913c4bd",
-            "start_line": 6,
-            "end_line": 6,
+            "source_sha256": "08a7b5a622b77b0af3054a6f8c66de96e0583abacf4f18c48b50d1db6fc81372",
+            "start_line": 8,
+            "end_line": 8,
             "sha256": "82b6b2bd933714f5041b89d1d7b45dfe4b99606f7fa21b56a615b74bd0d37066",
             "needle": "\"craft.rule.release.activate\""
           }
@@ -2859,10 +2859,10 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/craft/craft_backend/capabilities/rule_descriptors.py",
-            "source_sha256": "d16a01fec54eaf15122fb47304cda15412024732976abedd32c90cd43913c4bd",
-            "start_line": 8,
-            "end_line": 8,
-            "sha256": "da20d5c44de7b71c3e208cfd3e5f288782cee9783f0e104504f8dc2061330e30",
+            "source_sha256": "08a7b5a622b77b0af3054a6f8c66de96e0583abacf4f18c48b50d1db6fc81372",
+            "start_line": 10,
+            "end_line": 10,
+            "sha256": "ca1b4a318ec059654cce4387a2f2a64dc4936c778fe17ae82d7f2f1b5bbcf452",
             "needle": "\"craft.rule.waiver.create\""
           }
         ],
@@ -3369,17 +3369,17 @@
       "frontend_call_sites": [
         {
           "source_path": "web/container_card/modes/container_item_detail.js",
-          "line": 136,
+          "line": 178,
           "column": 134,
           "operation": "knowledge.update",
-          "source_sha256": "2707d0dfb871b339c28c587d03adabf464882b2095c62a364b32e77682e6dad9"
+          "source_sha256": "a95c48aee7fcfe802e0d0dc197d5115ee4ab3e439e86dfcab00a3aa48f9d8b81"
         },
         {
           "source_path": "web/container_card/modes/mode_field_detail.js",
-          "line": 46,
+          "line": 77,
           "column": 130,
           "operation": "knowledge.update",
-          "source_sha256": "f8656483caefc979f5f23be6e2c6ad84c0c053a4c3f0acb7821ffc9516fb790d"
+          "source_sha256": "a2fb6903665f9ca608a23a3cdef99ce7309bcb578ec63e0c08e05c44e9ad3af2"
         }
       ],
       "equivalence_evidence": {
@@ -3455,9 +3455,9 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "da866b136e014f9cd73dbd97c4351176ef0076fc33be78c06011cc7dc10b20dd",
-            "start_line": 562,
-            "end_line": 562,
+            "source_sha256": "30514af2c07b3eee53c9e103e1cfbf7d25f6c3b21d5dfb5f1e5baa2e8765895b",
+            "start_line": 577,
+            "end_line": 577,
             "sha256": "87996e6eb263b446ffb01e10d1cdbd92be0299705262028f64b237aa97d299d9",
             "needle": "INPUT_SCHEMAS[(\"craft.rule.library.change.apply\", 1)]"
           }

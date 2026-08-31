@@ -1,10 +1,10 @@
 # Capability V2 Structural Owner-Service Remediation Plan
 
-This plan preserves the reviewed historical Web source scope while reconciling each group to current canonical unresolved evidence or current generated migrated-capability evidence. It is an implementation sequence, not an operations or BFF exemption.
+This plan preserves the reviewed historical Web source scope while reconciling each group to current canonical unresolved, migrated-capability, or removed-dead-entry evidence. It is an implementation sequence, not an operations or BFF exemption.
 
 - Historical scope: **45 occurrences / 37 root-cause groups**.
-- Current progress: **26 migrated groups**; remaining groups are retained rather than erased.
-- Implementation disposition for every group: `owner_service_required`.
+- Current progress: **28 migrated groups**, **5 removed dead-entry groups**; unresolved groups are retained rather than erased.
+- Implementation disposition: unresolved groups remain `owner_service_required`; source-proved dead controls are `removed_dead_entry` with no target Capability.
 - Global prohibitions: no private-router import; no direct SQL provider; no generic JSON contracts; no secret logging; no auto-confirm; no unbounded runtime execution; no fabricated atomicity; no silent REST fallback.
 
 ## Ordered packages
@@ -102,30 +102,30 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 ### `DELETE /api/craft_lib/equipments/{dynamic}`
 
 - Historical occurrences: web/knowledge_hub/pages/gbop_vpps.html:771:58:DELETE:/api/craft_lib/equipments/{dynamic}
-- Current status: `unresolved` (`unresolved`).
+- Current status: `removed_dead_entry` (`removed_dead_entry`).
 - Owner/service: `craft` / `plugins.craft.craft_backend.application.library_lifecycle_service`
-- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/craft_library.py`; No delete provider exists; the available obsolete transition is a different lifecycle outcome.
-- Service boundary and transaction: New public Craft library lifecycle service that validates references and performs one lifecycle transition; no route-shaped SQL provider. one Craft library transaction locking item and references plus audit.
-- Target: `craft.library.equipment.retire@1`. Scope: Craft workspace/object scope.
+- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `None`; {'input': 'Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.', 'output': 'Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.', 'side_effects': 'Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.'}
+- Service boundary and transaction: New public Craft library lifecycle service that validates references and performs one lifecycle transition; no route-shaped SQL provider. not_applicable.
+- Target: `None`. Scope: Craft workspace/object scope.
 - Contract/security: Craft workspace/object scope; reference/lifecycle validation; audit event and revision lock.
-- Migration: Implement approved lifecycle outcome; do not map delete to an unrelated obsolete call.
+- Migration: No migration: retain source-derived removal evidence.
 - Tests: referenced/unreferenced delete behavior; owner/non-owner authorization; replay and lifecycle conflict. Dependencies: library reference index, Craft lifecycle audit migration. Cross-domain links: Reference checks use typed Craft ports only; no direct reads into other domain tables..
-- Approval: Product must decide hard-delete versus obsolete/archive behavior because the only existing outcome is obsolete, not delete.
-- Exit: public owner service and Gateway provider share this boundary; closed contract and scope tests pass; fresh canonical occurrence migrates without REST fallback; no operations/BFF/canonical-disposition relabeling.
+- Approval: None; implement from existing source evidence.
+- Exit: interactive control absent; network path absent; no candidate capability; canonical inventory has no occurrence.
 
 ### `DELETE /api/craft_lib/fixtures/{dynamic}`
 
 - Historical occurrences: web/knowledge_hub/pages/gbop_vpps.html:714:58:DELETE:/api/craft_lib/fixtures/{dynamic}
-- Current status: `unresolved` (`unresolved`).
+- Current status: `removed_dead_entry` (`removed_dead_entry`).
 - Owner/service: `craft` / `plugins.craft.craft_backend.application.library_lifecycle_service`
-- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/craft_library.py`; No delete provider exists; the available obsolete transition is a different lifecycle outcome.
-- Service boundary and transaction: New public Craft library lifecycle service that validates references and performs one lifecycle transition; no route-shaped SQL provider. one Craft library transaction locking item and references plus audit.
-- Target: `craft.library.fixture.retire@1`. Scope: Craft workspace/object scope.
+- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `None`; {'input': 'Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.', 'output': 'Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.', 'side_effects': 'Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.'}
+- Service boundary and transaction: New public Craft library lifecycle service that validates references and performs one lifecycle transition; no route-shaped SQL provider. not_applicable.
+- Target: `None`. Scope: Craft workspace/object scope.
 - Contract/security: Craft workspace/object scope; reference/lifecycle validation; audit event and revision lock.
-- Migration: Implement approved lifecycle outcome; do not map delete to an unrelated obsolete call.
+- Migration: No migration: retain source-derived removal evidence.
 - Tests: referenced/unreferenced delete behavior; owner/non-owner authorization; replay and lifecycle conflict. Dependencies: library reference index, Craft lifecycle audit migration. Cross-domain links: Reference checks use typed Craft ports only; no direct reads into other domain tables..
-- Approval: Product must decide hard-delete versus obsolete/archive behavior because the only existing outcome is obsolete, not delete.
-- Exit: public owner service and Gateway provider share this boundary; closed contract and scope tests pass; fresh canonical occurrence migrates without REST fallback; no operations/BFF/canonical-disposition relabeling.
+- Approval: None; implement from existing source evidence.
+- Exit: interactive control absent; network path absent; no candidate capability; canonical inventory has no occurrence.
 
 ### `DELETE /api/lists/{dynamic}`
 
@@ -270,9 +270,9 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 ### `GET /api/rule-engine/check-entry`
 
 - Historical occurrences: packages/craft-plugin/web/lineage_view/layout_detail_panel.js:2192:40:GET:/api/rule-engine/check-entry, packages/craft-plugin/web/lineage_view/layout_detail_panel.js:3524:40:GET:/api/rule-engine/check-entry
-- Current status: `unresolved` (`unresolved`).
+- Current status: `migrated` (`migrated`).
 - Owner/service: `craft` / `plugins.craft.craft_backend.application.rules.RuleService`
-- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/rule_engine.py`; No entry-check provider exists; CEL evaluation and BOP audit are different outcomes.
+- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/capabilities/rule_engine.py:174-183`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it. bounded read/evaluation with audit record; no arbitrary executable expression.
 - Target: `craft.rule.entry.evaluate@1`. Scope: workspace rule ownership.
 - Contract/security: workspace rule ownership; closed rule-definition grammar; audit, revision lock, explicit confirmation and no generic JSON.
@@ -466,44 +466,44 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 ### `POST /api/rules/{dynamic}/activate`
 
 - Historical occurrences: web/rule_mgmt/rule_mgmt.js:173:26:POST:/api/rules/{dynamic}/activate
-- Current status: `unresolved` (`unresolved`).
+- Current status: `removed_dead_entry` (`removed_dead_entry`).
 - Owner/service: `craft` / `plugins.craft.craft_backend.application.rules.RuleService`
-- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/rules.py`; No mutable-rule activation provider exists; immutable release activation is a different lifecycle outcome.
-- Service boundary and transaction: Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it. one rule lifecycle transition with audit and expected state.
-- Target: `craft.rule.lifecycle.activate@1`. Scope: workspace rule ownership.
+- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `None`; {'input': '/api/rules/{dynamic}/activate: REST activates mutable rule gid; candidate activates a published immutable release contract.', 'output': '/api/rules/{dynamic}/activate: REST returns rule status; candidate returns accepted release outcome.', 'side_effects': '/api/rules/{dynamic}/activate: Candidate lifecycle handler does not mutate the legacy rule record.'}
+- Service boundary and transaction: Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it. not_applicable.
+- Target: `None`. Scope: workspace rule ownership.
 - Contract/security: workspace rule ownership; closed rule-definition grammar; audit, revision lock, explicit confirmation and no generic JSON.
-- Migration: Implement mutable-rule activation only after its distinct lifecycle contract is approved.
+- Migration: No migration: retain source-derived removal evidence.
 - Tests: rule lifecycle authorization and revision conflict; definition/schema rejection; evaluation/waiver audit and idempotency. Dependencies: rule aggregate migration, approved closed rule-definition vocabulary. Cross-domain links: None; rule evaluation remains within Craft's public service boundary..
-- Approval: Product/security must approve the finite rule-definition and mutable lifecycle semantics; existing routes have no equivalent public service.
-- Exit: public owner service and Gateway provider share this boundary; closed contract and scope tests pass; fresh canonical occurrence migrates without REST fallback; no operations/BFF/canonical-disposition relabeling.
+- Approval: None; implement from existing source evidence.
+- Exit: interactive control absent; network path absent; no candidate capability; canonical inventory has no occurrence.
 
 ### `POST /api/rules/{dynamic}/deviations`
 
 - Historical occurrences: web/rule_mgmt/rule_mgmt.js:220:36:POST:/api/rules/{dynamic}/deviations
-- Current status: `unresolved` (`unresolved`).
+- Current status: `removed_dead_entry` (`removed_dead_entry`).
 - Owner/service: `craft` / `plugins.craft.craft_backend.application.rules.RuleService`
-- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/rules.py`; No legacy deviation provider exists; governed release waiver creation has a different evidence contract.
-- Service boundary and transaction: Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it. one rule deviation/waiver transaction with evidence and audit.
-- Target: `craft.rule.deviation.create@1`. Scope: workspace rule ownership.
+- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `None`; {'input': '/api/rules/{dynamic}/deviations: REST deviation body is tied to rule gid; candidate waiver contract expects governed release/evidence fields.', 'output': '/api/rules/{dynamic}/deviations: REST returns deviation record; candidate returns accepted waiver outcome.', 'side_effects': '/api/rules/{dynamic}/deviations: Candidate does not persist the legacy deviation model.'}
+- Service boundary and transaction: Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it. not_applicable.
+- Target: `None`. Scope: workspace rule ownership.
 - Contract/security: workspace rule ownership; closed rule-definition grammar; audit, revision lock, explicit confirmation and no generic JSON.
-- Migration: Do not substitute release waiver; model legacy deviation evidence exactly.
+- Migration: No migration: retain source-derived removal evidence.
 - Tests: rule lifecycle authorization and revision conflict; definition/schema rejection; evaluation/waiver audit and idempotency. Dependencies: rule aggregate migration, approved closed rule-definition vocabulary. Cross-domain links: None; rule evaluation remains within Craft's public service boundary..
-- Approval: Product/security must approve the finite rule-definition and mutable lifecycle semantics; existing routes have no equivalent public service.
-- Exit: public owner service and Gateway provider share this boundary; closed contract and scope tests pass; fresh canonical occurrence migrates without REST fallback; no operations/BFF/canonical-disposition relabeling.
+- Approval: None; implement from existing source evidence.
+- Exit: interactive control absent; network path absent; no candidate capability; canonical inventory has no occurrence.
 
 ### `POST /api/rules/{dynamic}/suspend`
 
 - Historical occurrences: web/rule_mgmt/rule_mgmt.js:175:26:POST:/api/rules/{dynamic}/suspend
-- Current status: `unresolved` (`unresolved`).
+- Current status: `removed_dead_entry` (`removed_dead_entry`).
 - Owner/service: `craft` / `plugins.craft.craft_backend.application.rules.RuleService`
-- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/rules.py`; No mutable-rule suspension handler or domain service exists.
-- Service boundary and transaction: Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it. one rule lifecycle transition with audit and expected state.
-- Target: `craft.rule.lifecycle.suspend@1`. Scope: workspace rule ownership.
+- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `None`; {'input': 'Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.', 'output': 'Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.', 'side_effects': 'Catalog and provider review found no exact provider-equivalent stable outcome; similar names were rejected.'}
+- Service boundary and transaction: Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it. not_applicable.
+- Target: `None`. Scope: workspace rule ownership.
 - Contract/security: workspace rule ownership; closed rule-definition grammar; audit, revision lock, explicit confirmation and no generic JSON.
-- Migration: Implement a mutable-rule suspension service; no missing-handler adapter.
+- Migration: No migration: retain source-derived removal evidence.
 - Tests: rule lifecycle authorization and revision conflict; definition/schema rejection; evaluation/waiver audit and idempotency. Dependencies: rule aggregate migration, approved closed rule-definition vocabulary. Cross-domain links: None; rule evaluation remains within Craft's public service boundary..
-- Approval: Product/security must approve the finite rule-definition and mutable lifecycle semantics; existing routes have no equivalent public service.
-- Exit: public owner service and Gateway provider share this boundary; closed contract and scope tests pass; fresh canonical occurrence migrates without REST fallback; no operations/BFF/canonical-disposition relabeling.
+- Approval: None; implement from existing source evidence.
+- Exit: interactive control absent; network path absent; no candidate capability; canonical inventory has no occurrence.
 
 ### `POST /api/skills/canvas-options`
 
@@ -592,9 +592,9 @@ This plan preserves the reviewed historical Web source scope while reconciling e
 ### `PUT /api/rules/{dynamic}`
 
 - Historical occurrences: web/container_card/modes/container_item_detail.js:137:53:PUT:/api/rules/{dynamic}, web/container_card/modes/mode_field_detail.js:47:50:PUT:/api/rules/{dynamic}
-- Current status: `unresolved` (`unresolved`).
+- Current status: `migrated` (`migrated`).
 - Owner/service: `craft` / `plugins.craft.craft_backend.application.rules.RuleService`
-- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/routers/rules.py`; Rule definition changes contain dynamic rule_definition data without a governed closed nested contract.
+- Blocker evidence: `docs/governance/craft-agent-project-structural-web-remediation.json`; `plugins/craft/craft_backend/capabilities/rule_library.py:149-176`; Migrated through the reviewed public owner service and generated capability evidence.
 - Service boundary and transaction: Public Craft RuleService expanded into bounded definition/lifecycle/evaluation/waiver operations; compatibility and Gateway must share it. one revision-locked rule-definition transaction plus audit.
 - Target: `craft.rule.definition.change.apply@1`. Scope: workspace rule ownership.
 - Contract/security: workspace rule ownership; closed rule-definition grammar; audit, revision lock, explicit confirmation and no generic JSON.
