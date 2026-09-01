@@ -11,6 +11,8 @@ from typing import Any, Protocol
 from backend.utils.gid import next_gid
 
 from .models import (
+    BusinessPurposeRecord,
+    BusinessRuleRecord,
     CapabilityBusinessProjection,
     CapabilityBusinessReview,
     CapabilityBinding,
@@ -114,6 +116,10 @@ def _optional_row_value(row: Any, name: str, index: int) -> str | None:
     return None if value is None else str(value)
 
 
+def _text_value(value: Any) -> str:
+    return value.decode("ascii") if isinstance(value, bytes | bytearray) else str(value)
+
+
 def _json_load(value: Any) -> Mapping[str, Any]:
     if isinstance(value, (bytes, bytearray)):
         value = value.decode("utf-8")
@@ -141,6 +147,13 @@ def _duplicate_key(exc: Exception) -> bool:
     return "duplicate" in text or "integrity" in text and "unique" in text
 
 
+def _validate_business_review_references(review: CapabilityBusinessReview) -> None:
+    if review.proposal_gid <= 0:
+        raise ImmutableRecordError("business_review_proposal_gid_invalid")
+    if review.evidence_snapshot_gid <= 0:
+        raise ImmutableRecordError("business_review_evidence_snapshot_gid_invalid")
+
+
 class MemoryGovernanceStore(GovernanceStore):
     """Thread-safe in-memory store used by governance tests and local projections."""
 
@@ -151,8 +164,8 @@ class MemoryGovernanceStore(GovernanceStore):
         self._major_ids: dict[tuple[int, int], int] = {}
         self._snapshots: dict[int, SnapshotRecord] = {}
         self._snapshots_by_hash: dict[str, SnapshotRecord] = {}
-        self._business_purposes: dict[int, object] = {}
-        self._business_rules: dict[int, object] = {}
+        self._business_purposes: dict[int, BusinessPurposeRecord] = {}
+        self._business_rules: dict[int, BusinessRuleRecord] = {}
         self._relation_candidates: dict[int, CapabilityRelationCandidate] = {}
         self._business_reviews: dict[int, CapabilityBusinessReview] = {}
         self._rule_effectiveness: dict[int, RuleEffectivenessRecord] = {}
@@ -206,13 +219,51 @@ class MemoryGovernanceStore(GovernanceStore):
     def save_business_projection(self, projection: CapabilityBusinessProjection) -> None:
         with self._lock:
             purpose = projection.purpose
-            ids_in_use = (
-                purpose.purpose_gid in self._business_purposes
-                or any(rule.business_rule_gid in self._business_rules for rule in projection.rules)
-                or any(candidate.relation_candidate_gid in self._relation_candidates for candidate in projection.relation_candidates)
-            )
-            if ids_in_use:
-                raise ImmutableRecordError("business_projection_gid_already_exists")
+            purpose_subject = (purpose.capability_version_gid, purpose.definition_hash)
+            if purpose.purpose_gid in self._business_purposes:
+                raise ImmutableRecordError("business_purpose_gid_already_exists")
+            if purpose_subject in {
+                (item.capability_version_gid, item.definition_hash)
+                for item in self._business_purposes.values()
+            }:
+                raise ImmutableRecordError("uq_capability_business_purpose")
+
+            rule_gids = [rule.business_rule_gid for rule in projection.rules]
+            rule_subjects = [
+                (rule.capability_version_gid, rule.definition_hash, rule.rule_id, rule.rule_version)
+                for rule in projection.rules
+            ]
+            if len(rule_gids) != len(set(rule_gids)) or any(
+                gid in self._business_rules for gid in rule_gids
+            ):
+                raise ImmutableRecordError("business_rule_gid_already_exists")
+            existing_rule_subjects = {
+                (rule.capability_version_gid, rule.definition_hash, rule.rule_id, rule.rule_version)
+                for rule in self._business_rules.values()
+            }
+            if len(rule_subjects) != len(set(rule_subjects)) or any(
+                subject in existing_rule_subjects for subject in rule_subjects
+            ):
+                raise ImmutableRecordError("uq_capability_business_rule")
+
+            candidate_gids = [candidate.relation_candidate_gid for candidate in projection.relation_candidates]
+            candidate_subjects = [
+                (candidate.snapshot_gid, candidate.candidate_hash)
+                for candidate in projection.relation_candidates
+            ]
+            if len(candidate_gids) != len(set(candidate_gids)) or any(
+                gid in self._relation_candidates for gid in candidate_gids
+            ):
+                raise ImmutableRecordError("relation_candidate_gid_already_exists")
+            existing_candidate_subjects = {
+                (candidate.snapshot_gid, candidate.candidate_hash)
+                for candidate in self._relation_candidates.values()
+            }
+            if len(candidate_subjects) != len(set(candidate_subjects)) or any(
+                subject in existing_candidate_subjects for subject in candidate_subjects
+            ):
+                raise ImmutableRecordError("uq_capability_relation_candidate")
+
             self._business_purposes[purpose.purpose_gid] = purpose
             self._business_rules.update((rule.business_rule_gid, rule) for rule in projection.rules)
             self._relation_candidates.update(
@@ -222,12 +273,16 @@ class MemoryGovernanceStore(GovernanceStore):
 
     def list_relation_candidates(self, snapshot_gid: int) -> tuple[CapabilityRelationCandidate, ...]:
         with self._lock:
-            return tuple(
-                candidate for candidate in self._relation_candidates.values()
-                if candidate.snapshot_gid == snapshot_gid
-            )
+            return tuple(sorted(
+                (
+                    candidate for candidate in self._relation_candidates.values()
+                    if candidate.snapshot_gid == snapshot_gid
+                ),
+                key=lambda item: item.relation_candidate_gid,
+            ))
 
     def save_business_review(self, review: CapabilityBusinessReview) -> None:
+        _validate_business_review_references(review)
         with self._lock:
             if review.review_gid in self._business_reviews:
                 raise ImmutableRecordError("business_review_gid_already_exists")
@@ -254,11 +309,11 @@ class MemoryGovernanceStore(GovernanceStore):
         self, capability_version_gid: int, definition_hash: str,
     ) -> tuple[RuleEffectivenessRecord, ...]:
         with self._lock:
-            return tuple(
+            return tuple(sorted((
                 record for record in self._rule_effectiveness.values()
                 if record.capability_version_gid == capability_version_gid
                 and record.definition_hash == definition_hash
-            )
+            ), key=lambda item: (item.measured_to, item.effectiveness_gid)))
 
     def _project_capabilities(self, document: SnapshotDocument) -> tuple[CapabilityProjection, ...]:
         projections: list[CapabilityProjection] = []
@@ -562,7 +617,7 @@ class SqlGovernanceStore(GovernanceStore):
                 CapabilityRelationCandidate(
                     relation_candidate_gid=int(_row_value(row, "relation_candidate_gid", 0)),
                     snapshot_gid=int(_row_value(row, "snapshot_gid", 1)),
-                    candidate_hash=str(_row_value(row, "candidate_hash", 2)),
+                    candidate_hash=_text_value(_row_value(row, "candidate_hash", 2)),
                     relation_type=str(_row_value(row, "relation_type", 3)),
                     source=str(_row_value(row, "source", 4)),
                     capability_keys=_json_tuple(_row_value(row, "capability_keys_json", 5)),
@@ -577,6 +632,7 @@ class SqlGovernanceStore(GovernanceStore):
                 close()
 
     def save_business_review(self, review: CapabilityBusinessReview) -> None:
+        _validate_business_review_references(review)
         cursor = self._connection.cursor()
         try:
             cursor.execute(
@@ -608,7 +664,7 @@ class SqlGovernanceStore(GovernanceStore):
                 "SELECT business_review_gid, capability_version_gid, definition_hash, decision, "
                 "decision_reason, reviewer_gid, reviewer_role, decided_at, proposal_gid, evidence_snapshot_gid "
                 "FROM workmanship_base_capability_business_reviews "
-                "WHERE capability_version_gid = %s AND definition_hash = %s "
+                "WHERE capability_version_gid = %s AND definition_hash = BINARY %s "
                 "ORDER BY decided_at DESC, business_review_gid DESC LIMIT 1",
                 (int(capability_version_gid), definition_hash),
             )
@@ -618,7 +674,7 @@ class SqlGovernanceStore(GovernanceStore):
             return CapabilityBusinessReview(
                 review_gid=int(_row_value(row, "business_review_gid", 0)),
                 capability_version_gid=int(_row_value(row, "capability_version_gid", 1)),
-                definition_hash=str(_row_value(row, "definition_hash", 2)),
+                definition_hash=_text_value(_row_value(row, "definition_hash", 2)),
                 decision=str(_row_value(row, "decision", 3)),
                 decision_reason=str(_row_value(row, "decision_reason", 4)),
                 reviewer_gid=str(_row_value(row, "reviewer_gid", 5)),
@@ -663,7 +719,7 @@ class SqlGovernanceStore(GovernanceStore):
                 "SELECT effectiveness_gid, capability_version_gid, definition_hash, metric_name, "
                 "metric_value, evidence_json, measured_from, measured_to "
                 "FROM workmanship_base_capability_rule_effectiveness "
-                "WHERE capability_version_gid = %s AND definition_hash = %s "
+                "WHERE capability_version_gid = %s AND definition_hash = BINARY %s "
                 "ORDER BY measured_to, effectiveness_gid",
                 (int(capability_version_gid), definition_hash),
             )
@@ -671,7 +727,7 @@ class SqlGovernanceStore(GovernanceStore):
                 RuleEffectivenessRecord(
                     effectiveness_gid=int(_row_value(row, "effectiveness_gid", 0)),
                     capability_version_gid=int(_row_value(row, "capability_version_gid", 1)),
-                    definition_hash=str(_row_value(row, "definition_hash", 2)),
+                    definition_hash=_text_value(_row_value(row, "definition_hash", 2)),
                     metric_name=str(_row_value(row, "metric_name", 3)),
                     metric_value=int(_row_value(row, "metric_value", 4)),
                     evidence=_json_load(_row_value(row, "evidence_json", 5)),

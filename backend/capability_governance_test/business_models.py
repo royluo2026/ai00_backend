@@ -124,8 +124,8 @@ class CapabilityBusinessReview:
     reviewer_gid: str
     reviewer_role: str
     decided_at: datetime
-    proposal_gid: int = 0
-    evidence_snapshot_gid: int = 0
+    proposal_gid: int
+    evidence_snapshot_gid: int
 
 
 @dataclass(frozen=True)

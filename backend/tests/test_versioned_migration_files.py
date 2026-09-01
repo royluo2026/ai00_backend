@@ -108,6 +108,35 @@ class VersionedMigrationFileTests(unittest.TestCase):
             "ALTER TABLE workmanship_app_x DROP PRIMARY KEY, ADD PRIMARY KEY (tenant_gid,view_gid)",
         ))
 
+    def test_not_null_hash_type_change_runs_until_binary_type_matches(self):
+        class MetadataCursor:
+            def __init__(self, column_type):
+                self.column_type = column_type
+
+            def __enter__(self): return self
+            def __exit__(self, *_args): return False
+            def execute(self, _sql, _params=()): pass
+            def fetchone(self): return ("NO", self.column_type)
+
+        class MetadataConnection:
+            def __init__(self, column_type):
+                self.column_type = column_type
+
+            def cursor(self): return MetadataCursor(self.column_type)
+
+        statement = (
+            "ALTER TABLE workmanship_base_capability_business_reviews "
+            "MODIFY COLUMN definition_hash VARBINARY(71) NOT NULL"
+        )
+
+        self.assertEqual(
+            prepare_resumable_statement(MetadataConnection("varchar(71)"), statement),
+            statement,
+        )
+        self.assertIsNone(
+            prepare_resumable_statement(MetadataConnection("varbinary(71)"), statement),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

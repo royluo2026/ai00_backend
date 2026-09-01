@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import FrozenInstanceError
+from dataclasses import FrozenInstanceError, replace
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -22,6 +22,7 @@ from backend.capability_governance_test.store import MemoryGovernanceStore, SqlG
 NOW = datetime(2026, 9, 1, tzinfo=timezone.utc)
 HASH_1 = "sha256:" + "1" * 64
 HASH_2 = "sha256:" + "2" * 64
+HASH_A = "sha256:" + "a" * 64
 
 
 def _effectiveness_record(**overrides: object) -> RuleEffectivenessRecord:
@@ -124,6 +125,67 @@ def test_memory_projection_round_trips_relation_candidates():
     assert store.list_relation_candidates(501) == projection.relation_candidates
 
 
+def test_memory_projection_enforces_purpose_subject_unique_key():
+    store = MemoryGovernanceStore()
+    projection = replace(_projection(), rules=(), relation_candidates=())
+    duplicate = replace(
+        projection,
+        purpose=replace(projection.purpose, purpose_gid=999),
+    )
+
+    store.save_business_projection(projection)
+
+    with pytest.raises(ImmutableRecordError, match="uq_capability_business_purpose"):
+        store.save_business_projection(duplicate)
+
+
+def test_memory_projection_rejects_duplicate_rule_identity_and_gid_within_batch():
+    projection = _projection()
+    rule = projection.rules[0]
+
+    duplicate_identity = replace(rule, business_rule_gid=999)
+    with pytest.raises(ImmutableRecordError, match="uq_capability_business_rule"):
+        MemoryGovernanceStore().save_business_projection(
+            replace(projection, rules=(rule, duplicate_identity), relation_candidates=()),
+        )
+
+    duplicate_gid = replace(rule, rule_id="person.height.unit")
+    with pytest.raises(ImmutableRecordError, match="business_rule_gid_already_exists"):
+        MemoryGovernanceStore().save_business_projection(
+            replace(projection, rules=(rule, duplicate_gid), relation_candidates=()),
+        )
+
+
+def test_memory_projection_rejects_duplicate_candidate_subject_and_gid_within_batch():
+    projection = _projection()
+    candidate = projection.relation_candidates[0]
+
+    duplicate_subject = replace(candidate, relation_candidate_gid=999)
+    with pytest.raises(ImmutableRecordError, match="uq_capability_relation_candidate"):
+        MemoryGovernanceStore().save_business_projection(
+            replace(projection, rules=(), relation_candidates=(candidate, duplicate_subject)),
+        )
+
+    duplicate_gid = replace(candidate, candidate_hash=HASH_1)
+    with pytest.raises(ImmutableRecordError, match="relation_candidate_gid_already_exists"):
+        MemoryGovernanceStore().save_business_projection(
+            replace(projection, rules=(), relation_candidates=(candidate, duplicate_gid)),
+        )
+
+
+def test_memory_relation_candidates_use_sql_order():
+    projection = _projection()
+    first = replace(projection.relation_candidates[0], relation_candidate_gid=405, candidate_hash=HASH_1)
+    second = replace(projection.relation_candidates[0], relation_candidate_gid=403, candidate_hash=HASH_2)
+    store = MemoryGovernanceStore()
+
+    store.save_business_projection(
+        replace(projection, rules=(), relation_candidates=(first, second)),
+    )
+
+    assert store.list_relation_candidates(501) == (second, first)
+
+
 def test_business_review_is_bound_to_exact_definition_hash():
     store = MemoryGovernanceStore()
     review = CapabilityBusinessReview(
@@ -135,6 +197,8 @@ def test_business_review_is_bound_to_exact_definition_hash():
         reviewer_gid="9001",
         reviewer_role="super_admin",
         decided_at=NOW,
+        proposal_gid=701,
+        evidence_snapshot_gid=501,
     )
 
     store.save_business_review(review)
@@ -143,10 +207,22 @@ def test_business_review_is_bound_to_exact_definition_hash():
     assert store.current_business_review(202, HASH_2) is None
 
 
+def test_business_review_hash_lookup_is_case_and_space_exact_in_memory():
+    store = MemoryGovernanceStore()
+    review = CapabilityBusinessReview(
+        101, 202, HASH_A, "approved", "Evidence is sufficient", "9001", "super_admin",
+        NOW, 701, 501,
+    )
+    store.save_business_review(review)
+
+    assert store.current_business_review(202, HASH_A.upper()) is None
+    assert store.current_business_review(202, HASH_A + " ") is None
+
+
 def test_business_reviews_are_append_only_and_latest_exact_hash_is_current():
     store = MemoryGovernanceStore()
-    first = CapabilityBusinessReview(101, 202, HASH_1, "changes_requested", "Add evidence", "9001", "super_admin", NOW)
-    second = CapabilityBusinessReview(102, 202, HASH_1, "approved", "Evidence added", "9001", "super_admin", NOW + timedelta(seconds=1))
+    first = CapabilityBusinessReview(101, 202, HASH_1, "changes_requested", "Add evidence", "9001", "super_admin", NOW, 701, 501)
+    second = CapabilityBusinessReview(102, 202, HASH_1, "approved", "Evidence added", "9001", "super_admin", NOW + timedelta(seconds=1), 701, 501)
 
     store.save_business_review(first)
     store.save_business_review(second)
@@ -170,6 +246,21 @@ def test_rule_effectiveness_is_append_only():
         store.save_rule_effectiveness(first)
 
 
+def test_memory_rule_effectiveness_uses_sql_order():
+    store = MemoryGovernanceStore()
+    latest = _effectiveness_record(effectiveness_gid=303, measured_to=NOW + timedelta(hours=1))
+    same_time_high_gid = _effectiveness_record(effectiveness_gid=302)
+    same_time_low_gid = _effectiveness_record(effectiveness_gid=301)
+
+    store.save_rule_effectiveness(latest)
+    store.save_rule_effectiveness(same_time_high_gid)
+    store.save_rule_effectiveness(same_time_low_gid)
+
+    assert store.list_rule_effectiveness(202, HASH_1) == (
+        same_time_low_gid, same_time_high_gid, latest,
+    )
+
+
 class _Cursor:
     def __init__(self, connection: "_Connection"):
         self.connection = connection
@@ -179,9 +270,26 @@ class _Cursor:
     def execute(self, query: str, parameters: tuple[object, ...] = ()) -> None:
         self.connection.calls.append((query, parameters))
         if query.startswith("SELECT business_review_gid"):
-            self.row = self.connection.review_row
+            row = self.connection.review_row
+            if row is not None:
+                stored_hash = row[2].decode("ascii") if isinstance(row[2], bytes) else str(row[2])
+                requested_hash = str(parameters[1])
+                exact = "definition_hash = BINARY %s" in query
+                matches = stored_hash == requested_hash if exact else stored_hash.rstrip().casefold() == requested_hash.rstrip().casefold()
+                row = row if matches else None
+            self.row = row
         elif query.startswith("SELECT effectiveness_gid"):
-            self.rows = list(self.connection.effectiveness_rows)
+            exact = "definition_hash = BINARY %s" in query
+            requested_hash = str(parameters[1])
+            self.rows = [
+                row for row in self.connection.effectiveness_rows
+                if (
+                    (row[2].decode("ascii") if isinstance(row[2], bytes) else str(row[2])) == requested_hash
+                    if exact else
+                    (row[2].decode("ascii") if isinstance(row[2], bytes) else str(row[2])).rstrip().casefold()
+                    == requested_hash.rstrip().casefold()
+                )
+            ]
         elif query.startswith("SELECT relation_candidate_gid"):
             self.rows = list(self.connection.relation_rows)
         else:
@@ -244,10 +352,10 @@ def test_sql_projection_uses_parameterized_canonical_json_and_lists_relations():
 
 
 def test_sql_review_and_effectiveness_round_trip_exact_definition_hash():
-    review = CapabilityBusinessReview(101, 202, HASH_1, "approved", "Evidence is sufficient", "9001", "super_admin", NOW)
+    review = CapabilityBusinessReview(101, 202, HASH_1, "approved", "Evidence is sufficient", "9001", "super_admin", NOW, 701, 501)
     effectiveness = _effectiveness_record()
     connection = _Connection(
-        review_row=(101, 202, HASH_1, "approved", "Evidence is sufficient", "9001", "super_admin", NOW, 0, 0),
+        review_row=(101, 202, HASH_1, "approved", "Evidence is sufficient", "9001", "super_admin", NOW, 701, 501),
         effectiveness_rows=((301, 202, HASH_1, "rule_rejection_count", 7,
                              '{"error_codes":["invalid_height"],"source":"audit"}',
                              NOW - timedelta(days=1), NOW),),
@@ -259,8 +367,43 @@ def test_sql_review_and_effectiveness_round_trip_exact_definition_hash():
 
     assert store.current_business_review(202, HASH_1) == review
     assert store.list_rule_effectiveness(202, HASH_1) == (effectiveness,)
+    assert store.list_rule_effectiveness(202, HASH_1.upper()) == ()
     review_select = next((query, parameters) for query, parameters in connection.calls if query.startswith("SELECT business_review_gid"))
     effectiveness_select = next((query, parameters) for query, parameters in connection.calls if query.startswith("SELECT effectiveness_gid"))
     assert review_select[1] == (202, HASH_1)
     assert effectiveness_select[1] == (202, HASH_1)
+    assert "definition_hash = BINARY %s" in effectiveness_select[0]
     assert connection.commits == 2
+
+
+def test_sql_review_lookup_is_binary_exact_for_case_and_trailing_space():
+    connection = _Connection(
+        review_row=(101, 202, HASH_A.encode("ascii"), "approved", "Evidence is sufficient", "9001", "super_admin", NOW, 701, 501),
+    )
+    store = SqlGovernanceStore(connection)
+
+    assert store.current_business_review(202, HASH_A.upper()) is None
+    assert store.current_business_review(202, HASH_A + " ") is None
+    queries = [query for query, _ in connection.calls if query.startswith("SELECT business_review_gid")]
+    assert all("definition_hash = BINARY %s" in query for query in queries)
+
+
+@pytest.mark.parametrize(
+    ("proposal_gid", "evidence_snapshot_gid", "error_code"),
+    ((0, 501, "business_review_proposal_gid_invalid"), (701, 0, "business_review_evidence_snapshot_gid_invalid")),
+)
+def test_stores_reject_invalid_business_review_references_before_insert(
+    proposal_gid: int, evidence_snapshot_gid: int, error_code: str,
+):
+    review = CapabilityBusinessReview(
+        101, 202, HASH_1, "approved", "Evidence is sufficient", "9001", "super_admin",
+        NOW, proposal_gid, evidence_snapshot_gid,
+    )
+
+    with pytest.raises(ImmutableRecordError, match=error_code):
+        MemoryGovernanceStore().save_business_review(review)
+
+    connection = _Connection()
+    with pytest.raises(ImmutableRecordError, match=error_code):
+        SqlGovernanceStore(connection).save_business_review(review)
+    assert connection.calls == []

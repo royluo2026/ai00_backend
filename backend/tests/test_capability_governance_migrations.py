@@ -80,6 +80,15 @@ def test_worker_leases_have_an_explicit_test_governance_table():
     assert "CREATE TABLE IF NOT EXISTS workmanship_base_capability_worker_leases" in compiled.normalized_sql
 
 
+def test_business_governance_hash_columns_are_binary_exact():
+    compiled = compile_governance_migrations(ROOT)
+    migration = next(item for item in compiled.migrations if item.migration_id == "0006")
+    sql = migration.sql.upper()
+
+    assert sql.count("DEFINITION_HASH VARBINARY(71) NOT NULL") == 4
+    assert "CANDIDATE_HASH VARBINARY(71) NOT NULL" in sql
+
+
 def test_cli_failure_redacts_configuration_and_traceback():
     environment = os.environ.copy()
     environment["AI00_DEPLOYMENT_PROFILE"] = "test-governance"

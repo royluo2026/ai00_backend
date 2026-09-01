@@ -310,13 +310,24 @@ def prepare_resumable_statement(conn, statement: str) -> str | None:
         table, column = modify_not_null.groups()
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT IS_NULLABLE FROM information_schema.COLUMNS "
+                "SELECT IS_NULLABLE, COLUMN_TYPE FROM information_schema.COLUMNS "
                 "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s AND COLUMN_NAME=%s",
                 (table, column),
             )
             row = cur.fetchone()
-        if row is not None and str(row["IS_NULLABLE"] if isinstance(row, dict) else row[0]).upper() == "NO":
-            return None
+        if row is not None:
+            nullable = str(row["IS_NULLABLE"] if isinstance(row, dict) else row[0]).upper()
+            if nullable == "NO":
+                desired_binary = re.search(r"\bVARBINARY\s*\(\s*\d+\s*\)", statement, re.I)
+                if desired_binary is None:
+                    return None
+                column_type = (
+                    row.get("COLUMN_TYPE") if isinstance(row, dict)
+                    else row[1] if len(row) > 1 else None
+                )
+                desired_type = re.sub(r"\s+", "", desired_binary.group(0)).lower()
+                if column_type is not None and re.sub(r"\s+", "", str(column_type)).lower() == desired_type:
+                    return None
         return statement
 
     primary_key_change = re.search(
