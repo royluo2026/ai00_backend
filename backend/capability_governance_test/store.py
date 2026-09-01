@@ -363,6 +363,15 @@ class MemoryGovernanceStore(GovernanceStore):
     def save_business_review(self, review: CapabilityBusinessReview) -> None:
         _validate_business_review_references(review)
         with self._lock:
+            snapshot = self._snapshots.get(review.evidence_snapshot_gid)
+            if snapshot is None:
+                raise ImmutableRecordError("business_review_evidence_snapshot_not_found")
+            if not any(
+                int(getattr(entry, "capability_version_gid", 0) or 0)
+                == review.capability_version_gid
+                for entry in snapshot.entries
+            ):
+                raise ImmutableRecordError("business_review_capability_version_not_in_snapshot")
             if review.review_gid in self._business_reviews:
                 raise ImmutableRecordError("business_review_gid_already_exists")
             self._business_reviews[review.review_gid] = review
@@ -376,7 +385,7 @@ class MemoryGovernanceStore(GovernanceStore):
                 if review.capability_version_gid == capability_version_gid
                 and review.definition_hash == definition_hash
             )
-            latest = max(matching, key=lambda item: (item.decided_at, item.review_gid), default=None)
+            latest = max(matching, key=lambda item: item.review_gid, default=None)
             return latest if latest is not None and latest.decision == "approved" else None
 
     def save_rule_effectiveness(self, record: RuleEffectivenessRecord) -> None:
@@ -844,7 +853,7 @@ class SqlGovernanceStore(GovernanceStore):
                 "decision_reason, reviewer_gid, reviewer_role, decided_at, proposal_gid, evidence_snapshot_gid "
                 "FROM workmanship_base_capability_business_reviews "
                 "WHERE capability_version_gid = %s AND definition_hash = BINARY %s "
-                "ORDER BY decided_at DESC, business_review_gid DESC LIMIT 1",
+                "ORDER BY business_review_gid DESC LIMIT 1",
                 (int(capability_version_gid), definition_hash),
             )
             row = cursor.fetchone()

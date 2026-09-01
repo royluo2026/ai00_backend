@@ -5,6 +5,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 import re
+from threading import RLock
 
 from .audit import AuditSink
 from .business_models import CapabilityBusinessReview
@@ -144,6 +145,7 @@ class ProposalService:
         self._idempotency: dict[str, Proposal] = {}
         self._business_review_sink = business_review_sink
         self._business_decisions: dict[str, tuple[tuple[object, ...], Proposal]] = {}
+        self._business_review_lock = RLock()
 
     def get(self, proposal_gid: int) -> Proposal:
         try:
@@ -242,68 +244,68 @@ class ProposalService:
         self, proposal_gid: int, *, reviewer_context: ReviewerContext,
         definition_hash: str, current_definition_hash: str, decision: str,
         decision_reason: str, expected_row_version: int, idempotency_key: str,
-        decided_at: datetime | None = None,
     ) -> Proposal:
         """Append one super-admin decision for a pinned business definition."""
-        key = str(idempotency_key).strip()
-        if not key:
-            raise WorkflowError("idempotency_key_required")
-        reason = str(decision_reason).strip()
-        fingerprint = (
-            int(proposal_gid), str(definition_hash), str(decision), reason,
-            int(expected_row_version), reviewer_context.gid,
-        )
-        replay = self._business_decisions.get(key)
-        if replay is not None:
-            if replay[0] != fingerprint:
-                raise WorkflowError("idempotency_conflict")
-            return replay[1]
-        if not _is_sha256(definition_hash) or not _is_sha256(current_definition_hash):
-            raise WorkflowError("review_subject_hash_invalid")
-        if decision not in {"approved", "rejected", "changes_requested"}:
-            raise WorkflowError("review_decision_invalid")
-        if not reason or len(reason) > 2000:
-            raise WorkflowError("review_reason_invalid")
-        proposal = self.get(proposal_gid)
-        if proposal.review_kind != "business_definition" or proposal.status != "pending_approval":
-            raise WorkflowError("review_subject_type_invalid")
-        if proposal.row_version != expected_row_version:
-            raise WorkflowError("row_version_conflict")
-        if definition_hash != proposal.proposed_descriptor_hash or current_definition_hash != proposal.proposed_descriptor_hash:
-            raise WorkflowError("review_subject_hash_mismatch")
-        if "super_admin" not in reviewer_context.roles:
-            raise WorkflowError("reviewer_not_authorized")
-        if reviewer_context.gid == proposal.submitted_by_gid:
-            raise WorkflowError("independent_reviewer_required")
-        if self._business_review_sink is None:
-            raise WorkflowError("business_review_persistence_unavailable")
-        review_gid = self._next_gid()
-        moment = _time(decided_at)
-        business_review = CapabilityBusinessReview(
-            review_gid=review_gid, capability_version_gid=proposal.capability_version_gid,
-            definition_hash=definition_hash, decision=decision, decision_reason=reason,
-            reviewer_gid=reviewer_context.gid, reviewer_role="super_admin", decided_at=moment,
-            proposal_gid=proposal.proposal_gid, evidence_snapshot_gid=proposal.base_snapshot_gid,
-        )
-        try:
-            self._business_review_sink(business_review)
-        except Exception as exc:
-            raise WorkflowError("business_review_persistence_failed") from exc
-        review = Review(
-            review_gid, proposal.proposal_gid, "business_definition", decision,
-            reviewer_context.gid, proposal.base_snapshot_gid, definition_hash,
-            proposal.evidence_hash, moment, reason, "business_definition",
-        )
-        target = "approved" if decision == "approved" else (
-            "rejected" if decision == "rejected" else "checks_failed"
-        )
-        resolved = self._record(
-            key, replace(proposal, status=target, reviews=proposal.reviews + (review,),
-                          row_version=proposal.row_version + 1),
-            operation="business_review", actor_gid=reviewer_context.gid,
-        )
-        self._business_decisions[key] = (fingerprint, resolved)
-        return resolved
+        with self._business_review_lock:
+            key = str(idempotency_key).strip()
+            if not key:
+                raise WorkflowError("idempotency_key_required")
+            reason = str(decision_reason).strip()
+            fingerprint = (
+                int(proposal_gid), str(definition_hash), str(decision), reason,
+                int(expected_row_version), reviewer_context.gid,
+            )
+            replay = self._business_decisions.get(key)
+            if replay is not None:
+                if replay[0] != fingerprint:
+                    raise WorkflowError("idempotency_conflict")
+                return replay[1]
+            if not _is_sha256(definition_hash) or not _is_sha256(current_definition_hash):
+                raise WorkflowError("review_subject_hash_invalid")
+            if decision not in {"approved", "rejected", "changes_requested"}:
+                raise WorkflowError("review_decision_invalid")
+            if not reason or len(reason) > 2000:
+                raise WorkflowError("review_reason_invalid")
+            proposal = self.get(proposal_gid)
+            if proposal.review_kind != "business_definition" or proposal.status != "pending_approval":
+                raise WorkflowError("review_subject_type_invalid")
+            if proposal.row_version != expected_row_version:
+                raise WorkflowError("row_version_conflict")
+            if definition_hash != proposal.proposed_descriptor_hash or current_definition_hash != proposal.proposed_descriptor_hash:
+                raise WorkflowError("review_subject_hash_mismatch")
+            if "super_admin" not in reviewer_context.roles:
+                raise WorkflowError("reviewer_not_authorized")
+            if reviewer_context.gid == proposal.submitted_by_gid:
+                raise WorkflowError("independent_reviewer_required")
+            if self._business_review_sink is None:
+                raise WorkflowError("business_review_persistence_unavailable")
+            review_gid = self._next_gid()
+            moment = _time(None)
+            business_review = CapabilityBusinessReview(
+                review_gid=review_gid, capability_version_gid=proposal.capability_version_gid,
+                definition_hash=definition_hash, decision=decision, decision_reason=reason,
+                reviewer_gid=reviewer_context.gid, reviewer_role="super_admin", decided_at=moment,
+                proposal_gid=proposal.proposal_gid, evidence_snapshot_gid=proposal.base_snapshot_gid,
+            )
+            try:
+                self._business_review_sink(business_review)
+            except Exception as exc:
+                raise WorkflowError("business_review_persistence_failed") from exc
+            review = Review(
+                review_gid, proposal.proposal_gid, "business_definition", decision,
+                reviewer_context.gid, proposal.base_snapshot_gid, definition_hash,
+                proposal.evidence_hash, moment, reason, "business_definition",
+            )
+            target = "approved" if decision == "approved" else (
+                "rejected" if decision == "rejected" else "checks_failed"
+            )
+            resolved = self._record(
+                key, replace(proposal, status=target, reviews=proposal.reviews + (review,),
+                              row_version=proposal.row_version + 1),
+                operation="business_review", actor_gid=reviewer_context.gid,
+            )
+            self._business_decisions[key] = (fingerprint, resolved)
+            return resolved
 
     def list(self) -> tuple[Proposal, ...]:
         return tuple(sorted(self._proposals.values(), key=lambda proposal: proposal.proposal_gid))

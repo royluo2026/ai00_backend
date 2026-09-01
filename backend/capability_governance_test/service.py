@@ -9,6 +9,7 @@ from typing import Any
 import re
 
 from backend.capabilities.models_next import CapabilityBusinessError
+from backend.capability_v2.contracts import ConsumerIdentity, ConsumerType
 from backend.domain_ports.capability_governance_ai import GovernanceAdvisorPort
 
 from .ai_advisory import AdvisoryContractError, AdvisoryResult
@@ -608,12 +609,13 @@ class CapabilityGovernanceService:
         except ValueError as exc:
             raise _business_error("invalid_input") from exc
         selected = tuple(item for item in proposals if matches(item) and int(item["proposal_gid"] or 0) > after_gid)
-        items = selected[:limit]
+        page = selected[:limit + 1]
+        items = page[:limit]
         return self._completed(
             "base.capability_proposal.search", items=items,
             data={"available": self._workflow_port is not None or not self._workflow_persistence_required,
                   "checked_at": self._now_iso(),
-                  "next_cursor": str(items[-1]["proposal_gid"]) if len(selected) > len(items) else None},
+                  "next_cursor": str(items[-1]["proposal_gid"]) if len(page) > len(items) else None},
         )
 
     def base_capability_health_get(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
@@ -955,7 +957,6 @@ class CapabilityGovernanceService:
                     decision_reason=_required_text(payload, "decision_reason"),
                     expected_row_version=_row_version(payload),
                     idempotency_key=f"business-review:{key}",
-                    decided_at=_timestamp(payload, "decided_at"),
                 )
             else:
                 if payload.get("definition_hash") is not None or payload.get("decision_reason") is not None:
@@ -1493,7 +1494,7 @@ class CapabilityGovernanceService:
             values = tuple(getattr(source, "_proposals", {}).values()) if isinstance(getattr(source, "_proposals", None), Mapping) else ()
         records: list[dict[str, Any]] = []
         may_read_business_evidence = context is not None and "super_admin" in self._business_reviewer_context(context).roles
-        for proposal in sorted(values, key=lambda item: int(getattr(item, "proposal_gid", 0)))[:_MAX_SEARCH]:
+        for proposal in sorted(values, key=lambda item: int(getattr(item, "proposal_gid", 0))):
             capability_id = str(getattr(proposal, "capability_id", ""))
             business = getattr(proposal, "review_kind", "standard") == "business_definition"
             records.append({
@@ -1537,14 +1538,16 @@ class CapabilityGovernanceService:
     def _business_reviewer_context(context: object) -> ReviewerContext:
         """Trust only the server-created effective identity, never context/payload claims."""
         identity = getattr(context, "effective_identity", None)
+        if not isinstance(identity, ConsumerIdentity):
+            return ReviewerContext(gid=_mutation_actor(context), roles=(), permissions=(), owned_domains=())
         actor = getattr(identity, "actor", None)
         tenant = getattr(identity, "tenant", None)
         consumer = getattr(identity, "consumer", None)
         user_id = getattr(actor, "user_id", None)
-        consumer_type = getattr(getattr(consumer, "type", None), "value", getattr(consumer, "type", None))
+        consumer_type = getattr(consumer, "type", None)
         roles = getattr(tenant, "active_roles", ()) if (
             identity is not None and user_id and getattr(identity, "delegation", None) is None
-            and str(consumer_type) == "web"
+            and consumer_type is ConsumerType.WEB
         ) else ()
         return ReviewerContext(
             gid=str(user_id or _mutation_actor(context)), roles=tuple(str(role) for role in roles),
@@ -1552,7 +1555,23 @@ class CapabilityGovernanceService:
         )
 
     def _current_business_definition_hash(self, proposal: Any) -> str:
-        snapshot = self._latest_snapshot()
+        pinned = self._snapshot_by_gid(int(getattr(proposal, "base_snapshot_gid", 0) or 0))
+        current = self._latest_snapshot()
+        pinned_hash = self._snapshot_definition_hash(pinned, proposal)
+        current_hash = self._snapshot_definition_hash(current, proposal)
+        if pinned_hash != current_hash:
+            raise WorkflowError("review_subject_hash_mismatch")
+        return current_hash
+
+    def _snapshot_by_gid(self, snapshot_gid: int) -> Any:
+        getter = getattr(self._store, "get_snapshot", None) if self._store is not None else None
+        snapshot = getter(snapshot_gid) if callable(getter) else None
+        if snapshot is None:
+            raise WorkflowError("review_subject_hash_mismatch")
+        return snapshot
+
+    @staticmethod
+    def _snapshot_definition_hash(snapshot: Any, proposal: Any) -> str:
         document = getattr(snapshot, "document", None)
         version_entry = next((
             entry for entry in getattr(snapshot, "entries", ())
@@ -1574,12 +1593,27 @@ class CapabilityGovernanceService:
         raise WorkflowError("review_subject_hash_mismatch")
 
     def _proposal_business_evidence(self, proposal: Any) -> dict[str, Any]:
-        snapshot = self._latest_snapshot()
+        try:
+            snapshot = self._snapshot_by_gid(int(getattr(proposal, "base_snapshot_gid", 0) or 0))
+        except WorkflowError:
+            return {}
         document = getattr(snapshot, "document", None)
+        version_entry = next((
+            entry for entry in getattr(snapshot, "entries", ())
+            if int(getattr(entry, "capability_version_gid", 0) or 0)
+            == int(getattr(proposal, "capability_version_gid", 0) or 0)
+            and str(getattr(entry, "capability_id", "")) == str(getattr(proposal, "capability_id", ""))
+        ), None)
+        if version_entry is None:
+            return {}
         for capability in getattr(document, "capabilities", ()):
-            if str(getattr(capability, "capability_id", "")) == str(getattr(proposal, "capability_id", "")):
+            if (
+                str(getattr(capability, "capability_id", "")) == str(getattr(proposal, "capability_id", ""))
+                and int(getattr(capability, "major_version", 0) or 0) == int(getattr(version_entry, "major_version", 0) or 0)
+            ):
                 relation_loader = getattr(self._store, "list_relation_candidates", None) if self._store is not None else None
                 relations = tuple(relation_loader(int(getattr(snapshot, "snapshot_gid"))) if callable(relation_loader) else ())
+                capability_key = f"{capability.capability_id}@{capability.major_version}"
                 def project(source: str) -> list[dict[str, Any]]:
                     return [
                         {
@@ -1588,7 +1622,10 @@ class CapabilityGovernanceService:
                             "capability_keys": list(getattr(item, "capability_keys", ()))[:20],
                             "evidence": _business_contract_value(redact(getattr(item, "evidence", {}))),
                         }
-                        for item in relations if str(getattr(item, "source", "")) == source
+                        for item in relations if (
+                            str(getattr(item, "source", "")) == source
+                            and capability_key in tuple(getattr(item, "capability_keys", ()))
+                        )
                     ][:20]
                 return {
                     "business_effect": str(getattr(capability, "business_effect", ""))[:4000],

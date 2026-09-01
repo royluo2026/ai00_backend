@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import FrozenInstanceError, replace
 from datetime import datetime, timedelta, timezone
+from types import SimpleNamespace
 
 import pytest
 
@@ -23,6 +24,14 @@ NOW = datetime(2026, 9, 1, tzinfo=timezone.utc)
 HASH_1 = "sha256:" + "1" * 64
 HASH_2 = "sha256:" + "2" * 64
 HASH_A = "sha256:" + "a" * 64
+
+
+def _memory_review_store() -> MemoryGovernanceStore:
+    store = MemoryGovernanceStore()
+    store._snapshots[501] = SimpleNamespace(
+        snapshot_gid=501, entries=(SimpleNamespace(capability_version_gid=202),),
+    )
+    return store
 
 
 def _effectiveness_record(**overrides: object) -> RuleEffectivenessRecord:
@@ -199,7 +208,7 @@ def test_memory_relation_candidate_batch_is_all_or_nothing():
 
 
 def test_business_review_is_bound_to_exact_definition_hash():
-    store = MemoryGovernanceStore()
+    store = _memory_review_store()
     review = CapabilityBusinessReview(
         review_gid=101,
         capability_version_gid=202,
@@ -220,7 +229,7 @@ def test_business_review_is_bound_to_exact_definition_hash():
 
 
 def test_business_review_hash_lookup_is_case_and_space_exact_in_memory():
-    store = MemoryGovernanceStore()
+    store = _memory_review_store()
     review = CapabilityBusinessReview(
         101, 202, HASH_A, "approved", "Evidence is sufficient", "9001", "super_admin",
         NOW, 701, 501,
@@ -231,8 +240,24 @@ def test_business_review_hash_lookup_is_case_and_space_exact_in_memory():
     assert store.current_business_review(202, HASH_A + " ") is None
 
 
+def test_memory_business_review_requires_the_referenced_snapshot_and_version():
+    review = CapabilityBusinessReview(
+        101, 202, HASH_1, "approved", "Evidence is sufficient", "9001", "super_admin",
+        NOW, 701, 501,
+    )
+
+    with pytest.raises(ImmutableRecordError, match="business_review_evidence_snapshot_not_found"):
+        MemoryGovernanceStore().save_business_review(review)
+    wrong_version = _memory_review_store()
+    wrong_version._snapshots[501] = SimpleNamespace(
+        snapshot_gid=501, entries=(SimpleNamespace(capability_version_gid=999),),
+    )
+    with pytest.raises(ImmutableRecordError, match="business_review_capability_version_not_in_snapshot"):
+        wrong_version.save_business_review(review)
+
+
 def test_business_reviews_are_append_only_and_latest_exact_hash_is_current():
-    store = MemoryGovernanceStore()
+    store = _memory_review_store()
     first = CapabilityBusinessReview(101, 202, HASH_1, "changes_requested", "Add evidence", "9001", "super_admin", NOW, 701, 501)
     second = CapabilityBusinessReview(102, 202, HASH_1, "approved", "Evidence added", "9001", "super_admin", NOW + timedelta(seconds=1), 701, 501)
 
@@ -247,7 +272,7 @@ def test_business_reviews_are_append_only_and_latest_exact_hash_is_current():
 @pytest.mark.parametrize("decision", ("rejected", "changes_requested"))
 def test_current_business_review_does_not_resurrect_a_superseded_approval(decision: str):
     """A later non-approval is current evidence, so older approval is expired."""
-    store = MemoryGovernanceStore()
+    store = _memory_review_store()
     store.save_business_review(CapabilityBusinessReview(
         101, 202, HASH_1, "approved", "Evidence is sufficient", "9001", "super_admin",
         NOW, 701, 501,
@@ -255,6 +280,20 @@ def test_current_business_review_does_not_resurrect_a_superseded_approval(decisi
     store.save_business_review(CapabilityBusinessReview(
         102, 202, HASH_1, decision, "Needs another review", "9002", "super_admin",
         NOW + timedelta(seconds=1), 702, 501,
+    ))
+
+    assert store.current_business_review(202, HASH_1) is None
+
+
+def test_current_business_review_uses_append_order_not_client_timestamp():
+    store = _memory_review_store()
+    store.save_business_review(CapabilityBusinessReview(
+        101, 202, HASH_1, "approved", "Evidence is sufficient", "9001", "super_admin",
+        NOW + timedelta(days=1), 701, 501,
+    ))
+    store.save_business_review(CapabilityBusinessReview(
+        102, 202, HASH_1, "rejected", "Evidence was withdrawn", "9002", "super_admin",
+        NOW, 702, 501,
     ))
 
     assert store.current_business_review(202, HASH_1) is None
@@ -423,6 +462,8 @@ def test_sql_current_business_review_returns_none_for_latest_non_approval():
     ))
 
     assert SqlGovernanceStore(connection).current_business_review(202, HASH_1) is None
+    query = next(query for query, _ in connection.calls if query.startswith("SELECT business_review_gid"))
+    assert "ORDER BY business_review_gid DESC" in query
 
 
 @pytest.mark.parametrize(

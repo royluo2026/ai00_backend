@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from types import SimpleNamespace
+from concurrent.futures import ThreadPoolExecutor
+from time import sleep
 
 import pytest
 
@@ -50,10 +52,15 @@ class _ReviewStore:
                 major_version=1,
             ),),
         )
+        self.current_snapshot = self.snapshot
         self.reviews = []
+        self.relation_candidates = ()
 
     def latest_snapshot(self):
-        return self.snapshot
+        return self.current_snapshot
+
+    def get_snapshot(self, snapshot_gid):
+        return self.snapshot if snapshot_gid == self.snapshot.snapshot_gid else None
 
     def save_business_review(self, review):
         self.reviews.append(review)
@@ -68,7 +75,7 @@ class _ReviewStore:
 
     def list_relation_candidates(self, snapshot_gid):
         assert snapshot_gid == 31
-        return ()
+        return self.relation_candidates
 
 
 def _context(
@@ -167,6 +174,21 @@ def test_business_review_requires_effective_undelegated_web_super_admin():
             )
 
 
+def test_business_review_rejects_duck_typed_effective_identity():
+    service = CapabilityGovernanceService(_ReviewStore())
+    proposal = _pending_business_proposal(service)
+    spoofed = SimpleNamespace(
+        actor=SimpleNamespace(user_id="reviewer", service_id=None),
+        tenant=SimpleNamespace(active_roles=("super_admin",)),
+        consumer=SimpleNamespace(type="web"),
+        delegation=None,
+    )
+    context = CapabilityContext(user_gid="reviewer", effective_identity=spoofed)
+
+    with pytest.raises(CapabilityBusinessError, match="reviewer_not_authorized"):
+        service.base_capability_review_decide(_decision_payload(proposal), context)
+
+
 def test_business_review_persists_an_exact_hash_approval_and_replays_only_the_same_request():
     store = _ReviewStore()
     service = CapabilityGovernanceService(store)
@@ -191,6 +213,115 @@ def test_business_review_persists_an_exact_hash_approval_and_replays_only_the_sa
             _decision_payload(proposal, decision="rejected"),
             _context(user_gid="reviewer", effective_roles=("super_admin",)),
         )
+
+
+def test_business_review_uses_server_timestamp_not_payload_timestamp():
+    store = _ReviewStore()
+    service = CapabilityGovernanceService(store)
+    proposal = _pending_business_proposal(service)
+
+    service.base_capability_review_decide(
+        _decision_payload(proposal, decided_at="2000-01-01T00:00:00Z"),
+        _context(user_gid="reviewer", effective_roles=("super_admin",)),
+    )
+
+    assert store.reviews[-1].decided_at.year != 2000
+
+
+def test_business_review_rejects_a_missing_pinned_snapshot():
+    service = CapabilityGovernanceService(_ReviewStore())
+    proposal = service.base_capability_proposal_submit(
+        _proposal_payload(base_snapshot_gid="999", idempotency_key="proposal-missing-snapshot"), _context(),
+    )["proposal"]
+    checking = service._proposals.transition(
+        proposal.proposal_gid, "checking", expected_row_version=proposal.row_version,
+        idempotency_key="proposal-missing-snapshot-checking",
+    )
+    pending = service._proposals.transition(
+        checking.proposal_gid, "pending_approval", expected_row_version=checking.row_version,
+        idempotency_key="proposal-missing-snapshot-pending",
+    )
+
+    with pytest.raises(CapabilityBusinessError, match="review_subject_hash_mismatch"):
+        service.base_capability_review_decide(
+            _decision_payload(pending), _context(user_gid="reviewer", effective_roles=("super_admin",)),
+        )
+
+
+def test_business_review_requires_exact_pinned_and_current_version_subjects():
+    store = _ReviewStore()
+    service = CapabilityGovernanceService(store)
+    proposal = _pending_business_proposal(service)
+    store.snapshot.entries = (SimpleNamespace(
+        capability_id="base.capability_registry.search", capability_version_gid=17, major_version=2,
+    ),)
+
+    with pytest.raises(CapabilityBusinessError, match="review_subject_hash_mismatch"):
+        service.base_capability_review_decide(
+            _decision_payload(proposal), _context(user_gid="reviewer", effective_roles=("super_admin",)),
+        )
+
+    store = _ReviewStore()
+    service = CapabilityGovernanceService(store)
+    proposal = _pending_business_proposal(service)
+    store.current_snapshot = SimpleNamespace(
+        snapshot_gid=32,
+        document=SimpleNamespace(capabilities=(SimpleNamespace(
+            capability_id="base.capability_registry.search", major_version=1,
+            descriptor={"business_definition_hash": OTHER_HASH}, business_rules=(), business_maturity=None,
+        ),)),
+        entries=(SimpleNamespace(
+            capability_id="base.capability_registry.search", capability_version_gid=17, major_version=1,
+        ),),
+    )
+    with pytest.raises(CapabilityBusinessError, match="review_subject_hash_mismatch"):
+        service.base_capability_review_decide(
+            _decision_payload(proposal), _context(user_gid="reviewer", effective_roles=("super_admin",)),
+        )
+
+
+def test_business_review_concurrent_decisions_have_one_winner_and_one_review():
+    store = _ReviewStore()
+    service = CapabilityGovernanceService(store)
+    proposal = _pending_business_proposal(service)
+    original_save = store.save_business_review
+
+    def delayed_save(review):
+        sleep(0.05)
+        original_save(review)
+    store.save_business_review = delayed_save
+
+    def decide(decision):
+        return service.base_capability_review_decide(
+            _decision_payload(proposal, decision=decision, idempotency_key=f"race-{decision}"),
+            _context(user_gid="reviewer", effective_roles=("super_admin",)),
+        )
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        futures = (pool.submit(decide, "approved"), pool.submit(decide, "rejected"))
+        outcomes = [future.result() if future.exception() is None else future.exception() for future in futures]
+
+    assert sum(isinstance(result, dict) for result in outcomes) == 1
+    assert sum(isinstance(result, CapabilityBusinessError) for result in outcomes) == 1
+    assert len(store.reviews) == 1
+
+
+def test_business_review_persistence_failure_does_not_change_proposal_or_history():
+    store = _ReviewStore()
+    service = CapabilityGovernanceService(store)
+    proposal = _pending_business_proposal(service)
+
+    def fail_save(review):
+        raise RuntimeError("database unavailable")
+    store.save_business_review = fail_save
+
+    with pytest.raises(CapabilityBusinessError, match="business_review_persistence_failed"):
+        service.base_capability_review_decide(
+            _decision_payload(proposal), _context(user_gid="reviewer", effective_roles=("super_admin",)),
+        )
+
+    assert service._proposals.get(proposal.proposal_gid) == proposal
+    assert store.reviews == []
 
 
 def test_business_review_requires_a_trimmed_bounded_reason():
@@ -272,6 +403,55 @@ def test_business_proposal_readback_is_stable_and_limits_evidence_to_super_admin
     ]
 
 
+def test_business_proposal_search_uses_limit_plus_one_for_the_next_cursor():
+    service = CapabilityGovernanceService(_ReviewStore())
+    for item in range(201):
+        service._proposals.detect(
+            capability_id=f"base.page.{item}", capability_version_gid=item + 1,
+            base_snapshot_gid=31, previous_hash=OTHER_HASH, proposed_descriptor_hash=HASH,
+            evidence_hash="sha256:" + f"{item:064x}", submitted_by_gid="author",
+            idempotency_key=f"page-{item}",
+        )
+
+    first = service.base_capability_proposal_search({"limit": 200}, _context())
+    second = service.base_capability_proposal_search(
+        {"limit": 200, "cursor": first["data"]["next_cursor"]}, _context(),
+    )
+
+    assert len(first["items"]) == 200
+    assert first["data"]["next_cursor"] == "200"
+    assert [item["proposal_gid"] for item in second["items"]] == ["201"]
+
+
+def test_business_review_evidence_is_limited_to_the_pinned_major_and_relation_key():
+    store = _ReviewStore()
+    first = store.snapshot.document.capabilities[0]
+    store.snapshot.document.capabilities = (
+        first,
+        SimpleNamespace(
+            capability_id=first.capability_id, major_version=2,
+            descriptor={"business_definition_hash": OTHER_HASH},
+            business_effect="Wrong major must not leak.", business_rules=(), business_maturity=None,
+        ),
+    )
+    store.relation_candidates = (
+        SimpleNamespace(candidate_hash="kept", relation_type="overlap", source="deterministic",
+                        capability_keys=("base.capability_registry.search@1",), evidence={"safe": True}),
+        SimpleNamespace(candidate_hash="hidden", relation_type="overlap", source="deterministic",
+                        capability_keys=("base.capability_registry.search@2",), evidence={"wrong": True}),
+    )
+    service = CapabilityGovernanceService(store)
+    _pending_business_proposal(service)
+
+    result = service.base_capability_proposal_search(
+        {"limit": 1}, _context(user_gid="reviewer", effective_roles=("super_admin",)),
+    )
+    evidence = result["items"][0]["review_evidence"]
+
+    assert evidence["business_effect"] == ""
+    assert [item["candidate_hash"] for item in evidence["deterministic_relation_candidates"]] == ["kept"]
+
+
 def test_business_review_provider_contract_is_closed_and_labels_the_pinned_hash():
     service = CapabilityGovernanceService(_ReviewStore())
     proposal = _pending_business_proposal(service)
@@ -280,6 +460,12 @@ def test_business_review_provider_contract_is_closed_and_labels_the_pinned_hash(
         validate_payload(
             INPUT_SCHEMAS["base.capability_review.decide"],
             _decision_payload(proposal, role="super_admin"),
+            label="input",
+        )
+    with pytest.raises(ValueError):
+        validate_payload(
+            INPUT_SCHEMAS["base.capability_review.decide"],
+            _decision_payload(proposal, decided_at="2000-01-01T00:00:00Z"),
             label="input",
         )
     result = _safe_response("base.capability_review.decide", {

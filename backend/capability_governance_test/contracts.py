@@ -160,7 +160,6 @@ def _input_schema(capability_id: str) -> dict[str, object]:
             "definition_hash": _SHA256_SCHEMA,
             "decision": {"type": "string", "enum": ["approved", "rejected", "changes_requested"]},
             "decision_reason": {"type": "string", "minLength": 1, "maxLength": 2000},
-            "decided_at": _SMALL_STRING_SCHEMA,
         })
     elif capability_id == "base.capability_waiver.grant":
         properties.update({
