@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import os
+from pathlib import Path
+import subprocess
 from types import SimpleNamespace
 
 
@@ -74,3 +76,26 @@ def test_local_snapshot_supplies_and_restores_the_offline_integration_factory(mo
 
     assert command._snapshot("a" * 40) == {"code_revision": "a" * 40}
     assert "AI00_INTEGRATION_ADAPTER_FACTORY" not in os.environ
+
+
+def test_revision_fails_closed_for_relevant_tracked_dirt(tmp_path):
+    from backend.scripts import audit_capability_business_rules as command
+
+    subprocess.run(("git", "init"), cwd=tmp_path, check=True, capture_output=True)
+    subprocess.run(("git", "config", "user.email", "audit@example.test"), cwd=tmp_path, check=True)
+    subprocess.run(("git", "config", "user.name", "Audit Test"), cwd=tmp_path, check=True)
+    backend = tmp_path / "backend"
+    backend.mkdir()
+    tracked = backend / "provider.py"
+    tracked.write_text("VALUE = 1\n", encoding="utf-8")
+    subprocess.run(("git", "add", "backend/provider.py"), cwd=tmp_path, check=True)
+    subprocess.run(("git", "commit", "-m", "fixture"), cwd=tmp_path, check=True, capture_output=True)
+
+    assert len(command._revision(tmp_path, relevant_paths=("backend",))) == 40
+    tracked.write_text("VALUE = 2\n", encoding="utf-8")
+    try:
+        command._revision(tmp_path, relevant_paths=("backend",))
+    except RuntimeError as exc:
+        assert str(exc) == "business_audit_relevant_tree_dirty"
+    else:
+        raise AssertionError("tracked relevant dirt must prevent false Git provenance")

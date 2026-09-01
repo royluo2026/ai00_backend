@@ -489,6 +489,12 @@ class CapabilityGovernanceService:
                 "fingerprint": _business_contract_value(getattr(evidence, "fingerprint", None)),
                 "business_layer_evidence": _business_contract_value(getattr(evidence, "business_layer_evidence", {})),
                 "business_maturity": _business_contract_value(getattr(evidence, "business_maturity", None)),
+                "business_definition_hash": str(
+                    getattr(evidence, "descriptor", {}).get("business_definition_hash", "")
+                ),
+                "catalog_capability_version_gid": str(
+                    getattr(evidence, "descriptor", {}).get("capability_version_gid", "")
+                ),
             }
             projected.append(record)
         return self._completed(
@@ -516,10 +522,14 @@ class CapabilityGovernanceService:
         return {
             "snapshot_gid": str(getattr(snapshot, "snapshot_gid")),
             "source_revision": str(getattr(document, "code_revision", "")),
-            "nodes": tuple(record(item, (
-                "canonical_key", "owner_domain", "node_type", "source_path", "source_symbol",
-                "http_method", "route_path",
-            )) for item in getattr(document, "nodes", ())),
+            "catalog_release_id": str(getattr(document, "product_release_id", "")),
+            "nodes": tuple({
+                **record(item, (
+                    "canonical_key", "owner_domain", "node_type", "source_path", "source_symbol",
+                    "http_method", "route_path",
+                )),
+                "metadata": _business_contract_value(redact(getattr(item, "metadata", {}))),
+            } for item in getattr(document, "nodes", ())),
             "bindings": tuple(record(item, (
                 "capability_id", "major_version", "node_canonical_key", "binding_type", "binding_hash",
             )) for item in getattr(document, "bindings", ())),

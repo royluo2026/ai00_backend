@@ -35,7 +35,7 @@ DEFAULT_WEB_ROOT = Path(r"E:/Projects/ai00/workmanship-web")
 OFFLINE_INTEGRATION_FACTORY = "backend.tests.support.integration_catalog_factory:build"
 
 
-def _revision(root: Path) -> str:
+def _revision(root: Path, *, relevant_paths: tuple[str, ...] = (".",)) -> str:
     try:
         revision = subprocess.run(
             ("git", "rev-parse", "HEAD"), cwd=root, check=True, capture_output=True, text=True,
@@ -44,6 +44,15 @@ def _revision(root: Path) -> str:
         raise RuntimeError("business_audit_revision_unavailable") from exc
     if len(revision) != 40 or any(character not in "0123456789abcdef" for character in revision):
         raise RuntimeError("business_audit_revision_invalid")
+    try:
+        dirty = subprocess.run(
+            ("git", "status", "--porcelain=v1", "--untracked-files=no", "--", *relevant_paths),
+            cwd=root, check=True, capture_output=True, text=True,
+        ).stdout.strip()
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise RuntimeError("business_audit_revision_unavailable") from exc
+    if dirty:
+        raise RuntimeError("business_audit_relevant_tree_dirty")
     return revision
 
 
@@ -72,7 +81,7 @@ def _snapshot(source_revision: str):
 
 
 def build_local_report(*, web_root: Path = DEFAULT_WEB_ROOT, page_limit: int = 200) -> dict[str, Any]:
-    backend_revision = _revision(REPOSITORY_ROOT)
+    backend_revision = _revision(REPOSITORY_ROOT, relevant_paths=("backend", "plugins", "docs/governance"))
     web_revision = _revision(web_root)
     document = _snapshot(backend_revision)
     ids = count(1)
@@ -96,7 +105,8 @@ def build_local_report(*, web_root: Path = DEFAULT_WEB_ROOT, page_limit: int = 2
     report = collect_business_audit(
         service, snapshot_gid=str(snapshot.snapshot_gid),
         source_revisions={"backend": backend_revision, "web": web_revision, "source": backend_revision},
-        gate_result=gate, page_limit=page_limit,
+        gate_result=gate, page_limit=page_limit, business_catalog=business_catalog,
+        legacy_baseline=baseline.capabilities, business_review_lookup={},
     )
     return report.to_dict()
 

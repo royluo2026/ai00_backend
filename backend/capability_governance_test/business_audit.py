@@ -26,7 +26,17 @@ _STATE_ACTIONS = {"approve", "authorize", "delete", "publish", "reject", "retire
 
 
 def _freeze_mapping(value: Mapping[str, Any]) -> Mapping[str, Any]:
-    return MappingProxyType({str(key): item for key, item in value.items()})
+    return MappingProxyType({str(key): _freeze(item) for key, item in value.items()})
+
+
+def _freeze(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return _freeze_mapping(value)
+    if isinstance(value, (tuple, list)):
+        return tuple(_freeze(item) for item in value)
+    if isinstance(value, (set, frozenset)):
+        return tuple(sorted((_freeze(item) for item in value), key=repr))
+    return value
 
 
 def _value(record: Any, name: str, default: Any = None) -> Any:
@@ -60,6 +70,9 @@ class AuditCapability:
     semantic_class: str = ""
     change_kind: str = ""
     governance_status: str = ""
+    business_definition_hash: str = ""
+    business_rules: tuple[Mapping[str, Any], ...] = ()
+    snapshot_capability_version_gid: str = ""
 
     def __post_init__(self) -> None:
         if self.maturity not in MATURITY_LEVELS:
@@ -70,6 +83,7 @@ class AuditCapability:
         }
         object.__setattr__(self, "layer_evidence", _freeze_mapping(normalized))
         object.__setattr__(self, "reason_codes", tuple(str(item) for item in self.reason_codes if str(item)))
+        object.__setattr__(self, "business_rules", tuple(_freeze(item) for item in self.business_rules))
 
     @property
     def capability_key(self) -> str:
@@ -138,6 +152,14 @@ class UnboundPublicEntry:
     source_symbol: str
     http_method: str | None = None
     route_path: str | None = None
+    source_line: int = 0
+    location: str = field(init=False)
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self, "location",
+            f"{self.source_path}:{self.source_line}" if self.source_line > 0 else self.source_path,
+        )
 
 
 @dataclass(frozen=True)
@@ -224,7 +246,7 @@ def _review_queue(capabilities: tuple[AuditCapability, ...], relations: tuple[Au
     return tuple(sorted(queued, key=lambda item: (item.priority, item.domain, item.capability_key)))
 
 
-def audit(
+def _build_report(
     findings: Iterable[AuditEvidence], *, capabilities: Iterable[AuditCapability] = (),
     snapshot_gid: str, source_revisions: Mapping[str, str] | None = None,
     relations: Iterable[AuditRelation] = (), unbound_entries: Iterable[UnboundPublicEntry] = (),
@@ -244,6 +266,8 @@ def audit(
             capability_version_gid=item.capability_version_gid, semantic_class=item.semantic_class,
             change_kind=str(_value(gate_rows.get(item.capability_key), "change_kind", item.change_kind)),
             governance_status=str(_value(gate_rows.get(item.capability_key), "governance_status", item.governance_status)),
+            business_definition_hash=item.business_definition_hash, business_rules=item.business_rules,
+            snapshot_capability_version_gid=item.snapshot_capability_version_gid,
         ) for item in capabilities
     ), key=lambda item: item.capability_key))
 
@@ -296,6 +320,18 @@ def audit(
     )
 
 
+def audit(
+    findings: Iterable[AuditEvidence], *, capabilities: Iterable[AuditCapability] = (),
+    snapshot_gid: str, source_revisions: Mapping[str, str] | None = None,
+    relations: Iterable[AuditRelation] = (), unbound_entries: Iterable[UnboundPublicEntry] = (),
+) -> BusinessAuditReport:
+    """Aggregate evidence without accepting untrusted release-state assertions."""
+    return _build_report(
+        findings, capabilities=capabilities, snapshot_gid=snapshot_gid,
+        source_revisions=source_revisions, relations=relations, unbound_entries=unbound_entries,
+    )
+
+
 def _page(service: Any, method_name: str, *, snapshot_gid: str, item_key: str, limit: int) -> tuple[Any, ...]:
     if limit < 1 or limit > 200:
         raise ValueError("business_audit_page_limit_invalid")
@@ -323,14 +359,32 @@ def _capability_from_projection(item: Any) -> AuditCapability:
         maturity=str(_value(maturity, "level", "L0")),
         reason_codes=tuple(_value(maturity, "reason_codes", ()) or ()),
         layer_evidence=_value(contract, "business_layer_evidence", {}) or {},
-        capability_version_gid=str(_value(item, "capability_version_gid", "")),
+        capability_version_gid=str(_value(contract, "catalog_capability_version_gid", _value(item, "capability_version_gid", ""))),
         semantic_class=str(_value(item, "semantic_class", "")),
+        business_definition_hash=str(_value(contract, "business_definition_hash", "")),
+        business_rules=tuple(_value(contract, "business_rules", ()) or ()),
+        snapshot_capability_version_gid=str(_value(item, "capability_version_gid", "")),
     )
+
+
+def _rule_id_for_ref(capability: AuditCapability, evidence_ref: str) -> str | None:
+    matches = {
+        str(_value(rule, "rule_id", ""))
+        for rule in capability.business_rules
+        if str(_value(rule, "rule_id", "")) and (
+            str(_value(rule, "enforcement_ref", "")) == evidence_ref
+            or evidence_ref in tuple(str(item) for item in (_value(rule, "test_refs", ()) or ()))
+        )
+    }
+    return next(iter(matches)) if len(matches) == 1 else None
 
 
 def collect_business_audit(
     service: Any, *, snapshot_gid: str, source_revisions: Mapping[str, str],
     gate_result: Any | None = None, page_limit: int = 200,
+    business_catalog: Mapping[str, object] | None = None,
+    legacy_baseline: Mapping[str, str] | None = None,
+    business_review_lookup: Any = None,
 ) -> BusinessAuditReport:
     if set(source_revisions) != {"backend", "web", "source"} or any(
         _SHA.fullmatch(str(source_revisions[key])) is None for key in ("backend", "web", "source")
@@ -344,7 +398,35 @@ def collect_business_audit(
     registry = _page(service, "base_capability_registry_search", snapshot_gid=str(snapshot_gid), item_key="items", limit=page_limit)
     findings = _page(service, "base_capability_finding_search", snapshot_gid=str(snapshot_gid), item_key="findings", limit=page_limit)
     capabilities = tuple(_capability_from_projection(item) for item in registry)
-    by_gid = {item.capability_version_gid: item for item in capabilities if item.capability_version_gid}
+    trusted_gate = None
+    if gate_result is not None:
+        if business_catalog is None or legacy_baseline is None or business_review_lookup is None:
+            raise ValueError("business_governance_context_unavailable")
+        from backend.capability_v2.release_gate import (
+            BusinessGovernanceConfigurationError,
+            build_business_catalog_projection,
+            parse_business_governance_result,
+        )
+
+        catalog = build_business_catalog_projection(business_catalog, legacy_baseline=legacy_baseline)
+        actual = {
+            (item.capability_key, item.capability_version_gid, item.major_version, item.business_definition_hash)
+            for item in capabilities
+        }
+        expected = {
+            (item.capability_key, item.capability_version_gid, item.major_version, item.business_definition_hash)
+            for item in catalog.capabilities
+        }
+        if str(_value(projection, "catalog_release_id", "")) != catalog.catalog_release_id or actual != expected:
+            raise BusinessGovernanceConfigurationError("business_governance_invalid")
+        trusted_gate = parse_business_governance_result(
+            gate_result, expected_catalog=business_catalog, legacy_baseline=legacy_baseline,
+            business_review_lookup=business_review_lookup,
+        )
+    by_gid = {
+        item.snapshot_capability_version_gid: item
+        for item in capabilities if item.snapshot_capability_version_gid
+    }
     evidence: list[AuditEvidence] = []
     for finding in findings:
         subjects = tuple(by_gid[str(gid)] for gid in tuple(_value(finding, "subject_version_gids", ()) or ()) if str(gid) in by_gid)
@@ -361,7 +443,7 @@ def collect_business_audit(
                 domain=primary.domain, layer=str(_value(finding, "layer", "C")), evidence_ref=ref,
                 remediation_family=str(_value(finding, "remediation_boundary", "manual_review")),
                 severity=str(_value(finding, "severity", "warning")),
-                rule_id=(str(_value(finding, "rule_id")) if _value(finding, "rule_id") else None),
+                rule_id=(str(_value(finding, "rule_id")) if _value(finding, "rule_id") else _rule_id_for_ref(primary, ref)),
                 related_capability_keys=related_keys, related_domains=related_domains,
             ))
     for capability in capabilities:
@@ -398,12 +480,14 @@ def collect_business_audit(
         str(_value(node, "source_symbol", "")),
         str(_value(node, "http_method")) if _value(node, "http_method") else None,
         str(_value(node, "route_path")) if _value(node, "route_path") else None,
+        int(_value(_value(node, "metadata", {}) or {}, "source_line", 0) or 0),
     ) for node in tuple(_value(projection, "nodes", ()) or ())
         if str(_value(node, "node_type", "")) in _UNBOUND_TYPES
+        and bool(_value(_value(node, "metadata", {}) or {}, "public_entry", False))
         and str(_value(node, "canonical_key", "")) not in bound)
-    return audit(
+    return _build_report(
         evidence, capabilities=capabilities, snapshot_gid=str(snapshot_gid), source_revisions=source_revisions,
-        relations=relations, unbound_entries=unbound, gate_result=gate_result,
+        relations=relations, unbound_entries=unbound, gate_result=trusted_gate,
     )
 
 

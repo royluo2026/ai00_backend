@@ -10,7 +10,7 @@ from dataclasses import dataclass, replace
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-from backend.capability_v2.business_definition import is_generated_business_effect
+from backend.capability_v2.business_definition import business_definition_hash, is_generated_business_effect
 from backend.capability_v2.contracts import BusinessInvariantContract
 
 from .config import GovernanceSettings
@@ -128,6 +128,37 @@ def _is_retired_http_route(item: ast.AST) -> bool:
         status = node.args[0] if node.args else next((keyword.value for keyword in node.keywords if keyword.arg == "status_code"), None)
         if isinstance(status, ast.Constant) and status.value == 410:
             return True
+    return False
+
+
+def _http_route_details(item: ast.AST) -> tuple[str | None, str | None]:
+    if not isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        return None, None
+    methods = {"get", "post", "put", "patch", "delete", "head", "options", "api_route"}
+    for decorator in item.decorator_list:
+        if not isinstance(decorator, ast.Call) or not isinstance(decorator.func, ast.Attribute):
+            continue
+        if decorator.func.attr not in methods:
+            continue
+        path = _constant_string(decorator.args[0]) if decorator.args else None
+        method = decorator.func.attr.upper()
+        if method == "API_ROUTE":
+            raw = next((keyword.value for keyword in decorator.keywords if keyword.arg == "methods"), None)
+            if isinstance(raw, (ast.List, ast.Tuple)) and len(raw.elts) == 1:
+                method = (_constant_string(raw.elts[0]) or method).upper()
+        return method, path
+    return None, None
+
+
+def _is_public_entry(unit: "_AstUnit") -> bool:
+    if unit.node_type in {"rest_route", "legacy_api"}:
+        return True
+    if unit.symbol.startswith("_"):
+        return False
+    if unit.node_type in {"provider", "agent_tool", "mcp_tool"}:
+        return True
+    if unit.node_type == "worker":
+        return "worker" in f"{unit.source_path}:{unit.symbol}".lower()
     return False
 
 
@@ -605,7 +636,12 @@ class GovernanceScanner:
         relations: list[ImplementationRelation] = []
         by_symbol: dict[tuple[str, str], list[_AstUnit]] = defaultdict(list)
         for unit in units:
-            node = ImplementationNode(unit.key, unit.owner, unit.node_type, unit.source_path, unit.source_hash, unit.symbol)
+            method, route = _http_route_details(unit.tree)
+            node = ImplementationNode(
+                unit.key, unit.owner, unit.node_type, unit.source_path, unit.source_hash,
+                unit.symbol, method, route,
+                metadata={"public_entry": _is_public_entry(unit), "source_line": int(getattr(unit.tree, "lineno", 0) or 0)},
+            )
             nodes[node.canonical_key] = node
             by_symbol[(unit.owner, unit.symbol)].append(unit)
         table_nodes: dict[tuple[str, str], str] = {}
@@ -717,6 +753,7 @@ class GovernanceScanner:
             for field_name in ("read_scope", "write_scope", "api_refs", "business_acceptance_criteria"):
                 if field_name in descriptor:
                     descriptor[field_name] = _strings(descriptor[field_name])
+            descriptor["business_definition_hash"] = business_definition_hash(descriptor)
             input_hash = _digest(descriptor.get("input_schema", {}))
             output_hash = _digest(descriptor.get("output_schema", {}))
             read_scope, write_scope = _scopes(descriptor)

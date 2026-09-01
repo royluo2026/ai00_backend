@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Mapping
+from typing import Any
 
 from .contracts import CapabilityDescriptorV2
 
@@ -19,22 +21,30 @@ def is_generated_business_effect(value: object, description: object) -> bool:
     )
 
 
-def business_definition_projection(descriptor: CapabilityDescriptorV2) -> dict[str, object]:
+def _field(descriptor: CapabilityDescriptorV2 | Mapping[str, Any], name: str, default: Any = None) -> Any:
+    return descriptor.get(name, default) if isinstance(descriptor, Mapping) else getattr(descriptor, name, default)
+
+
+def business_definition_projection(descriptor: CapabilityDescriptorV2 | Mapping[str, Any]) -> dict[str, object]:
+    invariants = _field(descriptor, "business_invariants", ()) or ()
     return {
-        "capability_id": descriptor.id,
-        "major_version": descriptor.major_version,
-        "business_effect": (descriptor.business_effect or "").strip(),
-        "business_acceptance_criteria": list(descriptor.business_acceptance_criteria),
-        "business_invariants": [item.model_dump(mode="json") for item in descriptor.business_invariants],
-        "no_business_invariant_reason": descriptor.no_business_invariant_reason,
-        "input_schema": descriptor.input_schema,
-        "output_schema": descriptor.output_schema,
-        "provider_ref": descriptor.provider_ref,
-        "side_effects": descriptor.side_effects,
+        "capability_id": _field(descriptor, "id", ""),
+        "major_version": _field(descriptor, "major_version", 0),
+        "business_effect": str(_field(descriptor, "business_effect", "") or "").strip(),
+        "business_acceptance_criteria": list(_field(descriptor, "business_acceptance_criteria", ()) or ()),
+        "business_invariants": [
+            dict(item) if isinstance(item, Mapping) else item.model_dump(mode="json")
+            for item in invariants
+        ],
+        "no_business_invariant_reason": _field(descriptor, "no_business_invariant_reason"),
+        "input_schema": _field(descriptor, "input_schema", {}),
+        "output_schema": _field(descriptor, "output_schema", {}),
+        "provider_ref": _field(descriptor, "provider_ref"),
+        "side_effects": _field(descriptor, "side_effects"),
     }
 
 
-def business_definition_hash(descriptor: CapabilityDescriptorV2) -> str:
+def business_definition_hash(descriptor: CapabilityDescriptorV2 | Mapping[str, Any]) -> str:
     raw = json.dumps(
         business_definition_projection(descriptor),
         ensure_ascii=False,

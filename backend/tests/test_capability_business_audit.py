@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+from copy import deepcopy
+from datetime import UTC, datetime
 from types import SimpleNamespace
+
+import pytest
 
 
 def _audit_types():
@@ -85,7 +89,7 @@ class _PagedAuditService:
                 "canonical_key": f"{node_type}:person:{path}:{symbol}", "owner_domain": "person",
                 "node_type": node_type, "source_path": f"person/{path}", "source_symbol": symbol,
                 "http_method": method, "route_path": route,
-                "metadata": {"authorization": "secret-value", "public": True} if node_type == "rest_route" else {},
+                "metadata": {"authorization": "secret-value", "public_entry": True, "source_line": 12},
             } for node_type, _label, path, symbol, method, route in types),
             "bindings": (),
             "relation_candidates": (
@@ -109,7 +113,7 @@ class _PagedAuditService:
         items = tuple({
             "capability_id": f"example.cap{index}", "major_version": 1,
             "capability_version_gid": str(index + 1), "owner_domain": "example", "semantic_class": "read",
-            "contract": {"business_maturity": {"level": "L3", "reason_codes": ()}, "business_layer_evidence": {"A": ("purpose",)}},
+            "contract": {"business_maturity": {"level": "L3", "reason_codes": ()}, "business_layer_evidence": {"A": ("purpose",)}, "business_rules": (), "business_definition_hash": "sha256:" + "a" * 64},
         } for index in range(offset, min(offset + payload["limit"], 205)))
         return {"items": items, "total": 205}
 
@@ -128,20 +132,23 @@ class _PagedAuditService:
 def test_collection_pages_to_total_and_keeps_exact_snapshot_redacted_projection():
     _, _, _, collect_business_audit, _ = _audit_types()
     service = _PagedAuditService()
-    gate = SimpleNamespace(machine_passed=True, human_approved=False, runtime_verified=False,
-                           legacy_pending_review_count=205, capabilities=())
     report = collect_business_audit(
         service, snapshot_gid="42",
         source_revisions={"backend": "a" * 40, "web": "c" * 40, "source": "a" * 40},
-        gate_result=gate,
     )
     assert service.registry_offsets == [0, 200]
     assert service.finding_offsets == [0, 200]
     assert report.finding_count == 207
-    assert (report.machine_passed, report.human_approved, report.runtime_verified) == (True, False, False)
-    assert report.legacy_pending_review_count == 205
+    assert (report.machine_passed, report.human_approved, report.runtime_verified) == (False, False, False)
+    assert report.legacy_pending_review_count == 0
     assert {entry.entry_type for entry in report.unbound_entries} == {"REST route", "Provider", "worker", "MCP", "Agent Tool"}
     assert {entry.source_path for entry in report.unbound_entries} == {"person/api.py", "person/provider.py", "person/worker.py", "person/mcp.py", "person/agent.py"}
+    assert {entry.location for entry in report.unbound_entries} == {
+        "person/api.py:12", "person/provider.py:12", "person/worker.py:12", "person/mcp.py:12", "person/agent.py:12",
+    }
+    assert {entry["location"] for entry in report.to_dict()["unbound_entries"]} == {
+        "person/api.py:12", "person/provider.py:12", "person/worker.py:12", "person/mcp.py:12", "person/agent.py:12",
+    }
     assert report.relations[0].evidence == {"token": "[REDACTED]", "safe": "kept"}
     conflict = next(item for item in report.root_causes if item.reason_code == "cross_domain_conflict")
     assert conflict.capability_keys == ("example.cap0@1", "example.cap1@1")
@@ -174,6 +181,7 @@ def test_service_projects_the_requested_snapshot_and_redacts_relation_evidence()
             capability_id=capability_id, major_version=1, business_rules=(), fingerprint=None,
             business_layer_evidence={"A": ("purpose",)},
             business_maturity=SimpleNamespace(level="L3", reason_codes=()),
+            descriptor={"business_definition_hash": "sha256:" + "d" * 64},
         )
         document = SimpleNamespace(
             code_revision=revision, capabilities=(capability,), nodes=(), bindings=(), relations=(),
@@ -210,3 +218,175 @@ def test_service_projects_the_requested_snapshot_and_redacts_relation_evidence()
     assert projection["snapshot_gid"] == "1"
     assert projection["source_revision"] == "a" * 40
     assert projection["relation_candidates"][0]["evidence"] == {"password": "[REDACTED]", "shared_field": "height"}
+
+
+def _trusted_gate_context(*, changed: bool = False):
+    from backend.capability_v2.catalog import build_catalog_entry, build_release, load_catalog_release
+    from backend.capability_v2.release_gate import evaluate_catalog_business_governance
+    from pathlib import Path
+    import json
+
+    root = Path(__file__).resolve().parents[2]
+    source = json.loads((root / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8"))
+    descriptor = load_catalog_release(source).descriptors[0]
+    descriptor = descriptor.model_copy(update={
+        "business_effect": "Operators receive one exact governed result." + (" Changed." if changed else ""),
+        "business_acceptance_criteria": ("The declared result is schema-valid.",),
+        "business_invariants": (),
+        "no_business_invariant_reason": "No additional invariant applies.",
+    })
+    release = build_release((descriptor,), created_at=datetime(2026, 9, 2, tzinfo=UTC))
+    catalog = release.model_dump(mode="json")
+    catalog["descriptors"] = [build_catalog_entry(descriptor)]
+    row = catalog["descriptors"][0]
+    key = f"{row['id']}@{row['major_version']}"
+    baseline = {key: row["business_definition_hash"]}
+    gate = evaluate_catalog_business_governance(
+        catalog, baseline, business_review_lookup={}, runtime_verification={}, deterministic_blockers={},
+    )
+    return catalog, baseline, gate
+
+
+class _ExactGateService:
+    def __init__(self, catalog):
+        self.catalog = catalog
+
+    def business_audit_snapshot_projection(self, snapshot_gid):
+        return {
+            "snapshot_gid": str(snapshot_gid), "source_revision": "a" * 40,
+            "catalog_release_id": self.catalog["release_id"], "nodes": (), "bindings": (), "relation_candidates": (),
+        }
+
+    def base_capability_registry_search(self, payload, _context):
+        row = self.catalog["descriptors"][0]
+        item = {
+            "capability_id": row["id"], "major_version": row["major_version"],
+            "capability_version_gid": row["capability_version_gid"], "owner_domain": row["owner_domain"],
+            "semantic_class": row["side_effect_level"],
+            "contract": {"business_maturity": {"level": "L3", "reason_codes": ()},
+                         "business_layer_evidence": {}, "business_rules": row["business_invariants"],
+                         "business_definition_hash": row["business_definition_hash"]},
+        }
+        return {"items": (item,), "total": 1}
+
+    def base_capability_finding_search(self, payload, _context):
+        return {"findings": (), "total": 0}
+
+
+def _collect_exact(service, gate, catalog, baseline):
+    _, _, _, collect_business_audit, _ = _audit_types()
+    return collect_business_audit(
+        service, snapshot_gid="1", source_revisions={"backend": "a" * 40, "web": "b" * 40, "source": "a" * 40},
+        gate_result=gate, business_catalog=catalog, legacy_baseline=baseline, business_review_lookup={},
+    )
+
+
+def test_gate_is_rederived_only_after_exact_catalog_and_capability_binding():
+    catalog, baseline, gate = _trusted_gate_context()
+    report = _collect_exact(_ExactGateService(catalog), gate, catalog, baseline)
+    assert report.machine_passed is True
+    assert report.legacy_pending_review_count == 1
+
+    stale_catalog, stale_baseline, stale_gate = _trusted_gate_context(changed=True)
+    corruptions = []
+    for mutate in ("empty", "omitted", "extra", "wrong_hash", "wrong_gid"):
+        document = deepcopy(gate.serialized())
+        if mutate == "empty": document["capabilities"] = []
+        elif mutate == "omitted": document["capabilities"] = document["capabilities"][:-1]
+        elif mutate == "extra": document["capabilities"].append(deepcopy(document["capabilities"][0]))
+        elif mutate == "wrong_hash": document["capabilities"][0]["definition_hash"] = "sha256:" + "f" * 64
+        else: document["capabilities"][0]["capability_version_gid"] = "999999"
+        corruptions.append(document)
+    corruptions.append(stale_gate)
+    for candidate in corruptions:
+        with pytest.raises(Exception, match="business_governance_invalid"):
+            _collect_exact(_ExactGateService(catalog), candidate, catalog, baseline)
+    with pytest.raises(Exception, match="business_governance_invalid"):
+        _collect_exact(_ExactGateService(catalog), gate, stale_catalog, stale_baseline)
+
+
+def test_rule_specific_evidence_groups_by_exact_rule_only():
+    AuditCapability, _, _, collect_business_audit, _ = _audit_types()
+    del AuditCapability
+
+    class Service(_ExactGateService):
+        def __init__(self):
+            self.catalog = {"release_id": "rel_test"}
+
+        def base_capability_registry_search(self, payload, _context):
+            rules = (
+                {"rule_id": "height.min", "enforcement_ref": "provider.py:enforce_min", "test_refs": ("tests/test_height.py::test_min",)},
+                {"rule_id": "height.max", "enforcement_ref": "provider.py:enforce_max", "test_refs": ("tests/test_height.py::test_max",)},
+            )
+            return {"items": ({"capability_id": "person.height.write", "major_version": 1, "capability_version_gid": "1",
+                               "owner_domain": "person", "semantic_class": "write",
+                               "contract": {"business_maturity": {"level": "L2", "reason_codes": ()}, "business_layer_evidence": {},
+                                            "business_rules": rules, "business_definition_hash": "sha256:" + "a" * 64}},), "total": 1}
+
+        def base_capability_finding_search(self, payload, _context):
+            refs = ("provider.py:enforce_min", "tests/test_height.py::test_min", "provider.py:enforce_max", "capability:person.height.write@1")
+            return {"findings": ({"reason_code": "rule_evidence_missing", "subject_version_gids": ("1",), "evidence": refs,
+                                   "remediation_boundary": "map_rule_enforcement", "severity": "warning"},), "total": 1}
+
+    report = collect_business_audit(Service(), snapshot_gid="1", source_revisions={"backend": "a" * 40, "web": "b" * 40, "source": "a" * 40})
+    assert [item.root_cause_key for item in report.root_causes] == [
+        "rule_evidence_missing:person.height.write@1",
+        "rule_evidence_missing:person.height.write@1:height.max",
+        "rule_evidence_missing:person.height.write@1:height.min",
+    ]
+    assert [item.finding_count for item in report.root_causes] == [1, 1, 2]
+
+
+def test_unbound_entries_require_public_projection_metadata_for_every_kind():
+    class Service(_PagedAuditService):
+        @staticmethod
+        def business_audit_snapshot_projection(snapshot_gid):
+            kinds = ("rest_route", "provider", "worker", "mcp_tool", "agent_tool")
+            nodes = []
+            private_names = {
+                "rest_route": "_route_helper", "provider": "_UnavailableProviderRegistry",
+                "worker": "_worker_error", "mcp_tool": "_mcp_helper", "agent_tool": "_agent_helper",
+            }
+            for index, kind in enumerate(kinds, 1):
+                for public, prefix in ((True, "public"), (False, private_names[kind])):
+                    nodes.append({"canonical_key": f"{kind}:x:{prefix}", "owner_domain": "x", "node_type": kind,
+                                  "source_path": f"x/{kind}.py", "source_symbol": prefix,
+                                  "metadata": {"public_entry": public, "source_line": index}})
+            return {"snapshot_gid": "42", "source_revision": "a" * 40, "nodes": tuple(nodes), "bindings": (), "relation_candidates": ()}
+
+    _, _, _, collect_business_audit, _ = _audit_types()
+    report = collect_business_audit(Service(), snapshot_gid="42", source_revisions={"backend": "a" * 40, "web": "b" * 40, "source": "a" * 40})
+    assert len(report.unbound_entries) == 5
+    assert all("public" in item.canonical_key for item in report.unbound_entries)
+    assert all(item.source_line > 0 and item.location.endswith(f":{item.source_line}") for item in report.unbound_entries)
+
+
+def test_scanner_public_entry_classification_keeps_explicit_routes_and_excludes_helpers():
+    import ast
+    from backend.capability_governance_test.scanner import _AstUnit, _is_public_entry
+
+    def unit(kind, symbol, source="def entry():\n    pass\n"):
+        tree = ast.parse(source).body[0]
+        return _AstUnit("x", f"x/{kind}.py", symbol, kind, tree, "sha256:" + "a" * 64)
+
+    explicit_route = unit("rest_route", "_internal_name", "@router.get('/public')\ndef entry():\n    pass\n")
+    assert _is_public_entry(explicit_route) is True
+    pairs = (
+        (unit("provider", "PublicProvider"), unit("provider", "_UnavailableProviderRegistry")),
+        (unit("worker", "PublicWorker"), unit("worker", "_worker_envelope_bytes")),
+        (unit("mcp_tool", "public_tool"), unit("mcp_tool", "_mcp_helper")),
+        (unit("agent_tool", "public_tool"), unit("agent_tool", "_agent_helper")),
+    )
+    assert all(_is_public_entry(public) and not _is_public_entry(private) for public, private in pairs)
+
+
+def test_nested_relation_evidence_is_recursively_immutable_and_serializable():
+    from backend.capability_governance_test.business_audit import AuditRelation, audit
+
+    report = audit((), snapshot_gid="1", relations=(AuditRelation(
+        "sha256:" + "a" * 64, "overlap", "advisory", ("x.read@1",),
+        {"nested": {"rows": [{"value": "safe"}]}}, "pending_review",
+    ),))
+    with pytest.raises(TypeError):
+        report.relations[0].evidence["nested"]["rows"][0]["value"] = "mutated"
+    assert report.to_dict()["relations"][0]["evidence"]["nested"]["rows"][0]["value"] == "safe"
