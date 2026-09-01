@@ -246,7 +246,7 @@ def build_business_catalog_projection(
             raise BusinessGovernanceConfigurationError("business_catalog_invalid")
         seen_keys.add(key)
         seen_gids.add(gid)
-        if str(raw.get("lifecycle_status", "")) == "stable":
+        if descriptor.lifecycle_status.value == "stable":
             stable_count += 1
             is_legacy = (
                 legacy_baseline is not None and legacy_baseline.get(key) == digest

@@ -4,6 +4,7 @@ from copy import deepcopy
 from datetime import UTC, datetime
 import base64
 import hashlib
+import inspect
 import json
 from pathlib import Path
 import subprocess
@@ -17,7 +18,9 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 import backend.capability_v2.release_gate as release_gate_module
 import backend.scripts.build_capability_v2_production_artifact as artifact_builder
 from backend.scripts import check_capability_v2_release_gate as release_gate_command
+from backend.capability_governance_test.release_gate import ReleaseCandidate, ReleaseGate
 from backend.capability_v2.catalog import build_catalog_entry, build_release, load_catalog_release
+from backend.capability_v2.contracts import LifecycleStatus
 from backend.capability_v2.release_gate import (
     BusinessGateCapability,
     BusinessGovernanceConfigurationError,
@@ -91,6 +94,38 @@ def _incomplete_catalog(kind: str) -> dict[str, object]:
     document = release.model_dump(mode="json")
     document["descriptors"] = [build_catalog_entry(descriptor)]
     return document
+
+
+def _mixed_lifecycle_catalog() -> dict[str, object]:
+    descriptors = list(load_catalog_release(_catalog(count=2)).descriptors)
+    descriptors[1] = descriptors[1].model_copy(update={
+        "business_effect": "",
+        "business_acceptance_criteria": (),
+        "business_invariants": (),
+        "no_business_invariant_reason": None,
+    })
+    release = build_release(descriptors, created_at=datetime(2026, 9, 2, tzinfo=UTC))
+    document = release.model_dump(mode="json")
+    document["descriptors"] = [build_catalog_entry(item) for item in release.descriptors]
+    document["descriptors"][1]["lifecycle_status"] = LifecycleStatus.STABLE
+    return document
+
+
+def _mixed_lifecycle_case(
+    change_kind: str,
+) -> tuple[dict[str, object], dict[str, str], dict[tuple[str, str], str]]:
+    catalog = _mixed_lifecycle_catalog()
+    valid, incomplete = catalog["descriptors"]
+    valid_key = f"{valid['id']}@{valid['major_version']}"
+    incomplete_key = f"{incomplete['id']}@{incomplete['major_version']}"
+    baseline = {valid_key: valid["business_definition_hash"]}
+    if change_kind == "material_change":
+        baseline[incomplete_key] = "sha256:" + "f" * 64
+    approvals = {
+        (incomplete["capability_version_gid"], incomplete["business_definition_hash"]):
+            incomplete["business_definition_hash"]
+    }
+    return catalog, baseline, approvals
 
 
 INCOMPLETE_DEFINITIONS = (
@@ -219,6 +254,111 @@ def test_projection_rejects_exact_hash_nonlegacy_incomplete_business_definition(
         match="business_catalog_definition_invalid",
     ):
         build_business_catalog_projection(catalog, legacy_baseline={})
+
+
+def test_projection_normalizes_json_and_enum_lifecycle_values():
+    json_catalog = _catalog(count=2)
+    enum_catalog = deepcopy(json_catalog)
+    for row in enum_catalog["descriptors"]:
+        row["lifecycle_status"] = LifecycleStatus(row["lifecycle_status"])
+
+    json_projection = build_business_catalog_projection(json_catalog, legacy_baseline={})
+    enum_projection = build_business_catalog_projection(enum_catalog, legacy_baseline={})
+
+    assert enum_projection == json_projection
+    assert enum_projection.binding == json_projection.binding
+
+
+@pytest.mark.parametrize("change_kind", ("new", "material_change"))
+def test_core_rejects_enum_stable_incomplete_definition_in_mixed_catalog(change_kind: str):
+    catalog, baseline, approvals = _mixed_lifecycle_case(change_kind)
+
+    with pytest.raises(
+        BusinessGovernanceConfigurationError,
+        match="business_catalog_definition_invalid",
+    ):
+        evaluate_catalog_business_governance(
+            catalog, baseline, business_review_lookup=approvals,
+        )
+
+
+@pytest.mark.parametrize("change_kind", ("new", "material_change"))
+def test_signed_release_gate_fails_closed_for_enum_stable_incomplete_definition(
+    change_kind: str,
+):
+    catalog, baseline, approvals = _mixed_lifecycle_case(change_kind)
+    valid, incomplete = catalog["descriptors"]
+    projection = build_business_catalog_projection(catalog, legacy_baseline={
+        f"{row['id']}@{row['major_version']}": row["business_definition_hash"]
+        for row in catalog["descriptors"]
+    })
+    governance = evaluate_business_governance_gate((
+        BusinessGateCapability(
+            capability_key=f"{valid['id']}@{valid['major_version']}",
+            capability_version_gid=valid["capability_version_gid"],
+            definition_hash=valid["business_definition_hash"],
+            approved_definition_hash=None,
+            change_kind="unchanged_legacy",
+            human_approved=False,
+            runtime_verified=False,
+        ),
+        BusinessGateCapability(
+            capability_key=f"{incomplete['id']}@{incomplete['major_version']}",
+            capability_version_gid=incomplete["capability_version_gid"],
+            definition_hash=incomplete["business_definition_hash"],
+            approved_definition_hash=incomplete["business_definition_hash"],
+            change_kind=change_kind,
+            human_approved=True,
+            runtime_verified=True,
+        ),
+    ), catalog_binding=projection.binding)
+
+    gate_inputs = {}
+    if "static_gate_status" in inspect.signature(ReleaseGate.evaluate).parameters:
+        gate_inputs.update(
+            static_gate_status="passed",
+            static_gate_hash="sha256:static-gate",
+        )
+    report = ReleaseGate(
+        next_gid=iter((1,)).__next__, signer=lambda _payload: "signature:test",
+    ).evaluate(
+        ReleaseCandidate("rev-a", catalog["release_id"], 101, 201),
+        test_status="passed",
+        approvals_complete=True,
+        data_complete=True,
+        evidence_hash="sha256:evidence",
+        business_governance=governance,
+        business_catalog=catalog,
+        legacy_baseline=baseline,
+        business_review_lookup=approvals,
+        idempotency_key=f"mixed-lifecycle-{change_kind}",
+        **gate_inputs,
+    )
+
+    assert report.conclusion == "fail"
+    assert "business_governance_missing" in report.blockers
+    assert report.signature == "signature:test"
+
+
+def test_enum_stable_legacy_exemption_requires_exact_key_and_hash():
+    catalog = _mixed_lifecycle_catalog()
+    incomplete = catalog["descriptors"][1]
+    key = f"{incomplete['id']}@{incomplete['major_version']}"
+    digest = incomplete["business_definition_hash"]
+
+    for baseline in (
+        {"wrong.capability@1": digest},
+        {key: "sha256:" + "f" * 64},
+    ):
+        with pytest.raises(
+            BusinessGovernanceConfigurationError,
+            match="business_catalog_definition_invalid",
+        ):
+            build_business_catalog_projection(catalog, legacy_baseline=baseline)
+
+    assert build_business_catalog_projection(
+        catalog, legacy_baseline={key: digest},
+    ).capabilities[1].business_definition_hash == digest
 
 
 def test_projection_accepts_exact_historical_cutover_catalog_as_legacy():

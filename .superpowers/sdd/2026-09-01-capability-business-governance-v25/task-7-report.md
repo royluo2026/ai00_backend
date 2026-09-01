@@ -88,3 +88,18 @@ TDD and verification evidence:
 - Selected `compileall`, `git diff --check`, and post-artifact clean-materialization `git status --short` passed/empty.
 
 The two previously separated stale acceptance assertions were not expanded or rewritten: one still assumes `completion.complete` despite intentional unapproved legacy backlog, and one hard-codes 1869 runtime cases while the current clean manifest has 3353. Unrelated shared CLI-wrapper, static-gate, generated-Catalog, acceptance-manifest, and UI/evidence changes remain unstaged. No push, merge, publish, baseline rewrite, or unrelated repair was performed.
+
+## Fix round 4/5 — canonical lifecycle classification
+
+Stable classification in `build_business_catalog_projection()` now uses the lifecycle value on the parsed `CapabilityDescriptorV2`, rather than coercing the caller's raw mapping value to a string. A `LifecycleStatus.STABLE` member therefore follows the same stable-count and substantive-definition path as JSON `"stable"`; mixed in-process Catalog mappings can no longer hide an exactly hashed and approved incomplete new or materially changed definition. The immediate sibling audit found no other lifecycle comparison in this projection builder. Raw fields remain limited to generated identity/hash evidence that is not represented by the parsed descriptor.
+
+The regression uses one complete JSON-string stable row and one exactly content-addressed enum stable row with an incomplete definition. Both new and material-change classifications now fail at direct core evaluation, and the signed `ReleaseGate` fails closed with `business_governance_missing` instead of issuing a passing report. Complete all-JSON and all-enum Catalogs produce the same projection and binding. Wrong-key and wrong-hash legacy mappings do not exempt the enum row; the exact mapping does, and the existing historical 495-entry baseline path remains green.
+
+TDD and verification evidence:
+
+- RED in both the shared worktree and exact clean HEAD materialization: `6 failed`. The all-enum complete Catalog was misclassified as having zero stable rows; both mixed new/material core cases did not raise; both signed-gate cases concluded `pass`; and non-exact legacy mappings bypassed validation.
+- GREEN for the six new cases: `6 passed, 19 deselected`. Exact clean focused projection/signed-gate/release regression: `48 passed in 33.49s`, including the 495-entry historical-baseline test.
+- Exact clean offline strict acceptance: exit `0`, status `passed`, `3365 passed in 30.96s`, and `working_tree_clean: true`.
+- Selected `compileall`, commit-range `git diff --check`, lifecycle-comparison audit, and clean-materialization `git status --short` passed/empty.
+
+The shared full trusted-projection file separately reported `21 passed, 4 failed`: all four pre-existing round-3 official-command cases expected an exception, while a preserved unrelated CLI-wrapper hunk now catches that same `business_catalog_definition_invalid` error and returns a structured configuration blocker. The exact clean materialization passed those cases, so this round did not absorb or rewrite the CLI behavior. Unrelated static-gate and other shared dirty changes remain unstaged. No push, merge, publish, baseline rewrite, or unrelated repair was performed.
