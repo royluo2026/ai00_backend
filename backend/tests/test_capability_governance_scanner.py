@@ -333,3 +333,28 @@ def test_snapshot_hash_is_repeatable_and_does_not_include_generated_identity(
     assert [node.canonical_key for node in first.nodes] == sorted(
         node.canonical_key for node in first.nodes
     )
+
+
+def test_offline_cli_emits_blocked_report_and_exits_nonzero(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str],
+) -> None:
+    runner = importlib.import_module("backend.scripts.run_capability_governance_scan")
+    output = tmp_path / "blocked-scan.json"
+
+    def blocked_scan(destination: Path) -> dict[str, object]:
+        report = {
+            "status": "blocked", "official_domain_count": 0,
+            "product_descriptor_count": 0, "stable_product_descriptor_count": 0,
+            "extension_descriptor_count": 0,
+            "snapshot": {"snapshot_hash": "sha256:blocked", "scan_status": "blocked"},
+        }
+        destination.write_text(json.dumps(report), encoding="utf-8")
+        return report
+
+    monkeypatch.setattr(runner, "run_offline_scan", blocked_scan)
+
+    result = runner.main(["--offline", "--output", str(output)])
+
+    assert result == 1
+    assert json.loads(output.read_text(encoding="utf-8"))["status"] == "blocked"
+    assert json.loads(capsys.readouterr().out)["scan_status"] == "blocked"

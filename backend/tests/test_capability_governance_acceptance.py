@@ -11,10 +11,20 @@ from backend.scripts.check_capability_v2_completion import _governance_acceptanc
 from backend.scripts.run_capability_governance_release_acceptance import (
     FakeEnvironment,
     MANDATORY_SECTIONS,
+    _controlled_fixture_codes,
     run_real_acceptance,
     run_acceptance,
 )
 from backend.capability_governance_test.fingerprint import canonical_fingerprint
+
+
+def test_release_acceptance_legacy_positional_capabilities_keep_descriptors() -> None:
+    assert _controlled_fixture_codes() == {
+        "transaction_provider": "transaction_participant_missing",
+        "drift": "catalog_schema_drift",
+        "cross_domain_conflict": "cross_domain_conflict",
+        "gap": "provider_missing",
+    }
 
 
 def test_acceptance_runner_has_no_optional_mandatory_sections() -> None:

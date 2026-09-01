@@ -6,7 +6,7 @@ import hashlib
 import re
 from collections import defaultdict
 from collections.abc import Iterable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path, PurePosixPath
 from typing import Any
 
@@ -147,11 +147,17 @@ def _business_object(descriptor: Mapping[str, Any]) -> str:
 
 
 def _strings(value: Any) -> tuple[str, ...]:
-    if isinstance(value, (str, bytes, Mapping)):
-        return (str(value).strip(),) if isinstance(value, str) and value.strip() else ()
+    if isinstance(value, str):
+        return (value.strip(),) if value.strip() else ()
+    if isinstance(value, (bytes, Mapping)):
+        raise ScanPolicyError("product_catalog_string_list_invalid")
     if not isinstance(value, (list, tuple, set, frozenset)):
-        return ()
-    return tuple(sorted({str(item).strip() for item in value if str(item).strip()}))
+        if value is None:
+            return ()
+        raise ScanPolicyError("product_catalog_string_list_invalid")
+    if any(not isinstance(item, str) for item in value):
+        raise ScanPolicyError("product_catalog_string_list_invalid")
+    return tuple(sorted({item.strip() for item in value if item.strip()}))
 
 
 def _scopes(descriptor: Mapping[str, Any]) -> tuple[tuple[str, ...], tuple[str, ...]]:
@@ -172,6 +178,7 @@ def _scopes(descriptor: Mapping[str, Any]) -> tuple[tuple[str, ...], tuple[str, 
 
 def _business_evidence(
     descriptor: Mapping[str, Any], business_effect: str, rules: tuple[Mapping[str, Any], ...],
+    *, resolved_enforcement_refs: tuple[str, ...] = (), resolved_test_refs: tuple[str, ...] = (),
 ) -> tuple[Mapping[str, tuple[str, ...]], CapabilityMaturity]:
     generated = is_generated_business_effect(business_effect, descriptor.get("description"))
     no_rule_reason = str(descriptor.get("no_business_invariant_reason") or "").strip()
@@ -190,8 +197,8 @@ def _business_evidence(
         "A": (business_effect,) + acceptance if business_effect else acceptance,
         "B": tuple(value for value in (_business_object(descriptor), _business_action(str(descriptor.get("id") or ""), descriptor)) if value),
         "C": tuple(value for value in (*rule_ids, no_rule_reason) if value),
-        "D": enforcement_refs,
-        "E": test_refs,
+        "D": resolved_enforcement_refs,
+        "E": resolved_test_refs,
         "F": tuple(value for value in (provider_ref, *_strings(descriptor.get("api_refs"))) if value),
         "G": (definition_hash,) if definition_hash else (),
     }
@@ -204,10 +211,19 @@ def _business_evidence(
             str(rule.get(field) or "").strip()
             for rule in rules for field in ("rule_id", "statement", "applies_when", "enforcement_ref", "error_code")
         ) and all(_strings(rule.get("test_refs")) for rule in rules)
-        maturity = CapabilityMaturity(
-            "L3" if complete else "L2",
-            ("rule_evidence_present",) if complete else ("business_rule_evidence_incomplete",),
-        )
+        enforcement_resolved = complete and enforcement_refs == resolved_enforcement_refs
+        tests_resolved = complete and test_refs == resolved_test_refs
+        if enforcement_resolved and tests_resolved:
+            maturity = CapabilityMaturity("L3", ("enforcement_mapping_resolved", "rule_test_evidence_resolved"))
+        elif complete:
+            reasons = []
+            if not enforcement_resolved:
+                reasons.append("enforcement_ref_unresolved")
+            if not tests_resolved:
+                reasons.append("rule_test_ref_unresolved")
+            maturity = CapabilityMaturity("L2", tuple(reasons))
+        else:
+            maturity = CapabilityMaturity("L2", ("business_rule_evidence_incomplete",))
     elif no_rule_reason:
         maturity = CapabilityMaturity("L2", ("business_invariants_not_applicable",))
     else:
@@ -321,6 +337,7 @@ class GovernanceScanner:
         test_bindings, test_relations = self._bind_acceptance_tests(capabilities, nodes)
         bindings.extend(test_bindings)
         relations.extend(test_relations)
+        capabilities = self._resolve_business_evidence(capabilities, nodes)
         ordered_nodes = tuple(sorted(nodes.values(), key=lambda item: item.canonical_key))
         ordered_relations = tuple(sorted(
             self._unique_relations(relations),
@@ -331,6 +348,7 @@ class GovernanceScanner:
             key=lambda item: (item.capability_id, item.major_version, item.node_canonical_key, item.binding_type),
         ))
         ordered_capabilities = tuple(sorted(capabilities, key=lambda item: (item.capability_id, item.major_version)))
+        scan_status = "blocked" if scan_findings else "completed"
         snapshot_hash = _digest({
             "product_release_id": str(product.get("release_id", "")),
             "extension_release_id": str(extension.get("release_id", "")) if extension else None,
@@ -340,6 +358,7 @@ class GovernanceScanner:
             "bindings": [item.__dict__ for item in ordered_bindings],
             "relations": [item.__dict__ for item in ordered_relations],
             "scan_findings": [item.to_json() for item in scan_findings],
+            "scan_status": scan_status,
         })
         return SnapshotDocument(
             product_release_id=str(product.get("release_id", "")),
@@ -351,6 +370,7 @@ class GovernanceScanner:
             bindings=ordered_bindings,
             relations=ordered_relations,
             scan_findings=scan_findings,
+            scan_status=scan_status,
         )
 
     def _failed_scan(self, code_revision: str, error: Exception) -> SnapshotDocument:
@@ -374,9 +394,10 @@ class GovernanceScanner:
             "product_release_id": product_release, "extension_release_id": None,
             "code_revision": code_revision, "capabilities": [], "nodes": [],
             "bindings": [], "relations": [], "scan_findings": [finding.to_json()],
+            "scan_status": "blocked",
         }
         return SnapshotDocument(
-            product_release, None, code_revision, _digest(payload), (), (), (), (), (finding,),
+            product_release, None, code_revision, _digest(payload), (), (), (), (), (finding,), "blocked",
         )
 
     @staticmethod
@@ -647,7 +668,7 @@ class GovernanceScanner:
     ) -> list[ScannedCapability]:
         capabilities: list[ScannedCapability] = []
         for raw_descriptor in catalog.get("descriptors", ()):
-            descriptor = _json_document(raw_descriptor)
+            descriptor = dict(_json_document(raw_descriptor))
             capability_id = str(descriptor.get("id", ""))
             major = int(descriptor.get("major_version", 0))
             owner = str(descriptor.get("owner_domain", ""))
@@ -656,10 +677,24 @@ class GovernanceScanner:
             artifact = domains[owner].get("artifact")
             provider_hash = str(artifact.get("artifact_hash", "")) if isinstance(artifact, Mapping) else ""
             business_effect = str(descriptor.get("business_effect") or "").strip()
+            raw_rules = descriptor.get("business_invariants", ())
+            if not isinstance(raw_rules, (list, tuple)):
+                raise ScanPolicyError("product_catalog_business_rules_invalid")
             rules = tuple(sorted(
-                (_json_document(rule) for rule in descriptor.get("business_invariants", ())),
+                (dict(_json_document(rule)) for rule in raw_rules),
                 key=lambda rule: (str(rule.get("rule_id") or ""), int(rule.get("rule_version") or 0)),
             ))
+            identities = [(str(rule.get("rule_id") or "").strip(), int(rule.get("rule_version") or 0)) for rule in rules]
+            if any(not rule_id or version < 1 for rule_id, version in identities):
+                raise ScanPolicyError("product_catalog_business_rule_invalid")
+            if len(set(identities)) != len(identities):
+                raise ScanPolicyError("product_catalog_business_rule_duplicate")
+            for rule in rules:
+                _strings(rule.get("test_refs"))
+            descriptor["business_invariants"] = rules
+            for field_name in ("read_scope", "write_scope", "api_refs", "business_acceptance_criteria"):
+                if field_name in descriptor:
+                    descriptor[field_name] = _strings(descriptor[field_name])
             input_hash = _digest(descriptor.get("input_schema", {}))
             output_hash = _digest(descriptor.get("output_schema", {}))
             read_scope, write_scope = _scopes(descriptor)
@@ -696,6 +731,36 @@ class GovernanceScanner:
                 descriptor=descriptor,
             ))
         return capabilities
+
+    @staticmethod
+    def _resolve_business_evidence(
+        capabilities: list[ScannedCapability], nodes: Mapping[str, ImplementationNode],
+    ) -> list[ScannedCapability]:
+        provider_refs: set[tuple[str, str]] = set()
+        test_refs: set[tuple[str, str]] = set()
+        for node in nodes.values():
+            if node.node_type in {"provider", "port", "repository", "handler"} and node.source_symbol:
+                provider_refs.add((node.owner_domain, f"{node.source_path}:{node.source_symbol}"))
+            if node.node_type == "test_case" and node.source_symbol:
+                reference = node.source_symbol if "::" in node.source_symbol else f"{node.source_path}::{node.source_symbol}"
+                test_refs.add((node.owner_domain, reference))
+        resolved: list[ScannedCapability] = []
+        for capability in capabilities:
+            enforcement = tuple(sorted({
+                str(rule.get("enforcement_ref") or "").strip()
+                for rule in capability.business_rules
+                if (capability.owner_domain, str(rule.get("enforcement_ref") or "").strip()) in provider_refs
+            }))
+            tests = tuple(sorted({
+                ref for rule in capability.business_rules for ref in _strings(rule.get("test_refs"))
+                if (capability.owner_domain, ref) in test_refs
+            }))
+            evidence, maturity = _business_evidence(
+                capability.descriptor, capability.business_effect, capability.business_rules,
+                resolved_enforcement_refs=enforcement, resolved_test_refs=tests,
+            )
+            resolved.append(replace(capability, business_layer_evidence=evidence, business_maturity=maturity))
+        return resolved
 
     def _bind_capabilities(
         self,

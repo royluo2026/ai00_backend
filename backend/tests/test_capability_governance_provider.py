@@ -1,3 +1,4 @@
+from dataclasses import replace
 from types import SimpleNamespace
 
 import pytest
@@ -5,9 +6,12 @@ import pytest
 from backend.capabilities.models_next import CapabilityBusinessError, CapabilityContext
 from backend.capabilities.validation_next import validate_payload
 from backend.capability_governance_test.contracts import OUTPUT_SCHEMAS
+from backend.capability_governance_test.fingerprint import snapshot_fingerprint
+from backend.capability_governance_test.models import ScanFinding, SnapshotDocument
 from backend.capability_governance_test.provider import register_governance_capabilities
 from backend.capability_governance_test.release_gate import ReleaseGate
 from backend.capability_governance_test.service import CapabilityGovernanceService
+from backend.capability_governance_test.store import MemoryGovernanceStore
 from backend.scripts.build_capability_governance_catalog import current_release
 
 
@@ -627,3 +631,27 @@ def test_registry_search_projects_scanned_business_evidence_in_contract():
         "business_object": "height", "action": "write",
     }
     assert result["items"][0]["contract"]["business_maturity"]["level"] == "L3"
+
+
+def test_blocked_scan_is_persisted_and_reachable_through_finding_provider():
+    draft = SnapshotDocument(
+        "catalog-test", None, "revision", "", (), (), (), (),
+        (ScanFinding("scan_configuration_error", "blocking", "configuration", "product_catalog", "invalid"),),
+        "blocked",
+    )
+    document = replace(draft, snapshot_hash=snapshot_fingerprint(draft))
+    store = MemoryGovernanceStore(next_ids=iter(range(100, 200)).__next__)
+    scanner = SimpleNamespace(scan=lambda _revision: document)
+    service = CapabilityGovernanceService(store, scanner=scanner)
+
+    scan_result = service.base_capability_scan_run(
+        {"code_revision": "revision", "idempotency_key": "blocked-scan"}, _context(),
+    )
+    validate_payload(OUTPUT_SCHEMAS["base.capability_scan.run"], scan_result, label="output")
+    finding_result = service.base_capability_finding_search(
+        {"target_gid": scan_result["snapshot_gid"]}, _context(),
+    )
+
+    assert scan_result["scan_status"] == "blocked"
+    assert finding_result["findings"][0]["code"] == "scan_configuration_error"
+    assert finding_result["findings"][0]["severity"] == "blocking"

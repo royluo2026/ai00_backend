@@ -63,13 +63,13 @@ class ScannedCapability:
     error_schema_hash: str
     policy_hash: str
     provider_hash: str
+    descriptor: Mapping[str, Any] = field(default_factory=dict)
     business_rules: tuple[Mapping[str, Any], ...] = ()
     fingerprint: CapabilityFingerprint | None = None
     business_layer_evidence: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
     business_maturity: CapabilityMaturity = field(
         default_factory=lambda: CapabilityMaturity("L0", ("unregistered",)),
     )
-    descriptor: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "business_rules", tuple(_freeze(item) for item in self.business_rules))
@@ -193,6 +193,7 @@ class SnapshotDocument:
     bindings: tuple[CapabilityBinding, ...]
     relations: tuple[ImplementationRelation, ...]
     scan_findings: tuple[ScanFinding, ...] = ()
+    scan_status: str = "completed"
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "capabilities", tuple(self.capabilities))
@@ -200,6 +201,8 @@ class SnapshotDocument:
         object.__setattr__(self, "bindings", tuple(self.bindings))
         object.__setattr__(self, "relations", tuple(self.relations))
         object.__setattr__(self, "scan_findings", tuple(self.scan_findings))
+        if self.scan_status not in {"completed", "blocked"}:
+            raise ValueError("snapshot_scan_status_invalid")
 
     def to_json(self) -> dict[str, Any]:
         return {
@@ -212,6 +215,7 @@ class SnapshotDocument:
             "bindings": [_json_value(item.__dict__) for item in self.bindings],
             "relations": [_json_value(item.__dict__) for item in self.relations],
             "scan_findings": [item.to_json() for item in self.scan_findings],
+            "scan_status": self.scan_status,
         }
 
 

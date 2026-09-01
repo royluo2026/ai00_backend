@@ -410,6 +410,8 @@ def _output_schema(capability_id: str) -> dict[str, object]:
         properties["waiver"] = _WAIVER_SCHEMA
     elif capability_id == "base.capability_release_gate.evaluate":
         properties["release"] = _RELEASE_SCHEMA
+    elif capability_id == "base.capability_scan.run":
+        properties["scan_status"] = {"type": "string", "enum": ["completed", "blocked"]}
     return _closed(properties, ("capability_id", "status"))
 
 

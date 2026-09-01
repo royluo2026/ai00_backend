@@ -121,6 +121,8 @@ def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, A
                 response[field] = min(max(0, int(result[field])), 100000)
             except (TypeError, ValueError):
                 pass
+    if capability_id == "base.capability_scan.run" and result.get("scan_status") in {"completed", "blocked"}:
+        response["scan_status"] = str(result["scan_status"])
     if capability_id == "base.capability_registry.search":
         response["items"] = [_projection(item, (
             "capability_id", "capability_version_gid", "capability_gid", "major_version",

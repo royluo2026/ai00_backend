@@ -734,23 +734,11 @@ class CapabilityGovernanceService:
             snapshot = self._latest_snapshot()
         findings: tuple[Any, ...] = ()
         if snapshot is not None:
-            custom_loader = getattr(self._store, "get_findings", None)
-            if callable(custom_loader):
-                findings = tuple(
-                    _enrich_finding_record(snapshot, item)
-                    for item in tuple(custom_loader(int(getattr(snapshot, "snapshot_gid"))) or ())[:_MAX_HEALTH_FINDINGS]
-                )
-            else:
-                if self._analysis_runner is None:
-                    raise _business_error("governance_dependency_unavailable")
-                analysis = self._invoke_port(
-                    self._analysis_runner, snapshot=snapshot, payload=payload, context=context,
-                    kind="analysis", run_gid=str(getattr(snapshot, "snapshot_gid")),
-                    request=AnalysisRequest(),
-                )
-                findings = self._finding_records(
-                    snapshot, getattr(analysis, "findings", ()), limit=_MAX_HEALTH_FINDINGS,
-                )
+            findings = self._load_findings(
+                snapshot, payload, context, limit=_MAX_HEALTH_FINDINGS,
+            )
+            if not findings and self._analysis_runner is None and self._store is None:
+                raise _business_error("governance_dependency_unavailable")
         query = str(payload.get("query", "")).strip().lower()
         domain = str(payload.get("domain", "")).strip().lower()
         severity = str(payload.get("severity", "")).strip().lower()
@@ -860,6 +848,7 @@ class CapabilityGovernanceService:
             "base.capability_scan.run",
             snapshot_gid=str(getattr(snapshot, "snapshot_gid")),
             scan_run_gid=str(getattr(snapshot, "scan_run_gid", "")),
+            scan_status=str(getattr(document, "scan_status", "completed")),
         )
 
     def base_capability_test_run(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
@@ -1442,25 +1431,32 @@ class CapabilityGovernanceService:
         self, snapshot: Any, payload: Mapping[str, Any], context: object, *, limit: int = _MAX_SEARCH,
     ) -> tuple[Any, ...]:
         loader = getattr(self._store, "get_findings", None) if self._store is not None else None
+        persisted: tuple[Any, ...] = ()
         if callable(loader):
             try:
-                return tuple(
+                persisted = tuple(
                     _enrich_finding_record(snapshot, item)
                     for item in tuple(loader(int(getattr(snapshot, "snapshot_gid"))) or ())[:limit]
                 )
             except Exception:
-                return ()
+                persisted = ()
         if self._analysis_runner is None:
-            return ()
+            return persisted
         try:
             analysis = self._invoke_port(
                 self._analysis_runner, snapshot=snapshot, payload=payload, context=context,
                 kind="analysis", run_gid=str(getattr(snapshot, "snapshot_gid")),
                 request=AnalysisRequest(),
             )
-            return self._finding_records(snapshot, getattr(analysis, "findings", ()), limit=limit)
+            analysed = self._finding_records(snapshot, getattr(analysis, "findings", ()), limit=limit)
+            combined = (*persisted, *analysed)
+            unique: dict[str, Any] = {}
+            for index, item in enumerate(combined):
+                fingerprint = str(_record_value(item, "fingerprint", "")) or f"record:{index}"
+                unique.setdefault(fingerprint, item)
+            return tuple(unique.values())[:limit]
         except Exception:
-            return ()
+            return persisted
 
     def _audit_events(self) -> tuple[Any, ...]:
         sink = self._audit_sink

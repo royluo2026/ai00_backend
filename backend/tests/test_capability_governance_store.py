@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import replace
+import json
 
 import pytest
 
 from backend.capability_governance_test.identity_projection import project_snapshot
-from backend.capability_governance_test.models import ImmutableRecordError
+from backend.capability_governance_test.fingerprint import snapshot_fingerprint
+from backend.capability_governance_test.models import ImmutableRecordError, ScanFinding, SnapshotDocument
 from backend.capability_governance_test.store import MemoryGovernanceStore, SqlGovernanceStore
 from backend.tests.test_capability_identity_projection import snapshot
 
@@ -41,6 +43,9 @@ class _Cursor:
         elif query.startswith("SELECT relation_gid"):
             self.rows = self.connection.relation_rows
             self.row = None
+        elif query.startswith("SELECT finding_gid"):
+            self.rows = self.connection.finding_rows
+            self.row = None
         elif query.startswith("SELECT capability_gid"):
             self.row = self.connection.logical_rows.pop(0) if self.connection.logical_rows else None
             self.rows = []
@@ -68,7 +73,7 @@ class _Cursor:
 
 
 class _Connection:
-    def __init__(self, logical_rows=(), major_rows=(), snapshot_rows=(), snapshot_entry_rows=(), node_rows=(), binding_rows=(), relation_rows=(), duplicate_logical_once=False, duplicate_snapshot_once=False):
+    def __init__(self, logical_rows=(), major_rows=(), snapshot_rows=(), snapshot_entry_rows=(), node_rows=(), binding_rows=(), relation_rows=(), finding_rows=(), duplicate_logical_once=False, duplicate_snapshot_once=False):
         self.logical_rows = list(logical_rows)
         self.major_rows = list(major_rows)
         self.snapshot_rows = list(snapshot_rows)
@@ -76,6 +81,7 @@ class _Connection:
         self.node_rows = list(node_rows)
         self.binding_rows = list(binding_rows)
         self.relation_rows = list(relation_rows)
+        self.finding_rows = list(finding_rows)
         self.duplicate_logical_once = duplicate_logical_once
         self.duplicate_snapshot_once = duplicate_snapshot_once
         self.calls = []
@@ -94,6 +100,70 @@ class _Connection:
 
 class _DuplicateKeyError(Exception):
     pass
+
+
+def _blocked_document() -> SnapshotDocument:
+    draft = SnapshotDocument(
+        "catalog-test", None, "revision", "", (), (), (), (),
+        (ScanFinding("scan_configuration_error", "blocking", "configuration", "product_catalog", "invalid"),),
+        "blocked",
+    )
+    return replace(draft, snapshot_hash=snapshot_fingerprint(draft))
+
+
+def test_memory_store_preserves_blocked_scan_findings_for_reads():
+    store = MemoryGovernanceStore(next_ids=iter(range(100, 200)).__next__)
+
+    record = store.import_snapshot(_blocked_document())
+
+    assert record.document.scan_status == "blocked"
+    assert store.get_findings(record.snapshot_gid)[0]["code"] == "scan_configuration_error"
+    assert store.get_findings(record.snapshot_gid)[0]["evidence"] == ("product_catalog",)
+
+
+def test_sql_store_persists_blocked_run_and_scan_finding():
+    connection = _Connection()
+
+    SqlGovernanceStore(connection, next_ids=iter(range(100, 200)).__next__).import_snapshot(_blocked_document())
+
+    scan_run = next(parameters for query, parameters in connection.calls if query.startswith("INSERT INTO workmanship_base_capability_scan_runs"))
+    finding = next(parameters for query, parameters in connection.calls if query.startswith("INSERT INTO workmanship_base_capability_findings"))
+    assert scan_run[7] == "blocked"
+    assert scan_run[10] == "invalid"
+    assert finding[3:7] == ("scan_configuration_error", "blocking", "open", "scanner")
+
+
+def test_sql_rehydration_restores_business_evidence_and_scan_findings():
+    document = snapshot("craft.bop.version.list", 1)
+    capability = document.capabilities[0]
+    connection = _Connection(
+        snapshot_rows=({
+            "snapshot_gid": 700, "scan_run_gid": 701, "snapshot_hash": document.snapshot_hash,
+            "code_revision": document.code_revision, "catalog_release_id": document.product_release_id,
+            "scan_status": "completed",
+        },),
+        snapshot_entry_rows=({
+            "snapshot_entry_gid": 702, "capability_gid": 703, "capability_version_gid": 704,
+            "capability_id": capability.capability_id, "major_version": capability.major_version,
+            "owner_domain": capability.owner_domain, "semantic_class": capability.semantic_class,
+            "business_effect": capability.business_effect, "lifecycle_status": capability.lifecycle_status,
+            "descriptor_hash": capability.descriptor_hash, "input_schema_hash": capability.input_schema_hash,
+            "output_schema_hash": capability.output_schema_hash, "error_schema_hash": capability.error_schema_hash,
+            "policy_hash": capability.policy_hash, "provider_hash": capability.provider_hash,
+            "descriptor_json": json.dumps(capability.to_json()),
+        },),
+        finding_rows=({
+            "finding_gid": 705, "finding_type": "scan_parser_error", "severity": "blocking",
+            "status": "open", "source_type": "scanner", "finding_fingerprint": "sha256:finding",
+            "title": "parser", "summary": "syntax_error", "recommendation": "craft/provider.py",
+        },),
+    )
+
+    record = SqlGovernanceStore(connection).get_snapshot(700)
+
+    assert record.document.capabilities[0].descriptor == capability.descriptor
+    assert record.document.scan_findings[0].source_path == "craft/provider.py"
+    assert record.document.scan_status == "completed"
 
 
 def test_sql_store_uses_one_parameterized_transaction_and_persists_graph():

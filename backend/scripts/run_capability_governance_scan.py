@@ -68,6 +68,7 @@ def run_offline_scan(output: Path) -> dict[str, object]:
     ).scan(code_revision="offline")
     report = {
         "mode": "offline",
+        "status": document.scan_status,
         "official_domain_count": len(manifests.domains),
         "product_descriptor_count": len(product.descriptors),
         "stable_product_descriptor_count": stable_count,
@@ -94,8 +95,9 @@ def main(argv: list[str] | None = None) -> int:
         "product_descriptor_count": report["product_descriptor_count"],
         "stable_product_descriptor_count": report["stable_product_descriptor_count"],
         "extension_descriptor_count": report["extension_descriptor_count"],
+        "scan_status": report["status"],
     }, sort_keys=True))
-    return 0
+    return 1 if report["status"] == "blocked" else 0
 
 
 if __name__ == "__main__":

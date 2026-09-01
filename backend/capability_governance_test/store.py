@@ -16,6 +16,8 @@ from .models import (
     CapabilityBusinessProjection,
     CapabilityBusinessReview,
     CapabilityBinding,
+    CapabilityFingerprint,
+    CapabilityMaturity,
     CapabilityProjection,
     CapabilityRelationCandidate,
     ImmutableRecordError,
@@ -23,6 +25,7 @@ from .models import (
     ImplementationRelation,
     ScannedCapability,
     RuleEffectivenessRecord,
+    ScanFinding,
     SnapshotDocument,
     SnapshotEntry,
     SnapshotRecord,
@@ -50,6 +53,9 @@ class GovernanceStore(ABC):
         """Return projected entries without exposing store implementation state."""
         snapshot = self.latest_snapshot() if snapshot_gid is None else self.get_snapshot(snapshot_gid)
         return tuple(getattr(snapshot, "entries", ())) if snapshot is not None else ()
+
+    def get_findings(self, snapshot_gid: int) -> tuple[Mapping[str, Any], ...]:
+        return ()
 
     def replace_snapshot(self, snapshot_gid: int, document: SnapshotDocument) -> None:
         raise ImmutableRecordError("snapshot_records_are_insert_only")
@@ -154,6 +160,43 @@ def _validate_business_review_references(review: CapabilityBusinessReview) -> No
         raise ImmutableRecordError("business_review_evidence_snapshot_gid_invalid")
 
 
+def _scan_finding_record(finding: ScanFinding, finding_gid: int) -> Mapping[str, Any]:
+    from .fingerprint import canonical_fingerprint
+    return {
+        "finding_gid": finding_gid,
+        "code": finding.code,
+        "reason_code": finding.code,
+        "severity": finding.severity,
+        "status": "open",
+        "source_type": "scanner",
+        "fingerprint": canonical_fingerprint(finding.to_json()),
+        "remediation_boundary": finding.category,
+        "domains": (),
+        "evidence": (finding.source_path,),
+        "reason": finding.message,
+        "subject_summary": finding.source_path,
+    }
+
+
+def _finding_row_record(row: Any) -> Mapping[str, Any]:
+    source_path = str(_row_value(row, "recommendation", 8))
+    code = str(_row_value(row, "finding_type", 1))
+    return {
+        "finding_gid": int(_row_value(row, "finding_gid", 0)),
+        "code": code,
+        "reason_code": code,
+        "severity": str(_row_value(row, "severity", 2)),
+        "status": str(_row_value(row, "status", 3)),
+        "source_type": str(_row_value(row, "source_type", 4)),
+        "fingerprint": str(_row_value(row, "finding_fingerprint", 5)),
+        "remediation_boundary": str(_row_value(row, "title", 6)),
+        "domains": (),
+        "evidence": (source_path,),
+        "reason": str(_row_value(row, "summary", 7)),
+        "subject_summary": source_path,
+    }
+
+
 class MemoryGovernanceStore(GovernanceStore):
     """Thread-safe in-memory store used by governance tests and local projections."""
 
@@ -169,6 +212,7 @@ class MemoryGovernanceStore(GovernanceStore):
         self._relation_candidates: dict[int, CapabilityRelationCandidate] = {}
         self._business_reviews: dict[int, CapabilityBusinessReview] = {}
         self._rule_effectiveness: dict[int, RuleEffectivenessRecord] = {}
+        self._scan_findings: dict[int, tuple[Mapping[str, Any], ...]] = {}
 
     def import_snapshot(self, document: SnapshotDocument) -> SnapshotRecord:
         with self._lock:
@@ -199,6 +243,9 @@ class MemoryGovernanceStore(GovernanceStore):
             )
             self._snapshots[snapshot_gid] = record
             self._snapshots_by_hash[document.snapshot_hash] = record
+            self._scan_findings[snapshot_gid] = tuple(
+                _scan_finding_record(finding, self._next_ids()) for finding in document.scan_findings
+            )
             return record
 
     def get_snapshot(self, snapshot_gid: int) -> SnapshotRecord | None:
@@ -208,6 +255,10 @@ class MemoryGovernanceStore(GovernanceStore):
     def latest_snapshot(self) -> SnapshotRecord | None:
         with self._lock:
             return self._snapshots[max(self._snapshots)] if self._snapshots else None
+
+    def get_findings(self, snapshot_gid: int) -> tuple[Mapping[str, Any], ...]:
+        with self._lock:
+            return self._scan_findings.get(snapshot_gid, ())
 
     def list_entries(self, snapshot_gid: int | None = None) -> tuple[SnapshotEntry, ...]:
         with self._lock:
@@ -377,6 +428,7 @@ class SqlGovernanceStore(GovernanceStore):
             node_gids = self._insert_nodes(cursor, snapshot_gid, document, created_at)
             binding_gids = self._insert_bindings(cursor, snapshot_gid, projections, node_gids, document)
             relation_gids = self._insert_relations(cursor, snapshot_gid, node_gids, document)
+            self._insert_scan_findings(cursor, snapshot_gid, document)
             self._update_mutable_projections(cursor, snapshot_gid, projections, created_at)
             record = SnapshotRecord(
                 snapshot_gid=snapshot_gid, scan_run_gid=scan_run_gid, document=document,
@@ -403,7 +455,9 @@ class SqlGovernanceStore(GovernanceStore):
         cursor = self._connection.cursor()
         try:
             cursor.execute(
-                "SELECT snapshot_gid, scan_run_gid, snapshot_hash, code_revision, catalog_release_id "
+                "SELECT snapshot_gid, scan_run_gid, snapshot_hash, code_revision, catalog_release_id, "
+                "(SELECT status FROM workmanship_base_capability_scan_runs AS scan_run "
+                "WHERE scan_run.scan_run_gid = workmanship_base_capability_snapshots.scan_run_gid) AS scan_status "
                 "FROM workmanship_base_capability_snapshots WHERE snapshot_gid = %s",
                 (int(snapshot_gid),),
             )
@@ -415,9 +469,10 @@ class SqlGovernanceStore(GovernanceStore):
             snapshot_hash = str(_row_value(row, "snapshot_hash", 2))
             code_revision = str(_row_value(row, "code_revision", 3))
             product_release = str(_row_value(row, "catalog_release_id", 4))
+            scan_status = str(_row_value(row, "scan_status", 5))
 
             cursor.execute(
-                "SELECT snapshot_entry.snapshot_entry_gid, capability_entry.capability_gid, "
+                "SELECT snapshot_entry_gid, capability_entry.capability_gid, "
                 "snapshot_entry.capability_version_gid, capability_entry.capability_id, "
                 "capability_version.major_version, capability_entry.owner_domain, "
                 "capability_version.semantic_class, capability_version.business_effect, "
@@ -438,21 +493,30 @@ class SqlGovernanceStore(GovernanceStore):
             capabilities: list[ScannedCapability] = []
             for item in entry_rows:
                 entries.append(self._entry_from_row(item))
-                descriptor = _json_load(_row_value(item, "descriptor_json", 15))
+                payload = _json_load(_row_value(item, "descriptor_json", 15))
+                descriptor = _json_load(payload.get("descriptor", payload))
+                fingerprint_payload = payload.get("fingerprint")
+                fingerprint = CapabilityFingerprint(**fingerprint_payload) if isinstance(fingerprint_payload, Mapping) else None
+                maturity_payload = payload.get("business_maturity")
+                maturity = CapabilityMaturity(**maturity_payload) if isinstance(maturity_payload, Mapping) else CapabilityMaturity("L0", ("unregistered",))
                 capabilities.append(ScannedCapability(
-                    str(_row_value(item, "capability_id", 3)),
-                    int(_row_value(item, "major_version", 4)),
-                    str(_row_value(item, "owner_domain", 5)),
-                    str(_row_value(item, "semantic_class", 6)),
-                    str(_row_value(item, "business_effect", 7)),
-                    str(_row_value(item, "lifecycle_status", 8)),
-                    str(_row_value(item, "descriptor_hash", 9)),
-                    str(_row_value(item, "input_schema_hash", 10)),
-                    str(_row_value(item, "output_schema_hash", 11)),
-                    str(_row_value(item, "error_schema_hash", 12)),
-                    str(_row_value(item, "policy_hash", 13)),
-                    str(_row_value(item, "provider_hash", 14)),
-                    descriptor,
+                    capability_id=str(_row_value(item, "capability_id", 3)),
+                    major_version=int(_row_value(item, "major_version", 4)),
+                    owner_domain=str(_row_value(item, "owner_domain", 5)),
+                    semantic_class=str(_row_value(item, "semantic_class", 6)),
+                    business_effect=str(_row_value(item, "business_effect", 7)),
+                    lifecycle_status=str(_row_value(item, "lifecycle_status", 8)),
+                    descriptor_hash=str(_row_value(item, "descriptor_hash", 9)),
+                    input_schema_hash=str(_row_value(item, "input_schema_hash", 10)),
+                    output_schema_hash=str(_row_value(item, "output_schema_hash", 11)),
+                    error_schema_hash=str(_row_value(item, "error_schema_hash", 12)),
+                    policy_hash=str(_row_value(item, "policy_hash", 13)),
+                    provider_hash=str(_row_value(item, "provider_hash", 14)),
+                    descriptor=descriptor,
+                    business_rules=tuple(payload.get("business_rules", ())),
+                    fingerprint=fingerprint,
+                    business_layer_evidence=_json_load(payload.get("business_layer_evidence", {})),
+                    business_maturity=maturity,
                 ))
 
             cursor.execute(
@@ -526,9 +590,23 @@ class SqlGovernanceStore(GovernanceStore):
                     str(_row_value(item, "relation_hash", 4)),
                 ))
                 relation_gids.append(relation_gid)
+            cursor.execute(
+                "SELECT finding_gid, finding_type, severity, status, source_type, finding_fingerprint, "
+                "title, summary, recommendation FROM workmanship_base_capability_findings "
+                "WHERE snapshot_gid = %s AND source_type = %s ORDER BY finding_gid",
+                (snapshot_id, "scanner"),
+            )
+            scan_findings = tuple(
+                ScanFinding(
+                    str(_row_value(item, "finding_type", 1)), str(_row_value(item, "severity", 2)),
+                    str(_row_value(item, "title", 6)), str(_row_value(item, "recommendation", 8)),
+                    str(_row_value(item, "summary", 7)),
+                )
+                for item in cursor.fetchall()
+            )
             document = SnapshotDocument(
                 product_release, None, code_revision, snapshot_hash,
-                tuple(capabilities), tuple(nodes), tuple(bindings), tuple(relations),
+                tuple(capabilities), tuple(nodes), tuple(bindings), tuple(relations), scan_findings, scan_status,
             )
             return SnapshotRecord(
                 snapshot_id, scan_run_gid, document, tuple(entries), node_gids,
@@ -556,6 +634,21 @@ class SqlGovernanceStore(GovernanceStore):
     def list_entries(self, snapshot_gid: int | None = None) -> tuple[SnapshotEntry, ...]:
         snapshot = self.latest_snapshot() if snapshot_gid is None else self.get_snapshot(snapshot_gid)
         return tuple(getattr(snapshot, "entries", ())) if snapshot is not None else ()
+
+    def get_findings(self, snapshot_gid: int) -> tuple[Mapping[str, Any], ...]:
+        cursor = self._connection.cursor()
+        try:
+            cursor.execute(
+                "SELECT finding_gid, finding_type, severity, status, source_type, finding_fingerprint, "
+                "title, summary, recommendation FROM workmanship_base_capability_findings "
+                "WHERE snapshot_gid = %s ORDER BY finding_gid",
+                (int(snapshot_gid),),
+            )
+            return tuple(_finding_row_record(item) for item in cursor.fetchall())
+        finally:
+            close = getattr(cursor, "close", None)
+            if callable(close):
+                close()
 
     def save_business_projection(self, projection: CapabilityBusinessProjection) -> None:
         cursor = self._connection.cursor()
@@ -903,8 +996,22 @@ class SqlGovernanceStore(GovernanceStore):
             "(scan_run_gid, environment_key, trigger_type, code_revision, catalog_release_id, requested_by_gid, idempotency_key, status, started_at, finished_at, error_summary) "
             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
             (scan_run_gid, "test-governance", "import", document.code_revision, document.product_release_id,
-             0, document.snapshot_hash, "completed", created_at, created_at, None),
+             0, document.snapshot_hash, document.scan_status, created_at, created_at,
+             "; ".join(finding.message for finding in document.scan_findings)[:1000] or None),
         )
+
+    def _insert_scan_findings(self, cursor: Any, snapshot_gid: int, document: SnapshotDocument) -> None:
+        from .fingerprint import canonical_fingerprint
+        for finding in document.scan_findings:
+            fingerprint = canonical_fingerprint(finding.to_json())
+            cursor.execute(
+                "INSERT INTO workmanship_base_capability_findings "
+                "(finding_gid, analysis_run_gid, snapshot_gid, finding_type, severity, status, source_type, "
+                "confidence, finding_fingerprint, title, summary, recommendation, confirmed_by_gid, confirmed_at, row_version) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                (self._next_ids(), None, snapshot_gid, finding.code, finding.severity, "open", "scanner",
+                 1, fingerprint, finding.category, finding.message, finding.source_path, None, None, 1),
+            )
 
     @staticmethod
     def _insert_snapshot(cursor: Any, snapshot_gid: int, scan_run_gid: int, document: SnapshotDocument, created_at: datetime) -> None:

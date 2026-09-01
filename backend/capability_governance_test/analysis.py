@@ -235,6 +235,15 @@ def _semantic_findings(snapshot: SnapshotDocument, request: AnalysisRequest) -> 
 
 def run_deterministic_analysis(snapshot: SnapshotDocument, request: AnalysisRequest) -> AnalysisResult:
     """Run every pure release rule and bounded semantic analysis without mutation."""
+    scan_findings = tuple(getattr(snapshot, "scan_findings", ()))
+    if getattr(snapshot, "scan_status", "completed") == "blocked" or scan_findings:
+        findings = tuple(sorted((
+            FindingCandidate(
+                finding.code, finding.severity, (), (finding.source_path,), finding.category,
+            )
+            for finding in scan_findings
+        ), key=lambda item: (item.code, item.fingerprint)))
+        return AnalysisResult("blocked", findings, 0, 0)
     graph = ImplementationGraph(snapshot.nodes, snapshot.relations, snapshot.bindings)
     status, semantic, candidates, operations = _semantic_findings(snapshot, request)
     if status != "ok":
