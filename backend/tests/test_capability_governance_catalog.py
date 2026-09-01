@@ -12,6 +12,7 @@ from backend.capability_v2.bootstrap import (
 from backend.capability_governance_test.contracts import ALL_IDS, provider_artifact
 from backend.capability_v2.provider_loader import hash_domain_artifact
 from backend.capability_v2.gateway import configure_default_gateway
+from backend.scripts import build_capability_governance_catalog as catalog_builder
 from backend.scripts.build_capability_governance_catalog import current_release
 
 
@@ -73,12 +74,28 @@ def test_governance_provider_artifact_uses_the_canonical_extension_hash():
     )
 
 
+def test_governance_catalog_build_isolated_from_official_provider_loading(monkeypatch):
+    """The extension artifact must only depend on its tracked test provider."""
+    def forbidden_official_registry(*_args, **_kwargs):
+        raise AssertionError("extension_catalog_must_not_load_official_providers")
+
+    monkeypatch.setattr(
+        catalog_builder, "build_capability_registry", forbidden_official_registry,
+        raising=False,
+    )
+
+    release = catalog_builder.current_release()
+
+    assert len(release.descriptors) == len(ALL_IDS) == 18
+    assert {item.id for item in release.descriptors} == set(ALL_IDS)
+
+
 def test_governance_catalog_artifact_matches_registered_extension():
     """Every registered governance capability must be resolvable by HTTP."""
     artifact = (ROOT / "docs/governance/test-extension/capability-governance-catalog-release.json").read_text(encoding="utf-8")
-    from backend.capability_v2.catalog import CatalogRelease
+    from backend.capability_v2.catalog import load_catalog_release
 
-    checked = CatalogRelease.model_validate_json(artifact)
+    checked = load_catalog_release(artifact)
     expected = current_release()
     assert checked.release_id == expected.release_id
     assert checked.catalog_hash == expected.catalog_hash

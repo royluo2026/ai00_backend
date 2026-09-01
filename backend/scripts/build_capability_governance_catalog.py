@@ -10,7 +10,8 @@ if str(REPOSITORY_ROOT) not in sys.path:
     sys.path.insert(0, str(REPOSITORY_ROOT))
 
 from backend.capability_governance_test.contracts import ALL_IDS, provider_artifact
-from backend.capability_v2.bootstrap import build_capability_registry
+from backend.capability_governance_test.provider import register_governance_capabilities
+from backend.capabilities.registry_next import CapabilityRegistry
 from backend.capability_v2.catalog import CatalogRelease, build_release, load_catalog_release
 
 
@@ -18,7 +19,13 @@ DEFAULT_OUTPUT = REPOSITORY_ROOT / "docs" / "governance" / "test-extension" / "c
 
 
 def current_release() -> CatalogRelease:
-    registry = build_capability_registry(REPOSITORY_ROOT, include_test_governance=True)
+    """Build only the tracked test-governance provider's 18 descriptors.
+
+    The test extension is intentionally independent from the official provider
+    registry: its artifact hash must not be affected by unrelated local edits.
+    """
+    registry = CapabilityRegistry()
+    register_governance_capabilities(registry)
     descriptors = [registry.get(capability_id, 1).descriptor for capability_id in ALL_IDS]
     return build_release(
         descriptors,

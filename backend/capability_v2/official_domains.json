@@ -36,7 +36,7 @@
         "plugin_id": "official.base",
         "module": "backend.base.official_provider",
         "version": "1.0.0",
-        "artifact_hash": "sha256:19c2c760b3f740c5f9bbcb01503c4ae1cc28bb9f320b040c8dc1afef947a5b05"
+        "artifact_hash": "sha256:e3deb234e9239be4ef588555424f36cadae9d0ee04f7431771add9ffddce33b3"
       },
       "artifact_path": "backend/base",
       "allowed_owners": [
@@ -191,7 +191,7 @@
         "plugin_id": "official.integration",
         "module": "integration_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:ce524f27aa052630032613fce6c81570f4c0aa042662f5d9cc3387917cd4e383"
+        "artifact_hash": "sha256:dca7bac708a60458433417f7fd7a83b7f16b2ca65783c9fa63f26333f7d862d1"
       },
       "artifact_path": "plugins/integration/integration_backend",
       "allowed_owners": [

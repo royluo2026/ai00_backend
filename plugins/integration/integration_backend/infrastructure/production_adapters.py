@@ -4,7 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 from datetime import UTC, datetime
 
-from backend.capability_v2.catalog import CatalogRelease, CatalogResolver
+from backend.capability_v2.catalog import CatalogResolver, load_catalog_release
 from backend.capability_v2.catalog_lineage import CatalogLineage
 from backend.capability_v2.catalog_store import InMemoryCatalogStore
 from backend.capability_v2.contracts import ActorIdentity, ConsumerDescriptor, ConsumerIdentity, ConsumerType, TenantIdentity
@@ -56,7 +56,7 @@ class _LazyDomainCapabilityClient(DomainCapabilityClient):
 
 def build() -> IntegrationProviderAdapters:
     """Publish only the local Catalog path; unavailable external ports fail on use."""
-    release = CatalogRelease.model_validate_json(_CATALOG_PATH.read_text(encoding="utf-8"))
+    release = load_catalog_release(_CATALOG_PATH.read_text(encoding="utf-8"))
     lineage = CatalogLineage.model_validate_json(_LINEAGE_PATH.read_text(encoding="utf-8"))
     store = InMemoryCatalogStore()
     store.publish(release)

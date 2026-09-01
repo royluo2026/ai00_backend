@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from backend.capability_v2.catalog import CatalogResolver, build_release
+from backend.capability_v2.catalog import CatalogResolver, build_release, load_catalog_release
 from backend.capability_v2.catalog_lineage import CatalogLineage
 from backend.capability_v2.catalog_store import InMemoryCatalogStore
 from plugins.integration.tests.test_integration_mapping_commands import (
@@ -72,9 +72,7 @@ class _UnavailableProviderRegistry:
 
 
 def _target_descriptor():
-    from backend.capability_v2.catalog import CatalogRelease
-
-    release = CatalogRelease.model_validate_json(
+    release = load_catalog_release(
         Path("docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
     )
     return release.descriptor(TARGET_ID, 1)

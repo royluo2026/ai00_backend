@@ -3,7 +3,7 @@ from datetime import UTC, datetime
 
 import pytest
 
-from backend.capability_v2.catalog import CatalogRelease
+from backend.capability_v2.catalog import load_catalog_release
 from backend.capability_v2.contracts import ActorIdentity, ConsumerDescriptor, ConsumerIdentity, ConsumerType, CorrelationRef, TenantIdentity
 from plugins.agent.agent_backend.ai_assistant.catalog_tools import CatalogToolRegistry, tool_name_for
 from plugins.agent.agent_backend.ai_assistant import tool_executor, tool_registry
@@ -16,7 +16,7 @@ def test_tool_name_is_deterministic_and_bounded():
 
 
 def test_agent_tools_equal_pinned_catalog_exposure():
-    release = CatalogRelease.model_validate_json(open("docs/governance/capability-catalog-release.json", encoding="utf-8").read())
+    release = load_catalog_release(open("docs/governance/capability-catalog-release.json", encoding="utf-8").read())
     registry = CatalogToolRegistry(release)
     expected = {tool_name_for(item.id, item.major_version) for item in release.descriptors if item.exposure.agent}
     assert set(registry.names()) == expected
@@ -28,7 +28,7 @@ def test_catalog_tool_executes_stored_reverse_mapping_through_domain_client():
     class Client:
         async def invoke(self, invocation, identity, correlation, deadline=None):
             calls.append((invocation, identity, correlation)); return {"status": "succeeded"}
-    release = CatalogRelease.model_validate_json(open("docs/governance/capability-catalog-release.json", encoding="utf-8").read())
+    release = load_catalog_release(open("docs/governance/capability-catalog-release.json", encoding="utf-8").read())
     registry = CatalogToolRegistry(release, client=Client())
     tool = next(item for item in registry.tools() if item.capability_id == "system.search")
     identity = ConsumerIdentity(
@@ -43,7 +43,7 @@ def test_catalog_tool_executes_stored_reverse_mapping_through_domain_client():
 
 
 def test_runtime_registry_and_executor_use_catalog_records_without_name_inference():
-    release = CatalogRelease.model_validate_json(open("docs/governance/capability-catalog-release.json", encoding="utf-8").read())
+    release = load_catalog_release(open("docs/governance/capability-catalog-release.json", encoding="utf-8").read())
     registry = tool_registry.build_catalog_tool_registry(release)
     definitions = tool_registry.catalog_tools_openai(registry)
     assert {item["function"]["name"] for item in definitions} == set(registry.names())

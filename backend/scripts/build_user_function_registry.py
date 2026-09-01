@@ -22,11 +22,13 @@ if str(REPOSITORY_ROOT) not in sys.path:
 
 from backend.capability_v2.catalog_targets import CatalogTargetIndex
 from backend.capability_v2.atomicity import load_atomicity_dispositions
+from backend.capability_v2.catalog import load_catalog_release
 
 
 REGISTRY_PATH = REPOSITORY_ROOT / "docs" / "governance" / "user-function-registry.json"
 REVIEW_PATH = REPOSITORY_ROOT / "docs" / "governance" / "capability-coverage-review"
 CATALOG_PATH = REPOSITORY_ROOT / "docs" / "capabilities" / "catalog.v2.json"
+CATALOG_RELEASE_PATH = REPOSITORY_ROOT / "docs" / "governance" / "capability-catalog-release.json"
 ATOMICITY_PATH = REPOSITORY_ROOT / "docs" / "governance" / "capability-atomicity-dispositions.json"
 DOMAINS = (
     "Base Platform",
@@ -326,15 +328,8 @@ def _registered_capability_ids(root: Path) -> set[str]:
         raise FileNotFoundError(
             "frozen Capability Catalog Release is required before User Function discovery"
         )
-    document = json.loads(catalog_path.read_text(encoding="utf-8"))
-    descriptors = document.get("descriptors")
-    if not isinstance(descriptors, list):
-        raise ValueError("Capability Catalog Release has no descriptor array")
-    result = {
-        str(item.get("id") or "")
-        for item in descriptors
-        if isinstance(item, dict) and item.get("id")
-    }
+    release = load_catalog_release(catalog_path.read_text(encoding="utf-8"))
+    result = {descriptor.id for descriptor in release.descriptors}
     if not result:
         raise ValueError("Capability Catalog Release contains no descriptor identities")
     return result
@@ -670,6 +665,9 @@ def _promote_device_review_fields(value: object) -> None:
 
 
 def load_catalog_owners(path: Path = CATALOG_PATH) -> dict[str, str]:
+    # The human-oriented projection is only trusted after the immutable release
+    # has passed hash and generated-field verification.
+    load_catalog_release(CATALOG_RELEASE_PATH.read_text(encoding="utf-8"))
     catalog = json.loads(path.read_text(encoding="utf-8"))
     return {row["id"]: row["owner_domain"] for row in catalog["capabilities"]}
 
@@ -897,6 +895,7 @@ def main(argv: list[str] | None = None) -> int:
         catalog_index = None
         if args.strict:
             dispositions = load_atomicity_dispositions(ATOMICITY_PATH)
+            load_catalog_release(CATALOG_RELEASE_PATH.read_text(encoding="utf-8"))
             catalog_index = CatalogTargetIndex.from_catalog(
                 json.loads(CATALOG_PATH.read_text(encoding="utf-8")),
                 replacements={
