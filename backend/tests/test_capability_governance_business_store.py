@@ -549,10 +549,12 @@ class _BusinessDecisionConnection:
 class _SharedBusinessDatabase:
     """Transactional SQL fixture with connection-local writes and one shared commit state."""
 
-    def __init__(self, proposal=None):
+    def __init__(self, proposal=None, *, fail_standard_review_insert=False):
         self.proposals = {} if proposal is None else {proposal.proposal_gid: proposal}
         self.reviews: dict[int, tuple[object, ...]] = {}
+        self.standard_reviews: dict[int, tuple[object, ...]] = {}
         self.requests: dict[str, tuple[object, int]] = {}
+        self.fail_standard_review_insert = fail_standard_review_insert
         self.sequence_value = max(self.proposals, default=0)
         self.calls: list[tuple[str, tuple[object, ...]]] = []
         self._lock = RLock()
@@ -576,6 +578,7 @@ class _SharedBusinessConnection:
         self._in_transaction = True
         self.staged_proposals = dict(self.database.proposals)
         self.staged_reviews = dict(self.database.reviews)
+        self.staged_standard_reviews = dict(self.database.standard_reviews)
         self.staged_requests = dict(self.database.requests)
         self.staged_sequence_value = self.database.sequence_value
 
@@ -593,6 +596,7 @@ class _SharedBusinessConnection:
         if self._in_transaction:
             self.database.proposals = dict(self.staged_proposals)
             self.database.reviews = dict(self.staged_reviews)
+            self.database.standard_reviews = dict(self.staged_standard_reviews)
             self.database.requests = dict(self.staged_requests)
             self.database.sequence_value = self.staged_sequence_value
             self._in_transaction = False
@@ -672,6 +676,14 @@ class _SharedBusinessCursor:
                 raise RuntimeError("duplicate business_review_gid")
             connection.staged_reviews[parameters[0]] = parameters
             self.rowcount = 1
+        elif query.startswith("INSERT INTO workmanship_base_capability_reviews"):
+            connection._begin()
+            if connection.database.fail_standard_review_insert:
+                raise RuntimeError("standard_review_insert_failed")
+            if parameters[0] in connection.staged_standard_reviews:
+                raise RuntimeError("duplicate review_gid")
+            connection.staged_standard_reviews[parameters[0]] = parameters
+            self.rowcount = 1
         elif query.startswith("INSERT INTO workmanship_base_capability_business_review_requests"):
             connection._begin()
             if parameters[0] in connection.staged_requests:
@@ -683,6 +695,11 @@ class _SharedBusinessCursor:
             self.rows = [
                 (review[0], review[1], review[4], review[6], review[8], review[3], review[5], review[9])
                 for review in reviews.values() if review[1] == parameters[0]
+            ]
+        elif query.startswith("SELECT review_gid, proposal_gid, review_stage"):
+            reviews = connection._view("standard_reviews")
+            self.rows = [
+                review for review in reviews.values() if review[1] == parameters[0]
             ]
         elif query.startswith("SELECT proposal_gid, capability_version_gid"):
             proposals = connection._view("proposals")
@@ -734,6 +751,15 @@ def _base_owner_context(user_gid="9003"):
         active_roles=("base_owner",),
         permissions=("system.capability.govern",),
         owned_domains=("base",),
+    )
+
+
+def _platform_release_context(user_gid="9004"):
+    return CapabilityContext(
+        user_gid=user_gid,
+        active_roles=("platform_release",),
+        permissions=("system.capability.release",),
+        owned_domains=("platform",),
     )
 
 
@@ -903,6 +929,109 @@ def test_fresh_sql_services_share_proposal_ids_and_address_each_type_after_resta
     assert final._proposals.get(business.proposal_gid).status == "approved"
     assert final._proposals.get(standard.proposal_gid).review_kind == "standard"
     assert final._proposals.get(business.proposal_gid).review_kind == "business_definition"
+
+
+def test_sql_standard_reviews_survive_restart_and_complete_two_stage_approval_once():
+    database = _SharedBusinessDatabase()
+    service, _ = _persistent_service(database)
+    payload = dict(_proposal_payload("standard", "standard-create"))
+    payload["capability_id"] = "base.capability_policy"
+    proposal = service.base_capability_proposal_submit(
+        payload, _super_admin_context("9001"),
+    )["proposal"]
+    for status in ("checking", "pending_approval"):
+        proposal = service._proposals.transition(
+            proposal.proposal_gid, status,
+            expected_row_version=proposal.row_version,
+            idempotency_key=f"standard-{status}",
+        )
+
+    decision = {
+        "proposal_gid": str(proposal.proposal_gid), "stage": "base_owner",
+        "decision": "approved", "row_version": str(proposal.row_version),
+        "idempotency_key": "base-owner-review",
+    }
+    base_approved = service.base_capability_review_decide(
+        decision, _base_owner_context(),
+    )["proposal"]
+    replay = service.base_capability_review_decide(
+        decision, _base_owner_context(),
+    )["proposal"]
+
+    assert replay == base_approved
+    assert len(database.standard_reviews) == 1
+
+    restarted, _ = _persistent_service(database)
+    hydrated = restarted._proposals.get(proposal.proposal_gid)
+    assert tuple(review.review_stage for review in hydrated.reviews) == ("base_owner",)
+    released = restarted.base_capability_review_decide({
+        "proposal_gid": str(hydrated.proposal_gid), "stage": "platform_release",
+        "decision": "approved", "row_version": str(hydrated.row_version),
+        "idempotency_key": "platform-release-review",
+    }, _platform_release_context())["proposal"]
+
+    final, _ = _persistent_service(database)
+    stored = final._proposals.get(proposal.proposal_gid)
+    assert released.status == stored.status == "approved"
+    assert tuple(review.review_stage for review in stored.reviews) == (
+        "base_owner", "platform_release",
+    )
+    assert len(database.standard_reviews) == 2
+
+
+def test_memory_standard_reviews_keep_stage_order_across_fresh_services():
+    store = MemoryGovernanceStore()
+    service = CapabilityGovernanceService(store=store)
+    payload = dict(_proposal_payload("standard", "memory-standard-create"))
+    payload["capability_id"] = "base.capability_policy"
+    proposal = service.base_capability_proposal_submit(
+        payload, _super_admin_context("9001"),
+    )["proposal"]
+    for status in ("checking", "pending_approval"):
+        proposal = service._proposals.transition(
+            proposal.proposal_gid, status,
+            expected_row_version=proposal.row_version,
+            idempotency_key=f"memory-standard-{status}",
+        )
+    proposal = service.base_capability_review_decide({
+        "proposal_gid": str(proposal.proposal_gid), "stage": "base_owner",
+        "decision": "approved", "row_version": str(proposal.row_version),
+        "idempotency_key": "memory-base-owner-review",
+    }, _base_owner_context())["proposal"]
+
+    restarted = CapabilityGovernanceService(store=store)
+    proposal = restarted.base_capability_review_decide({
+        "proposal_gid": str(proposal.proposal_gid), "stage": "platform_release",
+        "decision": "approved", "row_version": str(proposal.row_version),
+        "idempotency_key": "memory-platform-release-review",
+    }, _platform_release_context())["proposal"]
+
+    assert proposal.status == "approved"
+    assert tuple(review.review_stage for review in proposal.reviews) == (
+        "base_owner", "platform_release",
+    )
+
+
+def test_sql_standard_review_insert_failure_rolls_back_proposal_and_review():
+    proposal = Proposal(
+        701, "base.capability_policy", 203, 501, HASH_2, HASH_A, HASH_2, "9001",
+        status="pending_approval", row_version=5,
+    )
+    database = _SharedBusinessDatabase(
+        proposal, fail_standard_review_insert=True,
+    )
+    service, connection = _persistent_service(database)
+
+    with pytest.raises(CapabilityBusinessError) as error:
+        service.base_capability_review_decide({
+            "proposal_gid": "701", "stage": "base_owner", "decision": "approved",
+            "row_version": "5", "idempotency_key": "failing-standard-review",
+        }, _base_owner_context())
+
+    assert error.value.code == "standard_review_insert_failed"
+    assert database.proposals == {701: proposal}
+    assert database.standard_reviews == {}
+    assert connection.commits == 1 and connection.rollbacks == 1
 
 
 def test_sql_business_decision_is_single_transaction_and_failure_rolls_back_every_row():

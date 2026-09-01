@@ -184,6 +184,18 @@ class ProposalService:
             raise WorkflowError("workflow_proposal_gid_invalid")
         return proposal_gid
 
+    def _allocate_standard_review_gid(self) -> int:
+        allocator = getattr(self._business_review_store, "allocate_workflow_review_gid", None)
+        if not callable(allocator):
+            return self._next_gid()
+        try:
+            review_gid = int(allocator())
+        except Exception as exc:
+            raise WorkflowError(str(exc) or "workflow_review_allocator_unavailable") from exc
+        if not 0 < review_gid < 2**63:
+            raise WorkflowError("workflow_review_gid_invalid")
+        return review_gid
+
     def _record(self, key: str, proposal: Proposal, *, operation: str, actor_gid: str, create: bool = False) -> Proposal:
         saver = getattr(self._business_review_store, "save_workflow_proposal", None)
         if create and callable(saver):
@@ -285,7 +297,7 @@ class ProposalService:
             raise WorkflowError("reviewer_not_authorized")
         if decision not in {"approved", "rejected"}:
             raise WorkflowError("review_decision_invalid")
-        review = Review(self._next_gid(), proposal.proposal_gid, stage, decision, reviewer, proposal.base_snapshot_gid, proposal.proposed_descriptor_hash, proposal.evidence_hash, _time(decided_at))
+        review = Review(self._allocate_standard_review_gid(), proposal.proposal_gid, stage, decision, reviewer, proposal.base_snapshot_gid, proposal.proposed_descriptor_hash, proposal.evidence_hash, _time(decided_at))
         next_status = "rejected" if decision == "rejected" else ("approved" if set(required).issubset(prior_stages | {stage}) else "pending_approval")
         candidate = replace(proposal, status=next_status, reviews=proposal.reviews + (review,), row_version=proposal.row_version + 1)
         atomic = getattr(self._business_review_store, "transition_workflow_proposal", None)

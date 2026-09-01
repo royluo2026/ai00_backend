@@ -33,6 +33,7 @@ from .models import (
 
 
 _WORKFLOW_PROPOSAL_SEQUENCE = "capability_governance_proposal_gid"
+_WORKFLOW_REVIEW_SEQUENCE = "capability_governance_review_gid"
 
 
 class GovernanceStore(ABC):
@@ -226,6 +227,7 @@ class MemoryGovernanceStore(GovernanceStore):
         self._business_reviews: dict[int, CapabilityBusinessReview] = {}
         self._workflow_proposals: dict[int, Any] = {}
         self._workflow_proposal_gid_value = 0
+        self._workflow_review_gid_value = 0
         self._business_review_requests: dict[str, tuple[tuple[object, ...], Any]] = {}
         self._rule_effectiveness: dict[int, RuleEffectivenessRecord] = {}
         self._scan_findings: dict[int, tuple[Mapping[str, Any], ...]] = {}
@@ -410,6 +412,20 @@ class MemoryGovernanceStore(GovernanceStore):
             )
             return proposal
 
+    def allocate_workflow_review_gid(self) -> int:
+        """Allocate standard-review identity from the store-owned namespace."""
+        with self._lock:
+            review_gid = max(
+                self._workflow_review_gid_value,
+                *(review.review_gid for proposal in self._workflow_proposals.values()
+                  for review in proposal.reviews),
+                0,
+            ) + 1
+            if review_gid >= 2**63:
+                raise ImmutableRecordError("workflow_review_gid_invalid")
+            self._workflow_review_gid_value = review_gid
+            return review_gid
+
     def transition_workflow_proposal(self, proposal: Any, resolved: Any) -> Any:
         """CAS one ordinary proposal transition against the same durable row."""
         with self._lock:
@@ -588,7 +604,12 @@ class SqlGovernanceStore(GovernanceStore):
                 return None
             payload = _json_load(_row_value(row, "change_json", 6))
             from .workflow import Proposal
-            reviews = self._workflow_reviews(cursor, int(_row_value(row, "proposal_gid", 0)))
+            review_kind = str(payload.get("review_kind", "business_definition"))
+            reviews = self._workflow_reviews(
+                cursor, int(_row_value(row, "proposal_gid", 0)), review_kind,
+                _text_value(_row_value(row, "proposed_descriptor_hash", 3)),
+                str(payload.get("evidence_hash", "")),
+            )
             return Proposal(
                 proposal_gid=int(_row_value(row, "proposal_gid", 0)),
                 capability_id=str(payload.get("capability_id", "")),
@@ -601,7 +622,7 @@ class SqlGovernanceStore(GovernanceStore):
                 status=str(_row_value(row, "status", 4)),
                 row_version=int(_row_value(row, "row_version", 7)),
                 reviews=reviews,
-                review_kind=str(payload.get("review_kind", "business_definition")),
+                review_kind=review_kind,
             )
         finally:
             close = getattr(cursor, "close", None)
@@ -627,9 +648,14 @@ class SqlGovernanceStore(GovernanceStore):
         payload = _json_load(_row_value(row, "change_json", 6))
         from .workflow import Proposal
         proposal_gid = int(_row_value(row, "proposal_gid", 0))
+        review_kind = str(payload.get("review_kind", "business_definition"))
         cursor = self._connection.cursor()
         try:
-            reviews = self._workflow_reviews(cursor, proposal_gid)
+            reviews = self._workflow_reviews(
+                cursor, proposal_gid, review_kind,
+                _text_value(_row_value(row, "proposed_descriptor_hash", 3)),
+                str(payload.get("evidence_hash", "")),
+            )
         finally:
             close = getattr(cursor, "close", None)
             if callable(close):
@@ -646,11 +672,38 @@ class SqlGovernanceStore(GovernanceStore):
             status=str(_row_value(row, "status", 4)),
             row_version=int(_row_value(row, "row_version", 7)),
             reviews=reviews,
-            review_kind=str(payload.get("review_kind", "business_definition")),
+            review_kind=review_kind,
         )
 
     @staticmethod
-    def _workflow_reviews(cursor: Any, proposal_gid: int) -> tuple[Any, ...]:
+    def _workflow_reviews(
+        cursor: Any, proposal_gid: int, review_kind: str,
+        descriptor_hash: str, evidence_hash: str,
+    ) -> tuple[Any, ...]:
+        from .workflow import Review
+        if review_kind == "standard":
+            cursor.execute(
+                "SELECT review_gid, proposal_gid, review_stage, decision, reviewer_gid, "
+                "decision_reason, evidence_snapshot_gid, decided_at "
+                "FROM workmanship_base_capability_reviews WHERE proposal_gid = %s "
+                "ORDER BY review_gid",
+                (proposal_gid,),
+            )
+            return tuple(
+                Review(
+                    review_gid=int(_row_value(row, "review_gid", 0)),
+                    proposal_gid=int(_row_value(row, "proposal_gid", 1)),
+                    review_stage=str(_row_value(row, "review_stage", 2)),
+                    decision=str(_row_value(row, "decision", 3)),
+                    reviewer_gid=str(_row_value(row, "reviewer_gid", 4)),
+                    base_snapshot_gid=int(_row_value(row, "evidence_snapshot_gid", 6)),
+                    descriptor_hash=descriptor_hash,
+                    evidence_snapshot_hash=evidence_hash,
+                    decided_at=_row_value(row, "decided_at", 7),
+                    decision_reason=str(_row_value(row, "decision_reason", 5)),
+                )
+                for row in cursor.fetchall()
+            )
         cursor.execute(
             "SELECT business_review_gid, proposal_gid, decision, reviewer_gid, evidence_snapshot_gid, "
             "definition_hash, decision_reason, decided_at "
@@ -658,7 +711,6 @@ class SqlGovernanceStore(GovernanceStore):
             "ORDER BY business_review_gid",
             (proposal_gid,),
         )
-        from .workflow import Review
         return tuple(
             Review(
                 review_gid=int(_row_value(row, "business_review_gid", 0)),
@@ -701,6 +753,39 @@ class SqlGovernanceStore(GovernanceStore):
                 raise ImmutableRecordError("workflow_proposal_gid_invalid")
             self._connection.commit()
             return proposal_gid
+        except Exception:
+            self._connection.rollback()
+            raise
+        finally:
+            close = getattr(cursor, "close", None)
+            if callable(close):
+                close()
+
+    def allocate_workflow_review_gid(self) -> int:
+        """Allocate a restart-safe standard-review id from the Base counter."""
+        cursor = self._connection.cursor()
+        try:
+            cursor.execute(
+                "INSERT INTO workmanship_display_id_counters (seq_name, val) "
+                "SELECT %s, COALESCE(MAX(review_gid), 0) "
+                "FROM workmanship_base_capability_reviews "
+                "ON DUPLICATE KEY UPDATE val = GREATEST(val, VALUES(val))",
+                (_WORKFLOW_REVIEW_SEQUENCE,),
+            )
+            cursor.execute(
+                "UPDATE workmanship_display_id_counters "
+                "SET val = LAST_INSERT_ID(val + 1) WHERE seq_name = %s",
+                (_WORKFLOW_REVIEW_SEQUENCE,),
+            )
+            if getattr(cursor, "rowcount", 1) != 1:
+                raise ImmutableRecordError("workflow_review_sequence_unavailable")
+            cursor.execute("SELECT LAST_INSERT_ID() AS review_gid")
+            row = cursor.fetchone()
+            review_gid = int(_row_value(row, "review_gid", 0)) if row is not None else 0
+            if not 0 < review_gid < 2**63:
+                raise ImmutableRecordError("workflow_review_gid_invalid")
+            self._connection.commit()
+            return review_gid
         except Exception:
             self._connection.rollback()
             raise
@@ -753,6 +838,19 @@ class SqlGovernanceStore(GovernanceStore):
             )
             if getattr(cursor, "rowcount", 1) != 1:
                 raise ImmutableRecordError("row_version_conflict")
+            appended = resolved.reviews[len(proposal.reviews):]
+            if appended:
+                if len(appended) != 1 or resolved.review_kind != "standard":
+                    raise ImmutableRecordError("workflow_review_append_invalid")
+                review = appended[0]
+                cursor.execute(
+                    "INSERT INTO workmanship_base_capability_reviews "
+                    "(review_gid, proposal_gid, review_stage, decision, reviewer_gid, decision_reason, evidence_snapshot_gid, decided_at) "
+                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                    (review.review_gid, review.proposal_gid, review.review_stage,
+                     review.decision, int(review.reviewer_gid), review.decision_reason,
+                     review.base_snapshot_gid, review.decided_at),
+                )
             self._connection.commit()
             return self.get_workflow_proposal(proposal.proposal_gid) or resolved
         except Exception:
