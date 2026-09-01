@@ -187,9 +187,16 @@ class ProposalService:
             raise WorkflowError("review_subject_type_invalid")
         if review_kind == "business_definition" and not _is_sha256(proposed_descriptor_hash):
             raise WorkflowError("review_subject_hash_invalid")
-        for gid, proposal in tuple(self._proposals.items()):
+        for proposal in self.list():
+            gid = proposal.proposal_gid
             if proposal.capability_id == capability_id and proposal.status not in {"released", "rejected", "withdrawn", "superseded", "expired", "stale"} and proposal.proposed_descriptor_hash != proposed_descriptor_hash:
                 superseded = replace(proposal, status="superseded", row_version=proposal.row_version + 1)
+                atomic = getattr(self._business_review_store, "transition_workflow_proposal", None)
+                if proposal.review_kind == "business_definition" and callable(atomic):
+                    try:
+                        superseded = atomic(proposal, superseded)
+                    except Exception as exc:
+                        raise WorkflowError(str(exc)) from exc
                 self._proposals[gid] = superseded
                 self._audit(operation="proposal_superseded", entity_gid=gid, actor_gid=str(submitted_by_gid), idempotency_key=f"{key}:superseded:{gid}", detail={"before_status": proposal.status, "after_status": "superseded", "capability_id": proposal.capability_id})
         return self._record(key, Proposal(self._next_gid(), str(capability_id), int(capability_version_gid), int(base_snapshot_gid), str(previous_hash), str(proposed_descriptor_hash), str(evidence_hash), str(submitted_by_gid), review_kind=review_kind), operation="proposal", actor_gid=str(submitted_by_gid))
@@ -346,6 +353,10 @@ class ProposalService:
             return resolved
 
     def list(self) -> tuple[Proposal, ...]:
+        loader = getattr(self._business_review_store, "list_workflow_proposals", None)
+        if callable(loader):
+            for proposal in loader():
+                self._proposals[proposal.proposal_gid] = proposal
         return tuple(sorted(self._proposals.values(), key=lambda proposal: proposal.proposal_gid))
 
 

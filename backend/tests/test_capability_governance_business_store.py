@@ -19,8 +19,11 @@ from backend.capability_governance_test.business_models import (
     RuleEffectivenessRecord,
 )
 from backend.capability_governance_test.models import ImmutableRecordError
+from backend.capability_governance_test.service import CapabilityGovernanceService
 from backend.capability_governance_test.store import MemoryGovernanceStore, SqlGovernanceStore
 from backend.capability_governance_test.workflow import Proposal, ProposalService, ReviewerContext, WorkflowError
+from backend.capabilities.models_next import CapabilityContext
+from backend.capability_v2.contracts import ActorIdentity, ConsumerDescriptor, ConsumerIdentity, ConsumerType, TenantIdentity
 
 
 NOW = datetime(2026, 9, 1, tzinfo=timezone.utc)
@@ -298,6 +301,37 @@ def test_memory_atomic_business_decision_is_shared_across_workflow_instances():
     assert len(store._business_reviews) == 1
 
 
+def test_durable_supersession_survives_a_fresh_workflow_and_displaces_old_business_review():
+    store = _memory_review_store()
+    ids = iter(range(1, 200)).__next__
+    first = ProposalService(next_gid=ids, business_review_store=store)
+    old = first.detect(
+        capability_id="person.height.read", capability_version_gid=202, base_snapshot_gid=501,
+        previous_hash=HASH_2, proposed_descriptor_hash=HASH_1, evidence_hash=HASH_2,
+        submitted_by_gid="author", idempotency_key="old", review_kind="business_definition",
+    )
+    for status in ("draft", "submitted", "checking", "pending_approval"):
+        old = first.transition(old.proposal_gid, status, expected_row_version=old.row_version, idempotency_key=f"old-{status}")
+
+    replacement = ProposalService(next_gid=ids, business_review_store=store).detect(
+        capability_id="person.height.read", capability_version_gid=202, base_snapshot_gid=501,
+        previous_hash=HASH_1, proposed_descriptor_hash=HASH_A, evidence_hash=HASH_2,
+        submitted_by_gid="other", idempotency_key="replacement", review_kind="business_definition",
+    )
+
+    reloaded = ProposalService(next_gid=ids, business_review_store=store)
+    displaced = reloaded.get(old.proposal_gid)
+    assert replacement.proposed_descriptor_hash == HASH_A
+    assert displaced.status == "superseded"
+    with pytest.raises(WorkflowError, match="review_subject_type_invalid"):
+        reloaded.decide_business_definition(
+            displaced.proposal_gid, reviewer_context=ReviewerContext("reviewer", ("super_admin",), (), ()),
+            definition_hash=HASH_1, current_definition_hash=HASH_1, decision="approved",
+            decision_reason="Evidence sufficient", expected_row_version=displaced.row_version,
+            idempotency_key="old-review",
+        )
+
+
 def test_business_reviews_are_append_only_and_latest_exact_hash_is_current():
     store = _memory_review_store()
     first = CapabilityBusinessReview(101, 202, HASH_1, "changes_requested", "Add evidence", "9001", "super_admin", NOW, 701, 501)
@@ -436,7 +470,7 @@ class _Connection:
 
 class _BusinessDecisionCursor:
     def __init__(self, connection):
-        self.connection, self.row, self.rowcount = connection, None, 0
+        self.connection, self.row, self.rows, self.rowcount = connection, None, [], 0
 
     def execute(self, query, parameters=()):
         self.connection.calls.append((query, parameters))
@@ -444,12 +478,22 @@ class _BusinessDecisionCursor:
         if query.startswith("SELECT request_fingerprint"):
             request = database.staged_requests.get(parameters[0])
             self.row = None if request is None else (request[0], request[1])
+        elif query.startswith("INSERT INTO workmanship_base_capability_change_proposals"):
+            proposal_gid, version_gid, snapshot_gid, definition_hash, review_kind, _risk, status, submitted_by, _submitted, _summary, change_json, row_version = parameters
+            payload = __import__("json").loads(change_json)
+            database.staged_proposal = Proposal(
+                proposal_gid, payload["capability_id"], version_gid, snapshot_gid,
+                payload["previous_hash"], definition_hash, payload["evidence_hash"], str(submitted_by),
+                status=status, row_version=row_version, review_kind=payload["review_kind"],
+            )
         elif query.startswith("UPDATE workmanship_base_capability_change_proposals"):
-            status, proposal_gid, row_version, definition_hash = parameters
+            status, proposal_gid, row_version, *state = parameters
             proposal = database.staged_proposal
+            expected_status = "pending_approval" if len(state) == 1 else state[0]
+            definition_hash = state[-1]
             self.rowcount = int(
                 proposal.proposal_gid == proposal_gid and proposal.row_version == row_version
-                and proposal.status == "pending_approval" and proposal.proposed_descriptor_hash == definition_hash
+                and proposal.status == expected_status and proposal.proposed_descriptor_hash == definition_hash
             )
             if self.rowcount:
                 database.staged_proposal = replace(proposal, status=status, row_version=row_version + 1)
@@ -459,17 +503,22 @@ class _BusinessDecisionCursor:
             if database.fail_request_insert:
                 raise RuntimeError("request_insert_failed")
             database.staged_requests[parameters[0]] = (parameters[1], parameters[2])
+        elif query.startswith("SELECT business_review_gid, proposal_gid, decision"):
+            self.rows = [
+                (review[0], review[1], review[4], review[6], review[8], review[3], review[5], review[9])
+                for review in database.committed_reviews.values()
+                if review[1] == parameters[0]
+            ]
         elif query.startswith("SELECT proposal_gid, capability_version_gid"):
             proposal = database.committed_proposal
-            self.row = (
-                proposal.proposal_gid, proposal.capability_version_gid, proposal.base_snapshot_gid,
-                proposal.proposed_descriptor_hash, proposal.status, proposal.submitted_by_gid,
-                '{"capability_id":"person.height.read","previous_hash":"' + HASH_2
-                + '","evidence_hash":"' + HASH_2 + '","review_kind":"business_definition"}',
-                proposal.row_version,
-            )
+            row = _business_proposal_row(proposal)
+            if "WHERE proposal_gid" in query:
+                self.row = row if proposal.proposal_gid == parameters[0] else None
+            else:
+                self.rows = [row]
 
     def fetchone(self): return self.row
+    def fetchall(self): return self.rows
     def close(self): pass
 
 
@@ -496,10 +545,52 @@ class _BusinessDecisionConnection:
         self.rollbacks += 1
 
 
+class _SharedBusinessDatabase:
+    """Small transactional fixture: each service receives a distinct connection."""
+    def __init__(self, proposal):
+        self.state = _BusinessDecisionConnection(proposal)
+
+    def connect(self):
+        return _SharedBusinessConnection(self.state)
+
+
+class _SharedBusinessConnection:
+    def __init__(self, state):
+        self._state = state
+
+    @property
+    def calls(self): return self._state.calls
+    def cursor(self): return self._state.cursor()
+    def commit(self): self._state.commit()
+    def rollback(self): self._state.rollback()
+
+
 def _pending_business_proposal() -> Proposal:
     return Proposal(
         701, "person.height.read", 202, 501, HASH_2, HASH_1, HASH_2, "1",
         status="pending_approval", row_version=5, review_kind="business_definition",
+    )
+
+
+def _business_proposal_row(proposal: Proposal):
+    return (
+        proposal.proposal_gid, proposal.capability_version_gid, proposal.base_snapshot_gid,
+        proposal.proposed_descriptor_hash, proposal.status, proposal.submitted_by_gid,
+        __import__("json").dumps({
+            "capability_id": proposal.capability_id, "previous_hash": proposal.previous_hash,
+            "evidence_hash": proposal.evidence_hash, "review_kind": proposal.review_kind,
+        }), proposal.row_version,
+    )
+
+
+def _super_admin_context(user_gid="9001"):
+    return CapabilityContext(
+        user_gid=user_gid,
+        effective_identity=ConsumerIdentity(
+            actor=ActorIdentity(user_id=user_gid, authentication_method="test", authenticated_at=NOW),
+            tenant=TenantIdentity(tenant_id="tenant", membership="member", active_roles=("super_admin",)),
+            consumer=ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="ai00.web"),
+        ),
     )
 
 
@@ -565,6 +656,69 @@ def test_sql_persisted_proposal_cas_allows_one_of_two_independent_workflow_insta
     assert len(connection.committed_reviews) == 1
     assert any("WHERE proposal_gid = %s AND row_version = %s AND status = 'pending_approval'" in query
                for query, _ in connection.calls)
+
+
+def test_sql_cas_race_uses_separate_connections_over_one_shared_transactional_state():
+    database = _SharedBusinessDatabase(_pending_business_proposal())
+    first_connection, second_connection = database.connect(), database.connect()
+    assert first_connection is not second_connection
+    first = ProposalService(next_gid=iter(range(801, 900)).__next__, business_review_store=SqlGovernanceStore(first_connection))
+    second = ProposalService(next_gid=iter(range(901, 1000)).__next__, business_review_store=SqlGovernanceStore(second_connection))
+    reviewer = ReviewerContext("9001", ("super_admin",), (), ())
+    barrier = Barrier(2)
+
+    def decide(service, decision, key):
+        barrier.wait()
+        try:
+            return service.decide_business_definition(701, reviewer_context=reviewer, definition_hash=HASH_1,
+                current_definition_hash=HASH_1, decision=decision, decision_reason="Evidence sufficient",
+                expected_row_version=5, idempotency_key=key)
+        except WorkflowError as exc:
+            return exc
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        outcomes = tuple(pool.submit(decide, service, decision, key)
+                         for service, decision, key in ((first, "approved", "approve"), (second, "rejected", "reject")))
+        outcomes = tuple(future.result() for future in outcomes)
+    assert sum(isinstance(outcome, WorkflowError) for outcome in outcomes) == 1
+    assert len(database.state.committed_reviews) == 1
+
+
+def test_default_persistent_service_path_creates_transitions_reviews_and_rehydrates_history():
+    connection = _BusinessDecisionConnection(_pending_business_proposal())
+    store = SqlGovernanceStore(connection, next_ids=iter(range(1000, 1100)).__next__)
+    snapshot = SimpleNamespace(
+        snapshot_gid=501,
+        entries=(SimpleNamespace(capability_version_gid=202, capability_id="person.height.read", major_version=1),),
+        document=SimpleNamespace(capabilities=(SimpleNamespace(
+            capability_id="person.height.read", major_version=1,
+            descriptor={"business_definition_hash": HASH_1},
+        ),)),
+    )
+    store.get_snapshot = lambda snapshot_gid: snapshot if snapshot_gid == 501 else None
+    store.latest_snapshot = lambda: snapshot
+    service = CapabilityGovernanceService(store=store)
+    payload = {
+        "capability_id": "person.height.read", "capability_version_gid": "202", "base_snapshot_gid": "501",
+        "previous_hash": HASH_2, "proposed_descriptor_hash": HASH_1, "definition_hash": HASH_1,
+        "evidence_hash": HASH_2, "idempotency_key": "persistent-create",
+    }
+
+    submitted = service.base_capability_proposal_submit(payload, _super_admin_context("1"))["proposal"]
+    checking = service._proposals.transition(submitted.proposal_gid, "checking", expected_row_version=submitted.row_version, idempotency_key="checking")
+    pending = service._proposals.transition(checking.proposal_gid, "pending_approval", expected_row_version=checking.row_version, idempotency_key="pending")
+    approved = service.base_capability_review_decide({
+        "proposal_gid": str(pending.proposal_gid), "definition_hash": HASH_1,
+        "decision": "approved", "decision_reason": "Evidence sufficient",
+        "row_version": str(pending.row_version), "idempotency_key": "persistent-approve",
+    }, _super_admin_context())["proposal"]
+
+    assert approved.status == "approved" and len(approved.reviews) == 1
+    restarted = CapabilityGovernanceService(store=store)
+    reloaded = restarted._proposals.get(approved.proposal_gid)
+    assert reloaded.status == "approved" and len(reloaded.reviews) == 1
+    assert reloaded.reviews[0].decision == "approved"
+    assert restarted.base_capability_proposal_search({}, _super_admin_context())["data"]["available"] is True
 
 
 def test_sql_projection_uses_parameterized_canonical_json_and_lists_relations():

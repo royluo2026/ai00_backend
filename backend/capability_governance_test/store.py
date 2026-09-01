@@ -398,6 +398,10 @@ class MemoryGovernanceStore(GovernanceStore):
         with self._lock:
             return self._workflow_proposals.get(proposal_gid)
 
+    def list_workflow_proposals(self) -> tuple[Any, ...]:
+        with self._lock:
+            return tuple(sorted(self._workflow_proposals.values(), key=lambda item: item.proposal_gid))
+
     def decide_business_review_atomic(
         self, proposal: Any, resolved: Any, review: CapabilityBusinessReview,
         fingerprint: tuple[object, ...], idempotency_key: str,
@@ -556,6 +560,7 @@ class SqlGovernanceStore(GovernanceStore):
                 return None
             payload = _json_load(_row_value(row, "change_json", 6))
             from .workflow import Proposal
+            reviews = self._workflow_reviews(cursor, int(_row_value(row, "proposal_gid", 0)))
             return Proposal(
                 proposal_gid=int(_row_value(row, "proposal_gid", 0)),
                 capability_id=str(payload.get("capability_id", "")),
@@ -567,12 +572,81 @@ class SqlGovernanceStore(GovernanceStore):
                 submitted_by_gid=str(_row_value(row, "submitted_by_gid", 5)),
                 status=str(_row_value(row, "status", 4)),
                 row_version=int(_row_value(row, "row_version", 7)),
+                reviews=reviews,
                 review_kind=str(payload.get("review_kind", "business_definition")),
             )
         finally:
             close = getattr(cursor, "close", None)
             if callable(close):
                 close()
+
+    def list_workflow_proposals(self) -> tuple[Any, ...]:
+        cursor = self._connection.cursor()
+        try:
+            cursor.execute(
+                "SELECT proposal_gid, capability_version_gid, base_snapshot_gid, proposed_descriptor_hash, "
+                "status, submitted_by_gid, change_json, row_version "
+                "FROM workmanship_base_capability_change_proposals ORDER BY proposal_gid",
+            )
+            rows = tuple(cursor.fetchall())
+        finally:
+            close = getattr(cursor, "close", None)
+            if callable(close):
+                close()
+        return tuple(self._proposal_from_row(row) for row in rows)
+
+    def _proposal_from_row(self, row: Any) -> Any:
+        payload = _json_load(_row_value(row, "change_json", 6))
+        from .workflow import Proposal
+        proposal_gid = int(_row_value(row, "proposal_gid", 0))
+        cursor = self._connection.cursor()
+        try:
+            reviews = self._workflow_reviews(cursor, proposal_gid)
+        finally:
+            close = getattr(cursor, "close", None)
+            if callable(close):
+                close()
+        return Proposal(
+            proposal_gid=proposal_gid,
+            capability_id=str(payload.get("capability_id", "")),
+            capability_version_gid=int(_row_value(row, "capability_version_gid", 1)),
+            base_snapshot_gid=int(_row_value(row, "base_snapshot_gid", 2)),
+            previous_hash=str(payload.get("previous_hash", "")),
+            proposed_descriptor_hash=_text_value(_row_value(row, "proposed_descriptor_hash", 3)),
+            evidence_hash=str(payload.get("evidence_hash", "")),
+            submitted_by_gid=str(_row_value(row, "submitted_by_gid", 5)),
+            status=str(_row_value(row, "status", 4)),
+            row_version=int(_row_value(row, "row_version", 7)),
+            reviews=reviews,
+            review_kind=str(payload.get("review_kind", "business_definition")),
+        )
+
+    @staticmethod
+    def _workflow_reviews(cursor: Any, proposal_gid: int) -> tuple[Any, ...]:
+        cursor.execute(
+            "SELECT business_review_gid, proposal_gid, decision, reviewer_gid, evidence_snapshot_gid, "
+            "definition_hash, decision_reason, decided_at "
+            "FROM workmanship_base_capability_business_reviews WHERE proposal_gid = %s "
+            "ORDER BY business_review_gid",
+            (proposal_gid,),
+        )
+        from .workflow import Review
+        return tuple(
+            Review(
+                review_gid=int(_row_value(row, "business_review_gid", 0)),
+                proposal_gid=int(_row_value(row, "proposal_gid", 1)),
+                review_stage="business_definition",
+                decision=str(_row_value(row, "decision", 2)),
+                reviewer_gid=str(_row_value(row, "reviewer_gid", 3)),
+                base_snapshot_gid=int(_row_value(row, "evidence_snapshot_gid", 4)),
+                descriptor_hash=_text_value(_row_value(row, "definition_hash", 5)),
+                evidence_snapshot_hash="",
+                decided_at=_row_value(row, "decided_at", 7),
+                decision_reason=str(_row_value(row, "decision_reason", 6)),
+                review_type="business_definition",
+            )
+            for row in cursor.fetchall()
+        )
 
     def save_workflow_proposal(self, proposal: Any) -> None:
         """Persist the existing proposal state machine row for durable review CAS."""

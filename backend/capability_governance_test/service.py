@@ -402,19 +402,23 @@ class CapabilityGovernanceService:
         # implementations are intentionally in-memory test components.  Do
         # not let a persistent runtime silently report a mutation that would
         # disappear on restart; the launcher must inject a workflow port.
-        self._workflow_port = workflow_port
-        self._workflow_persistence_required = bool(getattr(store, "persistent", False)) and workflow_port is None
-        if workflow_port is not None:
+        # SqlGovernanceStore is itself the minimal durable workflow boundary:
+        # ProposalService uses its CAS/read methods directly.  Requiring a
+        # wrapper port here made the default SQL bootstrap reject operations
+        # even though the durable implementation was already present.
+        self._workflow_port = workflow_port or (store if getattr(store, "persistent", False) else None)
+        self._workflow_persistence_required = bool(getattr(store, "persistent", False)) and self._workflow_port is None
+        if self._workflow_port is not None:
             # A persistent adapter may expose the durable state machines
             # directly.  Keeping this as a narrow port avoids coupling the
             # service to a particular SQL driver or schema implementation.
-            self._proposals = getattr(workflow_port, "proposal_service", self._proposals)
-            self._waivers = getattr(workflow_port, "waiver_service", self._waivers)
+            self._proposals = getattr(self._workflow_port, "proposal_service", self._proposals)
+            self._waivers = getattr(self._workflow_port, "waiver_service", self._waivers)
         self._release_gate = release_gate or ReleaseGate(
             next_gid=self._next_governance_gid, audit_sink=audit_sink,
         )
-        if workflow_port is not None:
-            self._release_gate = getattr(workflow_port, "release_gate", self._release_gate)
+        if self._workflow_port is not None:
+            self._release_gate = getattr(self._workflow_port, "release_gate", self._release_gate)
 
     def bind_registry_snapshot(self, snapshot: Any) -> None:
         """Bind the registry used by the scanner to the serving registry."""
@@ -1034,6 +1038,8 @@ class CapabilityGovernanceService:
                 approvals_complete=evidence["approvals_complete"],
                 data_complete=evidence["data_complete"],
                 evidence_hash=evidence["evidence_hash"],
+                static_gate_status=evidence["static_gate_status"],
+                static_gate_hash=evidence["static_gate_hash"],
                 idempotency_key=f"release-gate:{key}",
                 evaluated_by_gid=_mutation_actor(context),
             )
@@ -1096,6 +1102,8 @@ class CapabilityGovernanceService:
             "approvals_complete": False,
             "data_complete": False,
             "evidence_hash": "",
+            "static_gate_status": None,
+            "static_gate_hash": "",
         }
         # These caller values may enrich a fail-closed diagnostic, but the
         # forced ``available=False`` below means they can never authorize a
@@ -1141,6 +1149,7 @@ class CapabilityGovernanceService:
             "snapshot_gid", "test_run_gid", "code_revision", "product_catalog_release_id",
             "snapshot_hash", "test_status", "findings", "stale_evidence", "waivers",
             "approvals_complete", "data_complete", "evidence_hash",
+            "static_gate_status", "static_gate_hash",
         }
         if not required.issubset(evidence):
             return fallback
@@ -1160,9 +1169,11 @@ class CapabilityGovernanceService:
             approvals_complete = evidence["approvals_complete"]
             data_complete = evidence["data_complete"]
             evidence_hash = str(evidence["evidence_hash"]).strip()
+            static_gate_status = str(evidence["static_gate_status"]).strip() or None
+            static_gate_hash = str(evidence["static_gate_hash"]).strip()
             if not isinstance(stale_evidence, bool) or not isinstance(approvals_complete, bool) or not isinstance(data_complete, bool):
                 return fallback
-            if not evidence_hash:
+            if not evidence_hash or not static_gate_hash:
                 return fallback
         except (CapabilityBusinessError, TypeError, ValueError):
             return fallback
@@ -1175,6 +1186,8 @@ class CapabilityGovernanceService:
             "approvals_complete": approvals_complete,
             "data_complete": data_complete,
             "evidence_hash": evidence_hash,
+            "static_gate_status": static_gate_status,
+            "static_gate_hash": static_gate_hash,
         }
 
     def run_analysis(self, snapshot_gid: str | int) -> Any:
@@ -1197,6 +1210,7 @@ class CapabilityGovernanceService:
         unavailable = False
         try:
             result = await self._advisor.review(package, identity=identity, request_id=request_id)
+            unavailable = result.status == "unavailable"
         except Exception as exc:
             # Advice is optional.  It must never suppress deterministic scan
             # evidence or turn an AI transport failure into a service failure.
