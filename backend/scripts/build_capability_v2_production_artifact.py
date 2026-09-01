@@ -24,7 +24,7 @@ DEFAULT_ALLOWLIST = Path("docs/governance/test-extension/production-artifact-all
 RELEASE_REPORT_FIELDS = frozenset({
     "report_gid", "code_revision", "product_catalog_release_id", "snapshot_gid",
     "test_run_gid", "conclusion", "blockers", "report_hash", "signing_key_id",
-    "signature",
+    "signature", "business_governance",
 })
 SIGNED_RELEASE_REPORT_FIELDS = RELEASE_REPORT_FIELDS - {"report_hash", "signature"}
 
@@ -63,6 +63,9 @@ def validate_release_report(
         "report_gid", "code_revision", "product_catalog_release_id", "snapshot_gid", "test_run_gid",
     )) or not isinstance(document.get("blockers"), list):
         errors.add("release_report_invalid")
+    governance = document.get("business_governance")
+    if not isinstance(governance, dict) or governance.get("status") == "blocked":
+        errors.add("release_report_governance_invalid")
     if not str(document.get("signing_key_id", "")).strip():
         errors.add("release_report_signing_key_missing")
     if not str(document.get("signature", "")).strip():

@@ -8,6 +8,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 from backend.capability_governance_test.release_gate import ReleaseCandidate, ReleaseGate, ReleaseGateError
+from backend.capability_v2.release_gate import BusinessGateCapability, evaluate_business_governance_gate
 from backend.scripts.build_capability_v2_production_artifact import validate_release_report
 
 
@@ -24,6 +25,12 @@ def _passing_inputs(**overrides):
         "waivers": (),
         "approvals_complete": True,
         "data_complete": True,
+        "business_governance": evaluate_business_governance_gate((BusinessGateCapability(
+            capability_key="person.height.write@1",
+            change_kind="new",
+            human_approved=True,
+            runtime_verified=True,
+        ),)),
         "idempotency_key": "gate-1",
     }
     values.update(overrides)
@@ -35,6 +42,43 @@ def test_release_gate_fails_when_required_runner_is_unavailable():
 
     assert report.conclusion == "fail"
     assert "required_test_unavailable" in report.blockers
+
+
+def test_signed_report_preserves_legacy_backlog_without_claiming_human_or_runtime_verification():
+    governance = evaluate_business_governance_gate((BusinessGateCapability(
+        capability_key="person.height.write@1",
+        change_kind="unchanged_legacy",
+    ),))
+    report = ReleaseGate(
+        next_gid=iter(range(1, 10)).__next__, signer=lambda value: "sig",
+    ).evaluate(_candidate(), **_passing_inputs(
+        business_governance=governance,
+        idempotency_key="legacy-backlog",
+    ))
+
+    assert report.conclusion == "pass"
+    assert report.business_governance["status"] == "passed_with_legacy_backlog"
+    assert report.business_governance["human_approved"] is False
+    assert report.business_governance["runtime_verified"] is False
+    assert report.to_document()["business_governance"] == report.business_governance
+
+
+def test_static_green_cannot_override_unapproved_new_business_definition():
+    governance = evaluate_business_governance_gate((BusinessGateCapability(
+        capability_key="person.height.write@1",
+        change_kind="new",
+    ),))
+    report = ReleaseGate(
+        next_gid=iter(range(1, 10)).__next__, signer=lambda value: "sig",
+    ).evaluate(_candidate(), **_passing_inputs(
+        business_governance=governance,
+        idempotency_key="unapproved-new",
+    ))
+
+    assert report.conclusion == "fail"
+    assert "business_governance_blocked" in report.blockers
+    assert report.business_governance["machine_passed"] is True
+    assert report.business_governance["human_approved"] is False
 
 
 def test_release_gate_fails_closed_for_missing_data_findings_stale_evidence_expired_waiver_and_incomplete_approval():

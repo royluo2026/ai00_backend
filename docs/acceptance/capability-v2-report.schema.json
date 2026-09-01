@@ -10,7 +10,7 @@
     "schema_hashes", "migration", "domain_manifest", "domain_migrations",
     "provider_artifacts", "environment_id",
     "validation_scope", "runtime_evidence_hash", "component_results", "completion",
-    "cases", "test_run", "blockers"
+    "business_governance", "cases", "test_run", "blockers"
   ],
   "properties": {
     "schema_version": {"const": 1},
@@ -105,6 +105,39 @@
         "web_consumer_bypasses": {"type": "integer", "minimum": 0},
         "catalog_capabilities": {"type": "integer", "minimum": 0},
         "failed": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "business_governance": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "status", "machine_passed", "human_approved", "runtime_verified",
+        "legacy_pending_review_count", "blockers", "capabilities"
+      ],
+      "properties": {
+        "status": {"enum": ["passed", "passed_with_legacy_backlog", "blocked"]},
+        "machine_passed": {"type": "boolean"},
+        "human_approved": {"type": "boolean"},
+        "runtime_verified": {"type": "boolean"},
+        "legacy_pending_review_count": {"type": "integer", "minimum": 0},
+        "blockers": {"type": "array", "items": {"type": "string"}},
+        "capabilities": {
+          "type": "array", "items": {
+            "type": "object", "additionalProperties": false,
+            "required": [
+              "capability_key", "change_kind", "governance_status",
+              "machine_passed", "human_approved", "runtime_verified", "blockers"
+            ],
+            "properties": {
+              "capability_key": {"type": "string"},
+              "change_kind": {"enum": ["new", "material_change", "unchanged_legacy"]},
+              "governance_status": {"enum": ["passed", "legacy_pending_review", "blocked"]},
+              "machine_passed": {"type": "boolean"},
+              "human_approved": {"type": "boolean"},
+              "runtime_verified": {"type": "boolean"},
+              "blockers": {"type": "array", "items": {"type": "string"}}
+            }
+          }
+        }
       }
     },
     "cases": {

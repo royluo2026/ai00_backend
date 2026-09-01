@@ -31,6 +31,13 @@ from backend.capability_v2.acceptance_contract import (
     mandatory_test_source_revision,
 )
 from backend.capability_v2.docs.generator import validate_machine_catalog
+from backend.capability_v2.release_gate import (
+    BusinessGateCapability,
+    BusinessGateResult,
+    classify_change,
+    evaluate_business_governance_gate,
+    load_legacy_baseline,
+)
 CATALOG_PATH = ROOT / "docs/capabilities/catalog.v2.json"
 IMMUTABLE_CATALOG_PATH = ROOT / "docs/governance/capability-catalog-release.json"
 MANIFEST_PATH = ROOT / "backend/tests/acceptance/fixtures/case-manifest.json"
@@ -528,6 +535,7 @@ def build_report(
     runtime_evidence_hash: str | None = None,
     completion: CompletionReport | None = None,
     component_results: Mapping[str, str] | None = None,
+    business_governance: BusinessGateResult | None = None,
 ) -> dict:
     commit = _git("rev-parse", "HEAD")
     clean = _tracked_worktree_clean()
@@ -535,7 +543,15 @@ def build_report(
     declared_cases = sum(len(value) for value in manifest.get("capabilities", {}).values())
     counts = test_result["outcome_counts"]
     completion = completion or evaluate_completion(ROOT, mode="progress")
-    status = "passed" if not blockers and test_result["exit_code"] == 0 and counts["passed"] == declared_cases else "failed"
+    governance = business_governance or _acceptance_business_governance(
+        runtime_verified=mode == "release-candidate" and runtime_evidence_hash is not None,
+    )
+    effective_blockers = list(blockers)
+    if governance.status == "blocked":
+        effective_blockers.extend(
+            f"business governance: {blocker}" for blocker in governance.blockers
+        )
+    status = "passed" if not effective_blockers and test_result["exit_code"] == 0 and counts["passed"] == declared_cases else "failed"
     report = {
         "schema_version": 1,
         "generated_at": datetime.now(UTC).isoformat(),
@@ -564,6 +580,7 @@ def build_report(
             "local_runtime": "not_run",
         }),
         "completion": completion.serialized(),
+        "business_governance": governance.serialized(),
         "cases": {
             "stable_capabilities": stable_count,
             "mandatory_case_types": len(MANDATORY_CASES),
@@ -573,11 +590,30 @@ def build_report(
             "skipped": counts["skipped"],
         },
         "test_run": {key: test_result[key] for key in ("command", "exit_code", "summary")},
-        "blockers": blockers,
+        "blockers": effective_blockers,
     }
     canonical = json.dumps(report, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
     report["report_id"] = "sha256:" + hashlib.sha256(canonical).hexdigest()
     return report
+
+
+def _acceptance_business_governance(*, runtime_verified: bool) -> BusinessGateResult:
+    release = json.loads(
+        (ROOT / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
+    )
+    baseline = load_legacy_baseline(
+        ROOT / "docs/governance/capability-business-governance-legacy-baseline.json"
+    )
+    return evaluate_business_governance_gate(
+        BusinessGateCapability(
+            capability_key=(key := f"{item['id']}@{item['major_version']}"),
+            change_kind=classify_change(
+                key, str(item["business_definition_hash"]), None, baseline.capabilities,
+            ),
+            runtime_verified=runtime_verified,
+        )
+        for item in release["descriptors"]
+    )
 
 
 def validate_report_schema(report: dict) -> list[str]:

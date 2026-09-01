@@ -1058,6 +1058,7 @@ class CapabilityGovernanceService:
                 evidence_hash=evidence["evidence_hash"],
                 static_gate_status=evidence["static_gate_status"],
                 static_gate_hash=evidence["static_gate_hash"],
+                business_governance=evidence["business_governance"],
                 idempotency_key=f"release-gate:{key}",
                 evaluated_by_gid=_mutation_actor(context),
             )
@@ -1122,6 +1123,7 @@ class CapabilityGovernanceService:
             "evidence_hash": "",
             "static_gate_status": None,
             "static_gate_hash": "",
+            "business_governance": None,
         }
         # These caller values may enrich a fail-closed diagnostic, but the
         # forced ``available=False`` below means they can never authorize a
@@ -1189,6 +1191,7 @@ class CapabilityGovernanceService:
             evidence_hash = str(evidence["evidence_hash"]).strip()
             static_gate_status = str(evidence["static_gate_status"]).strip() or None
             static_gate_hash = str(evidence["static_gate_hash"]).strip()
+            business_governance = evidence.get("business_governance")
             if not isinstance(stale_evidence, bool) or not isinstance(approvals_complete, bool) or not isinstance(data_complete, bool):
                 return fallback
             if not evidence_hash or not static_gate_hash:
@@ -1206,6 +1209,7 @@ class CapabilityGovernanceService:
             "evidence_hash": evidence_hash,
             "static_gate_status": static_gate_status,
             "static_gate_hash": static_gate_hash,
+            "business_governance": business_governance,
         }
 
     def run_analysis(self, snapshot_gid: str | int) -> Any:

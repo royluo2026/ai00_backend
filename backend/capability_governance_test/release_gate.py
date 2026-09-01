@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 from backend.plugin_platform.signing import sign
+from backend.capability_v2.release_gate import BusinessGateResult
 
 from .audit import AuditSink
 
@@ -33,6 +34,7 @@ class ReleaseReport:
     candidate: ReleaseCandidate
     conclusion: Literal["pass", "fail", "expired"]
     blockers: tuple[str, ...]
+    business_governance: dict[str, Any]
     report_hash: str
     signing_key_id: str
     signature: str
@@ -47,13 +49,21 @@ class ReleaseReport:
             "test_run_gid": str(self.candidate.test_run_gid),
             "conclusion": self.conclusion,
             "blockers": list(self.blockers),
+            "business_governance": self.business_governance,
             "report_hash": self.report_hash,
             "signing_key_id": self.signing_key_id,
             "signature": self.signature,
         }
 
 
-def _canonical(candidate: ReleaseCandidate, report_gid: int, conclusion: str, blockers: Iterable[str], signing_key_id: str) -> bytes:
+def _canonical(
+    candidate: ReleaseCandidate,
+    report_gid: int,
+    conclusion: str,
+    blockers: Iterable[str],
+    business_governance: Mapping[str, Any],
+    signing_key_id: str,
+) -> bytes:
     payload = {
         "report_gid": str(report_gid),
         "code_revision": candidate.code_revision,
@@ -62,6 +72,7 @@ def _canonical(candidate: ReleaseCandidate, report_gid: int, conclusion: str, bl
         "test_run_gid": str(candidate.test_run_gid),
         "conclusion": conclusion,
         "blockers": sorted(set(str(value) for value in blockers)),
+        "business_governance": business_governance,
         "signing_key_id": signing_key_id,
     }
     return json.dumps(payload, ensure_ascii=True, separators=(",", ":"), sort_keys=True).encode("utf-8")
@@ -85,6 +96,32 @@ def _blocking_codes(findings: Iterable[Any]) -> tuple[str, ...]:
             code = finding.get("code", "blocking_finding") if isinstance(finding, Mapping) else getattr(finding, "code", "blocking_finding")
             codes.add(str(code))
     return tuple(sorted(codes))
+
+
+def _business_governance_document(value: object) -> dict[str, Any]:
+    if isinstance(value, BusinessGateResult):
+        document = value.serialized()
+    elif isinstance(value, Mapping):
+        document = dict(value)
+    else:
+        return {}
+    required = {
+        "status", "machine_passed", "human_approved", "runtime_verified",
+        "legacy_pending_review_count", "blockers", "capabilities",
+    }
+    if set(document) != required or document.get("status") not in {
+        "passed", "passed_with_legacy_backlog", "blocked",
+    }:
+        return {}
+    if not all(isinstance(document.get(key), bool) for key in (
+        "machine_passed", "human_approved", "runtime_verified",
+    )):
+        return {}
+    if not isinstance(document.get("legacy_pending_review_count"), int):
+        return {}
+    if not isinstance(document.get("blockers"), (list, tuple)) or not isinstance(document.get("capabilities"), (list, tuple)):
+        return {}
+    return json.loads(json.dumps(document, ensure_ascii=True, sort_keys=True))
 
 
 class ReleaseGate:
@@ -115,13 +152,29 @@ class ReleaseGate:
     def _expired_report(self, report: ReleaseReport) -> ReleaseReport:
         """Append a separately signed expiry report without touching prior evidence."""
         report_gid = self._next_gid()
-        canonical = _canonical(report.candidate, report_gid, "expired", report.blockers, report.signing_key_id)
+        canonical = _canonical(
+            report.candidate,
+            report_gid,
+            "expired",
+            report.blockers,
+            report.business_governance,
+            report.signing_key_id,
+        )
         digest = "sha256:" + hashlib.sha256(canonical).hexdigest()
         try:
             signature = self._signer(canonical)
         except Exception:
             signature = ""
-        return ReleaseReport(report_gid, report.candidate, "expired", report.blockers, digest, report.signing_key_id, signature)
+        return ReleaseReport(
+            report_gid,
+            report.candidate,
+            "expired",
+            report.blockers,
+            report.business_governance,
+            digest,
+            report.signing_key_id,
+            signature,
+        )
 
     def _append_expiry(self, report: ReleaseReport) -> int:
         if report.release_report_gid in self._expiry_reports:
@@ -138,10 +191,17 @@ class ReleaseGate:
             )
         return expiry.release_report_gid
 
-    def _expire_prior_passes(self, candidate: ReleaseCandidate) -> tuple[int, ...]:
+    def _expire_prior_passes(
+        self,
+        candidate: ReleaseCandidate,
+        business_governance: Mapping[str, Any],
+    ) -> tuple[int, ...]:
         expired: list[int] = []
         for gid, report in tuple(self._reports.items()):
-            if report.conclusion == "pass" and report.candidate != candidate:
+            if report.conclusion == "pass" and (
+                report.candidate != candidate
+                or report.business_governance != business_governance
+            ):
                 expired.append(self._append_expiry(report))
         return tuple(expired)
 
@@ -183,13 +243,16 @@ class ReleaseGate:
         if self._audit_sink is not None:
             self._audit_sink.append(operation="gate", entity_gid=report.release_report_gid, actor_gid=actor_gid, request_gid=idempotency_key, detail={"conclusion": report.conclusion, "blockers": report.blockers}, idempotency_key=f"gate:{idempotency_key}")
 
-    def evaluate(self, candidate: ReleaseCandidate, *, available: bool = True, test_status: str | None = None, findings: Iterable[Any] = (), stale_evidence: bool = False, waivers: Iterable[Any] = (), approvals_complete: bool = False, data_complete: bool = False, evidence_hash: str = "", now: datetime | None = None, idempotency_key: str | None = None, evaluated_by_gid: str = "release_gate", **unknown: Any) -> ReleaseReport:
+    def evaluate(self, candidate: ReleaseCandidate, *, available: bool = True, test_status: str | None = None, findings: Iterable[Any] = (), stale_evidence: bool = False, waivers: Iterable[Any] = (), approvals_complete: bool = False, data_complete: bool = False, evidence_hash: str = "", business_governance: BusinessGateResult | Mapping[str, Any] | None = None, now: datetime | None = None, idempotency_key: str | None = None, evaluated_by_gid: str = "release_gate", **unknown: Any) -> ReleaseReport:
         key = str(idempotency_key or "").strip()
         if not key:
             raise ReleaseGateError("idempotency_key_required")
         if key in self._idempotency:
             return self._idempotency[key]
-        self._expire_prior_passes(candidate)
+        governance_document = _business_governance_document(business_governance)
+        self._expire_prior_passes(
+            candidate, governance_document,
+        )
         blockers: set[str] = set()
         if not available:
             blockers.add("governance_dependency_unavailable")
@@ -210,6 +273,10 @@ class ReleaseGate:
             blockers.add("incomplete_approvals")
         if not data_complete:
             blockers.add("missing_required_data")
+        if not governance_document:
+            blockers.add("business_governance_missing")
+        elif governance_document["status"] == "blocked":
+            blockers.add("business_governance_blocked")
         if unknown:
             blockers.add("missing_required_data")
         conclusion: Literal["pass", "fail", "expired"] = "fail" if blockers else "pass"
@@ -217,7 +284,10 @@ class ReleaseGate:
         key_id = self._signing_key_id
         if not key_id:
             key_id = "configured-release-key"
-        canonical = _canonical(candidate, report_gid, conclusion, blockers, key_id)
+        canonical = _canonical(
+            candidate, report_gid, conclusion, blockers,
+            governance_document, key_id,
+        )
         digest = "sha256:" + hashlib.sha256(canonical).hexdigest()
         signature = ""
         try:
@@ -225,9 +295,16 @@ class ReleaseGate:
         except Exception:
             blockers.add("release_signing_key_unavailable")
             conclusion = "fail"
-            canonical = _canonical(candidate, report_gid, conclusion, blockers, key_id)
+            canonical = _canonical(
+                candidate, report_gid, conclusion, blockers,
+                governance_document, key_id,
+            )
             digest = "sha256:" + hashlib.sha256(canonical).hexdigest()
-        report = ReleaseReport(report_gid, candidate, conclusion, tuple(sorted(blockers)), digest, key_id, signature)
+        report = ReleaseReport(
+            report_gid, candidate, conclusion, tuple(sorted(blockers)),
+            governance_document,
+            digest, key_id, signature,
+        )
         report = self._store(report, key)
         self._audit(report, idempotency_key=key, actor_gid=str(evaluated_by_gid))
         return report
