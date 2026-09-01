@@ -4,6 +4,8 @@ import json
 import os
 from pathlib import Path
 import subprocess
+
+import pytest
 from types import SimpleNamespace
 
 
@@ -99,3 +101,88 @@ def test_revision_fails_closed_for_relevant_tracked_dirt(tmp_path):
         assert str(exc) == "business_audit_relevant_tree_dirty"
     else:
         raise AssertionError("tracked relevant dirt must prevent false Git provenance")
+
+
+def _git_fixture(root: Path) -> Path:
+    subprocess.run(("git", "init"), cwd=root, check=True, capture_output=True)
+    subprocess.run(("git", "config", "user.email", "audit@example.test"), cwd=root, check=True)
+    subprocess.run(("git", "config", "user.name", "Audit Test"), cwd=root, check=True)
+    backend = root / "backend"
+    backend.mkdir()
+    tracked = backend / "provider.py"
+    tracked.write_text("VALUE = 1\n", encoding="utf-8")
+    (root / ".gitignore").write_text("backend/.cache/\n", encoding="utf-8")
+    subprocess.run(("git", "add", "backend/provider.py", ".gitignore"), cwd=root, check=True)
+    subprocess.run(("git", "commit", "-m", "fixture"), cwd=root, check=True, capture_output=True)
+    return tracked
+
+
+@pytest.mark.parametrize("staged", (False, True))
+def test_revision_rejects_staged_and_unstaged_eligible_source(tmp_path, staged):
+    from backend.scripts import audit_capability_business_rules as command
+
+    tracked = _git_fixture(tmp_path)
+    expected = subprocess.run(("git", "rev-parse", "HEAD"), cwd=tmp_path, check=True, capture_output=True, text=True).stdout.strip()
+    assert command._revision(tmp_path, relevant_paths=("backend",)) == expected
+    tracked.write_text("VALUE = 2\n", encoding="utf-8")
+    if staged:
+        subprocess.run(("git", "add", "backend/provider.py"), cwd=tmp_path, check=True)
+    with pytest.raises(RuntimeError, match="business_audit_relevant_tree_dirty"):
+        command._revision(tmp_path, relevant_paths=("backend",))
+
+
+def test_revision_rejects_untracked_eligible_source_but_ignores_irrelevant_file(tmp_path):
+    from backend.scripts import audit_capability_business_rules as command
+
+    _git_fixture(tmp_path)
+    eligible = tmp_path / "backend/new_provider.py"
+    eligible.write_text("VALUE = 2\n", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="business_audit_relevant_tree_dirty"):
+        command._revision(tmp_path, relevant_paths=("backend",))
+    eligible.unlink()
+    (tmp_path / "backend/notes.txt").write_text("not scanned\n", encoding="utf-8")
+    cache = tmp_path / "backend/.cache"
+    cache.mkdir()
+    (cache / "output.txt").write_text("ignored runtime output\n", encoding="utf-8")
+    expected = subprocess.run(("git", "rev-parse", "HEAD"), cwd=tmp_path, check=True, capture_output=True, text=True).stdout.strip()
+    assert command._revision(tmp_path, relevant_paths=("backend",)) == expected
+
+
+def test_revision_rejects_deleted_eligible_source(tmp_path):
+    from backend.scripts import audit_capability_business_rules as command
+
+    tracked = _git_fixture(tmp_path)
+    tracked.unlink()
+    with pytest.raises(RuntimeError, match="business_audit_relevant_tree_dirty"):
+        command._revision(tmp_path, relevant_paths=("backend",))
+
+
+def test_scan_aborts_when_backend_or_web_provenance_changes_during_scan():
+    from backend.scripts import audit_capability_business_rules as command
+
+    clean_backend = command._InputProvenance("a" * 40, "sha256:" + "1" * 64, ("backend/provider.py",))
+    changed_backend = command._InputProvenance("b" * 40, "sha256:" + "2" * 64, ("backend/provider.py",))
+    clean_web = command._InputProvenance("c" * 40, "sha256:" + "3" * 64, ("web/main.js",))
+
+    backend_values = iter((clean_backend, changed_backend))
+    web_values = iter((clean_web, clean_web))
+    with pytest.raises(RuntimeError, match="business_audit_inputs_changed_during_scan"):
+        command._stable_scan(lambda revision: {"code_revision": revision}, lambda: next(backend_values), lambda: next(web_values))
+
+    backend_values = iter((clean_backend, clean_backend))
+    changed_web = command._InputProvenance("c" * 40, "sha256:" + "4" * 64, ("web/main.js",))
+    web_values = iter((clean_web, changed_web))
+    with pytest.raises(RuntimeError, match="business_audit_inputs_changed_during_scan"):
+        command._stable_scan(lambda revision: {"code_revision": revision}, lambda: next(backend_values), lambda: next(web_values))
+
+
+def test_stable_scan_records_exact_clean_backend_and_web_revisions():
+    from backend.scripts import audit_capability_business_rules as command
+
+    backend = command._InputProvenance("a" * 40, "sha256:" + "1" * 64, ("backend/provider.py",))
+    web = command._InputProvenance("b" * 40, "sha256:" + "2" * 64, ("web/main.js",))
+    document, backend_revision, web_revision = command._stable_scan(
+        lambda revision: {"code_revision": revision}, lambda: backend, lambda: web,
+    )
+    assert document["code_revision"] == backend_revision == "a" * 40
+    assert web_revision == "b" * 40

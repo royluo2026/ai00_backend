@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import dataclass
+import hashlib
 from itertools import count
 import json
 import os
@@ -35,7 +37,14 @@ DEFAULT_WEB_ROOT = Path(r"E:/Projects/ai00/workmanship-web")
 OFFLINE_INTEGRATION_FACTORY = "backend.tests.support.integration_catalog_factory:build"
 
 
-def _revision(root: Path, *, relevant_paths: tuple[str, ...] = (".",)) -> str:
+@dataclass(frozen=True)
+class _InputProvenance:
+    revision: str
+    input_fingerprint: str
+    input_paths: tuple[str, ...]
+
+
+def _git_revision(root: Path) -> str:
     try:
         revision = subprocess.run(
             ("git", "rev-parse", "HEAD"), cwd=root, check=True, capture_output=True, text=True,
@@ -44,16 +53,119 @@ def _revision(root: Path, *, relevant_paths: tuple[str, ...] = (".",)) -> str:
         raise RuntimeError("business_audit_revision_unavailable") from exc
     if len(revision) != 40 or any(character not in "0123456789abcdef" for character in revision):
         raise RuntimeError("business_audit_revision_invalid")
+    return revision
+
+
+def _under_roots(path: str, roots: tuple[str, ...]) -> bool:
+    normalized = path.replace("\\", "/").strip("/")
+    return any(normalized == root.strip("/") or normalized.startswith(root.strip("/") + "/") for root in roots)
+
+
+def _status_paths(root: Path, pathspecs: tuple[str, ...]) -> tuple[tuple[str, str], ...]:
     try:
-        dirty = subprocess.run(
-            ("git", "status", "--porcelain=v1", "--untracked-files=no", "--", *relevant_paths),
-            cwd=root, check=True, capture_output=True, text=True,
-        ).stdout.strip()
+        result = subprocess.run(
+            ("git", "status", "--porcelain=v1", "-z", "--untracked-files=all", "--", *(pathspecs or (".",))),
+            cwd=root, check=True, capture_output=True,
+        )
     except (OSError, subprocess.CalledProcessError) as exc:
         raise RuntimeError("business_audit_revision_unavailable") from exc
-    if dirty:
+    tokens = result.stdout.decode("utf-8", errors="surrogateescape").split("\0")
+    rows: list[tuple[str, str]] = []
+    index = 0
+    while index < len(tokens):
+        raw = tokens[index]
+        index += 1
+        if not raw:
+            continue
+        status, path = raw[:2], raw[3:]
+        rows.append((status, path))
+        if "R" in status or "C" in status:
+            if index < len(tokens) and tokens[index]:
+                rows.append((status, tokens[index]))
+                index += 1
+    return tuple(rows)
+
+
+def _tracked_paths(root: Path) -> tuple[str, ...]:
+    try:
+        result = subprocess.run(("git", "ls-files", "-z"), cwd=root, check=True, capture_output=True)
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise RuntimeError("business_audit_revision_unavailable") from exc
+    return tuple(sorted(
+        value for value in result.stdout.decode("utf-8", errors="surrogateescape").split("\0") if value
+    ))
+
+
+def _capture_provenance(
+    root: Path, *, source_roots: tuple[str, ...] = (), input_paths: tuple[str, ...] = (),
+    all_tracked: bool = False,
+) -> _InputProvenance:
+    revision = _git_revision(root)
+    exact = tuple(sorted({path.replace("\\", "/") for path in input_paths}))
+    tracked = _tracked_paths(root)
+    fingerprint_paths = tracked if all_tracked else exact
+    if not all_tracked and any(path not in set(tracked) for path in exact):
         raise RuntimeError("business_audit_relevant_tree_dirty")
-    return revision
+    external_exact = tuple(path for path in exact if not _under_roots(path, source_roots))
+    pathspecs = (".",) if all_tracked else tuple(sorted(set(source_roots) | set(external_exact)))
+    for status, path in _status_paths(root, pathspecs):
+        source_candidate = (
+            _under_roots(path, source_roots)
+            and GovernanceScanner.is_source_candidate_path(path)
+            and (
+                status != "??"
+                or GovernanceScanner.is_source_input_file(root / Path(path), root)
+            )
+        )
+        relevant = (
+            (all_tracked and status != "??")
+            or path.replace("\\", "/") in exact
+            or source_candidate
+        )
+        if relevant:
+            raise RuntimeError("business_audit_relevant_tree_dirty")
+    digest = hashlib.sha256()
+    for relative in fingerprint_paths:
+        path = root / Path(relative)
+        try:
+            content = path.read_bytes()
+        except OSError as exc:
+            raise RuntimeError("business_audit_input_unavailable") from exc
+        digest.update(relative.encode("utf-8", errors="surrogateescape"))
+        digest.update(b"\0")
+        digest.update(hashlib.sha256(content).digest())
+    return _InputProvenance(
+        revision, "sha256:" + digest.hexdigest(), tuple(fingerprint_paths),
+    )
+
+
+def _revision(root: Path, *, relevant_paths: tuple[str, ...] = (".",)) -> str:
+    return _capture_provenance(root, source_roots=relevant_paths).revision
+
+
+def _stable_scan(scan, backend_probe, web_probe):
+    backend_before = backend_probe()
+    web_before = web_probe()
+    document = scan(backend_before.revision)
+    backend_after = backend_probe()
+    web_after = web_probe()
+    if backend_before != backend_after or web_before != web_after:
+        raise RuntimeError("business_audit_inputs_changed_during_scan")
+    return document, backend_before.revision, web_before.revision
+
+
+def _backend_provenance() -> _InputProvenance:
+    manifests = load_domain_manifests(OFFICIAL_DOMAINS)
+    discovery = GovernanceScanner(
+        GovernanceSettings("test-governance", REPOSITORY_ROOT), domain_manifests=manifests,
+    )
+    fixed = tuple(path.relative_to(REPOSITORY_ROOT).as_posix() for path in (
+        PRODUCT_CATALOG, EXTENSION_CATALOG, OFFICIAL_DOMAINS, ACCEPTANCE_MANIFEST, LEGACY_BASELINE,
+    ))
+    return _capture_provenance(
+        REPOSITORY_ROOT, source_roots=discovery.source_roots(),
+        input_paths=tuple(sorted(set(discovery.source_input_paths()) | set(fixed))),
+    )
 
 
 def _snapshot(source_revision: str):
@@ -81,9 +193,10 @@ def _snapshot(source_revision: str):
 
 
 def build_local_report(*, web_root: Path = DEFAULT_WEB_ROOT, page_limit: int = 200) -> dict[str, Any]:
-    backend_revision = _revision(REPOSITORY_ROOT, relevant_paths=("backend", "plugins", "docs/governance"))
-    web_revision = _revision(web_root)
-    document = _snapshot(backend_revision)
+    document, backend_revision, web_revision = _stable_scan(
+        _snapshot, _backend_provenance,
+        lambda: _capture_provenance(web_root, all_tracked=True),
+    )
     ids = count(1)
     store = MemoryGovernanceStore(next_ids=lambda: next(ids))
     snapshot = store.import_snapshot(document)

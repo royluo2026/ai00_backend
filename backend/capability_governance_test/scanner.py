@@ -466,19 +466,7 @@ class GovernanceScanner:
         list[_AstUnit], list[_TableReference], list[tuple[str, str, str]],
         dict[tuple[str, str], ast.Module], dict[tuple[str, str], dict[str, tuple[str, str, str]]],
     ]:
-        roots: dict[str, tuple[str, bool]] = {}
-        for owner, manifest in domains.items():
-            roots[str(manifest["artifact_path"])] = (owner, False)
-            database = manifest.get("database")
-            if isinstance(database, Mapping):
-                migration = database.get("migration_path")
-                if isinstance(migration, str):
-                    roots[migration] = (owner, True)
-                schema_paths = database.get("schema_paths", ())
-                if isinstance(schema_paths, (list, tuple)):
-                    for schema_path in schema_paths:
-                        if isinstance(schema_path, str):
-                            roots.setdefault(schema_path, (owner, False))
+        roots = self._declared_source_roots(domains)
         units: list[_AstUnit] = []
         tables: list[_TableReference] = []
         unresolved: list[tuple[str, str, str]] = []
@@ -573,6 +561,58 @@ class GovernanceScanner:
         return units, tables, unresolved, source_trees, source_imports
 
     @staticmethod
+    def _declared_source_roots(
+        domains: Mapping[str, Mapping[str, Any]],
+    ) -> dict[str, tuple[str, bool]]:
+        roots: dict[str, tuple[str, bool]] = {}
+        for owner, manifest in domains.items():
+            roots[str(manifest["artifact_path"])] = (owner, False)
+            database = manifest.get("database")
+            if isinstance(database, Mapping):
+                migration = database.get("migration_path")
+                if isinstance(migration, str):
+                    roots[migration] = (owner, True)
+                schema_paths = database.get("schema_paths", ())
+                if isinstance(schema_paths, (list, tuple)):
+                    for schema_path in schema_paths:
+                        if isinstance(schema_path, str):
+                            roots.setdefault(schema_path, (owner, False))
+        return roots
+
+    @staticmethod
+    def is_source_candidate_path(relative_path: str) -> bool:
+        """Mirror the scanner's file-kind eligibility without reading a file."""
+        path = PurePosixPath(str(relative_path).replace("\\", "/"))
+        return path.suffix in {".py", ".sql"} and not path.name.startswith(".")
+
+    @staticmethod
+    def is_source_input_file(path: Path, repository_root: Path) -> bool:
+        """Use the scan's real filesystem safety limits for provenance checks."""
+        if not GovernanceScanner.is_source_candidate_path(path.name):
+            return False
+        if not path.is_file() or path.is_symlink():
+            return False
+        try:
+            path.resolve().relative_to(repository_root.resolve())
+            return path.stat().st_size <= _MAX_SOURCE_BYTES
+        except (OSError, ValueError):
+            return False
+
+    def source_roots(self) -> tuple[str, ...]:
+        manifests = self._require_manifest(self._domain_manifests)
+        return tuple(sorted(self._declared_source_roots(self._domains(manifests))))
+
+    def source_input_paths(self) -> tuple[str, ...]:
+        """Return exactly the existing files the next scan may parse."""
+        paths = {
+            path.relative_to(self.settings.repository_root).as_posix()
+            for root in self.source_roots()
+            for path in self._scan_declared_manifest_path(root)
+            if self.is_source_candidate_path(path.relative_to(self.settings.repository_root).as_posix())
+        }
+        return tuple(sorted(paths))
+
+    @staticmethod
     def _resolve_import_source(source_path: str, module: str | None, level: int) -> str | None:
         """Resolve a relative Python import to one repository source path."""
         if level < 0:
@@ -618,13 +658,7 @@ class GovernanceScanner:
 
     def _is_safe_repository_file(self, path: Path) -> bool:
         """Exclude symlinks, oversize inputs, and every resolved path outside the repo."""
-        if not path.is_file() or path.is_symlink():
-            return False
-        try:
-            path.resolve().relative_to(self.settings.repository_root.resolve())
-            return path.stat().st_size <= _MAX_SOURCE_BYTES
-        except (OSError, ValueError):
-            return False
+        return self.is_source_input_file(path, self.settings.repository_root)
 
     def _build_nodes_and_relations(
         self,
