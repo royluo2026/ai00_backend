@@ -19,7 +19,7 @@ def main() -> int:
     parser.add_argument("--fail-on-open-arguments", action="store_true")
     parser.add_argument("--fail-on-default-all-exposure", action="store_true")
     args = parser.parse_args()
-    report = audit_catalog(args.catalog)
+    report = audit_catalog(args.catalog, source_root=ROOT)
     print(json.dumps(report.serialized(), ensure_ascii=False, indent=2, sort_keys=True))
     return int(
         (args.fail_on_open_arguments and report.open_arguments_count > 0)

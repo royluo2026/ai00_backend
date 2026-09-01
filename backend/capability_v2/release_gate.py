@@ -85,7 +85,7 @@ def evaluate_release_gate(
     )
     return ReleaseGateReport(
         completion=evaluate_completion(root, mode="strict", web_root=web_root),
-        audit=audit_catalog(resolved_catalog),
+        audit=audit_catalog(resolved_catalog, source_root=root),
         atomicity=audit_generic_operations(catalog, dispositions),
         orchestration=orchestration,
     )

@@ -429,3 +429,53 @@ python backend/scripts/run_capability_governance_scan.py --offline --output .tas
 All exited 0: product `rel_3f5ef8265738dc99f4803579111af53d` (495/479), extension `rel_842a83882703680257177d9f0ecbc400` (18), and the real scan completed with `495 / 479 / 18` and snapshot `sha256:99eaaf68ab23f5a78bc3c3ada122b3485fc2dc32d022a8d07f925dfb7de042d5`.
 
 The full mandatory/binding and migrated-reader selection exited 0 with `3361 passed`; `git diff --check 39123d77..HEAD` exited 0. Registry strict still exits 1 only for the verified identical 313 governance-data drift rows, with no release/projection-integrity row.
+
+## Catalog Integration Closure — Canonical Mandatory-Test Revision Repair (2026-09-02)
+
+### RED Evidence
+
+- The product builder hashed `test_mandatory_cases.py` with raw `read_bytes()`.  The initial contract test demonstrated that the generated `code_revision` did not equal the canonical LF/CRLF-equivalent digest.
+- A changed mandatory-test `code_revision` was accepted by both acceptance-manifest validation and catalog audit because each path only checked that the field existed.
+
+### GREEN Evidence
+
+- `backend.capability_v2.acceptance_contract.canonical_test_source_hash` defines the shared controlled hash: it decodes UTF-8 strictly, normalizes only CRLF to LF, rejects an isolated CR, and returns a `sha256:` digest of the re-encoded canonical UTF-8 bytes.  Thus LF and CRLF checkouts bind identically, while a content change does not.  Invalid UTF-8 and bare CR are fail-closed rather than silently rewritten.
+- `build_capability_catalog.py` obtains every mandatory `code_revision` through that helper.  Acceptance validation now requires exactly the seven canonical mandatory node IDs and paths per stable capability and rejects a source-hash mismatch.  Catalog audit receives the repository source root in both production callers and rejects a mismatched mandatory source revision.
+- The controlled cross-EOL byte probe produced identical LF/CRLF hash `sha256:98752ee28d5484bdc2814fb70adb6a0b2fb31f6a9b8ee7ae81fd2fc9cf300b3b`; changing `x=1` to `x=2` produced `sha256:7b519d327803fabd4c74e1b993360e8d48b414771a12d0a868d6edf7cfec50bb`.
+- Exact clean-candidate regeneration with `AI00_INTEGRATION_ADAPTER_FACTORY=integration_backend.infrastructure.production_adapters:build` produced product `rel_0b584b19349bc98727900583bb19f687`, catalog hash `sha256:0b584b19349bc98727900583bb19f687a093b3ce91431fb384795034d690ab60`, 495 descriptors / 479 stable, and mandatory test source hash `sha256:578d5843eb4b4bf06d74b3954220f41a6073171c414b0ad52f88dfda7436a802`.  The extension has no mandatory-test dependency and remains `rel_842a83882703680257177d9f0ecbc400` with 18 descriptors.  Product release/lineage, all generated docs/agent/MCP tools, and the 479-stable case manifest were regenerated from that candidate only.
+
+### Test Commands
+
+```text
+python -m pytest backend/tests/acceptance/test_catalog_release.py backend/tests/acceptance/test_mandatory_cases.py backend/tests/acceptance/test_acceptance_runner.py::test_current_manifest_is_release_complete backend/tests/acceptance/test_acceptance_runner.py::test_validate_manifest_rejects_tampered_mandatory_test_source_hash backend/tests/acceptance/test_acceptance_runner.py::test_validate_manifest_rejects_missing_mandatory_test_refs backend/tests/test_capability_catalog_release.py::test_generated_catalog_declares_exact_acceptance_cases_without_self_attested_results backend/tests/test_capability_catalog_release.py::test_mandatory_test_source_hash_is_eol_stable_and_content_sensitive backend/tests/test_capability_v2_catalog_audit.py::test_audit_catalog_rejects_tampered_mandatory_test_source_hash backend/tests/test_plugin_acceptance_tooling.py::PluginAcceptanceToolingTests::test_sdk_example_and_template_only_request_current_plugin_capabilities -q -p no:cacheprovider
+```
+
+Result: exit 0; `3363 passed`.
+
+```text
+python -m pytest backend/tests/test_user_function_registry.py::test_catalog_projection_rejects_tampered_release_hash backend/tests/test_domain_capability_coverage.py::test_catalog_document_is_verified_before_domain_coverage_reads_it -q -p no:cacheprovider
+```
+
+Result: exit 0; `2 passed` on the clean candidate.  A later aggregate rerun reached 3,363 passing tests before two `tmp_path` setup errors caused by an inaccessible/reused Windows pytest base directory; those errors occur before either test body and are not a Catalog assertion failure.
+
+### Concerns
+
+- This round uses an equivalent controlled LF/CRLF byte probe, rather than an OS-specific checkout, so the evidence is independent of Git EOL configuration and exercises the exact bytes accepted by the shared helper.
+- The known User Function Registry `--strict` 313-row governance-data drift remains out of scope; this repair removes no business drift and introduces no release/projection-integrity drift.
+
+### Final Clean Materialization Verification
+
+The final commit was materialized in a fresh detached worktree, with the explicit Integration factory, and the following commands exited 0:
+
+```text
+python backend/scripts/build_capability_catalog.py --check
+python backend/scripts/build_capability_governance_catalog.py --check
+python backend/scripts/generate_capability_docs.py --check
+python backend/scripts/build_capability_acceptance_manifest.py --check
+python backend/scripts/run_capability_governance_scan.py --offline --output .task4-r3-final-offline-scan.json
+git diff --check ca18325e..HEAD
+```
+
+They verified product `rel_0b584b19349bc98727900583bb19f687` (495 total / 479 stable), extension `rel_842a83882703680257177d9f0ecbc400` (18), and an offline scan status of `completed` with snapshot `sha256:0508f47cf78faf95c30b63d5ee5ed3bdbd0ce5049add523e373ccf696b5c4742`.  The clean checkout uses Windows checkout bytes, while the controlled LF/CRLF probe proves its stored Catalog source revision is invariant under the alternate line ending.
+
+The mandatory/binding/reader command above reached `3363 passed`; its two remaining errors occurred during `tmp_path` setup because the host denied enumeration of `C:\\Users\\luoyi8\\AppData\\Local\\Temp\\pytest-of-luoyi8`, before those test bodies.  Their same focused command passed earlier on the clean candidate (`2 passed`).  `build_user_function_registry.py --strict` still exits 1 for the same 313 drift records (314 output lines including its heading) and no release/projection integrity error.

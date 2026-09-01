@@ -8,7 +8,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from backend.capability_v2.completion import evaluate_completion
-from backend.capability_v2.acceptance_contract import case_node_id
+from backend.capability_v2.acceptance_contract import case_node_id, coverage_declarations
 from backend.capability_v2.domain_manifest import load_domain_manifests
 from backend.scripts import run_capability_v2_acceptance as acceptance_runner
 from backend.scripts.run_capability_v2_acceptance import (
@@ -141,6 +141,60 @@ def test_validate_manifest_rejects_rebound_case_node():
     )
 
     assert "base.example.read@1: mandatory case success has wrong verifier node id" in validate_manifest(catalog, manifest)
+
+
+def test_validate_manifest_rejects_tampered_mandatory_test_source_hash():
+    catalog = {
+        "release_id": "rel_test",
+        "catalog_hash": "sha256:" + "1" * 64,
+        "capabilities": [{
+            "id": "base.example.read",
+            "major_version": 1,
+            "lifecycle_status": "stable",
+            "test_refs": list(coverage_declarations(
+                "base.example.read", 1, code_revision="sha256:" + "0" * 64,
+            )),
+        }],
+    }
+    manifest = {
+        "catalog_release": "rel_test",
+        "catalog_hash": "sha256:" + "1" * 64,
+        "mandatory_cases": sorted(MANDATORY_CASES),
+        "capabilities": {
+            "base.example.read@1": {
+                case: case_node_id(case, "base.example.read", 1)
+                for case in MANDATORY_CASES
+            }
+        },
+    }
+
+    assert "base.example.read@1: mandatory test source hash mismatch" in validate_manifest(catalog, manifest)
+
+
+def test_validate_manifest_rejects_missing_mandatory_test_refs():
+    catalog = {
+        "release_id": "rel_test",
+        "catalog_hash": "sha256:" + "1" * 64,
+        "capabilities": [{
+            "id": "base.example.read",
+            "major_version": 1,
+            "lifecycle_status": "stable",
+            "test_refs": [],
+        }],
+    }
+    manifest = {
+        "catalog_release": "rel_test",
+        "catalog_hash": "sha256:" + "1" * 64,
+        "mandatory_cases": sorted(MANDATORY_CASES),
+        "capabilities": {
+            "base.example.read@1": {
+                case: case_node_id(case, "base.example.read", 1)
+                for case in MANDATORY_CASES
+            }
+        },
+    }
+
+    assert "base.example.read@1: mandatory test refs are invalid" in validate_manifest(catalog, manifest)
 
 
 def test_release_bindings_cover_manifest_and_every_domain_migration():

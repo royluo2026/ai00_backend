@@ -8,7 +8,7 @@ Read the full governed detail of one BOP entry at an exact revision.
 - 不适用：A consumer is rendering a BOP list or outline.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_3f5ef8265738dc99f4803579111af53d`
+- Catalog Release：`rel_0b584b19349bc98727900583bb19f687`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -97,7 +97,7 @@ Read the full governed detail of one BOP entry at an exact revision.
 ```json
 {
   "capability_id": "craft.bop.entry.detail.get",
-  "catalog_release": "rel_3f5ef8265738dc99f4803579111af53d",
+  "catalog_release": "rel_0b584b19349bc98727900583bb19f687",
   "major_version": 1,
   "payload": {
     "entry_gid": "example",

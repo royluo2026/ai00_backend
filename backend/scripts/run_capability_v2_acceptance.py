@@ -25,7 +25,11 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 from backend.capability_v2.completion import CompletionReport, evaluate_completion
 from backend.capability_v2.catalog import load_catalog_release
-from backend.capability_v2.acceptance_contract import case_node_id
+from backend.capability_v2.acceptance_contract import (
+    TEST_MODULE,
+    case_node_id,
+    mandatory_test_source_revision,
+)
 from backend.capability_v2.docs.generator import validate_machine_catalog
 CATALOG_PATH = ROOT / "docs/capabilities/catalog.v2.json"
 IMMUTABLE_CATALOG_PATH = ROOT / "docs/governance/capability-catalog-release.json"
@@ -59,12 +63,33 @@ def validate_manifest(catalog: dict, manifest: dict) -> list[str]:
     declared = manifest.get("capabilities", {})
     if set(manifest.get("mandatory_cases", ())) != MANDATORY_CASES:
         errors.append("manifest mandatory_cases must equal the seven supported case types")
-    stable = {
-        f'{item["id"]}@{item["major_version"]}'
+    stable_entries = {
+        f'{item["id"]}@{item["major_version"]}': item
         for item in catalog.get("capabilities", [])
         if item.get("lifecycle_status") == "stable"
     }
+    stable = set(stable_entries)
+    expected_test_revision = mandatory_test_source_revision(ROOT)
     for capability_key in sorted(stable):
+        test_refs = stable_entries[capability_key].get("test_refs")
+        capability_id, major_version = capability_key.rsplit("@", 1)
+        expected_test_nodes = {
+            case_node_id(case, capability_id, int(major_version))
+            for case in MANDATORY_CASES
+        }
+        if not isinstance(test_refs, list) or any(
+            not isinstance(item, dict) for item in test_refs
+        ) or {
+            item.get("test_node_id") for item in test_refs
+        } != expected_test_nodes or any(
+            item.get("path") != TEST_MODULE for item in test_refs
+        ):
+            errors.append(f"{capability_key}: mandatory test refs are invalid")
+        elif any(
+            item.get("code_revision") != expected_test_revision
+            for item in test_refs
+        ):
+            errors.append(f"{capability_key}: mandatory test source hash mismatch")
         cases = declared.get(capability_key, {})
         if not isinstance(cases, dict):
             errors.append(f"{capability_key}: mandatory cases must be an object")
@@ -74,7 +99,6 @@ def validate_manifest(catalog: dict, manifest: dict) -> list[str]:
             errors.append(f"{capability_key}: missing mandatory case {case}")
         for unknown in sorted(set(cases) - MANDATORY_CASES):
             errors.append(f"{capability_key}: unknown mandatory case {unknown}")
-        capability_id, major_version = capability_key.rsplit("@", 1)
         for case in sorted(MANDATORY_CASES & set(cases)):
             expected = case_node_id(case, capability_id, int(major_version))
             if cases[case] != expected:

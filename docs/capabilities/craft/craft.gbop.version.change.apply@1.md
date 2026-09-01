@@ -8,7 +8,7 @@ Create, update, freeze, archive, unarchive, or fork a GBOP version through one g
 - 不适用：The request changes entries, process cards, operation cards, links, or imports.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_3f5ef8265738dc99f4803579111af53d`
+- Catalog Release：`rel_0b584b19349bc98727900583bb19f687`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -149,7 +149,7 @@ Create, update, freeze, archive, unarchive, or fork a GBOP version through one g
 ```json
 {
   "capability_id": "craft.gbop.version.change.apply",
-  "catalog_release": "rel_3f5ef8265738dc99f4803579111af53d",
+  "catalog_release": "rel_0b584b19349bc98727900583bb19f687",
   "major_version": 1,
   "payload": {
     "operation": "create"

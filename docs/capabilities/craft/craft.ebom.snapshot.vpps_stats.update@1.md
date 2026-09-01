@@ -8,7 +8,7 @@ Store one PBOM snapshot VPPS check result.
 - 不适用：The request changes snapshot metadata or status.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_3f5ef8265738dc99f4803579111af53d`
+- Catalog Release：`rel_0b584b19349bc98727900583bb19f687`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -96,7 +96,7 @@ Store one PBOM snapshot VPPS check result.
 ```json
 {
   "capability_id": "craft.ebom.snapshot.vpps_stats.update",
-  "catalog_release": "rel_3f5ef8265738dc99f4803579111af53d",
+  "catalog_release": "rel_0b584b19349bc98727900583bb19f687",
   "major_version": 1,
   "payload": {
     "snapshot_gid": "example"

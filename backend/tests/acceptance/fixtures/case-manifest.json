@@ -4312,8 +4312,8 @@
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[vismockup.visibility@1]"
     }
   },
-  "catalog_hash": "sha256:3f5ef8265738dc99f4803579111af53dfc0e0e019bbca1190b0946e28ccc84dc",
-  "catalog_release": "rel_3f5ef8265738dc99f4803579111af53d",
+  "catalog_hash": "sha256:0b584b19349bc98727900583bb19f687a093b3ce91431fb384795034d690ab60",
+  "catalog_release": "rel_0b584b19349bc98727900583bb19f687",
   "mandatory_cases": [
     "success",
     "invalid_input",
