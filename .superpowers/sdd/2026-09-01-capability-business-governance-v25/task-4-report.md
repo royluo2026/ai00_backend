@@ -479,3 +479,28 @@ git diff --check ca18325e..HEAD
 They verified product `rel_0b584b19349bc98727900583bb19f687` (495 total / 479 stable), extension `rel_842a83882703680257177d9f0ecbc400` (18), and an offline scan status of `completed` with snapshot `sha256:0508f47cf78faf95c30b63d5ee5ed3bdbd0ce5049add523e373ccf696b5c4742`.  The clean checkout uses Windows checkout bytes, while the controlled LF/CRLF probe proves its stored Catalog source revision is invariant under the alternate line ending.
 
 The mandatory/binding/reader command above reached `3363 passed`; its two remaining errors occurred during `tmp_path` setup because the host denied enumeration of `C:\\Users\\luoyi8\\AppData\\Local\\Temp\\pytest-of-luoyi8`, before those test bodies.  Their same focused command passed earlier on the clean candidate (`2 passed`).  `build_user_function_registry.py --strict` still exits 1 for the same 313 drift records (314 output lines including its heading) and no release/projection integrity error.
+
+## Catalog Integration Closure — Release-Gate Audit Fixture Repair (2026-09-02)
+
+### RED Evidence
+
+- `test_release_gate_blocks_replaced_orchestration_target` retained a one-argument `audit_catalog` test double after production began passing `source_root=root`.  The old double raises `TypeError` when the release gate evaluates the catalog, masking the intended orchestration assertion.
+
+### GREEN Evidence
+
+- The double now uses the real keyword-only interface, records its arguments, and proves the release gate passes exactly `(catalog_path, tmp_path)` to `audit_catalog`.  It continues to return the same successful `CatalogAuditReport`; the existing assertion still proves the original `target_replaced` orchestration result.
+- Direct invocation of the test body with a real temporary catalog and `pytest.MonkeyPatch` passed after the fixture correction.
+
+```text
+python -m pytest backend/tests/test_capability_v2_release_gate.py -q -p no:cacheprovider --basetemp=E:/Projects/ai00_v3/.task4-r4-clean-5c228dc3/.pytest-r4-full
+```
+
+The required full release-gate command was run with a fresh base temp directory.  Its two fixture-free tests passed; the `tmp_path` test setup then failed because this host denied pytest enumeration of that fresh directory.  This is a host temporary-directory permission failure before the test body, not a production or assertion failure; the direct test-body execution above is the corresponding behavior evidence.
+
+```text
+python -m pytest backend/tests/test_capability_v2_release_gate.py::test_release_gate_fails_when_web_bypasses_or_contract_debt_exists backend/tests/test_capability_v2_release_gate.py::test_release_gate_fails_when_generic_operations_are_not_atomicity_governed backend/tests/test_capability_v2_catalog_audit.py::test_audit_catalog_rejects_tampered_mandatory_test_source_hash backend/tests/test_capability_catalog_release.py::test_mandatory_test_source_hash_is_eol_stable_and_content_sensitive backend/tests/acceptance/test_acceptance_runner.py::test_validate_manifest_rejects_tampered_mandatory_test_source_hash -q -p no:cacheprovider
+```
+
+Result: `5 passed`.
+
+The Task 4 canonical focused suite was repeated and passed `3363` tests.  No generated Catalog, docs, manifest, or extension artifact changed in this test-fixture-only repair.

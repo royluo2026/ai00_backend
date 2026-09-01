@@ -70,13 +70,20 @@ def test_release_gate_blocks_replaced_orchestration_target(tmp_path: Path, monke
         sync_production_paths=0, async_production_paths=0, cross_domain_sql=0,
         internal_imports=0, consumer_bypasses=0, catalog_capabilities=0, failed=(),
     ))
-    monkeypatch.setattr(release_gate, "audit_catalog", lambda _path: CatalogAuditReport(
-        stable_count=2, generic_operation_count=0, open_arguments_count=0,
-        default_all_exposure_count=0, generic_operation_ids=(),
-    ))
+    audit_calls: list[tuple[Path, Path]] = []
+
+    def audit_catalog(path: Path, *, source_root: Path) -> CatalogAuditReport:
+        audit_calls.append((path, source_root))
+        return CatalogAuditReport(
+            stable_count=2, generic_operation_count=0, open_arguments_count=0,
+            default_all_exposure_count=0, generic_operation_ids=(),
+        )
+
+    monkeypatch.setattr(release_gate, "audit_catalog", audit_catalog)
 
     report = release_gate.evaluate_release_gate(
         tmp_path, web_root=tmp_path, catalog_path=catalog_path, atomicity_path=atomicity_path,
     )
 
     assert report.orchestration[0].serialized()["target_failures"][0]["reason_code"] == "target_replaced"
+    assert audit_calls == [(catalog_path, tmp_path)]
