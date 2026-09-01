@@ -7,6 +7,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import subprocess
 
 from .atomicity import AtomicityAudit, audit_generic_operations, load_atomicity_dispositions
 from .catalog_targets import CatalogTargetIndex
@@ -24,6 +25,7 @@ class LegacyBusinessGovernanceBaseline:
     source_revision: str
     catalog_release_id: str
     catalog_hash: str
+    projection_hash: str
     capabilities: Mapping[str, str]
     baseline_hash: str
 
@@ -77,6 +79,7 @@ class BusinessGateResult:
     legacy_pending_review_count: int
     blockers: tuple[str, ...]
     capabilities: tuple[CapabilityGovernanceResult, ...]
+    catalog_binding: Mapping[str, str] = field(default_factory=dict)
 
     def serialized(self) -> dict[str, object]:
         return {
@@ -87,6 +90,39 @@ class BusinessGateResult:
             "legacy_pending_review_count": self.legacy_pending_review_count,
             "blockers": list(self.blockers),
             "capabilities": [item.serialized() for item in self.capabilities],
+            "catalog_binding": dict(self.catalog_binding),
+        }
+
+
+@dataclass(frozen=True)
+class BusinessCatalogCapability:
+    capability_key: str
+    capability_version_gid: str
+    major_version: int
+    business_definition_hash: str
+
+    def serialized(self) -> dict[str, object]:
+        return {
+            "capability_key": self.capability_key,
+            "capability_version_gid": self.capability_version_gid,
+            "major_version": self.major_version,
+            "business_definition_hash": self.business_definition_hash,
+        }
+
+
+@dataclass(frozen=True)
+class BusinessCatalogProjection:
+    catalog_release_id: str
+    catalog_hash: str
+    projection_hash: str
+    capabilities: tuple[BusinessCatalogCapability, ...]
+
+    @property
+    def binding(self) -> dict[str, str]:
+        return {
+            "catalog_release_id": self.catalog_release_id,
+            "catalog_hash": self.catalog_hash,
+            "projection_hash": self.projection_hash,
         }
 
 
@@ -104,6 +140,8 @@ def classify_change(
 
 def evaluate_business_governance_gate(
     capabilities: Iterable[BusinessGateCapability],
+    *,
+    catalog_binding: Mapping[str, str] | None = None,
 ) -> BusinessGateResult:
     results: list[CapabilityGovernanceResult] = []
     aggregate_blockers: set[str] = set()
@@ -151,6 +189,7 @@ def evaluate_business_governance_gate(
         legacy_pending_review_count=legacy_pending,
         blockers=tuple(sorted(aggregate_blockers)),
         capabilities=rows,
+        catalog_binding=dict(catalog_binding or {}),
     )
 
 
@@ -159,19 +198,87 @@ _CAPABILITY_VERSION_GID = re.compile(r"(?:cv2_[0-9a-f]{24}|[1-9][0-9]*)")
 _SHA256 = re.compile(r"sha256:[0-9a-f]{64}")
 
 
-def parse_business_governance_result(value: object) -> BusinessGateResult:
+def build_business_catalog_projection(
+    business_catalog: Mapping[str, object],
+) -> BusinessCatalogProjection:
+    """Return the complete governed projection of one content-addressed Catalog."""
+    try:
+        from .catalog import load_catalog_release
+        release = load_catalog_release(business_catalog)
+    except Exception as exc:
+        raise BusinessGovernanceConfigurationError("business_catalog_invalid") from exc
+    raw_descriptors = business_catalog.get("descriptors")
+    if not isinstance(raw_descriptors, (list, tuple)) or not raw_descriptors:
+        raise BusinessGovernanceConfigurationError("business_catalog_invalid")
+    rows: list[BusinessCatalogCapability] = []
+    seen_keys: set[str] = set()
+    seen_gids: set[str] = set()
+    stable_count = 0
+    for raw, descriptor in zip(raw_descriptors, release.descriptors):
+        if not isinstance(raw, Mapping) or "business_definition_hash" not in raw:
+            raise BusinessGovernanceConfigurationError("business_catalog_invalid")
+        key = f"{descriptor.id}@{descriptor.major_version}"
+        gid = str(raw.get("capability_version_gid", ""))
+        digest = str(raw.get("business_definition_hash", ""))
+        if (
+            _CAPABILITY_KEY.fullmatch(key) is None
+            or _CAPABILITY_VERSION_GID.fullmatch(gid) is None
+            or _SHA256.fullmatch(digest) is None
+            or key in seen_keys
+            or gid in seen_gids
+        ):
+            raise BusinessGovernanceConfigurationError("business_catalog_invalid")
+        seen_keys.add(key)
+        seen_gids.add(gid)
+        if str(raw.get("lifecycle_status", "")) == "stable":
+            stable_count += 1
+        rows.append(BusinessCatalogCapability(key, gid, descriptor.major_version, digest))
+    if len(rows) != len(release.descriptors) or stable_count == 0:
+        raise BusinessGovernanceConfigurationError("business_catalog_invalid")
+    ordered = tuple(sorted(rows, key=lambda item: item.capability_key))
+    canonical = json.dumps(
+        [item.serialized() for item in ordered],
+        ensure_ascii=True, sort_keys=True, separators=(",", ":"),
+    ).encode("utf-8")
+    return BusinessCatalogProjection(
+        release.release_id,
+        release.catalog_hash,
+        "sha256:" + hashlib.sha256(canonical).hexdigest(),
+        ordered,
+    )
+
+
+_APPROVAL_LOOKUP_MISSING = object()
+
+
+def parse_business_governance_result(
+    value: object,
+    *,
+    expected_catalog: Mapping[str, object] | None = None,
+    legacy_baseline: Mapping[str, str] | None = None,
+    business_review_lookup: Mapping[tuple[str, str], object] | Callable[[str, str], object] | object = _APPROVAL_LOOKUP_MISSING,
+) -> BusinessGateResult:
     """Validate and rederive one governance result at every trust boundary."""
     document = value.serialized() if isinstance(value, BusinessGateResult) else (
         dict(value) if isinstance(value, Mapping) else None
     )
     required = {
         "status", "machine_passed", "human_approved", "runtime_verified",
-        "legacy_pending_review_count", "blockers", "capabilities",
+        "legacy_pending_review_count", "blockers", "capabilities", "catalog_binding",
     }
     if not isinstance(document, dict) or set(document) != required:
         raise BusinessGovernanceConfigurationError("business_governance_invalid")
     rows = document.get("capabilities")
+    binding = document.get("catalog_binding")
     if not isinstance(rows, (list, tuple)) or not rows:
+        raise BusinessGovernanceConfigurationError("business_governance_invalid")
+    if (
+        not isinstance(binding, Mapping)
+        or set(binding) != {"catalog_release_id", "catalog_hash", "projection_hash"}
+        or not isinstance(binding.get("catalog_release_id"), str)
+        or re.fullmatch(r"rel_[0-9a-f]{32}", str(binding.get("catalog_release_id"))) is None
+        or any(_SHA256.fullmatch(str(binding.get(key, ""))) is None for key in ("catalog_hash", "projection_hash"))
+    ):
         raise BusinessGovernanceConfigurationError("business_governance_invalid")
     capabilities: list[BusinessGateCapability] = []
     seen: set[tuple[str, str]] = set()
@@ -227,10 +334,46 @@ def parse_business_governance_result(value: object) -> BusinessGateResult:
         if derived.serialized() != row:
             raise BusinessGovernanceConfigurationError("business_governance_invalid")
         capabilities.append(candidate)
-    derived = evaluate_business_governance_gate(capabilities)
+    derived = evaluate_business_governance_gate(capabilities, catalog_binding=dict(binding))
     if derived.serialized() != document:
         raise BusinessGovernanceConfigurationError("business_governance_invalid")
-    return derived
+    if (
+        expected_catalog is None
+        or legacy_baseline is None
+        or business_review_lookup is _APPROVAL_LOOKUP_MISSING
+    ):
+        raise BusinessGovernanceConfigurationError("business_governance_context_unavailable")
+    projection = build_business_catalog_projection(expected_catalog)
+    if dict(binding) != projection.binding:
+        raise BusinessGovernanceConfigurationError("business_governance_invalid")
+    expected_identities = {
+        (item.capability_key, item.capability_version_gid, item.business_definition_hash)
+        for item in projection.capabilities
+    }
+    actual_identities = {
+        (item.capability_key, item.capability_version_gid, item.definition_hash)
+        for item in derived.capabilities
+    }
+    if actual_identities != expected_identities:
+        raise BusinessGovernanceConfigurationError("business_governance_invalid")
+    runtime = {item.capability_key: item.runtime_verified for item in derived.capabilities}
+    deterministic = {
+        item.capability_key: tuple(
+            blocker for blocker in item.blockers
+            if blocker != f"business_definition_approval_missing:{item.capability_key}"
+        )
+        for item in derived.capabilities
+    }
+    trusted = evaluate_catalog_business_governance(
+        expected_catalog,
+        legacy_baseline,
+        business_review_lookup=business_review_lookup,  # type: ignore[arg-type]
+        runtime_verification=runtime,
+        deterministic_blockers=deterministic,
+    )
+    if trusted.serialized() != document:
+        raise BusinessGovernanceConfigurationError("business_governance_invalid")
+    return trusted
 
 
 def load_business_approval_artifact(
@@ -277,6 +420,7 @@ def _baseline_payload(document: Mapping[str, object]) -> dict[str, object]:
         "source_revision": document.get("source_revision"),
         "catalog_release_id": document.get("catalog_release_id"),
         "catalog_hash": document.get("catalog_hash"),
+        "projection_hash": document.get("projection_hash"),
         "capabilities": document.get("capabilities"),
     }
 
@@ -288,8 +432,43 @@ def _baseline_digest(document: Mapping[str, object]) -> str:
     return "sha256:" + hashlib.sha256(canonical).hexdigest()
 
 
+def _git_repository_root(path: Path) -> Path:
+    try:
+        completed = subprocess.run(
+            ("git", "rev-parse", "--show-toplevel"), cwd=path,
+            check=True, capture_output=True, text=True,
+        )
+        return Path(completed.stdout.strip()).resolve()
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise BusinessGovernanceConfigurationError("legacy_baseline_source_revision_invalid") from exc
+
+
+def _historical_catalog(
+    *, repository_root: Path, catalog_path: Path, source_revision: str,
+) -> tuple[str, dict[str, object]]:
+    try:
+        resolved = subprocess.run(
+            ("git", "rev-parse", "--verify", f"{source_revision}^{{commit}}"),
+            cwd=repository_root, check=True, capture_output=True,
+        ).stdout.decode("ascii").strip()
+        if re.fullmatch(r"[0-9a-f]{40}", resolved) is None:
+            raise ValueError("revision_not_exact")
+        relative = catalog_path.resolve().relative_to(repository_root).as_posix()
+        content = subprocess.run(
+            ("git", "show", f"{resolved}:{relative}"), cwd=repository_root,
+            check=True, capture_output=True,
+        ).stdout
+        document = json.loads(content.decode("utf-8"))
+        if not isinstance(document, dict):
+            raise ValueError("catalog_not_mapping")
+        build_business_catalog_projection(document)
+        return resolved, document
+    except (OSError, ValueError, json.JSONDecodeError, subprocess.CalledProcessError) as exc:
+        raise BusinessGovernanceConfigurationError("legacy_baseline_source_revision_invalid") from exc
+
+
 def load_legacy_baseline(
-    path: Path, *, catalog_path: Path | None = None,
+    path: Path, *, catalog_path: Path | None = None, repository_root: Path | None = None,
 ) -> LegacyBusinessGovernanceBaseline:
     try:
         document = json.loads(Path(path).read_text(encoding="utf-8"))
@@ -298,8 +477,17 @@ def load_legacy_baseline(
     if not isinstance(document, dict) or document.get("schema_version") != 1:
         raise BusinessGovernanceConfigurationError("legacy_baseline_invalid")
     capabilities = document.get("capabilities")
-    required = ("source_revision", "catalog_release_id", "catalog_hash", "baseline_hash")
+    required = (
+        "source_revision", "catalog_release_id", "catalog_hash", "projection_hash", "baseline_hash",
+    )
     if not isinstance(capabilities, dict) or any(not str(document.get(key, "")).strip() for key in required):
+        raise BusinessGovernanceConfigurationError("legacy_baseline_invalid")
+    if (
+        re.fullmatch(r"[0-9a-f]{40}", str(document["source_revision"])) is None
+        or re.fullmatch(r"rel_[0-9a-f]{32}", str(document["catalog_release_id"])) is None
+        or _SHA256.fullmatch(str(document["catalog_hash"])) is None
+        or _SHA256.fullmatch(str(document["projection_hash"])) is None
+    ):
         raise BusinessGovernanceConfigurationError("legacy_baseline_invalid")
     if document["baseline_hash"] != _baseline_digest(document):
         raise BusinessGovernanceConfigurationError("legacy_baseline_hash_invalid")
@@ -312,60 +500,55 @@ def load_legacy_baseline(
         source_revision=str(document["source_revision"]),
         catalog_release_id=str(document["catalog_release_id"]),
         catalog_hash=str(document["catalog_hash"]),
+        projection_hash=str(document["projection_hash"]),
         capabilities=dict(sorted((str(key), str(value)) for key, value in capabilities.items())),
         baseline_hash=str(document["baseline_hash"]),
     )
-    if catalog_path is not None:
-        try:
-            catalog = json.loads(Path(catalog_path).read_text(encoding="utf-8"))
-            from .catalog import load_catalog_release
-            load_catalog_release(catalog)
-        except (OSError, json.JSONDecodeError) as exc:
-            raise BusinessGovernanceConfigurationError("legacy_baseline_catalog_invalid") from exc
-        except Exception as exc:
-            raise BusinessGovernanceConfigurationError("legacy_baseline_catalog_invalid") from exc
-        expected: dict[str, str] = {}
-        for item in catalog.get("descriptors", catalog.get("capabilities", ())):
-            key = f"{item.get('id')}@{item.get('major_version')}"
-            digest = str(item.get("business_definition_hash", ""))
-            if _CAPABILITY_KEY.fullmatch(key) is None or _SHA256.fullmatch(digest) is None or key in expected:
-                raise BusinessGovernanceConfigurationError("legacy_baseline_catalog_invalid")
-            expected[key] = digest
-        if (
-            baseline.catalog_release_id != str(catalog.get("release_id", ""))
-            or baseline.catalog_hash != str(catalog.get("catalog_hash", ""))
-            or dict(baseline.capabilities) != dict(sorted(expected.items()))
-        ):
-            raise BusinessGovernanceConfigurationError("legacy_baseline_catalog_mismatch")
+    root = Path(repository_root).resolve() if repository_root is not None else _git_repository_root(Path(path).resolve().parent)
+    historical_path = Path(catalog_path).resolve() if catalog_path is not None else (
+        root / "docs/governance/capability-catalog-release.json"
+    )
+    _resolved, catalog = _historical_catalog(
+        repository_root=root, catalog_path=historical_path,
+        source_revision=baseline.source_revision,
+    )
+    projection = build_business_catalog_projection(catalog)
+    expected = {
+        item.capability_key: item.business_definition_hash
+        for item in projection.capabilities
+    }
+    if (
+        baseline.catalog_release_id != projection.catalog_release_id
+        or baseline.catalog_hash != projection.catalog_hash
+        or baseline.projection_hash != projection.projection_hash
+        or dict(baseline.capabilities) != expected
+    ):
+        raise BusinessGovernanceConfigurationError("legacy_baseline_catalog_mismatch")
     return baseline
 
 
 def create_legacy_baseline(
     catalog_path: Path, baseline_path: Path, *, source_revision: str,
+    repository_root: Path | None = None,
 ) -> LegacyBusinessGovernanceBaseline:
     destination = Path(baseline_path)
     if destination.exists():
         raise BusinessGovernanceConfigurationError("legacy_baseline_already_exists")
-    try:
-        catalog = json.loads(Path(catalog_path).read_text(encoding="utf-8"))
-        from .catalog import load_catalog_release
-        load_catalog_release(catalog)
-    except (OSError, json.JSONDecodeError) as exc:
-        raise BusinessGovernanceConfigurationError("legacy_baseline_catalog_invalid") from exc
-    except Exception as exc:
-        raise BusinessGovernanceConfigurationError("legacy_baseline_catalog_invalid") from exc
-    capabilities: dict[str, str] = {}
-    for item in catalog.get("descriptors", catalog.get("capabilities", ())):
-        key = f"{item.get('id')}@{item.get('major_version')}"
-        definition_hash = str(item.get("business_definition_hash", ""))
-        if not re.fullmatch(r"sha256:[0-9a-f]{64}", definition_hash):
-            raise BusinessGovernanceConfigurationError("legacy_baseline_catalog_invalid")
-        capabilities[key] = definition_hash
+    root = Path(repository_root).resolve() if repository_root is not None else _git_repository_root(Path(catalog_path).resolve().parent)
+    resolved_revision, catalog = _historical_catalog(
+        repository_root=root, catalog_path=Path(catalog_path), source_revision=str(source_revision).strip(),
+    )
+    projection = build_business_catalog_projection(catalog)
+    capabilities = {
+        item.capability_key: item.business_definition_hash
+        for item in projection.capabilities
+    }
     document: dict[str, object] = {
         "schema_version": 1,
-        "source_revision": str(source_revision).strip(),
-        "catalog_release_id": str(catalog.get("release_id", "")).strip(),
-        "catalog_hash": str(catalog.get("catalog_hash", "")).strip(),
+        "source_revision": resolved_revision,
+        "catalog_release_id": projection.catalog_release_id,
+        "catalog_hash": projection.catalog_hash,
+        "projection_hash": projection.projection_hash,
         "capabilities": dict(sorted(capabilities.items())),
     }
     if not document["source_revision"] or not document["catalog_release_id"] or not document["catalog_hash"]:
@@ -376,7 +559,9 @@ def create_legacy_baseline(
         json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
-    return load_legacy_baseline(destination, catalog_path=catalog_path)
+    return load_legacy_baseline(
+        destination, catalog_path=catalog_path, repository_root=root,
+    )
 
 
 def evaluate_catalog_business_governance(
@@ -391,10 +576,7 @@ def evaluate_catalog_business_governance(
     previous = previous_hashes or {}
     runtime = runtime_verification or {}
     blocker_map = deterministic_blockers or {}
-    governed = tuple(
-        item for item in business_catalog.get("descriptors", business_catalog.get("capabilities", ()))
-        if isinstance(item, Mapping) and "business_definition_hash" in item
-    )
+    projection = build_business_catalog_projection(business_catalog)
 
     def approved_hash(version_gid: str, definition_hash: str) -> str | None:
         value = (
@@ -411,16 +593,10 @@ def evaluate_catalog_business_governance(
         return None
 
     capabilities: list[BusinessGateCapability] = []
-    for item in governed:
-        key = f"{item.get('id')}@{item.get('major_version')}"
-        version_gid = str(item.get("capability_version_gid", ""))
-        definition_hash = str(item.get("business_definition_hash", ""))
-        if (
-            _CAPABILITY_KEY.fullmatch(key) is None
-            or _CAPABILITY_VERSION_GID.fullmatch(version_gid) is None
-            or _SHA256.fullmatch(definition_hash) is None
-        ):
-            raise BusinessGovernanceConfigurationError("business_catalog_invalid")
+    for item in projection.capabilities:
+        key = item.capability_key
+        version_gid = item.capability_version_gid
+        definition_hash = item.business_definition_hash
         approval = approved_hash(version_gid, definition_hash)
         capabilities.append(BusinessGateCapability(
             capability_key=key,
@@ -432,7 +608,9 @@ def evaluate_catalog_business_governance(
             runtime_verified=bool(runtime.get(key, False)),
             deterministic_blockers=tuple(blocker_map.get(key, ())),
         ))
-    return evaluate_business_governance_gate(capabilities)
+    return evaluate_business_governance_gate(
+        capabilities, catalog_binding=projection.binding,
+    )
 
 
 @dataclass(frozen=True)
@@ -504,22 +682,16 @@ def evaluate_release_gate(
     resolved_catalog = catalog_path or root / "docs/capabilities/catalog.v2.json"
     resolved_atomicity = atomicity_path or root / "docs/governance/capability-atomicity-dispositions.json"
     catalog = json.loads(resolved_catalog.read_text(encoding="utf-8"))
-    resolved_business_catalog = business_catalog_path or (
-        catalog_path if catalog_path is not None
-        else root / "docs/governance/capability-catalog-release.json"
-    )
+    resolved_business_catalog = business_catalog_path or root / "docs/governance/capability-catalog-release.json"
     try:
         business_catalog = json.loads(resolved_business_catalog.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         raise BusinessGovernanceConfigurationError("business_catalog_invalid") from exc
-    has_governed = any(
-        isinstance(item, Mapping) and "business_definition_hash" in item
-        for item in business_catalog.get("descriptors", business_catalog.get("capabilities", ()))
-    )
+    build_business_catalog_projection(business_catalog)
     baseline = load_legacy_baseline(
         legacy_baseline_path or root / "docs/governance/capability-business-governance-legacy-baseline.json",
-        catalog_path=resolved_business_catalog,
-    ) if has_governed else LegacyBusinessGovernanceBaseline("", "", "", {}, "")
+        repository_root=root,
+    )
     business_governance = evaluate_catalog_business_governance(
         business_catalog,
         baseline.capabilities,
@@ -551,10 +723,11 @@ def evaluate_release_gate(
 
 
 __all__ = [
+    "BusinessCatalogCapability", "BusinessCatalogProjection",
     "BusinessGateCapability", "BusinessGateResult",
     "BusinessGovernanceConfigurationError", "CapabilityGovernanceResult",
     "LegacyBusinessGovernanceBaseline", "ReleaseGateReport", "classify_change",
-    "create_legacy_baseline", "evaluate_business_governance_gate",
+    "build_business_catalog_projection", "create_legacy_baseline", "evaluate_business_governance_gate",
     "evaluate_catalog_business_governance", "evaluate_release_gate",
     "load_business_approval_artifact", "load_legacy_baseline",
     "parse_business_governance_result",

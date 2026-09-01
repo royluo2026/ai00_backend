@@ -14,6 +14,7 @@ from backend.plugin_platform.signing import sign
 from backend.capability_v2.release_gate import (
     BusinessGateResult,
     BusinessGovernanceConfigurationError,
+    build_business_catalog_projection,
     parse_business_governance_result,
 )
 
@@ -102,9 +103,26 @@ def _blocking_codes(findings: Iterable[Any]) -> tuple[str, ...]:
     return tuple(sorted(codes))
 
 
-def _business_governance_document(value: object) -> dict[str, Any]:
+def _business_governance_document(
+    value: object,
+    *,
+    candidate: ReleaseCandidate,
+    expected_catalog: Mapping[str, object] | None,
+    legacy_baseline: Mapping[str, str] | None,
+    business_review_lookup: Mapping[tuple[str, str], object] | Callable[[str, str], object] | None,
+) -> dict[str, Any]:
     try:
-        return parse_business_governance_result(value).serialized()
+        if expected_catalog is None or legacy_baseline is None or business_review_lookup is None:
+            return {}
+        projection = build_business_catalog_projection(expected_catalog)
+        if candidate.product_catalog_release_id != projection.catalog_release_id:
+            return {}
+        return parse_business_governance_result(
+            value,
+            expected_catalog=expected_catalog,
+            legacy_baseline=legacy_baseline,
+            business_review_lookup=business_review_lookup,
+        ).serialized()
     except BusinessGovernanceConfigurationError:
         return {}
 
@@ -228,13 +246,19 @@ class ReleaseGate:
         if self._audit_sink is not None:
             self._audit_sink.append(operation="gate", entity_gid=report.release_report_gid, actor_gid=actor_gid, request_gid=idempotency_key, detail={"conclusion": report.conclusion, "blockers": report.blockers}, idempotency_key=f"gate:{idempotency_key}")
 
-    def evaluate(self, candidate: ReleaseCandidate, *, available: bool = True, test_status: str | None = None, findings: Iterable[Any] = (), stale_evidence: bool = False, waivers: Iterable[Any] = (), approvals_complete: bool = False, data_complete: bool = False, evidence_hash: str = "", business_governance: BusinessGateResult | Mapping[str, Any] | None = None, now: datetime | None = None, idempotency_key: str | None = None, evaluated_by_gid: str = "release_gate", **unknown: Any) -> ReleaseReport:
+    def evaluate(self, candidate: ReleaseCandidate, *, available: bool = True, test_status: str | None = None, findings: Iterable[Any] = (), stale_evidence: bool = False, waivers: Iterable[Any] = (), approvals_complete: bool = False, data_complete: bool = False, evidence_hash: str = "", business_governance: BusinessGateResult | Mapping[str, Any] | None = None, business_catalog: Mapping[str, object] | None = None, legacy_baseline: Mapping[str, str] | None = None, business_review_lookup: Mapping[tuple[str, str], object] | Callable[[str, str], object] | None = None, now: datetime | None = None, idempotency_key: str | None = None, evaluated_by_gid: str = "release_gate", **unknown: Any) -> ReleaseReport:
         key = str(idempotency_key or "").strip()
         if not key:
             raise ReleaseGateError("idempotency_key_required")
         if key in self._idempotency:
             return self._idempotency[key]
-        governance_document = _business_governance_document(business_governance)
+        governance_document = _business_governance_document(
+            business_governance,
+            candidate=candidate,
+            expected_catalog=business_catalog,
+            legacy_baseline=legacy_baseline,
+            business_review_lookup=business_review_lookup,
+        )
         self._expire_prior_passes(
             candidate, governance_document,
         )

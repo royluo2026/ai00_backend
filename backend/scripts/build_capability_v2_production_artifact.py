@@ -20,6 +20,9 @@ from backend.scripts.check_production_governance_exclusion import check_producti
 from backend.plugin_platform.signing import SignatureError, verify
 from backend.capability_v2.release_gate import (
     BusinessGovernanceConfigurationError,
+    build_business_catalog_projection,
+    load_business_approval_artifact,
+    load_legacy_baseline,
     parse_business_governance_result,
 )
 
@@ -48,6 +51,10 @@ class ArtifactBuildError(RuntimeError):
 def validate_release_report(
     path: Path,
     trusted_release_keys: Mapping[str, str] | None = None,
+    *,
+    expected_catalog: Mapping[str, object] | None = None,
+    legacy_baseline: Mapping[str, str] | None = None,
+    business_review_lookup: Mapping[tuple[str, str], object] | None = None,
 ) -> tuple[str, ...]:
     try:
         document = json.loads(Path(path).read_text(encoding="utf-8"))
@@ -68,11 +75,26 @@ def validate_release_report(
     )) or not isinstance(document.get("blockers"), list):
         errors.add("release_report_invalid")
     governance = document.get("business_governance")
+    projection = None
     try:
-        governance_result = parse_business_governance_result(governance)
+        projection = (
+            build_business_catalog_projection(expected_catalog)
+            if expected_catalog is not None else None
+        )
+        governance_result = parse_business_governance_result(
+            governance,
+            expected_catalog=expected_catalog,
+            legacy_baseline=legacy_baseline,
+            business_review_lookup=business_review_lookup,
+        )
     except BusinessGovernanceConfigurationError:
         governance_result = None
-    if governance_result is None or governance_result.status == "blocked":
+    if (
+        governance_result is None
+        or governance_result.status == "blocked"
+        or projection is None
+        or document.get("product_catalog_release_id") != projection.catalog_release_id
+    ):
         errors.add("release_report_governance_invalid")
     if not str(document.get("signing_key_id", "")).strip():
         errors.add("release_report_signing_key_missing")
@@ -112,6 +134,7 @@ def build_production_artifact(
     output: Path,
     *,
     allowlist_path: Path | None = None,
+    business_approvals_path: Path | None = None,
 ) -> ArtifactBuildReport:
     source_root = Path(repository_root).resolve()
     artifact_root = Path(output).resolve()
@@ -122,7 +145,29 @@ def build_production_artifact(
         allowlist = _load_allowlist(allowlist_path or source_root / DEFAULT_ALLOWLIST)
     except ArtifactBuildError as exc:
         return ArtifactBuildReport("failed", (str(exc),), str(artifact_root))
-    errors = validate_release_report(release_report, allowlist["trusted_release_keys"])
+    try:
+        catalog_path = source_root / "docs/governance/capability-catalog-release.json"
+        catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+        baseline = load_legacy_baseline(
+            source_root / "docs/governance/capability-business-governance-legacy-baseline.json",
+            repository_root=source_root,
+        )
+        if business_approvals_path is None:
+            raise BusinessGovernanceConfigurationError("business_approval_evidence_unavailable")
+        approvals = load_business_approval_artifact(
+            business_approvals_path,
+            catalog_release_id=str(catalog.get("release_id", "")),
+        )
+    except (OSError, json.JSONDecodeError, BusinessGovernanceConfigurationError) as exc:
+        return ArtifactBuildReport(
+            "failed", (f"release_report_governance_context_invalid:{exc}",), str(artifact_root),
+        )
+    errors = validate_release_report(
+        release_report, allowlist["trusted_release_keys"],
+        expected_catalog=catalog,
+        legacy_baseline=baseline.capabilities,
+        business_review_lookup=approvals,
+    )
     if errors:
         return ArtifactBuildReport("failed", errors, str(artifact_root))
 
@@ -135,6 +180,18 @@ def build_production_artifact(
         for relative in _allowed_frontend_files(Path(frontend_root), allowlist):
             _copy(Path(frontend_root), temporary_root, relative, copied)
         _copy(Path(release_report).parent, temporary_root, Path(release_report).name, copied, destination="release-report.json")
+
+        packaged_catalog = json.loads(
+            (temporary_root / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
+        )
+        packaged_errors = validate_release_report(
+            temporary_root / "release-report.json", allowlist["trusted_release_keys"],
+            expected_catalog=packaged_catalog,
+            legacy_baseline=baseline.capabilities,
+            business_review_lookup=approvals,
+        )
+        if packaged_errors:
+            return ArtifactBuildReport("failed", packaged_errors, str(artifact_root))
 
         exclusion = check_production_artifact(temporary_root)
         errors = tuple(sorted(exclusion.errors))
@@ -225,10 +282,12 @@ def main() -> int:
     parser.add_argument("--release-report", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--allowlist", type=Path)
+    parser.add_argument("--business-approvals", type=Path, required=True)
     args = parser.parse_args()
     report = build_production_artifact(
         ROOT, args.frontend_root, args.release_report,
         args.output, allowlist_path=args.allowlist,
+        business_approvals_path=args.business_approvals,
     )
     print(json.dumps(report.__dict__, ensure_ascii=False, indent=2))
     return 0 if report.status == "passed" else 1

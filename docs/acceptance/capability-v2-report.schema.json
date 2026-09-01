@@ -111,7 +111,7 @@
       "type": "object", "additionalProperties": false,
       "required": [
         "status", "machine_passed", "human_approved", "runtime_verified",
-        "legacy_pending_review_count", "blockers", "capabilities"
+        "legacy_pending_review_count", "blockers", "capabilities", "catalog_binding"
       ],
       "properties": {
         "status": {"enum": ["passed", "passed_with_legacy_backlog", "blocked"]},
@@ -120,6 +120,15 @@
         "runtime_verified": {"type": "boolean"},
         "legacy_pending_review_count": {"type": "integer", "minimum": 0},
         "blockers": {"type": "array", "items": {"type": "string"}},
+        "catalog_binding": {
+          "type": "object", "additionalProperties": false,
+          "required": ["catalog_release_id", "catalog_hash", "projection_hash"],
+          "properties": {
+            "catalog_release_id": {"type": "string", "pattern": "^rel_[0-9a-f]{32}$"},
+            "catalog_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            "projection_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+          }
+        },
         "capabilities": {
           "type": "array", "items": {
             "type": "object", "additionalProperties": false,

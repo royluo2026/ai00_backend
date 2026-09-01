@@ -1,5 +1,5 @@
 {
-  "baseline_hash": "sha256:f73f10868cf1104148d16c618991ea5153575fb3b46c74e77f513241d1ec5f47",
+  "baseline_hash": "sha256:c3b48536733e155b5fe9626e823da988274e9c7df14ceab249d02b560499a392",
   "capabilities": {
     "agent.audit.read@1": "sha256:9181713316f10d185eaafe81135c33778dc3243bdc7fd4285c911cc302187fc5",
     "agent.audit.record@1": "sha256:17b7104827fc52d8a7599b29991e8c9eb2089c688c5a862718d0bc2dc88bdcfd",
@@ -499,6 +499,7 @@
   },
   "catalog_hash": "sha256:0b584b19349bc98727900583bb19f687a093b3ce91431fb384795034d690ab60",
   "catalog_release_id": "rel_0b584b19349bc98727900583bb19f687",
+  "projection_hash": "sha256:15630f67419ab2c37da05b21be35505a030fd64ea5ef0a8e47d4ad81d0fa139d",
   "schema_version": 1,
   "source_revision": "b52cb4a74b29d27fdf6e0c00ec5598fe5462c907"
 }

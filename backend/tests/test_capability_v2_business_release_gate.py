@@ -24,6 +24,8 @@ from backend.scripts.run_capability_v2_acceptance import build_report, load_docu
 HASH_1 = "sha256:" + "1" * 64
 HASH_2 = "sha256:" + "2" * 64
 VERSION_GID = "cv2_0123456789abcdef01234567"
+ROOT = Path(__file__).resolve().parents[2]
+SOURCE_REVISION = "b52cb4a74b29d27fdf6e0c00ec5598fe5462c907"
 
 
 @pytest.mark.parametrize(("kind", "approved", "expected"), [
@@ -139,41 +141,43 @@ def _catalog(path: Path) -> None:
 
 
 def test_cutover_baseline_is_created_once_and_subsequent_loads_only_verify(tmp_path: Path):
-    catalog_path = tmp_path / "catalog.json"
+    catalog_path = ROOT / "docs/governance/capability-catalog-release.json"
     baseline_path = tmp_path / "baseline.json"
-    _catalog(catalog_path)
 
     created = create_legacy_baseline(
-        catalog_path, baseline_path, source_revision="cutover-revision",
+        catalog_path, baseline_path, source_revision=SOURCE_REVISION,
+        repository_root=ROOT,
     )
     before = baseline_path.read_bytes()
-    loaded = load_legacy_baseline(baseline_path)
+    loaded = load_legacy_baseline(baseline_path, repository_root=ROOT)
 
     assert loaded == created
-    assert loaded.source_revision == "cutover-revision"
-    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
-    assert loaded.catalog_release_id == catalog["release_id"]
-    assert len(loaded.capabilities) == len(catalog["descriptors"])
+    assert loaded.source_revision == SOURCE_REVISION
+    assert loaded.catalog_release_id == "rel_0b584b19349bc98727900583bb19f687"
+    assert len(loaded.capabilities) == 495
     assert baseline_path.read_bytes() == before
     with pytest.raises(BusinessGovernanceConfigurationError, match="legacy_baseline_already_exists"):
         create_legacy_baseline(
-            catalog_path, baseline_path, source_revision="replacement-revision",
+            catalog_path, baseline_path, source_revision=SOURCE_REVISION,
+            repository_root=ROOT,
         )
     assert baseline_path.read_bytes() == before
 
 
 def test_cutover_baseline_tampering_fails_closed(tmp_path: Path):
-    catalog_path = tmp_path / "catalog.json"
+    catalog_path = ROOT / "docs/governance/capability-catalog-release.json"
     baseline_path = tmp_path / "baseline.json"
-    _catalog(catalog_path)
-    create_legacy_baseline(catalog_path, baseline_path, source_revision="cutover-revision")
+    create_legacy_baseline(
+        catalog_path, baseline_path, source_revision=SOURCE_REVISION,
+        repository_root=ROOT,
+    )
     document = json.loads(baseline_path.read_text(encoding="utf-8"))
     first_key = next(iter(document["capabilities"]))
     document["capabilities"][first_key] = HASH_2
     baseline_path.write_text(json.dumps(document), encoding="utf-8")
 
     with pytest.raises(BusinessGovernanceConfigurationError, match="legacy_baseline_hash_invalid"):
-        load_legacy_baseline(baseline_path)
+        load_legacy_baseline(baseline_path, repository_root=ROOT)
 
 
 def test_offline_acceptance_reports_legacy_backlog_without_human_or_runtime_claims(monkeypatch):

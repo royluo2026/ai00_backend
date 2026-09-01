@@ -54,3 +54,21 @@ Clean detached materialization at `d787e73d`:
 - selected `compileall`, `git diff --check`, and clean `git status --short`: passed/empty.
 
 Shared static-gate, acceptance-manifest, and UI-asset hunks remained unstaged and were not absorbed. No push, merge, publish, or implicit production-store access was performed.
+
+## Fix round 2/5 — bind governance evidence to the candidate Catalog
+
+The three review findings were resolved at one trust boundary. `BusinessCatalogProjection` is now the canonical, content-addressed view of the candidate Catalog: release ID, Catalog content hash, projection hash, and the complete deterministic set of governed capability keys, major versions, capability-version GIDs, and business-definition hashes. The same canonical parser is used before signing and when consuming a production artifact. It rebuilds rows and aggregate truth from the trusted candidate Catalog, historical baseline, and configured exact-hash approval evidence; caller mappings cannot omit, add, invent, duplicate, rename, rehash, or self-approve rows. Missing Catalog or approval context fails closed.
+
+The cutover baseline now has historical rather than mutable-current provenance. Creation resolves `source_revision` to one exact Git commit, reads and verifies the Catalog at that commit, and records its release, content hash, projection hash, and capability projection. Loading verifies both the baseline self-hash and that exact historical Git artifact. Current Catalog additions and material definition changes are classified entry-by-entry against the baseline and continue to exact approval lookup; the gate no longer rejects legitimate evolution as a baseline/Catalog mismatch. The regenerated baseline projection hash is `sha256:15630f67419ab2c37da05b21be35505a030fd64ea5ef0a8e47d4ad81d0fa139d`, with baseline hash `sha256:c3b48536733e155b5fe9626e823da988274e9c7df14ceab249d02b560499a392`.
+
+Official evaluation keeps the static release Catalog and governed business Catalog as separate inputs. A non-business or zero-governed business Catalog fails closed. The CLI/core path was exercised for unchanged legacy backlog, new and material rows without approval, exact approval success, and stale/wrong approval rejection. Production-artifact validation repeats the same exact row and binding validation against the Catalog actually packaged in the artifact.
+
+TDD and verification evidence:
+
+- RED: the new trust-boundary suite initially failed collection because no trusted Catalog projection API existed.
+- GREEN: the new adversarial/evolution suite passed `6/6`; the shared focused group passed `103/103`; STANDARD store/workflow retention passed `52/52`; production-artifact tests passed `14/14`; and the core release-gate tests passed `9/9` in the shared materialization.
+- Selective-index detached materialization: focused group `99 passed, 2 failed` in 126.10s. The two failures are pre-existing stale acceptance assertions outside this round: `completion.complete is True` despite the intentional unapproved legacy backlog, and a hard-coded `1869` runtime-case count while the current clean manifest contains `3353`. All round-2 trust-boundary, signed-gate, production-artifact, and CLI/core cases in the group passed.
+- Offline strict acceptance in the detached materialization: exit `0`, status `passed`, contract scope, 479 stable capabilities, `3353/3353` cases validated, zero failed/skipped; governance `passed_with_legacy_backlog`, machine true, human/runtime false, 495 legacy pending, zero governance blockers; report ID `sha256:3b1bf0b6b230d4955612d77ab3dcea9f0b3212912ea5a46bfac844e41ccbc7d6`.
+- Selected `compileall` and `git diff --check` passed. The detached source was built from the exact selective index tree. Test-created `.runtime` and an access-protected pytest temp directory remained untracked in that disposable detached worktree; the target worktree/index was unaffected.
+
+Unrelated shared static-gate, generated-Catalog, acceptance-manifest, and UI/evidence hunks remain unstaged and were not absorbed. No push, merge, publish, implicit production-store access, baseline rewrite during normal checking, or unrelated failure repair was performed.

@@ -35,7 +35,10 @@ from backend.capability_governance_test.test_runner import RegisteredTestCase, r
 from backend.capability_governance_test.workflow import ProposalService, ReviewerContext
 from backend.capability_v2.catalog import CatalogRelease, load_catalog_release
 from backend.capability_v2.catalog_overlay import compose_catalogs
-from backend.capability_v2.release_gate import BusinessGateCapability, evaluate_business_governance_gate
+from backend.capability_v2.release_gate import (
+    evaluate_catalog_business_governance,
+    load_legacy_baseline,
+)
 from backend.scripts.check_frontend_deployment import check as check_frontend_deployment
 from backend.scripts.check_production_governance_exclusion import check_production_artifact
 from backend.scripts.generate_capability_governance_grants import render_grants
@@ -160,7 +163,24 @@ def _workflow_evidence() -> dict[str, Any]:
 
 def _release_evidence() -> dict[str, Any]:
     ids = iter(range(501, 1000))
-    candidate = ReleaseCandidate("sha256:revision", "rel_product", 101, 201)
+    catalog = json.loads(
+        (ROOT / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
+    )
+    baseline = load_legacy_baseline(
+        ROOT / "docs/governance/capability-business-governance-legacy-baseline.json",
+        repository_root=ROOT,
+    )
+    runtime = {
+        f"{item['id']}@{item['major_version']}": True
+        for item in catalog["descriptors"]
+    }
+    governance = evaluate_catalog_business_governance(
+        catalog, baseline.capabilities, business_review_lookup={},
+        runtime_verification=runtime,
+    )
+    candidate = ReleaseCandidate(
+        "sha256:revision", str(catalog["release_id"]), 101, 201,
+    )
     gate = ReleaseGate(next_gid=ids.__next__, signer=lambda _payload: "unit-signature", signing_key_id="unit-key")
     report = gate.evaluate(
         candidate,
@@ -168,15 +188,10 @@ def _release_evidence() -> dict[str, Any]:
         approvals_complete=True,
         data_complete=True,
         evidence_hash="sha256:unit-evidence",
-        business_governance=evaluate_business_governance_gate((
-            BusinessGateCapability(
-                capability_key="base.capability_registry.search@1",
-                capability_version_gid="cv2_0123456789abcdef01234567",
-                definition_hash="sha256:" + "a" * 64,
-                approved_definition_hash="sha256:" + "a" * 64,
-                change_kind="new", human_approved=True, runtime_verified=True,
-            ),
-        )),
+        business_governance=governance,
+        business_catalog=catalog,
+        legacy_baseline=baseline.capabilities,
+        business_review_lookup={},
         idempotency_key="unit-pass",
     )
     if report.conclusion != "pass":

@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 import hashlib
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -11,12 +12,10 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 from backend.capability_governance_test.release_gate import ReleaseCandidate, ReleaseGate
+from backend.capability_v2.catalog import build_catalog_entry, build_release, load_catalog_release
 from backend.capability_v2.release_gate import (
-    BusinessGateCapability,
     BusinessGovernanceConfigurationError,
-    create_legacy_baseline,
     evaluate_catalog_business_governance,
-    evaluate_business_governance_gate,
     load_business_approval_artifact,
     load_legacy_baseline,
     parse_business_governance_result,
@@ -28,20 +27,37 @@ from backend.scripts.build_capability_v2_production_artifact import (
 from backend.scripts import check_capability_v2_release_gate as release_gate_command
 
 
-HASH_1 = "sha256:" + "1" * 64
 HASH_2 = "sha256:" + "2" * 64
-VERSION_GID = "cv2_" + "a" * 24
+
+
+def _trusted_catalog() -> dict[str, object]:
+    source = json.loads(
+        (Path(__file__).resolve().parents[2] / "docs/governance/capability-catalog-release.json")
+        .read_text(encoding="utf-8")
+    )
+    descriptor = load_catalog_release(source).descriptors[0]
+    release = build_release((descriptor,), created_at=datetime(2026, 9, 1, tzinfo=UTC))
+    document = release.model_dump(mode="json")
+    document["descriptors"] = [build_catalog_entry(descriptor)]
+    return document
+
+
+TRUSTED_CATALOG = _trusted_catalog()
+TRUSTED_ROW = TRUSTED_CATALOG["descriptors"][0]
+HASH_1 = TRUSTED_ROW["business_definition_hash"]
+VERSION_GID = TRUSTED_ROW["capability_version_gid"]
+CAPABILITY_KEY = f"{TRUSTED_ROW['id']}@{TRUSTED_ROW['major_version']}"
 
 
 def _governance(*, kind: str = "new", approved: bool = True):
-    return evaluate_business_governance_gate((BusinessGateCapability(
-        capability_key="person.height.write@1",
-        capability_version_gid=VERSION_GID,
-        definition_hash=HASH_1,
-        approved_definition_hash=HASH_1 if approved else None,
-        change_kind=kind,
-        human_approved=approved,
-    ),))
+    baseline = (
+        {CAPABILITY_KEY: HASH_1 if kind == "unchanged_legacy" else HASH_2}
+        if kind != "new" else {}
+    )
+    approvals = {(VERSION_GID, HASH_1): HASH_1} if approved else {}
+    return evaluate_catalog_business_governance(
+        TRUSTED_CATALOG, baseline, business_review_lookup=approvals,
+    )
 
 
 @pytest.mark.parametrize(
@@ -59,14 +75,22 @@ def test_canonical_governance_parser_rejects_nested_or_aggregate_bypass(tamper):
     tamper(document)
 
     with pytest.raises(BusinessGovernanceConfigurationError, match="business_governance_invalid"):
-        parse_business_governance_result(document)
+        parse_business_governance_result(
+            document, expected_catalog=TRUSTED_CATALOG, legacy_baseline={},
+            business_review_lookup={(VERSION_GID, HASH_1): HASH_1},
+        )
 
 
 def test_canonical_governance_parser_rederives_the_exact_valid_result():
     expected = _governance(kind="unchanged_legacy", approved=False)
 
-    assert parse_business_governance_result(expected) == expected
-    assert parse_business_governance_result(expected.serialized()) == expected
+    context = {
+        "expected_catalog": TRUSTED_CATALOG,
+        "legacy_baseline": {CAPABILITY_KEY: HASH_1},
+        "business_review_lookup": {},
+    }
+    assert parse_business_governance_result(expected, **context) == expected
+    assert parse_business_governance_result(expected.serialized(), **context) == expected
 
 
 def test_production_artifact_rejects_a_resigned_nested_governance_bypass(tmp_path: Path):
@@ -81,10 +105,12 @@ def test_production_artifact_rejects_a_resigned_nested_governance_bypass(tmp_pat
         signing_key_id="release-test",
     )
     report = gate.evaluate(
-        ReleaseCandidate("rev-a", "catalog-a", 101, 201),
+        ReleaseCandidate("rev-a", TRUSTED_CATALOG["release_id"], 101, 201),
         test_status="passed", approvals_complete=True, data_complete=True,
         evidence_hash=HASH_1, static_gate_status="passed", static_gate_hash=HASH_2,
-        business_governance=_governance(), idempotency_key="signed-valid",
+        business_governance=_governance(), business_catalog=TRUSTED_CATALOG,
+        legacy_baseline={}, business_review_lookup={(VERSION_GID, HASH_1): HASH_1},
+        idempotency_key="signed-valid",
     ).to_document()
     report["business_governance"]["capabilities"][0]["human_approved"] = False
     canonical = _canonical_release_report(report)
@@ -94,8 +120,23 @@ def test_production_artifact_rejects_a_resigned_nested_governance_bypass(tmp_pat
     path.write_text(json.dumps(report), encoding="utf-8")
 
     assert "release_report_governance_invalid" in validate_release_report(
-        path, {"release-test": public_key},
+        path, {"release-test": public_key}, expected_catalog=TRUSTED_CATALOG,
+        legacy_baseline={}, business_review_lookup={(VERSION_GID, HASH_1): HASH_1},
     )
+
+
+def test_signed_gate_fails_closed_without_trusted_catalog_and_approval_context():
+    report = ReleaseGate(
+        next_gid=iter(range(601, 610)).__next__, signer=lambda _payload: "signature",
+    ).evaluate(
+        ReleaseCandidate("rev-a", TRUSTED_CATALOG["release_id"], 101, 201),
+        test_status="passed", approvals_complete=True, data_complete=True,
+        evidence_hash=HASH_1, static_gate_status="passed", static_gate_hash=HASH_2,
+        business_governance=_governance(), idempotency_key="missing-trusted-context",
+    )
+
+    assert report.conclusion == "fail"
+    assert "business_governance_missing" in report.blockers
 
 
 def _catalog(path: Path) -> dict:
@@ -105,19 +146,15 @@ def _catalog(path: Path) -> dict:
     return document
 
 
-def test_baseline_verification_is_bound_to_the_referenced_catalog(tmp_path: Path):
-    catalog = tmp_path / "catalog.json"
-    other = tmp_path / "other.json"
-    baseline = tmp_path / "baseline.json"
-    document = _catalog(catalog)
-    tampered = _catalog(other)
-    tampered["catalog_hash"] = HASH_2
-    other.write_text(json.dumps(tampered), encoding="utf-8")
-    create_legacy_baseline(catalog, baseline, source_revision="cutover")
+def test_baseline_verification_is_bound_to_the_referenced_catalog():
+    root = Path(__file__).resolve().parents[2]
+    baseline = load_legacy_baseline(
+        root / "docs/governance/capability-business-governance-legacy-baseline.json",
+        repository_root=root,
+    )
 
-    assert load_legacy_baseline(baseline, catalog_path=catalog).catalog_release_id == document["release_id"]
-    with pytest.raises(BusinessGovernanceConfigurationError, match="legacy_baseline_catalog_(invalid|mismatch)"):
-        load_legacy_baseline(baseline, catalog_path=other)
+    assert baseline.catalog_release_id == "rel_0b584b19349bc98727900583bb19f687"
+    assert baseline.projection_hash == "sha256:15630f67419ab2c37da05b21be35505a030fd64ea5ef0a8e47d4ad81d0fa139d"
 
 
 def test_approval_artifact_is_exactly_bound_to_version_and_definition_hash(tmp_path: Path):
@@ -142,12 +179,7 @@ def test_approval_artifact_is_exactly_bound_to_version_and_definition_hash(tmp_p
 
 
 def test_catalog_gate_passes_only_with_the_exact_current_version_and_hash_approval():
-    catalog = {"descriptors": [{
-        "id": "person.height.write",
-        "major_version": 1,
-        "capability_version_gid": VERSION_GID,
-        "business_definition_hash": HASH_1,
-    }]}
+    catalog = TRUSTED_CATALOG
 
     exact = evaluate_catalog_business_governance(
         catalog, {}, business_review_lookup={(VERSION_GID, HASH_1): HASH_1},

@@ -5,12 +5,18 @@ import json
 import subprocess
 import sys
 import base64
+from datetime import UTC, datetime
 
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 import backend.scripts.check_production_governance_exclusion as exclusion
 import backend.scripts.build_capability_v2_production_artifact as artifact_builder
+from backend.capability_v2.catalog import build_catalog_entry, build_release, load_catalog_release
+from backend.capability_v2.release_gate import (
+    create_legacy_baseline,
+    evaluate_catalog_business_governance,
+)
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -42,36 +48,74 @@ def signing_material() -> tuple[Ed25519PrivateKey, str]:
     return private_key, public_key
 
 
+def trusted_catalog() -> dict[str, object]:
+    source = json.loads(
+        (ROOT / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
+    )
+    descriptor = load_catalog_release(source).descriptors[0]
+    release = build_release((descriptor,), created_at=datetime(2026, 9, 1, tzinfo=UTC))
+    document = release.model_dump(mode="json")
+    document["descriptors"] = [build_catalog_entry(descriptor)]
+    return document
+
+
+TEST_CATALOG = trusted_catalog()
+TEST_ROW = TEST_CATALOG["descriptors"][0]
+TEST_KEY = f"{TEST_ROW['id']}@{TEST_ROW['major_version']}"
+TEST_APPROVALS = {
+    (TEST_ROW["capability_version_gid"], TEST_ROW["business_definition_hash"]):
+        TEST_ROW["business_definition_hash"]
+}
+
+
 def signed_release_report(private_key: Ed25519PrivateKey, signing_key_id: str = "release-test") -> dict[str, object]:
-    definition_hash = "sha256:" + "a" * 64
+    governance = evaluate_catalog_business_governance(
+        TEST_CATALOG, {TEST_KEY: TEST_ROW["business_definition_hash"]},
+        business_review_lookup=TEST_APPROVALS,
+        runtime_verification={TEST_KEY: True},
+    ).serialized()
     report = {
         "report_gid": "501",
         "code_revision": "rev-a",
-        "product_catalog_release_id": "catalog-a",
+        "product_catalog_release_id": TEST_CATALOG["release_id"],
         "snapshot_gid": "101",
         "test_run_gid": "201",
         "conclusion": "pass",
         "blockers": [],
-        "business_governance": {
-            "status": "passed", "machine_passed": True,
-            "human_approved": True, "runtime_verified": True,
-            "legacy_pending_review_count": 0, "blockers": [],
-            "capabilities": [{
-                "capability_key": "person.height.write@1",
-                "capability_version_gid": "cv2_0123456789abcdef01234567",
-                "definition_hash": definition_hash,
-                "approved_definition_hash": definition_hash,
-                "change_kind": "new", "governance_status": "passed",
-                "machine_passed": True, "human_approved": True,
-                "runtime_verified": True, "blockers": [],
-            }],
-        },
+        "business_governance": governance,
         "signing_key_id": signing_key_id,
     }
     canonical = artifact_builder._canonical_release_report(report)
     report["report_hash"] = "sha256:" + hashlib.sha256(canonical).hexdigest()
     report["signature"] = base64.b64encode(private_key.sign(canonical)).decode("ascii")
     return report
+
+
+def governance_source(source: Path) -> Path:
+    catalog_path = source / "docs/governance/capability-catalog-release.json"
+    write(catalog_path, json.dumps(TEST_CATALOG))
+    subprocess.run(("git", "init"), cwd=source, check=True, capture_output=True)
+    subprocess.run(("git", "config", "user.email", "test@example.invalid"), cwd=source, check=True)
+    subprocess.run(("git", "config", "user.name", "Test"), cwd=source, check=True)
+    subprocess.run(("git", "add", "."), cwd=source, check=True)
+    subprocess.run(("git", "commit", "-m", "catalog"), cwd=source, check=True, capture_output=True)
+    create_legacy_baseline(
+        catalog_path,
+        source / "docs/governance/capability-business-governance-legacy-baseline.json",
+        source_revision="HEAD", repository_root=source,
+    )
+    approvals = source / "approvals.json"
+    write(approvals, json.dumps({
+        "schema_version": 1,
+        "catalog_release_id": TEST_CATALOG["release_id"],
+        "approvals": [{
+            "capability_key": TEST_KEY,
+            "capability_version_gid": TEST_ROW["capability_version_gid"],
+            "definition_hash": TEST_ROW["business_definition_hash"],
+            "decision": "approved",
+        }],
+    }))
+    return approvals
 
 
 def test_production_artifact_rejects_governance_provider(tmp_path):
@@ -115,7 +159,6 @@ def test_production_artifact_builder_copies_only_allowlisted_files(tmp_path):
     write(source / "backend/capability_governance_test/provider.py", "TEST_GOVERNANCE_START")
     write(source / "backend/db/migrations/202608010001_base.sql")
     write(source / "backend/db/migrations/test_governance/0001.sql")
-    write(source / "docs/governance/capability-catalog-release.json", "{}")
     write(source / "docs/governance/test-extension/capability-governance-catalog-release.json", "{}")
     write(frontend / "web/index.html")
     write(frontend / "web/tests/run_tests.js", "load('/web/admin/capability_governance/index.html')")
@@ -138,9 +181,11 @@ def test_production_artifact_builder_copies_only_allowlisted_files(tmp_path):
     )
     report_path = tmp_path / "release-report.json"
     write(report_path, json.dumps(signed_release_report(private_key)))
+    approvals = governance_source(source)
 
     report = artifact_builder.build_production_artifact(
-        source, frontend, report_path, output, allowlist_path=allowlist
+        source, frontend, report_path, output, allowlist_path=allowlist,
+        business_approvals_path=approvals,
     )
 
     assert report.status == "passed"
@@ -237,7 +282,7 @@ def test_production_artifact_builder_discards_failed_temp_output_and_allows_retr
                 "migrations": [],
                 "frontend_prefixes": ["web/**"],
                 "frontend_excluded_prefixes": ["web/tests/**"],
-                "catalog_files": [],
+                "catalog_files": ["docs/governance/capability-catalog-release.json"],
                 "provider_modules": [],
                 "trusted_release_keys": {"release-test": public_key},
             }
@@ -245,9 +290,11 @@ def test_production_artifact_builder_discards_failed_temp_output_and_allows_retr
     )
     release_report = tmp_path / "release-report.json"
     write(release_report, json.dumps(signed_release_report(private_key)))
+    approvals = governance_source(source)
 
     failed = artifact_builder.build_production_artifact(
-        source, frontend, release_report, output, allowlist_path=allowlist
+        source, frontend, release_report, output, allowlist_path=allowlist,
+        business_approvals_path=approvals,
     )
 
     assert failed.status == "failed"
@@ -256,7 +303,8 @@ def test_production_artifact_builder_discards_failed_temp_output_and_allows_retr
 
     write(source / "backend/capabilities/registry_next.py")
     retried = artifact_builder.build_production_artifact(
-        source, frontend, release_report, output, allowlist_path=allowlist
+        source, frontend, release_report, output, allowlist_path=allowlist,
+        business_approvals_path=approvals,
     )
 
     assert retried.status == "passed"

@@ -1,23 +1,35 @@
 import hashlib
 import base64
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
+from pathlib import Path
 
 import pytest
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 from backend.capability_governance_test.release_gate import ReleaseCandidate, ReleaseGate, ReleaseGateError
-from backend.capability_v2.release_gate import BusinessGateCapability, evaluate_business_governance_gate
+from backend.capability_v2.catalog import build_catalog_entry, build_release, load_catalog_release
+from backend.capability_v2.release_gate import evaluate_catalog_business_governance
 from backend.scripts.build_capability_v2_production_artifact import validate_release_report
 
 
-VERSION_GID = "cv2_0123456789abcdef01234567"
-DEFINITION_HASH = "sha256:" + "a" * 64
+ROOT = Path(__file__).resolve().parents[2]
+_SOURCE_CATALOG = json.loads(
+    (ROOT / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
+)
+_DESCRIPTOR = load_catalog_release(_SOURCE_CATALOG).descriptors[0]
+_RELEASE = build_release((_DESCRIPTOR,), created_at=datetime(2026, 9, 1, tzinfo=UTC))
+CATALOG = _RELEASE.model_dump(mode="json")
+CATALOG["descriptors"] = [build_catalog_entry(_DESCRIPTOR)]
+VERSION_GID = CATALOG["descriptors"][0]["capability_version_gid"]
+DEFINITION_HASH = CATALOG["descriptors"][0]["business_definition_hash"]
+CAPABILITY_KEY = f"{CATALOG['descriptors'][0]['id']}@{CATALOG['descriptors'][0]['major_version']}"
+APPROVALS = {(VERSION_GID, DEFINITION_HASH): DEFINITION_HASH}
 
 
 def _candidate() -> ReleaseCandidate:
-    return ReleaseCandidate("rev-a", "catalog-a", 101, 201)
+    return ReleaseCandidate("rev-a", CATALOG["release_id"], 101, 201)
 
 
 def _passing_inputs(**overrides):
@@ -29,15 +41,13 @@ def _passing_inputs(**overrides):
         "waivers": (),
         "approvals_complete": True,
         "data_complete": True,
-        "business_governance": evaluate_business_governance_gate((BusinessGateCapability(
-            capability_key="person.height.write@1",
-            capability_version_gid=VERSION_GID,
-            definition_hash=DEFINITION_HASH,
-            approved_definition_hash=DEFINITION_HASH,
-            change_kind="new",
-            human_approved=True,
-            runtime_verified=True,
-        ),)),
+        "business_governance": evaluate_catalog_business_governance(
+            CATALOG, {}, business_review_lookup=APPROVALS,
+            runtime_verification={CAPABILITY_KEY: True},
+        ),
+        "business_catalog": CATALOG,
+        "legacy_baseline": {},
+        "business_review_lookup": APPROVALS,
         "idempotency_key": "gate-1",
     }
     values.update(overrides)
@@ -52,16 +62,15 @@ def test_release_gate_fails_when_required_runner_is_unavailable():
 
 
 def test_signed_report_preserves_legacy_backlog_without_claiming_human_or_runtime_verification():
-    governance = evaluate_business_governance_gate((BusinessGateCapability(
-        capability_key="person.height.write@1",
-        capability_version_gid=VERSION_GID,
-        definition_hash=DEFINITION_HASH,
-        change_kind="unchanged_legacy",
-    ),))
+    governance = evaluate_catalog_business_governance(
+        CATALOG, {CAPABILITY_KEY: DEFINITION_HASH}, business_review_lookup={},
+    )
     report = ReleaseGate(
         next_gid=iter(range(1, 10)).__next__, signer=lambda value: "sig",
     ).evaluate(_candidate(), **_passing_inputs(
         business_governance=governance,
+        legacy_baseline={CAPABILITY_KEY: DEFINITION_HASH},
+        business_review_lookup={},
         idempotency_key="legacy-backlog",
     ))
 
@@ -73,16 +82,14 @@ def test_signed_report_preserves_legacy_backlog_without_claiming_human_or_runtim
 
 
 def test_static_green_cannot_override_unapproved_new_business_definition():
-    governance = evaluate_business_governance_gate((BusinessGateCapability(
-        capability_key="person.height.write@1",
-        capability_version_gid=VERSION_GID,
-        definition_hash=DEFINITION_HASH,
-        change_kind="new",
-    ),))
+    governance = evaluate_catalog_business_governance(
+        CATALOG, {}, business_review_lookup={},
+    )
     report = ReleaseGate(
         next_gid=iter(range(1, 10)).__next__, signer=lambda value: "sig",
     ).evaluate(_candidate(), **_passing_inputs(
         business_governance=governance,
+        business_review_lookup={},
         idempotency_key="unapproved-new",
     ))
 
@@ -133,7 +140,10 @@ def test_passing_release_gate_report_verifies_in_production_artifact_checker(tmp
     report_path = tmp_path / "release-report.json"
     report_path.write_text(json.dumps(report.to_document()), encoding="utf-8")
 
-    assert validate_release_report(report_path, {"release-test": public_key}) == ()
+    assert validate_release_report(
+        report_path, {"release-test": public_key}, expected_catalog=CATALOG,
+        legacy_baseline={}, business_review_lookup=APPROVALS,
+    ) == ()
 
 
 def test_release_gate_requires_idempotency_key_and_fails_active_waiver_after_expiry():
@@ -141,12 +151,12 @@ def test_release_gate_requires_idempotency_key_and_fails_active_waiver_after_exp
     with pytest.raises(ReleaseGateError, match="idempotency_key_required"):
         gate.evaluate(_candidate(), **_passing_inputs(idempotency_key=""))
 
-    report = gate.evaluate(_candidate(), **_passing_inputs(idempotency_key="gate-expired", waivers=({"status": "active", "starts_at": datetime(2026, 8, 1, tzinfo=timezone.utc), "expires_at": datetime(2026, 8, 2, tzinfo=timezone.utc), "code_hash": "rev-a", "catalog_hash": "catalog-a", "evidence_hash": "evidence-a"},), evidence_hash="evidence-a", now=datetime(2026, 8, 18, tzinfo=timezone.utc)))
+    report = gate.evaluate(_candidate(), **_passing_inputs(idempotency_key="gate-expired", waivers=({"status": "active", "starts_at": datetime(2026, 8, 1, tzinfo=timezone.utc), "expires_at": datetime(2026, 8, 2, tzinfo=timezone.utc), "code_hash": "rev-a", "catalog_hash": CATALOG["release_id"], "evidence_hash": "evidence-a"},), evidence_hash="evidence-a", now=datetime(2026, 8, 18, tzinfo=timezone.utc)))
     assert report.conclusion == "fail"
     assert "expired_waiver" in report.blockers
 
 
 def test_release_gate_rejects_stale_waiver_hashes():
-    report = ReleaseGate(next_gid=iter(range(1, 20)).__next__, signer=lambda value: "sig").evaluate(_candidate(), **_passing_inputs(idempotency_key="gate-stale", waivers=({"status": "active", "starts_at": datetime(2026, 8, 1, tzinfo=timezone.utc), "expires_at": datetime(2026, 9, 1, tzinfo=timezone.utc), "code_hash": "rev-old", "catalog_hash": "catalog-a", "evidence_hash": "evidence-a"},), evidence_hash="evidence-a", now=datetime(2026, 8, 18, tzinfo=timezone.utc)))
+    report = ReleaseGate(next_gid=iter(range(1, 20)).__next__, signer=lambda value: "sig").evaluate(_candidate(), **_passing_inputs(idempotency_key="gate-stale", waivers=({"status": "active", "starts_at": datetime(2026, 8, 1, tzinfo=timezone.utc), "expires_at": datetime(2026, 9, 1, tzinfo=timezone.utc), "code_hash": "rev-old", "catalog_hash": CATALOG["release_id"], "evidence_hash": "evidence-a"},), evidence_hash="evidence-a", now=datetime(2026, 8, 18, tzinfo=timezone.utc)))
     assert report.conclusion == "fail"
     assert "stale_waiver" in report.blockers
