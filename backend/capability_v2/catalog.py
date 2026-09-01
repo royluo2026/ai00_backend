@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any, Iterable, Mapping, Protocol
 
 from pydantic import Field, model_validator
 
+from .business_definition import business_definition_hash
 from .contracts import CapabilityDescriptorV2, ExecutionBudget, FrozenModel, LifecycleStatus
 
 if TYPE_CHECKING:
@@ -78,6 +79,19 @@ def canonical_catalog_bytes(
     ).encode("utf-8")
 
 
+def build_catalog_entry(item: CapabilityDescriptorV2) -> dict[str, Any]:
+    """Return the catalog projection, including its business definition."""
+    entry = item.model_dump(mode="json")
+    entry.update({
+        "business_effect": (item.business_effect or "").strip(),
+        "business_acceptance_criteria": list(item.business_acceptance_criteria),
+        "business_invariants": [rule.model_dump(mode="json") for rule in item.business_invariants],
+        "no_business_invariant_reason": item.no_business_invariant_reason,
+        "business_definition_hash": business_definition_hash(item),
+    })
+    return entry
+
+
 def complete_governance_metadata(
     item: CapabilityDescriptorV2,
     *,
@@ -89,9 +103,7 @@ def complete_governance_metadata(
 ) -> CapabilityDescriptorV2:
     """Return a deterministic V2.1 projection without changing business schemas."""
     digest = hashlib.sha256(f"{item.id}@{item.major_version}".encode("utf-8")).hexdigest()[:24]
-    business_effect = item.business_effect
-    if not business_effect or business_effect.strip() == item.description.strip():
-        business_effect = f"Business outcome: {item.description.strip()}"
+    business_effect = (item.business_effect or "").strip()
     side_effects = item.side_effects
     if not side_effects or side_effects.strip() in {
         "Reads domain state without mutation.",

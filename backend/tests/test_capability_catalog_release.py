@@ -14,6 +14,7 @@ from backend.capability_v2.catalog import (
     CatalogResolver,
     ProviderArtifact,
     build_release,
+    build_catalog_entry,
     compatibility_errors,
     complete_governance_metadata,
 )
@@ -69,6 +70,58 @@ def test_catalog_hash_is_order_independent_and_binds_provider_artifacts():
     assert forward.catalog_hash != changed_provider.catalog_hash
 
 
+def test_catalog_projects_business_definition_hash():
+    descriptor = CapabilityDescriptorV2.model_validate(_descriptor("person.height.write").model_dump(mode="json") | {
+        "business_acceptance_criteria": ["The normalized height is stored."],
+        "business_invariants": [{
+            "rule_id": "person.height.range",
+            "version": 1,
+            "statement": "Height is 0.3m to 2.5m.",
+            "applies_when": "height changes",
+            "enforcement_ref": "person.provider:validate_height",
+            "error_code": "invalid_person_height",
+            "test_refs": ["backend/tests/test_person_height.py::test_range"],
+        }],
+    })
+
+    entry = build_catalog_entry(descriptor)
+
+    assert entry["business_definition_hash"].startswith("sha256:")
+    assert entry["business_invariants"][0]["rule_id"] == "person.height.range"
+
+
+def test_generated_catalog_declares_exact_acceptance_cases_without_self_attested_results():
+    from backend.scripts.build_capability_catalog import current_release
+
+    stable = [
+        descriptor
+        for descriptor in current_release().descriptors
+        if descriptor.lifecycle_status is LifecycleStatus.STABLE
+    ]
+
+    assert stable
+    assert all(len(descriptor.test_refs) == 7 for descriptor in stable)
+    assert all(
+        "result" not in test_ref
+        for descriptor in stable
+        for test_ref in descriptor.test_refs
+    )
+    assert all(
+        f"[{descriptor.id}@{descriptor.major_version}]" in str(test_ref["test_node_id"])
+        for descriptor in stable
+        for test_ref in descriptor.test_refs
+    )
+
+
+def test_catalog_generator_is_deterministic_with_business_definition_hashes():
+    from backend.scripts.build_capability_catalog import current_release
+
+    first = current_release()
+    second = current_release()
+
+    assert first.catalog_hash == second.catalog_hash
+
+
 def test_catalog_hash_normalizes_derived_error_schema_from_domain_errors():
     descriptor = _descriptor("craft.routing.get").model_copy(update={
         "domain_errors": (DomainErrorContract(code="invalid_input", meaning="Invalid routing."),),
@@ -80,7 +133,7 @@ def test_catalog_hash_normalizes_derived_error_schema_from_domain_errors():
     assert release.descriptors[0].error_schema[0]["error_code"] == "invalid_input"
 
 
-def test_complete_governance_metadata_backfills_stable_projection_fields():
+def test_complete_governance_metadata_does_not_synthesize_business_effect():
     descriptor = _descriptor("craft.routing.get").model_copy(update={
         "lifecycle_status": LifecycleStatus.STABLE,
     })
@@ -94,7 +147,7 @@ def test_complete_governance_metadata_backfills_stable_projection_fields():
     )
 
     assert completed.capability_version_gid.startswith("cv2_")
-    assert completed.business_effect
+    assert completed.business_effect == ""
     assert completed.side_effects
     assert completed.transaction_policy["boundary"] == "provider"
     assert completed.provider_ref == "craft.provider.routing"
@@ -297,6 +350,32 @@ def test_compatibility_scanner_binds_agent_projection_schema_to_stable_major():
     ]
 
 
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("authorization_policy", "craft.routing.admin"),
+        ("confirmation_policy", "admin"),
+        ("idempotency_policy", "required"),
+        ("consistency_policy", "eventual"),
+        ("transaction_policy", {"requires_transaction": True, "participants": ["craft"]}),
+        ("evidence_policy", "required"),
+        ("audit_policy", "high_risk"),
+        ("required_auth_freshness_seconds", 300),
+    ],
+)
+def test_compatibility_scanner_blocks_policy_changes_without_major_bump(field, value):
+    stable = _descriptor("craft.routing.get").model_copy(update={
+        "lifecycle_status": LifecycleStatus.STABLE,
+    })
+    changed = stable.model_copy(update={field: value})
+
+    errors = compatibility_errors(build_release([stable]), build_release([changed]))
+
+    assert errors == [
+        f"stable capability {field} changed without major version bump: craft.routing.get@1"
+    ]
+
+
 def test_compatibility_scanner_freezes_stable_execution_budget():
     stable = _descriptor("craft.routing.get").model_copy(update={
         "lifecycle_status": LifecycleStatus.STABLE,
@@ -332,6 +411,43 @@ def test_resolve_requires_release_and_pinned_major_without_latest_fallback():
     with pytest.raises(CatalogResolutionError, match="capability_not_in_release"):
         resolver.resolve(release.release_id, "craft.routing.get", 2)
     assert resolver.resolve(release.release_id, "craft.routing.get", 1).spec.version == 1
+
+
+def test_resolver_rejects_release_provider_artifact_without_runtime_binding():
+    registry = CapabilityRegistry()
+    registry.register(
+        CapabilitySpec(id="craft.routing.get", version=1, owner="craft"),
+        lambda payload, context: payload,
+    )
+    release = build_release([_descriptor("craft.routing.get", 1)], [_provider()])
+    store = InMemoryCatalogStore()
+    store.publish(release)
+
+    with pytest.raises(CatalogResolutionError, match="provider_artifact_unbound"):
+        CatalogResolver(store, registry).resolve(release.release_id, "craft.routing.get", 1)
+
+
+def test_resolver_rejects_runtime_provider_artifact_drift():
+    registry = CapabilityRegistry()
+    registry.register(
+        CapabilitySpec(id="craft.routing.get", version=1, owner="craft"),
+        lambda payload, context: payload,
+    )
+    registry.bind_provider_artifact(
+        "craft",
+        ProviderArtifact(
+            plugin_id="official.craft",
+            module="craft_backend.capabilities",
+            version="1.0.0",
+            artifact_hash="sha256:" + "b" * 64,
+        ),
+    )
+    release = build_release([_descriptor("craft.routing.get", 1)], [_provider()])
+    store = InMemoryCatalogStore()
+    store.publish(release)
+
+    with pytest.raises(CatalogResolutionError, match="provider_artifact_mismatch"):
+        CatalogResolver(store, registry).resolve(release.release_id, "craft.routing.get", 1)
 
 
 def test_official_provider_requires_exact_frozen_release_allowlist():

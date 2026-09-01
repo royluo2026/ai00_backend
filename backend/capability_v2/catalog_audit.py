@@ -5,6 +5,8 @@ import json
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .business_definition import is_generated_business_effect
+
 
 class CatalogAuditConfigurationError(ValueError):
     """Raised when the catalog cannot be audited safely."""
@@ -23,10 +25,14 @@ class CatalogAuditReport:
     required_field_missing_counts: dict[str, int] = field(default_factory=dict)
     invalid_error_schema_count: int = 0
     test_evidence_not_run_count: int = 0
+    test_evidence_failed_count: int = 0
+    self_attested_test_result_count: int = 0
     invalid_test_ref_count: int = 0
     invalid_consumer_ref_count: int = 0
     invalid_business_effect_count: int = 0
     invalid_side_effect_count: int = 0
+    generated_business_effect_count: int = 0
+    missing_business_rule_declaration_count: int = 0
 
     @property
     def missing_fields(self) -> dict[str, int]:
@@ -42,10 +48,14 @@ class CatalogAuditReport:
             "required_field_missing_counts": self.missing_fields,
             "invalid_error_schema_count": self.invalid_error_schema_count,
             "test_evidence_not_run_count": self.test_evidence_not_run_count,
+            "test_evidence_failed_count": self.test_evidence_failed_count,
+            "self_attested_test_result_count": self.self_attested_test_result_count,
             "invalid_test_ref_count": self.invalid_test_ref_count,
             "invalid_consumer_ref_count": self.invalid_consumer_ref_count,
             "invalid_business_effect_count": self.invalid_business_effect_count,
             "invalid_side_effect_count": self.invalid_side_effect_count,
+            "generated_business_effect_count": self.generated_business_effect_count,
+            "missing_business_rule_declaration_count": self.missing_business_rule_declaration_count,
         }
 
 
@@ -63,7 +73,11 @@ def _load_catalog(path: Path) -> list[dict]:
 
 
 def audit_catalog(path: Path) -> CatalogAuditReport:
-    stable = [entry for entry in _load_catalog(path) if entry.get("lifecycle_status") == "stable"]
+    return audit_catalog_entries(_load_catalog(path))
+
+
+def audit_catalog_entries(entries: list[dict]) -> CatalogAuditReport:
+    stable = [entry for entry in entries if entry.get("lifecycle_status") == "stable"]
     generic_ids: list[str] = []
     open_arguments = 0
     default_all = 0
@@ -76,10 +90,14 @@ def audit_catalog(path: Path) -> CatalogAuditReport:
     }
     invalid_error_schema = 0
     test_evidence_not_run = 0
+    test_evidence_failed = 0
+    self_attested_test_results = 0
     invalid_test_refs = 0
     invalid_consumer_refs = 0
     invalid_business_effects = 0
     invalid_side_effects = 0
+    generated_business_effects = 0
+    missing_business_rule_declarations = 0
     generic_side_effects = {
         "Reads domain state without mutation.",
         "Writes domain state through the owning Provider.",
@@ -129,8 +147,15 @@ def audit_catalog(path: Path) -> CatalogAuditReport:
             invalid_consumer_refs += 1
         description = entry.get("description")
         business_effect = entry.get("business_effect")
-        if not isinstance(business_effect, str) or not business_effect.strip() or business_effect.strip() == description:
+        if is_generated_business_effect(business_effect, description):
             invalid_business_effects += 1
+            generated_business_effects += 1
+        invariants = entry.get("business_invariants")
+        no_invariant_reason = entry.get("no_business_invariant_reason")
+        if not invariants and (
+            not isinstance(no_invariant_reason, str) or not no_invariant_reason.strip()
+        ):
+            missing_business_rule_declarations += 1
         side_effects = entry.get("side_effects")
         if not isinstance(side_effects, str) or not side_effects.strip() or side_effects.strip() in generic_side_effects:
             invalid_side_effects += 1
@@ -148,10 +173,19 @@ def audit_catalog(path: Path) -> CatalogAuditReport:
             for item in test_refs
         ):
             test_evidence_not_run += 1
+        if isinstance(test_refs, list) and any(
+            isinstance(item, dict) and item.get("result") == "fail"
+            for item in test_refs
+        ):
+            test_evidence_failed += 1
+        if isinstance(test_refs, list) and any(
+            isinstance(item, dict) and "result" in item
+            for item in test_refs
+        ):
+            self_attested_test_results += 1
         if not isinstance(test_refs, list) or any(
             not isinstance(item, dict)
-            or not {"test_type", "test_node_id", "code_revision", "result"} <= set(item)
-            or item.get("result") not in {"pass", "fail", "not_run", "skipped"}
+            or not {"test_type", "test_node_id", "code_revision"} <= set(item)
             for item in (test_refs if isinstance(test_refs, list) else [{}])
         ):
             invalid_test_refs += 1
@@ -164,11 +198,20 @@ def audit_catalog(path: Path) -> CatalogAuditReport:
         required_field_missing_counts=dict(sorted(missing_fields.items())),
         invalid_error_schema_count=invalid_error_schema,
         test_evidence_not_run_count=test_evidence_not_run,
+        test_evidence_failed_count=test_evidence_failed,
+        self_attested_test_result_count=self_attested_test_results,
         invalid_test_ref_count=invalid_test_refs,
         invalid_consumer_ref_count=invalid_consumer_refs,
         invalid_business_effect_count=invalid_business_effects,
         invalid_side_effect_count=invalid_side_effects,
+        generated_business_effect_count=generated_business_effects,
+        missing_business_rule_declaration_count=missing_business_rule_declarations,
     )
 
 
-__all__ = ["CatalogAuditConfigurationError", "CatalogAuditReport", "audit_catalog"]
+__all__ = [
+    "CatalogAuditConfigurationError",
+    "CatalogAuditReport",
+    "audit_catalog",
+    "audit_catalog_entries",
+]

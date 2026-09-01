@@ -12,9 +12,11 @@ if str(REPOSITORY_ROOT) not in sys.path:
     sys.path.insert(0, str(REPOSITORY_ROOT))
 
 from backend.capability_v2.bootstrap import build_capability_registry
+from backend.capability_v2.acceptance_contract import TEST_MODULE, coverage_declarations
 from backend.capability_v2.catalog import (
     CatalogRelease,
     ProviderArtifact,
+    build_catalog_entry,
     build_release,
     compatibility_errors,
     complete_governance_metadata,
@@ -27,7 +29,21 @@ from backend.capability_v2.descriptor_adapter import descriptor_from_provider_sp
 DEFAULT_OUTPUT = REPOSITORY_ROOT / "docs" / "governance" / "capability-catalog-release.json"
 DEFAULT_LINEAGE = REPOSITORY_ROOT / "docs" / "governance" / "capability-catalog-lineage.json"
 PROVIDERS_PATH = REPOSITORY_ROOT / "backend" / "capability_v2" / "official_domains.json"
-CONTRACT_TEST = REPOSITORY_ROOT / "backend/tests/test_capability_v2_contracts.py"
+CONTRACT_TEST = REPOSITORY_ROOT / TEST_MODULE
+
+
+def _release_document(release: CatalogRelease) -> dict[str, object]:
+    document = release.model_dump(mode="json")
+    document["descriptors"] = [build_catalog_entry(item) for item in release.descriptors]
+    return document
+
+
+def _load_release(path: Path) -> CatalogRelease:
+    document = json.loads(path.read_text(encoding="utf-8"))
+    for descriptor in document.get("descriptors", []):
+        if isinstance(descriptor, dict):
+            descriptor.pop("business_definition_hash", None)
+    return CatalogRelease.model_validate(document)
 
 
 def _verified_consumer_refs(capability_id: str) -> tuple[dict[str, str], ...]:
@@ -85,14 +101,10 @@ def current_release() -> CatalogRelease:
             registrations[key].descriptor or descriptor_from_provider_spec(registrations[key].spec),
             provider_ref=f"{registrations[key].spec.owner}.provider",
             consumer_refs=_verified_consumer_refs(registrations[key].spec.id),
-            test_refs=(
-                {
-                    "test_type": "contract",
-                    "test_node_id": "backend/tests/test_capability_v2_contracts.py::test_v21_descriptor_exposes_independent_business_and_error_contract_fields",
-                    "code_revision": _contract_test_revision(),
-                    "result": "pass",
-                    "path": "backend/tests/test_capability_v2_contracts.py",
-                },
+            test_refs=coverage_declarations(
+                registrations[key].spec.id,
+                registrations[key].spec.version,
+                code_revision=_contract_test_revision(),
             ),
         )
         for key in sorted(registrations)
@@ -132,7 +144,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--previous", type=Path, help="fail on breaking changes from a prior release")
     args = parser.parse_args(argv)
     previous_release = (
-        CatalogRelease.model_validate_json(args.output.read_text(encoding="utf-8"))
+        _load_release(args.output)
         if args.output.is_file() else None
     )
     lineage = (
@@ -148,7 +160,7 @@ def main(argv: list[str] | None = None) -> int:
         args.lineage.write_text(lineage.model_dump_json(indent=2) + "\n", encoding="utf-8")
     release = current_release()
     if args.previous:
-        previous = CatalogRelease.model_validate_json(args.previous.read_text(encoding="utf-8"))
+        previous = _load_release(args.previous)
         breaking = compatibility_errors(previous, release)
         if breaking:
             print("Catalog compatibility check failed:")
@@ -159,7 +171,7 @@ def main(argv: list[str] | None = None) -> int:
         if not args.output.is_file():
             print(f"Catalog release missing: {args.output}")
             return 1
-        expected = CatalogRelease.model_validate_json(args.output.read_text(encoding="utf-8"))
+        expected = _load_release(args.output)
         if expected.catalog_hash != release.catalog_hash or expected.release_id != release.release_id:
             print(
                 f"Catalog release drift: expected {expected.release_id}/{expected.catalog_hash}, "
@@ -181,7 +193,10 @@ def main(argv: list[str] | None = None) -> int:
         lineage = CatalogLineage.from_releases((release,))
     else:
         lineage = next_lineage(lineage, previous_release, release)
-    args.output.write_text(release.model_dump_json(indent=2) + "\n", encoding="utf-8")
+    args.output.write_text(
+        json.dumps(_release_document(release), ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
     args.lineage.parent.mkdir(parents=True, exist_ok=True)
     args.lineage.write_text(lineage.model_dump_json(indent=2) + "\n", encoding="utf-8")
     print(f"Catalog release written: {release.release_id}, {len(release.descriptors)} descriptors")

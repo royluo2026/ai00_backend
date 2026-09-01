@@ -5,7 +5,11 @@ from pathlib import Path
 
 import pytest
 
-from backend.capability_v2.catalog_audit import CatalogAuditConfigurationError, audit_catalog
+from backend.capability_v2.catalog_audit import (
+    CatalogAuditConfigurationError,
+    audit_catalog,
+    audit_catalog_entries,
+)
 
 
 def test_audit_catalog_reports_generic_open_and_default_all_descriptors(tmp_path: Path) -> None:
@@ -52,6 +56,29 @@ def test_audit_catalog_reports_generic_open_and_default_all_descriptors(tmp_path
     assert report.open_arguments_count == 1
     assert report.default_all_exposure_count == 1
     assert report.generic_operation_ids == ("project.change.apply",)
+
+
+def test_generated_business_effect_is_reported_not_silently_accepted() -> None:
+    entry = {
+        "id": "person.height.write",
+        "lifecycle_status": "stable",
+        "description": "Record a normalized person height.",
+        "business_effect": "Business outcome: Record a normalized person height.",
+    }
+
+    report = audit_catalog_entries([entry])
+
+    assert report.generated_business_effect_count == 1
+
+
+def test_missing_business_rule_declaration_is_reported() -> None:
+    report = audit_catalog_entries([{
+        "id": "person.height.write",
+        "lifecycle_status": "stable",
+        "no_business_invariant_reason": "",
+    }])
+
+    assert report.missing_business_rule_declaration_count == 1
 
 
 def test_audit_catalog_reports_missing_v21_fields_and_unrun_test_evidence(tmp_path: Path) -> None:
@@ -169,3 +196,57 @@ def test_audit_catalog_detects_known_multi_operation_ebom_descriptor_without_arg
     report = audit_catalog(catalog)
 
     assert report.generic_operation_ids == ("craft.ebom.change.apply",)
+
+
+def test_audit_catalog_counts_failed_test_evidence(tmp_path: Path) -> None:
+    catalog = tmp_path / "catalog.json"
+    catalog.write_text(json.dumps({"capabilities": [{
+        "id": "craft.read",
+        "lifecycle_status": "stable",
+        "input_schema": {"type": "object", "additionalProperties": False},
+        "test_refs": [{
+            "test_type": "contract",
+            "test_node_id": "backend/tests/test_craft.py::test_read",
+            "code_revision": "sha256:" + "a" * 64,
+            "result": "fail",
+        }],
+    }]}), encoding="utf-8")
+
+    assert audit_catalog(catalog).test_evidence_failed_count == 1
+
+
+def test_audit_catalog_rejects_self_attested_test_result(tmp_path: Path) -> None:
+    catalog = tmp_path / "catalog.json"
+    catalog.write_text(json.dumps({"capabilities": [{
+        "id": "craft.read",
+        "lifecycle_status": "stable",
+        "input_schema": {"type": "object", "additionalProperties": False},
+        "test_refs": [{
+            "test_type": "contract",
+            "test_node_id": "backend/tests/test_craft.py::test_read[craft.read@1]",
+            "code_revision": "sha256:" + "a" * 64,
+            "result": "pass",
+        }],
+    }]}), encoding="utf-8")
+
+    assert audit_catalog(catalog).self_attested_test_result_count == 1
+
+
+def test_audit_catalog_accepts_test_coverage_declaration_without_result(tmp_path: Path) -> None:
+    catalog = tmp_path / "catalog.json"
+    catalog.write_text(json.dumps({"capabilities": [{
+        "id": "craft.read",
+        "lifecycle_status": "stable",
+        "input_schema": {"type": "object", "additionalProperties": False},
+        "test_refs": [{
+            "test_type": "contract",
+            "test_node_id": "backend/tests/test_craft.py::test_read[craft.read@1]",
+            "code_revision": "sha256:" + "a" * 64,
+        }],
+    }]}), encoding="utf-8")
+
+    report = audit_catalog(catalog)
+
+    assert report.invalid_test_ref_count == 0
+    assert report.test_evidence_not_run_count == 0
+    assert report.test_evidence_failed_count == 0
