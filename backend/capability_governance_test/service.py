@@ -104,6 +104,20 @@ def _record_value(record: Any, name: str, default: Any = None) -> Any:
     return getattr(record, name, default)
 
 
+def _business_contract_value(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {str(key): _business_contract_value(item) for key, item in value.items()}
+    if isinstance(value, (tuple, list)):
+        return [_business_contract_value(item) for item in value]
+    values = getattr(value, "__dict__", None)
+    if isinstance(values, Mapping):
+        return {
+            str(key): _business_contract_value(item)
+            for key, item in values.items() if not str(key).startswith("_")
+        }
+    return value
+
+
 def _root_cause_capability_refs(record: Any, root_key: str = "") -> tuple[str, ...]:
     refs = _capability_refs(_record_value(record, "subjects", ()))
     if not refs:
@@ -415,8 +429,29 @@ class CapabilityGovernanceService:
             item for item in matches
             if str(getattr(item, "capability_id", "")).lower().startswith("base.capability_")
         ]
+        latest = self._latest_snapshot()
+        scanned = {
+            (str(getattr(item, "capability_id", "")), int(getattr(item, "major_version", 0) or 0)): item
+            for item in getattr(getattr(latest, "document", None), "capabilities", ())
+        }
+        projected: list[Any] = []
+        for item in matches[offset:offset + limit]:
+            evidence = scanned.get((
+                str(getattr(item, "capability_id", "")), int(getattr(item, "major_version", 0) or 0),
+            ))
+            if evidence is None:
+                projected.append(item)
+                continue
+            record = dict(item) if isinstance(item, Mapping) else dict(getattr(item, "__dict__", {}))
+            record["contract"] = {
+                "business_rules": _business_contract_value(getattr(evidence, "business_rules", ())),
+                "fingerprint": _business_contract_value(getattr(evidence, "fingerprint", None)),
+                "business_layer_evidence": _business_contract_value(getattr(evidence, "business_layer_evidence", {})),
+                "business_maturity": _business_contract_value(getattr(evidence, "business_maturity", None)),
+            }
+            projected.append(record)
         return self._completed(
-            "base.capability_registry.search", limit=limit, offset=offset, items=tuple(matches[offset:offset + limit]),
+            "base.capability_registry.search", limit=limit, offset=offset, items=tuple(projected),
             total=len(matches),
             product_capability_total=len(matches) - len(extension_matches),
             governance_extension_capability_total=len(extension_matches),

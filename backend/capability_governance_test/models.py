@@ -63,10 +63,22 @@ class ScannedCapability:
     error_schema_hash: str
     policy_hash: str
     provider_hash: str
+    business_rules: tuple[Mapping[str, Any], ...] = ()
+    fingerprint: CapabilityFingerprint | None = None
+    business_layer_evidence: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
+    business_maturity: CapabilityMaturity = field(
+        default_factory=lambda: CapabilityMaturity("L0", ("unregistered",)),
+    )
     descriptor: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        object.__setattr__(self, "business_rules", tuple(_freeze(item) for item in self.business_rules))
+        object.__setattr__(self, "business_layer_evidence", _frozen_mapping(self.business_layer_evidence))
         object.__setattr__(self, "descriptor", _frozen_mapping(self.descriptor))
+
+    @property
+    def rules(self) -> tuple[Mapping[str, Any], ...]:
+        return self.business_rules
 
     def to_json(self) -> dict[str, Any]:
         return {
@@ -82,8 +94,24 @@ class ScannedCapability:
             "error_schema_hash": self.error_schema_hash,
             "policy_hash": self.policy_hash,
             "provider_hash": self.provider_hash,
+            "business_rules": _json_value(self.business_rules),
+            "fingerprint": _json_value(self.fingerprint.__dict__) if self.fingerprint else None,
+            "business_layer_evidence": _json_value(self.business_layer_evidence),
+            "business_maturity": _json_value(self.business_maturity.__dict__),
             "descriptor": _json_value(self.descriptor),
         }
+
+
+@dataclass(frozen=True)
+class ScanFinding:
+    code: str
+    severity: str
+    category: str
+    source_path: str
+    message: str
+
+    def to_json(self) -> dict[str, str]:
+        return dict(self.__dict__)
 
 
 @dataclass(frozen=True)
@@ -164,12 +192,14 @@ class SnapshotDocument:
     nodes: tuple[ImplementationNode, ...]
     bindings: tuple[CapabilityBinding, ...]
     relations: tuple[ImplementationRelation, ...]
+    scan_findings: tuple[ScanFinding, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "capabilities", tuple(self.capabilities))
         object.__setattr__(self, "nodes", tuple(self.nodes))
         object.__setattr__(self, "bindings", tuple(self.bindings))
         object.__setattr__(self, "relations", tuple(self.relations))
+        object.__setattr__(self, "scan_findings", tuple(self.scan_findings))
 
     def to_json(self) -> dict[str, Any]:
         return {
@@ -181,6 +211,7 @@ class SnapshotDocument:
             "nodes": [item.to_json() for item in self.nodes],
             "bindings": [_json_value(item.__dict__) for item in self.bindings],
             "relations": [_json_value(item.__dict__) for item in self.relations],
+            "scan_findings": [item.to_json() for item in self.scan_findings],
         }
 
 
@@ -224,5 +255,5 @@ __all__ = [
     "BusinessPurposeRecord", "BusinessRuleRecord", "CapabilityBinding", "CapabilityBusinessProjection",
     "CapabilityBusinessReview", "CapabilityFingerprint", "CapabilityMaturity", "CapabilityProjection",
     "CapabilityRelationCandidate", "ImplementationNode", "ImplementationRelation", "ImmutableRecordError",
-    "RuleEffectivenessRecord", "ScannedCapability", "SnapshotDocument", "SnapshotEntry", "SnapshotRecord",
+    "RuleEffectivenessRecord", "ScannedCapability", "ScanFinding", "SnapshotDocument", "SnapshotEntry", "SnapshotRecord",
 ]

@@ -584,3 +584,46 @@ def test_governance_read_capabilities_expose_proposals_health_and_audit():
         ("base.capability_audit.search", audit_result),
     ):
         validate_payload(dict(descriptors[capability_id].output_schema), result, label=f"{capability_id}.output")
+
+
+def test_registry_search_projects_scanned_business_evidence_in_contract():
+    entry = SimpleNamespace(
+        capability_id="person.height.write", major_version=1,
+        capability_version_gid=17, capability_gid=16,
+        owner_domain="person", semantic_class="write",
+        business_effect="Personnel planning can use a normalized height.",
+        lifecycle_status="experimental", descriptor_hash="sha256:descriptor",
+    )
+    scanned = SimpleNamespace(
+        capability_id=entry.capability_id, major_version=entry.major_version,
+        business_rules=({"rule_id": "person.height.valid_range"},),
+        fingerprint=SimpleNamespace(business_object="height", action="write"),
+        business_layer_evidence={"A": (entry.business_effect,), "B": ("height", "write")},
+        business_maturity=SimpleNamespace(level="L3", reason_codes=("rule_evidence_present",)),
+    )
+    snapshot = SimpleNamespace(
+        snapshot_gid=100, entries=(entry,),
+        document=SimpleNamespace(nodes=(), relations=(), bindings=(), capabilities=(scanned,)),
+    )
+
+    class Store:
+        def list_entries(self):
+            return snapshot.entries
+
+        def latest_snapshot(self):
+            return snapshot
+
+    class Registry:
+        def register(self, spec, handler, *, descriptor=None):
+            if spec.id == "base.capability_registry.search":
+                self.handler = handler
+
+    registry = Registry()
+    register_governance_capabilities(registry, CapabilityGovernanceService(Store()))
+
+    result = registry.handler({"query": "height"}, _context())
+
+    assert result["items"][0]["contract"]["fingerprint"] == {
+        "business_object": "height", "action": "write",
+    }
+    assert result["items"][0]["contract"]["business_maturity"]["level"] == "L3"

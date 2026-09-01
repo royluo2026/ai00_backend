@@ -10,13 +10,18 @@ from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 from typing import Any
 
+from backend.capability_v2.business_definition import is_generated_business_effect
+
 from .config import GovernanceSettings
 from .fingerprint import canonical_fingerprint
 from .graph import node_key
 from .models import (
     CapabilityBinding,
+    CapabilityFingerprint,
+    CapabilityMaturity,
     ImplementationNode,
     ImplementationRelation,
+    ScanFinding,
     ScannedCapability,
     SnapshotDocument,
 )
@@ -129,6 +134,87 @@ def _normalise_relative(path: Path) -> str:
     return PurePosixPath(path.as_posix()).as_posix()
 
 
+def _business_action(capability_id: str, descriptor: Mapping[str, Any]) -> str:
+    return str(descriptor.get("business_action") or capability_id.rsplit(".", 1)[-1]).strip()
+
+
+def _business_object(descriptor: Mapping[str, Any]) -> str:
+    explicit = str(descriptor.get("business_object") or "").strip()
+    if explicit:
+        return explicit
+    parts = str(descriptor.get("id") or "").split(".")
+    return ".".join(parts[1:-1]) if len(parts) > 2 else (parts[-2] if len(parts) == 2 else "")
+
+
+def _strings(value: Any) -> tuple[str, ...]:
+    if isinstance(value, (str, bytes, Mapping)):
+        return (str(value).strip(),) if isinstance(value, str) and value.strip() else ()
+    if not isinstance(value, (list, tuple, set, frozenset)):
+        return ()
+    return tuple(sorted({str(item).strip() for item in value if str(item).strip()}))
+
+
+def _scopes(descriptor: Mapping[str, Any]) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    read_scope = _strings(descriptor.get("read_scope"))
+    write_scope = _strings(descriptor.get("write_scope"))
+    selectors = descriptor.get("resource_selectors", ())
+    resources = tuple(sorted({
+        str(item.get("resource_type") or "").strip()
+        for item in selectors if isinstance(item, Mapping) and str(item.get("resource_type") or "").strip()
+    })) if isinstance(selectors, (list, tuple)) else ()
+    semantic_class = str(descriptor.get("side_effect_level") or "")
+    if not read_scope and semantic_class == "read":
+        read_scope = resources
+    if not write_scope and semantic_class in {"write", "high_risk_write"}:
+        write_scope = resources
+    return read_scope, write_scope
+
+
+def _business_evidence(
+    descriptor: Mapping[str, Any], business_effect: str, rules: tuple[Mapping[str, Any], ...],
+) -> tuple[Mapping[str, tuple[str, ...]], CapabilityMaturity]:
+    generated = is_generated_business_effect(business_effect, descriptor.get("description"))
+    no_rule_reason = str(descriptor.get("no_business_invariant_reason") or "").strip()
+    enforcement_refs = tuple(sorted({
+        str(rule.get("enforcement_ref") or "").strip() for rule in rules
+        if str(rule.get("enforcement_ref") or "").strip()
+    }))
+    test_refs = tuple(sorted({
+        ref for rule in rules for ref in _strings(rule.get("test_refs"))
+    }))
+    rule_ids = tuple(str(rule.get("rule_id") or "").strip() for rule in rules)
+    acceptance = _strings(descriptor.get("business_acceptance_criteria"))
+    provider_ref = str(descriptor.get("provider_ref") or "").strip()
+    definition_hash = str(descriptor.get("business_definition_hash") or "").strip()
+    evidence = {
+        "A": (business_effect,) + acceptance if business_effect else acceptance,
+        "B": tuple(value for value in (_business_object(descriptor), _business_action(str(descriptor.get("id") or ""), descriptor)) if value),
+        "C": tuple(value for value in (*rule_ids, no_rule_reason) if value),
+        "D": enforcement_refs,
+        "E": test_refs,
+        "F": tuple(value for value in (provider_ref, *_strings(descriptor.get("api_refs"))) if value),
+        "G": (definition_hash,) if definition_hash else (),
+    }
+    if not business_effect:
+        maturity = CapabilityMaturity("L1", ("missing_business_effect",))
+    elif generated:
+        maturity = CapabilityMaturity("L1", ("generated_business_effect",))
+    elif rules:
+        complete = all(
+            str(rule.get(field) or "").strip()
+            for rule in rules for field in ("rule_id", "statement", "applies_when", "enforcement_ref", "error_code")
+        ) and all(_strings(rule.get("test_refs")) for rule in rules)
+        maturity = CapabilityMaturity(
+            "L3" if complete else "L2",
+            ("rule_evidence_present",) if complete else ("business_rule_evidence_incomplete",),
+        )
+    elif no_rule_reason:
+        maturity = CapabilityMaturity("L2", ("business_invariants_not_applicable",))
+    else:
+        maturity = CapabilityMaturity("L1", ("business_rules_missing",))
+    return evidence, maturity
+
+
 @dataclass(frozen=True)
 class _AstUnit:
     owner: str
@@ -207,11 +293,25 @@ class GovernanceScanner:
 
     def scan(self, code_revision: str) -> SnapshotDocument:
         """Create an immutable document without importing or executing scanned source."""
+        try:
+            return self._scan(code_revision)
+        except (ScanPolicyError, OSError, UnicodeError, TypeError, ValueError, SyntaxError) as exc:
+            return self._failed_scan(code_revision, exc)
+
+    def _scan(self, code_revision: str) -> SnapshotDocument:
         product = self._require_catalog(self._product_catalog, "product_catalog_required")
         extension = _json_document(self._extension_catalog) if self._extension_catalog is not None else None
         manifests = self._require_manifest(self._domain_manifests)
         domains = self._domains(manifests)
         units, tables, unresolved, source_trees, source_imports = self._parse_allowlisted_sources(domains)
+        scan_findings = tuple(
+            ScanFinding(
+                code="scan_parser_error", severity="blocking", category="parser",
+                source_path=source_path, message=reason,
+            )
+            for _owner, source_path, reason in sorted(set(unresolved))
+            if reason == "syntax_error"
+        )
         nodes, relations = self._build_nodes_and_relations(units, tables, unresolved)
         capabilities = self._scan_capabilities(product, domains)
         bindings, extra_relations = self._bind_capabilities(
@@ -239,6 +339,7 @@ class GovernanceScanner:
             "nodes": [item.to_json() for item in ordered_nodes],
             "bindings": [item.__dict__ for item in ordered_bindings],
             "relations": [item.__dict__ for item in ordered_relations],
+            "scan_findings": [item.to_json() for item in scan_findings],
         })
         return SnapshotDocument(
             product_release_id=str(product.get("release_id", "")),
@@ -249,6 +350,33 @@ class GovernanceScanner:
             nodes=ordered_nodes,
             bindings=ordered_bindings,
             relations=ordered_relations,
+            scan_findings=scan_findings,
+        )
+
+    def _failed_scan(self, code_revision: str, error: Exception) -> SnapshotDocument:
+        message = str(error) or error.__class__.__name__
+        category = "parser" if isinstance(error, SyntaxError) else (
+            "source_io" if isinstance(error, (OSError, UnicodeError)) else "configuration"
+        )
+        source_path = "scanner"
+        if message.startswith("product_catalog") or message == "scanner_requires_structured_manifest":
+            source_path = "product_catalog"
+        elif message.startswith("official_domain"):
+            source_path = "official_domain_manifests"
+        finding = ScanFinding(
+            code=f"scan_{category}_error", severity="blocking", category=category,
+            source_path=source_path, message=message,
+        )
+        product_release = ""
+        if isinstance(self._product_catalog, Mapping):
+            product_release = str(self._product_catalog.get("release_id") or "")
+        payload = {
+            "product_release_id": product_release, "extension_release_id": None,
+            "code_revision": code_revision, "capabilities": [], "nodes": [],
+            "bindings": [], "relations": [], "scan_findings": [finding.to_json()],
+        }
+        return SnapshotDocument(
+            product_release, None, code_revision, _digest(payload), (), (), (), (), (finding,),
         )
 
     @staticmethod
@@ -527,19 +655,44 @@ class GovernanceScanner:
                 raise ScanPolicyError("product_catalog_descriptor_invalid")
             artifact = domains[owner].get("artifact")
             provider_hash = str(artifact.get("artifact_hash", "")) if isinstance(artifact, Mapping) else ""
+            business_effect = str(descriptor.get("business_effect") or "").strip()
+            rules = tuple(sorted(
+                (_json_document(rule) for rule in descriptor.get("business_invariants", ())),
+                key=lambda rule: (str(rule.get("rule_id") or ""), int(rule.get("rule_version") or 0)),
+            ))
+            input_hash = _digest(descriptor.get("input_schema", {}))
+            output_hash = _digest(descriptor.get("output_schema", {}))
+            read_scope, write_scope = _scopes(descriptor)
+            fingerprint = CapabilityFingerprint(
+                owner_domain=owner,
+                business_object=_business_object(descriptor),
+                action=_business_action(capability_id, descriptor),
+                business_effect=business_effect,
+                input_schema_hash=input_hash,
+                output_schema_hash=output_hash,
+                provider_ref=str(descriptor.get("provider_ref") or ""),
+                read_scope=tuple(sorted(read_scope)),
+                write_scope=tuple(sorted(write_scope)),
+                rule_ids=tuple(sorted(str(rule.get("rule_id") or "") for rule in rules if str(rule.get("rule_id") or ""))),
+            )
+            layer_evidence, maturity = _business_evidence(descriptor, business_effect, rules)
             capabilities.append(ScannedCapability(
                 capability_id=capability_id,
                 major_version=major,
                 owner_domain=owner,
                 semantic_class=str(descriptor.get("side_effect_level", "")),
-                business_effect=str(descriptor.get("description", descriptor.get("title", ""))),
+                business_effect=business_effect,
                 lifecycle_status=str(descriptor.get("lifecycle_status", "")),
                 descriptor_hash=_digest(descriptor),
-                input_schema_hash=_digest(descriptor.get("input_schema", {})),
-                output_schema_hash=_digest(descriptor.get("output_schema", {})),
+                input_schema_hash=input_hash,
+                output_schema_hash=output_hash,
                 error_schema_hash=_digest(descriptor.get("domain_errors", ())),
                 policy_hash=_digest({key: descriptor.get(key) for key in ("authorization_policy", "confirmation_policy", "audit_policy", "idempotency_policy")}),
                 provider_hash=provider_hash,
+                business_rules=rules,
+                fingerprint=fingerprint,
+                business_layer_evidence=layer_evidence,
+                business_maturity=maturity,
                 descriptor=descriptor,
             ))
         return capabilities
