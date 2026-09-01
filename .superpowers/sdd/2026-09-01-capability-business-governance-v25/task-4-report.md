@@ -365,3 +365,67 @@ Commit `21864a2d` (`fix: close catalog integration`) contains the integration cl
 - The final `fix: regenerate clean capability catalogs` commit was materialized in a fresh detached worktree and verified without using the shared dirty Provider tree.
 - Fresh-clean results: product `--check` passed at `rel_3f5ef8265738dc99f4803579111af53d` (495 total / 479 stable); extension `--check` passed at `rel_842a83882703680257177d9f0ecbc400` (18); offline scan completed with `495 / 479 / 18`; the authoritative offline binding test passed; agent e2e passed `4`; extension/integration target focused tests passed `17`; and `git diff --check 21864a2d..HEAD` passed.
 - `build_user_function_registry.py --strict` reaches the shared loader successfully but exits 1 on existing reviewed-disposition drift (replacement/non-stable Craft and Project targets plus missing review rows). This is governance-data drift outside the loader migration and is retained as a concern rather than rewritten by this closure.
+
+## Catalog Integration Closure — Projection and Acceptance Binding Repair (2026-09-02)
+
+### RED Evidence
+
+- The committed human `docs/capabilities/catalog.v2.json` and acceptance case manifest still represented `rel_b79...`; the immutable product release is `rel_3f5ef8265738dc99f4803579111af53d`. The old manifest did not have `catalog_hash`.
+- `test_catalog_projection_rejects_tampered_release_hash` initially failed because the registry builder exposed no verified projection loader. `test_case_manifest_is_bound_to_verified_catalog_hash` failed with the stale release mismatch. `test_validate_manifest_rejects_rebound_case_node` failed because a valid-looking node for another capability was accepted.
+- `test_catalog_document_is_verified_before_domain_coverage_reads_it` failed because the coverage reader accepted `{ "descriptors": [] }` through `json.loads`.
+
+### GREEN Evidence
+
+```text
+python backend/scripts/generate_capability_docs.py --write
+python backend/scripts/build_capability_acceptance_manifest.py --write
+python backend/scripts/generate_capability_docs.py --check
+python backend/scripts/build_capability_acceptance_manifest.py --check
+```
+
+All exited 0 from the exact detached `39123d77` candidate. The regenerated machine/human projection has product release `rel_3f5ef8265738dc99f4803579111af53d`, catalog hash `sha256:3f5ef8265738dc99f4803579111af53dfc0e0e019bbca1190b0946e28ccc84dc`, 495 descriptors, and 479 stable descriptors. The schema-v2 acceptance manifest has the same release/hash and 3,353 mandatory case nodes (479 × 7).
+
+```text
+python -m pytest backend/tests/acceptance/test_acceptance_runner.py::test_validate_manifest_rejects_catalog_hash_mismatch backend/tests/acceptance/test_acceptance_runner.py::test_validate_manifest_rejects_rebound_case_node backend/tests/acceptance/test_catalog_release.py backend/tests/acceptance/test_mandatory_cases.py -q
+```
+
+Result: exit 0; `3358 passed`.
+
+```text
+python -m pytest backend/tests/test_user_function_registry.py::test_catalog_projection_rejects_tampered_release_hash backend/tests/test_domain_capability_coverage.py::test_catalog_document_is_verified_before_domain_coverage_reads_it backend/tests/test_plugin_acceptance_tooling.py::PluginAcceptanceToolingTests::test_sdk_example_and_template_only_request_current_plugin_capabilities -q
+```
+
+Result: exit 0; `3 passed`.
+
+### Fix Notes
+
+- `validate_machine_catalog` compares a human/machine projection against the same verified immutable release, including release/hash and every generated descriptor/governance field. User Function Registry now loads that verified pair once before deriving its target index; it no longer validates one document and trusts another.
+- The existing documentation generator remains the only projection generator. Its exact clean output replaces all 502 changed `docs/capabilities` files plus the acceptance case manifest; no shared dirty documentation or Provider input was used.
+- Mandatory test support and manifest generation derive stable descriptor identities from the immutable release. Manifest validation now verifies release, hash, exact stable set, all case kinds, and the canonical per-capability pytest node identifier.
+- Domain coverage and plugin tooling tests now consume generated releases via `load_catalog_release`. Remaining `CatalogRelease.model_validate_json` calls are fixture/author-contract tests in `test_capability_governance_business_scanner.py`; they do not read generated release files.
+
+### Registry Drift Baseline
+
+- On an independent clean `39123d77` materialization after its own docs regeneration, `build_user_function_registry.py --strict` exited 1 with 313 business/review drift lines, SHA-256 `bcf200cf6528edfff2473e10af3e07c10dce0847cb4b5fa6504a4dde55e27cc3`.
+- The closure candidate has the same exit, 313 lines, and digest, with zero release/projection-integrity lines. These replacements, non-stable targets, and missing/evidence review rows are retained governance data drift.
+
+### Concerns
+
+- The full document tree must be committed together because the existing `generate_capability_docs.py --check` compares the complete generated tree; the clean semantic change is rebinding its release/hash and descriptors to the immutable product release.
+- The final commit still requires fresh detached-materialization checks, including the explicit Integration adapter factory and the offline scanner; no result above uses the shared dirty worktree.
+
+### Final Clean Materialization Verification
+
+The single closure commit was materialized in a new detached worktree and verified with `AI00_INTEGRATION_ADAPTER_FACTORY=integration_backend.infrastructure.production_adapters:build`:
+
+```text
+python backend/scripts/build_capability_catalog.py --check
+python backend/scripts/build_capability_governance_catalog.py --check
+python backend/scripts/generate_capability_docs.py --check
+python backend/scripts/build_capability_acceptance_manifest.py --check
+python backend/scripts/run_capability_governance_scan.py --offline --output .task4-r2-offline-scan.json
+```
+
+All exited 0: product `rel_3f5ef8265738dc99f4803579111af53d` (495/479), extension `rel_842a83882703680257177d9f0ecbc400` (18), and the real scan completed with `495 / 479 / 18` and snapshot `sha256:99eaaf68ab23f5a78bc3c3ada122b3485fc2dc32d022a8d07f925dfb7de042d5`.
+
+The full mandatory/binding and migrated-reader selection exited 0 with `3361 passed`; `git diff --check 39123d77..HEAD` exited 0. Registry strict still exits 1 only for the verified identical 313 governance-data drift rows, with no release/projection-integrity row.

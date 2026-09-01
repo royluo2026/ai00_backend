@@ -8,7 +8,7 @@ Execute the governed agent.canvas.execution.resume Agent outcome.
 - 不适用：The outcome belongs to another business domain; invoke that domain Capability instead.
 - 生命周期：`stable`
 - 所属领域：`agent`
-- Catalog Release：`rel_b79f7e734da4b72dbf4af4adbf91bb37`
+- Catalog Release：`rel_3f5ef8265738dc99f4803579111af53d`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -174,7 +174,7 @@ Execute the governed agent.canvas.execution.resume Agent outcome.
 ```json
 {
   "capability_id": "agent.canvas.execution.resume",
-  "catalog_release": "rel_b79f7e734da4b72dbf4af4adbf91bb37",
+  "catalog_release": "rel_3f5ef8265738dc99f4803579111af53d",
   "major_version": 1,
   "payload": {
     "approved": false,

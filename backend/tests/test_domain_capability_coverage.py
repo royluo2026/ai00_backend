@@ -6,6 +6,8 @@ from pathlib import Path
 
 import pytest
 
+from backend.capability_v2.catalog import load_catalog_release
+
 
 ROOT = Path(__file__).resolve().parents[2]
 DOMAINS = {
@@ -30,12 +32,30 @@ def _documents() -> tuple[list[dict], dict[str, dict]]:
     registry_document = json.loads(
         (ROOT / "docs/governance/user-function-registry.json").read_text(encoding="utf-8")
     )
-    catalog_document = json.loads(
+    catalog = load_catalog_release(
         (ROOT / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
     )
     records = list(registry_document["functions"].values())
-    descriptors = {item["id"]: item for item in catalog_document["descriptors"]}
+    descriptors = {
+        item.id: item.model_dump(mode="json") for item in catalog.descriptors
+    }
     return records, descriptors
+
+
+def test_catalog_document_is_verified_before_domain_coverage_reads_it(tmp_path, monkeypatch):
+    """A JSON-shaped but non-release document must not enter coverage checks."""
+    governance = tmp_path / "docs/governance"
+    governance.mkdir(parents=True)
+    (governance / "user-function-registry.json").write_text(
+        '{"functions": {}}', encoding="utf-8"
+    )
+    (governance / "capability-catalog-release.json").write_text(
+        '{"descriptors": []}', encoding="utf-8"
+    )
+    monkeypatch.setattr(__import__(__name__, fromlist=["ROOT"]), "ROOT", tmp_path)
+
+    with pytest.raises(ValueError):
+        _documents()
 
 
 def _stable_targets(domain: str, records: list[dict]) -> set[str]:

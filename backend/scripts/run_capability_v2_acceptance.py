@@ -24,7 +24,11 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 from backend.capability_v2.completion import CompletionReport, evaluate_completion
+from backend.capability_v2.catalog import load_catalog_release
+from backend.capability_v2.acceptance_contract import case_node_id
+from backend.capability_v2.docs.generator import validate_machine_catalog
 CATALOG_PATH = ROOT / "docs/capabilities/catalog.v2.json"
+IMMUTABLE_CATALOG_PATH = ROOT / "docs/governance/capability-catalog-release.json"
 MANIFEST_PATH = ROOT / "backend/tests/acceptance/fixtures/case-manifest.json"
 REPORT_SCHEMA_PATH = ROOT / "docs/acceptance/capability-v2-report.schema.json"
 RC_EVIDENCE_SCHEMA_PATH = ROOT / "docs/acceptance/capability-v2-rc-evidence.schema.json"
@@ -40,16 +44,18 @@ RC_URLS = {
 
 
 def load_documents() -> tuple[dict, dict]:
-    return (
-        json.loads(CATALOG_PATH.read_text(encoding="utf-8")),
-        json.loads(MANIFEST_PATH.read_text(encoding="utf-8")),
-    )
+    release = load_catalog_release(IMMUTABLE_CATALOG_PATH.read_text(encoding="utf-8"))
+    catalog = json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
+    validate_machine_catalog(release, catalog)
+    return catalog, json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
 
 
 def validate_manifest(catalog: dict, manifest: dict) -> list[str]:
     errors: list[str] = []
     if manifest.get("catalog_release") != catalog.get("release_id"):
         errors.append("manifest catalog release mismatch")
+    if manifest.get("catalog_hash") != catalog.get("catalog_hash"):
+        errors.append("manifest catalog hash mismatch")
     declared = manifest.get("capabilities", {})
     if set(manifest.get("mandatory_cases", ())) != MANDATORY_CASES:
         errors.append("manifest mandatory_cases must equal the seven supported case types")
@@ -60,12 +66,22 @@ def validate_manifest(catalog: dict, manifest: dict) -> list[str]:
     }
     for capability_key in sorted(stable):
         cases = declared.get(capability_key, {})
+        if not isinstance(cases, dict):
+            errors.append(f"{capability_key}: mandatory cases must be an object")
+            cases = {}
         missing = MANDATORY_CASES - set(cases)
         for case in sorted(missing):
             errors.append(f"{capability_key}: missing mandatory case {case}")
         for unknown in sorted(set(cases) - MANDATORY_CASES):
             errors.append(f"{capability_key}: unknown mandatory case {unknown}")
-        nodes = list(cases.values()) if isinstance(cases, dict) else []
+        capability_id, major_version = capability_key.rsplit("@", 1)
+        for case in sorted(MANDATORY_CASES & set(cases)):
+            expected = case_node_id(case, capability_id, int(major_version))
+            if cases[case] != expected:
+                errors.append(
+                    f"{capability_key}: mandatory case {case} has wrong verifier node id"
+                )
+        nodes = list(cases.values())
         if len(nodes) != len(set(nodes)):
             errors.append(f"{capability_key}: verifier node ids must be unique")
         if any(not isinstance(node, str) or "::test_" not in node for node in nodes):
@@ -233,14 +249,12 @@ def _domain_migration_bindings() -> list[dict]:
 
 
 def catalog_integrity_errors(catalog: dict) -> list[str]:
-    from backend.capability_v2.catalog import load_catalog_release
     from backend.capability_v2.docs.generator import build_documentation
 
-    release_document = json.loads(
-        (ROOT / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
-    )
     try:
-        release = load_catalog_release(release_document)
+        release = load_catalog_release(
+            (ROOT / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
+        )
     except Exception as exc:
         return [f"catalog release integrity failed: {type(exc).__name__}"]
     errors = []

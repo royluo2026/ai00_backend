@@ -10,6 +10,7 @@ from unittest.mock import patch
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
+from backend.capability_v2.catalog import load_catalog_release
 from backend.plugin_platform.artifacts import validate_package
 from backend.plugin_platform.manifest import parse_manifest
 from backend.plugin_platform.signing import canonical_release
@@ -75,11 +76,11 @@ class PluginAcceptanceToolingTests(unittest.TestCase):
 
     def test_sdk_example_and_template_only_request_current_plugin_capabilities(self):
         root = Path(__file__).resolve().parents[2]
-        catalog = json.loads(
+        catalog = load_catalog_release(
             (root / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
         )
         plugin_capabilities = {
-            item["id"] for item in catalog["descriptors"] if item["exposure"]["plugin"]
+            item.id for item in catalog.descriptors if item.exposure.plugin
         }
         for source in (
             root / "packages/plugin-sdk/examples/hello-capability/plugin.json",

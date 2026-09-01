@@ -23,6 +23,7 @@ if str(REPOSITORY_ROOT) not in sys.path:
 from backend.capability_v2.catalog_targets import CatalogTargetIndex
 from backend.capability_v2.atomicity import load_atomicity_dispositions
 from backend.capability_v2.catalog import load_catalog_release
+from backend.capability_v2.docs.generator import validate_machine_catalog
 
 
 REGISTRY_PATH = REPOSITORY_ROOT / "docs" / "governance" / "user-function-registry.json"
@@ -665,11 +666,15 @@ def _promote_device_review_fields(value: object) -> None:
 
 
 def load_catalog_owners(path: Path = CATALOG_PATH) -> dict[str, str]:
-    # The human-oriented projection is only trusted after the immutable release
-    # has passed hash and generated-field verification.
-    load_catalog_release(CATALOG_RELEASE_PATH.read_text(encoding="utf-8"))
-    catalog = json.loads(path.read_text(encoding="utf-8"))
+    _release, catalog = load_catalog_projection(path)
     return {row["id"]: row["owner_domain"] for row in catalog["capabilities"]}
+
+
+def load_catalog_projection(path: Path = CATALOG_PATH):
+    release = load_catalog_release(CATALOG_RELEASE_PATH.read_text(encoding="utf-8"))
+    catalog = json.loads(path.read_text(encoding="utf-8"))
+    validate_machine_catalog(release, catalog)
+    return release, catalog
 
 
 def _reviewed_dispositions(reviews: list[dict]) -> tuple[dict[str, dict], set[str]]:
@@ -895,9 +900,9 @@ def main(argv: list[str] | None = None) -> int:
         catalog_index = None
         if args.strict:
             dispositions = load_atomicity_dispositions(ATOMICITY_PATH)
-            load_catalog_release(CATALOG_RELEASE_PATH.read_text(encoding="utf-8"))
+            _release, catalog = load_catalog_projection()
             catalog_index = CatalogTargetIndex.from_catalog(
-                json.loads(CATALOG_PATH.read_text(encoding="utf-8")),
+                catalog,
                 replacements={
                     (item.capability_id, item.major_version): item.replacement_capabilities[0]
                     for item in dispositions.dispositions

@@ -8,6 +8,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from backend.capability_v2.completion import evaluate_completion
+from backend.capability_v2.acceptance_contract import case_node_id
 from backend.capability_v2.domain_manifest import load_domain_manifests
 from backend.scripts import run_capability_v2_acceptance as acceptance_runner
 from backend.scripts.run_capability_v2_acceptance import (
@@ -104,6 +105,42 @@ def _runtime_evidence(catalog, manifest, *, commit, run_id="rc-run-42"):
             for key, cases in manifest["capabilities"].items()
         },
     }
+
+
+def test_validate_manifest_rejects_catalog_hash_mismatch():
+    catalog = {"release_id": "rel_test", "catalog_hash": "sha256:" + "1" * 64, "capabilities": []}
+    tampered = {
+        "catalog_release": "rel_test",
+        "catalog_hash": "sha256:" + "0" * 64,
+        "mandatory_cases": sorted(MANDATORY_CASES),
+        "capabilities": {},
+    }
+
+    assert "manifest catalog hash mismatch" in validate_manifest(catalog, tampered)
+
+
+def test_validate_manifest_rejects_rebound_case_node():
+    catalog = {
+        "release_id": "rel_test",
+        "catalog_hash": "sha256:" + "1" * 64,
+        "capabilities": [{"id": "base.example.read", "major_version": 1, "lifecycle_status": "stable"}],
+    }
+    manifest = {
+        "catalog_release": "rel_test",
+        "catalog_hash": "sha256:" + "1" * 64,
+        "mandatory_cases": sorted(MANDATORY_CASES),
+        "capabilities": {
+            "base.example.read@1": {
+                case: case_node_id(case, "base.example.read", 1)
+                for case in MANDATORY_CASES
+            }
+        },
+    }
+    manifest["capabilities"]["base.example.read@1"]["success"] = (
+        "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[other@1]"
+    )
+
+    assert "base.example.read@1: mandatory case success has wrong verifier node id" in validate_manifest(catalog, manifest)
 
 
 def test_release_bindings_cover_manifest_and_every_domain_migration():

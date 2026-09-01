@@ -4,38 +4,37 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
-CATALOG = ROOT / "docs/capabilities/catalog.v2.json"
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from backend.capability_v2.catalog import load_catalog_release
+from backend.capability_v2.acceptance_contract import MANDATORY_CASES, TEST_MODULE, case_node_id
+
+
+CATALOG = ROOT / "docs/governance/capability-catalog-release.json"
 OUTPUT = ROOT / "backend/tests/acceptance/fixtures/case-manifest.json"
-MANDATORY_CASES = (
-    "success",
-    "invalid_input",
-    "unauthenticated",
-    "resource_denied",
-    "output_contract",
-    "consumer_contract",
-    "version_pin",
-)
-TEST_MODULE = "backend/tests/acceptance/test_mandatory_cases.py"
 
 
 def build() -> dict:
-    catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
+    catalog = load_catalog_release(CATALOG.read_text(encoding="utf-8"))
     capabilities = {}
-    for item in catalog["capabilities"]:
-        if item["lifecycle_status"] != "stable":
+    for item in catalog.descriptors:
+        if item.lifecycle_status.value != "stable":
             continue
-        key = f'{item["id"]}@{item["major_version"]}'
+        key = f"{item.id}@{item.major_version}"
         capabilities[key] = {
-            case: f"{TEST_MODULE}::test_{case}_case[{key}]"
+            case: case_node_id(case, item.id, item.major_version)
             for case in MANDATORY_CASES
         }
     return {
-        "schema_version": 1,
-        "catalog_release": catalog["release_id"],
+        "schema_version": 2,
+        "catalog_release": catalog.release_id,
+        "catalog_hash": catalog.catalog_hash,
         "mandatory_cases": list(MANDATORY_CASES),
         "capabilities": dict(sorted(capabilities.items())),
     }

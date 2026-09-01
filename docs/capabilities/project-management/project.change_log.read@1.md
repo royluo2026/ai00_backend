@@ -8,7 +8,7 @@ Execute the reviewed project.change_log.read project outcome.
 - 不适用：The operation belongs to another domain.
 - 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_b79f7e734da4b72dbf4af4adbf91bb37`
+- Catalog Release：`rel_3f5ef8265738dc99f4803579111af53d`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -338,7 +338,7 @@ Execute the reviewed project.change_log.read project outcome.
 ```json
 {
   "capability_id": "project.change_log.read",
-  "catalog_release": "rel_b79f7e734da4b72dbf4af4adbf91bb37",
+  "catalog_release": "rel_3f5ef8265738dc99f4803579111af53d",
   "major_version": 1,
   "payload": {
     "arguments": {},
