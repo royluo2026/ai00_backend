@@ -99,3 +99,32 @@ Clean detached worktree: `E:\Projects\ai00_v3\.task6-round4-clean-ad6f5a7b` at f
 - Governance migration compilation: `python -m pytest backend/tests/test_capability_governance_migrations.py -q` — **4 failed, 2 passed in 0.63s**. The existing `0007_business_review_idempotency.sql` table `workmanship_base_capability_business_review_requests` is absent from the existing `GOVERNANCE_TABLES` contract, so compilation reports it as an extra table; round 4 did not change migrations or schema contracts.
 - Versioned migration policy: `python -m pytest backend/tests/test_versioned_migration_files.py -q` — **1 failed, 8 passed in 0.53s** because the pre-existing `202608310001_craft_rule_identity_backfill.sql` contains a non-resumable `UPDATE`.
 - Catalog/bootstrap environment: `python -m pytest backend/tests/test_capability_governance_catalog.py -q` — **8 failed, 2 passed in 6.77s**. Seven failures stop at the missing `AI00_INTEGRATION_ADAPTER_FACTORY`; the remaining failure is the pre-existing generated catalog release-id mismatch (`rel_842a...` versus `rel_8456...`). These failures are outside the two implementation commits.
+
+## Fix round 5 — one proposal identity namespace for every proposal type
+
+- `ProposalService` now obtains every new proposal id, standard or `business_definition`, from the selected store's one proposal allocator before calling the store's insert-only create method. A store that advertises proposal creation without the allocator fails closed instead of falling back to a process-local id.
+- `MemoryGovernanceStore` owns a lock-protected monotonic proposal counter shared by fresh service instances. It advances past every stored proposal id and rejects a duplicate create without changing the existing row.
+- `SqlGovernanceStore` exposes the round-4 Base-owned `workmanship_display_id_counters` allocation as the same store operation used by both proposal types. Proposal creation is a plain `INSERT`; a duplicate-key collision rolls back and becomes `workflow_proposal_gid_already_exists`, never an update or alias.
+- Durable supersession, ordinary transitions, and standard review status transitions now use the existing proposal CAS for both proposal types. Opposite standard/business creation orders remain separately addressable after restart, and each review route resolves the intended persisted row.
+- The separately observed process-local `business_review_gid` restart collision remains out of scope and unchanged; round 5 changes proposal ids only.
+
+### Test-first evidence
+
+- RED: `python -m pytest backend/tests/test_capability_governance_business_store.py -q -p no:cacheprovider --basetemp .tmp-task6-r5-red -k "fresh_memory_services or duplicate_proposal_create or fresh_sql_services"` — **6 failed, 36 deselected in 1.20s**. Both Memory and SQL orderings reused id `1`; business-first/standard-second also hit the aliased row's `row_version_conflict`; and both Memory and SQL duplicate creates mutated/created instead of rejecting.
+- GREEN: the same six-case selection after the fix produced **6 passed, 36 deselected in 0.76s**.
+- GREEN before materialization: the four-file Task 6 proposal/business-review regression command produced **73 passed in 1.40s**; compileall and the scoped diff check passed before implementation commit `7bd3588c` (`fix: unify governance proposal identity`).
+
+### Clean-materialization verification
+
+Clean detached worktree: `E:\Projects\ai00_v3\.task6-round5-clean-7bd3588c` at implementation commit `7bd3588c7f25b705c668c3765fd8eb0d35134847`.
+
+- Proposal/store/business-review/relation set (`test_capability_business_review.py`, `test_capability_governance_business_store.py`, and `test_capability_business_relations.py`) — **69 passed in 1.00s**. This includes the six round-4 integration/guard cases, the SQL decision transaction and rollback case, the two-service CAS race, and all six round-5 identity/collision cases.
+- Broad Task 6 affected set (the preceding files plus service-workflow, AI, and provider tests) — **111 passed, 2 failed in 2.15s**. Both failures are the known static-gate fixture mismatch: authoritative release evidence lacks `static_gate_status`/`static_gate_hash`, producing `governance_dependency_unavailable` and `missing_required_data`, and the provider expectation omits the corresponding `missing_required_data` blocker. No proposal identity, store, transition, review, supersession, port-guard, or concurrency assertion failed.
+- `python -m compileall -q backend/capability_governance_test backend/tests/test_capability_governance_business_store.py` — passed.
+- `git diff --check 06256143 7bd3588c` — clean. The range contains only `service.py`, `store.py`, `workflow.py`, and `test_capability_governance_business_store.py`; the detached worktree remained clean after verification.
+
+### Known migration, static-gate, and catalog failures
+
+- Governance migration compilation: `python -m pytest backend/tests/test_capability_governance_migrations.py -q -p no:cacheprovider` — **4 failed, 2 passed in 0.75s** because the pre-existing `workmanship_base_capability_business_review_requests` table is still absent from `GOVERNANCE_TABLES`.
+- Versioned migration policy: `python -m pytest backend/tests/test_versioned_migration_files.py -q -p no:cacheprovider` — **1 failed, 8 passed in 0.50s** because pre-existing `202608310001_craft_rule_identity_backfill.sql` contains non-resumable `UPDATE` SQL.
+- Catalog/bootstrap environment: `python -m pytest backend/tests/test_capability_governance_catalog.py -q -p no:cacheprovider` — **8 failed, 2 passed in 7.41s**. Seven failures stop at missing `AI00_INTEGRATION_ADAPTER_FACTORY`; the remaining failure is the pre-existing checked-in release-id mismatch (`rel_842a83882703680257177d9f0ecbc400` versus `rel_b8070bc261b694832926be8c81402b50`).
