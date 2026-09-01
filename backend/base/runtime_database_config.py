@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote
@@ -102,6 +103,8 @@ def get_database_config(_payload: dict[str, Any], _context: object) -> dict[str,
 
 
 def save_database_config(payload: dict[str, Any], _context: object) -> dict[str, Any]:
+    if os.getenv("ENV_FILE", "").strip():
+        return {"saved": False, "password_configured": False}
     config = _validated(payload)
     document = load_system_json()
     existing = _stored_database_config(document)
@@ -113,10 +116,25 @@ def save_database_config(payload: dict[str, Any], _context: object) -> dict[str,
     return {"saved": True, "password_configured": bool(config["password"])}
 
 
+def _connection_error_code(error: Exception) -> str:
+    code = error.args[0] if error.args and isinstance(error.args[0], int) else None
+    if code in {1044, 1045}:
+        return "authentication_failed"
+    if code == 1049:
+        return "database_not_found"
+    if code in {2002, 2003, 2005, 2006, 2013}:
+        return "network_unreachable"
+    if code == 2026:
+        return "tls_or_server_config_failed"
+    return "connection_failed"
+
+
 def test_database_connection(payload: dict[str, Any], _context: object) -> dict[str, Any]:
     config = _validated(payload)
     existing = _stored_database_config()
     config["password"] = resolve_password(config["password"], existing)
+    if not config["password"]:
+        return {"connected": False, "error_code": "password_required"}
     connection = None
     try:
         connection = pymysql.connect(
@@ -129,8 +147,8 @@ def test_database_connection(payload: dict[str, Any], _context: object) -> dict[
             cursor.execute("SELECT 1 AS ok")
             cursor.fetchone()
         return {"connected": True}
-    except Exception:
-        return {"connected": False, "error_code": "connection_failed"}
+    except Exception as error:
+        return {"connected": False, "error_code": _connection_error_code(error)}
     finally:
         if connection is not None:
             try:

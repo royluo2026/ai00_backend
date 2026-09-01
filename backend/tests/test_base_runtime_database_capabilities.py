@@ -1,7 +1,20 @@
 import json
 
+import pytest
+
 from backend.base import runtime_database_config
 from backend.capabilities.registry_next import CapabilityRegistry
+
+
+def _complete_payload(*, password: str = "secret") -> dict:
+    return {
+        "host": "db.internal",
+        "port": 2883,
+        "user": "worker",
+        "password": password,
+        "collab_db": "craft",
+        "public_db": "public",
+    }
 
 
 def test_password_resolution_reuses_blank_and_masked_values() -> None:
@@ -86,6 +99,55 @@ def test_connection_test_reuses_saved_password(monkeypatch) -> None:
     assert result == {"connected": True}
     assert captured["password"] == "saved"
     assert captured["closed"] is True
+
+
+def test_connection_test_rejects_missing_password_without_connecting(monkeypatch) -> None:
+    monkeypatch.setattr(runtime_database_config, "load_system_json", lambda: {})
+
+    def unexpected_connect(**_kwargs):
+        pytest.fail("missing password must not open a database connection")
+
+    monkeypatch.setattr(runtime_database_config.pymysql, "connect", unexpected_connect)
+
+    result = runtime_database_config.test_database_connection(
+        _complete_payload(password=""), object()
+    )
+
+    assert result == {"connected": False, "error_code": "password_required"}
+
+
+@pytest.mark.parametrize(
+    ("mysql_error", "expected"),
+    (
+        (runtime_database_config.pymysql.err.OperationalError(1045, "secret raw message"), "authentication_failed"),
+        (runtime_database_config.pymysql.err.OperationalError(1049, "secret raw message"), "database_not_found"),
+        (runtime_database_config.pymysql.err.OperationalError(2003, "secret raw message"), "network_unreachable"),
+        (runtime_database_config.pymysql.err.OperationalError(2026, "secret raw message"), "tls_or_server_config_failed"),
+    ),
+)
+def test_connection_test_returns_sanitized_error_codes(monkeypatch, mysql_error, expected) -> None:
+    def failed_connect(**_kwargs):
+        raise mysql_error
+
+    monkeypatch.setattr(runtime_database_config.pymysql, "connect", failed_connect)
+
+    result = runtime_database_config.test_database_connection(_complete_payload(), object())
+
+    assert result == {"connected": False, "error_code": expected}
+    assert "secret raw message" not in str(result)
+
+
+def test_deployment_managed_runtime_refuses_browser_save(monkeypatch) -> None:
+    monkeypatch.setenv("ENV_FILE", "runtime.env")
+    monkeypatch.setattr(
+        runtime_database_config,
+        "save_system_json",
+        lambda _value: pytest.fail("deployment-managed configuration must not be saved"),
+    )
+
+    result = runtime_database_config.save_database_config(_complete_payload(), object())
+
+    assert result == {"saved": False, "password_configured": False}
 
 
 def test_base_registers_three_atomic_runtime_database_capabilities() -> None:
