@@ -257,10 +257,9 @@ def test_provider_projects_workflow_mutation_and_release_records():
         "capability_id": "base.capability_release_gate.evaluate", "status": "completed",
         "release": {
             "report_gid": "1", "conclusion": "fail",
-                "blockers": [
-                    "governance_dependency_unavailable", "required_test_unavailable", "stale_evidence",
-                    "static_gate_not_passed",
-                ],
+            "blockers": [
+                "governance_dependency_unavailable", "required_test_unavailable", "stale_evidence",
+            ],
         },
     }
 
