@@ -33,3 +33,24 @@ Clean detached materialization at `d8f67d2d`:
 - clean materialization reported `working_tree_clean: true`
 
 Shared static-gate edits and `source_root` forwarding were preserved but not absorbed into these commits. No migration, bootstrap, or Catalog failure occurred in the clean Task 7 acceptance run.
+
+## Fix round 1/5 — release-evidence hardening
+
+Implementation commit: `d787e73d` (`fix: harden capability governance release evidence`).
+
+All five verified review findings were addressed as one fail-closed evidence wave:
+
+- Signed governance now uses one canonical parser for dataclass and mapping inputs. It validates exact row keys/types/identity/hash/change/status/blockers, rederives every row and all aggregates, and is used both before signing and during production-artifact readback. Resigned nested or aggregate tampering is rejected.
+- The cutover baseline was regenerated with the canonical generator from the exact Catalog at source revision `b52cb4a74b29d27fdf6e0c00ec5598fe5462c907`. Its corrected binding is Catalog release `rel_0b584b19349bc98727900583bb19f687`, Catalog hash `sha256:0b584b19349bc98727900583bb19f687a093b3ce91431fb384795034d690ab60`, 495 capabilities, and baseline hash `sha256:f73f10868cf1104148d16c618991ea5153575fb3b46c74e77f513241d1ec5f47`. Normal verification now validates the referenced Catalog's own content address and exact business-definition projection; it never rewrites the baseline.
+- `runtime_verified` is true only when environment validation, RC schema/commit/Catalog/migration/domain/database/case validation, and the exact five component results are all error-free. Readable or hashable evidence alone no longer sets it.
+- STANDARD review request key/fingerprint/result identity is persisted in the same SQL CAS/review transaction. Restart replay returns the original result, mismatch conflicts, and request-insert failure rolls back proposal/review/key atomically. Memory has identical durable replay semantics. STANDARD and business reviews now share the store-owned review allocator, including existing-row maxima, avoiding the deferred process-local collision.
+- Official release-gate and offline acceptance commands accept only an explicit immutable approval artifact bound to the Catalog release and exact `(capability_version_gid, definition_hash)`. No production connection is implicit. Missing evidence leaves new/material definitions blocked and unchanged cutover definitions in legacy backlog. The governance release-acceptance caller supplies a valid structured approved result rather than bypassing the gate.
+
+Clean detached materialization at `d787e73d`:
+
+- focused release/store/workflow/migration/acceptance group: `142 passed, 2 failed` in 98.03s. Both failures are pre-existing static-evidence/completion fixtures outside this round: the authoritative release fixture omits required static/business evidence, and the generated-report test expects `completion.complete` while the checked-in completion state remains false. All round-1 tests in that group passed.
+- offline strict acceptance: exit 0; report status `passed`; `3365 passed`; `working_tree_clean: true`; business governance `passed_with_legacy_backlog`, 495 legacy pending, human/runtime false, and zero blockers.
+- baseline/Catalog verification: source revision, release, content hash, and 495-entry projection matched exactly.
+- selected `compileall`, `git diff --check`, and clean `git status --short`: passed/empty.
+
+Shared static-gate, acceptance-manifest, and UI-asset hunks remained unstaged and were not absorbed. No push, merge, publish, or implicit production-store access was performed.
