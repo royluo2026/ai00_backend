@@ -1,9 +1,10 @@
-"""Deterministic, narrowed relationship candidates for scanned Capabilities."""
+"""Narrowed, reproducible relationship analysis over structured business evidence."""
 from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Iterable, Iterator, Mapping
 from itertools import combinations
+import math
 from typing import Any
 
 from .business_models import CapabilityRelationCandidate
@@ -19,210 +20,133 @@ def _text(value: Any) -> str:
     return " ".join(str(value or "").split()).casefold()
 
 
-def _scopes(item: ScannedCapability) -> tuple[str, ...]:
-    fingerprint = item.fingerprint
-    if fingerprint is None:
-        return ()
-    return tuple(sorted(set(fingerprint.read_scope) | set(fingerprint.write_scope)))
+def _strings(value: Any) -> tuple[str, ...]:
+    return tuple(sorted({_text(item) for item in value or () if _text(item)})) if isinstance(value, (tuple, list)) else ()
 
 
 def _rules(item: ScannedCapability) -> tuple[dict[str, Any], ...]:
-    result: list[dict[str, Any]] = []
+    values = []
     for raw in item.business_rules:
         if not isinstance(raw, Mapping):
             continue
-        constraints = raw.get("machine_constraints", raw.get("constraints", {}))
-        if not isinstance(constraints, Mapping):
-            constraints = {}
-        result.append({
-            "rule_id": _text(raw.get("rule_id")),
-            "version": raw.get("version"),
-            "statement": _text(raw.get("statement")),
-            "applies_when": _text(raw.get("applies_when")),
-            "error_code": _text(raw.get("error_code")),
-            "machine_constraints": dict(constraints),
-        })
-    return tuple(sorted(result, key=canonical_fingerprint))
+        constraint = raw.get("machine_constraints")
+        values.append({"rule_id": _text(raw.get("rule_id")), "version": raw.get("version"), "statement": _text(raw.get("statement")), "applies_when": _text(raw.get("applies_when")), "error_code": _text(raw.get("error_code")), "machine_constraints": dict(constraint) if isinstance(constraint, Mapping) else None})
+    return tuple(sorted(values, key=canonical_fingerprint))
 
 
-def _same_contract(left: ScannedCapability, right: ScannedCapability) -> bool:
-    left_fingerprint = left.fingerprint
-    right_fingerprint = right.fingerprint
-    if left_fingerprint is None or right_fingerprint is None:
-        return False
-    return (
-        _text(left_fingerprint.business_effect) == _text(right_fingerprint.business_effect)
-        and left_fingerprint.input_schema_hash == right_fingerprint.input_schema_hash
-        and left_fingerprint.output_schema_hash == right_fingerprint.output_schema_hash
-        and left_fingerprint.read_scope == right_fingerprint.read_scope
-        and left_fingerprint.write_scope == right_fingerprint.write_scope
-        and _rules(left) == _rules(right)
-    )
+def _selectors(item: ScannedCapability) -> tuple[dict[str, object], ...]:
+    values = []
+    for raw in item.descriptor.get("resource_selectors", ()) if isinstance(item.descriptor, Mapping) else ():
+        if isinstance(raw, Mapping) and _text(raw.get("resource_type")) and _text(raw.get("payload_path")):
+            values.append({"resource_type": _text(raw.get("resource_type")), "payload_path": _text(raw.get("payload_path")), "required": bool(raw.get("required", True))})
+    return tuple(sorted(values, key=canonical_fingerprint))
+
+
+def _semantic(item: ScannedCapability) -> dict[str, object] | None:
+    fp = item.fingerprint
+    if fp is None:
+        return None
+    descriptor = item.descriptor if isinstance(item.descriptor, Mapping) else {}
+    return {"business_effect": _text(fp.business_effect), "criteria": _strings(descriptor.get("business_acceptance_criteria")), "input_schema_hash": fp.input_schema_hash, "output_schema_hash": fp.output_schema_hash, "input_schema": descriptor.get("input_schema", {}), "output_schema": descriptor.get("output_schema", {}), "read_scope": tuple(sorted(fp.read_scope)), "write_scope": tuple(sorted(fp.write_scope)), "resource_selectors": _selectors(item), "rules": _rules(item)}
 
 
 def candidate_pairs(items: Iterable[ScannedCapability]) -> Iterator[tuple[ScannedCapability, ScannedCapability]]:
-    """Yield only same-object/same-action pairs, in canonical order."""
+    """Narrow duplicate/coverage/overlap work to the same object and action."""
     buckets: dict[tuple[str, str], dict[str, ScannedCapability]] = defaultdict(dict)
     for item in items:
-        fingerprint = item.fingerprint
-        if fingerprint is None:
-            continue
-        bucket = (_text(fingerprint.business_object), _text(fingerprint.action))
-        if not all(bucket):
-            continue
-        buckets[bucket].setdefault(_key(item), item)
+        fp = item.fingerprint
+        if fp is not None and _text(fp.business_object) and _text(fp.action):
+            buckets[(_text(fp.business_object), _text(fp.action))].setdefault(_key(item), item)
     for bucket in sorted(buckets):
-        values = tuple(sorted(buckets[bucket].values(), key=_key))
-        yield from combinations(values, 2)
+        yield from combinations(tuple(sorted(buckets[bucket].values(), key=_key)), 2)
 
 
-def _interval(rule: Mapping[str, Any]) -> tuple[str, str, float | None, float | None] | None:
-    constraints = rule.get("machine_constraints")
-    if not isinstance(constraints, Mapping):
+def _interval(rule: Mapping[str, Any]) -> tuple[str, str, str, float | None, float | None, bool, bool] | None:
+    value = rule.get("machine_constraints")
+    if not isinstance(value, Mapping):
         return None
-    field = _text(constraints.get("field"))
-    if not field:
+    field, applies, unit = _text(value.get("field")), _text(rule.get("applies_when")), _text(value.get("unit"))
+    if not field or not applies or not unit:
         return None
-    try:
-        minimum = constraints.get("minimum")
-        maximum = constraints.get("maximum")
-        lower = None if minimum is None else float(minimum)
-        upper = None if maximum is None else float(maximum)
-    except (TypeError, ValueError):
+    lower, upper = value.get("minimum"), value.get("maximum")
+    if any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(float(v)) for v in (lower, upper) if v is not None) or (lower is None and upper is None):
         return None
-    if lower is None and upper is None:
-        return None
-    return field, _text(rule.get("applies_when")), lower, upper
+    return field, applies, unit, None if lower is None else float(lower), None if upper is None else float(upper), bool(value.get("minimum_inclusive", True)), bool(value.get("maximum_inclusive", True))
 
 
-def _conflict_evidence(left: ScannedCapability, right: ScannedCapability) -> dict[str, object] | None:
-    for left_rule in _rules(left):
-        left_interval = _interval(left_rule)
-        if left_interval is None:
+def _conflict(left: ScannedCapability, right: ScannedCapability) -> dict[str, object] | None:
+    for a in _rules(left):
+        ar = _interval(a)
+        if ar is None:
             continue
-        for right_rule in _rules(right):
-            right_interval = _interval(right_rule)
-            if right_interval is None or left_interval[:2] != right_interval[:2]:
+        for b in _rules(right):
+            br = _interval(b)
+            if br is None or ar[:3] != br[:3]:
                 continue
-            left_lower, left_upper = left_interval[2:]
-            right_lower, right_upper = right_interval[2:]
-            lower = max(value for value in (left_lower, right_lower) if value is not None) if any(
-                value is not None for value in (left_lower, right_lower)
-            ) else None
-            upper = min(value for value in (left_upper, right_upper) if value is not None) if any(
-                value is not None for value in (left_upper, right_upper)
-            ) else None
-            if lower is not None and upper is not None and lower > upper:
-                return {
-                    "applies_when": left_interval[1],
-                    "constraint_field": left_interval[0],
-                    "left_interval": (left_lower, left_upper),
-                    "left_rule_id": left_rule["rule_id"],
-                    "right_interval": (right_lower, right_upper),
-                    "right_rule_id": right_rule["rule_id"],
-                }
+            low = max(v for v in (ar[3], br[3]) if v is not None) if any(v is not None for v in (ar[3], br[3])) else None
+            high = min(v for v in (ar[4], br[4]) if v is not None) if any(v is not None for v in (ar[4], br[4])) else None
+            if low is not None and high is not None:
+                low_inc = (ar[5] if low == ar[3] else True) and (br[5] if low == br[3] else True)
+                high_inc = (ar[6] if high == ar[4] else True) and (br[6] if high == br[4] else True)
+                if low > high or (low == high and not (low_inc and high_inc)):
+                    return {"constraint_field": ar[0], "applies_when": ar[1], "unit": ar[2], "left_interval": (ar[3], ar[4]), "right_interval": (br[3], br[4]), "left_rule_id": a["rule_id"], "right_rule_id": b["rule_id"]}
     return None
 
 
-def _candidate(
-    relation_type: str, left: ScannedCapability, right: ScannedCapability, evidence: Mapping[str, object], *, snapshot_gid: int,
-) -> CapabilityRelationCandidate:
-    capability_keys = tuple(sorted((_key(left), _key(right))))
-    payload = {
-        "capability_keys": capability_keys,
-        "evidence": dict(evidence),
-        "relation_type": relation_type,
-        "snapshot_gid": snapshot_gid,
-        "source": "deterministic",
-    }
-    candidate_hash = canonical_fingerprint(payload)
-    relation_candidate_gid = int(candidate_hash.split(":", 1)[1][:15], 16) or 1
-    return CapabilityRelationCandidate(
-        relation_candidate_gid=relation_candidate_gid,
-        snapshot_gid=snapshot_gid,
-        candidate_hash=candidate_hash,
-        relation_type=relation_type,  # type: ignore[arg-type]
-        source="deterministic",
-        capability_keys=capability_keys,
-        evidence=dict(evidence),
-    )
+def _conflict_pairs(items: Iterable[ScannedCapability]) -> Iterator[tuple[ScannedCapability, ScannedCapability]]:
+    buckets: dict[tuple[str, str, str, str], dict[str, ScannedCapability]] = defaultdict(dict)
+    for item in items:
+        fp = item.fingerprint
+        if fp is None or not _text(fp.business_object):
+            continue
+        for rule in _rules(item):
+            value = _interval(rule)
+            if value is not None:
+                buckets[(_text(fp.business_object), value[0], value[1], value[2])].setdefault(_key(item), item)
+    for bucket in sorted(buckets):
+        yield from combinations(tuple(sorted(buckets[bucket].values(), key=_key)), 2)
 
 
-def _analyze_pair(
-    left: ScannedCapability, right: ScannedCapability, *, snapshot_gid: int,
-) -> CapabilityRelationCandidate | None:
-    left_fingerprint = left.fingerprint
-    right_fingerprint = right.fingerprint
-    if left_fingerprint is None or right_fingerprint is None:
+def _candidate(kind: str, left: ScannedCapability, right: ScannedCapability, evidence: Mapping[str, object], snapshot_gid: int) -> CapabilityRelationCandidate:
+    keys = tuple(sorted((_key(left), _key(right))))
+    digest = canonical_fingerprint({"snapshot_gid": snapshot_gid, "relation_type": kind, "capability_keys": keys, "evidence": dict(evidence), "source": "deterministic"})
+    return CapabilityRelationCandidate(int(digest.split(":", 1)[1][:15], 16) or 1, snapshot_gid, digest, kind, "deterministic", keys, dict(evidence))  # type: ignore[arg-type]
+
+
+def _analyze_pair(left: ScannedCapability, right: ScannedCapability, snapshot_gid: int) -> CapabilityRelationCandidate | None:
+    lf, rf = left.fingerprint, right.fingerprint
+    if lf is None or rf is None or _text(lf.business_object) != _text(rf.business_object):
         return None
-    conflict = _conflict_evidence(left, right)
+    conflict = _conflict(left, right)
     if conflict is not None:
-        return _candidate("conflict", left, right, conflict, snapshot_gid=snapshot_gid)
-    if _same_contract(left, right):
-        return _candidate("duplicate", left, right, {
-            "matching_fields": (
-                "action", "business_effect", "business_object", "input_schema_hash",
-                "output_schema_hash", "read_scope", "rules", "write_scope",
-            ),
-            "provider_refs": tuple(sorted((left_fingerprint.provider_ref, right_fingerprint.provider_ref))),
-        }, snapshot_gid=snapshot_gid)
-    left_scopes = set(_scopes(left))
-    right_scopes = set(_scopes(right))
-    left_read, right_read = set(left_fingerprint.read_scope), set(right_fingerprint.read_scope)
-    left_write, right_write = set(left_fingerprint.write_scope), set(right_fingerprint.write_scope)
-    left_covers = left_read.issuperset(right_read) and left_write.issuperset(right_write)
-    right_covers = right_read.issuperset(left_read) and right_write.issuperset(left_write)
-    if (
-        _text(left_fingerprint.business_effect) == _text(right_fingerprint.business_effect)
-        and left_fingerprint.input_schema_hash == right_fingerprint.input_schema_hash
-        and left_fingerprint.output_schema_hash == right_fingerprint.output_schema_hash
-        and _rules(left) == _rules(right)
-        and left_covers != right_covers
-    ):
-        covering, covered = (left, right) if left_covers else (right, left)
-        covering_fingerprint, covered_fingerprint = covering.fingerprint, covered.fingerprint
-        assert covering_fingerprint is not None and covered_fingerprint is not None
-        contained_fields = tuple(field for field, covering_scope, covered_scope in (
-            ("read_scope", covering_fingerprint.read_scope, covered_fingerprint.read_scope),
-            ("write_scope", covering_fingerprint.write_scope, covered_fingerprint.write_scope),
-        ) if tuple(covering_scope) != tuple(covered_scope))
-        return _candidate("coverage", left, right, {
-            "contained_fields": contained_fields,
-            "covered_capability_key": _key(covered),
-            "covering_capability_key": _key(covering),
-            "covered_read_scope": covered_fingerprint.read_scope,
-            "covered_write_scope": covered_fingerprint.write_scope,
-            "covering_read_scope": covering_fingerprint.read_scope,
-            "covering_write_scope": covering_fingerprint.write_scope,
-        }, snapshot_gid=snapshot_gid)
-    shared_scope = tuple(sorted(left_scopes & right_scopes))
-    same_provider = left_fingerprint.provider_ref == right_fingerprint.provider_ref and bool(left_fingerprint.provider_ref)
-    if not shared_scope and not same_provider:
+        return _candidate("conflict", left, right, conflict, snapshot_gid)
+    if _text(lf.action) != _text(rf.action):
         return None
-    differing = tuple(field for field, left_value, right_value in (
-        ("business_effect", _text(left_fingerprint.business_effect), _text(right_fingerprint.business_effect)),
-        ("provider_ref", left_fingerprint.provider_ref, right_fingerprint.provider_ref),
-        ("rules", _rules(left), _rules(right)),
-    ) if left_value != right_value)
-    if not differing:
+    a, b = _semantic(left), _semantic(right)
+    if a is None or b is None:
         return None
-    return _candidate("boundary_overlap", left, right, {
-        "differing_fields": differing,
-        "shared_provider_ref": left_fingerprint.provider_ref if same_provider else "",
-        "shared_scope": shared_scope,
-    }, snapshot_gid=snapshot_gid)
+    if a == b:
+        return _candidate("duplicate", left, right, {"matching_fields": tuple(sorted(a)), "provider_refs": tuple(sorted((lf.provider_ref, rf.provider_ref)))}, snapshot_gid)
+    core = ("business_effect", "criteria", "input_schema_hash", "output_schema_hash", "input_schema", "output_schema", "read_scope", "write_scope", "rules")
+    if all(a[name] == b[name] for name in core):
+        sa, sb = set(map(canonical_fingerprint, a["resource_selectors"])), set(map(canonical_fingerprint, b["resource_selectors"]))
+        if sa > sb or sb > sa:
+            covering, covered = (left, right) if sa > sb else (right, left)
+            return _candidate("coverage", left, right, {"covering_capability_key": _key(covering), "covered_capability_key": _key(covered), "resource_selector_containment": True}, snapshot_gid)
+    shared_writes = tuple(sorted(set(lf.write_scope) & set(rf.write_scope)))
+    shared_resources = tuple(sorted({item["resource_type"] for item in _selectors(left)} & {item["resource_type"] for item in _selectors(right)}))
+    if shared_writes or shared_resources:
+        return _candidate("boundary_overlap", left, right, {"shared_write_scope": shared_writes, "shared_resource_types": shared_resources, "differing_fields": tuple(name for name in sorted(set(a) | set(b)) if a.get(name) != b.get(name))}, snapshot_gid)
+    return None
 
 
-def analyze_relationships(
-    capabilities: Iterable[ScannedCapability], *, snapshot_gid: int = 0,
-) -> tuple[CapabilityRelationCandidate, ...]:
-    """Produce one deterministic candidate per narrowed pair without AI input."""
-    candidates = []
-    for left, right in candidate_pairs(capabilities):
-        candidate = _analyze_pair(left, right, snapshot_gid=snapshot_gid)
-        if candidate is not None:
-            candidates.append(candidate)
-    return tuple(sorted(candidates, key=lambda item: (item.relation_type, item.capability_keys, item.candidate_hash)))
+def analyze_relationships(capabilities: Iterable[ScannedCapability], *, snapshot_gid: int = 0) -> tuple[CapabilityRelationCandidate, ...]:
+    items = tuple(capabilities)
+    pairs = {tuple(sorted((_key(a), _key(b)))): (a, b) for a, b in candidate_pairs(items)}
+    for left, right in _conflict_pairs(items):
+        pairs.setdefault(tuple(sorted((_key(left), _key(right)))), (left, right))
+    values = (_analyze_pair(left, right, snapshot_gid) for left, right in pairs.values())
+    return tuple(sorted((item for item in values if item is not None), key=lambda item: (item.relation_type, item.capability_keys, item.candidate_hash)))
 
 
 __all__ = ["analyze_relationships", "candidate_pairs"]

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
+import math
 from typing import Any, Literal, Mapping
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -297,13 +298,18 @@ class InvocationEnvelope(FrozenModel):
 class MachineRangeConstraint(FrozenModel):
     """A deliberately small, machine-provable interval used only for comparison."""
     field: str = Field(pattern=r"^[A-Za-z][A-Za-z0-9_.-]{0,127}$")
+    unit: str = Field(pattern=r"^[A-Za-z][A-Za-z0-9_./^-]{0,31}$")
     minimum: float | None = Field(default=None, strict=True)
     maximum: float | None = Field(default=None, strict=True)
+    minimum_inclusive: bool = True
+    maximum_inclusive: bool = True
 
     @model_validator(mode="after")
     def has_a_valid_bound(self) -> "MachineRangeConstraint":
         if self.minimum is None and self.maximum is None:
             raise ValueError("machine range requires a bound")
+        if any(value is not None and not math.isfinite(value) for value in (self.minimum, self.maximum)):
+            raise ValueError("machine range requires finite bounds")
         if self.minimum is not None and self.maximum is not None and self.minimum > self.maximum:
             raise ValueError("machine range minimum exceeds maximum")
         return self

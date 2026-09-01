@@ -104,6 +104,14 @@ def sanitize_candidate_package(value: Any) -> dict[str, object]:
         result["snapshot_gid"] = snapshot_gid
     if snapshot_hash := _hash(value.get("snapshot_hash")):
         result["snapshot_hash"] = snapshot_hash
+    if candidate_hash := _hash(value.get("candidate_hash")):
+        result["candidate_hash"] = candidate_hash
+    if relation_type := _identifier(value.get("relation_type")):
+        result["relation_type"] = relation_type
+    if keys := _identifiers(value.get("capability_keys")):
+        result["capability_keys"] = keys
+    if comparison := sanitize_evidence(value.get("field_comparison")):
+        result["field_comparison"] = comparison
     if ids := _identifiers(value.get("capability_ids")):
         result["capability_ids"] = ids
     if gids := _gids(value.get("capability_version_gids")):

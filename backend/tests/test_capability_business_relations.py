@@ -61,7 +61,7 @@ def _rule(
     maximum: float | None = None,
     applies_when: str = "A height is changed.",
 ) -> dict[str, object]:
-    constraints: dict[str, object] = {"field": "height"}
+    constraints: dict[str, object] = {"field": "height", "unit": "m"}
     if minimum is not None:
         constraints["minimum"] = minimum
     if maximum is not None:
@@ -89,21 +89,20 @@ def test_duplicate_is_cross_domain_and_field_explainable():
 
     assert candidate.capability_keys == ("ergonomics.height.write@1", "person.height.write@1")
     assert candidate.source == "deterministic"
-    assert candidate.evidence["matching_fields"] == (
-        "action", "business_effect", "business_object", "input_schema_hash",
-        "output_schema_hash", "read_scope", "rules", "write_scope",
-    )
+    assert set(candidate.evidence["matching_fields"]) >= {"business_effect", "criteria", "input_schema", "output_schema", "resource_selectors", "rules"}
 
 
 def test_coverage_has_one_explicit_direction():
-    broad = _capability("person.height.write_all", write_scope=("person.height", "person.profile"))
-    narrow = _capability("person.height.write", write_scope=("person.height",))
+    broad = _capability("person.height.write_all")
+    narrow = _capability("person.height.write")
+    broad = replace(broad, descriptor={"resource_selectors": ({"resource_type": "person.height", "payload_path": "$.person"}, {"resource_type": "person.profile", "payload_path": "$.person"})})
+    narrow = replace(narrow, descriptor={"resource_selectors": ({"resource_type": "person.height", "payload_path": "$.person"},)})
 
     candidate = _relation((narrow, broad), "coverage")
 
     assert candidate.evidence["covering_capability_key"] == "person.height.write_all@1"
     assert candidate.evidence["covered_capability_key"] == "person.height.write@1"
-    assert candidate.evidence["contained_fields"] == ("write_scope",)
+    assert candidate.evidence["resource_selector_containment"] is True
 
 
 def test_coverage_does_not_reverse_read_and_write_scope_direction():
@@ -138,14 +137,35 @@ def test_conflict_requires_disjoint_machine_constraints_not_merely_different_tex
     assert conflict.evidence["right_interval"] == (2.6, None)
 
 
+def test_cross_action_validate_and_write_rules_conflict_when_their_closed_intervals_do_not_overlap():
+    result = analyze_relationships((
+        _capability("ergonomics.height.validate", domain="ergonomics", action="validate", rules=(_rule("height.maximum", maximum=2.5),)),
+        _capability("person.height.write", action="write", rules=(_rule("height.minimum", minimum=2.6),)),
+    ))
+
+    conflict = next(item for item in result if item.relation_type == "conflict")
+    assert conflict.capability_keys == ("ergonomics.height.validate@1", "person.height.write@1")
+
+
+def test_open_boundary_and_units_are_part_of_a_provable_conflict():
+    upper = _rule("height.maximum", maximum=2.5)
+    lower = _rule("height.minimum", minimum=2.5)
+    lower["machine_constraints"]["minimum_inclusive"] = False
+    result = analyze_relationships((_capability("a.height.validate", domain="a", action="validate", rules=(upper,)), _capability("b.height.write", domain="b", rules=(lower,))))
+    assert any(item.relation_type == "conflict" for item in result)
+    lower["machine_constraints"]["unit"] = "cm"
+    result = analyze_relationships((_capability("a.height.validate", domain="a", action="validate", rules=(upper,)), _capability("b.height.write", domain="b", rules=(lower,))))
+    assert not any(item.relation_type == "conflict" for item in result)
+
+
 def test_boundary_overlap_requires_shared_structured_responsibility():
     candidate = _relation((
         _capability("ergonomics.height.recommend", domain="ergonomics", effect="Recommend a workstation height."),
         _capability("person.height.write", effect="Record a normalized height."),
     ), "boundary_overlap")
 
-    assert candidate.evidence["shared_scope"] == ("person.height",)
-    assert candidate.evidence["differing_fields"] == ("business_effect", "provider_ref")
+    assert candidate.evidence["shared_write_scope"] == ("person.height",)
+    assert candidate.evidence["differing_fields"] == ("business_effect",)
 
 
 def test_candidate_narrowing_skips_other_buckets_and_is_bounded():

@@ -11,6 +11,7 @@ from pathlib import Path, PurePosixPath
 from typing import Any
 
 from backend.capability_v2.business_definition import is_generated_business_effect
+from backend.capability_v2.contracts import BusinessInvariantContract
 
 from .config import GovernanceSettings
 from .fingerprint import canonical_fingerprint
@@ -682,6 +683,12 @@ class GovernanceScanner:
                 raise ScanPolicyError("product_catalog_business_rules_invalid")
             parsed_rules = tuple(dict(_json_document(rule)) for rule in raw_rules)
             for rule in parsed_rules:
+                try:
+                    validated_rule = BusinessInvariantContract.model_validate(rule)
+                except Exception as exc:
+                    raise ScanPolicyError("product_catalog_business_rule_scalar_invalid") from exc
+                rule.clear()
+                rule.update(validated_rule.model_dump(mode="json"))
                 rule_id = rule.get("rule_id")
                 version = rule.get("version")
                 if (

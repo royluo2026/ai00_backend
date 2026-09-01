@@ -723,6 +723,9 @@ class CapabilityGovernanceService:
                 if index < len(relation_gids) else relation
                 for index, relation in enumerate(relations[:_MAX_GRAPH_NODES])
             )
+        loader = getattr(self._store, "list_relation_candidates", None) if self._store is not None else None
+        if callable(loader):
+            result["relation_candidates"] = tuple(loader(int(getattr(snapshot, "snapshot_gid"))))[:max_nodes]
         return result
 
     def base_capability_finding_search(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:

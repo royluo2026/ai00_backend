@@ -413,12 +413,13 @@ def test_catalog_release_accepts_integer_version_and_rejects_rule_version_alias(
 
 def test_catalog_release_preserves_explicit_machine_rule_range_for_formal_relation_analysis(scanner):
     rule = _author_rule()
-    rule["machine_constraints"] = {"field": "height", "maximum": 2.5}
+    rule["machine_constraints"] = {"field": "height", "unit": "m", "maximum": 2.5}
 
     scanned = _scan_author_release(scanner, _author_release((rule,)))
 
     assert scanned.capabilities[0].business_rules[0]["machine_constraints"] == {
-        "field": "height", "minimum": None, "maximum": 2.5,
+        "field": "height", "unit": "m", "minimum": None, "maximum": 2.5,
+        "minimum_inclusive": True, "maximum_inclusive": True,
     }
 
 

@@ -344,7 +344,8 @@ class MemoryGovernanceStore(GovernanceStore):
 
     def save_relation_candidates(self, candidates: tuple[CapabilityRelationCandidate, ...]) -> None:
         with self._lock:
-            for candidate in candidates:
+            unique = {(candidate.snapshot_gid, candidate.candidate_hash): candidate for candidate in candidates}
+            for candidate in unique.values():
                 existing_gid = self._relation_candidates.get(candidate.relation_candidate_gid)
                 existing_subject = next((
                     item for item in self._relation_candidates.values()
@@ -757,7 +758,7 @@ class SqlGovernanceStore(GovernanceStore):
             for snapshot_gid in {candidate.snapshot_gid for candidate in candidates}
             for item in self.list_relation_candidates(snapshot_gid)
         }
-        pending = tuple(candidate for candidate in candidates if (candidate.snapshot_gid, candidate.candidate_hash) not in existing)
+        pending = tuple({(candidate.snapshot_gid, candidate.candidate_hash): candidate for candidate in candidates if (candidate.snapshot_gid, candidate.candidate_hash) not in existing}.values())
         if not pending:
             return
         cursor = self._connection.cursor()
@@ -766,7 +767,7 @@ class SqlGovernanceStore(GovernanceStore):
                 cursor.execute(
                     "INSERT INTO workmanship_base_capability_relation_candidates "
                     "(relation_candidate_gid, snapshot_gid, candidate_hash, relation_type, source, capability_keys_json, evidence_json, status) "
-                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE candidate_hash = candidate_hash",
                     (
                         candidate.relation_candidate_gid, candidate.snapshot_gid,
                         candidate.candidate_hash, candidate.relation_type, candidate.source,

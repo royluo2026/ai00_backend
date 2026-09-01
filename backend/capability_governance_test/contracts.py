@@ -262,6 +262,12 @@ _RELATION_SCHEMA = _closed({
     "to_canonical_key": STRING_SCHEMA, "relation_type": _SMALL_STRING_SCHEMA,
     "relation_hash": _VERSION_SCHEMA,
 })
+_RELATION_CANDIDATE_SCHEMA = _closed({
+    "relation_candidate_gid": GID_SCHEMA, "candidate_hash": _VERSION_SCHEMA,
+    "relation_type": _SMALL_STRING_SCHEMA, "source": _SMALL_STRING_SCHEMA,
+    "capability_keys": {"type": "array", "items": STRING_SCHEMA, "maxItems": 20},
+    "evidence": {"type": "object"}, "status": _SMALL_STRING_SCHEMA,
+})
 _RUN_SCHEMA = _closed({
     "run_gid": GID_SCHEMA, "snapshot_gid": GID_SCHEMA, "kind": _SMALL_STRING_SCHEMA,
     "status": _SMALL_STRING_SCHEMA,
@@ -381,6 +387,7 @@ def _output_schema(capability_id: str) -> dict[str, object]:
             "nodes": {"type": "array", "items": _NODE_SCHEMA, "maxItems": 500},
             "bindings": {"type": "array", "items": _BINDING_SCHEMA, "maxItems": 500},
             "relations": {"type": "array", "items": _RELATION_SCHEMA, "maxItems": 500},
+            "relation_candidates": {"type": "array", "items": _RELATION_CANDIDATE_SCHEMA, "maxItems": 500},
         })
     elif capability_id == "base.capability_finding.search":
         properties["findings"] = {"type": "array", "items": _FINDING_SCHEMA, "maxItems": 200}

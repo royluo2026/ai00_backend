@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+import asyncio
 from datetime import UTC, datetime, timedelta
 import hashlib
 import json
@@ -86,7 +87,7 @@ def advisory_result(**values: Any) -> dict[str, Any]:
     return {"findings": values.pop("findings", ()), "status": values.pop("status", "candidate"), **values}
 
 
-def validate_advisory(value: Any) -> AdvisoryResult:
+def validate_advisory(value: Any, *, allowed_gids: tuple[str, ...] = (), allowed_keys: tuple[str, ...] = ()) -> AdvisoryResult:
     """Validate exactly the candidate contract; advice can never become a decision."""
     try:
         if isinstance(value, AdvisoryResult):
@@ -101,6 +102,11 @@ def validate_advisory(value: Any) -> AdvisoryResult:
         raise AdvisoryContractError(f"candidate_only: {exc.errors()[0]['msg']}") from exc
     if result.status != "candidate" or any(finding.status != "candidate" for finding in result.findings):
         raise AdvisoryContractError("candidate_only: confirmed findings are forbidden")
+    for finding in result.findings:
+        if allowed_gids and not set(finding.subject_version_gids).issubset(allowed_gids):
+            raise AdvisoryContractError("candidate_only: subject outside candidate")
+        if allowed_keys and not set(finding.capability_keys).issubset(allowed_keys):
+            raise AdvisoryContractError("candidate_only: capability outside candidate")
     return result
 
 
@@ -127,7 +133,7 @@ def explain_relation(
         capability_keys=candidate.capability_keys,
         confidence=0.0,
         evidence_keys=evidence_keys,
-        recommendation="Review the cited deterministic relation evidence; this advisory cannot change its type or gate severity.",
+        recommendation=str(evidence.get("recommendation") or "Review the cited deterministic relation evidence; this advisory cannot change its type or gate severity."),
     )
 
 
@@ -186,7 +192,8 @@ class GovernedAgentAdvisor(GovernanceAdvisorPort):
         if len(_json_bytes(payload)) > self._max_input_bytes:
             raise AdvisoryContractError("input_bytes_exceeded")
         deadline = datetime.now(UTC) + timedelta(seconds=self._timeout_seconds)
-        result = await self._client.invoke(
+        try:
+            result = await asyncio.wait_for(self._client.invoke(
             DomainInvocation(
                 "agent.interaction.request", 1, payload,
                 idempotency_key=f"capability-advisory:{request_hash}",
@@ -194,14 +201,16 @@ class GovernedAgentAdvisor(GovernanceAdvisorPort):
             identity,
             CorrelationRef(request_id=request_id),
             deadline=deadline,
-        )
+        ), timeout=self._timeout_seconds)
+        except TimeoutError as exc:
+            raise AdvisoryContractError("agent_advisory_timeout") from exc
         result = await self._completed_result(result, identity=identity, request_id=request_id, deadline=deadline)
         if len(_json_bytes(result.data)) > self._max_output_bytes:
             raise AdvisoryContractError("output_bytes_exceeded")
         data = result.data
         if isinstance(data, Mapping) and isinstance(data.get("content"), Mapping):
             data = data["content"]
-        return validate_advisory(data)
+        return validate_advisory(data, allowed_gids=tuple(candidate_package.get("capability_version_gids", ())), allowed_keys=tuple(candidate_package.get("capability_keys", ())))
 
     async def _completed_result(
         self,
