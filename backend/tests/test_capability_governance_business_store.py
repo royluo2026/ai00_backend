@@ -461,7 +461,7 @@ def test_sql_relation_transactional_readback_exact_replay_and_conflicts_rollback
     assert any("FOR UPDATE" in query for query, _ in connection.calls)
     assert any("ON DUPLICATE KEY UPDATE" in query for query, _ in connection.calls)
     for conflict in (replace(candidate, snapshot_gid=999, candidate_hash=HASH_1), replace(candidate, relation_candidate_gid=999)):
-        with pytest.raises(ImmutableRecordError, match="relation_candidate_immutable_conflict"):
+        with pytest.raises(ImmutableRecordError, match="(relation_candidate_gid_already_exists|uq_capability_relation_candidate|relation_candidate_immutable_conflict)"):
             store.save_relation_candidates((conflict,))
         assert connection.rollbacks and connection.rows == [_relation_row(candidate)]
 
@@ -476,3 +476,72 @@ def test_sql_relation_transaction_batch_rolls_back_and_preserves_nonunique_error
     assert connection.rows == []
     with pytest.raises(RuntimeError, match="transport_down"):
         SqlGovernanceStore(_RelationTxConnection(fail_insert=True)).save_relation_candidates((candidate,))
+
+
+class _SharedRelationDatabase:
+    def __init__(self, rows=(), hook=None): self.committed, self.hook, self.upserts = list(rows), hook, 0
+    def connect(self): return _SharedRelationConnection(self)
+
+
+class _SharedRelationConnection:
+    def __init__(self, database): self.database, self.staged, self.calls = database, [], []; self.commits = self.rollbacks = 0
+    def cursor(self): return _SharedRelationCursor(self)
+    def commit(self):
+        for row in self.staged:
+            if not any(item[0] == row[0] or (item[1] == row[1] and item[2] == row[2]) for item in self.database.committed):
+                self.database.committed.append(row)
+        self.staged.clear(); self.commits += 1
+    def rollback(self): self.staged.clear(); self.rollbacks += 1
+
+
+class _SharedRelationCursor:
+    def __init__(self, connection): self.connection, self.rows = connection, []
+    def execute(self, query, parameters=()):
+        self.connection.calls.append((query, parameters))
+        if query.startswith("INSERT INTO workmanship_base_capability_relation_candidates"):
+            assert "ON DUPLICATE KEY UPDATE relation_candidate_gid=relation_candidate_gid" in query
+            row = tuple(parameters); db = self.connection.database
+            if not any(item[0] == row[0] or (item[1] == row[1] and item[2] == row[2]) for item in db.committed + self.connection.staged):
+                self.connection.staged.append(row)
+            db.upserts += 1
+            if db.hook: db.hook(db, row)
+        elif query.startswith("SELECT relation_candidate_gid"):
+            assert "WHERE relation_candidate_gid = %s OR (snapshot_gid = %s AND candidate_hash = %s) FOR UPDATE" in query
+            gid, snapshot, digest = parameters
+            merged = self.connection.database.committed + self.connection.staged
+            # one visible row per exact identity; concurrent conflict retains both.
+            self.rows = [item for index, item in enumerate(merged) if (item[0] == gid or (item[1] == snapshot and item[2] == digest)) and item not in merged[:index]]
+    def fetchall(self): return self.rows
+    def close(self): pass
+
+
+def test_shared_db_exact_concurrent_replay_current_read_commits_once():
+    candidate = _projection().relation_candidates[0]
+    def replay(database, row):
+        if database.upserts == 1: database.committed.append(row)
+    database = _SharedRelationDatabase(hook=replay); connection = database.connect()
+    SqlGovernanceStore(connection).save_relation_candidates((candidate,))
+    assert connection.commits == 1 and connection.rollbacks == 0 and database.committed == [_relation_row(candidate)]
+    assert all("FOR UPDATE" in query for query, _ in connection.calls if query.startswith("SELECT"))
+
+
+def test_shared_db_conflict_or_collision_and_batch_second_rollback():
+    candidate = _projection().relation_candidates[0]
+    conflict = replace(candidate, snapshot_gid=999, candidate_hash=HASH_1)
+    def conflicting_commit(database, row):
+        if database.upserts == 1: database.committed.append(_relation_row(conflict))
+    database = _SharedRelationDatabase(hook=conflicting_commit); connection = database.connect()
+    with pytest.raises(ImmutableRecordError, match="relation_candidate_gid_already_exists"):
+        SqlGovernanceStore(connection).save_relation_candidates((candidate,))
+    assert connection.rollbacks == 1 and database.committed == [_relation_row(conflict)]
+    row_a = _relation_row(conflict); row_b = _relation_row(replace(candidate, relation_candidate_gid=999))
+    collision = _SharedRelationDatabase((row_a, row_b)).connect()
+    with pytest.raises(ImmutableRecordError): SqlGovernanceStore(collision).save_relation_candidates((candidate,))
+    assert collision.rollbacks == 1
+    first = replace(candidate, relation_candidate_gid=404, candidate_hash=HASH_1)
+    second = replace(candidate, relation_candidate_gid=405, candidate_hash=HASH_A)
+    def second_conflict(database, row):
+        if database.upserts == 2: database.committed.append(_relation_row(replace(second, snapshot_gid=999, candidate_hash=HASH_2)))
+    batch_database = _SharedRelationDatabase(hook=second_conflict); batch = batch_database.connect()
+    with pytest.raises(ImmutableRecordError): SqlGovernanceStore(batch).save_relation_candidates((first, second))
+    assert batch.rollbacks == 1 and all(row[0] != first.relation_candidate_gid for row in batch_database.committed)

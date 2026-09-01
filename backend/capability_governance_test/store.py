@@ -795,6 +795,10 @@ class SqlGovernanceStore(GovernanceStore):
                     evidence=_json_load(_row_value(row, "evidence_json", 6)), status=str(_row_value(row, "status", 7)),
                 ) for row in cursor.fetchall())
                 if len(matches) != 1 or matches[0] != candidate:
+                    if any(item.relation_candidate_gid == candidate.relation_candidate_gid for item in matches):
+                        raise ImmutableRecordError("relation_candidate_gid_already_exists")
+                    if any((item.snapshot_gid, item.candidate_hash) == (candidate.snapshot_gid, candidate.candidate_hash) for item in matches):
+                        raise ImmutableRecordError("uq_capability_relation_candidate")
                     raise ImmutableRecordError("relation_candidate_immutable_conflict")
             self._connection.commit()
         except Exception:
