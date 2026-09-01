@@ -1160,7 +1160,7 @@ class CapabilityGovernanceService:
         self._audit(
             operation="agent_invocation", request_id=request_id, context=context,
             detail={
-                "status": "advisory_unavailable" if unavailable else result.status,
+                "status": result.status,
                 "reason_code": result.reason_code,
                 "finding_count": len(result.findings),
                 "finding_types": tuple(finding.finding_type for finding in result.findings),
@@ -1677,7 +1677,7 @@ class CapabilityGovernanceService:
         if operation == "agent_invocation":
             allowed = {"duplicate", "semantic_overlap", "conflict", "gap", "non_atomic_facade", "lifecycle_pair_gap"}
             finding_types = tuple(str(value) for value in detail.get("finding_types", ()) if str(value) in allowed)
-            status = "unavailable" if detail.get("status") == "advisory_unavailable" else (
+            status = "unavailable" if detail.get("status") in {"advisory_unavailable", "unavailable"} else (
                 "candidate" if detail.get("status") == "candidate" else "invalid"
             )
             reason = str(detail.get("reason_code", ""))

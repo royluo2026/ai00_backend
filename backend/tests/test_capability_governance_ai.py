@@ -199,6 +199,19 @@ def test_service_returns_structured_unavailable_advice_and_audits_timeout():
     }
 
 
+def test_service_preserves_advisor_returned_unavailable_reason_in_audit():
+    class Unavailable:
+        async def review(self, *_args, **_kwargs):
+            from backend.capability_governance_test.ai_advisory import AdvisoryResult
+            return AdvisoryResult(status="unavailable", reason_code="dependency_unavailable")
+    sink = AuditSink(next_gid=iter(range(1, 10)).__next__)
+    result = asyncio.run(CapabilityGovernanceService(advisor=Unavailable(), audit_sink=sink).review_advisory(
+        {}, context=type("Context", (), {"identity": object(), "user_gid": "actor-1"})(), request_id="dependency-1",
+    ))
+    assert result.status == "unavailable" and result.reason_code == "dependency_unavailable"
+    assert dict(sink.events[0].detail)["reason_code"] == "dependency_unavailable"
+
+
 class SequencedDomainClient:
     def __init__(self, results):
         self._results = iter(results)

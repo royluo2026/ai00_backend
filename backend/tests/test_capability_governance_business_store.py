@@ -459,6 +459,7 @@ def test_sql_relation_transactional_readback_exact_replay_and_conflicts_rollback
     store.save_relation_candidates((candidate,))
     assert connection.commits == 1 and len(connection.rows) == 1
     assert any("FOR UPDATE" in query for query, _ in connection.calls)
+    assert any("ON DUPLICATE KEY UPDATE" in query for query, _ in connection.calls)
     for conflict in (replace(candidate, snapshot_gid=999, candidate_hash=HASH_1), replace(candidate, relation_candidate_gid=999)):
         with pytest.raises(ImmutableRecordError, match="relation_candidate_immutable_conflict"):
             store.save_relation_candidates((conflict,))
