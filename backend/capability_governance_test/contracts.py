@@ -325,6 +325,7 @@ _AUDIT_DETAIL_SCHEMA = _closed({
     "prompt_hash": _VERSION_SCHEMA,
     "finding_count": {"type": "integer", "minimum": 0, "maximum": 5000},
     "finding_types": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 20},
+    "reason_code": {"type": ["string", "null"], "enum": ["timeout", "failed", "invalid_output", "dependency_unavailable", None]},
 })
 _AUDIT_ITEM_SCHEMA = _closed({
     "audit_event_gid": GID_SCHEMA,

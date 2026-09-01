@@ -233,8 +233,11 @@ def _relation_candidate_projection(record: Any) -> dict[str, Any]:
     evidence = _value(record, "evidence")
     entries = []
     if isinstance(evidence, Mapping):
-        for key, value in sorted(evidence.items(), key=lambda item: str(item[0]))[:40]:
-            encoded = json.dumps(redact(value), sort_keys=True, separators=(",", ":"), ensure_ascii=True, default=str)
+        # Redact the full mapping first: a secret-bearing *outer key* is as
+        # sensitive as a nested key and must affect neither JSON nor hash.
+        safe_evidence = redact(evidence)
+        for key, value in sorted(safe_evidence.items(), key=lambda item: str(item[0]))[:40]:
+            encoded = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True, default=str)
             entries.append({
                 "key": str(key), "value_json": encoded[:512],
                 "value_hash": "sha256:" + hashlib.sha256(encoded.encode("utf-8")).hexdigest(),

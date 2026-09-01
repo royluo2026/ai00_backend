@@ -255,15 +255,26 @@ class GovernedAgentAdvisor(GovernanceAdvisorPort):
         # fail-fast until it completes, bounding both latency and task count.
         if self._inflight_task is not None and not self._inflight_task.done():
             raise AdvisoryContractError("agent_advisory_timeout")
-        self._inflight_task = asyncio.create_task(
+        task = asyncio.create_task(
             self._client.invoke(invocation, identity, CorrelationRef(request_id=request_id), deadline=deadline),
         )
-        done, _ = await asyncio.wait((self._inflight_task,), timeout=remaining)
+        self._inflight_task = task
+        task.add_done_callback(self._reap_detached_task)
+        done, _ = await asyncio.wait((task,), timeout=remaining)
         if not done:
             raise AdvisoryContractError("agent_advisory_timeout")
-        task = self._inflight_task
-        self._inflight_task = None
+        if self._inflight_task is task:
+            self._inflight_task = None
         return task.result()
+
+    def _reap_detached_task(self, task: asyncio.Task[Any]) -> None:
+        """Consume late completion so detached failures never hit loop warnings."""
+        try:
+            task.exception()
+        except asyncio.CancelledError:
+            pass
+        if self._inflight_task is task:
+            self._inflight_task = None
 
     async def _completed_result(
         self,

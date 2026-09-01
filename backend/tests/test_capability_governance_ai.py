@@ -185,6 +185,20 @@ def test_service_audits_redacted_governed_advice_without_promoting_candidate_to_
     assert "secret" not in repr(event.detail)
 
 
+def test_service_returns_structured_unavailable_advice_and_audits_timeout():
+    class Failing:
+        async def review(self, *_args, **_kwargs):
+            raise AdvisoryContractError("agent_advisory_timeout")
+    sink = AuditSink(next_gid=iter(range(1, 10)).__next__)
+    result = asyncio.run(CapabilityGovernanceService(advisor=Failing(), audit_sink=sink).review_advisory(
+        {}, context=type("Context", (), {"identity": object(), "user_gid": "actor-1"})(), request_id="timeout-1",
+    ))
+    assert result.status == "unavailable" and result.reason_code == "timeout" and result.findings == ()
+    assert dict(sink.events[0].detail) == {
+        "status": "unavailable", "reason_code": "timeout", "finding_count": 0, "finding_types": (),
+    }
+
+
 class SequencedDomainClient:
     def __init__(self, results):
         self._results = iter(results)

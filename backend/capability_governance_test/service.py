@@ -11,7 +11,7 @@ import re
 from backend.capabilities.models_next import CapabilityBusinessError
 from backend.domain_ports.capability_governance_ai import GovernanceAdvisorPort
 
-from .ai_advisory import AdvisoryResult
+from .ai_advisory import AdvisoryContractError, AdvisoryResult
 from .analysis import AnalysisRequest, run_deterministic_analysis
 from .business_relations import analyze_relationships
 from .prompting import PromptAuthorizationError, RedactedPrompt, _render_repair_prompt
@@ -1152,13 +1152,16 @@ class CapabilityGovernanceService:
         except Exception as exc:
             # Advice is optional.  It must never suppress deterministic scan
             # evidence or turn an AI transport failure into a service failure.
-            reason = "timeout" if "timeout" in str(exc).lower() else "failed"
+            reason = "timeout" if isinstance(exc, TimeoutError) or (
+                isinstance(exc, AdvisoryContractError) and str(exc) == "agent_advisory_timeout"
+            ) else "failed"
             result = AdvisoryResult(status="unavailable", reason_code=reason)
             unavailable = True
         self._audit(
             operation="agent_invocation", request_id=request_id, context=context,
             detail={
                 "status": "advisory_unavailable" if unavailable else result.status,
+                "reason_code": result.reason_code,
                 "finding_count": len(result.findings),
                 "finding_types": tuple(finding.finding_type for finding in result.findings),
             },
@@ -1674,10 +1677,17 @@ class CapabilityGovernanceService:
         if operation == "agent_invocation":
             allowed = {"duplicate", "semantic_overlap", "conflict", "gap", "non_atomic_facade", "lifecycle_pair_gap"}
             finding_types = tuple(str(value) for value in detail.get("finding_types", ()) if str(value) in allowed)
+            status = "unavailable" if detail.get("status") == "advisory_unavailable" else (
+                "candidate" if detail.get("status") == "candidate" else "invalid"
+            )
+            reason = str(detail.get("reason_code", ""))
             return {
-                "status": "candidate" if detail.get("status") == "candidate" else "invalid",
-                "finding_count": min(max(0, int(detail.get("finding_count", 0))), 5000),
-                "finding_types": finding_types,
+                "status": status,
+                "reason_code": reason if status == "unavailable" and reason in {
+                    "timeout", "failed", "invalid_output", "dependency_unavailable",
+                } else None,
+                "finding_count": 0 if status == "unavailable" else min(max(0, int(detail.get("finding_count", 0))), 5000),
+                "finding_types": () if status == "unavailable" else finding_types,
             }
         return {}
 
