@@ -29,9 +29,9 @@
 
 ### Clean-materialization verification
 
-Clean detached worktree: `E:\Projects\ai00_v3\.task6-worktree-clean-13b1c238` at commit `13b1c238`.
+Clean detached worktree: `E:\Projects\ai00_v3\.task6-worktree-clean-a5c18109` at commit `a5c18109`.
 
-- `python -m pytest backend/tests/test_capability_business_review.py backend/tests/test_capability_governance_business_store.py backend/tests/test_capability_governance_service_workflow.py backend/tests/test_capability_business_relations.py backend/tests/test_capability_governance_provider.py -q` — **79 passed in 2.32s**. Pytest emitted two cache-directory permission warnings only; test outcomes are clean.
+- `python -m pytest backend/tests/test_capability_business_review.py backend/tests/test_capability_governance_business_store.py backend/tests/test_capability_governance_service_workflow.py backend/tests/test_capability_business_relations.py backend/tests/test_capability_governance_provider.py -q` — **79 passed in 2.28s**. Pytest emitted two cache-directory permission warnings only; test outcomes are clean.
 - `python -m compileall -q backend/capability_governance_test/workflow.py backend/capability_governance_test/service.py backend/capability_governance_test/contracts.py backend/capability_governance_test/provider.py backend/capability_governance_test/store.py backend/capability_governance_test/business_models.py backend/capability_v2/gateway.py` — passed.
 - `git diff --check` for the staged Task6 fix was clean before commit.
 - Separate known migration issue: `python -m pytest backend/tests/test_versioned_migration_files.py -q` has **1 failed, 8 passed** because pre-existing `202608310001_craft_rule_identity_backfill.sql` contains non-resumable `UPDATE` SQL. It is outside Task6 and unchanged.
