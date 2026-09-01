@@ -755,44 +755,47 @@ class SqlGovernanceStore(GovernanceStore):
     def save_relation_candidates(self, candidates: tuple[CapabilityRelationCandidate, ...]) -> None:
         if not candidates:
             return
-        existing = {item.relation_candidate_gid: item for snapshot_gid in {candidate.snapshot_gid for candidate in candidates}
-                    for item in self.list_relation_candidates(snapshot_gid)}
-        subjects = {(item.snapshot_gid, item.candidate_hash): item for item in existing.values()}
-        pending: list[CapabilityRelationCandidate] = []
-        # Validate both SQL unique identities before inserting a single row.
+        gids: dict[int, CapabilityRelationCandidate] = {}
+        subjects: dict[tuple[int, str], CapabilityRelationCandidate] = {}
+        # Match Memory semantics before opening the write transaction.
         for candidate in candidates:
-            gid_match = existing.get(candidate.relation_candidate_gid)
+            gid_match = gids.get(candidate.relation_candidate_gid)
             subject_match = subjects.get((candidate.snapshot_gid, candidate.candidate_hash))
             if gid_match is not None and gid_match != candidate:
                 raise ImmutableRecordError("relation_candidate_gid_already_exists")
             if subject_match is not None and subject_match != candidate:
                 raise ImmutableRecordError("uq_capability_relation_candidate")
-            if gid_match is None and subject_match is None:
-                existing[candidate.relation_candidate_gid] = candidate
-                subjects[(candidate.snapshot_gid, candidate.candidate_hash)] = candidate
-                pending.append(candidate)
-        if not pending:
-            return
+            gids[candidate.relation_candidate_gid] = candidate
+            subjects[(candidate.snapshot_gid, candidate.candidate_hash)] = candidate
         cursor = self._connection.cursor()
         try:
-            for candidate in pending:
-                try:
-                    cursor.execute(
-                        "INSERT INTO workmanship_base_capability_relation_candidates "
-                        "(relation_candidate_gid, snapshot_gid, candidate_hash, relation_type, source, capability_keys_json, evidence_json, status) "
-                        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
-                        (candidate.relation_candidate_gid, candidate.snapshot_gid, candidate.candidate_hash,
-                         candidate.relation_type, candidate.source, _json(candidate.capability_keys),
-                         _json(candidate.evidence), candidate.status),
-                    )
-                except Exception:
-                    # A concurrent exact replay is a no-op; every other
-                    # duplicate is an immutable identity collision.
-                    replay = next((item for item in self.list_relation_candidates(candidate.snapshot_gid)
-                                   if item.relation_candidate_gid == candidate.relation_candidate_gid
-                                   or item.candidate_hash == candidate.candidate_hash), None)
-                    if replay != candidate:
-                        raise
+            for candidate in candidates:
+                cursor.execute(
+                    "INSERT INTO workmanship_base_capability_relation_candidates "
+                    "(relation_candidate_gid, snapshot_gid, candidate_hash, relation_type, source, capability_keys_json, evidence_json, status) "
+                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s) "
+                    "ON DUPLICATE KEY UPDATE relation_candidate_gid=relation_candidate_gid",
+                    (candidate.relation_candidate_gid, candidate.snapshot_gid, candidate.candidate_hash,
+                     candidate.relation_type, candidate.source, _json(candidate.capability_keys),
+                     _json(candidate.evidence), candidate.status),
+                )
+                cursor.execute(
+                    "SELECT relation_candidate_gid, snapshot_gid, candidate_hash, relation_type, source, "
+                    "capability_keys_json, evidence_json, status "
+                    "FROM workmanship_base_capability_relation_candidates "
+                    "WHERE relation_candidate_gid = %s OR (snapshot_gid = %s AND candidate_hash = %s) FOR UPDATE",
+                    (candidate.relation_candidate_gid, candidate.snapshot_gid, candidate.candidate_hash),
+                )
+                matches = tuple(CapabilityRelationCandidate(
+                    relation_candidate_gid=int(_row_value(row, "relation_candidate_gid", 0)),
+                    snapshot_gid=int(_row_value(row, "snapshot_gid", 1)),
+                    candidate_hash=_text_value(_row_value(row, "candidate_hash", 2)),
+                    relation_type=str(_row_value(row, "relation_type", 3)), source=str(_row_value(row, "source", 4)),
+                    capability_keys=_json_tuple(_row_value(row, "capability_keys_json", 5)),
+                    evidence=_json_load(_row_value(row, "evidence_json", 6)), status=str(_row_value(row, "status", 7)),
+                ) for row in cursor.fetchall())
+                if len(matches) != 1 or matches[0] != candidate:
+                    raise ImmutableRecordError("relation_candidate_immutable_conflict")
             self._connection.commit()
         except Exception:
             self._connection.rollback()

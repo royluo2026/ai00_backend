@@ -4,11 +4,14 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any, Callable
 from unittest.mock import patch
+import hashlib
+import json
 
 from backend.base import provider as base_provider
 from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityRisk, CapabilitySpec
 
 from .contracts import ALL_IDS, ANALYZE_IDS, GOVERN_IDS, INPUT_SCHEMAS, OUTPUT_SCHEMAS, RELEASE_IDS, WRITE_IDS
+from .redaction import redact
 
 
 _READ_PERMISSION = "system.capability.read"
@@ -231,8 +234,12 @@ def _relation_candidate_projection(record: Any) -> dict[str, Any]:
     entries = []
     if isinstance(evidence, Mapping):
         for key, value in sorted(evidence.items(), key=lambda item: str(item[0]))[:40]:
-            text = _transport_value(value, depth=0)
-            entries.append({"key": str(key)[:255], "value": str(text)[:255]})
+            encoded = json.dumps(redact(value), sort_keys=True, separators=(",", ":"), ensure_ascii=True, default=str)
+            entries.append({
+                "key": str(key), "value_json": encoded[:512],
+                "value_hash": "sha256:" + hashlib.sha256(encoded.encode("utf-8")).hexdigest(),
+                "truncated": len(encoded) > 512,
+            })
     return {
         **_projection(record, (
             "relation_candidate_gid", "candidate_hash", "relation_type", "source", "capability_keys", "status",

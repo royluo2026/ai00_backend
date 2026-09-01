@@ -13,6 +13,7 @@ from backend.capability_governance_test.service import CapabilityGovernanceServi
 def _finding():
     return {
         "finding_type": "gap", "subject_version_gids": ["7"], "confidence": 0.8,
+        "capability_keys": ["capability.contract"],
         "evidence_keys": ["evidence:7"], "recommendation": "add a lifecycle pair", "status": "candidate",
     }
 
@@ -21,8 +22,8 @@ def test_repair_prompt_has_required_sections_and_only_authorized_callers_can_rea
     service = CapabilityGovernanceService()
     prompt = service.generate_repair_prompt(
         _finding(),
-        {"implementation": {"url": "https://user:pass@example.test/private"}},
-        {"allowed": ["backend/capabilities"], "forbidden": ["database migrations"], "required_tests": ["pytest"]},
+        {"implementation": {"url": "https://user:pass@example.test/private"}, "evidence_keys": ["evidence:7"]},
+        {"capability_version_gids": ["7"], "capability_ids": ["capability.contract"], "allowed": ["backend/capabilities"], "forbidden": ["database migrations"], "required_tests": ["pytest"]},
         context=type("Context", (), {"user_gid": "actor-1"})(), request_id="request-1",
     )
 
@@ -42,7 +43,7 @@ def test_repair_prompt_has_required_sections_and_only_authorized_callers_can_rea
 
 
 def test_repair_prompt_store_record_never_contains_prompt_text():
-    prompt = build_repair_prompt(_finding(), {"summary": "safe"}, {"allowed": []})
+    prompt = build_repair_prompt(_finding(), {"evidence_keys": ["evidence:7"]}, {"capability_version_gids": ["7"], "capability_ids": ["capability.contract"]})
 
     assert set(prompt.store_record()) == {"prompt_hash", "redacted_summary"}
 
@@ -53,7 +54,7 @@ def test_service_persists_only_redacted_prompt_metadata_and_audits_generation():
     context = type("Context", (), {"user_gid": "actor-1"})()
 
     prompt = service.generate_repair_prompt(
-        _finding(), {"password": "secret"}, {"allowed": []}, context=context, request_id="request-1",
+        _finding(), {"password": "secret", "evidence_keys": ["evidence:7"]}, {"capability_version_gids": ["7"], "capability_ids": ["capability.contract"]}, context=context, request_id="request-1",
     )
 
     assert service.prompt_records == {prompt.prompt_hash: prompt.store_record()}
@@ -67,7 +68,7 @@ def test_service_authorizes_prompt_read_and_drops_benign_business_evidence_and_b
     prompt = service.generate_repair_prompt(
         _finding(),
         {"evidence_keys": ["evidence:7"], "friendly_note": "customer Alice order 123"},
-        {"snapshot_gid": "9", "allowed_change_ids": ["capability.contract"], "friendly_note": "source code text"},
+        {"snapshot_gid": "9", "capability_version_gids": ["7"], "capability_ids": ["capability.contract"], "allowed_change_ids": ["capability.contract"], "friendly_note": "source code text"},
         context=type("Context", (), {"user_gid": "actor-1"})(), request_id="request-1",
     )
     unauthorized = type("Context", (), {"user_gid": "actor-1", "governance_permissions": ()})()
@@ -83,7 +84,7 @@ def test_service_authorizes_prompt_read_and_drops_benign_business_evidence_and_b
 
 
 def test_prompt_holder_cannot_self_authorize_text_access():
-    prompt = build_repair_prompt(_finding(), {"evidence_keys": ["evidence:7"]}, {"snapshot_gid": "9"})
+    prompt = build_repair_prompt(_finding(), {"evidence_keys": ["evidence:7"]}, {"snapshot_gid": "9", "capability_version_gids": ["7"], "capability_ids": ["capability.contract"]})
 
     assert not hasattr(prompt, "text_for")
     assert "text" not in repr(vars(prompt)).lower()

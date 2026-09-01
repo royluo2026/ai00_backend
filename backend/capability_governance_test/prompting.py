@@ -33,10 +33,16 @@ class RedactedPrompt:
         return {"prompt_hash": self.prompt_hash, "redacted_summary": self.redacted_summary}
 
 
-def _finding(value: AdvisoryFinding | Mapping[str, Any]) -> AdvisoryFinding:
+def _finding(
+    value: AdvisoryFinding | Mapping[str, Any], *, allowed_gids: tuple[str, ...],
+    allowed_keys: tuple[str, ...], allowed_evidence_keys: tuple[str, ...],
+) -> AdvisoryFinding:
     if isinstance(value, AdvisoryFinding):
-        return value
-    return validate_advisory({"findings": [value]}).findings[0]
+        value = value.model_dump(mode="json")
+    return validate_advisory(
+        {"findings": [value]}, allowed_gids=allowed_gids, allowed_keys=allowed_keys,
+        allowed_evidence_keys=allowed_evidence_keys,
+    ).findings[0]
 
 
 def build_repair_prompt(
@@ -54,13 +60,21 @@ def _render_repair_prompt(
     boundary: Mapping[str, Any],
 ) -> tuple[RedactedPrompt, str]:
     """Build all nine sections from only fixed, reviewable governance metadata."""
-    safe_finding = _finding(finding)
     safe_evidence = sanitize_evidence(evidence)
     safe_boundary = sanitize_repair_boundary(boundary)
+    # The repair boundary, not the untrusted finding, supplies the authority
+    # surface. Missing boundary evidence therefore fails closed.
+    allowed_gids = tuple(safe_boundary.get("capability_version_gids", ()))
+    allowed_keys = tuple(safe_boundary.get("capability_ids", ()))
+    allowed_evidence_keys = tuple(safe_evidence.get("evidence_keys", ()))
+    safe_finding = _finding(
+        finding, allowed_gids=allowed_gids, allowed_keys=allowed_keys,
+        allowed_evidence_keys=allowed_evidence_keys,
+    )
     snapshot_identity = {key: safe_boundary[key] for key in ("snapshot_gid", "snapshot_hash") if key in safe_boundary}
     capability_identities = {
         "capability_ids": safe_boundary.get("capability_ids", ()),
-        "capability_version_gids": safe_boundary.get("capability_version_gids", safe_finding.subject_version_gids),
+        "capability_version_gids": safe_boundary.get("capability_version_gids", ()),
     }
     finding_summary = {
         "finding_type": safe_finding.finding_type,

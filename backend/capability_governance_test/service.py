@@ -1149,10 +1149,11 @@ class CapabilityGovernanceService:
         unavailable = False
         try:
             result = await self._advisor.review(package, identity=identity, request_id=request_id)
-        except Exception:
+        except Exception as exc:
             # Advice is optional.  It must never suppress deterministic scan
             # evidence or turn an AI transport failure into a service failure.
-            result = AdvisoryResult()
+            reason = "timeout" if "timeout" in str(exc).lower() else "failed"
+            result = AdvisoryResult(status="unavailable", reason_code=reason)
             unavailable = True
         self._audit(
             operation="agent_invocation", request_id=request_id, context=context,

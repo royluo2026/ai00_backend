@@ -271,8 +271,9 @@ _RELATION_CANDIDATE_SCHEMA = _closed({
     "capability_keys": {"type": "array", "items": STRING_SCHEMA, "maxItems": 20},
     "evidence": _closed({
         "entries": {"type": "array", "maxItems": 40, "items": _closed({
-            "key": _SMALL_STRING_SCHEMA, "value": _SMALL_STRING_SCHEMA,
-        }, ("key", "value"))},
+            "key": _SMALL_STRING_SCHEMA, "value_json": {"type": "string", "maxLength": 512},
+            "value_hash": _VERSION_SCHEMA, "truncated": _BOOLEAN_SCHEMA,
+        }, ("key", "value_json", "value_hash", "truncated"))},
     }, ("entries",)), "status": _SMALL_STRING_SCHEMA,
 })
 _RUN_SCHEMA = _closed({

@@ -80,7 +80,18 @@ class AdvisoryFinding(FrozenModel):
 
 class AdvisoryResult(FrozenModel):
     findings: tuple[AdvisoryFinding, ...] = ()
-    status: Literal["candidate"] = "candidate"
+    status: Literal["candidate", "unavailable"] = "candidate"
+    reason_code: Literal["timeout", "failed", "invalid_output", "dependency_unavailable"] | None = None
+
+    def __init__(self, **data: Any) -> None:
+        if data.get("status", "candidate") == "unavailable":
+            if data.get("findings", ()):
+                raise AdvisoryContractError("unavailable_advisory_must_be_empty")
+            if data.get("reason_code") is None:
+                raise AdvisoryContractError("unavailable_advisory_requires_reason")
+        elif data.get("reason_code") is not None:
+            raise AdvisoryContractError("candidate_advisory_has_reason")
+        super().__init__(**data)
 
 
 def advisory_result(**values: Any) -> dict[str, Any]:
@@ -107,7 +118,9 @@ def validate_advisory(
         raise
     except ValidationError as exc:
         raise AdvisoryContractError(f"candidate_only: {exc.errors()[0]['msg']}") from exc
-    if result.status != "candidate" or any(finding.status != "candidate" for finding in result.findings):
+    if result.status == "unavailable":
+        return result
+    if any(finding.status != "candidate" for finding in result.findings):
         raise AdvisoryContractError("candidate_only: confirmed findings are forbidden")
     for finding in result.findings:
         # Candidate binding is fail-closed: an empty allow-list does not mean
@@ -183,6 +196,7 @@ class GovernedAgentAdvisor(GovernanceAdvisorPort):
         self._max_input_bytes = max_input_bytes
         self._max_output_bytes = max_output_bytes
         self._timeout_seconds = timeout_seconds
+        self._inflight_task: asyncio.Task[Any] | None = None
 
     async def review(
         self,
@@ -236,13 +250,20 @@ class GovernedAgentAdvisor(GovernanceAdvisorPort):
         remaining = deadline_monotonic - time.monotonic()
         if remaining <= 0:
             raise AdvisoryContractError("agent_advisory_timeout")
-        try:
-            return await asyncio.wait_for(
-                self._client.invoke(invocation, identity, CorrelationRef(request_id=request_id), deadline=deadline),
-                timeout=remaining,
-            )
-        except TimeoutError as exc:
-            raise AdvisoryContractError("agent_advisory_timeout") from exc
+        # Do not use wait_for here: it waits for a coroutine that swallows
+        # CancelledError.  One detached task is permitted, then the advisor is
+        # fail-fast until it completes, bounding both latency and task count.
+        if self._inflight_task is not None and not self._inflight_task.done():
+            raise AdvisoryContractError("agent_advisory_timeout")
+        self._inflight_task = asyncio.create_task(
+            self._client.invoke(invocation, identity, CorrelationRef(request_id=request_id), deadline=deadline),
+        )
+        done, _ = await asyncio.wait((self._inflight_task,), timeout=remaining)
+        if not done:
+            raise AdvisoryContractError("agent_advisory_timeout")
+        task = self._inflight_task
+        self._inflight_task = None
+        return task.result()
 
     async def _completed_result(
         self,
