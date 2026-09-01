@@ -14,6 +14,7 @@ from backend.capability_v2.contracts import CapabilityStatus, ConsumerIdentity, 
 from backend.capability_v2.domain_client import DomainCapabilityClient, DomainInvocation
 from backend.domain_ports.capability_governance_ai import GovernanceAdvisorPort
 
+from .business_models import CapabilityRelationCandidate
 from .redaction import sanitize_candidate_package
 
 
@@ -34,11 +35,14 @@ class AdvisoryFinding(FrozenModel):
     finding_type: Literal[
         "duplicate", "semantic_overlap", "conflict", "gap", "non_atomic_facade", "lifecycle_pair_gap",
     ]
-    subject_version_gids: tuple[str, ...] = Field(min_length=1)
+    subject_version_gids: tuple[str, ...] = ()
+    capability_keys: tuple[str, ...] = ()
     confidence: float = Field(ge=0, le=1)
     evidence_keys: tuple[str, ...]
     recommendation: str = Field(min_length=1, max_length=4000)
     status: Literal["candidate"] = "candidate"
+    authority: Literal["advisory"] = "advisory"
+    severity: Literal["info", "review"] = "review"
 
     @classmethod
     def _validate_gids(cls, value: Any) -> Any:
@@ -59,7 +63,15 @@ class AdvisoryFinding(FrozenModel):
         return value
 
     def __init__(self, **data: Any) -> None:
-        data["subject_version_gids"] = self._validate_gids(data.get("subject_version_gids"))
+        gids = data.get("subject_version_gids", ())
+        capability_keys = data.get("capability_keys", ())
+        if gids:
+            data["subject_version_gids"] = self._validate_gids(gids)
+        elif not isinstance(capability_keys, (tuple, list)) or not capability_keys or any(
+            not isinstance(key, str) or not key.strip() for key in capability_keys
+        ):
+            raise AdvisoryContractError("candidate_only: subject_version_gids must be decimal strings")
+        data["capability_keys"] = tuple(capability_keys)
         data["evidence_keys"] = self._validate_evidence_keys(data.get("evidence_keys"))
         super().__init__(**data)
 
@@ -90,6 +102,33 @@ def validate_advisory(value: Any) -> AdvisoryResult:
     if result.status != "candidate" or any(finding.status != "candidate" for finding in result.findings):
         raise AdvisoryContractError("candidate_only: confirmed findings are forbidden")
     return result
+
+
+def explain_relation(
+    candidate: CapabilityRelationCandidate, evidence: Mapping[str, Any],
+) -> AdvisoryFinding:
+    """Attach a non-authoritative explanation without changing hard evidence."""
+    if candidate.source != "deterministic":
+        raise AdvisoryContractError("relation_explanation_requires_deterministic_candidate")
+    if not isinstance(evidence, Mapping):
+        raise AdvisoryContractError("invalid_relation_evidence")
+    finding_type = {
+        "duplicate": "duplicate",
+        "coverage": "semantic_overlap",
+        "conflict": "conflict",
+        "boundary_overlap": "semantic_overlap",
+    }[candidate.relation_type]
+    evidence_keys = tuple(sorted({
+        *(str(key) for key in candidate.evidence if _EVIDENCE_KEY.fullmatch(str(key))),
+        *(str(key) for key in evidence if _EVIDENCE_KEY.fullmatch(str(key))),
+    }))[:_MAX_EVIDENCE_KEYS]
+    return AdvisoryFinding(
+        finding_type=finding_type,
+        capability_keys=candidate.capability_keys,
+        confidence=0.0,
+        evidence_keys=evidence_keys,
+        recommendation="Review the cited deterministic relation evidence; this advisory cannot change its type or gate severity.",
+    )
 
 
 def _json_bytes(value: Any) -> bytes:
@@ -198,5 +237,5 @@ class GovernedAgentAdvisor(GovernanceAdvisorPort):
 
 __all__ = [
     "AdvisoryContractError", "AdvisoryFinding", "AdvisoryResult", "GovernedAgentAdvisor",
-    "advisory_result", "bounded_candidate_package", "validate_advisory",
+    "advisory_result", "bounded_candidate_package", "explain_relation", "validate_advisory",
 ]

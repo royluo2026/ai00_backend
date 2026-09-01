@@ -294,6 +294,21 @@ class InvocationEnvelope(FrozenModel):
     approval_reference: str | None = Field(default=None, pattern=IDENTITY_PATTERN)
 
 
+class MachineRangeConstraint(FrozenModel):
+    """A deliberately small, machine-provable interval used only for comparison."""
+    field: str = Field(pattern=r"^[A-Za-z][A-Za-z0-9_.-]{0,127}$")
+    minimum: float | None = Field(default=None, strict=True)
+    maximum: float | None = Field(default=None, strict=True)
+
+    @model_validator(mode="after")
+    def has_a_valid_bound(self) -> "MachineRangeConstraint":
+        if self.minimum is None and self.maximum is None:
+            raise ValueError("machine range requires a bound")
+        if self.minimum is not None and self.maximum is not None and self.minimum > self.maximum:
+            raise ValueError("machine range minimum exceeds maximum")
+        return self
+
+
 class BusinessInvariantContract(FrozenModel):
     rule_id: str = Field(pattern=r"^[a-z][a-z0-9_.-]{2,127}$")
     version: int = Field(ge=1, strict=True)
@@ -302,6 +317,7 @@ class BusinessInvariantContract(FrozenModel):
     enforcement_ref: str = Field(min_length=1, max_length=1000)
     error_code: str = Field(min_length=1, max_length=255)
     test_refs: tuple[str, ...] = Field(min_length=1)
+    machine_constraints: MachineRangeConstraint | None = None
 
 
 def _assert_closed_schema(schema: Mapping[str, Any], path: str) -> None:

@@ -12,6 +12,7 @@ from backend.capabilities.models_next import CapabilityBusinessError
 from backend.domain_ports.capability_governance_ai import GovernanceAdvisorPort
 
 from .analysis import AnalysisRequest, run_deterministic_analysis
+from .business_relations import analyze_relationships
 from .prompting import PromptAuthorizationError, RedactedPrompt, _render_repair_prompt
 from .release_gate import ReleaseCandidate, ReleaseGate, ReleaseGateError
 from .workflow import ProposalService, ReviewerContext, WaiverService, WorkflowError
@@ -840,6 +841,7 @@ class CapabilityGovernanceService:
         try:
             document = self._scanner.scan(code_revision)
             snapshot = self._persist_scanned_snapshot(document)
+            self._persist_relation_candidates(snapshot, document)
         except CapabilityBusinessError:
             raise
         except Exception as exc:
@@ -1313,6 +1315,21 @@ class CapabilityGovernanceService:
                     raise _business_error("governance_dependency_unavailable")
                 return snapshot
         raise _business_error("governance_dependency_unavailable")
+
+    def _persist_relation_candidates(self, snapshot: Any, document: Any) -> tuple[Any, ...]:
+        """Persist only reproducible candidates; advisory failures never affect them."""
+        if self._store is None:
+            return ()
+        candidates = analyze_relationships(
+            getattr(document, "capabilities", ()), snapshot_gid=int(getattr(snapshot, "snapshot_gid")),
+        )
+        save = getattr(self._store, "save_relation_candidates", None)
+        if callable(save):
+            save(candidates)
+        loader = getattr(self._store, "list_relation_candidates", None)
+        if callable(loader):
+            return tuple(loader(int(getattr(snapshot, "snapshot_gid"))))
+        return candidates
 
     def _queue(self, capability_id: str, payload: Mapping[str, Any], context: object, *, kind: str) -> dict[str, Any]:
         key = self._idempotency(payload)

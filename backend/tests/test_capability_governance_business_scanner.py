@@ -411,6 +411,17 @@ def test_catalog_release_accepts_integer_version_and_rejects_rule_version_alias(
         CatalogRelease.model_validate_json(json.dumps(document))
 
 
+def test_catalog_release_preserves_explicit_machine_rule_range_for_formal_relation_analysis(scanner):
+    rule = _author_rule()
+    rule["machine_constraints"] = {"field": "height", "maximum": 2.5}
+
+    scanned = _scan_author_release(scanner, _author_release((rule,)))
+
+    assert scanned.capabilities[0].business_rules[0]["machine_constraints"] == {
+        "field": "height", "minimum": None, "maximum": 2.5,
+    }
+
+
 def test_catalog_release_rule_version_changes_hash_but_shuffle_does_not(scanner):
     release_one = _author_release((_author_rule(version=1),))
     release_two = _author_release((_author_rule(version=2),))

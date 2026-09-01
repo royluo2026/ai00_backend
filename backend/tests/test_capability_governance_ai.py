@@ -9,8 +9,10 @@ from backend.capability_governance_test.ai_advisory import (
     AdvisoryContractError,
     GovernedAgentAdvisor,
     advisory_result,
+    explain_relation,
     validate_advisory,
 )
+from backend.capability_governance_test.business_models import CapabilityRelationCandidate
 from backend.capability_governance_test.audit import AuditSink
 from backend.capability_governance_test.service import CapabilityGovernanceService
 from backend.capability_v2.contracts import CapabilityResultV2, CapabilityStatus, CorrelationRef, OperationRef, OperationStatus
@@ -38,6 +40,26 @@ def test_ai_result_cannot_confirm_finding():
 
     with pytest.raises(AdvisoryContractError, match="candidate_only"):
         validate_advisory(result)
+
+
+def test_ai_relation_explanation_is_advisory_and_cannot_change_deterministic_blocking_evidence():
+    candidate = CapabilityRelationCandidate(
+        relation_candidate_gid=7,
+        snapshot_gid=9,
+        candidate_hash="sha256:" + "a" * 64,
+        relation_type="conflict",
+        source="deterministic",
+        capability_keys=("ergonomics.height.validate@1", "person.height.write@1"),
+        evidence={"constraint_field": "height", "left_interval": (None, 2.5), "right_interval": (2.6, None)},
+    )
+
+    advisory = explain_relation(candidate, evidence={"summary": "possibly similar", "severity": "blocking"})
+
+    assert advisory.authority == "advisory"
+    assert advisory.severity != "blocking"
+    assert advisory.capability_keys == candidate.capability_keys
+    assert candidate.source == "deterministic"
+    assert candidate.evidence["constraint_field"] == "height"
 
 
 @pytest.mark.parametrize("finding", [
