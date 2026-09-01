@@ -610,7 +610,77 @@ class GovernanceScanner:
             for path in self._scan_declared_manifest_path(root)
             if self.is_source_candidate_path(path.relative_to(self.settings.repository_root).as_posix())
         }
+        paths.update(self.acceptance_input_paths())
         return tuple(sorted(paths))
+
+    def _resolve_repository_input(self, relative_path: str, *, source_only: bool) -> tuple[str, Path]:
+        pure = PurePosixPath(relative_path)
+        if (
+            not relative_path or pure.is_absolute() or Path(relative_path).is_absolute()
+            or ".." in pure.parts
+        ):
+            raise ScanPolicyError("acceptance_manifest_case_invalid")
+        source = (self.settings.repository_root / Path(pure)).resolve()
+        try:
+            source.relative_to(self.settings.repository_root.resolve())
+        except ValueError as exc:
+            raise ScanPolicyError("acceptance_manifest_case_invalid") from exc
+        valid = (
+            self.is_source_input_file(source, self.settings.repository_root)
+            if source_only else self._is_safe_repository_input(source)
+        )
+        if not valid:
+            raise ScanPolicyError("acceptance_manifest_case_invalid")
+        return source.relative_to(self.settings.repository_root).as_posix(), source
+
+    @staticmethod
+    def _is_safe_repository_input(path: Path) -> bool:
+        if not path.is_file() or path.is_symlink():
+            return False
+        try:
+            return path.stat().st_size <= _MAX_SOURCE_BYTES
+        except OSError:
+            return False
+
+    def _acceptance_test_references(
+        self,
+    ) -> tuple[tuple[str, str, str, str, str, Path], ...]:
+        if self._acceptance_manifest is None:
+            return ()
+        manifest = _json_document(self._acceptance_manifest)
+        declared = manifest.get("capabilities")
+        if not isinstance(declared, Mapping):
+            raise ScanPolicyError("acceptance_manifest_invalid")
+        references: list[tuple[str, str, str, str, str, Path]] = []
+        seen_node_ids: set[str] = set()
+        for raw_key, raw_cases in sorted(declared.items(), key=lambda item: str(item[0])):
+            if not isinstance(raw_key, str) or not isinstance(raw_cases, Mapping):
+                raise ScanPolicyError("acceptance_manifest_capability_invalid")
+            for case_name, raw_node_id in sorted(raw_cases.items(), key=lambda item: str(item[0])):
+                if not isinstance(case_name, str) or not isinstance(raw_node_id, str):
+                    raise ScanPolicyError("acceptance_manifest_case_invalid")
+                source_path, separator, source_symbol = raw_node_id.partition("::")
+                if (
+                    not separator or not source_symbol.startswith("test_")
+                    or not source_path.endswith(".py") or raw_node_id in seen_node_ids
+                ):
+                    raise ScanPolicyError("acceptance_manifest_case_invalid")
+                seen_node_ids.add(raw_node_id)
+                relative_source, source = self._resolve_repository_input(source_path, source_only=True)
+                references.append((raw_key, case_name, raw_node_id, relative_source, source_symbol, source))
+        return tuple(references)
+
+    def acceptance_input_paths(self) -> tuple[str, ...]:
+        """Return the manifest and every local test source it authorizes the scan to read."""
+        if self._acceptance_manifest is None:
+            return ()
+        manifest_path, _manifest = self._resolve_repository_input(
+            self._acceptance_manifest_path, source_only=False,
+        )
+        return tuple(sorted({
+            manifest_path,
+            *(reference[3] for reference in self._acceptance_test_references()),
+        }))
 
     @staticmethod
     def _resolve_import_source(source_path: str, module: str | None, level: int) -> str | None:
@@ -1109,62 +1179,38 @@ class GovernanceScanner:
         """Bind only executable test node ids explicitly declared by the acceptance manifest."""
         if self._acceptance_manifest is None:
             return [], []
-        manifest = _json_document(self._acceptance_manifest)
-        declared = manifest.get("capabilities")
-        if not isinstance(declared, Mapping):
-            raise ScanPolicyError("acceptance_manifest_invalid")
         by_key = {
             f"{item.capability_id}@{item.major_version}": item
             for item in capabilities
         }
         bindings: list[CapabilityBinding] = []
         relations: list[ImplementationRelation] = []
-        for raw_key, raw_cases in sorted(declared.items(), key=lambda item: str(item[0])):
-            if not isinstance(raw_key, str) or raw_key not in by_key:
+        for raw_key, case_name, raw_node_id, relative_source, _source_symbol, source in self._acceptance_test_references():
+            if raw_key not in by_key:
                 raise ScanPolicyError("acceptance_manifest_capability_invalid")
             capability = by_key[raw_key]
-            if capability.lifecycle_status != "stable" or not isinstance(raw_cases, Mapping):
+            if capability.lifecycle_status != "stable":
                 raise ScanPolicyError("acceptance_manifest_capability_invalid")
             descriptor_key = node_key(
                 "descriptor", capability.owner_domain,
                 f"catalog/{capability.capability_id}@{capability.major_version}",
             )
-            for case_name, raw_node_id in sorted(raw_cases.items(), key=lambda item: str(item[0])):
-                if not isinstance(case_name, str) or not isinstance(raw_node_id, str):
-                    raise ScanPolicyError("acceptance_manifest_case_invalid")
-                source_path, separator, source_symbol = raw_node_id.partition("::")
-                if (
-                    not separator
-                    or not source_symbol.startswith("test_")
-                    or not source_path.endswith(".py")
-                    or Path(source_path).is_absolute()
-                    or ".." in PurePosixPath(source_path).parts
-                ):
-                    raise ScanPolicyError("acceptance_manifest_case_invalid")
-                source = (self.settings.repository_root / Path(PurePosixPath(source_path))).resolve()
-                try:
-                    source.relative_to(self.settings.repository_root.resolve())
-                except ValueError as exc:
-                    raise ScanPolicyError("acceptance_manifest_case_invalid") from exc
-                if not self._is_safe_repository_file(source):
-                    raise ScanPolicyError("acceptance_manifest_case_invalid")
-                relative_source = source.relative_to(self.settings.repository_root).as_posix()
-                key = node_key("test_case", capability.owner_domain, relative_source, raw_node_id)
-                nodes[key] = ImplementationNode(
-                    key,
-                    capability.owner_domain,
-                    "test_case",
-                    relative_source,
-                    _source_hash(source.read_text(encoding="utf-8")),
-                    raw_node_id,
-                    metadata={
-                        "case_type": case_name,
-                        "test_node_id": raw_node_id,
-                        "acceptance_manifest": self._acceptance_manifest_path,
-                    },
-                )
-                bindings.append(self._binding(capability, key, "tested_by"))
-                relations.append(self._relation(descriptor_key, key, "tested_by"))
+            key = node_key("test_case", capability.owner_domain, relative_source, raw_node_id)
+            nodes[key] = ImplementationNode(
+                key,
+                capability.owner_domain,
+                "test_case",
+                relative_source,
+                _source_hash(source.read_text(encoding="utf-8")),
+                raw_node_id,
+                metadata={
+                    "case_type": case_name,
+                    "test_node_id": raw_node_id,
+                    "acceptance_manifest": self._acceptance_manifest_path,
+                },
+            )
+            bindings.append(self._binding(capability, key, "tested_by"))
+            relations.append(self._relation(descriptor_key, key, "tested_by"))
         return bindings, relations
 
     def _registry_modules(self) -> dict[tuple[str, int], str]:

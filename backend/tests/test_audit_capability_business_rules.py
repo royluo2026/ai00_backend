@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 from pathlib import Path
+import shutil
 import subprocess
 
 import pytest
@@ -186,3 +188,100 @@ def test_stable_scan_records_exact_clean_backend_and_web_revisions():
     )
     assert document["code_revision"] == backend_revision == "a" * 40
     assert web_revision == "b" * 40
+
+
+def _acceptance_fixture(tmp_path: Path, *, tracked_source: bool = True):
+    from backend.capability_governance_test.config import GovernanceSettings
+    from backend.capability_governance_test.scanner import GovernanceScanner
+
+    source_fixture = Path(__file__).parent / "fixtures/capability_governance_scan/valid"
+    root = tmp_path / "acceptance-provenance"
+    shutil.copytree(source_fixture, root)
+    acceptance_source = root / "acceptance/test_external.py"
+    acceptance_source.parent.mkdir()
+    acceptance_source.write_text(
+        "def test_success_case():\n    assert True\n", encoding="utf-8",
+    )
+    node_id = "acceptance/test_external.py::test_success_case[craft.bop.factory.create@1]"
+    manifest = {
+        "capabilities": {"craft.bop.factory.create@1": {"success": node_id}},
+    }
+    manifest_path = root / "acceptance.json"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    subprocess.run(("git", "init"), cwd=root, check=True, capture_output=True)
+    subprocess.run(("git", "config", "user.email", "audit@example.test"), cwd=root, check=True)
+    subprocess.run(("git", "config", "user.name", "Audit Test"), cwd=root, check=True)
+    subprocess.run(("git", "add", "."), cwd=root, check=True)
+    if not tracked_source:
+        subprocess.run(("git", "reset", "--", "acceptance/test_external.py"), cwd=root, check=True)
+    subprocess.run(("git", "commit", "-m", "fixture"), cwd=root, check=True, capture_output=True)
+    scanner = GovernanceScanner(
+        GovernanceSettings("test-governance", root, ("plugins",)),
+        product_catalog=json.loads((root / "product_catalog.json").read_text(encoding="utf-8")),
+        extension_catalog=json.loads((root / "extension_catalog.json").read_text(encoding="utf-8")),
+        domain_manifests=json.loads((root / "official_domains.json").read_text(encoding="utf-8")),
+        acceptance_manifest=manifest, acceptance_manifest_path="acceptance.json",
+    )
+    return root, scanner, acceptance_source, node_id
+
+
+def test_scanner_discovery_includes_and_scan_hashes_acceptance_manifest_source(tmp_path):
+    root, scanner, source, node_id = _acceptance_fixture(tmp_path)
+    paths = scanner.source_input_paths()
+    assert "acceptance.json" in paths
+    assert "acceptance/test_external.py" in paths
+
+    document = scanner.scan("a" * 40)
+    node = next(item for item in document.nodes if item.source_symbol == node_id)
+    expected = "sha256:" + hashlib.sha256(source.read_text(encoding="utf-8").encode("utf-8")).hexdigest()
+    assert node.source_path == "acceptance/test_external.py"
+    assert node.artifact_hash == expected
+
+
+@pytest.mark.parametrize("staged", (False, True))
+def test_acceptance_source_staged_and_unstaged_mutation_fail_provenance(tmp_path, staged):
+    from backend.scripts import audit_capability_business_rules as command
+
+    root, scanner, source, _node_id = _acceptance_fixture(tmp_path)
+    clean = command._capture_provenance(
+        root, source_roots=scanner.source_roots(), input_paths=scanner.source_input_paths(),
+    )
+    assert clean.revision == subprocess.run(
+        ("git", "rev-parse", "HEAD"), cwd=root, check=True, capture_output=True, text=True,
+    ).stdout.strip()
+    source.write_text("def test_success_case():\n    assert False\n", encoding="utf-8")
+    if staged:
+        subprocess.run(("git", "add", "acceptance/test_external.py"), cwd=root, check=True)
+    with pytest.raises(RuntimeError, match="business_audit_relevant_tree_dirty"):
+        command._capture_provenance(
+            root, source_roots=scanner.source_roots(), input_paths=scanner.source_input_paths(),
+        )
+
+
+def test_untracked_acceptance_source_fails_provenance(tmp_path):
+    from backend.scripts import audit_capability_business_rules as command
+
+    root, scanner, _source, _node_id = _acceptance_fixture(tmp_path, tracked_source=False)
+    with pytest.raises(RuntimeError, match="business_audit_relevant_tree_dirty"):
+        command._capture_provenance(
+            root, source_roots=scanner.source_roots(), input_paths=scanner.source_input_paths(),
+        )
+
+
+def test_acceptance_source_mutation_between_probes_aborts_after_consuming_change(tmp_path):
+    from backend.scripts import audit_capability_business_rules as command
+
+    root, scanner, source, node_id = _acceptance_fixture(tmp_path)
+    probe = lambda: command._capture_provenance(
+        root, source_roots=scanner.source_roots(), input_paths=scanner.source_input_paths(),
+    )
+    web = command._InputProvenance("b" * 40, "sha256:" + "2" * 64, ("web/main.js",))
+
+    def mutate_and_scan(revision):
+        source.write_text("def test_success_case():\n    assert False\n", encoding="utf-8")
+        document = scanner.scan(revision)
+        assert any(item.source_symbol == node_id for item in document.nodes)
+        return document
+
+    with pytest.raises(RuntimeError, match="business_audit_relevant_tree_dirty"):
+        command._stable_scan(mutate_and_scan, probe, lambda: web)

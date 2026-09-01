@@ -156,8 +156,11 @@ def _stable_scan(scan, backend_probe, web_probe):
 
 def _backend_provenance() -> _InputProvenance:
     manifests = load_domain_manifests(OFFICIAL_DOMAINS)
+    acceptance_manifest = json.loads(ACCEPTANCE_MANIFEST.read_text(encoding="utf-8"))
     discovery = GovernanceScanner(
         GovernanceSettings("test-governance", REPOSITORY_ROOT), domain_manifests=manifests,
+        acceptance_manifest=acceptance_manifest,
+        acceptance_manifest_path=ACCEPTANCE_MANIFEST.relative_to(REPOSITORY_ROOT).as_posix(),
     )
     fixed = tuple(path.relative_to(REPOSITORY_ROOT).as_posix() for path in (
         PRODUCT_CATALOG, EXTENSION_CATALOG, OFFICIAL_DOMAINS, ACCEPTANCE_MANIFEST, LEGACY_BASELINE,
