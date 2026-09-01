@@ -426,7 +426,7 @@ class CapabilityGovernanceService:
             proposal_port is None
             and proposal_service is None
             and all(callable(getattr(store, name, None)) for name in (
-                "save_workflow_proposal", "get_workflow_proposal",
+                "allocate_workflow_proposal_gid", "save_workflow_proposal", "get_workflow_proposal",
                 "transition_workflow_proposal", "decide_business_review_atomic",
             ))
         )

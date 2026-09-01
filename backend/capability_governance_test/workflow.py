@@ -169,10 +169,28 @@ class ProposalService:
         if self._audit_sink is not None:
             self._audit_sink.append(operation=operation, entity_gid=entity_gid, actor_gid=actor_gid, request_gid=idempotency_key, detail=detail, idempotency_key=f"{operation}:{idempotency_key}")
 
-    def _record(self, key: str, proposal: Proposal, *, operation: str, actor_gid: str) -> Proposal:
+    def _allocate_proposal_gid(self) -> int:
         saver = getattr(self._business_review_store, "save_workflow_proposal", None)
-        if proposal.review_kind == "business_definition" and callable(saver):
-            persisted = saver(proposal)
+        if not callable(saver):
+            return self._next_gid()
+        allocator = getattr(self._business_review_store, "allocate_workflow_proposal_gid", None)
+        if not callable(allocator):
+            raise WorkflowError("workflow_proposal_allocator_unavailable")
+        try:
+            proposal_gid = int(allocator())
+        except Exception as exc:
+            raise WorkflowError(str(exc) or "workflow_proposal_allocator_unavailable") from exc
+        if not 0 < proposal_gid < 2**63:
+            raise WorkflowError("workflow_proposal_gid_invalid")
+        return proposal_gid
+
+    def _record(self, key: str, proposal: Proposal, *, operation: str, actor_gid: str, create: bool = False) -> Proposal:
+        saver = getattr(self._business_review_store, "save_workflow_proposal", None)
+        if create and callable(saver):
+            try:
+                persisted = saver(proposal)
+            except Exception as exc:
+                raise WorkflowError(str(exc) or "workflow_proposal_create_failed") from exc
             if persisted is not None:
                 proposal = persisted
         self._proposals[proposal.proposal_gid] = proposal
@@ -194,14 +212,14 @@ class ProposalService:
             if proposal.capability_id == capability_id and proposal.status not in {"released", "rejected", "withdrawn", "superseded", "expired", "stale"} and proposal.proposed_descriptor_hash != proposed_descriptor_hash:
                 superseded = replace(proposal, status="superseded", row_version=proposal.row_version + 1)
                 atomic = getattr(self._business_review_store, "transition_workflow_proposal", None)
-                if proposal.review_kind == "business_definition" and callable(atomic):
+                if callable(atomic):
                     try:
                         superseded = atomic(proposal, superseded)
                     except Exception as exc:
                         raise WorkflowError(str(exc)) from exc
                 self._proposals[gid] = superseded
                 self._audit(operation="proposal_superseded", entity_gid=gid, actor_gid=str(submitted_by_gid), idempotency_key=f"{key}:superseded:{gid}", detail={"before_status": proposal.status, "after_status": "superseded", "capability_id": proposal.capability_id})
-        return self._record(key, Proposal(self._next_gid(), str(capability_id), int(capability_version_gid), int(base_snapshot_gid), str(previous_hash), str(proposed_descriptor_hash), str(evidence_hash), str(submitted_by_gid), review_kind=review_kind), operation="proposal", actor_gid=str(submitted_by_gid))
+        return self._record(key, Proposal(self._allocate_proposal_gid(), str(capability_id), int(capability_version_gid), int(base_snapshot_gid), str(previous_hash), str(proposed_descriptor_hash), str(evidence_hash), str(submitted_by_gid), review_kind=review_kind), operation="proposal", actor_gid=str(submitted_by_gid), create=True)
 
     def transition(self, proposal_gid: int, target: str, *, expected_row_version: int, idempotency_key: str) -> Proposal:
         key = str(idempotency_key).strip()
@@ -215,7 +233,7 @@ class ProposalService:
             raise WorkflowError("invalid_transition")
         candidate = replace(proposal, status=target, row_version=proposal.row_version + 1)
         atomic = getattr(self._business_review_store, "transition_workflow_proposal", None)
-        if proposal.review_kind == "business_definition" and callable(atomic):
+        if callable(atomic):
             try:
                 resolved = atomic(proposal, candidate)
             except Exception as exc:
@@ -269,7 +287,19 @@ class ProposalService:
             raise WorkflowError("review_decision_invalid")
         review = Review(self._next_gid(), proposal.proposal_gid, stage, decision, reviewer, proposal.base_snapshot_gid, proposal.proposed_descriptor_hash, proposal.evidence_hash, _time(decided_at))
         next_status = "rejected" if decision == "rejected" else ("approved" if set(required).issubset(prior_stages | {stage}) else "pending_approval")
-        return self._record(key, replace(proposal, status=next_status, reviews=proposal.reviews + (review,), row_version=proposal.row_version + 1), operation="review", actor_gid=reviewer)
+        candidate = replace(proposal, status=next_status, reviews=proposal.reviews + (review,), row_version=proposal.row_version + 1)
+        atomic = getattr(self._business_review_store, "transition_workflow_proposal", None)
+        if callable(atomic):
+            try:
+                resolved = atomic(proposal, candidate)
+            except Exception as exc:
+                raise WorkflowError(str(exc)) from exc
+            self._proposals[proposal_gid] = resolved
+            self._idempotency[key] = resolved
+            self._audit(operation="review", entity_gid=proposal_gid, actor_gid=reviewer,
+                        idempotency_key=key, detail={"status": resolved.status, "capability_id": resolved.capability_id})
+            return resolved
+        return self._record(key, candidate, operation="review", actor_gid=reviewer)
 
     def decide_business_definition(
         self, proposal_gid: int, *, reviewer_context: ReviewerContext,

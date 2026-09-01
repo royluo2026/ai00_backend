@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Mapping
-from dataclasses import replace
 from datetime import datetime, timezone
 import json
 from threading import RLock
@@ -226,6 +225,7 @@ class MemoryGovernanceStore(GovernanceStore):
         self._relation_candidates: dict[int, CapabilityRelationCandidate] = {}
         self._business_reviews: dict[int, CapabilityBusinessReview] = {}
         self._workflow_proposals: dict[int, Any] = {}
+        self._workflow_proposal_gid_value = 0
         self._business_review_requests: dict[str, tuple[tuple[object, ...], Any]] = {}
         self._rule_effectiveness: dict[int, RuleEffectivenessRecord] = {}
         self._scan_findings: dict[int, tuple[Mapping[str, Any], ...]] = {}
@@ -382,9 +382,33 @@ class MemoryGovernanceStore(GovernanceStore):
                 raise ImmutableRecordError("business_review_gid_already_exists")
             self._business_reviews[review.review_gid] = review
 
-    def save_workflow_proposal(self, proposal: Any) -> None:
+    def allocate_workflow_proposal_gid(self) -> int:
+        """Allocate from the proposal namespace shared by every service using this store."""
         with self._lock:
-            self._workflow_proposals[proposal.proposal_gid] = proposal
+            proposal_gid = max(
+                self._workflow_proposal_gid_value,
+                max(self._workflow_proposals, default=0),
+            ) + 1
+            if proposal_gid >= 2**63:
+                raise ImmutableRecordError("workflow_proposal_gid_invalid")
+            self._workflow_proposal_gid_value = proposal_gid
+            return proposal_gid
+
+    def save_workflow_proposal(self, proposal: Any) -> Any:
+        """Insert one newly allocated proposal without replacing an existing row."""
+        with self._lock:
+            proposal_gid = int(proposal.proposal_gid)
+            if not 0 < proposal_gid < 2**63:
+                raise ImmutableRecordError("workflow_proposal_gid_invalid")
+            if proposal_gid in self._workflow_proposals:
+                raise ImmutableRecordError("workflow_proposal_gid_already_exists")
+            staged = dict(self._workflow_proposals)
+            staged[proposal_gid] = proposal
+            self._workflow_proposals = staged
+            self._workflow_proposal_gid_value = max(
+                self._workflow_proposal_gid_value, proposal_gid,
+            )
+            return proposal
 
     def transition_workflow_proposal(self, proposal: Any, resolved: Any) -> Any:
         """CAS one ordinary proposal transition against the same durable row."""
@@ -652,8 +676,8 @@ class SqlGovernanceStore(GovernanceStore):
             for row in cursor.fetchall()
         )
 
-    def save_workflow_proposal(self, proposal: Any) -> Any:
-        """Persist the existing proposal state machine row for durable review CAS."""
+    def allocate_workflow_proposal_gid(self) -> int:
+        """Allocate the next proposal id from one durable cross-process namespace."""
         cursor = self._connection.cursor()
         try:
             cursor.execute(
@@ -675,22 +699,40 @@ class SqlGovernanceStore(GovernanceStore):
             proposal_gid = int(_row_value(row, "proposal_gid", 0)) if row is not None else 0
             if not 0 < proposal_gid < 2**63:
                 raise ImmutableRecordError("workflow_proposal_gid_invalid")
-            persisted = replace(proposal, proposal_gid=proposal_gid)
+            self._connection.commit()
+            return proposal_gid
+        except Exception:
+            self._connection.rollback()
+            raise
+        finally:
+            close = getattr(cursor, "close", None)
+            if callable(close):
+                close()
+
+    def save_workflow_proposal(self, proposal: Any) -> Any:
+        """Insert one allocated proposal; a collision never updates the existing row."""
+        cursor = self._connection.cursor()
+        try:
+            proposal_gid = int(proposal.proposal_gid)
+            if not 0 < proposal_gid < 2**63:
+                raise ImmutableRecordError("workflow_proposal_gid_invalid")
             cursor.execute(
                 "INSERT INTO workmanship_base_capability_change_proposals "
                 "(proposal_gid, capability_version_gid, base_snapshot_gid, proposed_descriptor_hash, change_type, risk_level, status, submitted_by_gid, submitted_at, summary, change_json, row_version) "
                 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                (persisted.proposal_gid, persisted.capability_version_gid, persisted.base_snapshot_gid,
-                 persisted.proposed_descriptor_hash, persisted.review_kind, "governed", persisted.status,
-                 int(persisted.submitted_by_gid), _now(), persisted.capability_id,
-                 json.dumps({"capability_id": persisted.capability_id, "previous_hash": persisted.previous_hash,
-                             "evidence_hash": persisted.evidence_hash, "review_kind": persisted.review_kind}, separators=(",", ":")),
-                 persisted.row_version),
+                (proposal.proposal_gid, proposal.capability_version_gid, proposal.base_snapshot_gid,
+                 proposal.proposed_descriptor_hash, proposal.review_kind, "governed", proposal.status,
+                 int(proposal.submitted_by_gid), _now(), proposal.capability_id,
+                 json.dumps({"capability_id": proposal.capability_id, "previous_hash": proposal.previous_hash,
+                             "evidence_hash": proposal.evidence_hash, "review_kind": proposal.review_kind}, separators=(",", ":")),
+                 proposal.row_version),
             )
             self._connection.commit()
-            return persisted
-        except Exception:
+            return proposal
+        except Exception as exc:
             self._connection.rollback()
+            if _duplicate_key(exc):
+                raise ImmutableRecordError("workflow_proposal_gid_already_exists") from exc
             raise
         finally:
             close = getattr(cursor, "close", None)

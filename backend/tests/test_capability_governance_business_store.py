@@ -728,6 +728,15 @@ def _super_admin_context(user_gid="9001"):
     )
 
 
+def _base_owner_context(user_gid="9003"):
+    return CapabilityContext(
+        user_gid=user_gid,
+        active_roles=("base_owner",),
+        permissions=("system.capability.govern",),
+        owned_domains=("base",),
+    )
+
+
 def _business_snapshot(snapshot_gid: int, capability_version_gid: int, definition_hash: str):
     return SimpleNamespace(
         snapshot_gid=snapshot_gid,
@@ -751,6 +760,149 @@ def _persistent_service(database: _SharedBusinessDatabase, *snapshots):
     store.get_snapshot = indexed.get
     store.latest_snapshot = lambda: indexed[max(indexed)] if indexed else None
     return CapabilityGovernanceService(store=store), connection
+
+
+def _proposal_payload(review_kind: str, idempotency_key: str):
+    if review_kind == "business_definition":
+        return {
+            "capability_id": "person.height.read", "capability_version_gid": "202",
+            "base_snapshot_gid": "501", "previous_hash": HASH_2,
+            "proposed_descriptor_hash": HASH_1, "definition_hash": HASH_1,
+            "evidence_hash": HASH_2, "idempotency_key": idempotency_key,
+        }
+    return {
+        "capability_id": "person.height.write", "capability_version_gid": "203",
+        "base_snapshot_gid": "501", "previous_hash": HASH_2,
+        "proposed_descriptor_hash": HASH_A,
+        "evidence_hash": HASH_2, "idempotency_key": idempotency_key,
+    }
+
+
+@pytest.mark.parametrize("order", (
+    ("standard", "business_definition"),
+    ("business_definition", "standard"),
+))
+def test_fresh_memory_services_share_one_proposal_identity_namespace(order):
+    store = MemoryGovernanceStore()
+    created = {}
+    for index, review_kind in enumerate(order, start=1):
+        service = CapabilityGovernanceService(store=store)
+        created[review_kind] = service.base_capability_proposal_submit(
+            _proposal_payload(review_kind, f"memory-{review_kind}"),
+            _super_admin_context(str(index)),
+        )["proposal"]
+
+    restarted = CapabilityGovernanceService(store=store)
+    rows = restarted.base_capability_proposal_search({}, _super_admin_context())["items"]
+
+    assert len({proposal.proposal_gid for proposal in created.values()}) == 2
+    assert {
+        (row["proposal_gid"], row["review_type"], row["status"])
+        for row in rows
+    } == {
+        (str(created[review_kind].proposal_gid), review_kind, "submitted")
+        for review_kind in order
+    }
+    assert {
+        restarted._proposals.get(proposal.proposal_gid).capability_id
+        for proposal in created.values()
+    } == {"person.height.read", "person.height.write"}
+
+
+def test_memory_duplicate_proposal_create_is_rejected_without_mutation():
+    store = MemoryGovernanceStore()
+    original = Proposal(
+        701, "person.height.read", 202, 501, HASH_2, HASH_1, HASH_2, "1",
+    )
+    collision = replace(original, capability_id="person.height.write", proposed_descriptor_hash=HASH_A)
+
+    store.save_workflow_proposal(original)
+    with pytest.raises(ImmutableRecordError, match="workflow_proposal_gid_already_exists"):
+        store.save_workflow_proposal(collision)
+
+    assert store.get_workflow_proposal(701) == original
+    assert store.list_workflow_proposals() == (original,)
+
+
+def test_sql_duplicate_proposal_create_is_rejected_without_mutation():
+    original = Proposal(
+        701, "person.height.read", 202, 501, HASH_2, HASH_1, HASH_2, "1",
+    )
+    collision = replace(original, capability_id="person.height.write", proposed_descriptor_hash=HASH_A)
+    database = _SharedBusinessDatabase(original)
+    store = SqlGovernanceStore(database.connect())
+
+    with pytest.raises(ImmutableRecordError, match="workflow_proposal_gid_already_exists"):
+        store.save_workflow_proposal(collision)
+
+    assert database.proposals == {701: original}
+
+
+@pytest.mark.parametrize("order", (
+    ("standard", "business_definition"),
+    ("business_definition", "standard"),
+))
+def test_fresh_sql_services_share_proposal_ids_and_address_each_type_after_restart(order):
+    database = _SharedBusinessDatabase()
+    snapshot = _business_snapshot(501, 202, HASH_1)
+    created = {}
+    for index, review_kind in enumerate(order, start=1):
+        service, _ = _persistent_service(database, snapshot)
+        created[review_kind] = service.base_capability_proposal_submit(
+            _proposal_payload(review_kind, f"sql-{review_kind}"),
+            _super_admin_context(str(index)),
+        )["proposal"]
+
+    assert len({proposal.proposal_gid for proposal in created.values()}) == 2
+    assert set(database.proposals) == {
+        proposal.proposal_gid for proposal in created.values()
+    }
+
+    restarted, _ = _persistent_service(database, snapshot)
+    rows = restarted.base_capability_proposal_search({}, _super_admin_context())["items"]
+    assert {
+        (row["proposal_gid"], row["review_type"], row["status"])
+        for row in rows
+    } == {
+        (str(created[review_kind].proposal_gid), review_kind, "submitted")
+        for review_kind in order
+    }
+
+    standard = restarted._proposals.get(created["standard"].proposal_gid)
+    standard = restarted._proposals.transition(
+        standard.proposal_gid, "checking", expected_row_version=standard.row_version,
+        idempotency_key="standard-checking",
+    )
+    standard = restarted._proposals.transition(
+        standard.proposal_gid, "pending_approval", expected_row_version=standard.row_version,
+        idempotency_key="standard-pending",
+    )
+    standard = restarted.base_capability_review_decide({
+        "proposal_gid": str(standard.proposal_gid), "stage": "base_owner",
+        "decision": "approved", "row_version": str(standard.row_version),
+        "idempotency_key": "standard-review",
+    }, _base_owner_context())["proposal"]
+
+    business = restarted._proposals.get(created["business_definition"].proposal_gid)
+    business = restarted._proposals.transition(
+        business.proposal_gid, "checking", expected_row_version=business.row_version,
+        idempotency_key="business-checking",
+    )
+    business = restarted._proposals.transition(
+        business.proposal_gid, "pending_approval", expected_row_version=business.row_version,
+        idempotency_key="business-pending",
+    )
+    business = restarted.base_capability_review_decide({
+        "proposal_gid": str(business.proposal_gid), "definition_hash": HASH_1,
+        "decision": "approved", "decision_reason": "Evidence sufficient",
+        "row_version": str(business.row_version), "idempotency_key": "business-review",
+    }, _super_admin_context("9004"))["proposal"]
+
+    final, _ = _persistent_service(database, snapshot)
+    assert final._proposals.get(standard.proposal_gid).status == "approved"
+    assert final._proposals.get(business.proposal_gid).status == "approved"
+    assert final._proposals.get(standard.proposal_gid).review_kind == "standard"
+    assert final._proposals.get(business.proposal_gid).review_kind == "business_definition"
 
 
 def test_sql_business_decision_is_single_transaction_and_failure_rolls_back_every_row():
