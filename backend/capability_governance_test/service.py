@@ -389,6 +389,7 @@ class CapabilityGovernanceService:
         self._proposals = proposal_service or ProposalService(
             next_gid=self._next_governance_gid, audit_sink=audit_sink,
             business_review_sink=self._save_business_review,
+            business_review_store=store,
         )
         self._waivers = waiver_service or WaiverService(
             next_gid=self._next_governance_gid, audit_sink=audit_sink,

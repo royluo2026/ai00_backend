@@ -221,6 +221,8 @@ class MemoryGovernanceStore(GovernanceStore):
         self._business_rules: dict[int, BusinessRuleRecord] = {}
         self._relation_candidates: dict[int, CapabilityRelationCandidate] = {}
         self._business_reviews: dict[int, CapabilityBusinessReview] = {}
+        self._workflow_proposals: dict[int, Any] = {}
+        self._business_review_requests: dict[str, tuple[tuple[object, ...], Any]] = {}
         self._rule_effectiveness: dict[int, RuleEffectivenessRecord] = {}
         self._scan_findings: dict[int, tuple[Mapping[str, Any], ...]] = {}
 
@@ -376,6 +378,44 @@ class MemoryGovernanceStore(GovernanceStore):
                 raise ImmutableRecordError("business_review_gid_already_exists")
             self._business_reviews[review.review_gid] = review
 
+    def save_workflow_proposal(self, proposal: Any) -> None:
+        with self._lock:
+            self._workflow_proposals[proposal.proposal_gid] = proposal
+
+    def get_workflow_proposal(self, proposal_gid: int) -> Any | None:
+        with self._lock:
+            return self._workflow_proposals.get(proposal_gid)
+
+    def decide_business_review_atomic(
+        self, proposal: Any, resolved: Any, review: CapabilityBusinessReview,
+        fingerprint: tuple[object, ...], idempotency_key: str,
+    ) -> Any:
+        """Commit proposal CAS, immutable review, and replay key under one lock."""
+        _validate_business_review_references(review)
+        with self._lock:
+            replay = self._business_review_requests.get(idempotency_key)
+            if replay is not None:
+                if replay[0] != fingerprint:
+                    raise ImmutableRecordError("idempotency_conflict")
+                return replay[1]
+            current = self._workflow_proposals.get(proposal.proposal_gid)
+            if current is None or current.row_version != proposal.row_version or current.status != "pending_approval":
+                raise ImmutableRecordError("row_version_conflict")
+            if current.proposed_descriptor_hash != review.definition_hash:
+                raise ImmutableRecordError("review_subject_hash_mismatch")
+            snapshot = self._snapshots.get(review.evidence_snapshot_gid)
+            if snapshot is None or not any(
+                int(getattr(entry, "capability_version_gid", 0) or 0) == review.capability_version_gid
+                for entry in snapshot.entries
+            ):
+                raise ImmutableRecordError("business_review_reference_invalid")
+            if review.review_gid in self._business_reviews:
+                raise ImmutableRecordError("business_review_gid_already_exists")
+            self._business_reviews[review.review_gid] = review
+            self._workflow_proposals[proposal.proposal_gid] = resolved
+            self._business_review_requests[idempotency_key] = (fingerprint, resolved)
+            return resolved
+
     def current_business_review(
         self, capability_version_gid: int, definition_hash: str,
     ) -> CapabilityBusinessReview | None:
@@ -474,6 +514,82 @@ class SqlGovernanceStore(GovernanceStore):
             )
             self._connection.commit()
             return record
+        except Exception:
+            self._connection.rollback()
+            raise
+        finally:
+            close = getattr(cursor, "close", None)
+            if callable(close):
+                close()
+
+    def save_workflow_proposal(self, proposal: Any) -> None:
+        """Persist the existing proposal state machine row for durable review CAS."""
+        cursor = self._connection.cursor()
+        try:
+            cursor.execute(
+                "INSERT INTO workmanship_base_capability_change_proposals "
+                "(proposal_gid, capability_version_gid, base_snapshot_gid, proposed_descriptor_hash, change_type, risk_level, status, submitted_by_gid, submitted_at, summary, change_json, row_version) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) "
+                "ON DUPLICATE KEY UPDATE status = VALUES(status), row_version = VALUES(row_version), change_json = VALUES(change_json)",
+                (proposal.proposal_gid, proposal.capability_version_gid, proposal.base_snapshot_gid,
+                 proposal.proposed_descriptor_hash, proposal.review_kind, "governed", proposal.status,
+                 int(proposal.submitted_by_gid), _now(), proposal.capability_id,
+                 json.dumps({"capability_id": proposal.capability_id, "previous_hash": proposal.previous_hash,
+                             "evidence_hash": proposal.evidence_hash, "review_kind": proposal.review_kind}, separators=(",", ":")),
+                 proposal.row_version),
+            )
+            self._connection.commit()
+        except Exception:
+            self._connection.rollback()
+            raise
+        finally:
+            close = getattr(cursor, "close", None)
+            if callable(close):
+                close()
+
+    def decide_business_review_atomic(
+        self, proposal: Any, resolved: Any, review: CapabilityBusinessReview,
+        fingerprint: tuple[object, ...], idempotency_key: str,
+    ) -> Any:
+        """One SQL transaction: replay check, proposal CAS, review append, replay key."""
+        _validate_business_review_references(review)
+        cursor = self._connection.cursor()
+        try:
+            cursor.execute(
+                "SELECT request_fingerprint, proposal_gid FROM workmanship_base_capability_business_review_requests "
+                "WHERE idempotency_key = %s FOR UPDATE", (idempotency_key,),
+            )
+            replay = cursor.fetchone()
+            encoded = json.dumps(fingerprint, separators=(",", ":"), default=str)
+            if replay is not None:
+                if str(_row_value(replay, "request_fingerprint", 0)) != encoded:
+                    raise ImmutableRecordError("idempotency_conflict")
+                self._connection.commit()
+                return resolved
+            cursor.execute(
+                "UPDATE workmanship_base_capability_change_proposals "
+                "SET status = %s, row_version = row_version + 1 "
+                "WHERE proposal_gid = %s AND row_version = %s AND status = 'pending_approval' "
+                "AND proposed_descriptor_hash = BINARY %s",
+                (resolved.status, proposal.proposal_gid, proposal.row_version, review.definition_hash),
+            )
+            if getattr(cursor, "rowcount", 1) != 1:
+                raise ImmutableRecordError("row_version_conflict")
+            cursor.execute(
+                "INSERT INTO workmanship_base_capability_business_reviews "
+                "(business_review_gid, proposal_gid, capability_version_gid, definition_hash, decision, decision_reason, reviewer_gid, reviewer_role, evidence_snapshot_gid, decided_at) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                (review.review_gid, review.proposal_gid, review.capability_version_gid, review.definition_hash,
+                 review.decision, review.decision_reason, int(review.reviewer_gid), review.reviewer_role,
+                 review.evidence_snapshot_gid, review.decided_at),
+            )
+            cursor.execute(
+                "INSERT INTO workmanship_base_capability_business_review_requests "
+                "(idempotency_key, request_fingerprint, proposal_gid, review_gid) VALUES (%s, %s, %s, %s)",
+                (idempotency_key, encoded, proposal.proposal_gid, review.review_gid),
+            )
+            self._connection.commit()
+            return resolved
         except Exception:
             self._connection.rollback()
             raise

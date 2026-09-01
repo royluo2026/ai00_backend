@@ -18,6 +18,7 @@ from backend.capability_governance_test.business_models import (
 )
 from backend.capability_governance_test.models import ImmutableRecordError
 from backend.capability_governance_test.store import MemoryGovernanceStore, SqlGovernanceStore
+from backend.capability_governance_test.workflow import ProposalService, ReviewerContext, WorkflowError
 
 
 NOW = datetime(2026, 9, 1, tzinfo=timezone.utc)
@@ -254,6 +255,38 @@ def test_memory_business_review_requires_the_referenced_snapshot_and_version():
     )
     with pytest.raises(ImmutableRecordError, match="business_review_capability_version_not_in_snapshot"):
         wrong_version.save_business_review(review)
+
+
+def test_memory_atomic_business_decision_is_shared_across_workflow_instances():
+    store = _memory_review_store()
+    ids = iter(range(1, 100)).__next__
+    first = ProposalService(next_gid=ids, business_review_store=store)
+    proposal = first.detect(
+        capability_id="person.height.read", capability_version_gid=202, base_snapshot_gid=501,
+        previous_hash=HASH_2, proposed_descriptor_hash=HASH_1, evidence_hash=HASH_2,
+        submitted_by_gid="author", idempotency_key="detect", review_kind="business_definition",
+    )
+    draft = first.transition(proposal.proposal_gid, "draft", expected_row_version=proposal.row_version, idempotency_key="draft")
+    submitted = first.transition(draft.proposal_gid, "submitted", expected_row_version=draft.row_version, idempotency_key="submitted")
+    checking = first.transition(submitted.proposal_gid, "checking", expected_row_version=submitted.row_version, idempotency_key="checking")
+    pending = first.transition(checking.proposal_gid, "pending_approval", expected_row_version=checking.row_version, idempotency_key="pending")
+    second = ProposalService(next_gid=iter(range(100, 200)).__next__, business_review_store=store)
+    reviewer = ReviewerContext("reviewer", ("super_admin",), (), ())
+
+    approved = first.decide_business_definition(
+        pending.proposal_gid, reviewer_context=reviewer, definition_hash=HASH_1,
+        current_definition_hash=HASH_1, decision="approved", decision_reason="Evidence sufficient",
+        expected_row_version=pending.row_version, idempotency_key="approve",
+    )
+    with pytest.raises(WorkflowError, match="row_version_conflict"):
+        second.decide_business_definition(
+            pending.proposal_gid, reviewer_context=reviewer, definition_hash=HASH_1,
+            current_definition_hash=HASH_1, decision="rejected", decision_reason="Withdrawn",
+            expected_row_version=pending.row_version, idempotency_key="reject",
+        )
+
+    assert approved.status == "approved"
+    assert len(store._business_reviews) == 1
 
 
 def test_business_reviews_are_append_only_and_latest_exact_hash_is_current():

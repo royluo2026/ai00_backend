@@ -138,16 +138,23 @@ class ProposalService:
     def __init__(
         self, *, next_gid: Callable[[], int], audit_sink: AuditSink | None = None,
         business_review_sink: Callable[[CapabilityBusinessReview], None] | None = None,
+        business_review_store: object | None = None,
     ) -> None:
         self._next_gid = next_gid
         self._audit_sink = audit_sink
         self._proposals: dict[int, Proposal] = {}
         self._idempotency: dict[str, Proposal] = {}
         self._business_review_sink = business_review_sink
+        self._business_review_store = business_review_store
         self._business_decisions: dict[str, tuple[tuple[object, ...], Proposal]] = {}
         self._business_review_lock = RLock()
 
     def get(self, proposal_gid: int) -> Proposal:
+        loader = getattr(self._business_review_store, "get_workflow_proposal", None)
+        if callable(loader):
+            value = loader(proposal_gid)
+            if value is not None:
+                self._proposals[proposal_gid] = value
         try:
             return self._proposals[proposal_gid]
         except KeyError as exc:
@@ -163,6 +170,9 @@ class ProposalService:
             self._audit_sink.append(operation=operation, entity_gid=entity_gid, actor_gid=actor_gid, request_gid=idempotency_key, detail=detail, idempotency_key=f"{operation}:{idempotency_key}")
 
     def _record(self, key: str, proposal: Proposal, *, operation: str, actor_gid: str) -> Proposal:
+        saver = getattr(self._business_review_store, "save_workflow_proposal", None)
+        if proposal.review_kind == "business_definition" and callable(saver):
+            saver(proposal)
         self._proposals[proposal.proposal_gid] = proposal
         self._idempotency[key] = proposal
         self._audit(operation=operation, entity_gid=proposal.proposal_gid, actor_gid=actor_gid, idempotency_key=key, detail={"status": proposal.status, "capability_id": proposal.capability_id})
@@ -267,17 +277,19 @@ class ProposalService:
             if not reason or len(reason) > 2000:
                 raise WorkflowError("review_reason_invalid")
             proposal = self.get(proposal_gid)
-            if proposal.review_kind != "business_definition" or proposal.status != "pending_approval":
-                raise WorkflowError("review_subject_type_invalid")
             if proposal.row_version != expected_row_version:
                 raise WorkflowError("row_version_conflict")
+            if proposal.review_kind != "business_definition" or proposal.status != "pending_approval":
+                raise WorkflowError("review_subject_type_invalid")
             if definition_hash != proposal.proposed_descriptor_hash or current_definition_hash != proposal.proposed_descriptor_hash:
                 raise WorkflowError("review_subject_hash_mismatch")
             if "super_admin" not in reviewer_context.roles:
                 raise WorkflowError("reviewer_not_authorized")
             if reviewer_context.gid == proposal.submitted_by_gid:
                 raise WorkflowError("independent_reviewer_required")
-            if self._business_review_sink is None:
+            if self._business_review_sink is None and not callable(
+                getattr(self._business_review_store, "decide_business_review_atomic", None)
+            ):
                 raise WorkflowError("business_review_persistence_unavailable")
             review_gid = self._next_gid()
             moment = _time(None)
@@ -287,10 +299,6 @@ class ProposalService:
                 reviewer_gid=reviewer_context.gid, reviewer_role="super_admin", decided_at=moment,
                 proposal_gid=proposal.proposal_gid, evidence_snapshot_gid=proposal.base_snapshot_gid,
             )
-            try:
-                self._business_review_sink(business_review)
-            except Exception as exc:
-                raise WorkflowError("business_review_persistence_failed") from exc
             review = Review(
                 review_gid, proposal.proposal_gid, "business_definition", decision,
                 reviewer_context.gid, proposal.base_snapshot_gid, definition_hash,
@@ -299,9 +307,27 @@ class ProposalService:
             target = "approved" if decision == "approved" else (
                 "rejected" if decision == "rejected" else "checks_failed"
             )
+            candidate = replace(proposal, status=target, reviews=proposal.reviews + (review,),
+                                row_version=proposal.row_version + 1)
+            atomic = getattr(self._business_review_store, "decide_business_review_atomic", None)
+            if callable(atomic):
+                try:
+                    resolved = atomic(proposal, candidate, business_review, fingerprint, key)
+                except Exception as exc:
+                    raise WorkflowError(str(exc)) from exc
+                self._proposals[proposal.proposal_gid] = resolved
+                self._idempotency[key] = resolved
+                self._business_decisions[key] = (fingerprint, resolved)
+                self._audit(operation="business_review", entity_gid=proposal.proposal_gid,
+                            actor_gid=reviewer_context.gid, idempotency_key=key,
+                            detail={"status": resolved.status, "capability_id": resolved.capability_id})
+                return resolved
+            try:
+                self._business_review_sink(business_review)
+            except Exception as exc:
+                raise WorkflowError("business_review_persistence_failed") from exc
             resolved = self._record(
-                key, replace(proposal, status=target, reviews=proposal.reviews + (review,),
-                              row_version=proposal.row_version + 1),
+                key, candidate,
                 operation="business_review", actor_gid=reviewer_context.gid,
             )
             self._business_decisions[key] = (fingerprint, resolved)
