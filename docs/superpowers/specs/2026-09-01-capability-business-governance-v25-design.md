@@ -43,7 +43,7 @@ This design must not stop current testing while the existing Catalog is migrated
 
 ### 4.1 Compatibility-first contract extension
 
-`business_effect` remains a string in phase 1 to avoid breaking existing descriptors and generated consumers. V2.5 adds fields instead of changing its type:
+`business_effect` remains a string in phase 1 to avoid breaking existing descriptors and generated consumers. V2.5 produces the following joined governance view:
 
 ```yaml
 business_effect: Modify the height recorded in a person's profile
@@ -63,6 +63,8 @@ governance_status: approved
 review_ref: review_opaque_gid
 definition_hash: sha256:...
 ```
+
+The author-controlled Descriptor contains `business_effect`, `business_acceptance_criteria`, `business_invariants`, and `no_business_invariant_reason`. The generated Catalog adds `definition_hash`. The Governance Center joins `governance_status` and `review_ref` from immutable review records. Dynamic approval state is not written back into Descriptor authority, which avoids an approval-to-contract mutation cycle.
 
 `business_invariants` and `no_business_invariant_reason` are mutually exclusive. One of them must be present for V2.5 approval. A no-rule reason is reviewed like a rule and is not an automatic waiver.
 
