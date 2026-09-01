@@ -1,14 +1,70 @@
 from __future__ import annotations
 
+import json
 from copy import deepcopy
+from datetime import UTC, datetime
 
 import pytest
+from pydantic import ValidationError
 
 from backend.capability_governance_test.analysis import AnalysisRequest, run_deterministic_analysis
 from backend.capability_governance_test.config import GovernanceSettings
 from backend.capability_governance_test.fingerprint import snapshot_fingerprint
 from backend.capability_governance_test.models import ScannedCapability
 from backend.capability_governance_test.scanner import GovernanceScanner
+from backend.capability_v2.business_definition import business_definition_hash
+from backend.capability_v2.catalog import CatalogRelease, build_release
+from backend.capability_v2.contracts import (
+    AutomationLevel,
+    CapabilityDescriptorV2,
+    ExposurePolicy,
+)
+
+
+def _author_release(rules: tuple[dict[str, object], ...]) -> CatalogRelease:
+    descriptor = CapabilityDescriptorV2(
+        id="person.height.write",
+        major_version=1,
+        owner_domain="person",
+        title="Write person height",
+        description="Record a normalized person height.",
+        use_when="A caller needs to record height.",
+        do_not_use_when="A caller needs another attribute.",
+        business_effect="Personnel planning can use one normalized height measurement.",
+        business_acceptance_criteria=("The normalized height is persisted.",),
+        business_invariants=rules,
+        side_effect_level="write",
+        side_effects="Stores the normalized height.",
+        exposure=ExposurePolicy(api=True),
+        automation_level=AutomationLevel.A2,
+        authorization_policy="person.height.write",
+        input_schema={"type": "object", "properties": {}, "additionalProperties": False},
+        output_schema={"type": "object", "properties": {}, "additionalProperties": False},
+        schema_hash="sha256:" + "a" * 64,
+        provider_ref="person.provider:write_height",
+    )
+    return build_release((descriptor,), created_at=datetime(2026, 9, 1, tzinfo=UTC))
+
+
+def _author_rule(rule_id: str = "person.height.valid_range", version: object = 1) -> dict[str, object]:
+    return {
+        "rule_id": rule_id,
+        "version": version,
+        "statement": "Height is valid.",
+        "applies_when": "Height changes.",
+        "enforcement_ref": "person/provider.py:validate_height",
+        "error_code": "height_out_of_range",
+        "test_refs": ("person/test_height.py::test_accepts_boundary",),
+    }
+
+
+def _scan_author_release(scanner: GovernanceScanner, release: CatalogRelease):
+    parsed = CatalogRelease.model_validate_json(release.model_dump_json())
+    return GovernanceScanner(
+        scanner.settings,
+        product_catalog=parsed,
+        domain_manifests={"domains": [{"domain_id": "person", "artifact_path": "person"}]},
+    ).scan("abc123")
 
 
 @pytest.fixture
@@ -329,6 +385,47 @@ def test_scanner_rejects_persistence_rule_version_alias_at_author_boundary(scann
 
     assert document.scan_status == "blocked"
     assert document.scan_findings[0].message == "product_catalog_business_rule_scalar_invalid"
+
+
+@pytest.mark.parametrize("invalid_version", (True, "1"))
+def test_catalog_release_rejects_coerced_author_rule_version_before_scanning(scanner, invalid_version):
+    release = _author_release((_author_rule(),))
+    document = json.loads(release.model_dump_json())
+    document["descriptors"][0]["business_invariants"][0]["version"] = invalid_version
+
+    with pytest.raises(ValidationError):
+        CatalogRelease.model_validate_json(json.dumps(document))
+
+
+def test_catalog_release_accepts_integer_version_and_rejects_rule_version_alias(scanner):
+    release = _author_release((_author_rule(version=1),))
+
+    scanned = _scan_author_release(scanner, release)
+
+    assert scanned.scan_status == "completed"
+    assert scanned.capabilities[0].business_rules[0]["version"] == 1
+    document = json.loads(release.model_dump_json())
+    rule = document["descriptors"][0]["business_invariants"][0]
+    rule["rule_version"] = rule.pop("version")
+    with pytest.raises(ValidationError):
+        CatalogRelease.model_validate_json(json.dumps(document))
+
+
+def test_catalog_release_rule_version_changes_hash_but_shuffle_does_not(scanner):
+    release_one = _author_release((_author_rule(version=1),))
+    release_two = _author_release((_author_rule(version=2),))
+    version_one = _scan_author_release(scanner, release_one)
+    version_two = _scan_author_release(scanner, release_two)
+    rules = (
+        _author_rule("person.height.minimum", 1),
+        _author_rule("person.height.maximum", 1),
+    )
+    forward = _scan_author_release(scanner, _author_release(rules))
+    reverse = _scan_author_release(scanner, _author_release(tuple(reversed(rules))))
+
+    assert version_one.capabilities[0].descriptor_hash != version_two.capabilities[0].descriptor_hash
+    assert business_definition_hash(release_one.descriptors[0]) != business_definition_hash(release_two.descriptors[0])
+    assert forward.capabilities[0].descriptor_hash == reverse.capabilities[0].descriptor_hash
 
 
 def test_scanned_capability_preserves_legacy_positional_descriptor_contract():

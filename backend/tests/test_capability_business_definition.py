@@ -8,6 +8,7 @@ from backend.capability_v2.business_definition import (
 )
 from backend.capability_v2.contracts import (
     AutomationLevel,
+    BusinessInvariantContract,
     CapabilityDescriptorV2,
     ExposurePolicy,
 )
@@ -74,3 +75,10 @@ def test_generated_business_effect_detection_rejects_catalog_templates():
     assert not is_generated_business_effect(
         "Personnel planning can use one normalized, traceable height measurement.", description
     )
+
+
+def test_business_invariant_version_json_schema_is_integer_at_least_one():
+    version = BusinessInvariantContract.model_json_schema()["properties"]["version"]
+
+    assert version["type"] == "integer"
+    assert version["minimum"] == 1

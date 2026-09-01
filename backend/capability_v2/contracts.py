@@ -296,7 +296,7 @@ class InvocationEnvelope(FrozenModel):
 
 class BusinessInvariantContract(FrozenModel):
     rule_id: str = Field(pattern=r"^[a-z][a-z0-9_.-]{2,127}$")
-    version: int = Field(ge=1)
+    version: int = Field(ge=1, strict=True)
     statement: str = Field(min_length=1, max_length=4000)
     applies_when: str = Field(min_length=1, max_length=4000)
     enforcement_ref: str = Field(min_length=1, max_length=1000)
