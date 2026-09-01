@@ -52,6 +52,7 @@ _DEPTH_SCHEMA = {"type": "integer", "minimum": 1, "maximum": 4}
 _NODES_SCHEMA = {"type": "integer", "minimum": 1, "maximum": 500}
 _COUNT_SCHEMA = {"type": "integer", "minimum": 0, "maximum": 100000}
 _VERSION_SCHEMA = {"type": "string", "minLength": 1, "maxLength": 255}
+_SHA256_SCHEMA = {"type": "string", "pattern": r"^sha256:[0-9a-f]{64}$", "minLength": 71, "maxLength": 71}
 _SMALL_STRING_SCHEMA = {"type": "string", "minLength": 1, "maxLength": 255}
 _BOOLEAN_SCHEMA = {"type": "boolean"}
 _RESPONSE_GID_FIELDS = (
@@ -147,6 +148,7 @@ def _input_schema(capability_id: str) -> dict[str, object]:
             "base_snapshot_gid": GID_SCHEMA,
             "previous_hash": _VERSION_SCHEMA,
             "proposed_descriptor_hash": _VERSION_SCHEMA,
+            "definition_hash": _SHA256_SCHEMA,
             "evidence_hash": _VERSION_SCHEMA,
             "row_version": _VERSION_SCHEMA,
             "expected_resource_version": _VERSION_SCHEMA,
@@ -155,7 +157,9 @@ def _input_schema(capability_id: str) -> dict[str, object]:
         properties.update({
             "proposal_gid": GID_SCHEMA,
             "stage": _SMALL_STRING_SCHEMA,
-            "decision": _SMALL_STRING_SCHEMA,
+            "definition_hash": _SHA256_SCHEMA,
+            "decision": {"type": "string", "enum": ["approved", "rejected", "changes_requested"]},
+            "decision_reason": {"type": "string", "minLength": 1, "maxLength": 2000},
             "decided_at": _SMALL_STRING_SCHEMA,
         })
     elif capability_id == "base.capability_waiver.grant":
@@ -288,6 +292,9 @@ _PROMPT_SCHEMA = _closed({
 _PROPOSAL_SCHEMA = _closed({
     "proposal_gid": GID_SCHEMA, "status": _SMALL_STRING_SCHEMA,
     "row_version": _VERSION_SCHEMA,
+    "business_definition_hash": _SHA256_SCHEMA,
+    "review_type": {"type": "string", "enum": ["business_definition"]},
+    "proposed_descriptor_hash_label": {"type": "string", "enum": ["business_definition_hash"]},
 }, ("proposal_gid", "status", "row_version"))
 _PROPOSAL_ITEM_SCHEMA = _closed({
     "proposal_gid": GID_SCHEMA,
@@ -296,11 +303,15 @@ _PROPOSAL_ITEM_SCHEMA = _closed({
     "base_snapshot_gid": GID_SCHEMA,
     "previous_hash": _VERSION_SCHEMA,
     "proposed_descriptor_hash": _VERSION_SCHEMA,
+    "proposed_descriptor_hash_label": {"type": "string", "enum": ["descriptor_hash", "business_definition_hash"]},
+    "business_definition_hash": _SHA256_SCHEMA,
+    "review_type": {"type": "string", "enum": ["standard", "business_definition"]},
     "evidence_hash": _VERSION_SCHEMA,
     "submitted_by_gid": _SMALL_STRING_SCHEMA,
     "status": _SMALL_STRING_SCHEMA,
     "row_version": _VERSION_SCHEMA,
     "reviews": {"type": "array", "maxItems": 20, "items": _BOUNDED_OBJECT_SCHEMA},
+    "review_evidence": _BOUNDED_OBJECT_SCHEMA,
 })
 _HEALTH_ITEM_SCHEMA = _closed({
     "domain": _SMALL_STRING_SCHEMA,

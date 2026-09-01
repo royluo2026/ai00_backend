@@ -80,7 +80,7 @@ class GovernanceStore(ABC):
     def current_business_review(
         self, capability_version_gid: int, definition_hash: str,
     ) -> CapabilityBusinessReview | None:
-        """Return the latest review for the exact semantic definition hash."""
+        """Return only a latest approved review for the exact semantic definition hash."""
 
     @abstractmethod
     def save_rule_effectiveness(self, record: RuleEffectivenessRecord) -> None:
@@ -376,7 +376,8 @@ class MemoryGovernanceStore(GovernanceStore):
                 if review.capability_version_gid == capability_version_gid
                 and review.definition_hash == definition_hash
             )
-            return max(matching, key=lambda item: (item.decided_at, item.review_gid), default=None)
+            latest = max(matching, key=lambda item: (item.decided_at, item.review_gid), default=None)
+            return latest if latest is not None and latest.decision == "approved" else None
 
     def save_rule_effectiveness(self, record: RuleEffectivenessRecord) -> None:
         with self._lock:
@@ -849,7 +850,7 @@ class SqlGovernanceStore(GovernanceStore):
             row = cursor.fetchone()
             if row is None:
                 return None
-            return CapabilityBusinessReview(
+            review = CapabilityBusinessReview(
                 review_gid=int(_row_value(row, "business_review_gid", 0)),
                 capability_version_gid=int(_row_value(row, "capability_version_gid", 1)),
                 definition_hash=_text_value(_row_value(row, "definition_hash", 2)),
@@ -861,6 +862,7 @@ class SqlGovernanceStore(GovernanceStore):
                 proposal_gid=int(_row_value(row, "proposal_gid", 8)),
                 evidence_snapshot_gid=int(_row_value(row, "evidence_snapshot_gid", 9)),
             )
+            return review if review.decision == "approved" else None
         finally:
             close = getattr(cursor, "close", None)
             if callable(close):

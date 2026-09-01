@@ -244,6 +244,22 @@ def test_business_reviews_are_append_only_and_latest_exact_hash_is_current():
         store.save_business_review(first)
 
 
+@pytest.mark.parametrize("decision", ("rejected", "changes_requested"))
+def test_current_business_review_does_not_resurrect_a_superseded_approval(decision: str):
+    """A later non-approval is current evidence, so older approval is expired."""
+    store = MemoryGovernanceStore()
+    store.save_business_review(CapabilityBusinessReview(
+        101, 202, HASH_1, "approved", "Evidence is sufficient", "9001", "super_admin",
+        NOW, 701, 501,
+    ))
+    store.save_business_review(CapabilityBusinessReview(
+        102, 202, HASH_1, decision, "Needs another review", "9002", "super_admin",
+        NOW + timedelta(seconds=1), 702, 501,
+    ))
+
+    assert store.current_business_review(202, HASH_1) is None
+
+
 def test_rule_effectiveness_is_append_only():
     store = MemoryGovernanceStore()
     first = _effectiveness_record()
@@ -398,6 +414,15 @@ def test_sql_review_lookup_is_binary_exact_for_case_and_trailing_space():
     assert store.current_business_review(202, HASH_A + " ") is None
     queries = [query for query, _ in connection.calls if query.startswith("SELECT business_review_gid")]
     assert all("definition_hash = BINARY %s" in query for query in queries)
+
+
+def test_sql_current_business_review_returns_none_for_latest_non_approval():
+    connection = _Connection(review_row=(
+        102, 202, HASH_1, "changes_requested", "Needs another review", "9002", "super_admin",
+        NOW + timedelta(seconds=1), 702, 501,
+    ))
+
+    assert SqlGovernanceStore(connection).current_business_review(202, HASH_1) is None
 
 
 @pytest.mark.parametrize(

@@ -15,6 +15,7 @@ from .ai_advisory import AdvisoryContractError, AdvisoryResult
 from .analysis import AnalysisRequest, run_deterministic_analysis
 from .business_relations import analyze_relationships
 from .prompting import PromptAuthorizationError, RedactedPrompt, _render_repair_prompt
+from .redaction import redact
 from .release_gate import ReleaseCandidate, ReleaseGate, ReleaseGateError
 from .workflow import ProposalService, ReviewerContext, WaiverService, WorkflowError
 
@@ -279,6 +280,13 @@ def _required_text(payload: Mapping[str, Any], field: str) -> str:
     return value
 
 
+def _definition_hash(payload: Mapping[str, Any], field: str = "definition_hash") -> str:
+    value = payload.get(field)
+    if not isinstance(value, str) or re.fullmatch(r"sha256:[0-9a-f]{64}", value) is None:
+        raise _business_error("review_subject_hash_invalid")
+    return value
+
+
 def _payload_gid(payload: Mapping[str, Any], *fields: str) -> int:
     for field in fields:
         if payload.get(field) is not None:
@@ -379,6 +387,7 @@ class CapabilityGovernanceService:
         self._next_governance_gid_value = 1
         self._proposals = proposal_service or ProposalService(
             next_gid=self._next_governance_gid, audit_sink=audit_sink,
+            business_review_sink=self._save_business_review,
         )
         self._waivers = waiver_service or WaiverService(
             next_gid=self._next_governance_gid, audit_sink=audit_sink,
@@ -584,7 +593,7 @@ class CapabilityGovernanceService:
         query = str(payload.get("query", "")).strip().lower()
         domain = str(payload.get("domain", "")).strip().lower()
         stage = str(payload.get("stage", "")).strip().lower()
-        proposals = self._proposal_records()
+        proposals = self._proposal_records(context=context)
         def matches(item: Mapping[str, Any]) -> bool:
             if domain and domain not in str(item.get("domain", "")).lower():
                 return False
@@ -593,11 +602,18 @@ class CapabilityGovernanceService:
             if query and query not in " ".join(str(item.get(field, "")) for field in ("proposal_gid", "capability_id", "status", "domain")).lower():
                 return False
             return True
-        items = tuple(item for item in proposals if matches(item))[:limit]
+        cursor = str(payload.get("cursor", "")).strip()
+        try:
+            after_gid = int(cursor) if cursor else 0
+        except ValueError as exc:
+            raise _business_error("invalid_input") from exc
+        selected = tuple(item for item in proposals if matches(item) and int(item["proposal_gid"] or 0) > after_gid)
+        items = selected[:limit]
         return self._completed(
             "base.capability_proposal.search", items=items,
             data={"available": self._workflow_port is not None or not self._workflow_persistence_required,
-                  "checked_at": self._now_iso(), "next_cursor": None},
+                  "checked_at": self._now_iso(),
+                  "next_cursor": str(items[-1]["proposal_gid"]) if len(selected) > len(items) else None},
         )
 
     def base_capability_health_get(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
@@ -888,15 +904,24 @@ class CapabilityGovernanceService:
                     idempotency_key=f"proposal-submit:{key}",
                 )
             else:
+                definition_hash = payload.get("definition_hash")
+                review_kind = "standard"
+                proposed_descriptor_hash = _required_text(payload, "proposed_descriptor_hash")
+                if definition_hash is not None:
+                    definition_hash = _definition_hash(payload)
+                    if proposed_descriptor_hash != definition_hash:
+                        raise _business_error("review_subject_hash_mismatch")
+                    review_kind = "business_definition"
                 proposal = self._proposals.detect(
                     capability_id=_required_text(payload, "capability_id"),
                     capability_version_gid=_payload_gid(payload, "capability_version_gid"),
                     base_snapshot_gid=_payload_gid(payload, "base_snapshot_gid"),
                     previous_hash=_required_text(payload, "previous_hash"),
-                    proposed_descriptor_hash=_required_text(payload, "proposed_descriptor_hash"),
+                    proposed_descriptor_hash=proposed_descriptor_hash,
                     evidence_hash=_required_text(payload, "evidence_hash"),
                     submitted_by_gid=_mutation_actor(context),
                     idempotency_key=f"proposal-detect:{key}",
+                    review_kind=review_kind,
                 )
                 draft = self._proposals.transition(
                     proposal.proposal_gid, "draft", expected_row_version=proposal.row_version,
@@ -913,22 +938,43 @@ class CapabilityGovernanceService:
     def base_capability_review_decide(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
         self._require_workflow_persistence()
         key = self._idempotency(payload)
-        reviewer = ReviewerContext(
-            gid=_mutation_actor(context),
-            roles=_context_values(context, "active_roles", "governance_roles"),
-            permissions=_context_values(context, "permissions", "governance_permissions"),
-            owned_domains=_context_values(context, "owned_domains", "governance_owned_domains"),
-        )
         try:
-            proposal = self._proposals.decide(
-                _payload_gid(payload, "proposal_gid", "target_gid"),
-                stage=_required_text(payload, "stage"),
-                decision=_required_text(payload, "decision"),
-                reviewer_context=reviewer,
-                expected_row_version=_row_version(payload),
-                idempotency_key=f"proposal-review:{key}",
-                decided_at=_timestamp(payload, "decided_at"),
-            )
+            proposal_gid = _payload_gid(payload, "proposal_gid", "target_gid")
+            subject = self._proposals.get(proposal_gid)
+            if getattr(subject, "review_kind", "standard") == "business_definition":
+                reviewer = self._business_reviewer_context(context)
+                if "super_admin" not in reviewer.roles:
+                    raise WorkflowError("reviewer_not_authorized")
+                definition_hash = _definition_hash(payload)
+                proposal = self._proposals.decide_business_definition(
+                    proposal_gid,
+                    reviewer_context=reviewer,
+                    definition_hash=definition_hash,
+                    current_definition_hash=self._current_business_definition_hash(subject),
+                    decision=_required_text(payload, "decision"),
+                    decision_reason=_required_text(payload, "decision_reason"),
+                    expected_row_version=_row_version(payload),
+                    idempotency_key=f"business-review:{key}",
+                    decided_at=_timestamp(payload, "decided_at"),
+                )
+            else:
+                if payload.get("definition_hash") is not None or payload.get("decision_reason") is not None:
+                    raise _business_error("review_subject_type_invalid")
+                reviewer = ReviewerContext(
+                    gid=_mutation_actor(context),
+                    roles=_context_values(context, "active_roles", "governance_roles"),
+                    permissions=_context_values(context, "permissions", "governance_permissions"),
+                    owned_domains=_context_values(context, "owned_domains", "governance_owned_domains"),
+                )
+                proposal = self._proposals.decide(
+                    proposal_gid,
+                    stage=_required_text(payload, "stage"),
+                    decision=_required_text(payload, "decision"),
+                    reviewer_context=reviewer,
+                    expected_row_version=_row_version(payload),
+                    idempotency_key=f"proposal-review:{key}",
+                    decided_at=_timestamp(payload, "decided_at"),
+                )
         except WorkflowError as exc:
             raise _workflow_error(exc) from exc
         return self._accepted("base.capability_review.decide", proposal=proposal)
@@ -1434,7 +1480,7 @@ class CapabilityGovernanceService:
     def _now_iso() -> str:
         return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
-    def _proposal_records(self) -> tuple[dict[str, Any], ...]:
+    def _proposal_records(self, *, context: object | None = None) -> tuple[dict[str, Any], ...]:
         """Project the in-process or workflow-port proposal collection safely."""
         source = self._proposals
         list_method = getattr(source, "list", None)
@@ -1446,8 +1492,10 @@ class CapabilityGovernanceService:
         else:
             values = tuple(getattr(source, "_proposals", {}).values()) if isinstance(getattr(source, "_proposals", None), Mapping) else ()
         records: list[dict[str, Any]] = []
-        for proposal in values[:_MAX_SEARCH]:
+        may_read_business_evidence = context is not None and "super_admin" in self._business_reviewer_context(context).roles
+        for proposal in sorted(values, key=lambda item: int(getattr(item, "proposal_gid", 0)))[:_MAX_SEARCH]:
             capability_id = str(getattr(proposal, "capability_id", ""))
+            business = getattr(proposal, "review_kind", "standard") == "business_definition"
             records.append({
                 "proposal_gid": str(getattr(proposal, "proposal_gid", "")),
                 "capability_id": capability_id,
@@ -1455,12 +1503,16 @@ class CapabilityGovernanceService:
                 "base_snapshot_gid": str(getattr(proposal, "base_snapshot_gid", "")),
                 "previous_hash": str(getattr(proposal, "previous_hash", "")),
                 "proposed_descriptor_hash": str(getattr(proposal, "proposed_descriptor_hash", "")),
+                "proposed_descriptor_hash_label": "business_definition_hash" if business else "descriptor_hash",
+                "business_definition_hash": str(getattr(proposal, "proposed_descriptor_hash", "")) if business else None,
+                "review_type": "business_definition" if business else "standard",
                 "evidence_hash": str(getattr(proposal, "evidence_hash", "")),
                 "submitted_by_gid": str(getattr(proposal, "submitted_by_gid", "")),
                 "status": str(getattr(proposal, "status", "detected")),
                 "row_version": str(getattr(proposal, "row_version", "1")),
                 "domain": capability_id.split(".", 1)[0] if "." in capability_id else "base",
-                "reviews": tuple(self._review_record(review) for review in getattr(proposal, "reviews", ()))[:20],
+                "reviews": tuple(self._review_record(review) for review in getattr(proposal, "reviews", ()))[:20] if may_read_business_evidence or not business else (),
+                "review_evidence": self._proposal_business_evidence(proposal) if business and may_read_business_evidence else {},
             })
         return tuple(records)
 
@@ -1471,7 +1523,82 @@ class CapabilityGovernanceService:
             "review_stage": str(getattr(review, "review_stage", "")),
             "decision": str(getattr(review, "decision", "")),
             "reviewer_gid": str(getattr(review, "reviewer_gid", "")),
+            "decision_reason": str(getattr(review, "decision_reason", ""))[:2000],
+            "review_type": str(getattr(review, "review_type", "standard")),
         }
+
+    def _save_business_review(self, review: Any) -> None:
+        saver = getattr(self._store, "save_business_review", None) if self._store is not None else None
+        if not callable(saver):
+            raise RuntimeError("business_review_persistence_unavailable")
+        saver(review)
+
+    @staticmethod
+    def _business_reviewer_context(context: object) -> ReviewerContext:
+        """Trust only the server-created effective identity, never context/payload claims."""
+        identity = getattr(context, "effective_identity", None)
+        actor = getattr(identity, "actor", None)
+        tenant = getattr(identity, "tenant", None)
+        consumer = getattr(identity, "consumer", None)
+        user_id = getattr(actor, "user_id", None)
+        consumer_type = getattr(getattr(consumer, "type", None), "value", getattr(consumer, "type", None))
+        roles = getattr(tenant, "active_roles", ()) if (
+            identity is not None and user_id and getattr(identity, "delegation", None) is None
+            and str(consumer_type) == "web"
+        ) else ()
+        return ReviewerContext(
+            gid=str(user_id or _mutation_actor(context)), roles=tuple(str(role) for role in roles),
+            permissions=(), owned_domains=(),
+        )
+
+    def _current_business_definition_hash(self, proposal: Any) -> str:
+        snapshot = self._latest_snapshot()
+        document = getattr(snapshot, "document", None)
+        version_entry = next((
+            entry for entry in getattr(snapshot, "entries", ())
+            if int(getattr(entry, "capability_version_gid", 0) or 0)
+            == int(getattr(proposal, "capability_version_gid", 0) or 0)
+            and str(getattr(entry, "capability_id", "")) == str(getattr(proposal, "capability_id", ""))
+        ), None)
+        if version_entry is None:
+            raise WorkflowError("review_subject_hash_mismatch")
+        for capability in getattr(document, "capabilities", ()):
+            if (
+                str(getattr(capability, "capability_id", "")) == str(getattr(proposal, "capability_id", ""))
+                and int(getattr(capability, "major_version", 0) or 0) == int(getattr(version_entry, "major_version", 0) or 0)
+            ):
+                descriptor = getattr(capability, "descriptor", {})
+                value = descriptor.get("business_definition_hash") if isinstance(descriptor, Mapping) else None
+                if isinstance(value, str) and re.fullmatch(r"sha256:[0-9a-f]{64}", value):
+                    return value
+        raise WorkflowError("review_subject_hash_mismatch")
+
+    def _proposal_business_evidence(self, proposal: Any) -> dict[str, Any]:
+        snapshot = self._latest_snapshot()
+        document = getattr(snapshot, "document", None)
+        for capability in getattr(document, "capabilities", ()):
+            if str(getattr(capability, "capability_id", "")) == str(getattr(proposal, "capability_id", "")):
+                relation_loader = getattr(self._store, "list_relation_candidates", None) if self._store is not None else None
+                relations = tuple(relation_loader(int(getattr(snapshot, "snapshot_gid"))) if callable(relation_loader) else ())
+                def project(source: str) -> list[dict[str, Any]]:
+                    return [
+                        {
+                            "candidate_hash": str(getattr(item, "candidate_hash", "")),
+                            "relation_type": str(getattr(item, "relation_type", "")),
+                            "capability_keys": list(getattr(item, "capability_keys", ()))[:20],
+                            "evidence": _business_contract_value(redact(getattr(item, "evidence", {}))),
+                        }
+                        for item in relations if str(getattr(item, "source", "")) == source
+                    ][:20]
+                return {
+                    "business_effect": str(getattr(capability, "business_effect", ""))[:4000],
+                    "business_rules": _business_contract_value(getattr(capability, "business_rules", ())),
+                    "business_maturity": _business_contract_value(getattr(capability, "business_maturity", None)),
+                    "definition_hash": str(getattr(proposal, "proposed_descriptor_hash", "")),
+                    "deterministic_relation_candidates": project("deterministic"),
+                    "ai_advisory_relation_candidates": project("advisory"),
+                }
+        return {}
 
     def _load_findings(
         self, snapshot: Any, payload: Mapping[str, Any], context: object, *, limit: int = _MAX_SEARCH,

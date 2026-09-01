@@ -4,8 +4,10 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass, replace
 from datetime import datetime, timezone
+import re
 
 from .audit import AuditSink
+from .business_models import CapabilityBusinessReview
 
 
 class WorkflowError(RuntimeError):
@@ -64,6 +66,8 @@ class Review:
     descriptor_hash: str
     evidence_snapshot_hash: str
     decided_at: datetime
+    decision_reason: str = ""
+    review_type: str = "standard"
 
 
 @dataclass(frozen=True)
@@ -95,10 +99,15 @@ class Proposal:
     status: str = "detected"
     row_version: int = 1
     reviews: tuple[Review, ...] = ()
+    review_kind: str = "standard"
 
     @property
     def governance_capability(self) -> bool:
         return self.capability_id.startswith("base.capability_")
+
+    @property
+    def business_definition_hash(self) -> str | None:
+        return self.proposed_descriptor_hash if self.review_kind == "business_definition" else None
 
 
 @dataclass(frozen=True)
@@ -125,11 +134,16 @@ def _time(value: datetime | None) -> datetime:
 
 
 class ProposalService:
-    def __init__(self, *, next_gid: Callable[[], int], audit_sink: AuditSink | None = None) -> None:
+    def __init__(
+        self, *, next_gid: Callable[[], int], audit_sink: AuditSink | None = None,
+        business_review_sink: Callable[[CapabilityBusinessReview], None] | None = None,
+    ) -> None:
         self._next_gid = next_gid
         self._audit_sink = audit_sink
         self._proposals: dict[int, Proposal] = {}
         self._idempotency: dict[str, Proposal] = {}
+        self._business_review_sink = business_review_sink
+        self._business_decisions: dict[str, tuple[tuple[object, ...], Proposal]] = {}
 
     def get(self, proposal_gid: int) -> Proposal:
         try:
@@ -152,17 +166,21 @@ class ProposalService:
         self._audit(operation=operation, entity_gid=proposal.proposal_gid, actor_gid=actor_gid, idempotency_key=key, detail={"status": proposal.status, "capability_id": proposal.capability_id})
         return proposal
 
-    def detect(self, *, capability_id: str, capability_version_gid: int, base_snapshot_gid: int, previous_hash: str, proposed_descriptor_hash: str, evidence_hash: str, submitted_by_gid: str, idempotency_key: str) -> Proposal:
+    def detect(self, *, capability_id: str, capability_version_gid: int, base_snapshot_gid: int, previous_hash: str, proposed_descriptor_hash: str, evidence_hash: str, submitted_by_gid: str, idempotency_key: str, review_kind: str = "standard") -> Proposal:
         key = str(idempotency_key).strip()
         existing = self._existing(key)
         if existing is not None:
             return existing
+        if review_kind not in {"standard", "business_definition"}:
+            raise WorkflowError("review_subject_type_invalid")
+        if review_kind == "business_definition" and not _is_sha256(proposed_descriptor_hash):
+            raise WorkflowError("review_subject_hash_invalid")
         for gid, proposal in tuple(self._proposals.items()):
             if proposal.capability_id == capability_id and proposal.status not in {"released", "rejected", "withdrawn", "superseded", "expired", "stale"} and proposal.proposed_descriptor_hash != proposed_descriptor_hash:
                 superseded = replace(proposal, status="superseded", row_version=proposal.row_version + 1)
                 self._proposals[gid] = superseded
                 self._audit(operation="proposal_superseded", entity_gid=gid, actor_gid=str(submitted_by_gid), idempotency_key=f"{key}:superseded:{gid}", detail={"before_status": proposal.status, "after_status": "superseded", "capability_id": proposal.capability_id})
-        return self._record(key, Proposal(self._next_gid(), str(capability_id), int(capability_version_gid), int(base_snapshot_gid), str(previous_hash), str(proposed_descriptor_hash), str(evidence_hash), str(submitted_by_gid)), operation="proposal", actor_gid=str(submitted_by_gid))
+        return self._record(key, Proposal(self._next_gid(), str(capability_id), int(capability_version_gid), int(base_snapshot_gid), str(previous_hash), str(proposed_descriptor_hash), str(evidence_hash), str(submitted_by_gid), review_kind=review_kind), operation="proposal", actor_gid=str(submitted_by_gid))
 
     def transition(self, proposal_gid: int, target: str, *, expected_row_version: int, idempotency_key: str) -> Proposal:
         key = str(idempotency_key).strip()
@@ -192,6 +210,8 @@ class ProposalService:
         if existing is not None:
             return existing
         proposal = self.get(proposal_gid)
+        if proposal.review_kind == "business_definition":
+            raise WorkflowError("business_review_required")
         if proposal.row_version != expected_row_version:
             raise WorkflowError("row_version_conflict")
         if proposal.status != "pending_approval":
@@ -217,6 +237,80 @@ class ProposalService:
         review = Review(self._next_gid(), proposal.proposal_gid, stage, decision, reviewer, proposal.base_snapshot_gid, proposal.proposed_descriptor_hash, proposal.evidence_hash, _time(decided_at))
         next_status = "rejected" if decision == "rejected" else ("approved" if set(required).issubset(prior_stages | {stage}) else "pending_approval")
         return self._record(key, replace(proposal, status=next_status, reviews=proposal.reviews + (review,), row_version=proposal.row_version + 1), operation="review", actor_gid=reviewer)
+
+    def decide_business_definition(
+        self, proposal_gid: int, *, reviewer_context: ReviewerContext,
+        definition_hash: str, current_definition_hash: str, decision: str,
+        decision_reason: str, expected_row_version: int, idempotency_key: str,
+        decided_at: datetime | None = None,
+    ) -> Proposal:
+        """Append one super-admin decision for a pinned business definition."""
+        key = str(idempotency_key).strip()
+        if not key:
+            raise WorkflowError("idempotency_key_required")
+        reason = str(decision_reason).strip()
+        fingerprint = (
+            int(proposal_gid), str(definition_hash), str(decision), reason,
+            int(expected_row_version), reviewer_context.gid,
+        )
+        replay = self._business_decisions.get(key)
+        if replay is not None:
+            if replay[0] != fingerprint:
+                raise WorkflowError("idempotency_conflict")
+            return replay[1]
+        if not _is_sha256(definition_hash) or not _is_sha256(current_definition_hash):
+            raise WorkflowError("review_subject_hash_invalid")
+        if decision not in {"approved", "rejected", "changes_requested"}:
+            raise WorkflowError("review_decision_invalid")
+        if not reason or len(reason) > 2000:
+            raise WorkflowError("review_reason_invalid")
+        proposal = self.get(proposal_gid)
+        if proposal.review_kind != "business_definition" or proposal.status != "pending_approval":
+            raise WorkflowError("review_subject_type_invalid")
+        if proposal.row_version != expected_row_version:
+            raise WorkflowError("row_version_conflict")
+        if definition_hash != proposal.proposed_descriptor_hash or current_definition_hash != proposal.proposed_descriptor_hash:
+            raise WorkflowError("review_subject_hash_mismatch")
+        if "super_admin" not in reviewer_context.roles:
+            raise WorkflowError("reviewer_not_authorized")
+        if reviewer_context.gid == proposal.submitted_by_gid:
+            raise WorkflowError("independent_reviewer_required")
+        if self._business_review_sink is None:
+            raise WorkflowError("business_review_persistence_unavailable")
+        review_gid = self._next_gid()
+        moment = _time(decided_at)
+        business_review = CapabilityBusinessReview(
+            review_gid=review_gid, capability_version_gid=proposal.capability_version_gid,
+            definition_hash=definition_hash, decision=decision, decision_reason=reason,
+            reviewer_gid=reviewer_context.gid, reviewer_role="super_admin", decided_at=moment,
+            proposal_gid=proposal.proposal_gid, evidence_snapshot_gid=proposal.base_snapshot_gid,
+        )
+        try:
+            self._business_review_sink(business_review)
+        except Exception as exc:
+            raise WorkflowError("business_review_persistence_failed") from exc
+        review = Review(
+            review_gid, proposal.proposal_gid, "business_definition", decision,
+            reviewer_context.gid, proposal.base_snapshot_gid, definition_hash,
+            proposal.evidence_hash, moment, reason, "business_definition",
+        )
+        target = "approved" if decision == "approved" else (
+            "rejected" if decision == "rejected" else "checks_failed"
+        )
+        resolved = self._record(
+            key, replace(proposal, status=target, reviews=proposal.reviews + (review,),
+                          row_version=proposal.row_version + 1),
+            operation="business_review", actor_gid=reviewer_context.gid,
+        )
+        self._business_decisions[key] = (fingerprint, resolved)
+        return resolved
+
+    def list(self) -> tuple[Proposal, ...]:
+        return tuple(sorted(self._proposals.values(), key=lambda proposal: proposal.proposal_gid))
+
+
+def _is_sha256(value: object) -> bool:
+    return isinstance(value, str) and re.fullmatch(r"sha256:[0-9a-f]{64}", value) is not None
 
 
 class WaiverService:

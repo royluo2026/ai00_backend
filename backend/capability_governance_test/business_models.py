@@ -4,6 +4,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import datetime
+import re
 from types import MappingProxyType
 from typing import Any, Literal
 
@@ -126,6 +127,18 @@ class CapabilityBusinessReview:
     decided_at: datetime
     proposal_gid: int
     evidence_snapshot_gid: int
+
+    def __post_init__(self) -> None:
+        if re.fullmatch(r"sha256:[0-9a-f]{64}", self.definition_hash) is None:
+            raise ValueError("business_review_definition_hash_invalid")
+        if self.decision not in {"approved", "rejected", "changes_requested"}:
+            raise ValueError("business_review_decision_invalid")
+        reason = self.decision_reason.strip()
+        if not reason or len(reason) > 2000:
+            raise ValueError("business_review_reason_invalid")
+        if self.reviewer_role != "super_admin":
+            raise ValueError("business_review_reviewer_role_invalid")
+        object.__setattr__(self, "decision_reason", reason)
 
 
 @dataclass(frozen=True)

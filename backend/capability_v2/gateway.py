@@ -536,6 +536,9 @@ class CapabilityGatewayService:
             plugin_id=(envelope.identity.consumer.consumer_id
                        if envelope.identity.consumer.type.value in {"plugin", "agent"} else None),
             plugin_version=envelope.identity.consumer.consumer_version,
+            # Governance business approvals consume this server-created object
+            # rather than caller-provided roles on the legacy context.
+            effective_identity=envelope.identity,
         )
 
     @staticmethod

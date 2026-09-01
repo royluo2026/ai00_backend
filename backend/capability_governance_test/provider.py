@@ -46,6 +46,10 @@ def _projection(record: Any, fields: tuple[str, ...]) -> dict[str, Any]:
             descriptor = _value(record, "descriptor")
             if isinstance(descriptor, Mapping):
                 value = descriptor.get("contract", descriptor)
+        if value is None and field == "review_type":
+            value = _value(record, "review_kind")
+        if value is None and field == "proposed_descriptor_hash_label":
+            value = "business_definition_hash" if _value(record, "review_kind") == "business_definition" else None
         if value is not None:
             result[field] = _transport_value(value, depth=0) if not field.endswith("_gid") and field != "row_version" else str(value)
     return result
@@ -184,8 +188,9 @@ def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, A
     elif capability_id == "base.capability_proposal.search":
         response["items"] = [_projection(proposal, (
             "proposal_gid", "capability_id", "capability_version_gid", "base_snapshot_gid",
-            "previous_hash", "proposed_descriptor_hash", "evidence_hash", "submitted_by_gid",
-            "status", "row_version", "domain", "reviews",
+            "previous_hash", "proposed_descriptor_hash", "proposed_descriptor_hash_label",
+            "business_definition_hash", "review_type", "evidence_hash", "submitted_by_gid",
+            "status", "row_version", "domain", "reviews", "review_evidence",
         )) for proposal in tuple(result.get("items", ()))[:200]]
     elif capability_id == "base.capability_health.get":
         response["items"] = [_projection(item, (
@@ -217,7 +222,10 @@ def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, A
     elif capability_id in {"base.capability_proposal.submit", "base.capability_review.decide"}:
         proposal = result.get("proposal")
         if proposal is not None:
-            response["proposal"] = _projection(proposal, ("proposal_gid", "status", "row_version"))
+            fields = ("proposal_gid", "status", "row_version")
+            if _value(proposal, "review_kind") == "business_definition":
+                fields += ("business_definition_hash", "review_type", "proposed_descriptor_hash_label")
+            response["proposal"] = _projection(proposal, fields)
     elif capability_id in {"base.capability_waiver.grant", "base.capability_waiver.revoke"}:
         waiver = result.get("waiver")
         if waiver is not None:
