@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Mapping
+from dataclasses import replace
 from datetime import datetime, timezone
 import json
 from threading import RLock
@@ -30,6 +31,9 @@ from .models import (
     SnapshotEntry,
     SnapshotRecord,
 )
+
+
+_WORKFLOW_PROPOSAL_SEQUENCE = "capability_governance_proposal_gid"
 
 
 class GovernanceStore(ABC):
@@ -648,23 +652,43 @@ class SqlGovernanceStore(GovernanceStore):
             for row in cursor.fetchall()
         )
 
-    def save_workflow_proposal(self, proposal: Any) -> None:
+    def save_workflow_proposal(self, proposal: Any) -> Any:
         """Persist the existing proposal state machine row for durable review CAS."""
         cursor = self._connection.cursor()
         try:
             cursor.execute(
+                "INSERT INTO workmanship_display_id_counters (seq_name, val) "
+                "SELECT %s, COALESCE(MAX(proposal_gid), 0) "
+                "FROM workmanship_base_capability_change_proposals "
+                "ON DUPLICATE KEY UPDATE val = GREATEST(val, VALUES(val))",
+                (_WORKFLOW_PROPOSAL_SEQUENCE,),
+            )
+            cursor.execute(
+                "UPDATE workmanship_display_id_counters "
+                "SET val = LAST_INSERT_ID(val + 1) WHERE seq_name = %s",
+                (_WORKFLOW_PROPOSAL_SEQUENCE,),
+            )
+            if getattr(cursor, "rowcount", 1) != 1:
+                raise ImmutableRecordError("workflow_proposal_sequence_unavailable")
+            cursor.execute("SELECT LAST_INSERT_ID() AS proposal_gid")
+            row = cursor.fetchone()
+            proposal_gid = int(_row_value(row, "proposal_gid", 0)) if row is not None else 0
+            if not 0 < proposal_gid < 2**63:
+                raise ImmutableRecordError("workflow_proposal_gid_invalid")
+            persisted = replace(proposal, proposal_gid=proposal_gid)
+            cursor.execute(
                 "INSERT INTO workmanship_base_capability_change_proposals "
                 "(proposal_gid, capability_version_gid, base_snapshot_gid, proposed_descriptor_hash, change_type, risk_level, status, submitted_by_gid, submitted_at, summary, change_json, row_version) "
-                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) "
-                "ON DUPLICATE KEY UPDATE status = VALUES(status), row_version = VALUES(row_version), change_json = VALUES(change_json)",
-                (proposal.proposal_gid, proposal.capability_version_gid, proposal.base_snapshot_gid,
-                 proposal.proposed_descriptor_hash, proposal.review_kind, "governed", proposal.status,
-                 int(proposal.submitted_by_gid), _now(), proposal.capability_id,
-                 json.dumps({"capability_id": proposal.capability_id, "previous_hash": proposal.previous_hash,
-                             "evidence_hash": proposal.evidence_hash, "review_kind": proposal.review_kind}, separators=(",", ":")),
-                 proposal.row_version),
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                (persisted.proposal_gid, persisted.capability_version_gid, persisted.base_snapshot_gid,
+                 persisted.proposed_descriptor_hash, persisted.review_kind, "governed", persisted.status,
+                 int(persisted.submitted_by_gid), _now(), persisted.capability_id,
+                 json.dumps({"capability_id": persisted.capability_id, "previous_hash": persisted.previous_hash,
+                             "evidence_hash": persisted.evidence_hash, "review_kind": persisted.review_kind}, separators=(",", ":")),
+                 persisted.row_version),
             )
             self._connection.commit()
+            return persisted
         except Exception:
             self._connection.rollback()
             raise

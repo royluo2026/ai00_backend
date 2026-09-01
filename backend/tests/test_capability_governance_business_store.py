@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import FrozenInstanceError, replace
 from datetime import datetime, timedelta, timezone
 from concurrent.futures import ThreadPoolExecutor
-from threading import Barrier
+from threading import Barrier, RLock
 from types import SimpleNamespace
 
 import pytest
@@ -19,10 +19,11 @@ from backend.capability_governance_test.business_models import (
     RuleEffectivenessRecord,
 )
 from backend.capability_governance_test.models import ImmutableRecordError
+from backend.capability_governance_test.release_gate import ReleaseGate
 from backend.capability_governance_test.service import CapabilityGovernanceService
 from backend.capability_governance_test.store import MemoryGovernanceStore, SqlGovernanceStore
-from backend.capability_governance_test.workflow import Proposal, ProposalService, ReviewerContext, WorkflowError
-from backend.capabilities.models_next import CapabilityContext
+from backend.capability_governance_test.workflow import Proposal, ProposalService, ReviewerContext, WaiverService, WorkflowError
+from backend.capabilities.models_next import CapabilityBusinessError, CapabilityContext
 from backend.capability_v2.contracts import ActorIdentity, ConsumerDescriptor, ConsumerIdentity, ConsumerType, TenantIdentity
 
 
@@ -546,23 +547,156 @@ class _BusinessDecisionConnection:
 
 
 class _SharedBusinessDatabase:
-    """Small transactional fixture: each service receives a distinct connection."""
-    def __init__(self, proposal):
-        self.state = _BusinessDecisionConnection(proposal)
+    """Transactional SQL fixture with connection-local writes and one shared commit state."""
+
+    def __init__(self, proposal=None):
+        self.proposals = {} if proposal is None else {proposal.proposal_gid: proposal}
+        self.reviews: dict[int, tuple[object, ...]] = {}
+        self.requests: dict[str, tuple[object, int]] = {}
+        self.sequence_value = max(self.proposals, default=0)
+        self.calls: list[tuple[str, tuple[object, ...]]] = []
+        self._lock = RLock()
 
     def connect(self):
-        return _SharedBusinessConnection(self.state)
+        return _SharedBusinessConnection(self)
 
 
 class _SharedBusinessConnection:
-    def __init__(self, state):
-        self._state = state
+    def __init__(self, database):
+        self.database = database
+        self.calls: list[tuple[str, tuple[object, ...]]] = []
+        self.commits = self.rollbacks = 0
+        self.last_insert_id = 0
+        self._in_transaction = False
 
-    @property
-    def calls(self): return self._state.calls
-    def cursor(self): return self._state.cursor()
-    def commit(self): self._state.commit()
-    def rollback(self): self._state.rollback()
+    def _begin(self):
+        if self._in_transaction:
+            return
+        self.database._lock.acquire()
+        self._in_transaction = True
+        self.staged_proposals = dict(self.database.proposals)
+        self.staged_reviews = dict(self.database.reviews)
+        self.staged_requests = dict(self.database.requests)
+        self.staged_sequence_value = self.database.sequence_value
+
+    def _view(self, name):
+        if self._in_transaction:
+            return getattr(self, f"staged_{name}")
+        with self.database._lock:
+            value = getattr(self.database, name)
+            return dict(value) if isinstance(value, dict) else value
+
+    def cursor(self):
+        return _SharedBusinessCursor(self)
+
+    def commit(self):
+        if self._in_transaction:
+            self.database.proposals = dict(self.staged_proposals)
+            self.database.reviews = dict(self.staged_reviews)
+            self.database.requests = dict(self.staged_requests)
+            self.database.sequence_value = self.staged_sequence_value
+            self._in_transaction = False
+            self.database._lock.release()
+        self.commits += 1
+
+    def rollback(self):
+        if self._in_transaction:
+            self._in_transaction = False
+            self.database._lock.release()
+        self.rollbacks += 1
+
+
+class _SharedBusinessCursor:
+    def __init__(self, connection):
+        self.connection = connection
+        self.row = None
+        self.rows = []
+        self.rowcount = 0
+
+    def execute(self, query, parameters=()):
+        parameters = tuple(parameters)
+        self.connection.calls.append((query, parameters))
+        self.connection.database.calls.append((query, parameters))
+        self.row, self.rows, self.rowcount = None, [], 0
+        connection = self.connection
+        if query.startswith("SELECT request_fingerprint"):
+            connection._begin()
+            request = connection.staged_requests.get(parameters[0])
+            self.row = None if request is None else (request[0], request[1])
+        elif query.startswith("INSERT INTO workmanship_display_id_counters"):
+            connection._begin()
+            connection.staged_sequence_value = max(
+                connection.staged_sequence_value,
+                max(connection.staged_proposals, default=0),
+            )
+            self.rowcount = 1
+        elif query.startswith("UPDATE workmanship_display_id_counters"):
+            connection._begin()
+            connection.staged_sequence_value += 1
+            connection.last_insert_id = connection.staged_sequence_value
+            self.rowcount = 1
+        elif query.startswith("SELECT LAST_INSERT_ID()"):
+            self.row = (connection.last_insert_id,)
+        elif query.startswith("INSERT INTO workmanship_base_capability_change_proposals"):
+            connection._begin()
+            proposal_gid, version_gid, snapshot_gid, definition_hash, review_kind, _risk, status, submitted_by, _submitted, _summary, change_json, row_version = parameters
+            payload = __import__("json").loads(change_json)
+            proposal = Proposal(
+                proposal_gid, payload["capability_id"], version_gid, snapshot_gid,
+                payload["previous_hash"], definition_hash, payload["evidence_hash"], str(submitted_by),
+                status=status, row_version=row_version, review_kind=payload["review_kind"],
+            )
+            if proposal_gid in connection.staged_proposals and "ON DUPLICATE KEY UPDATE" not in query:
+                raise RuntimeError("duplicate proposal_gid")
+            connection.staged_proposals[proposal_gid] = proposal
+            self.rowcount = 1
+        elif query.startswith("UPDATE workmanship_base_capability_change_proposals"):
+            connection._begin()
+            status, proposal_gid, row_version, *state = parameters
+            proposal = connection.staged_proposals.get(proposal_gid)
+            expected_status = "pending_approval" if len(state) == 1 else state[0]
+            definition_hash = state[-1]
+            self.rowcount = int(
+                proposal is not None
+                and proposal.row_version == row_version
+                and proposal.status == expected_status
+                and proposal.proposed_descriptor_hash == definition_hash
+            )
+            if self.rowcount:
+                connection.staged_proposals[proposal_gid] = replace(
+                    proposal, status=status, row_version=row_version + 1,
+                )
+        elif query.startswith("INSERT INTO workmanship_base_capability_business_reviews"):
+            connection._begin()
+            if parameters[0] in connection.staged_reviews:
+                raise RuntimeError("duplicate business_review_gid")
+            connection.staged_reviews[parameters[0]] = parameters
+            self.rowcount = 1
+        elif query.startswith("INSERT INTO workmanship_base_capability_business_review_requests"):
+            connection._begin()
+            if parameters[0] in connection.staged_requests:
+                raise RuntimeError("duplicate idempotency_key")
+            connection.staged_requests[parameters[0]] = (parameters[1], parameters[2])
+            self.rowcount = 1
+        elif query.startswith("SELECT business_review_gid, proposal_gid, decision"):
+            reviews = connection._view("reviews")
+            self.rows = [
+                (review[0], review[1], review[4], review[6], review[8], review[3], review[5], review[9])
+                for review in reviews.values() if review[1] == parameters[0]
+            ]
+        elif query.startswith("SELECT proposal_gid, capability_version_gid"):
+            proposals = connection._view("proposals")
+            if "WHERE proposal_gid" in query:
+                proposal = proposals.get(parameters[0])
+                self.row = None if proposal is None else _business_proposal_row(proposal)
+            else:
+                self.rows = [_business_proposal_row(proposal) for proposal in sorted(
+                    proposals.values(), key=lambda item: item.proposal_gid,
+                )]
+
+    def fetchone(self): return self.row
+    def fetchall(self): return self.rows
+    def close(self): pass
 
 
 def _pending_business_proposal() -> Proposal:
@@ -592,6 +726,31 @@ def _super_admin_context(user_gid="9001"):
             consumer=ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="ai00.web"),
         ),
     )
+
+
+def _business_snapshot(snapshot_gid: int, capability_version_gid: int, definition_hash: str):
+    return SimpleNamespace(
+        snapshot_gid=snapshot_gid,
+        entries=(SimpleNamespace(
+            capability_version_gid=capability_version_gid,
+            capability_id="person.height.read",
+            major_version=1,
+        ),),
+        document=SimpleNamespace(capabilities=(SimpleNamespace(
+            capability_id="person.height.read",
+            major_version=1,
+            descriptor={"business_definition_hash": definition_hash},
+        ),)),
+    )
+
+
+def _persistent_service(database: _SharedBusinessDatabase, *snapshots):
+    connection = database.connect()
+    store = SqlGovernanceStore(connection)
+    indexed = {snapshot.snapshot_gid: snapshot for snapshot in snapshots}
+    store.get_snapshot = indexed.get
+    store.latest_snapshot = lambda: indexed[max(indexed)] if indexed else None
+    return CapabilityGovernanceService(store=store), connection
 
 
 def test_sql_business_decision_is_single_transaction_and_failure_rolls_back_every_row():
@@ -658,46 +817,141 @@ def test_sql_persisted_proposal_cas_allows_one_of_two_independent_workflow_insta
                for query, _ in connection.calls)
 
 
-def test_sql_cas_race_uses_separate_connections_over_one_shared_transactional_state():
+def test_sql_cas_race_uses_two_services_and_trusted_identities_over_separate_connections():
     database = _SharedBusinessDatabase(_pending_business_proposal())
-    first_connection, second_connection = database.connect(), database.connect()
+    snapshot = _business_snapshot(501, 202, HASH_1)
+    first, first_connection = _persistent_service(database, snapshot)
+    second, second_connection = _persistent_service(database, snapshot)
     assert first_connection is not second_connection
-    first = ProposalService(next_gid=iter(range(801, 900)).__next__, business_review_store=SqlGovernanceStore(first_connection))
-    second = ProposalService(next_gid=iter(range(901, 1000)).__next__, business_review_store=SqlGovernanceStore(second_connection))
-    reviewer = ReviewerContext("9001", ("super_admin",), (), ())
     barrier = Barrier(2)
 
-    def decide(service, decision, key):
+    def decide(service, decision, key, reviewer_gid):
         barrier.wait()
         try:
-            return service.decide_business_definition(701, reviewer_context=reviewer, definition_hash=HASH_1,
-                current_definition_hash=HASH_1, decision=decision, decision_reason="Evidence sufficient",
-                expected_row_version=5, idempotency_key=key)
-        except WorkflowError as exc:
+            return service.base_capability_review_decide({
+                "proposal_gid": "701", "definition_hash": HASH_1,
+                "decision": decision, "decision_reason": "Evidence sufficient",
+                "row_version": "5", "idempotency_key": key,
+            }, _super_admin_context(reviewer_gid))["proposal"]
+        except CapabilityBusinessError as exc:
             return exc
 
     with ThreadPoolExecutor(max_workers=2) as pool:
-        outcomes = tuple(pool.submit(decide, service, decision, key)
-                         for service, decision, key in ((first, "approved", "approve"), (second, "rejected", "reject")))
+        outcomes = tuple(pool.submit(decide, service, decision, key, reviewer_gid)
+                         for service, decision, key, reviewer_gid in (
+                             (first, "approved", "approve", "9001"),
+                             (second, "rejected", "reject", "9002"),
+                         ))
         outcomes = tuple(future.result() for future in outcomes)
-    assert sum(isinstance(outcome, WorkflowError) for outcome in outcomes) == 1
-    assert len(database.state.committed_reviews) == 1
+    failures = tuple(outcome for outcome in outcomes if isinstance(outcome, CapabilityBusinessError))
+    assert len(failures) == 1 and failures[0].code == "row_version_conflict"
+    assert sum(getattr(outcome, "status", None) in {"approved", "rejected"} for outcome in outcomes) == 1
+    assert len(database.reviews) == 1
+
+    restarted, _ = _persistent_service(database, snapshot)
+    reloaded = restarted._proposals.get(701)
+    assert reloaded.status in {"approved", "rejected"}
+    assert len(reloaded.reviews) == 1
+
+
+def test_fresh_persistent_service_allocates_a_distinct_proposal_and_preserves_supersession():
+    database = _SharedBusinessDatabase()
+    old_snapshot = _business_snapshot(501, 202, HASH_1)
+    replacement_snapshot = _business_snapshot(502, 203, HASH_A)
+    first, first_connection = _persistent_service(database, old_snapshot)
+    old = first.base_capability_proposal_submit({
+        "capability_id": "person.height.read", "capability_version_gid": "202",
+        "base_snapshot_gid": "501", "previous_hash": HASH_2,
+        "proposed_descriptor_hash": HASH_1, "definition_hash": HASH_1,
+        "evidence_hash": HASH_2, "idempotency_key": "old-proposal",
+    }, _super_admin_context("1"))["proposal"]
+    checking = first._proposals.transition(
+        old.proposal_gid, "checking", expected_row_version=old.row_version,
+        idempotency_key="old-checking",
+    )
+    pending = first._proposals.transition(
+        checking.proposal_gid, "pending_approval", expected_row_version=checking.row_version,
+        idempotency_key="old-pending",
+    )
+
+    restarted, second_connection = _persistent_service(database, old_snapshot, replacement_snapshot)
+    replacement = restarted.base_capability_proposal_submit({
+        "capability_id": "person.height.read", "capability_version_gid": "203",
+        "base_snapshot_gid": "502", "previous_hash": HASH_1,
+        "proposed_descriptor_hash": HASH_A, "definition_hash": HASH_A,
+        "evidence_hash": HASH_2, "idempotency_key": "replacement-proposal",
+    }, _super_admin_context("2"))["proposal"]
+
+    assert first_connection is not second_connection
+    assert replacement.proposal_gid != pending.proposal_gid
+    displaced = restarted._proposals.get(pending.proposal_gid)
+    assert displaced.status == "superseded"
+    assert restarted._proposals.get(replacement.proposal_gid) == replacement
+    assert set(database.proposals) == {pending.proposal_gid, replacement.proposal_gid}
+    proposal_inserts = [query for query, _ in database.calls if query.startswith(
+        "INSERT INTO workmanship_base_capability_change_proposals"
+    )]
+    assert proposal_inserts and all("ON DUPLICATE KEY UPDATE" not in query for query in proposal_inserts)
+
+    with pytest.raises(CapabilityBusinessError) as error:
+        restarted.base_capability_review_decide({
+            "proposal_gid": str(displaced.proposal_gid), "definition_hash": HASH_1,
+            "decision": "approved", "decision_reason": "Evidence sufficient",
+            "row_version": str(displaced.row_version), "idempotency_key": "review-displaced",
+        }, _super_admin_context())
+    assert error.value.code == "review_subject_hash_mismatch"
+
+
+def test_persistent_proposal_port_does_not_enable_in_memory_waiver_or_release_after_restart():
+    database = _SharedBusinessDatabase()
+    for index in (1, 2):
+        service, _ = _persistent_service(database)
+        with pytest.raises(CapabilityBusinessError) as waiver_error:
+            service.base_capability_waiver_grant({
+                "finding_gid": "11", "capability_version_gid": "202", "scope": "one finding",
+                "reason": "Temporary exception", "code_hash": HASH_1, "catalog_hash": HASH_1,
+                "evidence_hash": HASH_1, "expires_at": (NOW + timedelta(days=1)).isoformat(),
+                "idempotency_key": f"waiver-{index}",
+            }, _super_admin_context())
+        assert waiver_error.value.code == "governance_persistence_unavailable"
+
+        with pytest.raises(CapabilityBusinessError) as release_error:
+            service.base_capability_release_gate_evaluate(
+                {"idempotency_key": f"release-{index}"}, _super_admin_context(),
+            )
+        assert release_error.value.code == "governance_persistence_unavailable"
+
+
+def test_persistent_runtime_rejects_in_memory_waiver_and_release_services_on_a_workflow_port():
+    database = _SharedBusinessDatabase()
+    store = SqlGovernanceStore(database.connect())
+    ids = iter(range(1, 20)).__next__
+    workflow_port = SimpleNamespace(
+        waiver_service=WaiverService(next_gid=ids),
+        release_gate=ReleaseGate(next_gid=ids),
+    )
+    service = CapabilityGovernanceService(store=store, workflow_port=workflow_port)
+
+    with pytest.raises(CapabilityBusinessError) as waiver_error:
+        service.base_capability_waiver_grant({
+            "finding_gid": "11", "capability_version_gid": "202", "scope": "one finding",
+            "reason": "Temporary exception", "code_hash": HASH_1, "catalog_hash": HASH_1,
+            "evidence_hash": HASH_1, "expires_at": (NOW + timedelta(days=1)).isoformat(),
+            "idempotency_key": "in-memory-waiver",
+        }, _super_admin_context())
+    assert waiver_error.value.code == "governance_persistence_unavailable"
+
+    with pytest.raises(CapabilityBusinessError) as release_error:
+        service.base_capability_release_gate_evaluate(
+            {"idempotency_key": "in-memory-release"}, _super_admin_context(),
+        )
+    assert release_error.value.code == "governance_persistence_unavailable"
 
 
 def test_default_persistent_service_path_creates_transitions_reviews_and_rehydrates_history():
-    connection = _BusinessDecisionConnection(_pending_business_proposal())
-    store = SqlGovernanceStore(connection, next_ids=iter(range(1000, 1100)).__next__)
-    snapshot = SimpleNamespace(
-        snapshot_gid=501,
-        entries=(SimpleNamespace(capability_version_gid=202, capability_id="person.height.read", major_version=1),),
-        document=SimpleNamespace(capabilities=(SimpleNamespace(
-            capability_id="person.height.read", major_version=1,
-            descriptor={"business_definition_hash": HASH_1},
-        ),)),
-    )
-    store.get_snapshot = lambda snapshot_gid: snapshot if snapshot_gid == 501 else None
-    store.latest_snapshot = lambda: snapshot
-    service = CapabilityGovernanceService(store=store)
+    database = _SharedBusinessDatabase(_pending_business_proposal())
+    snapshot = _business_snapshot(501, 202, HASH_1)
+    service, _ = _persistent_service(database, snapshot)
     payload = {
         "capability_id": "person.height.read", "capability_version_gid": "202", "base_snapshot_gid": "501",
         "previous_hash": HASH_2, "proposed_descriptor_hash": HASH_1, "definition_hash": HASH_1,
@@ -714,7 +968,7 @@ def test_default_persistent_service_path_creates_transitions_reviews_and_rehydra
     }, _super_admin_context())["proposal"]
 
     assert approved.status == "approved" and len(approved.reviews) == 1
-    restarted = CapabilityGovernanceService(store=store)
+    restarted, _ = _persistent_service(database, snapshot)
     reloaded = restarted._proposals.get(approved.proposal_gid)
     assert reloaded.status == "approved" and len(reloaded.reviews) == 1
     assert reloaded.reviews[0].decision == "approved"

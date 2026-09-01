@@ -406,19 +406,40 @@ class CapabilityGovernanceService:
         # ProposalService uses its CAS/read methods directly.  Requiring a
         # wrapper port here made the default SQL bootstrap reject operations
         # even though the durable implementation was already present.
-        self._workflow_port = workflow_port or (store if getattr(store, "persistent", False) else None)
-        self._workflow_persistence_required = bool(getattr(store, "persistent", False)) and self._workflow_port is None
+        persistent_runtime = bool(getattr(store, "persistent", False))
+        self._workflow_port = workflow_port or (store if persistent_runtime else None)
+        proposal_port = getattr(self._workflow_port, "proposal_service", None)
+        waiver_port = getattr(self._workflow_port, "waiver_service", None)
+        release_port = getattr(self._workflow_port, "release_gate", None)
         if self._workflow_port is not None:
             # A persistent adapter may expose the durable state machines
             # directly.  Keeping this as a narrow port avoids coupling the
             # service to a particular SQL driver or schema implementation.
-            self._proposals = getattr(self._workflow_port, "proposal_service", self._proposals)
-            self._waivers = getattr(self._workflow_port, "waiver_service", self._waivers)
+            self._proposals = proposal_port or self._proposals
+            self._waivers = waiver_port or self._waivers
         self._release_gate = release_gate or ReleaseGate(
             next_gid=self._next_governance_gid, audit_sink=audit_sink,
         )
-        if self._workflow_port is not None:
-            self._release_gate = getattr(self._workflow_port, "release_gate", self._release_gate)
+        if release_port is not None:
+            self._release_gate = release_port
+        durable_store_proposals = proposal_service is None and all(callable(getattr(store, name, None)) for name in (
+            "save_workflow_proposal", "get_workflow_proposal",
+            "transition_workflow_proposal", "decide_business_review_atomic",
+        ))
+        self._workflow_persistence_required = {
+            "proposal": persistent_runtime and not (
+                proposal_port is not None or durable_store_proposals
+                or bool(getattr(proposal_service, "persistent", False))
+            ),
+            "waiver": persistent_runtime and not (
+                bool(getattr(waiver_port, "persistent", False))
+                or bool(getattr(waiver_service, "persistent", False))
+            ),
+            "release": persistent_runtime and not (
+                bool(getattr(release_port, "persistent", False))
+                or bool(getattr(release_gate, "persistent", False))
+            ),
+        }
 
     def bind_registry_snapshot(self, snapshot: Any) -> None:
         """Bind the registry used by the scanner to the serving registry."""
@@ -618,7 +639,7 @@ class CapabilityGovernanceService:
         items = page[:limit]
         return self._completed(
             "base.capability_proposal.search", items=items,
-            data={"available": self._workflow_port is not None or not self._workflow_persistence_required,
+            data={"available": not self._workflow_persistence_required["proposal"],
                   "checked_at": self._now_iso(),
                   "next_cursor": str(items[-1]["proposal_gid"]) if len(page) > len(items) else None},
         )
@@ -901,7 +922,7 @@ class CapabilityGovernanceService:
         )
 
     def base_capability_proposal_submit(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
-        self._require_workflow_persistence()
+        self._require_workflow_persistence("proposal")
         key = self._idempotency(payload)
         try:
             if payload.get("proposal_gid") is not None or payload.get("target_gid") is not None:
@@ -943,7 +964,7 @@ class CapabilityGovernanceService:
         return self._accepted("base.capability_proposal.submit", proposal=proposal)
 
     def base_capability_review_decide(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
-        self._require_workflow_persistence()
+        self._require_workflow_persistence("proposal")
         key = self._idempotency(payload)
         try:
             proposal_gid = _payload_gid(payload, "proposal_gid", "target_gid")
@@ -986,7 +1007,7 @@ class CapabilityGovernanceService:
         return self._accepted("base.capability_review.decide", proposal=proposal)
 
     def base_capability_waiver_grant(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
-        self._require_workflow_persistence()
+        self._require_workflow_persistence("waiver")
         key = self._idempotency(payload)
         try:
             waiver = self._waivers.grant(
@@ -1007,7 +1028,7 @@ class CapabilityGovernanceService:
         return self._accepted("base.capability_waiver.grant", waiver=waiver)
 
     def base_capability_waiver_revoke(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
-        self._require_workflow_persistence()
+        self._require_workflow_persistence("waiver")
         key = self._idempotency(payload)
         try:
             waiver = self._waivers.revoke(
@@ -1023,7 +1044,7 @@ class CapabilityGovernanceService:
         return self._accepted("base.capability_waiver.revoke", waiver=waiver)
 
     def base_capability_release_gate_evaluate(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
-        self._require_workflow_persistence()
+        self._require_workflow_persistence("release")
         key = self._idempotency(payload)
         candidate = self._release_candidate(payload)
         evidence = self._load_release_evidence(candidate, payload)
@@ -1877,8 +1898,8 @@ class CapabilityGovernanceService:
             raise _business_error("idempotency_conflict")
         return value
 
-    def _require_workflow_persistence(self) -> None:
-        if self._workflow_persistence_required:
+    def _require_workflow_persistence(self, operation: str) -> None:
+        if self._workflow_persistence_required[operation]:
             raise _business_error("governance_persistence_unavailable")
 
     @staticmethod

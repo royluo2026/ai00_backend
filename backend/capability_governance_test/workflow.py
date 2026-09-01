@@ -172,7 +172,9 @@ class ProposalService:
     def _record(self, key: str, proposal: Proposal, *, operation: str, actor_gid: str) -> Proposal:
         saver = getattr(self._business_review_store, "save_workflow_proposal", None)
         if proposal.review_kind == "business_definition" and callable(saver):
-            saver(proposal)
+            persisted = saver(proposal)
+            if persisted is not None:
+                proposal = persisted
         self._proposals[proposal.proposal_gid] = proposal
         self._idempotency[key] = proposal
         self._audit(operation=operation, entity_gid=proposal.proposal_gid, actor_gid=actor_gid, idempotency_key=key, detail={"status": proposal.status, "capability_id": proposal.capability_id})
