@@ -294,6 +294,16 @@ class InvocationEnvelope(FrozenModel):
     approval_reference: str | None = Field(default=None, pattern=IDENTITY_PATTERN)
 
 
+class BusinessInvariantContract(FrozenModel):
+    rule_id: str = Field(pattern=r"^[a-z][a-z0-9_.-]{2,127}$")
+    version: int = Field(ge=1)
+    statement: str = Field(min_length=1, max_length=4000)
+    applies_when: str = Field(min_length=1, max_length=4000)
+    enforcement_ref: str = Field(min_length=1, max_length=1000)
+    error_code: str = Field(min_length=1, max_length=255)
+    test_refs: tuple[str, ...] = Field(min_length=1)
+
+
 def _assert_closed_schema(schema: Mapping[str, Any], path: str) -> None:
     if schema.get("type") == "object" and schema.get("additionalProperties") is not False:
         raise ValueError(f"{path} object schema must declare additionalProperties false")
@@ -318,6 +328,9 @@ class CapabilityDescriptorV2(FrozenModel):
     do_not_use_when: str = Field(min_length=1, max_length=4000)
     # V2.1 names the business outcome separately from the human description.
     business_effect: str | None = Field(default=None, max_length=4000)
+    business_acceptance_criteria: tuple[str, ...] = ()
+    business_invariants: tuple[BusinessInvariantContract, ...] = ()
+    no_business_invariant_reason: str | None = Field(default=None, min_length=1, max_length=4000)
     side_effect_level: SideEffectLevel = SideEffectLevel.READ
     side_effects: str | None = Field(default=None, max_length=4000)
     execution_mode: ExecutionMode = ExecutionMode.CLOUD_SYNC
@@ -371,6 +384,8 @@ class CapabilityDescriptorV2(FrozenModel):
         _assert_closed_schema(self.output_schema, "output_schema")
         if self.agent_output_schema is not None:
             _assert_closed_schema(self.agent_output_schema, "agent_output_schema")
+        if self.business_invariants and self.no_business_invariant_reason is not None:
+            raise ValueError("business_rule_declaration_conflict")
         if self.domain_errors_complete and not self.domain_errors:
             raise ValueError("complete domain error contract cannot be empty")
         if self.concurrency_policy == "expected_version" and not self.expected_version_payload_path:
