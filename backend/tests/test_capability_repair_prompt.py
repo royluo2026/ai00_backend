@@ -89,3 +89,17 @@ def test_prompt_holder_cannot_self_authorize_text_access():
     assert not hasattr(prompt, "text_for")
     assert "text" not in repr(vars(prompt)).lower()
     assert not hasattr(prompt, "_text_for_governance_service")
+
+
+@pytest.mark.parametrize(("field", "value"), [
+    ("subject_version_gids", ["8"]), ("capability_keys", ["other.capability"]),
+    ("evidence_keys", ["evidence:foreign"]),
+])
+def test_repair_prompt_rejects_findings_outside_sanitized_boundary_allowlists(field, value):
+    finding = _finding()
+    finding[field] = value
+    with pytest.raises(ValueError, match="candidate_only"):
+        build_repair_prompt(
+            finding, {"evidence_keys": ["evidence:7"]},
+            {"snapshot_gid": "9", "capability_version_gids": ["7"], "capability_ids": ["capability.contract"]},
+        )

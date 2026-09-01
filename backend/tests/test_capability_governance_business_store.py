@@ -419,3 +419,59 @@ def test_stores_reject_invalid_business_review_references_before_insert(
     with pytest.raises(ImmutableRecordError, match=error_code):
         SqlGovernanceStore(connection).save_business_review(review)
     assert connection.calls == []
+
+
+class _RelationTxCursor:
+    def __init__(self, connection): self.connection, self.rows = connection, []
+    def execute(self, query, parameters=()):
+        self.connection.calls.append((query, parameters))
+        if self.connection.fail_insert:
+            raise RuntimeError("transport_down")
+        if query.startswith("INSERT INTO workmanship_base_capability_relation_candidates"):
+            row = tuple(parameters)
+            if not any(item[0] == row[0] or (item[1] == row[1] and item[2] == row[2]) for item in self.connection.staged):
+                self.connection.staged.append(row)
+        elif query.startswith("SELECT relation_candidate_gid"):
+            gid, snapshot, digest = parameters
+            self.rows = [item for item in self.connection.staged if item[0] == gid or (item[1] == snapshot and item[2] == digest)]
+    def fetchall(self): return self.rows
+    def close(self): pass
+
+
+class _RelationTxConnection:
+    def __init__(self, rows=(), fail_insert=False):
+        self.rows, self.staged, self.calls, self.fail_insert = list(rows), list(rows), [], fail_insert
+        self.commits = self.rollbacks = 0
+    def cursor(self): return _RelationTxCursor(self)
+    def commit(self): self.rows = list(self.staged); self.commits += 1
+    def rollback(self): self.staged = list(self.rows); self.rollbacks += 1
+
+
+def _relation_row(candidate):
+    return (candidate.relation_candidate_gid, candidate.snapshot_gid, candidate.candidate_hash, candidate.relation_type,
+            candidate.source, '["person.height.read@1","person.height.write@1"]', '{"shared_fields":["height"]}', candidate.status)
+
+
+def test_sql_relation_transactional_readback_exact_replay_and_conflicts_rollback():
+    candidate = _projection().relation_candidates[0]
+    connection = _RelationTxConnection((_relation_row(candidate),))
+    store = SqlGovernanceStore(connection)
+    store.save_relation_candidates((candidate,))
+    assert connection.commits == 1 and len(connection.rows) == 1
+    assert any("FOR UPDATE" in query for query, _ in connection.calls)
+    for conflict in (replace(candidate, snapshot_gid=999, candidate_hash=HASH_1), replace(candidate, relation_candidate_gid=999)):
+        with pytest.raises(ImmutableRecordError, match="relation_candidate_immutable_conflict"):
+            store.save_relation_candidates((conflict,))
+        assert connection.rollbacks and connection.rows == [_relation_row(candidate)]
+
+
+def test_sql_relation_transaction_batch_rolls_back_and_preserves_nonunique_errors():
+    candidate = _projection().relation_candidates[0]
+    first = replace(candidate, relation_candidate_gid=404, candidate_hash=HASH_1)
+    conflicting = replace(candidate, relation_candidate_gid=405, candidate_hash=HASH_1)
+    connection = _RelationTxConnection()
+    with pytest.raises(ImmutableRecordError):
+        SqlGovernanceStore(connection).save_relation_candidates((first, conflicting))
+    assert connection.rows == []
+    with pytest.raises(RuntimeError, match="transport_down"):
+        SqlGovernanceStore(_RelationTxConnection(fail_insert=True)).save_relation_candidates((candidate,))
