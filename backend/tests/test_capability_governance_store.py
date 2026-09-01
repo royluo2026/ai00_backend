@@ -5,6 +5,7 @@ import json
 
 import pytest
 
+from backend.capability_governance_test.analysis import AnalysisRequest, run_deterministic_analysis
 from backend.capability_governance_test.identity_projection import project_snapshot
 from backend.capability_governance_test.fingerprint import snapshot_fingerprint
 from backend.capability_governance_test.models import ImmutableRecordError, ScanFinding, SnapshotDocument
@@ -131,6 +132,12 @@ def test_sql_store_persists_blocked_run_and_scan_finding():
     assert scan_run[7] == "blocked"
     assert scan_run[10] == "invalid"
     assert finding[3:7] == ("scan_configuration_error", "blocking", "open", "scanner")
+    document = _blocked_document()
+    candidate = run_deterministic_analysis(document, AnalysisRequest()).findings[0]
+    memory = MemoryGovernanceStore(next_ids=iter(range(300, 400)).__next__)
+    memory_record = memory.import_snapshot(document)
+    assert finding[8] == candidate.fingerprint
+    assert memory.get_findings(memory_record.snapshot_gid)[0]["fingerprint"] == candidate.fingerprint
 
 
 def test_sql_rehydration_restores_business_evidence_and_scan_findings():

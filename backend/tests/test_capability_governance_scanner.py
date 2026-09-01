@@ -358,3 +358,30 @@ def test_offline_cli_emits_blocked_report_and_exits_nonzero(
     assert result == 1
     assert json.loads(output.read_text(encoding="utf-8"))["status"] == "blocked"
     assert json.loads(capsys.readouterr().out)["scan_status"] == "blocked"
+
+
+def test_offline_cli_persists_real_catalog_validation_failure_before_exit(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str],
+) -> None:
+    runner = importlib.import_module("backend.scripts.run_capability_governance_scan")
+    invalid_catalog = tmp_path / "invalid-catalog.json"
+    invalid_catalog.write_text('{"schema_version":"invalid"}', encoding="utf-8")
+    output = tmp_path / "blocked-preflight.json"
+    monkeypatch.setattr(runner, "REPOSITORY_ROOT", tmp_path)
+    monkeypatch.setattr(runner, "PRODUCT_CATALOG", invalid_catalog)
+
+    result = runner.main(["--offline", "--output", str(output)])
+
+    report = json.loads(output.read_text(encoding="utf-8"))
+    finding = report["snapshot"]["scan_findings"][0]
+    assert result == 1
+    assert report["status"] == "blocked"
+    assert report["snapshot"]["scan_status"] == "blocked"
+    assert finding == {
+        "category": "configuration",
+        "code": "scan_configuration_error",
+        "message": "product_catalog_validation_error",
+        "severity": "blocking",
+        "source_path": "product_catalog",
+    }
+    assert json.loads(capsys.readouterr().out)["scan_status"] == "blocked"

@@ -265,6 +265,55 @@ def test_scanner_rejects_duplicate_rule_identity_deterministically(scanner, cata
     assert first.snapshot_hash == second.snapshot_hash
 
 
+@pytest.mark.parametrize(("field_name", "invalid_value"), (
+    ("rule_id", 1),
+    ("rule_version", True),
+    ("statement", 1),
+    ("applies_when", True),
+    ("enforcement_ref", 1),
+    ("error_code", True),
+))
+def test_scanner_rejects_business_rule_scalar_type_coercion(
+    scanner, catalog, field_name, invalid_value,
+):
+    rule = {
+        "rule_id": "person.height.valid_range", "rule_version": 1,
+        "statement": "Height is valid.", "applies_when": "Height changes.",
+        "enforcement_ref": "person/provider.py:validate_height",
+        "error_code": "height_out_of_range",
+        "test_refs": ("person/test_height.py::test_accepts_boundary",),
+    }
+    catalog["descriptors"][0]["business_invariants"] = ({**rule, field_name: invalid_value},)
+
+    document = scanner.scan("abc123")
+
+    assert document.scan_status == "blocked"
+    assert document.scan_findings[0].message == "product_catalog_business_rule_scalar_invalid"
+
+
+def test_invalid_rule_scalar_order_has_one_deterministic_identity(scanner, catalog):
+    rules = (
+        {
+            "rule_id": 1, "rule_version": 1, "statement": "One.",
+            "applies_when": "Always.", "enforcement_ref": "person/provider.py:validate_height",
+            "error_code": "one", "test_refs": (),
+        },
+        {
+            "rule_id": "person.height.two", "rule_version": True, "statement": "Two.",
+            "applies_when": "Always.", "enforcement_ref": "person/provider.py:validate_height",
+            "error_code": "two", "test_refs": (),
+        },
+    )
+    catalog["descriptors"][0]["business_invariants"] = rules
+    first = scanner.scan("abc123")
+    catalog["descriptors"][0]["business_invariants"] = tuple(reversed(rules))
+    second = scanner.scan("abc123")
+
+    assert first.scan_status == second.scan_status == "blocked"
+    assert first.snapshot_hash == second.snapshot_hash
+    assert first.scan_findings == second.scan_findings
+
+
 def test_scanned_capability_preserves_legacy_positional_descriptor_contract():
     descriptor = {"business_object": "height"}
 

@@ -680,12 +680,26 @@ class GovernanceScanner:
             raw_rules = descriptor.get("business_invariants", ())
             if not isinstance(raw_rules, (list, tuple)):
                 raise ScanPolicyError("product_catalog_business_rules_invalid")
+            parsed_rules = tuple(dict(_json_document(rule)) for rule in raw_rules)
+            for rule in parsed_rules:
+                rule_id = rule.get("rule_id")
+                rule_version = rule.get("rule_version")
+                if (
+                    not isinstance(rule_id, str)
+                    or not rule_id.strip()
+                    or isinstance(rule_version, bool)
+                    or not isinstance(rule_version, int)
+                ):
+                    raise ScanPolicyError("product_catalog_business_rule_scalar_invalid")
+                for field_name in ("statement", "applies_when", "enforcement_ref", "error_code"):
+                    if field_name in rule and not isinstance(rule[field_name], str):
+                        raise ScanPolicyError("product_catalog_business_rule_scalar_invalid")
             rules = tuple(sorted(
-                (dict(_json_document(rule)) for rule in raw_rules),
-                key=lambda rule: (str(rule.get("rule_id") or ""), int(rule.get("rule_version") or 0)),
+                parsed_rules,
+                key=lambda rule: (rule["rule_id"], rule["rule_version"]),
             ))
-            identities = [(str(rule.get("rule_id") or "").strip(), int(rule.get("rule_version") or 0)) for rule in rules]
-            if any(not rule_id or version < 1 for rule_id, version in identities):
+            identities = [(rule["rule_id"].strip(), rule["rule_version"]) for rule in rules]
+            if any(version < 1 for _rule_id, version in identities):
                 raise ScanPolicyError("product_catalog_business_rule_invalid")
             if len(set(identities)) != len(identities):
                 raise ScanPolicyError("product_catalog_business_rule_duplicate")

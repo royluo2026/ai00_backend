@@ -655,3 +655,28 @@ def test_blocked_scan_is_persisted_and_reachable_through_finding_provider():
     assert scan_result["scan_status"] == "blocked"
     assert finding_result["findings"][0]["code"] == "scan_configuration_error"
     assert finding_result["findings"][0]["severity"] == "blocking"
+    assert finding_result["total"] == 1
+
+
+def test_scan_finding_pagination_deduplicates_analysis_without_merging_evidence():
+    findings = (
+        ScanFinding("scan_configuration_error", "blocking", "configuration", "product_catalog", "invalid"),
+        ScanFinding("scan_configuration_error", "blocking", "configuration", "extension_catalog", "invalid"),
+    )
+    draft = SnapshotDocument("catalog-test", None, "revision", "", (), (), (), (), findings, "blocked")
+    document = replace(draft, snapshot_hash=snapshot_fingerprint(draft))
+    store = MemoryGovernanceStore(next_ids=iter(range(200, 300)).__next__)
+    snapshot = store.import_snapshot(document)
+    service = CapabilityGovernanceService(store)
+
+    first = service.base_capability_finding_search(
+        {"target_gid": snapshot.snapshot_gid, "limit": 1, "offset": 0}, _context(),
+    )
+    second = service.base_capability_finding_search(
+        {"target_gid": snapshot.snapshot_gid, "limit": 1, "offset": 1}, _context(),
+    )
+
+    assert first["total"] == second["total"] == 2
+    assert first["offset"] == 0
+    assert second["offset"] == 1
+    assert first["findings"][0]["evidence"] != second["findings"][0]["evidence"]

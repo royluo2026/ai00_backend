@@ -161,7 +161,6 @@ def _validate_business_review_references(review: CapabilityBusinessReview) -> No
 
 
 def _scan_finding_record(finding: ScanFinding, finding_gid: int) -> Mapping[str, Any]:
-    from .fingerprint import canonical_fingerprint
     return {
         "finding_gid": finding_gid,
         "code": finding.code,
@@ -169,13 +168,20 @@ def _scan_finding_record(finding: ScanFinding, finding_gid: int) -> Mapping[str,
         "severity": finding.severity,
         "status": "open",
         "source_type": "scanner",
-        "fingerprint": canonical_fingerprint(finding.to_json()),
+        "fingerprint": _scan_finding_fingerprint(finding),
         "remediation_boundary": finding.category,
         "domains": (),
         "evidence": (finding.source_path,),
         "reason": finding.message,
         "subject_summary": finding.source_path,
     }
+
+
+def _scan_finding_fingerprint(finding: ScanFinding) -> str:
+    from .rules import finding_fingerprint
+    return finding_fingerprint(
+        finding.code, finding.severity, (), (finding.source_path,), finding.category,
+    )
 
 
 def _finding_row_record(row: Any) -> Mapping[str, Any]:
@@ -1001,9 +1007,8 @@ class SqlGovernanceStore(GovernanceStore):
         )
 
     def _insert_scan_findings(self, cursor: Any, snapshot_gid: int, document: SnapshotDocument) -> None:
-        from .fingerprint import canonical_fingerprint
         for finding in document.scan_findings:
-            fingerprint = canonical_fingerprint(finding.to_json())
+            fingerprint = _scan_finding_fingerprint(finding)
             cursor.execute(
                 "INSERT INTO workmanship_base_capability_findings "
                 "(finding_gid, analysis_run_gid, snapshot_gid, finding_type, severity, status, source_type, "
