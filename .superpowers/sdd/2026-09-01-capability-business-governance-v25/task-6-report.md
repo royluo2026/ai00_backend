@@ -69,3 +69,33 @@ Clean detached worktree: `E:\Projects\ai00_v3\.task6-round3-clean-c9dd3d64` at c
 - `python -m compileall -q backend/capability_governance_test/service.py backend/capability_governance_test/store.py backend/capability_governance_test/workflow.py backend/tests/test_capability_governance_business_store.py` — passed.
 - `git diff --check c9dd3d64^ c9dd3d64` — clean.
 - Separate known migration failure remains unchanged: `python -m pytest backend/tests/test_versioned_migration_files.py -q` — **1 failed, 8 passed** due to `202608310001_craft_rule_identity_backfill.sql` containing a non-resumable `UPDATE`.
+
+## Fix round 4 — restart-safe proposal identity and port-specific persistence
+
+- Persistent business-definition proposals now allocate their identity from the existing Base-owned `workmanship_display_id_counters` mechanism. The sequence is synchronized to the greatest stored proposal id, incremented transactionally, and the proposal is inserted without an upsert, so a restarted process cannot overwrite an earlier row. The returned durable id replaces only the transient proposal id; the deterministic in-memory path is unchanged.
+- Restart coverage uses two fresh `CapabilityGovernanceService` instances and distinct connection wrappers over one transactional database. A replacement definition receives a distinct id, the prior row remains visible as `superseded` and cannot be reviewed, and both rows remain addressable by their exact ids.
+- The CAS race now enters through two independent services' real `base_capability_review_decide` method with genuine trusted, undelegated web `ConsumerIdentity` objects. For one persisted proposal and row version, one approved/rejected decision wins, the other reports `row_version_conflict`, one review is durable, and a restarted service rehydrates that one review.
+- The persistent-runtime guard is split by proposal, waiver, and release capability and follows the service actually selected for each operation. `SqlGovernanceStore` is accepted as the durable proposal boundary only; in-memory waiver and release services remain fail-closed after restart, when placed on a workflow-port-shaped object without a persistent marker, and when they shadow separately supplied durable arguments.
+- The existing SQL decision transaction remains connected: proposal CAS, immutable review insert, and idempotency insert still commit together, and the injected final-insert failure still rolls back all three writes.
+
+### Test-first evidence
+
+- RED: the three-finding command initially produced **2 failed, 1 passed**. The restart case reused proposal id `1`, and the persistent-runtime waiver/release case did not raise; the new service-level concurrency evidence already passed against the pre-fix decision transaction.
+- RED: the workflow-port-shaped in-memory waiver/release case separately produced **1 failed** because an in-memory waiver was accepted.
+- Self-review RED: the selected-service guard case separately produced **1 failed** because an in-memory workflow-port waiver shadowed an explicit persistent argument while the guard inspected the unused argument.
+- GREEN at implementation commits `1f595a83` and `ad6f5a7b`: the six focused cases (original SQL transaction/rollback plus the five round-4 integration/guard cases) produced **6 passed in 0.89s**.
+- GREEN at final implementation commit `ad6f5a7b`: `python -m pytest backend/tests/test_capability_governance_business_store.py -q -p no:cacheprovider --basetemp .tmp-task6-round4-clean-store` — **36 passed in 0.69s**.
+
+### Clean-materialization verification
+
+Clean detached worktree: `E:\Projects\ai00_v3\.task6-round4-clean-ad6f5a7b` at final implementation commit `ad6f5a7b`.
+
+- Task6 plus affected store/workflow/provider/Task5 regression command (`test_capability_business_review.py`, `test_capability_governance_business_store.py`, `test_capability_governance_service_workflow.py`, `test_capability_business_relations.py`, `test_capability_governance_ai.py`, and `test_capability_governance_provider.py`) produced **105 passed, 2 failed in 2.68s**. Both failures are the pre-existing static-gate integration mismatch: authoritative release evidence lacks the newly expected static-gate fields and yields `governance_dependency_unavailable` / `missing_required_data`, while provider projection has the corresponding extra `missing_required_data` blocker. No round-4 store, identity, CAS, or guard assertion failed.
+- `python -m compileall -q backend/capability_governance_test backend/tests/test_capability_governance_business_store.py` — passed.
+- `git diff --check 22a67f4d ad6f5a7b` — clean; the clean worktree itself had no changes.
+
+### Known migration, static-gate, and environment failures
+
+- Governance migration compilation: `python -m pytest backend/tests/test_capability_governance_migrations.py -q` — **4 failed, 2 passed in 0.63s**. The existing `0007_business_review_idempotency.sql` table `workmanship_base_capability_business_review_requests` is absent from the existing `GOVERNANCE_TABLES` contract, so compilation reports it as an extra table; round 4 did not change migrations or schema contracts.
+- Versioned migration policy: `python -m pytest backend/tests/test_versioned_migration_files.py -q` — **1 failed, 8 passed in 0.53s** because the pre-existing `202608310001_craft_rule_identity_backfill.sql` contains a non-resumable `UPDATE`.
+- Catalog/bootstrap environment: `python -m pytest backend/tests/test_capability_governance_catalog.py -q` — **8 failed, 2 passed in 6.77s**. Seven failures stop at the missing `AI00_INTEGRATION_ADAPTER_FACTORY`; the remaining failure is the pre-existing generated catalog release-id mismatch (`rel_842a...` versus `rel_8456...`). These failures are outside the two implementation commits.
