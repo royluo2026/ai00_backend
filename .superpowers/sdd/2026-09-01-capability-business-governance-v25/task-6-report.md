@@ -52,3 +52,20 @@ Clean detached worktree: `E:\Projects\ai00_v3\.task6-round2-clean-5ac01fdb` at c
 - `python -m compileall -q backend/capability_governance_test/store.py backend/capability_governance_test/workflow.py backend/capability_governance_test/service.py backend/capability_governance_test/provider.py backend/tests/test_capability_governance_business_store.py` — passed.
 - `git diff --check 5ac01fdb^ 5ac01fdb` — clean.
 - Separate pre-existing migration failure remains unchanged: `python -m pytest backend/tests/test_versioned_migration_files.py -q` — **1 failed, 8 passed**; the failure is the non-resumable `UPDATE` in `202608310001_craft_rule_identity_backfill.sql`.
+
+## Fix round 3 — persistent-service integration closure
+
+- `SqlGovernanceStore` now acts as the existing minimal workflow port when a persistent service is constructed without a separately injected wrapper. The service no longer rejects a durable proposal/review operation merely because that optional wrapper was omitted.
+- Durable proposal readback now lists persisted rows and rehydrates ordered business-review history. A restarted service sees the committed status and exactly one append-only review.
+- New-definition detection loads durable proposals and transitions displaced business proposals to `superseded` through the existing conditional proposal CAS; a fresh workflow cannot review the displaced pending proposal.
+- Added coverage for the default persistent service constructor across create, transitions, business decision, and restarted readback; separate connection wrappers over shared transactional state race the same stored proposal and leave one review.
+
+### Clean-materialization verification
+
+Clean detached worktree: `E:\Projects\ai00_v3\.task6-round3-clean-c9dd3d64` at commit `c9dd3d64`.
+
+- Core Task6 store/workflow set: `python -m pytest backend/tests/test_capability_business_review.py backend/tests/test_capability_governance_business_store.py backend/tests/test_capability_governance_service_workflow.py backend/tests/test_capability_business_relations.py -q` — **63 passed in 1.42s** in the shared tree before clean materialization.
+- Clean broad affected set (business-review, store, service-workflow, relations, provider, catalog) produced **85 passed, 10 failed**. The failures are outside Task6: one pre-existing release evidence expectation now requires static-gate fields, and nine catalog/bootstrap failures are caused by the integration provider's missing `AI00_INTEGRATION_ADAPTER_FACTORY` / catalog release mismatch. No Task6 assertion failed.
+- `python -m compileall -q backend/capability_governance_test/service.py backend/capability_governance_test/store.py backend/capability_governance_test/workflow.py backend/tests/test_capability_governance_business_store.py` — passed.
+- `git diff --check c9dd3d64^ c9dd3d64` — clean.
+- Separate known migration failure remains unchanged: `python -m pytest backend/tests/test_versioned_migration_files.py -q` — **1 failed, 8 passed** due to `202608310001_craft_rule_identity_backfill.sql` containing a non-resumable `UPDATE`.
