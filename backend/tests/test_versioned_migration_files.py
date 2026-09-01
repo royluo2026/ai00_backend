@@ -12,9 +12,18 @@ from backend.db.versioned_migrations import (
     validate_migration,
 )
 from backend.governance import load_registry
+from backend.scripts.migrate_capability_governance_test import MIGRATION_FILE_RE
+
+
+TEST_GOVERNANCE_DIR = Path(__file__).resolve().parents[1] / "db/migrations/test_governance"
 
 
 class VersionedMigrationFileTests(unittest.TestCase):
+    def test_business_governance_migration_is_discoverable(self):
+        matches = (MIGRATION_FILE_RE.fullmatch(path.name) for path in TEST_GOVERNANCE_DIR.glob("*.sql"))
+        ids = {match.group("id") for match in matches if match is not None}
+        self.assertIn("0005", ids)
+
     def test_bootstrap_stays_in_selected_database(self):
         statements = bootstrap_statements(
             "CREATE DATABASE IF NOT EXISTS wrong; USE wrong; "

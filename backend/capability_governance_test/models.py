@@ -8,6 +8,17 @@ from typing import Any
 
 from backend.utils.gid import gid_to_json
 
+from .business_models import (
+    BusinessPurposeRecord,
+    BusinessRuleRecord,
+    CapabilityBusinessProjection,
+    CapabilityBusinessReview,
+    CapabilityFingerprint,
+    CapabilityMaturity,
+    CapabilityRelationCandidate,
+    RuleEffectivenessRecord,
+)
+
 
 class ImmutableRecordError(RuntimeError):
     """Raised when an immutable governance record would be changed."""
@@ -210,6 +221,8 @@ class SnapshotRecord:
 
 
 __all__ = [
-    "CapabilityBinding", "CapabilityProjection", "ImplementationNode", "ImplementationRelation",
-    "ImmutableRecordError", "ScannedCapability", "SnapshotDocument", "SnapshotEntry", "SnapshotRecord",
+    "BusinessPurposeRecord", "BusinessRuleRecord", "CapabilityBinding", "CapabilityBusinessProjection",
+    "CapabilityBusinessReview", "CapabilityFingerprint", "CapabilityMaturity", "CapabilityProjection",
+    "CapabilityRelationCandidate", "ImplementationNode", "ImplementationRelation", "ImmutableRecordError",
+    "RuleEffectivenessRecord", "ScannedCapability", "SnapshotDocument", "SnapshotEntry", "SnapshotRecord",
 ]

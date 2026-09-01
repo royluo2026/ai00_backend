@@ -55,6 +55,11 @@ GOVERNANCE_TABLES = (
     "workmanship_base_capability_release_reports",
     "workmanship_base_capability_audit_events",
     "workmanship_base_capability_worker_leases",
+    "workmanship_base_capability_business_purposes",
+    "workmanship_base_capability_business_rules",
+    "workmanship_base_capability_relation_candidates",
+    "workmanship_base_capability_business_reviews",
+    "workmanship_base_capability_rule_effectiveness",
 )
 
 

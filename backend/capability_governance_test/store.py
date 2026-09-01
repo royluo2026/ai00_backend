@@ -11,12 +11,16 @@ from typing import Any, Protocol
 from backend.utils.gid import next_gid
 
 from .models import (
+    CapabilityBusinessProjection,
+    CapabilityBusinessReview,
     CapabilityBinding,
     CapabilityProjection,
+    CapabilityRelationCandidate,
     ImmutableRecordError,
     ImplementationNode,
     ImplementationRelation,
     ScannedCapability,
+    RuleEffectivenessRecord,
     SnapshotDocument,
     SnapshotEntry,
     SnapshotRecord,
@@ -47,6 +51,34 @@ class GovernanceStore(ABC):
 
     def replace_snapshot(self, snapshot_gid: int, document: SnapshotDocument) -> None:
         raise ImmutableRecordError("snapshot_records_are_insert_only")
+
+    @abstractmethod
+    def save_business_projection(self, projection: CapabilityBusinessProjection) -> None:
+        """Persist an immutable normalized business projection."""
+
+    @abstractmethod
+    def list_relation_candidates(self, snapshot_gid: int) -> tuple[CapabilityRelationCandidate, ...]:
+        """Return immutable relationship candidates for one snapshot."""
+
+    @abstractmethod
+    def save_business_review(self, review: CapabilityBusinessReview) -> None:
+        """Append a business review without mutating prior decisions."""
+
+    @abstractmethod
+    def current_business_review(
+        self, capability_version_gid: int, definition_hash: str,
+    ) -> CapabilityBusinessReview | None:
+        """Return the latest review for the exact semantic definition hash."""
+
+    @abstractmethod
+    def save_rule_effectiveness(self, record: RuleEffectivenessRecord) -> None:
+        """Append immutable runtime rule-effectiveness evidence."""
+
+    @abstractmethod
+    def list_rule_effectiveness(
+        self, capability_version_gid: int, definition_hash: str,
+    ) -> tuple[RuleEffectivenessRecord, ...]:
+        """Return effectiveness evidence for the exact semantic definition hash."""
 
 
 class GovernanceWorkflowPort(Protocol):
@@ -93,6 +125,17 @@ def _json_load(value: Any) -> Mapping[str, Any]:
     return value if isinstance(value, Mapping) else {}
 
 
+def _json_tuple(value: Any) -> tuple[Any, ...]:
+    if isinstance(value, (bytes, bytearray)):
+        value = value.decode("utf-8")
+    if isinstance(value, str):
+        try:
+            value = json.loads(value)
+        except (TypeError, ValueError):
+            return ()
+    return tuple(value) if isinstance(value, tuple | list) else ()
+
+
 def _duplicate_key(exc: Exception) -> bool:
     text = f"{type(exc).__name__} {exc}".lower()
     return "duplicate" in text or "integrity" in text and "unique" in text
@@ -108,6 +151,11 @@ class MemoryGovernanceStore(GovernanceStore):
         self._major_ids: dict[tuple[int, int], int] = {}
         self._snapshots: dict[int, SnapshotRecord] = {}
         self._snapshots_by_hash: dict[str, SnapshotRecord] = {}
+        self._business_purposes: dict[int, object] = {}
+        self._business_rules: dict[int, object] = {}
+        self._relation_candidates: dict[int, CapabilityRelationCandidate] = {}
+        self._business_reviews: dict[int, CapabilityBusinessReview] = {}
+        self._rule_effectiveness: dict[int, RuleEffectivenessRecord] = {}
 
     def import_snapshot(self, document: SnapshotDocument) -> SnapshotRecord:
         with self._lock:
@@ -154,6 +202,63 @@ class MemoryGovernanceStore(GovernanceStore):
                 self._snapshots[max(self._snapshots)] if self._snapshots else None
             )
             return tuple(getattr(snapshot, "entries", ())) if snapshot is not None else ()
+
+    def save_business_projection(self, projection: CapabilityBusinessProjection) -> None:
+        with self._lock:
+            purpose = projection.purpose
+            ids_in_use = (
+                purpose.purpose_gid in self._business_purposes
+                or any(rule.business_rule_gid in self._business_rules for rule in projection.rules)
+                or any(candidate.relation_candidate_gid in self._relation_candidates for candidate in projection.relation_candidates)
+            )
+            if ids_in_use:
+                raise ImmutableRecordError("business_projection_gid_already_exists")
+            self._business_purposes[purpose.purpose_gid] = purpose
+            self._business_rules.update((rule.business_rule_gid, rule) for rule in projection.rules)
+            self._relation_candidates.update(
+                (candidate.relation_candidate_gid, candidate)
+                for candidate in projection.relation_candidates
+            )
+
+    def list_relation_candidates(self, snapshot_gid: int) -> tuple[CapabilityRelationCandidate, ...]:
+        with self._lock:
+            return tuple(
+                candidate for candidate in self._relation_candidates.values()
+                if candidate.snapshot_gid == snapshot_gid
+            )
+
+    def save_business_review(self, review: CapabilityBusinessReview) -> None:
+        with self._lock:
+            if review.review_gid in self._business_reviews:
+                raise ImmutableRecordError("business_review_gid_already_exists")
+            self._business_reviews[review.review_gid] = review
+
+    def current_business_review(
+        self, capability_version_gid: int, definition_hash: str,
+    ) -> CapabilityBusinessReview | None:
+        with self._lock:
+            matching = (
+                review for review in self._business_reviews.values()
+                if review.capability_version_gid == capability_version_gid
+                and review.definition_hash == definition_hash
+            )
+            return max(matching, key=lambda item: (item.decided_at, item.review_gid), default=None)
+
+    def save_rule_effectiveness(self, record: RuleEffectivenessRecord) -> None:
+        with self._lock:
+            if record.effectiveness_gid in self._rule_effectiveness:
+                raise ImmutableRecordError("effectiveness_gid_already_exists")
+            self._rule_effectiveness[record.effectiveness_gid] = record
+
+    def list_rule_effectiveness(
+        self, capability_version_gid: int, definition_hash: str,
+    ) -> tuple[RuleEffectivenessRecord, ...]:
+        with self._lock:
+            return tuple(
+                record for record in self._rule_effectiveness.values()
+                if record.capability_version_gid == capability_version_gid
+                and record.definition_hash == definition_hash
+            )
 
     def _project_capabilities(self, document: SnapshotDocument) -> tuple[CapabilityProjection, ...]:
         projections: list[CapabilityProjection] = []
@@ -396,6 +501,189 @@ class SqlGovernanceStore(GovernanceStore):
     def list_entries(self, snapshot_gid: int | None = None) -> tuple[SnapshotEntry, ...]:
         snapshot = self.latest_snapshot() if snapshot_gid is None else self.get_snapshot(snapshot_gid)
         return tuple(getattr(snapshot, "entries", ())) if snapshot is not None else ()
+
+    def save_business_projection(self, projection: CapabilityBusinessProjection) -> None:
+        cursor = self._connection.cursor()
+        try:
+            purpose = projection.purpose
+            cursor.execute(
+                "INSERT INTO workmanship_base_capability_business_purposes "
+                "(purpose_gid, capability_version_gid, definition_hash, business_effect, acceptance_criteria_json, evidence_snapshot_gid, created_at) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                (
+                    purpose.purpose_gid, purpose.capability_version_gid, purpose.definition_hash,
+                    purpose.business_effect, _json(purpose.acceptance_criteria),
+                    purpose.evidence_snapshot_gid, purpose.created_at,
+                ),
+            )
+            for rule in projection.rules:
+                cursor.execute(
+                    "INSERT INTO workmanship_base_capability_business_rules "
+                    "(business_rule_gid, capability_version_gid, definition_hash, rule_id, rule_version, statement, applies_when, enforcement_ref, error_code, test_refs_json, evidence_snapshot_gid) "
+                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    (
+                        rule.business_rule_gid, rule.capability_version_gid, rule.definition_hash,
+                        rule.rule_id, rule.rule_version, rule.statement, rule.applies_when,
+                        rule.enforcement_ref, rule.error_code, _json(rule.test_refs),
+                        rule.evidence_snapshot_gid,
+                    ),
+                )
+            for candidate in projection.relation_candidates:
+                cursor.execute(
+                    "INSERT INTO workmanship_base_capability_relation_candidates "
+                    "(relation_candidate_gid, snapshot_gid, candidate_hash, relation_type, source, capability_keys_json, evidence_json, status) "
+                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                    (
+                        candidate.relation_candidate_gid, candidate.snapshot_gid,
+                        candidate.candidate_hash, candidate.relation_type, candidate.source,
+                        _json(candidate.capability_keys), _json(candidate.evidence), candidate.status,
+                    ),
+                )
+            self._connection.commit()
+        except Exception:
+            self._connection.rollback()
+            raise
+        finally:
+            close = getattr(cursor, "close", None)
+            if callable(close):
+                close()
+
+    def list_relation_candidates(self, snapshot_gid: int) -> tuple[CapabilityRelationCandidate, ...]:
+        cursor = self._connection.cursor()
+        try:
+            cursor.execute(
+                "SELECT relation_candidate_gid, snapshot_gid, candidate_hash, relation_type, source, "
+                "capability_keys_json, evidence_json, status "
+                "FROM workmanship_base_capability_relation_candidates "
+                "WHERE snapshot_gid = %s ORDER BY relation_candidate_gid",
+                (int(snapshot_gid),),
+            )
+            return tuple(
+                CapabilityRelationCandidate(
+                    relation_candidate_gid=int(_row_value(row, "relation_candidate_gid", 0)),
+                    snapshot_gid=int(_row_value(row, "snapshot_gid", 1)),
+                    candidate_hash=str(_row_value(row, "candidate_hash", 2)),
+                    relation_type=str(_row_value(row, "relation_type", 3)),
+                    source=str(_row_value(row, "source", 4)),
+                    capability_keys=_json_tuple(_row_value(row, "capability_keys_json", 5)),
+                    evidence=_json_load(_row_value(row, "evidence_json", 6)),
+                    status=str(_row_value(row, "status", 7)),
+                )
+                for row in cursor.fetchall()
+            )
+        finally:
+            close = getattr(cursor, "close", None)
+            if callable(close):
+                close()
+
+    def save_business_review(self, review: CapabilityBusinessReview) -> None:
+        cursor = self._connection.cursor()
+        try:
+            cursor.execute(
+                "INSERT INTO workmanship_base_capability_business_reviews "
+                "(business_review_gid, proposal_gid, capability_version_gid, definition_hash, decision, decision_reason, reviewer_gid, reviewer_role, evidence_snapshot_gid, decided_at) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                (
+                    review.review_gid, review.proposal_gid, review.capability_version_gid,
+                    review.definition_hash, review.decision, review.decision_reason,
+                    int(review.reviewer_gid), review.reviewer_role,
+                    review.evidence_snapshot_gid, review.decided_at,
+                ),
+            )
+            self._connection.commit()
+        except Exception:
+            self._connection.rollback()
+            raise
+        finally:
+            close = getattr(cursor, "close", None)
+            if callable(close):
+                close()
+
+    def current_business_review(
+        self, capability_version_gid: int, definition_hash: str,
+    ) -> CapabilityBusinessReview | None:
+        cursor = self._connection.cursor()
+        try:
+            cursor.execute(
+                "SELECT business_review_gid, capability_version_gid, definition_hash, decision, "
+                "decision_reason, reviewer_gid, reviewer_role, decided_at, proposal_gid, evidence_snapshot_gid "
+                "FROM workmanship_base_capability_business_reviews "
+                "WHERE capability_version_gid = %s AND definition_hash = %s "
+                "ORDER BY decided_at DESC, business_review_gid DESC LIMIT 1",
+                (int(capability_version_gid), definition_hash),
+            )
+            row = cursor.fetchone()
+            if row is None:
+                return None
+            return CapabilityBusinessReview(
+                review_gid=int(_row_value(row, "business_review_gid", 0)),
+                capability_version_gid=int(_row_value(row, "capability_version_gid", 1)),
+                definition_hash=str(_row_value(row, "definition_hash", 2)),
+                decision=str(_row_value(row, "decision", 3)),
+                decision_reason=str(_row_value(row, "decision_reason", 4)),
+                reviewer_gid=str(_row_value(row, "reviewer_gid", 5)),
+                reviewer_role=str(_row_value(row, "reviewer_role", 6)),
+                decided_at=_row_value(row, "decided_at", 7),
+                proposal_gid=int(_row_value(row, "proposal_gid", 8)),
+                evidence_snapshot_gid=int(_row_value(row, "evidence_snapshot_gid", 9)),
+            )
+        finally:
+            close = getattr(cursor, "close", None)
+            if callable(close):
+                close()
+
+    def save_rule_effectiveness(self, record: RuleEffectivenessRecord) -> None:
+        cursor = self._connection.cursor()
+        try:
+            cursor.execute(
+                "INSERT INTO workmanship_base_capability_rule_effectiveness "
+                "(effectiveness_gid, capability_version_gid, definition_hash, metric_name, metric_value, evidence_json, measured_from, measured_to) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                (
+                    record.effectiveness_gid, record.capability_version_gid,
+                    record.definition_hash, record.metric_name, record.metric_value,
+                    _json(record.evidence), record.measured_from, record.measured_to,
+                ),
+            )
+            self._connection.commit()
+        except Exception:
+            self._connection.rollback()
+            raise
+        finally:
+            close = getattr(cursor, "close", None)
+            if callable(close):
+                close()
+
+    def list_rule_effectiveness(
+        self, capability_version_gid: int, definition_hash: str,
+    ) -> tuple[RuleEffectivenessRecord, ...]:
+        cursor = self._connection.cursor()
+        try:
+            cursor.execute(
+                "SELECT effectiveness_gid, capability_version_gid, definition_hash, metric_name, "
+                "metric_value, evidence_json, measured_from, measured_to "
+                "FROM workmanship_base_capability_rule_effectiveness "
+                "WHERE capability_version_gid = %s AND definition_hash = %s "
+                "ORDER BY measured_to, effectiveness_gid",
+                (int(capability_version_gid), definition_hash),
+            )
+            return tuple(
+                RuleEffectivenessRecord(
+                    effectiveness_gid=int(_row_value(row, "effectiveness_gid", 0)),
+                    capability_version_gid=int(_row_value(row, "capability_version_gid", 1)),
+                    definition_hash=str(_row_value(row, "definition_hash", 2)),
+                    metric_name=str(_row_value(row, "metric_name", 3)),
+                    metric_value=int(_row_value(row, "metric_value", 4)),
+                    evidence=_json_load(_row_value(row, "evidence_json", 5)),
+                    measured_from=_row_value(row, "measured_from", 6),
+                    measured_to=_row_value(row, "measured_to", 7),
+                )
+                for row in cursor.fetchall()
+            )
+        finally:
+            close = getattr(cursor, "close", None)
+            if callable(close):
+                close()
 
     def _resolve_projection(self, cursor: Any, capability: ScannedCapability, snapshot_gid: int) -> CapabilityProjection:
         capability_gid = self._resolve_logical_gid(cursor, capability)
