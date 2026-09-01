@@ -95,7 +95,7 @@ def test_scanner_normalizes_fingerprint_order(scanner, catalog):
     descriptor["business_invariants"] = (
         {
             "rule_id": "person.height.maximum",
-            "rule_version": 1,
+            "version": 1,
             "statement": "Height is at most 2.5 metres.",
             "applies_when": "A height is changed.",
             "enforcement_ref": "person.provider:validate_height",
@@ -104,7 +104,7 @@ def test_scanner_normalizes_fingerprint_order(scanner, catalog):
         },
         {
             "rule_id": "person.height.minimum",
-            "rule_version": 1,
+            "version": 1,
             "statement": "Height is greater than zero.",
             "applies_when": "A height is changed.",
             "enforcement_ref": "person.provider:validate_height",
@@ -143,7 +143,7 @@ def test_scanner_emits_all_business_layers_and_l3_rule_evidence(scanner, catalog
     descriptor["no_business_invariant_reason"] = None
     descriptor["business_invariants"] = ({
         "rule_id": "person.height.valid_range",
-        "rule_version": 1,
+        "version": 1,
         "statement": "Height is greater than zero and at most 2.5 metres.",
         "applies_when": "A height is changed.",
         "enforcement_ref": "person/provider.py:validate_height",
@@ -159,6 +159,8 @@ def test_scanner_emits_all_business_layers_and_l3_rule_evidence(scanner, catalog
     assert tuple(item.business_layer_evidence) == tuple("ABCDEFG")
     assert item.business_maturity.level == "L3"
     assert item.business_rules[0]["rule_id"] == "person.height.valid_range"
+    assert item.business_rules[0]["version"] == 1
+    assert "rule_version" not in item.business_rules[0]
     assert "person/provider.py:validate_height" in item.business_layer_evidence["D"]
     assert "person/test_height.py::test_rejects_out_of_range" in item.business_layer_evidence["E"]
     assert item.business_maturity.reason_codes == (
@@ -171,7 +173,7 @@ def test_scanner_keeps_unresolved_rule_evidence_at_l2(scanner, catalog):
     descriptor["no_business_invariant_reason"] = None
     descriptor["business_invariants"] = ({
         "rule_id": "person.height.valid_range",
-        "rule_version": 1,
+        "version": 1,
         "statement": "Height is within the valid range.",
         "applies_when": "A height is changed.",
         "enforcement_ref": "person/missing.py:validate_height",
@@ -231,7 +233,7 @@ def test_scanner_returns_configuration_error_as_structured_report(tmp_path, cata
 
 def test_scanner_rejects_invalid_string_evidence_as_structured_configuration(scanner, catalog):
     catalog["descriptors"][0]["business_invariants"] = ({
-        "rule_id": "person.height.valid_range", "rule_version": 1,
+        "rule_id": "person.height.valid_range", "version": 1,
         "statement": "Height is valid.", "applies_when": "Height changes.",
         "enforcement_ref": "person/provider.py:validate_height",
         "error_code": "height_out_of_range", "test_refs": (42,),
@@ -246,7 +248,7 @@ def test_scanner_rejects_invalid_string_evidence_as_structured_configuration(sca
 
 def test_scanner_rejects_duplicate_rule_identity_deterministically(scanner, catalog):
     rule = {
-        "rule_id": "person.height.valid_range", "rule_version": 1,
+        "rule_id": "person.height.valid_range", "version": 1,
         "statement": "Height is valid.", "applies_when": "Height changes.",
         "enforcement_ref": "person/provider.py:validate_height",
         "error_code": "height_out_of_range",
@@ -267,7 +269,7 @@ def test_scanner_rejects_duplicate_rule_identity_deterministically(scanner, cata
 
 @pytest.mark.parametrize(("field_name", "invalid_value"), (
     ("rule_id", 1),
-    ("rule_version", True),
+    ("version", True),
     ("statement", 1),
     ("applies_when", True),
     ("enforcement_ref", 1),
@@ -277,7 +279,7 @@ def test_scanner_rejects_business_rule_scalar_type_coercion(
     scanner, catalog, field_name, invalid_value,
 ):
     rule = {
-        "rule_id": "person.height.valid_range", "rule_version": 1,
+        "rule_id": "person.height.valid_range", "version": 1,
         "statement": "Height is valid.", "applies_when": "Height changes.",
         "enforcement_ref": "person/provider.py:validate_height",
         "error_code": "height_out_of_range",
@@ -294,12 +296,12 @@ def test_scanner_rejects_business_rule_scalar_type_coercion(
 def test_invalid_rule_scalar_order_has_one_deterministic_identity(scanner, catalog):
     rules = (
         {
-            "rule_id": 1, "rule_version": 1, "statement": "One.",
+            "rule_id": 1, "version": 1, "statement": "One.",
             "applies_when": "Always.", "enforcement_ref": "person/provider.py:validate_height",
             "error_code": "one", "test_refs": (),
         },
         {
-            "rule_id": "person.height.two", "rule_version": True, "statement": "Two.",
+            "rule_id": "person.height.two", "version": True, "statement": "Two.",
             "applies_when": "Always.", "enforcement_ref": "person/provider.py:validate_height",
             "error_code": "two", "test_refs": (),
         },
@@ -312,6 +314,21 @@ def test_invalid_rule_scalar_order_has_one_deterministic_identity(scanner, catal
     assert first.scan_status == second.scan_status == "blocked"
     assert first.snapshot_hash == second.snapshot_hash
     assert first.scan_findings == second.scan_findings
+
+
+def test_scanner_rejects_persistence_rule_version_alias_at_author_boundary(scanner, catalog):
+    catalog["descriptors"][0]["business_invariants"] = ({
+        "rule_id": "person.height.valid_range", "rule_version": 1,
+        "statement": "Height is valid.", "applies_when": "Height changes.",
+        "enforcement_ref": "person/provider.py:validate_height",
+        "error_code": "height_out_of_range",
+        "test_refs": ("person/test_height.py::test_accepts_boundary",),
+    },)
+
+    document = scanner.scan("abc123")
+
+    assert document.scan_status == "blocked"
+    assert document.scan_findings[0].message == "product_catalog_business_rule_scalar_invalid"
 
 
 def test_scanned_capability_preserves_legacy_positional_descriptor_contract():

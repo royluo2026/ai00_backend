@@ -683,12 +683,13 @@ class GovernanceScanner:
             parsed_rules = tuple(dict(_json_document(rule)) for rule in raw_rules)
             for rule in parsed_rules:
                 rule_id = rule.get("rule_id")
-                rule_version = rule.get("rule_version")
+                version = rule.get("version")
                 if (
-                    not isinstance(rule_id, str)
+                    "rule_version" in rule
+                    or not isinstance(rule_id, str)
                     or not rule_id.strip()
-                    or isinstance(rule_version, bool)
-                    or not isinstance(rule_version, int)
+                    or isinstance(version, bool)
+                    or not isinstance(version, int)
                 ):
                     raise ScanPolicyError("product_catalog_business_rule_scalar_invalid")
                 for field_name in ("statement", "applies_when", "enforcement_ref", "error_code"):
@@ -696,9 +697,9 @@ class GovernanceScanner:
                         raise ScanPolicyError("product_catalog_business_rule_scalar_invalid")
             rules = tuple(sorted(
                 parsed_rules,
-                key=lambda rule: (rule["rule_id"], rule["rule_version"]),
+                key=lambda rule: (rule["rule_id"], rule["version"]),
             ))
-            identities = [(rule["rule_id"].strip(), rule["rule_version"]) for rule in rules]
+            identities = [(rule["rule_id"].strip(), rule["version"]) for rule in rules]
             if any(version < 1 for _rule_id, version in identities):
                 raise ScanPolicyError("product_catalog_business_rule_invalid")
             if len(set(identities)) != len(identities):
