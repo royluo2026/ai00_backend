@@ -122,6 +122,21 @@ def test_catalog_generator_is_deterministic_with_business_definition_hashes():
     assert first.catalog_hash == second.catalog_hash
 
 
+def test_catalog_loader_rejects_tampered_business_definition_hash(tmp_path: Path):
+    from backend.scripts.build_capability_catalog import _load_release, _release_document
+
+    release = build_release([_descriptor("craft.routing.get").model_copy(update={
+        "business_effect": "A routing operator can retrieve the current route.",
+    })])
+    document = _release_document(release)
+    document["descriptors"][0]["business_definition_hash"] = "sha256:" + "0" * 64
+    path = tmp_path / "catalog.json"
+    path.write_text(json.dumps(document), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="business_definition_hash_mismatch"):
+        _load_release(path)
+
+
 def test_catalog_hash_normalizes_derived_error_schema_from_domain_errors():
     descriptor = _descriptor("craft.routing.get").model_copy(update={
         "domain_errors": (DomainErrorContract(code="invalid_input", meaning="Invalid routing."),),

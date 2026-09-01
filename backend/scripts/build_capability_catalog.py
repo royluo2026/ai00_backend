@@ -13,6 +13,7 @@ if str(REPOSITORY_ROOT) not in sys.path:
 
 from backend.capability_v2.bootstrap import build_capability_registry
 from backend.capability_v2.acceptance_contract import TEST_MODULE, coverage_declarations
+from backend.capability_v2.business_definition import business_definition_hash
 from backend.capability_v2.catalog import (
     CatalogRelease,
     ProviderArtifact,
@@ -23,6 +24,7 @@ from backend.capability_v2.catalog import (
     unbounded_collection_paths,
 )
 from backend.capability_v2.catalog_lineage import CatalogLineage
+from backend.capability_v2.contracts import CapabilityDescriptorV2
 from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec
 
 
@@ -42,7 +44,10 @@ def _load_release(path: Path) -> CatalogRelease:
     document = json.loads(path.read_text(encoding="utf-8"))
     for descriptor in document.get("descriptors", []):
         if isinstance(descriptor, dict):
-            descriptor.pop("business_definition_hash", None)
+            stored_hash = descriptor.pop("business_definition_hash", None)
+            parsed_descriptor = CapabilityDescriptorV2.model_validate(descriptor)
+            if stored_hash != business_definition_hash(parsed_descriptor):
+                raise ValueError("business_definition_hash_mismatch")
     return CatalogRelease.model_validate(document)
 
 
