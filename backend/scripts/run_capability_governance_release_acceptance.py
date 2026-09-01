@@ -33,7 +33,7 @@ from backend.capability_governance_test.redaction import redact
 from backend.capability_governance_test.release_gate import ReleaseCandidate, ReleaseGate
 from backend.capability_governance_test.test_runner import RegisteredTestCase, run_fast_profile, run_release_e2e_profile
 from backend.capability_governance_test.workflow import ProposalService, ReviewerContext
-from backend.capability_v2.catalog import CatalogRelease
+from backend.capability_v2.catalog import CatalogRelease, load_catalog_release
 from backend.capability_v2.catalog_overlay import compose_catalogs
 from backend.scripts.check_frontend_deployment import check as check_frontend_deployment
 from backend.scripts.check_production_governance_exclusion import check_production_artifact
@@ -128,8 +128,8 @@ def _section(run) -> AcceptanceSection:
 
 
 def _catalogs(root: Path) -> tuple[CatalogRelease, CatalogRelease]:
-    product = CatalogRelease.model_validate_json((root / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8"))
-    extension = CatalogRelease.model_validate_json((root / "docs/governance/test-extension/capability-governance-catalog-release.json").read_text(encoding="utf-8"))
+    product = load_catalog_release((root / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8"))
+    extension = load_catalog_release((root / "docs/governance/test-extension/capability-governance-catalog-release.json").read_text(encoding="utf-8"))
     return product, extension
 
 

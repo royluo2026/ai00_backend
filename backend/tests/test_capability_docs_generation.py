@@ -5,7 +5,7 @@ from pathlib import Path
 
 from backend.capabilities.models_next import CapabilitySpec
 from backend.capabilities.validation_next import validate_payload
-from backend.capability_v2.catalog import CatalogRelease
+from backend.capability_v2.catalog import CatalogRelease, load_catalog_release
 from backend.capability_v2.docs.generator import (
     DOMAIN_DOC_PATHS, build_documentation, example_for_schema, generated_files,
 )
@@ -18,7 +18,7 @@ DOCS_ROOT = ROOT / "docs/capabilities"
 
 
 def _catalog() -> CatalogRelease:
-    return CatalogRelease.model_validate_json(CATALOG_PATH.read_text(encoding="utf-8"))
+    return load_catalog_release(CATALOG_PATH.read_text(encoding="utf-8"))
 
 
 def test_v1_adapter_makes_required_fields_possible_under_closed_schema():

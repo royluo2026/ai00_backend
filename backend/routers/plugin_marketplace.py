@@ -21,7 +21,7 @@ from backend.plugin_platform.invocation_audit import mount_invocation_audit
 from backend.plugin_platform.service import finish_upgrade as finish_plugin_upgrade, list_catalog, list_installations, list_lifecycle_events, list_releases, register_publisher, resolve_asset_object_key, review_release, revoke_release, submit_release, tenant_registry, verify_submission_signature
 from backend.plugin_platform.signing import SignatureError
 from backend.routers.deps import build_profile, get_authenticated_principal, get_current_user
-from backend.capability_v2.catalog import CatalogRelease
+from backend.capability_v2.catalog import CatalogRelease, load_catalog_release
 from backend.capability_v2.contracts import (
     ActorIdentity, ConsumerDescriptor, ConsumerIdentity, ConsumerType,
     InvocationEnvelope, TenantIdentity,
@@ -68,7 +68,7 @@ def _mount_service() -> MountSessionService:
 
 def _catalog_release() -> CatalogRelease:
     path = Path(__file__).resolve().parents[2] / "docs/governance/capability-catalog-release.json"
-    release = CatalogRelease.model_validate_json(path.read_text(encoding="utf-8"))
+    release = load_catalog_release(path.read_text(encoding="utf-8"))
     if release.release_id != get_default_gateway().catalog_release:
         raise MountSessionError("gateway and plugin mount catalog releases differ")
     return release

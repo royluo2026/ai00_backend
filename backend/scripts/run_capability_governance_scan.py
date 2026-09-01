@@ -16,7 +16,7 @@ from backend.capability_governance_test.config import GovernanceSettings
 from backend.capability_governance_test.fingerprint import snapshot_fingerprint
 from backend.capability_governance_test.models import ScanFinding, SnapshotDocument
 from backend.capability_governance_test.scanner import GovernanceScanner
-from backend.capability_v2.catalog import CatalogRelease
+from backend.capability_v2.catalog import load_catalog_release
 from backend.capability_v2.domain_manifest import load_domain_manifests
 
 
@@ -29,7 +29,7 @@ EXPECTED_OFFICIAL_DOMAINS = (
     "agent", "base", "craft", "device", "digital_model", "factory", "integration",
     "knowledge", "ontology", "project_management", "simulation",
 )
-PINNED_STABLE_PRODUCT_DESCRIPTOR_COUNT = 317
+PINNED_STABLE_PRODUCT_DESCRIPTOR_COUNT = 479
 
 
 def _inside_repository(path: Path) -> Path:
@@ -83,9 +83,9 @@ def run_offline_scan(output: Path) -> dict[str, object]:
     failure_source = "product_catalog"
     failure_reason = "product_catalog_validation_error"
     try:
-        product = CatalogRelease.model_validate_json(PRODUCT_CATALOG.read_text(encoding="utf-8"))
+        product = load_catalog_release(PRODUCT_CATALOG.read_text(encoding="utf-8"))
         failure_source, failure_reason = "extension_catalog", "extension_catalog_validation_error"
-        extension = CatalogRelease.model_validate_json(EXTENSION_CATALOG.read_text(encoding="utf-8"))
+        extension = load_catalog_release(EXTENSION_CATALOG.read_text(encoding="utf-8"))
         failure_source, failure_reason = "official_domain_manifests", "official_domain_manifests_load_error"
         manifests = load_domain_manifests(OFFICIAL_DOMAINS)
         failure_source, failure_reason = "acceptance_manifest", "acceptance_manifest_load_error"

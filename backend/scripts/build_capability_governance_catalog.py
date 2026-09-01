@@ -11,7 +11,7 @@ if str(REPOSITORY_ROOT) not in sys.path:
 
 from backend.capability_governance_test.contracts import ALL_IDS, provider_artifact
 from backend.capability_v2.bootstrap import build_capability_registry
-from backend.capability_v2.catalog import CatalogRelease, build_release
+from backend.capability_v2.catalog import CatalogRelease, build_release, load_catalog_release
 
 
 DEFAULT_OUTPUT = REPOSITORY_ROOT / "docs" / "governance" / "test-extension" / "capability-governance-catalog-release.json"
@@ -43,7 +43,7 @@ def main(argv: list[str] | None = None) -> int:
     if not args.output.is_file():
         print(f"Governance catalog release missing: {args.output}")
         return 1
-    expected = CatalogRelease.model_validate_json(args.output.read_text(encoding="utf-8"))
+    expected = load_catalog_release(args.output.read_text(encoding="utf-8"))
     if (expected.catalog_hash, expected.release_id) != (release.catalog_hash, release.release_id):
         print(f"Governance catalog release drift: expected {expected.release_id}/{expected.catalog_hash}, actual {release.release_id}/{release.catalog_hash}")
         return 1

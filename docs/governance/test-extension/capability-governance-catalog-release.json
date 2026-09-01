@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_3a7569f515478f501a6aefb00594c272",
-  "catalog_hash": "sha256:3a7569f515478f501a6aefb00594c272d64a3f024d7d9c25cc85b9ef36fd1c92",
+  "release_id": "rel_44af378bd836395c52f29b265ed6b442",
+  "catalog_hash": "sha256:44af378bd836395c52f29b265ed6b442d11e32525b682f85dc8347d055e951cb",
   "descriptors": [
     {
       "id": "base.capability_analysis.get",
@@ -12,7 +12,12 @@
       "description": "Test-only governance operation base.capability_analysis.get.",
       "use_when": "The test-governance profile needs this governed capability contract.",
       "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "business_effect": "Test-only governance operation base.capability_analysis.get.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
       "side_effect_level": "read",
+      "side_effects": "Reads domain state without mutation.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -323,6 +328,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
@@ -344,45 +350,113 @@
         {
           "code": "resource_not_found",
           "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "permission_denied",
           "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "approval_required",
           "meaning": "The governed operation requires a valid approval.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "authentication_stale",
           "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "idempotency_conflict",
           "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "version_conflict",
           "meaning": "The resource version differs from the expected version.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "provider_unavailable",
           "meaning": "A required domain provider is not registered.",
-          "retryable": true
+          "retryable": true,
+          "is_caller_error": false
         },
         {
           "code": "plugin_state_conflict",
           "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
-      "domain_errors_complete": true
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_903287cf30ef4da912f6d7f6",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "base.provider",
+      "api_refs": [],
+      "test_refs": []
     },
     {
       "id": "base.capability_analysis.run",
@@ -394,7 +468,12 @@
       "description": "Test-only governance operation base.capability_analysis.run.",
       "use_when": "The test-governance profile needs this governed capability contract.",
       "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "business_effect": "Test-only governance operation base.capability_analysis.run.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
       "side_effect_level": "write",
+      "side_effects": "Writes domain state through the owning Provider.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -711,6 +790,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
       "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
@@ -732,45 +812,113 @@
         {
           "code": "resource_not_found",
           "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "permission_denied",
           "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "approval_required",
           "meaning": "The governed operation requires a valid approval.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "authentication_stale",
           "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "idempotency_conflict",
           "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "version_conflict",
           "meaning": "The resource version differs from the expected version.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "provider_unavailable",
           "meaning": "A required domain provider is not registered.",
-          "retryable": true
+          "retryable": true,
+          "is_caller_error": false
         },
         {
           "code": "plugin_state_conflict",
           "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
-      "domain_errors_complete": true
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_3f78e170aa977fee485d22e8",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "base.provider",
+      "api_refs": [],
+      "test_refs": []
     },
     {
       "id": "base.capability_audit.search",
@@ -782,7 +930,12 @@
       "description": "Test-only governance operation base.capability_audit.search.",
       "use_when": "The test-governance profile needs this governed capability contract.",
       "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "business_effect": "Test-only governance operation base.capability_audit.search.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
       "side_effect_level": "read",
+      "side_effects": "Reads domain state without mutation.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -1327,6 +1480,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
@@ -1348,45 +1502,113 @@
         {
           "code": "resource_not_found",
           "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "permission_denied",
           "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "approval_required",
           "meaning": "The governed operation requires a valid approval.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "authentication_stale",
           "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "idempotency_conflict",
           "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "version_conflict",
           "meaning": "The resource version differs from the expected version.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "provider_unavailable",
           "meaning": "A required domain provider is not registered.",
-          "retryable": true
+          "retryable": true,
+          "is_caller_error": false
         },
         {
           "code": "plugin_state_conflict",
           "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
-      "domain_errors_complete": true
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_81116015451f4c6d060317a4",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "base.provider",
+      "api_refs": [],
+      "test_refs": []
     },
     {
       "id": "base.capability_finding.search",
@@ -1398,7 +1620,12 @@
       "description": "Test-only governance operation base.capability_finding.search.",
       "use_when": "The test-governance profile needs this governed capability contract.",
       "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "business_effect": "Test-only governance operation base.capability_finding.search.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
       "side_effect_level": "read",
+      "side_effects": "Reads domain state without mutation.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -1879,6 +2106,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
@@ -1900,45 +2128,113 @@
         {
           "code": "resource_not_found",
           "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "permission_denied",
           "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "approval_required",
           "meaning": "The governed operation requires a valid approval.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "authentication_stale",
           "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "idempotency_conflict",
           "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "version_conflict",
           "meaning": "The resource version differs from the expected version.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "provider_unavailable",
           "meaning": "A required domain provider is not registered.",
-          "retryable": true
+          "retryable": true,
+          "is_caller_error": false
         },
         {
           "code": "plugin_state_conflict",
           "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
-      "domain_errors_complete": true
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_50823e508572dba64fc18cd9",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "base.provider",
+      "api_refs": [],
+      "test_refs": []
     },
     {
       "id": "base.capability_governance.snapshot.summary.get",
@@ -1950,7 +2246,12 @@
       "description": "Test-only governance operation base.capability_governance.snapshot.summary.get.",
       "use_when": "The test-governance profile needs this governed capability contract.",
       "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "business_effect": "Test-only governance operation base.capability_governance.snapshot.summary.get.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
       "side_effect_level": "read",
+      "side_effects": "Reads domain state without mutation.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -2527,6 +2828,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
@@ -2548,45 +2850,113 @@
         {
           "code": "resource_not_found",
           "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "permission_denied",
           "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "approval_required",
           "meaning": "The governed operation requires a valid approval.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "authentication_stale",
           "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "idempotency_conflict",
           "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "version_conflict",
           "meaning": "The resource version differs from the expected version.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "provider_unavailable",
           "meaning": "A required domain provider is not registered.",
-          "retryable": true
+          "retryable": true,
+          "is_caller_error": false
         },
         {
           "code": "plugin_state_conflict",
           "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
-      "domain_errors_complete": true
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_91f00f743f299012f43a7944",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "base.provider",
+      "api_refs": [],
+      "test_refs": []
     },
     {
       "id": "base.capability_graph.get",
@@ -2598,7 +2968,12 @@
       "description": "Test-only governance operation base.capability_graph.get.",
       "use_when": "The test-governance profile needs this governed capability contract.",
       "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "business_effect": "Test-only governance operation base.capability_graph.get.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
       "side_effect_level": "read",
+      "side_effects": "Reads domain state without mutation.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -3171,6 +3546,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
@@ -3192,45 +3568,113 @@
         {
           "code": "resource_not_found",
           "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "permission_denied",
           "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "approval_required",
           "meaning": "The governed operation requires a valid approval.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "authentication_stale",
           "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "idempotency_conflict",
           "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "version_conflict",
           "meaning": "The resource version differs from the expected version.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "provider_unavailable",
           "meaning": "A required domain provider is not registered.",
-          "retryable": true
+          "retryable": true,
+          "is_caller_error": false
         },
         {
           "code": "plugin_state_conflict",
           "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
-      "domain_errors_complete": true
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_89c925b4f4349a9edc079530",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "base.provider",
+      "api_refs": [],
+      "test_refs": []
     },
     {
       "id": "base.capability_health.get",
@@ -3242,7 +3686,12 @@
       "description": "Test-only governance operation base.capability_health.get.",
       "use_when": "The test-governance profile needs this governed capability contract.",
       "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "business_effect": "Test-only governance operation base.capability_health.get.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
       "side_effect_level": "read",
+      "side_effects": "Reads domain state without mutation.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -3646,6 +4095,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
@@ -3667,45 +4117,113 @@
         {
           "code": "resource_not_found",
           "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "permission_denied",
           "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "approval_required",
           "meaning": "The governed operation requires a valid approval.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "authentication_stale",
           "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "idempotency_conflict",
           "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "version_conflict",
           "meaning": "The resource version differs from the expected version.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "provider_unavailable",
           "meaning": "A required domain provider is not registered.",
-          "retryable": true
+          "retryable": true,
+          "is_caller_error": false
         },
         {
           "code": "plugin_state_conflict",
           "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
-      "domain_errors_complete": true
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_0759b8392dace0963e11c7fd",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "base.provider",
+      "api_refs": [],
+      "test_refs": []
     },
     {
       "id": "base.capability_proposal.search",
@@ -3717,7 +4235,12 @@
       "description": "Test-only governance operation base.capability_proposal.search.",
       "use_when": "The test-governance profile needs this governed capability contract.",
       "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "business_effect": "Test-only governance operation base.capability_proposal.search.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
       "side_effect_level": "read",
+      "side_effects": "Reads domain state without mutation.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -4154,6 +4677,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
@@ -4175,45 +4699,113 @@
         {
           "code": "resource_not_found",
           "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "permission_denied",
           "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "approval_required",
           "meaning": "The governed operation requires a valid approval.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "authentication_stale",
           "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "idempotency_conflict",
           "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "version_conflict",
           "meaning": "The resource version differs from the expected version.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "provider_unavailable",
           "meaning": "A required domain provider is not registered.",
-          "retryable": true
+          "retryable": true,
+          "is_caller_error": false
         },
         {
           "code": "plugin_state_conflict",
           "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
-      "domain_errors_complete": true
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_57540676d58fbfe63bc153db",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "base.provider",
+      "api_refs": [],
+      "test_refs": []
     },
     {
       "id": "base.capability_proposal.submit",
@@ -4225,7 +4817,12 @@
       "description": "Test-only governance operation base.capability_proposal.submit.",
       "use_when": "The test-governance profile needs this governed capability contract.",
       "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "business_effect": "Test-only governance operation base.capability_proposal.submit.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
       "side_effect_level": "write",
+      "side_effects": "Writes domain state through the owning Provider.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -4575,6 +5172,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
       "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
@@ -4596,45 +5194,113 @@
         {
           "code": "resource_not_found",
           "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "permission_denied",
           "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "approval_required",
           "meaning": "The governed operation requires a valid approval.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "authentication_stale",
           "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "idempotency_conflict",
           "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "version_conflict",
           "meaning": "The resource version differs from the expected version.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "provider_unavailable",
           "meaning": "A required domain provider is not registered.",
-          "retryable": true
+          "retryable": true,
+          "is_caller_error": false
         },
         {
           "code": "plugin_state_conflict",
           "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
-      "domain_errors_complete": true
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_4fe4019eb6a6bb56c5931216",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "base.provider",
+      "api_refs": [],
+      "test_refs": []
     },
     {
       "id": "base.capability_registry.get",
@@ -4646,7 +5312,12 @@
       "description": "Test-only governance operation base.capability_registry.get.",
       "use_when": "The test-governance profile needs this governed capability contract.",
       "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "business_effect": "Test-only governance operation base.capability_registry.get.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
       "side_effect_level": "read",
+      "side_effects": "Reads domain state without mutation.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -5033,6 +5704,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
@@ -5054,45 +5726,113 @@
         {
           "code": "resource_not_found",
           "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "permission_denied",
           "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "approval_required",
           "meaning": "The governed operation requires a valid approval.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "authentication_stale",
           "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "idempotency_conflict",
           "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "version_conflict",
           "meaning": "The resource version differs from the expected version.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "provider_unavailable",
           "meaning": "A required domain provider is not registered.",
-          "retryable": true
+          "retryable": true,
+          "is_caller_error": false
         },
         {
           "code": "plugin_state_conflict",
           "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
-      "domain_errors_complete": true
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_c82feea25e25f60464a4d0f4",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "base.provider",
+      "api_refs": [],
+      "test_refs": []
     },
     {
       "id": "base.capability_registry.search",
@@ -5104,7 +5844,12 @@
       "description": "Test-only governance operation base.capability_registry.search.",
       "use_when": "The test-governance profile needs this governed capability contract.",
       "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "business_effect": "Test-only governance operation base.capability_registry.search.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
       "side_effect_level": "read",
+      "side_effects": "Reads domain state without mutation.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -5542,6 +6287,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
@@ -5563,45 +6309,113 @@
         {
           "code": "resource_not_found",
           "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "permission_denied",
           "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "approval_required",
           "meaning": "The governed operation requires a valid approval.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "authentication_stale",
           "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "idempotency_conflict",
           "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "version_conflict",
           "meaning": "The resource version differs from the expected version.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "provider_unavailable",
           "meaning": "A required domain provider is not registered.",
-          "retryable": true
+          "retryable": true,
+          "is_caller_error": false
         },
         {
           "code": "plugin_state_conflict",
           "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
-      "domain_errors_complete": true
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_3ddd3d8553ea57f4418fed91",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "base.provider",
+      "api_refs": [],
+      "test_refs": []
     },
     {
       "id": "base.capability_release_gate.evaluate",
@@ -5613,7 +6427,12 @@
       "description": "Test-only governance operation base.capability_release_gate.evaluate.",
       "use_when": "The test-governance profile needs this governed capability contract.",
       "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "business_effect": "Test-only governance operation base.capability_release_gate.evaluate.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
       "side_effect_level": "write",
+      "side_effects": "Writes domain state through the owning Provider.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -5998,6 +6817,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
       "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
@@ -6019,45 +6839,113 @@
         {
           "code": "resource_not_found",
           "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "permission_denied",
           "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "approval_required",
           "meaning": "The governed operation requires a valid approval.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "authentication_stale",
           "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "idempotency_conflict",
           "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "version_conflict",
           "meaning": "The resource version differs from the expected version.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "provider_unavailable",
           "meaning": "A required domain provider is not registered.",
-          "retryable": true
+          "retryable": true,
+          "is_caller_error": false
         },
         {
           "code": "plugin_state_conflict",
           "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
-      "domain_errors_complete": true
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_de76451994f755ff42e64fae",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "base.provider",
+      "api_refs": [],
+      "test_refs": []
     },
     {
       "id": "base.capability_repair_prompt.generate",
@@ -6069,7 +6957,12 @@
       "description": "Test-only governance operation base.capability_repair_prompt.generate.",
       "use_when": "The test-governance profile needs this governed capability contract.",
       "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "business_effect": "Test-only governance operation base.capability_repair_prompt.generate.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
       "side_effect_level": "read",
+      "side_effects": "Reads domain state without mutation.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -6425,6 +7318,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
@@ -6446,45 +7340,113 @@
         {
           "code": "resource_not_found",
           "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "permission_denied",
           "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "approval_required",
           "meaning": "The governed operation requires a valid approval.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "authentication_stale",
           "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "idempotency_conflict",
           "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "version_conflict",
           "meaning": "The resource version differs from the expected version.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "provider_unavailable",
           "meaning": "A required domain provider is not registered.",
-          "retryable": true
+          "retryable": true,
+          "is_caller_error": false
         },
         {
           "code": "plugin_state_conflict",
           "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
-      "domain_errors_complete": true
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_fffcc5098d894256bdbe4d44",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "base.provider",
+      "api_refs": [],
+      "test_refs": []
     },
     {
       "id": "base.capability_review.decide",
@@ -6496,7 +7458,12 @@
       "description": "Test-only governance operation base.capability_review.decide.",
       "use_when": "The test-governance profile needs this governed capability contract.",
       "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "business_effect": "Test-only governance operation base.capability_review.decide.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
       "side_effect_level": "write",
+      "side_effects": "Writes domain state through the owning Provider.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -6829,6 +7796,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
       "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
@@ -6850,45 +7818,113 @@
         {
           "code": "resource_not_found",
           "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "permission_denied",
           "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "approval_required",
           "meaning": "The governed operation requires a valid approval.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "authentication_stale",
           "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "idempotency_conflict",
           "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "version_conflict",
           "meaning": "The resource version differs from the expected version.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "provider_unavailable",
           "meaning": "A required domain provider is not registered.",
-          "retryable": true
+          "retryable": true,
+          "is_caller_error": false
         },
         {
           "code": "plugin_state_conflict",
           "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
-      "domain_errors_complete": true
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_81648231100b3388aefd9068",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "base.provider",
+      "api_refs": [],
+      "test_refs": []
     },
     {
       "id": "base.capability_scan.run",
@@ -6900,7 +7936,12 @@
       "description": "Test-only governance operation base.capability_scan.run.",
       "use_when": "The test-governance profile needs this governed capability contract.",
       "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "business_effect": "Test-only governance operation base.capability_scan.run.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
       "side_effect_level": "write",
+      "side_effects": "Writes domain state through the owning Provider.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -7040,6 +8081,13 @@
             "pattern": "^[0-9]{1,19}$",
             "minLength": 1,
             "maxLength": 19
+          },
+          "scan_status": {
+            "type": "string",
+            "enum": [
+              "completed",
+              "blocked"
+            ]
           }
         },
         "required": [
@@ -7140,6 +8188,13 @@
             "pattern": "^[0-9]{1,19}$",
             "minLength": 1,
             "maxLength": 19
+          },
+          "scan_status": {
+            "type": "string",
+            "enum": [
+              "completed",
+              "blocked"
+            ]
           }
         },
         "required": [
@@ -7148,12 +8203,13 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:009e9ee45dca1323755306f5a29121c8789a901f952aef5812b6cc342530b632",
+      "schema_hash": "sha256:f8d2d15328bde54c7fb6e0d95a3aaf0e74d3f8c2a2016c4a5a6e63a2809e2584",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
       "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
@@ -7175,45 +8231,113 @@
         {
           "code": "resource_not_found",
           "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "permission_denied",
           "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "approval_required",
           "meaning": "The governed operation requires a valid approval.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "authentication_stale",
           "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "idempotency_conflict",
           "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "version_conflict",
           "meaning": "The resource version differs from the expected version.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "provider_unavailable",
           "meaning": "A required domain provider is not registered.",
-          "retryable": true
+          "retryable": true,
+          "is_caller_error": false
         },
         {
           "code": "plugin_state_conflict",
           "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
-      "domain_errors_complete": true
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_5637d1b5efe551a09e51c6ca",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "base.provider",
+      "api_refs": [],
+      "test_refs": []
     },
     {
       "id": "base.capability_test.run",
@@ -7225,7 +8349,12 @@
       "description": "Test-only governance operation base.capability_test.run.",
       "use_when": "The test-governance profile needs this governed capability contract.",
       "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "business_effect": "Test-only governance operation base.capability_test.run.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
       "side_effect_level": "write",
+      "side_effects": "Writes domain state through the owning Provider.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -7542,6 +8671,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
       "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
@@ -7563,45 +8693,113 @@
         {
           "code": "resource_not_found",
           "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "permission_denied",
           "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "approval_required",
           "meaning": "The governed operation requires a valid approval.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "authentication_stale",
           "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "idempotency_conflict",
           "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "version_conflict",
           "meaning": "The resource version differs from the expected version.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "provider_unavailable",
           "meaning": "A required domain provider is not registered.",
-          "retryable": true
+          "retryable": true,
+          "is_caller_error": false
         },
         {
           "code": "plugin_state_conflict",
           "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
-      "domain_errors_complete": true
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_1eed5ae97c4190a6f7d4c5e6",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "base.provider",
+      "api_refs": [],
+      "test_refs": []
     },
     {
       "id": "base.capability_waiver.grant",
@@ -7613,7 +8811,12 @@
       "description": "Test-only governance operation base.capability_waiver.grant.",
       "use_when": "The test-governance profile needs this governed capability contract.",
       "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "business_effect": "Test-only governance operation base.capability_waiver.grant.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
       "side_effect_level": "write",
+      "side_effects": "Writes domain state through the owning Provider.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -7962,6 +9165,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
       "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
@@ -7983,45 +9187,113 @@
         {
           "code": "resource_not_found",
           "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "permission_denied",
           "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "approval_required",
           "meaning": "The governed operation requires a valid approval.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "authentication_stale",
           "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "idempotency_conflict",
           "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "version_conflict",
           "meaning": "The resource version differs from the expected version.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "provider_unavailable",
           "meaning": "A required domain provider is not registered.",
-          "retryable": true
+          "retryable": true,
+          "is_caller_error": false
         },
         {
           "code": "plugin_state_conflict",
           "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
-      "domain_errors_complete": true
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_53ce3f5ae4bb386e3fe8c93a",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "base.provider",
+      "api_refs": [],
+      "test_refs": []
     },
     {
       "id": "base.capability_waiver.revoke",
@@ -8033,7 +9305,12 @@
       "description": "Test-only governance operation base.capability_waiver.revoke.",
       "use_when": "The test-governance profile needs this governed capability contract.",
       "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "business_effect": "Test-only governance operation base.capability_waiver.revoke.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
       "side_effect_level": "write",
+      "side_effects": "Writes domain state through the owning Provider.",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -8356,6 +9633,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
       "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
@@ -8377,45 +9655,113 @@
         {
           "code": "resource_not_found",
           "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "permission_denied",
           "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "approval_required",
           "meaning": "The governed operation requires a valid approval.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "authentication_stale",
           "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "idempotency_conflict",
           "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "version_conflict",
           "meaning": "The resource version differs from the expected version.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         },
         {
           "code": "provider_unavailable",
           "meaning": "A required domain provider is not registered.",
-          "retryable": true
+          "retryable": true,
+          "is_caller_error": false
         },
         {
           "code": "plugin_state_conflict",
           "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
-      "domain_errors_complete": true
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_2a9fcad9bf4a3bca4b7849df",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested Base resource does not exist or is not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller lacks a required Base Platform permission.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The governed operation requires a valid approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "authentication_stale",
+          "message_template": "The caller must authenticate again before this high-risk operation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The resource version differs from the expected version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "A required domain provider is not registered.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plugin_state_conflict",
+          "message_template": "The plugin installation cannot perform this lifecycle transition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "base.provider",
+      "api_refs": [],
+      "test_refs": []
     }
   ],
   "provider_artifacts": [
@@ -8423,8 +9769,8 @@
       "plugin_id": "test.governance",
       "module": "backend.capability_governance_test.provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:5b06163b6348586e0c84d5f98bfc0f46f2bfa72ab12f3f0a95e7f4af422d687c"
+      "artifact_hash": "sha256:0aadb0ddcc02056b0c27a97dc81a87fb9e3e4e0867364a7b4b9ca146c0231c2d"
     }
   ],
-  "created_at": "2026-08-20T04:00:44.657224Z"
+  "created_at": "2026-09-01T15:15:46.092367Z"
 }

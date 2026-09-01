@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from backend.capability_v2.catalog import CatalogRelease
+from backend.capability_v2.catalog import load_catalog_release
 from backend.capability_v2.docs.generator import generated_files
 
 
@@ -38,7 +38,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     args = parser.parse_args(argv)
 
-    release = CatalogRelease.model_validate_json(args.catalog.read_text(encoding="utf-8"))
+    release = load_catalog_release(args.catalog.read_text(encoding="utf-8"))
     if args.catalog_release and args.catalog_release != release.release_id:
         print(f"catalog release mismatch: requested {args.catalog_release}, found {release.release_id}")
         return 1

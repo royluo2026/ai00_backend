@@ -119,14 +119,14 @@ def _install_default_test_governance_runtime() -> None:
     from backend.capability_governance_test.store import MemoryGovernanceStore, SqlGovernanceStore
     from backend.capability_governance_test.worker import InMemoryRunLeaseStore, LeasedGovernanceWorker, SqlRunLeaseStore
     from backend.domain_ports.capability_governance_config import GovernanceSettings
-    from backend.capability_v2.catalog import CatalogRelease
+    from backend.capability_v2.catalog import load_catalog_release
     from backend.utils.gid import next_gid
 
     repository_root = Path(__file__).resolve().parents[2]
-    product = CatalogRelease.model_validate_json(
+    product = load_catalog_release(
         (repository_root / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
     )
-    extension = CatalogRelease.model_validate_json(
+    extension = load_catalog_release(
         (repository_root / "docs/governance/test-extension/capability-governance-catalog-release.json").read_text(encoding="utf-8")
     )
     manifests = load_domain_manifests(repository_root / "backend/capability_v2/official_domains.json")

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from backend.capability_v2.catalog import CatalogRelease
+from backend.capability_v2.catalog import load_catalog_release
 from backend.capabilities.models_next import CapabilityRisk, CapabilitySpec
 from plugins.project_management.project_management_backend.capabilities.provider import descriptor_for
 from plugins.project_management.project_management_backend.capabilities.reviewed import register_reviewed_capabilities
@@ -11,7 +11,7 @@ from plugins.project_management.project_management_backend.capabilities import r
 
 def test_execution_structure_is_available_to_governed_plugins():
     root = Path(__file__).resolve().parents[2]
-    release = CatalogRelease.model_validate_json(
+    release = load_catalog_release(
         (root / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
     )
     descriptor = next(

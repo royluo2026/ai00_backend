@@ -17,6 +17,7 @@ from backend.capability_v2.catalog import (
     build_catalog_entry,
     compatibility_errors,
     complete_governance_metadata,
+    load_catalog_release,
 )
 from backend.capability_v2.catalog_store import InMemoryCatalogStore, SqlCatalogStore
 from backend.capability_v2.contracts import (
@@ -135,6 +136,71 @@ def test_catalog_loader_rejects_tampered_business_definition_hash(tmp_path: Path
 
     with pytest.raises(ValueError, match="business_definition_hash_mismatch"):
         _load_release(path)
+
+
+def test_shared_catalog_loader_accepts_derived_hash_without_mutating_document():
+    """Removing generated metadata before validation must not alter caller data."""
+    from backend.scripts.build_capability_catalog import _release_document
+
+    release = build_release([_descriptor("craft.routing.get").model_copy(update={"business_effect": ""})])
+    document = _release_document(release)
+    original = json.loads(json.dumps(document))
+
+    assert load_catalog_release(document) == release
+    assert document == original
+
+
+def test_shared_catalog_loader_rejects_unknown_descriptor_fields():
+    """Only generated business hashes may be stripped from descriptor input."""
+    from backend.scripts.build_capability_catalog import _release_document
+
+    document = _release_document(build_release([
+        _descriptor("craft.routing.get").model_copy(update={"business_effect": ""}),
+    ]))
+    document["descriptors"][0]["unexpected_generated_field"] = True
+
+    with pytest.raises(ValidationError):
+        load_catalog_release(document)
+
+
+@pytest.mark.parametrize("stored_hash", (None, "not-a-sha256-hash"))
+def test_shared_catalog_loader_rejects_malformed_derived_hashes(stored_hash):
+    """A supplied generated-hash field is never treated as optional metadata."""
+    from backend.scripts.build_capability_catalog import _release_document
+
+    document = _release_document(build_release([
+        _descriptor("craft.routing.get").model_copy(update={"business_effect": ""}),
+    ]))
+    document["descriptors"][0]["business_definition_hash"] = stored_hash
+
+    with pytest.raises(ValueError, match="business_definition_hash_mismatch"):
+        load_catalog_release(document)
+
+
+def test_shared_catalog_loader_allows_legacy_documents_without_derived_hashes():
+    """Extensions predating the generated hash remain valid descriptor documents."""
+    from backend.scripts.build_capability_catalog import _release_document
+
+    release = build_release([_descriptor("craft.routing.get").model_copy(update={"business_effect": ""})])
+    document = _release_document(release)
+    del document["descriptors"][0]["business_definition_hash"]
+
+    assert load_catalog_release(document) == release
+
+
+def test_checked_in_catalog_has_verified_stable_descriptor_pin():
+    """The audited pin follows the checked-in authority, never a runtime count."""
+    from backend.scripts.run_capability_governance_scan import (
+        PINNED_STABLE_PRODUCT_DESCRIPTOR_COUNT,
+    )
+
+    catalog_path = Path(__file__).resolve().parents[2] / "docs/governance/capability-catalog-release.json"
+    release = load_catalog_release(catalog_path.read_text(encoding="utf-8"))
+    stable_count = sum(item.lifecycle_status is LifecycleStatus.STABLE for item in release.descriptors)
+
+    assert len(release.descriptors) == 495
+    assert stable_count == 479
+    assert PINNED_STABLE_PRODUCT_DESCRIPTOR_COUNT == stable_count
 
 
 def test_catalog_hash_normalizes_derived_error_schema_from_domain_errors():

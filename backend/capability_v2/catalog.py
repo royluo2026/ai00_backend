@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from copy import deepcopy
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, Iterable, Mapping, Protocol
 
@@ -57,6 +58,34 @@ class CatalogRelease(FrozenModel):
             (item for item in self.descriptors if item.id == capability_id and item.major_version == major_version),
             None,
         )
+
+
+_MISSING_DERIVED_HASH = object()
+
+
+def load_catalog_release(document: Mapping[str, Any] | str | bytes | bytearray) -> CatalogRelease:
+    """Parse a Catalog document while verifying its generated descriptor hashes."""
+    if isinstance(document, (bytes, bytearray)):
+        document = document.decode("utf-8")
+    if isinstance(document, str):
+        document = json.loads(document)
+    if not isinstance(document, Mapping):
+        raise ValueError("catalog_document_invalid")
+
+    copied = deepcopy(dict(document))
+    supplied_hashes: list[object] = []
+    descriptors = copied.get("descriptors")
+    if isinstance(descriptors, (list, tuple)):
+        for descriptor in descriptors:
+            supplied_hashes.append(
+                descriptor.pop("business_definition_hash", _MISSING_DERIVED_HASH)
+                if isinstance(descriptor, dict) else _MISSING_DERIVED_HASH
+            )
+    release = CatalogRelease.model_validate(copied)
+    for descriptor, supplied_hash in zip(release.descriptors, supplied_hashes):
+        if supplied_hash is not _MISSING_DERIVED_HASH and supplied_hash != business_definition_hash(descriptor):
+            raise ValueError("business_definition_hash_mismatch")
+    return release
 
 
 def canonical_catalog_bytes(
@@ -352,5 +381,6 @@ __all__ = [
     "canonical_catalog_bytes",
     "complete_governance_metadata",
     "compatibility_errors",
+    "load_catalog_release",
     "unbounded_collection_paths",
 ]

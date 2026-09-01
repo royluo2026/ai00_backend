@@ -14,7 +14,7 @@ from typing import Any
 from backend.capabilities.models_next import CapabilityBusinessError, CapabilityContext, CapabilityOutput
 from backend.capabilities.validation_next import validate_payload
 
-from .catalog import CatalogRelease, CatalogResolutionError, CatalogResolver, build_release
+from .catalog import CatalogRelease, CatalogResolutionError, CatalogResolver, build_release, load_catalog_release
 from .catalog_store import InMemoryCatalogStore
 from .contracts import (
     CapabilityErrorV2,
@@ -602,7 +602,7 @@ def configure_default_gateway(registry, *, policy: GatewayPolicy | None = None,
                               release_path: Path | None = None) -> CapabilityGatewayService:
     global _default_gateway
     path = release_path or Path(__file__).resolve().parents[2] / "docs" / "governance" / "capability-catalog-release.json"
-    release = CatalogRelease.model_validate_json(path.read_text(encoding="utf-8"))
+    release = load_catalog_release(path.read_text(encoding="utf-8"))
     # The governance extension is a test-only catalog overlay.  It must be
     # visible to the HTTP Gateway only when the explicitly selected test
     # profile has also loaded the extension providers.  Production keeps the
@@ -612,7 +612,7 @@ def configure_default_gateway(registry, *, policy: GatewayPolicy | None = None,
             "capability-" + "governance" + "-catalog-release.json"
         )
         if extension_path.is_file():
-            extension = CatalogRelease.model_validate_json(
+            extension = load_catalog_release(
                 extension_path.read_text(encoding="utf-8")
             )
             release = build_release(

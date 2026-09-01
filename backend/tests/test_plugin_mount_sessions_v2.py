@@ -296,13 +296,13 @@ def test_mount_catalog_discovery_returns_only_the_exact_granted_subset():
 
 
 def test_mount_data_scopes_are_derived_from_exact_granted_capabilities():
-    from backend.capability_v2.catalog import CatalogRelease
+    from backend.capability_v2.catalog import load_catalog_release
     from backend.routers import plugin_marketplace as router_module
 
     resolver = getattr(router_module, "_mount_data_scopes", None)
     assert resolver is not None
     root = Path(__file__).resolve().parents[2]
-    release = CatalogRelease.model_validate_json(
+    release = load_catalog_release(
         (root / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
     )
 

@@ -233,14 +233,14 @@ def _domain_migration_bindings() -> list[dict]:
 
 
 def catalog_integrity_errors(catalog: dict) -> list[str]:
-    from backend.capability_v2.catalog import CatalogRelease
+    from backend.capability_v2.catalog import load_catalog_release
     from backend.capability_v2.docs.generator import build_documentation
 
     release_document = json.loads(
         (ROOT / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
     )
     try:
-        release = CatalogRelease.model_validate(release_document)
+        release = load_catalog_release(release_document)
     except Exception as exc:
         return [f"catalog release integrity failed: {type(exc).__name__}"]
     errors = []
