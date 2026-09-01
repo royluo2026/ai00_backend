@@ -147,6 +147,7 @@ class ProposalService:
         self._business_review_sink = business_review_sink
         self._business_review_store = business_review_store
         self._business_decisions: dict[str, tuple[tuple[object, ...], Proposal]] = {}
+        self._standard_decisions: dict[str, tuple[tuple[object, ...], Proposal]] = {}
         self._business_review_lock = RLock()
 
     def get(self, proposal_gid: int) -> Proposal:
@@ -269,9 +270,28 @@ class ProposalService:
 
     def decide(self, proposal_gid: int, *, stage: str, decision: str, reviewer_context: ReviewerContext, expected_row_version: int, idempotency_key: str, decided_at: datetime | None = None) -> Proposal:
         key = str(idempotency_key).strip()
-        existing = self._existing(key)
-        if existing is not None:
-            return existing
+        if not key:
+            raise WorkflowError("idempotency_key_required")
+        fingerprint = (
+            int(proposal_gid), str(stage), str(decision), reviewer_context.gid,
+            int(expected_row_version),
+        )
+        replay = self._standard_decisions.get(key)
+        if replay is not None:
+            if replay[0] != fingerprint:
+                raise WorkflowError("idempotency_conflict")
+            return replay[1]
+        durable_replay = getattr(self._business_review_store, "replay_workflow_review", None)
+        if callable(durable_replay):
+            try:
+                replay_proposal = durable_replay(key, fingerprint)
+            except Exception as exc:
+                raise WorkflowError(str(exc)) from exc
+            if replay_proposal is not None:
+                self._proposals[proposal_gid] = replay_proposal
+                self._idempotency[key] = replay_proposal
+                self._standard_decisions[key] = (fingerprint, replay_proposal)
+                return replay_proposal
         proposal = self.get(proposal_gid)
         if proposal.review_kind == "business_definition":
             raise WorkflowError("business_review_required")
@@ -303,15 +323,21 @@ class ProposalService:
         atomic = getattr(self._business_review_store, "transition_workflow_proposal", None)
         if callable(atomic):
             try:
-                resolved = atomic(proposal, candidate)
+                resolved = atomic(
+                    proposal, candidate, idempotency_key=key,
+                    request_fingerprint=fingerprint,
+                )
             except Exception as exc:
                 raise WorkflowError(str(exc)) from exc
             self._proposals[proposal_gid] = resolved
             self._idempotency[key] = resolved
+            self._standard_decisions[key] = (fingerprint, resolved)
             self._audit(operation="review", entity_gid=proposal_gid, actor_gid=reviewer,
                         idempotency_key=key, detail={"status": resolved.status, "capability_id": resolved.capability_id})
             return resolved
-        return self._record(key, candidate, operation="review", actor_gid=reviewer)
+        resolved = self._record(key, candidate, operation="review", actor_gid=reviewer)
+        self._standard_decisions[key] = (fingerprint, resolved)
+        return resolved
 
     def decide_business_definition(
         self, proposal_gid: int, *, reviewer_context: ReviewerContext,
@@ -354,7 +380,7 @@ class ProposalService:
                 getattr(self._business_review_store, "decide_business_review_atomic", None)
             ):
                 raise WorkflowError("business_review_persistence_unavailable")
-            review_gid = self._next_gid()
+            review_gid = self._allocate_standard_review_gid()
             moment = _time(None)
             business_review = CapabilityBusinessReview(
                 review_gid=review_gid, capability_version_gid=proposal.capability_version_gid,

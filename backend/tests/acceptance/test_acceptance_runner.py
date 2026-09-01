@@ -27,6 +27,7 @@ from backend.scripts.run_capability_v2_acceptance import (
     catalog_integrity_errors,
     completion_blockers,
     load_documents,
+    runtime_verification_passed,
     validate_runtime_evidence,
     validate_report_schema,
     validate_manifest,
@@ -621,6 +622,37 @@ def test_schema_invalid_runtime_evidence_fails_without_structural_exception(tmp_
 
     assert errors
     assert evidence_hash.startswith("sha256:")
+
+
+def test_invalid_schema_commit_catalog_or_case_never_marks_runtime_verified(tmp_path, monkeypatch):
+    catalog, manifest = load_documents()
+    commit = "a" * 40
+    monkeypatch.setattr("backend.scripts.run_capability_v2_acceptance._git", lambda *args: commit)
+    mutations = ("schema", "commit", "catalog", "case")
+
+    for mutation in mutations:
+        evidence = _runtime_evidence(catalog, manifest, commit=commit)
+        if mutation == "schema":
+            evidence.pop("catalog_release")
+        elif mutation == "commit":
+            evidence["git_commit"] = "b" * 40
+        elif mutation == "catalog":
+            evidence["catalog_hash"] = "sha256:" + "0" * 64
+        else:
+            capability_key = next(iter(manifest["capabilities"]))
+            case = next(iter(manifest["capabilities"][capability_key]))
+            evidence["capabilities"][capability_key][case] = "failed"
+        path = tmp_path / f"{mutation}.json"
+        path.write_text(json.dumps(evidence), encoding="utf-8")
+
+        errors, _ = validate_runtime_evidence(catalog, manifest, {
+            "AI00_ACCEPTANCE_RC_EVIDENCE": str(path),
+            "AI00_ACCEPTANCE_ENVIRONMENT_ID": "rc-isolated-42",
+            "AI00_ACCEPTANCE_RUN_ID": "rc-run-42",
+        })
+
+        assert errors
+        assert runtime_verification_passed(errors, evidence.get("component_results")) is False
 
 
 def test_schema_valid_but_unparseable_evidence_time_becomes_blocker(tmp_path, monkeypatch):

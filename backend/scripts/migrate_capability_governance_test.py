@@ -59,6 +59,8 @@ GOVERNANCE_TABLES = (
     "workmanship_base_capability_business_rules",
     "workmanship_base_capability_relation_candidates",
     "workmanship_base_capability_business_reviews",
+    "workmanship_base_capability_business_review_requests",
+    "workmanship_base_capability_standard_review_requests",
     "workmanship_base_capability_rule_effectiveness",
 )
 

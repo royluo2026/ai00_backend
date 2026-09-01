@@ -18,6 +18,10 @@ if str(ROOT) not in sys.path:
 
 from backend.scripts.check_production_governance_exclusion import check_production_artifact
 from backend.plugin_platform.signing import SignatureError, verify
+from backend.capability_v2.release_gate import (
+    BusinessGovernanceConfigurationError,
+    parse_business_governance_result,
+)
 
 
 DEFAULT_ALLOWLIST = Path("docs/governance/test-extension/production-artifact-allowlist.json")
@@ -64,7 +68,11 @@ def validate_release_report(
     )) or not isinstance(document.get("blockers"), list):
         errors.add("release_report_invalid")
     governance = document.get("business_governance")
-    if not isinstance(governance, dict) or governance.get("status") == "blocked":
+    try:
+        governance_result = parse_business_governance_result(governance)
+    except BusinessGovernanceConfigurationError:
+        governance_result = None
+    if governance_result is None or governance_result.status == "blocked":
         errors.add("release_report_governance_invalid")
     if not str(document.get("signing_key_id", "")).strip():
         errors.add("release_report_signing_key_missing")

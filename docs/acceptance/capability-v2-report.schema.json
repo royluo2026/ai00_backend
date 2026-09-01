@@ -124,11 +124,20 @@
           "type": "array", "items": {
             "type": "object", "additionalProperties": false,
             "required": [
-              "capability_key", "change_kind", "governance_status",
+              "capability_key", "capability_version_gid", "definition_hash",
+              "approved_definition_hash", "change_kind", "governance_status",
               "machine_passed", "human_approved", "runtime_verified", "blockers"
             ],
             "properties": {
               "capability_key": {"type": "string"},
+              "capability_version_gid": {"type": "string"},
+              "definition_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+              "approved_definition_hash": {
+                "anyOf": [
+                  {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+                  {"type": "null"}
+                ]
+              },
               "change_kind": {"enum": ["new", "material_change", "unchanged_legacy"]},
               "governance_status": {"enum": ["passed", "legacy_pending_review", "blocked"]},
               "machine_passed": {"type": "boolean"},

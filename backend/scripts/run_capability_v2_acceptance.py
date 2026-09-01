@@ -35,7 +35,9 @@ from backend.capability_v2.release_gate import (
     BusinessGateCapability,
     BusinessGateResult,
     classify_change,
+    evaluate_catalog_business_governance,
     evaluate_business_governance_gate,
+    load_business_approval_artifact,
     load_legacy_baseline,
 )
 CATALOG_PATH = ROOT / "docs/capabilities/catalog.v2.json"
@@ -376,6 +378,20 @@ def runtime_component_results(env: Mapping[str, str]) -> dict[str, str]:
     return {name: str(components[name]) for name in sorted(required)}
 
 
+def runtime_verification_passed(
+    evidence_errors: list[str], component_results: Mapping[str, str] | None,
+) -> bool:
+    """Return true only for complete, error-free runtime evidence."""
+
+    required = {"backend_gateway", "plugin", "agent", "mcp", "local_runtime"}
+    return (
+        not evidence_errors
+        and component_results is not None
+        and set(component_results) == required
+        and all(component_results[name] == "passed" for name in required)
+    )
+
+
 def _database_isolation_evidence_errors(evidence: dict) -> list[str]:
     from backend.capability_v2.domain_manifest import load_domain_manifests
 
@@ -535,6 +551,8 @@ def build_report(
     runtime_evidence_hash: str | None = None,
     completion: CompletionReport | None = None,
     component_results: Mapping[str, str] | None = None,
+    runtime_verified: bool = False,
+    business_review_lookup: Mapping[tuple[str, str], object] | None = None,
     business_governance: BusinessGateResult | None = None,
 ) -> dict:
     commit = _git("rev-parse", "HEAD")
@@ -544,7 +562,8 @@ def build_report(
     counts = test_result["outcome_counts"]
     completion = completion or evaluate_completion(ROOT, mode="progress")
     governance = business_governance or _acceptance_business_governance(
-        runtime_verified=mode == "release-candidate" and runtime_evidence_hash is not None,
+        runtime_verified=runtime_verified,
+        business_review_lookup=business_review_lookup,
     )
     effective_blockers = list(blockers)
     if governance.status == "blocked":
@@ -597,22 +616,25 @@ def build_report(
     return report
 
 
-def _acceptance_business_governance(*, runtime_verified: bool) -> BusinessGateResult:
+def _acceptance_business_governance(
+    *, runtime_verified: bool,
+    business_review_lookup: Mapping[tuple[str, str], object] | None = None,
+) -> BusinessGateResult:
     release = json.loads(
         (ROOT / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
     )
     baseline = load_legacy_baseline(
-        ROOT / "docs/governance/capability-business-governance-legacy-baseline.json"
+        ROOT / "docs/governance/capability-business-governance-legacy-baseline.json",
+        catalog_path=ROOT / "docs/governance/capability-catalog-release.json",
     )
-    return evaluate_business_governance_gate(
-        BusinessGateCapability(
-            capability_key=(key := f"{item['id']}@{item['major_version']}"),
-            change_kind=classify_change(
-                key, str(item["business_definition_hash"]), None, baseline.capabilities,
-            ),
-            runtime_verified=runtime_verified,
-        )
+    runtime = {
+        f"{item['id']}@{item['major_version']}": runtime_verified
         for item in release["descriptors"]
+    }
+    return evaluate_catalog_business_governance(
+        release, baseline.capabilities,
+        business_review_lookup=business_review_lookup,
+        runtime_verification=runtime,
     )
 
 
@@ -641,12 +663,14 @@ def main() -> int:
     parser.add_argument("--mode", choices=("offline", "nightly", "release-candidate"), required=True)
     parser.add_argument("--strict", action="store_true")
     parser.add_argument("--report", type=Path)
+    parser.add_argument("--business-approvals", type=Path)
     args = parser.parse_args()
     catalog, manifest = load_documents()
     blockers = validate_manifest(catalog, manifest)
     blockers.extend(catalog_integrity_errors(catalog))
     current_env = dict(os.environ)
-    blockers.extend(environment_errors(args.mode, current_env))
+    runtime_environment_errors = environment_errors(args.mode, current_env)
+    blockers.extend(runtime_environment_errors)
     if args.mode == "offline" and args.strict:
         from backend.scripts.run_bop_large_version_acceptance import run_size
         large_run_id = "capability-offline-large-bop"
@@ -656,11 +680,23 @@ def main() -> int:
                 blockers.append(f"large BOP {size}: {failure}")
     runtime_evidence_hash = None
     component_results = None
+    evidence_errors: list[str] = []
     completion = evaluate_completion(
         ROOT,
         mode="strict" if args.mode == "release-candidate" else "progress",
     )
     blockers.extend(completion_blockers(args.mode, completion))
+    business_review_lookup = None
+    if args.business_approvals is not None:
+        try:
+            release = json.loads(
+                (ROOT / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
+            )
+            business_review_lookup = load_business_approval_artifact(
+                args.business_approvals, catalog_release_id=str(release.get("release_id", "")),
+            )
+        except Exception as exc:
+            blockers.append(f"business approval evidence unavailable: {exc}")
     if args.mode == "release-candidate":
         evidence_errors, runtime_evidence_hash = validate_runtime_evidence(catalog, manifest, current_env)
         blockers.extend(evidence_errors)
@@ -676,11 +712,18 @@ def main() -> int:
             blockers.append("release-candidate cannot resolve git working tree")
     test_result, test_blockers = _run_contract_tests(manifest)
     blockers.extend(test_blockers)
+    runtime_verified = (
+        args.mode == "release-candidate"
+        and not runtime_environment_errors
+        and runtime_verification_passed(evidence_errors, component_results)
+    )
     report = build_report(
         args.mode, catalog, manifest, blockers, test_result,
         runtime_evidence_hash=runtime_evidence_hash,
         completion=completion,
         component_results=component_results,
+        runtime_verified=runtime_verified,
+        business_review_lookup=business_review_lookup,
     )
     schema_errors = validate_report_schema(report)
     if schema_errors:
@@ -690,6 +733,8 @@ def main() -> int:
             runtime_evidence_hash=runtime_evidence_hash,
             completion=completion,
             component_results=component_results,
+            runtime_verified=runtime_verified,
+            business_review_lookup=business_review_lookup,
         )
         remaining = validate_report_schema(report)
         if remaining:

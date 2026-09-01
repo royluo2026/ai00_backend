@@ -35,6 +35,7 @@ from backend.capability_governance_test.test_runner import RegisteredTestCase, r
 from backend.capability_governance_test.workflow import ProposalService, ReviewerContext
 from backend.capability_v2.catalog import CatalogRelease, load_catalog_release
 from backend.capability_v2.catalog_overlay import compose_catalogs
+from backend.capability_v2.release_gate import BusinessGateCapability, evaluate_business_governance_gate
 from backend.scripts.check_frontend_deployment import check as check_frontend_deployment
 from backend.scripts.check_production_governance_exclusion import check_production_artifact
 from backend.scripts.generate_capability_governance_grants import render_grants
@@ -161,7 +162,23 @@ def _release_evidence() -> dict[str, Any]:
     ids = iter(range(501, 1000))
     candidate = ReleaseCandidate("sha256:revision", "rel_product", 101, 201)
     gate = ReleaseGate(next_gid=ids.__next__, signer=lambda _payload: "unit-signature", signing_key_id="unit-key")
-    report = gate.evaluate(candidate, test_status="passed", approvals_complete=True, data_complete=True, evidence_hash="sha256:evidence", idempotency_key="pass")
+    report = gate.evaluate(
+        candidate,
+        test_status="passed",
+        approvals_complete=True,
+        data_complete=True,
+        evidence_hash="sha256:unit-evidence",
+        business_governance=evaluate_business_governance_gate((
+            BusinessGateCapability(
+                capability_key="base.capability_registry.search@1",
+                capability_version_gid="cv2_0123456789abcdef01234567",
+                definition_hash="sha256:" + "a" * 64,
+                approved_definition_hash="sha256:" + "a" * 64,
+                change_kind="new", human_approved=True, runtime_verified=True,
+            ),
+        )),
+        idempotency_key="unit-pass",
+    )
     if report.conclusion != "pass":
         raise RuntimeError("release_gate_did_not_pass")
     expired = gate.expire_changed_inputs(code_revision="sha256:changed")

@@ -4,6 +4,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Mapping
 from datetime import datetime, timezone
+from dataclasses import replace
 import json
 from threading import RLock
 from typing import Any, Protocol
@@ -229,6 +230,7 @@ class MemoryGovernanceStore(GovernanceStore):
         self._workflow_proposal_gid_value = 0
         self._workflow_review_gid_value = 0
         self._business_review_requests: dict[str, tuple[tuple[object, ...], Any]] = {}
+        self._workflow_review_requests: dict[str, tuple[tuple[object, ...], Any]] = {}
         self._rule_effectiveness: dict[int, RuleEffectivenessRecord] = {}
         self._scan_findings: dict[int, tuple[Mapping[str, Any], ...]] = {}
 
@@ -413,12 +415,13 @@ class MemoryGovernanceStore(GovernanceStore):
             return proposal
 
     def allocate_workflow_review_gid(self) -> int:
-        """Allocate standard-review identity from the store-owned namespace."""
+        """Allocate review identity from the store-owned shared namespace."""
         with self._lock:
             review_gid = max(
                 self._workflow_review_gid_value,
                 *(review.review_gid for proposal in self._workflow_proposals.values()
                   for review in proposal.reviews),
+                *self._business_reviews,
                 0,
             ) + 1
             if review_gid >= 2**63:
@@ -426,16 +429,42 @@ class MemoryGovernanceStore(GovernanceStore):
             self._workflow_review_gid_value = review_gid
             return review_gid
 
-    def transition_workflow_proposal(self, proposal: Any, resolved: Any) -> Any:
+    def replay_workflow_review(
+        self, idempotency_key: str, fingerprint: tuple[object, ...],
+    ) -> Any | None:
+        with self._lock:
+            replay = self._workflow_review_requests.get(idempotency_key)
+            if replay is None:
+                return None
+            if replay[0] != fingerprint:
+                raise ImmutableRecordError("idempotency_conflict")
+            return replay[1]
+
+    def transition_workflow_proposal(
+        self, proposal: Any, resolved: Any, *, idempotency_key: str | None = None,
+        request_fingerprint: tuple[object, ...] | None = None,
+    ) -> Any:
         """CAS one ordinary proposal transition against the same durable row."""
         with self._lock:
+            if idempotency_key is not None:
+                if request_fingerprint is None:
+                    raise ImmutableRecordError("idempotency_fingerprint_required")
+                replay = self._workflow_review_requests.get(idempotency_key)
+                if replay is not None:
+                    if replay[0] != request_fingerprint:
+                        raise ImmutableRecordError("idempotency_conflict")
+                    return replay[1]
             current = self._workflow_proposals.get(proposal.proposal_gid)
             if (current is None or current.row_version != proposal.row_version
                     or current.status != proposal.status):
                 raise ImmutableRecordError("row_version_conflict")
             staged = dict(self._workflow_proposals)
+            staged_requests = dict(self._workflow_review_requests)
             staged[proposal.proposal_gid] = resolved
+            if idempotency_key is not None:
+                staged_requests[idempotency_key] = (request_fingerprint, resolved)
             self._workflow_proposals = staged
+            self._workflow_review_requests = staged_requests
             return resolved
 
     def get_workflow_proposal(self, proposal_gid: int) -> Any | None:
@@ -762,13 +791,14 @@ class SqlGovernanceStore(GovernanceStore):
                 close()
 
     def allocate_workflow_review_gid(self) -> int:
-        """Allocate a restart-safe standard-review id from the Base counter."""
+        """Allocate a restart-safe review id from the Base counter."""
         cursor = self._connection.cursor()
         try:
             cursor.execute(
                 "INSERT INTO workmanship_display_id_counters (seq_name, val) "
-                "SELECT %s, COALESCE(MAX(review_gid), 0) "
-                "FROM workmanship_base_capability_reviews "
+                "SELECT %s, GREATEST("
+                "COALESCE((SELECT MAX(review_gid) FROM workmanship_base_capability_reviews), 0), "
+                "COALESCE((SELECT MAX(business_review_gid) FROM workmanship_base_capability_business_reviews), 0)) "
                 "ON DUPLICATE KEY UPDATE val = GREATEST(val, VALUES(val))",
                 (_WORKFLOW_REVIEW_SEQUENCE,),
             )
@@ -824,10 +854,70 @@ class SqlGovernanceStore(GovernanceStore):
             if callable(close):
                 close()
 
-    def transition_workflow_proposal(self, proposal: Any, resolved: Any) -> Any:
+    def _standard_review_replay_result(
+        self, proposal_gid: int, review_gid: int, status: str, row_version: int,
+    ) -> Any:
+        proposal = self.get_workflow_proposal(proposal_gid)
+        if proposal is None:
+            raise ImmutableRecordError("workflow_review_replay_missing")
+        reviews = tuple(review for review in proposal.reviews if review.review_gid <= review_gid)
+        return replace(proposal, status=status, row_version=row_version, reviews=reviews)
+
+    def replay_workflow_review(
+        self, idempotency_key: str, fingerprint: tuple[object, ...],
+    ) -> Any | None:
+        cursor = self._connection.cursor()
+        try:
+            cursor.execute(
+                "SELECT request_fingerprint, proposal_gid, review_gid, result_status, result_row_version "
+                "FROM workmanship_base_capability_standard_review_requests "
+                "WHERE idempotency_key = %s", (idempotency_key,),
+            )
+            replay = cursor.fetchone()
+        finally:
+            close = getattr(cursor, "close", None)
+            if callable(close):
+                close()
+        if replay is None:
+            return None
+        encoded = json.dumps(fingerprint, separators=(",", ":"), default=str)
+        if str(_row_value(replay, "request_fingerprint", 0)) != encoded:
+            raise ImmutableRecordError("idempotency_conflict")
+        return self._standard_review_replay_result(
+            int(_row_value(replay, "proposal_gid", 1)),
+            int(_row_value(replay, "review_gid", 2)),
+            str(_row_value(replay, "result_status", 3)),
+            int(_row_value(replay, "result_row_version", 4)),
+        )
+
+    def transition_workflow_proposal(
+        self, proposal: Any, resolved: Any, *, idempotency_key: str | None = None,
+        request_fingerprint: tuple[object, ...] | None = None,
+    ) -> Any:
         """Apply an ordinary proposal transition with the same SQL CAS as a review."""
         cursor = self._connection.cursor()
         try:
+            encoded = None
+            if idempotency_key is not None:
+                if request_fingerprint is None:
+                    raise ImmutableRecordError("idempotency_fingerprint_required")
+                encoded = json.dumps(request_fingerprint, separators=(",", ":"), default=str)
+                cursor.execute(
+                    "SELECT request_fingerprint, proposal_gid, review_gid, result_status, result_row_version "
+                    "FROM workmanship_base_capability_standard_review_requests "
+                    "WHERE idempotency_key = %s FOR UPDATE", (idempotency_key,),
+                )
+                replay = cursor.fetchone()
+                if replay is not None:
+                    if str(_row_value(replay, "request_fingerprint", 0)) != encoded:
+                        raise ImmutableRecordError("idempotency_conflict")
+                    self._connection.commit()
+                    return self._standard_review_replay_result(
+                        int(_row_value(replay, "proposal_gid", 1)),
+                        int(_row_value(replay, "review_gid", 2)),
+                        str(_row_value(replay, "result_status", 3)),
+                        int(_row_value(replay, "result_row_version", 4)),
+                    )
             cursor.execute(
                 "UPDATE workmanship_base_capability_change_proposals "
                 "SET status = %s, row_version = row_version + 1 "
@@ -851,6 +941,14 @@ class SqlGovernanceStore(GovernanceStore):
                      review.decision, int(review.reviewer_gid), review.decision_reason,
                      review.base_snapshot_gid, review.decided_at),
                 )
+                if idempotency_key is not None:
+                    cursor.execute(
+                        "INSERT INTO workmanship_base_capability_standard_review_requests "
+                        "(idempotency_key, request_fingerprint, proposal_gid, review_gid, result_status, result_row_version) "
+                        "VALUES (%s, %s, %s, %s, %s, %s)",
+                        (idempotency_key, encoded, proposal.proposal_gid, review.review_gid,
+                         resolved.status, resolved.row_version),
+                    )
             self._connection.commit()
             return self.get_workflow_proposal(proposal.proposal_gid) or resolved
         except Exception:

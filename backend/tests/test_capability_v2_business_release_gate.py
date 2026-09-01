@@ -23,6 +23,7 @@ from backend.scripts.run_capability_v2_acceptance import build_report, load_docu
 
 HASH_1 = "sha256:" + "1" * 64
 HASH_2 = "sha256:" + "2" * 64
+VERSION_GID = "cv2_0123456789abcdef01234567"
 
 
 @pytest.mark.parametrize(("kind", "approved", "expected"), [
@@ -34,6 +35,9 @@ HASH_2 = "sha256:" + "2" * 64
 def test_business_governance_gate_policy(kind: str, approved: bool, expected: str):
     result = evaluate_business_governance_gate((BusinessGateCapability(
         capability_key="person.height.write@1",
+        capability_version_gid=VERSION_GID,
+        definition_hash=HASH_1,
+        approved_definition_hash=HASH_1 if approved else None,
         change_kind=kind,
         human_approved=approved,
     ),))
@@ -68,10 +72,15 @@ def test_structured_result_never_infers_human_or_runtime_state_from_machine_pass
     result = evaluate_business_governance_gate((
         BusinessGateCapability(
             capability_key="person.height.write@1",
+            capability_version_gid=VERSION_GID,
+            definition_hash=HASH_1,
             change_kind="unchanged_legacy",
         ),
         BusinessGateCapability(
             capability_key="person.weight.write@1",
+            capability_version_gid="cv2_1123456789abcdef01234567",
+            definition_hash=HASH_2,
+            approved_definition_hash=HASH_2,
             change_kind="new",
             human_approved=True,
         ),
@@ -84,6 +93,9 @@ def test_structured_result_never_infers_human_or_runtime_state_from_machine_pass
     assert result.legacy_pending_review_count == 1
     assert result.serialized()["capabilities"][0] == {
         "capability_key": "person.height.write@1",
+        "capability_version_gid": VERSION_GID,
+        "definition_hash": HASH_1,
+        "approved_definition_hash": None,
         "change_kind": "unchanged_legacy",
         "governance_status": "legacy_pending_review",
         "machine_passed": True,
@@ -122,15 +134,8 @@ def test_static_release_report_exposes_governance_result_and_allows_legacy_backl
 
 
 def _catalog(path: Path) -> None:
-    path.write_text(json.dumps({
-        "release_id": "rel_cutover",
-        "catalog_hash": HASH_2,
-        "capabilities": [{
-            "id": "person.height.write",
-            "major_version": 1,
-            "business_definition_hash": HASH_1,
-        }],
-    }), encoding="utf-8")
+    source = Path(__file__).resolve().parents[2] / "docs/governance/capability-catalog-release.json"
+    path.write_bytes(source.read_bytes())
 
 
 def test_cutover_baseline_is_created_once_and_subsequent_loads_only_verify(tmp_path: Path):
@@ -146,8 +151,9 @@ def test_cutover_baseline_is_created_once_and_subsequent_loads_only_verify(tmp_p
 
     assert loaded == created
     assert loaded.source_revision == "cutover-revision"
-    assert loaded.catalog_release_id == "rel_cutover"
-    assert loaded.capabilities == {"person.height.write@1": HASH_1}
+    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    assert loaded.catalog_release_id == catalog["release_id"]
+    assert len(loaded.capabilities) == len(catalog["descriptors"])
     assert baseline_path.read_bytes() == before
     with pytest.raises(BusinessGovernanceConfigurationError, match="legacy_baseline_already_exists"):
         create_legacy_baseline(
@@ -162,7 +168,8 @@ def test_cutover_baseline_tampering_fails_closed(tmp_path: Path):
     _catalog(catalog_path)
     create_legacy_baseline(catalog_path, baseline_path, source_revision="cutover-revision")
     document = json.loads(baseline_path.read_text(encoding="utf-8"))
-    document["capabilities"]["person.height.write@1"] = HASH_2
+    first_key = next(iter(document["capabilities"]))
+    document["capabilities"][first_key] = HASH_2
     baseline_path.write_text(json.dumps(document), encoding="utf-8")
 
     with pytest.raises(BusinessGovernanceConfigurationError, match="legacy_baseline_hash_invalid"):
@@ -177,6 +184,21 @@ def test_offline_acceptance_reports_legacy_backlog_without_human_or_runtime_clai
         lambda *_args: "b52cb4a74b29d27fdf6e0c00ec5598fe5462c907",
     )
 
+    baseline_document = json.loads(
+        (Path(__file__).resolve().parents[2] / "docs/governance/capability-business-governance-legacy-baseline.json")
+        .read_text(encoding="utf-8")
+    )
+    governance_result = evaluate_business_governance_gate(
+        BusinessGateCapability(
+            capability_key=key,
+            capability_version_gid=f"cv2_{index:024x}",
+            definition_hash=digest,
+            change_kind="unchanged_legacy",
+        )
+        for index, (key, digest) in enumerate(
+            sorted(baseline_document["capabilities"].items()), start=1,
+        )
+    )
     report = build_report("offline", catalog, manifest, [], {
         "exit_code": 0,
         "summary": "acceptance passed",
@@ -184,7 +206,7 @@ def test_offline_acceptance_reports_legacy_backlog_without_human_or_runtime_clai
         "outcome_counts": {
             "passed": declared, "failed": 0, "skipped": 0, "missing": 0,
         },
-    }, completion=CompletionReport(
+    }, business_governance=governance_result, completion=CompletionReport(
         domains=(), plugin_agent_gateway_only=True, independent_domains=11,
         sync_production_paths=1, async_production_paths=1, cross_domain_sql=0,
         internal_imports=0, consumer_bypasses=0,

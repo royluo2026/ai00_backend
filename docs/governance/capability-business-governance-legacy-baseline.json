@@ -1,5 +1,5 @@
 {
-  "baseline_hash": "sha256:f22102aeb1fbf187e28c46bbea89cec23c18398419248dda32717d9841080cf4",
+  "baseline_hash": "sha256:f73f10868cf1104148d16c618991ea5153575fb3b46c74e77f513241d1ec5f47",
   "capabilities": {
     "agent.audit.read@1": "sha256:9181713316f10d185eaafe81135c33778dc3243bdc7fd4285c911cc302187fc5",
     "agent.audit.record@1": "sha256:17b7104827fc52d8a7599b29991e8c9eb2089c688c5a862718d0bc2dc88bdcfd",
@@ -497,8 +497,8 @@
     "vismockup.tree@1": "sha256:8dd8999d8558765b7f4158fc9ebf31e5a297e6821b64961c6110da099747f208",
     "vismockup.visibility@1": "sha256:d23e1c5e81a2060e0a36fd71180ed0fc77fe4ad1f97f23c344e85debc7c6db1c"
   },
-  "catalog_hash": "sha256:3f5ef8265738dc99f4803579111af53dfc0e0e019bbca1190b0946e28ccc84dc",
-  "catalog_release_id": "rel_3f5ef8265738dc99f4803579111af53d",
+  "catalog_hash": "sha256:0b584b19349bc98727900583bb19f687a093b3ce91431fb384795034d690ab60",
+  "catalog_release_id": "rel_0b584b19349bc98727900583bb19f687",
   "schema_version": 1,
   "source_revision": "b52cb4a74b29d27fdf6e0c00ec5598fe5462c907"
 }

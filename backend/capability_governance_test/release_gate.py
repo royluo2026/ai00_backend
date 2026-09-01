@@ -11,7 +11,11 @@ from pathlib import Path
 from typing import Any, Literal
 
 from backend.plugin_platform.signing import sign
-from backend.capability_v2.release_gate import BusinessGateResult
+from backend.capability_v2.release_gate import (
+    BusinessGateResult,
+    BusinessGovernanceConfigurationError,
+    parse_business_governance_result,
+)
 
 from .audit import AuditSink
 
@@ -99,29 +103,10 @@ def _blocking_codes(findings: Iterable[Any]) -> tuple[str, ...]:
 
 
 def _business_governance_document(value: object) -> dict[str, Any]:
-    if isinstance(value, BusinessGateResult):
-        document = value.serialized()
-    elif isinstance(value, Mapping):
-        document = dict(value)
-    else:
+    try:
+        return parse_business_governance_result(value).serialized()
+    except BusinessGovernanceConfigurationError:
         return {}
-    required = {
-        "status", "machine_passed", "human_approved", "runtime_verified",
-        "legacy_pending_review_count", "blockers", "capabilities",
-    }
-    if set(document) != required or document.get("status") not in {
-        "passed", "passed_with_legacy_backlog", "blocked",
-    }:
-        return {}
-    if not all(isinstance(document.get(key), bool) for key in (
-        "machine_passed", "human_approved", "runtime_verified",
-    )):
-        return {}
-    if not isinstance(document.get("legacy_pending_review_count"), int):
-        return {}
-    if not isinstance(document.get("blockers"), (list, tuple)) or not isinstance(document.get("capabilities"), (list, tuple)):
-        return {}
-    return json.loads(json.dumps(document, ensure_ascii=True, sort_keys=True))
 
 
 class ReleaseGate:

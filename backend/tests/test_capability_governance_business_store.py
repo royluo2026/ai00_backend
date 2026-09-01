@@ -479,6 +479,14 @@ class _BusinessDecisionCursor:
         if query.startswith("SELECT request_fingerprint"):
             request = database.staged_requests.get(parameters[0])
             self.row = None if request is None else (request[0], request[1])
+        elif query.startswith("INSERT INTO workmanship_display_id_counters"):
+            self.rowcount = 1
+        elif query.startswith("UPDATE workmanship_display_id_counters"):
+            database.review_sequence += 1
+            database.last_insert_id = database.review_sequence
+            self.rowcount = 1
+        elif query.startswith("SELECT LAST_INSERT_ID()"):
+            self.row = (database.last_insert_id,)
         elif query.startswith("INSERT INTO workmanship_base_capability_change_proposals"):
             proposal_gid, version_gid, snapshot_gid, definition_hash, review_kind, _risk, status, submitted_by, _submitted, _summary, change_json, row_version = parameters
             payload = __import__("json").loads(change_json)
@@ -531,6 +539,7 @@ class _BusinessDecisionConnection:
         self.committed_requests: dict[str, tuple[object, int]] = {}
         self.staged_requests: dict[str, tuple[object, int]] = {}
         self.fail_request_insert, self.calls = fail_request_insert, []
+        self.review_sequence = self.last_insert_id = 800
         self.commits = self.rollbacks = 0
 
     def cursor(self): return _BusinessDecisionCursor(self)
@@ -549,12 +558,15 @@ class _BusinessDecisionConnection:
 class _SharedBusinessDatabase:
     """Transactional SQL fixture with connection-local writes and one shared commit state."""
 
-    def __init__(self, proposal=None, *, fail_standard_review_insert=False):
+    def __init__(self, proposal=None, *, fail_standard_review_insert=False,
+                 fail_standard_request_insert=False):
         self.proposals = {} if proposal is None else {proposal.proposal_gid: proposal}
         self.reviews: dict[int, tuple[object, ...]] = {}
         self.standard_reviews: dict[int, tuple[object, ...]] = {}
         self.requests: dict[str, tuple[object, int]] = {}
+        self.standard_requests: dict[str, tuple[object, int, int, str, int]] = {}
         self.fail_standard_review_insert = fail_standard_review_insert
+        self.fail_standard_request_insert = fail_standard_request_insert
         self.sequence_value = max(self.proposals, default=0)
         self.calls: list[tuple[str, tuple[object, ...]]] = []
         self._lock = RLock()
@@ -580,6 +592,7 @@ class _SharedBusinessConnection:
         self.staged_reviews = dict(self.database.reviews)
         self.staged_standard_reviews = dict(self.database.standard_reviews)
         self.staged_requests = dict(self.database.requests)
+        self.staged_standard_requests = dict(self.database.standard_requests)
         self.staged_sequence_value = self.database.sequence_value
 
     def _view(self, name):
@@ -598,6 +611,7 @@ class _SharedBusinessConnection:
             self.database.reviews = dict(self.staged_reviews)
             self.database.standard_reviews = dict(self.staged_standard_reviews)
             self.database.requests = dict(self.staged_requests)
+            self.database.standard_requests = dict(self.staged_standard_requests)
             self.database.sequence_value = self.staged_sequence_value
             self._in_transaction = False
             self.database._lock.release()
@@ -625,8 +639,13 @@ class _SharedBusinessCursor:
         connection = self.connection
         if query.startswith("SELECT request_fingerprint"):
             connection._begin()
-            request = connection.staged_requests.get(parameters[0])
-            self.row = None if request is None else (request[0], request[1])
+            requests = (
+                connection.staged_standard_requests
+                if "standard_review_requests" in query
+                else connection.staged_requests
+            )
+            request = requests.get(parameters[0])
+            self.row = None if request is None else tuple(request)
         elif query.startswith("INSERT INTO workmanship_display_id_counters"):
             connection._begin()
             connection.staged_sequence_value = max(
@@ -689,6 +708,14 @@ class _SharedBusinessCursor:
             if parameters[0] in connection.staged_requests:
                 raise RuntimeError("duplicate idempotency_key")
             connection.staged_requests[parameters[0]] = (parameters[1], parameters[2])
+            self.rowcount = 1
+        elif query.startswith("INSERT INTO workmanship_base_capability_standard_review_requests"):
+            connection._begin()
+            if connection.database.fail_standard_request_insert:
+                raise RuntimeError("standard_request_insert_failed")
+            if parameters[0] in connection.staged_standard_requests:
+                raise RuntimeError("duplicate standard idempotency_key")
+            connection.staged_standard_requests[parameters[0]] = tuple(parameters[1:])
             self.rowcount = 1
         elif query.startswith("SELECT business_review_gid, proposal_gid, decision"):
             reviews = connection._view("reviews")
@@ -1031,6 +1058,86 @@ def test_sql_standard_review_insert_failure_rolls_back_proposal_and_review():
     assert error.value.code == "standard_review_insert_failed"
     assert database.proposals == {701: proposal}
     assert database.standard_reviews == {}
+    assert connection.commits == 1 and connection.rollbacks == 1
+
+
+def test_sql_standard_review_idempotency_replays_exact_result_after_restart_and_rejects_mismatch():
+    database = _SharedBusinessDatabase()
+    service, _ = _persistent_service(database)
+    payload = dict(_proposal_payload("standard", "durable-standard-create"))
+    payload["capability_id"] = "base.capability_policy"
+    proposal = service.base_capability_proposal_submit(payload, _super_admin_context("9001"))["proposal"]
+    for status in ("checking", "pending_approval"):
+        proposal = service._proposals.transition(
+            proposal.proposal_gid, status, expected_row_version=proposal.row_version,
+            idempotency_key=f"durable-standard-{status}",
+        )
+    request_row_version = proposal.row_version
+    request = {
+        "proposal_gid": str(proposal.proposal_gid), "stage": "base_owner",
+        "decision": "approved", "row_version": str(request_row_version),
+        "idempotency_key": "durable-standard-review",
+    }
+    first = service.base_capability_review_decide(request, _base_owner_context())["proposal"]
+
+    restarted, _ = _persistent_service(database)
+    replay = restarted.base_capability_review_decide(request, _base_owner_context())["proposal"]
+
+    assert replay == first
+    assert len(database.standard_reviews) == 1
+    assert set(database.standard_requests) == {"proposal-review:durable-standard-review"}
+    with pytest.raises(CapabilityBusinessError) as error:
+        restarted.base_capability_review_decide(
+            {**request, "decision": "rejected"}, _base_owner_context(),
+        )
+    assert error.value.code == "idempotency_conflict"
+
+
+def test_memory_standard_review_idempotency_replays_after_fresh_service_and_rejects_mismatch():
+    store = MemoryGovernanceStore()
+    service = CapabilityGovernanceService(store=store)
+    payload = dict(_proposal_payload("standard", "memory-durable-standard-create"))
+    payload["capability_id"] = "base.capability_policy"
+    proposal = service.base_capability_proposal_submit(payload, _super_admin_context("9001"))["proposal"]
+    for status in ("checking", "pending_approval"):
+        proposal = service._proposals.transition(
+            proposal.proposal_gid, status, expected_row_version=proposal.row_version,
+            idempotency_key=f"memory-durable-standard-{status}",
+        )
+    request = {
+        "proposal_gid": str(proposal.proposal_gid), "stage": "base_owner",
+        "decision": "approved", "row_version": str(proposal.row_version),
+        "idempotency_key": "memory-durable-standard-review",
+    }
+    first = service.base_capability_review_decide(request, _base_owner_context())["proposal"]
+
+    restarted = CapabilityGovernanceService(store=store)
+    assert restarted.base_capability_review_decide(request, _base_owner_context())["proposal"] == first
+    with pytest.raises(CapabilityBusinessError) as error:
+        restarted.base_capability_review_decide(
+            {**request, "decision": "rejected"}, _base_owner_context(),
+        )
+    assert error.value.code == "idempotency_conflict"
+
+
+def test_sql_standard_review_request_failure_rolls_back_proposal_review_and_replay_key():
+    proposal = Proposal(
+        701, "base.capability_policy", 203, 501, HASH_2, HASH_A, HASH_2, "9001",
+        status="pending_approval", row_version=5,
+    )
+    database = _SharedBusinessDatabase(proposal, fail_standard_request_insert=True)
+    service, connection = _persistent_service(database)
+
+    with pytest.raises(CapabilityBusinessError) as error:
+        service.base_capability_review_decide({
+            "proposal_gid": "701", "stage": "base_owner", "decision": "approved",
+            "row_version": "5", "idempotency_key": "failing-standard-request",
+        }, _base_owner_context())
+
+    assert error.value.code == "standard_request_insert_failed"
+    assert database.proposals == {701: proposal}
+    assert database.standard_reviews == {}
+    assert database.standard_requests == {}
     assert connection.commits == 1 and connection.rollbacks == 1
 
 

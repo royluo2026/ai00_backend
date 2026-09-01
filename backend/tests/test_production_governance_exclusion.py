@@ -42,7 +42,8 @@ def signing_material() -> tuple[Ed25519PrivateKey, str]:
     return private_key, public_key
 
 
-def signed_release_report(private_key: Ed25519PrivateKey, signing_key_id: str = "release-test") -> dict[str, str]:
+def signed_release_report(private_key: Ed25519PrivateKey, signing_key_id: str = "release-test") -> dict[str, object]:
+    definition_hash = "sha256:" + "a" * 64
     report = {
         "report_gid": "501",
         "code_revision": "rev-a",
@@ -51,6 +52,20 @@ def signed_release_report(private_key: Ed25519PrivateKey, signing_key_id: str = 
         "test_run_gid": "201",
         "conclusion": "pass",
         "blockers": [],
+        "business_governance": {
+            "status": "passed", "machine_passed": True,
+            "human_approved": True, "runtime_verified": True,
+            "legacy_pending_review_count": 0, "blockers": [],
+            "capabilities": [{
+                "capability_key": "person.height.write@1",
+                "capability_version_gid": "cv2_0123456789abcdef01234567",
+                "definition_hash": definition_hash,
+                "approved_definition_hash": definition_hash,
+                "change_kind": "new", "governance_status": "passed",
+                "machine_passed": True, "human_approved": True,
+                "runtime_verified": True, "blockers": [],
+            }],
+        },
         "signing_key_id": signing_key_id,
     }
     canonical = artifact_builder._canonical_release_report(report)

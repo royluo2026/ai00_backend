@@ -12,6 +12,10 @@ from backend.capability_v2.release_gate import BusinessGateCapability, evaluate_
 from backend.scripts.build_capability_v2_production_artifact import validate_release_report
 
 
+VERSION_GID = "cv2_0123456789abcdef01234567"
+DEFINITION_HASH = "sha256:" + "a" * 64
+
+
 def _candidate() -> ReleaseCandidate:
     return ReleaseCandidate("rev-a", "catalog-a", 101, 201)
 
@@ -27,6 +31,9 @@ def _passing_inputs(**overrides):
         "data_complete": True,
         "business_governance": evaluate_business_governance_gate((BusinessGateCapability(
             capability_key="person.height.write@1",
+            capability_version_gid=VERSION_GID,
+            definition_hash=DEFINITION_HASH,
+            approved_definition_hash=DEFINITION_HASH,
             change_kind="new",
             human_approved=True,
             runtime_verified=True,
@@ -47,6 +54,8 @@ def test_release_gate_fails_when_required_runner_is_unavailable():
 def test_signed_report_preserves_legacy_backlog_without_claiming_human_or_runtime_verification():
     governance = evaluate_business_governance_gate((BusinessGateCapability(
         capability_key="person.height.write@1",
+        capability_version_gid=VERSION_GID,
+        definition_hash=DEFINITION_HASH,
         change_kind="unchanged_legacy",
     ),))
     report = ReleaseGate(
@@ -66,6 +75,8 @@ def test_signed_report_preserves_legacy_backlog_without_claiming_human_or_runtim
 def test_static_green_cannot_override_unapproved_new_business_definition():
     governance = evaluate_business_governance_gate((BusinessGateCapability(
         capability_key="person.height.write@1",
+        capability_version_gid=VERSION_GID,
+        definition_hash=DEFINITION_HASH,
         change_kind="new",
     ),))
     report = ReleaseGate(
