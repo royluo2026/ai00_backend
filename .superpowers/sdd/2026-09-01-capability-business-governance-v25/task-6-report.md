@@ -35,3 +35,20 @@ Clean detached worktree: `E:\Projects\ai00_v3\.task6-worktree-clean-a5c18109` at
 - `python -m compileall -q backend/capability_governance_test/workflow.py backend/capability_governance_test/service.py backend/capability_governance_test/contracts.py backend/capability_governance_test/provider.py backend/capability_governance_test/store.py backend/capability_governance_test/business_models.py backend/capability_v2/gateway.py` — passed.
 - `git diff --check` for the staged Task6 fix was clean before commit.
 - Separate known migration issue: `python -m pytest backend/tests/test_versioned_migration_files.py -q` has **1 failed, 8 passed** because pre-existing `202608310001_craft_rule_identity_backfill.sql` contains non-resumable `UPDATE` SQL. It is outside Task6 and unchanged.
+
+## Fix round 2 — durable proposal CAS transaction
+
+- Added durable storage for the existing proposal workflow state and review-decision idempotency (`0007_business_review_idempotency.sql`); this is not a parallel approval API.
+- A business decision now conditionally updates the persisted proposal (`proposal_gid`, `row_version`, `pending_approval`, and pinned hash), appends the immutable review, and stores the request fingerprint in one SQL transaction. Any failure rolls back all three writes.
+- Memory uses one shared store lock, validates before publish, and stages replacement maps so a failed validation cannot expose a partial review/proposal/idempotency state.
+- Business-definition transitions now use the same durable proposal CAS, preventing a normal transition from racing a review decision. SQL rehydrates the persisted proposal after commit/replay so local workflow state does not become an authority after durable writes.
+- Added tests for two independent workflow instances deciding the same persisted proposal concurrently (one winner, one review), SQL write order/rollback on injected idempotency insertion failure, and the Memory equivalent.
+
+### Clean-materialization verification
+
+Clean detached worktree: `E:\Projects\ai00_v3\.task6-round2-clean-5ac01fdb` at commits `d88e6177` and `5ac01fdb`.
+
+- `python -m pytest backend/tests/test_capability_business_review.py backend/tests/test_capability_governance_business_store.py backend/tests/test_capability_governance_service_workflow.py backend/tests/test_capability_business_relations.py backend/tests/test_capability_governance_provider.py -q` — **82 passed in 2.32s**.
+- `python -m compileall -q backend/capability_governance_test/store.py backend/capability_governance_test/workflow.py backend/capability_governance_test/service.py backend/capability_governance_test/provider.py backend/tests/test_capability_governance_business_store.py` — passed.
+- `git diff --check 5ac01fdb^ 5ac01fdb` — clean.
+- Separate pre-existing migration failure remains unchanged: `python -m pytest backend/tests/test_versioned_migration_files.py -q` — **1 failed, 8 passed**; the failure is the non-resumable `UPDATE` in `202608310001_craft_rule_identity_backfill.sql`.
