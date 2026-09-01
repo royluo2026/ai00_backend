@@ -948,6 +948,37 @@ def test_persistent_runtime_rejects_in_memory_waiver_and_release_services_on_a_w
     assert release_error.value.code == "governance_persistence_unavailable"
 
 
+def test_persistence_guards_follow_the_selected_workflow_services():
+    database = _SharedBusinessDatabase()
+    store = SqlGovernanceStore(database.connect())
+    ids = iter(range(1, 20)).__next__
+    workflow_port = SimpleNamespace(
+        waiver_service=WaiverService(next_gid=ids),
+        release_gate=ReleaseGate(next_gid=ids),
+    )
+    service = CapabilityGovernanceService(
+        store=store,
+        waiver_service=SimpleNamespace(persistent=True),
+        release_gate=SimpleNamespace(persistent=True),
+        workflow_port=workflow_port,
+    )
+
+    with pytest.raises(CapabilityBusinessError) as waiver_error:
+        service.base_capability_waiver_grant({
+            "finding_gid": "11", "capability_version_gid": "202", "scope": "one finding",
+            "reason": "Temporary exception", "code_hash": HASH_1, "catalog_hash": HASH_1,
+            "evidence_hash": HASH_1, "expires_at": (NOW + timedelta(days=1)).isoformat(),
+            "idempotency_key": "shadowed-waiver",
+        }, _super_admin_context())
+    assert waiver_error.value.code == "governance_persistence_unavailable"
+
+    with pytest.raises(CapabilityBusinessError) as release_error:
+        service.base_capability_release_gate_evaluate(
+            {"idempotency_key": "shadowed-release"}, _super_admin_context(),
+        )
+    assert release_error.value.code == "governance_persistence_unavailable"
+
+
 def test_default_persistent_service_path_creates_transitions_reviews_and_rehydrates_history():
     database = _SharedBusinessDatabase(_pending_business_proposal())
     snapshot = _business_snapshot(501, 202, HASH_1)

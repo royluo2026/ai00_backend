@@ -422,23 +422,20 @@ class CapabilityGovernanceService:
         )
         if release_port is not None:
             self._release_gate = release_port
-        durable_store_proposals = proposal_service is None and all(callable(getattr(store, name, None)) for name in (
-            "save_workflow_proposal", "get_workflow_proposal",
-            "transition_workflow_proposal", "decide_business_review_atomic",
-        ))
+        durable_store_proposals = (
+            proposal_port is None
+            and proposal_service is None
+            and all(callable(getattr(store, name, None)) for name in (
+                "save_workflow_proposal", "get_workflow_proposal",
+                "transition_workflow_proposal", "decide_business_review_atomic",
+            ))
+        )
         self._workflow_persistence_required = {
             "proposal": persistent_runtime and not (
-                proposal_port is not None or durable_store_proposals
-                or bool(getattr(proposal_service, "persistent", False))
+                durable_store_proposals or bool(getattr(self._proposals, "persistent", False))
             ),
-            "waiver": persistent_runtime and not (
-                bool(getattr(waiver_port, "persistent", False))
-                or bool(getattr(waiver_service, "persistent", False))
-            ),
-            "release": persistent_runtime and not (
-                bool(getattr(release_port, "persistent", False))
-                or bool(getattr(release_gate, "persistent", False))
-            ),
+            "waiver": persistent_runtime and not bool(getattr(self._waivers, "persistent", False)),
+            "release": persistent_runtime and not bool(getattr(self._release_gate, "persistent", False)),
         }
 
     def bind_registry_snapshot(self, snapshot: Any) -> None:
