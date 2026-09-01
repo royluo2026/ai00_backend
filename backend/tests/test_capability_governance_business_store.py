@@ -186,6 +186,18 @@ def test_memory_relation_candidates_use_sql_order():
     assert store.list_relation_candidates(501) == (second, first)
 
 
+def test_memory_relation_candidate_batch_is_all_or_nothing():
+    candidate = _projection().relation_candidates[0]
+    valid = replace(candidate, relation_candidate_gid=404, candidate_hash=HASH_1)
+    conflicting = replace(valid, relation_candidate_gid=405)
+    store = MemoryGovernanceStore()
+
+    with pytest.raises(ImmutableRecordError, match="uq_capability_relation_candidate"):
+        store.save_relation_candidates((valid, conflicting))
+
+    assert store.list_relation_candidates(candidate.snapshot_gid) == ()
+
+
 def test_business_review_is_bound_to_exact_definition_hash():
     store = MemoryGovernanceStore()
     review = CapabilityBusinessReview(

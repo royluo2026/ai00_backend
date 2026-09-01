@@ -85,6 +85,18 @@ def test_ai_result_rejects_unbounded_or_non_identifier_evidence_keys(evidence_ke
         }]})
 
 
+def test_ai_result_is_fail_closed_for_empty_or_foreign_candidate_allowlists():
+    finding = {"finding_type": "gap", "subject_version_gids": ["7"], "capability_keys": ["a@1"],
+               "confidence": 0.5, "evidence_keys": ["evidence:7"], "recommendation": "review"}
+    with pytest.raises(AdvisoryContractError, match="subject outside"):
+        validate_advisory({"findings": [finding]})
+    with pytest.raises(AdvisoryContractError, match="evidence outside"):
+        validate_advisory({"findings": [finding]}, allowed_gids=("7",), allowed_keys=("a@1",))
+    with pytest.raises(AdvisoryContractError, match="subject outside"):
+        validate_advisory({"findings": [{**finding, "subject_version_gids": ["8"]}]},
+                          allowed_gids=("7",), allowed_keys=("a@1",), allowed_evidence_keys=("evidence:7",))
+
+
 def test_advisor_uses_only_governed_agent_client_with_bounded_redacted_package_and_deadline():
     client = RecordingDomainClient({"findings": [{
         "finding_type": "gap", "subject_version_gids": ["7"], "confidence": 0.75,
@@ -94,7 +106,9 @@ def test_advisor_uses_only_governed_agent_client_with_bounded_redacted_package_a
     identity = object()
     before = datetime.now(UTC)
 
-    result = asyncio.run(advisor.review({"snapshot_gid": "9", "token": "secret", "business_effect": "orders"}, identity=identity, request_id="request-1"))
+    result = asyncio.run(advisor.review({"snapshot_gid": "9", "token": "secret", "business_effect": "orders",
+        "capability_version_gids": ["7"], "capability_keys": ["a@1"],
+        "field_comparison": {"evidence_keys": ["evidence:7"]}}, identity=identity, request_id="request-1"))
 
     invocation, actual_identity, correlation, deadline = client.invocations[0]
     assert result.findings[0].status == "candidate"
@@ -112,7 +126,8 @@ def test_advisor_drops_benign_key_business_and_source_content_from_nested_candid
     advisor = GovernedAgentAdvisor(client, max_input_bytes=4096, max_output_bytes=4096)
 
     asyncio.run(advisor.review({
-        "snapshot_gid": "9",
+        "snapshot_gid": "9", "capability_version_gids": ["7"], "capability_keys": ["a@1"],
+        "field_comparison": {"evidence_keys": ["evidence:7"]},
         "capabilities": [{
             "capability_id": "craft.order.submit",
             "input_schema_hash": "sha256:" + "a" * 64,
@@ -158,7 +173,8 @@ def test_service_audits_redacted_governed_advice_without_promoting_candidate_to_
     service = CapabilityGovernanceService(advisor=GovernedAgentAdvisor(client), audit_sink=sink)
 
     result = asyncio.run(service.review_advisory(
-        {"snapshot_gid": "9", "token": "secret"},
+        {"snapshot_gid": "9", "token": "secret", "capability_version_gids": ["7"],
+         "capability_keys": ["a@1"], "field_comparison": {"evidence_keys": ["evidence:7"]}},
         context=type("Context", (), {"identity": object(), "user_gid": "actor-1"})(),
         request_id="request-1",
     ))

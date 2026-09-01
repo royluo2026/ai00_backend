@@ -168,6 +168,10 @@ def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, A
             response["relations"] = [_projection(relation, (
                 "relation_gid", "from_canonical_key", "to_canonical_key", "relation_type", "relation_hash",
             )) for relation in tuple(result.get("relations", ()))[:500]]
+        response["relation_candidates"] = [_relation_candidate_projection(item) for item in tuple(result.get("relation_candidates", ()))[:200]]
+        for field in ("relation_total", "relation_offset", "relation_limit"):
+            if result.get(field) is not None:
+                response[field] = min(max(0, int(result[field])), 100000)
     elif capability_id == "base.capability_finding.search":
         response["findings"] = [_projection(finding, (
             "finding_gid", "code", "severity", "status", "fingerprint", "remediation_boundary",
@@ -220,6 +224,21 @@ def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, A
         if release is not None:
             response["release"] = _release_projection(release)
     return response
+
+
+def _relation_candidate_projection(record: Any) -> dict[str, Any]:
+    evidence = _value(record, "evidence")
+    entries = []
+    if isinstance(evidence, Mapping):
+        for key, value in sorted(evidence.items(), key=lambda item: str(item[0]))[:40]:
+            text = _transport_value(value, depth=0)
+            entries.append({"key": str(key)[:255], "value": str(text)[:255]})
+    return {
+        **_projection(record, (
+            "relation_candidate_gid", "candidate_hash", "relation_type", "source", "capability_keys", "status",
+        )),
+        "evidence": {"entries": entries},
+    }
 
 
 def _handler(capability_id: str, service_port: Any) -> Callable[[dict[str, Any], object], dict[str, Any]]:

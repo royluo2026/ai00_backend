@@ -11,6 +11,7 @@ import re
 from backend.capabilities.models_next import CapabilityBusinessError
 from backend.domain_ports.capability_governance_ai import GovernanceAdvisorPort
 
+from .ai_advisory import AdvisoryResult
 from .analysis import AnalysisRequest, run_deterministic_analysis
 from .business_relations import analyze_relationships
 from .prompting import PromptAuthorizationError, RedactedPrompt, _render_repair_prompt
@@ -695,6 +696,11 @@ class CapabilityGovernanceService:
             raise _business_error("invalid_input") from exc
         if not 1 <= max_depth <= _MAX_GRAPH_DEPTH or not 1 <= max_nodes <= _MAX_GRAPH_NODES:
             raise _business_error("invalid_input")
+        try:
+            relation_offset = self._bounded_offset(payload.get("relation_offset", 0))
+            relation_limit = self._bounded_limit(payload.get("relation_limit", _MAX_SEARCH))
+        except CapabilityBusinessError:
+            raise
         document = getattr(snapshot, "document", None)
         source_nodes = tuple(getattr(document, "nodes", ()))[:max_nodes]
         node_gids = getattr(snapshot, "node_gids", {})
@@ -725,7 +731,16 @@ class CapabilityGovernanceService:
             )
         loader = getattr(self._store, "list_relation_candidates", None) if self._store is not None else None
         if callable(loader):
-            result["relation_candidates"] = tuple(loader(int(getattr(snapshot, "snapshot_gid"))))[:max_nodes]
+            candidates = tuple(sorted(
+                loader(int(getattr(snapshot, "snapshot_gid"))),
+                key=lambda item: (str(getattr(item, "candidate_hash", "")), int(getattr(item, "relation_candidate_gid", 0))),
+            ))
+            result.update(
+                relation_candidates=candidates[relation_offset:relation_offset + relation_limit],
+                relation_total=len(candidates), relation_offset=relation_offset, relation_limit=relation_limit,
+            )
+        else:
+            result.update(relation_candidates=(), relation_total=0, relation_offset=relation_offset, relation_limit=relation_limit)
         return result
 
     def base_capability_finding_search(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
@@ -1131,11 +1146,18 @@ class CapabilityGovernanceService:
         identity = getattr(context, "identity", None)
         if identity is None:
             raise _business_error("invalid_input")
-        result = await self._advisor.review(package, identity=identity, request_id=request_id)
+        unavailable = False
+        try:
+            result = await self._advisor.review(package, identity=identity, request_id=request_id)
+        except Exception:
+            # Advice is optional.  It must never suppress deterministic scan
+            # evidence or turn an AI transport failure into a service failure.
+            result = AdvisoryResult()
+            unavailable = True
         self._audit(
             operation="agent_invocation", request_id=request_id, context=context,
             detail={
-                "status": result.status,
+                "status": "advisory_unavailable" if unavailable else result.status,
                 "finding_count": len(result.findings),
                 "finding_types": tuple(finding.finding_type for finding in result.findings),
             },

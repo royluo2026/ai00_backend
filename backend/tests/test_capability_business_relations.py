@@ -235,6 +235,6 @@ def test_advisory_failure_cannot_remove_persisted_deterministic_evidence():
     service = CapabilityGovernanceService(store, scanner=Scanner(), advisor=FailingAdvisor())
     result = service.base_capability_scan_run({"code_revision": "revision", "idempotency_key": "scan"}, object())
 
-    with pytest.raises(TimeoutError, match="timed out"):
-        asyncio.run(service.review_advisory({}, context=type("Context", (), {"identity": object()})(), request_id="advice"))
+    advice = asyncio.run(service.review_advisory({}, context=type("Context", (), {"identity": object()})(), request_id="advice"))
+    assert advice.findings == ()
     assert len(store.list_relation_candidates(int(result["snapshot_gid"]))) == 1

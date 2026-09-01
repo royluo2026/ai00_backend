@@ -118,7 +118,10 @@ def _input_schema(capability_id: str) -> dict[str, object]:
             "cursor": _SMALL_STRING_SCHEMA,
         })
     if capability_id == "base.capability_graph.get":
-        properties.update({"max_depth": _DEPTH_SCHEMA, "max_nodes": _NODES_SCHEMA})
+        properties.update({
+            "max_depth": _DEPTH_SCHEMA, "max_nodes": _NODES_SCHEMA,
+            "relation_offset": _OFFSET_SCHEMA, "relation_limit": _LIMIT_SCHEMA,
+        })
         required = ("target_gid", "max_depth", "max_nodes")
     if capability_id in {
         "base.capability_registry.get", "base.capability_analysis.get",
@@ -266,7 +269,11 @@ _RELATION_CANDIDATE_SCHEMA = _closed({
     "relation_candidate_gid": GID_SCHEMA, "candidate_hash": _VERSION_SCHEMA,
     "relation_type": _SMALL_STRING_SCHEMA, "source": _SMALL_STRING_SCHEMA,
     "capability_keys": {"type": "array", "items": STRING_SCHEMA, "maxItems": 20},
-    "evidence": {"type": "object"}, "status": _SMALL_STRING_SCHEMA,
+    "evidence": _closed({
+        "entries": {"type": "array", "maxItems": 40, "items": _closed({
+            "key": _SMALL_STRING_SCHEMA, "value": _SMALL_STRING_SCHEMA,
+        }, ("key", "value"))},
+    }, ("entries",)), "status": _SMALL_STRING_SCHEMA,
 })
 _RUN_SCHEMA = _closed({
     "run_gid": GID_SCHEMA, "snapshot_gid": GID_SCHEMA, "kind": _SMALL_STRING_SCHEMA,
@@ -388,6 +395,8 @@ def _output_schema(capability_id: str) -> dict[str, object]:
             "bindings": {"type": "array", "items": _BINDING_SCHEMA, "maxItems": 500},
             "relations": {"type": "array", "items": _RELATION_SCHEMA, "maxItems": 500},
             "relation_candidates": {"type": "array", "items": _RELATION_CANDIDATE_SCHEMA, "maxItems": 500},
+            "relation_total": _COUNT_SCHEMA, "relation_offset": _COUNT_SCHEMA,
+            "relation_limit": _LIMIT_SCHEMA,
         })
     elif capability_id == "base.capability_finding.search":
         properties["findings"] = {"type": "array", "items": _FINDING_SCHEMA, "maxItems": 200}

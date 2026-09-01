@@ -147,6 +147,17 @@ def sanitize_candidate_package(value: Any) -> dict[str, object]:
         result["model_policy_version"] = model_policy_version
     if hashes := _hashes(value.get("hashes")):
         result["hashes"] = hashes
+    # The advisory response is candidate-bound.  Make the exact response
+    # surface explicit so clients cannot infer broad permission from omission.
+    evidence_keys = set()
+    for source in (result.get("field_comparison"), result.get("evidence_summaries")):
+        if isinstance(source, Mapping):
+            evidence_keys.update(_identifiers(source.get("evidence_keys")))
+    result["advisory_output_allowlist"] = {
+        "subject_version_gids": tuple(result.get("capability_version_gids", ())),
+        "capability_keys": tuple(result.get("capability_keys", ())),
+        "evidence_keys": tuple(sorted(evidence_keys)),
+    }
     return result
 
 

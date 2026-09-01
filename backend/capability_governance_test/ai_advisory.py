@@ -7,6 +7,7 @@ from datetime import UTC, datetime, timedelta
 import hashlib
 import json
 import re
+import time
 from typing import Any, Literal
 
 from pydantic import Field, ValidationError
@@ -87,7 +88,13 @@ def advisory_result(**values: Any) -> dict[str, Any]:
     return {"findings": values.pop("findings", ()), "status": values.pop("status", "candidate"), **values}
 
 
-def validate_advisory(value: Any, *, allowed_gids: tuple[str, ...] = (), allowed_keys: tuple[str, ...] = ()) -> AdvisoryResult:
+def validate_advisory(
+    value: Any,
+    *,
+    allowed_gids: tuple[str, ...] = (),
+    allowed_keys: tuple[str, ...] = (),
+    allowed_evidence_keys: tuple[str, ...] = (),
+) -> AdvisoryResult:
     """Validate exactly the candidate contract; advice can never become a decision."""
     try:
         if isinstance(value, AdvisoryResult):
@@ -103,10 +110,14 @@ def validate_advisory(value: Any, *, allowed_gids: tuple[str, ...] = (), allowed
     if result.status != "candidate" or any(finding.status != "candidate" for finding in result.findings):
         raise AdvisoryContractError("candidate_only: confirmed findings are forbidden")
     for finding in result.findings:
-        if allowed_gids and not set(finding.subject_version_gids).issubset(allowed_gids):
+        # Candidate binding is fail-closed: an empty allow-list does not mean
+        # "all subjects".  A model may only refer to the exact members sent.
+        if not finding.subject_version_gids or not set(finding.subject_version_gids).issubset(allowed_gids):
             raise AdvisoryContractError("candidate_only: subject outside candidate")
-        if allowed_keys and not set(finding.capability_keys).issubset(allowed_keys):
+        if not set(finding.capability_keys).issubset(allowed_keys):
             raise AdvisoryContractError("candidate_only: capability outside candidate")
+        if not set(finding.evidence_keys).issubset(allowed_evidence_keys):
+            raise AdvisoryContractError("candidate_only: evidence outside candidate")
     return result
 
 
@@ -192,25 +203,46 @@ class GovernedAgentAdvisor(GovernanceAdvisorPort):
         if len(_json_bytes(payload)) > self._max_input_bytes:
             raise AdvisoryContractError("input_bytes_exceeded")
         deadline = datetime.now(UTC) + timedelta(seconds=self._timeout_seconds)
+        deadline_monotonic = time.monotonic() + self._timeout_seconds
         try:
-            result = await asyncio.wait_for(self._client.invoke(
-            DomainInvocation(
-                "agent.interaction.request", 1, payload,
-                idempotency_key=f"capability-advisory:{request_hash}",
-            ),
-            identity,
-            CorrelationRef(request_id=request_id),
-            deadline=deadline,
-        ), timeout=self._timeout_seconds)
+            result = await self._invoke_before_deadline(
+                DomainInvocation("agent.interaction.request", 1, payload,
+                                 idempotency_key=f"capability-advisory:{request_hash}"),
+                identity, request_id, deadline, deadline_monotonic,
+            )
         except TimeoutError as exc:
             raise AdvisoryContractError("agent_advisory_timeout") from exc
-        result = await self._completed_result(result, identity=identity, request_id=request_id, deadline=deadline)
+        result = await self._completed_result(
+            result, identity=identity, request_id=request_id, deadline=deadline,
+            deadline_monotonic=deadline_monotonic,
+        )
         if len(_json_bytes(result.data)) > self._max_output_bytes:
             raise AdvisoryContractError("output_bytes_exceeded")
         data = result.data
         if isinstance(data, Mapping) and isinstance(data.get("content"), Mapping):
             data = data["content"]
-        return validate_advisory(data, allowed_gids=tuple(candidate_package.get("capability_version_gids", ())), allowed_keys=tuple(candidate_package.get("capability_keys", ())))
+        allowlist = candidate_package.get("advisory_output_allowlist", {})
+        return validate_advisory(
+            data,
+            allowed_gids=tuple(allowlist.get("subject_version_gids", ())) if isinstance(allowlist, Mapping) else (),
+            allowed_keys=tuple(allowlist.get("capability_keys", ())) if isinstance(allowlist, Mapping) else (),
+            allowed_evidence_keys=tuple(allowlist.get("evidence_keys", ())) if isinstance(allowlist, Mapping) else (),
+        )
+
+    async def _invoke_before_deadline(
+        self, invocation: DomainInvocation, identity: ConsumerIdentity, request_id: str,
+        deadline: datetime, deadline_monotonic: float,
+    ) -> Any:
+        remaining = deadline_monotonic - time.monotonic()
+        if remaining <= 0:
+            raise AdvisoryContractError("agent_advisory_timeout")
+        try:
+            return await asyncio.wait_for(
+                self._client.invoke(invocation, identity, CorrelationRef(request_id=request_id), deadline=deadline),
+                timeout=remaining,
+            )
+        except TimeoutError as exc:
+            raise AdvisoryContractError("agent_advisory_timeout") from exc
 
     async def _completed_result(
         self,
@@ -219,6 +251,7 @@ class GovernedAgentAdvisor(GovernanceAdvisorPort):
         identity: ConsumerIdentity,
         request_id: str,
         deadline: datetime,
+        deadline_monotonic: float,
     ) -> Any:
         if result.ok and result.status is CapabilityStatus.COMPLETED:
             return result
@@ -226,16 +259,14 @@ class GovernedAgentAdvisor(GovernanceAdvisorPort):
             raise AdvisoryContractError("agent_advisory_failed")
         operation_id = result.operation_ref.operation_id
         for _ in range(_MAX_OPERATION_POLLS):
-            if datetime.now(UTC) >= deadline:
+            if time.monotonic() >= deadline_monotonic:
                 raise AdvisoryContractError("agent_advisory_timeout")
             payload = {"resource_gid": operation_id}
             if len(_json_bytes(payload)) > self._max_input_bytes:
                 raise AdvisoryContractError("input_bytes_exceeded")
-            result = await self._client.invoke(
-                DomainInvocation("agent.run.read", 1, payload),
-                identity,
-                CorrelationRef(request_id=request_id),
-                deadline=deadline,
+            result = await self._invoke_before_deadline(
+                DomainInvocation("agent.run.read", 1, payload), identity, request_id,
+                deadline, deadline_monotonic,
             )
             if result.ok and result.status is CapabilityStatus.COMPLETED:
                 return result

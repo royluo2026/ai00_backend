@@ -344,19 +344,21 @@ class MemoryGovernanceStore(GovernanceStore):
 
     def save_relation_candidates(self, candidates: tuple[CapabilityRelationCandidate, ...]) -> None:
         with self._lock:
-            unique = {(candidate.snapshot_gid, candidate.candidate_hash): candidate for candidate in candidates}
-            for candidate in unique.values():
-                existing_gid = self._relation_candidates.get(candidate.relation_candidate_gid)
-                existing_subject = next((
-                    item for item in self._relation_candidates.values()
-                    if (item.snapshot_gid, item.candidate_hash) == (candidate.snapshot_gid, candidate.candidate_hash)
-                ), None)
+            # Validate the whole replay against a staging copy.  This gives
+            # Memory the same all-or-nothing semantics as the SQL transaction.
+            staged = dict(self._relation_candidates)
+            subjects = {(item.snapshot_gid, item.candidate_hash): item for item in staged.values()}
+            for candidate in candidates:
+                existing_gid = staged.get(candidate.relation_candidate_gid)
+                existing_subject = subjects.get((candidate.snapshot_gid, candidate.candidate_hash))
                 if existing_gid is not None and existing_gid != candidate:
                     raise ImmutableRecordError("relation_candidate_gid_already_exists")
                 if existing_subject is not None and existing_subject != candidate:
                     raise ImmutableRecordError("uq_capability_relation_candidate")
                 if existing_gid is None and existing_subject is None:
-                    self._relation_candidates[candidate.relation_candidate_gid] = candidate
+                    staged[candidate.relation_candidate_gid] = candidate
+                    subjects[(candidate.snapshot_gid, candidate.candidate_hash)] = candidate
+            self._relation_candidates = staged
 
     def save_business_review(self, review: CapabilityBusinessReview) -> None:
         _validate_business_review_references(review)
@@ -753,27 +755,44 @@ class SqlGovernanceStore(GovernanceStore):
     def save_relation_candidates(self, candidates: tuple[CapabilityRelationCandidate, ...]) -> None:
         if not candidates:
             return
-        existing = {
-            (item.snapshot_gid, item.candidate_hash): item
-            for snapshot_gid in {candidate.snapshot_gid for candidate in candidates}
-            for item in self.list_relation_candidates(snapshot_gid)
-        }
-        pending = tuple({(candidate.snapshot_gid, candidate.candidate_hash): candidate for candidate in candidates if (candidate.snapshot_gid, candidate.candidate_hash) not in existing}.values())
+        existing = {item.relation_candidate_gid: item for snapshot_gid in {candidate.snapshot_gid for candidate in candidates}
+                    for item in self.list_relation_candidates(snapshot_gid)}
+        subjects = {(item.snapshot_gid, item.candidate_hash): item for item in existing.values()}
+        pending: list[CapabilityRelationCandidate] = []
+        # Validate both SQL unique identities before inserting a single row.
+        for candidate in candidates:
+            gid_match = existing.get(candidate.relation_candidate_gid)
+            subject_match = subjects.get((candidate.snapshot_gid, candidate.candidate_hash))
+            if gid_match is not None and gid_match != candidate:
+                raise ImmutableRecordError("relation_candidate_gid_already_exists")
+            if subject_match is not None and subject_match != candidate:
+                raise ImmutableRecordError("uq_capability_relation_candidate")
+            if gid_match is None and subject_match is None:
+                existing[candidate.relation_candidate_gid] = candidate
+                subjects[(candidate.snapshot_gid, candidate.candidate_hash)] = candidate
+                pending.append(candidate)
         if not pending:
             return
         cursor = self._connection.cursor()
         try:
             for candidate in pending:
-                cursor.execute(
-                    "INSERT INTO workmanship_base_capability_relation_candidates "
-                    "(relation_candidate_gid, snapshot_gid, candidate_hash, relation_type, source, capability_keys_json, evidence_json, status) "
-                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE candidate_hash = candidate_hash",
-                    (
-                        candidate.relation_candidate_gid, candidate.snapshot_gid,
-                        candidate.candidate_hash, candidate.relation_type, candidate.source,
-                        _json(candidate.capability_keys), _json(candidate.evidence), candidate.status,
-                    ),
-                )
+                try:
+                    cursor.execute(
+                        "INSERT INTO workmanship_base_capability_relation_candidates "
+                        "(relation_candidate_gid, snapshot_gid, candidate_hash, relation_type, source, capability_keys_json, evidence_json, status) "
+                        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                        (candidate.relation_candidate_gid, candidate.snapshot_gid, candidate.candidate_hash,
+                         candidate.relation_type, candidate.source, _json(candidate.capability_keys),
+                         _json(candidate.evidence), candidate.status),
+                    )
+                except Exception:
+                    # A concurrent exact replay is a no-op; every other
+                    # duplicate is an immutable identity collision.
+                    replay = next((item for item in self.list_relation_candidates(candidate.snapshot_gid)
+                                   if item.relation_candidate_gid == candidate.relation_candidate_gid
+                                   or item.candidate_hash == candidate.candidate_hash), None)
+                    if replay != candidate:
+                        raise
             self._connection.commit()
         except Exception:
             self._connection.rollback()

@@ -257,9 +257,10 @@ def test_provider_projects_workflow_mutation_and_release_records():
         "capability_id": "base.capability_release_gate.evaluate", "status": "completed",
         "release": {
             "report_gid": "1", "conclusion": "fail",
-            "blockers": [
-                "governance_dependency_unavailable", "required_test_unavailable", "stale_evidence",
-            ],
+                "blockers": [
+                    "governance_dependency_unavailable", "required_test_unavailable", "stale_evidence",
+                    "static_gate_not_passed",
+                ],
         },
     }
 
@@ -494,6 +495,7 @@ def test_closed_provider_schema_admits_graph_bounds_required_by_service():
         "capability_id": "base.capability_graph.get", "status": "completed",
         "snapshot_gid": "100", "snapshot": {"snapshot_gid": "100"},
         "max_depth": 4, "max_nodes": 500, "nodes": [],
+        "relation_candidates": [], "relation_total": 0, "relation_offset": 0, "relation_limit": 200,
     }
 
 
