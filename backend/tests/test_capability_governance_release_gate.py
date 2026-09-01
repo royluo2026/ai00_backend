@@ -18,7 +18,16 @@ ROOT = Path(__file__).resolve().parents[2]
 _SOURCE_CATALOG = json.loads(
     (ROOT / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
 )
-_DESCRIPTOR = load_catalog_release(_SOURCE_CATALOG).descriptors[0]
+_DESCRIPTOR = load_catalog_release(_SOURCE_CATALOG).descriptors[0].model_copy(update={
+    "business_effect": "Operators receive one governed business result.",
+    "business_acceptance_criteria": (
+        "A successful invocation returns the declared schema-valid business result.",
+    ),
+    "business_invariants": (),
+    "no_business_invariant_reason": (
+        "No additional domain invariant applies beyond the declared contract."
+    ),
+})
 _RELEASE = build_release((_DESCRIPTOR,), created_at=datetime(2026, 9, 1, tzinfo=UTC))
 CATALOG = _RELEASE.model_dump(mode="json")
 CATALOG["descriptors"] = [build_catalog_entry(_DESCRIPTOR)]

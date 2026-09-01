@@ -42,3 +42,28 @@ def business_definition_hash(descriptor: CapabilityDescriptorV2) -> str:
         separators=(",", ":"),
     ).encode("utf-8")
     return f"sha256:{hashlib.sha256(raw).hexdigest()}"
+
+
+def substantive_business_definition_errors(
+    descriptor: CapabilityDescriptorV2,
+) -> tuple[str, ...]:
+    """Return Task 1 author-contract gaps that prevent V2.5 approval."""
+    errors: set[str] = set()
+    if is_generated_business_effect(descriptor.business_effect, descriptor.description):
+        errors.add("business_effect_invalid")
+    criteria = descriptor.business_acceptance_criteria
+    if not criteria or any(not item.strip() for item in criteria):
+        errors.add("business_acceptance_criteria_invalid")
+    if descriptor.business_invariants:
+        identities: set[tuple[str, int]] = set()
+        for rule in descriptor.business_invariants:
+            identity = (rule.rule_id, rule.version)
+            if identity in identities or any(not str(value).strip() for value in (
+                rule.rule_id, rule.statement, rule.applies_when,
+                rule.enforcement_ref, rule.error_code, *rule.test_refs,
+            )):
+                errors.add("business_invariant_invalid")
+            identities.add(identity)
+    elif not str(descriptor.no_business_invariant_reason or "").strip():
+        errors.add("business_rule_declaration_missing")
+    return tuple(sorted(errors))

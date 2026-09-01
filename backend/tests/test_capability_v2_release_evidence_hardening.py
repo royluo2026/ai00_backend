@@ -35,7 +35,16 @@ def _trusted_catalog() -> dict[str, object]:
         (Path(__file__).resolve().parents[2] / "docs/governance/capability-catalog-release.json")
         .read_text(encoding="utf-8")
     )
-    descriptor = load_catalog_release(source).descriptors[0]
+    descriptor = load_catalog_release(source).descriptors[0].model_copy(update={
+        "business_effect": "Operators receive one governed business result.",
+        "business_acceptance_criteria": (
+            "A successful invocation returns the declared schema-valid business result.",
+        ),
+        "business_invariants": (),
+        "no_business_invariant_reason": (
+            "No additional domain invariant applies beyond the declared contract."
+        ),
+    })
     release = build_release((descriptor,), created_at=datetime(2026, 9, 1, tzinfo=UTC))
     document = release.model_dump(mode="json")
     document["descriptors"] = [build_catalog_entry(descriptor)]

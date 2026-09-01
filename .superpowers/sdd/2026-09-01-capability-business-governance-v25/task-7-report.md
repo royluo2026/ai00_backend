@@ -72,3 +72,19 @@ TDD and verification evidence:
 - Selected `compileall` and `git diff --check` passed. The detached source was built from the exact selective index tree. Test-created `.runtime` and an access-protected pytest temp directory remained untracked in that disposable detached worktree; the target worktree/index was unaffected.
 
 Unrelated shared static-gate, generated-Catalog, acceptance-manifest, and UI/evidence hunks remain unstaged and were not absorbed. No push, merge, publish, implicit production-store access, baseline rewrite during normal checking, or unrelated failure repair was performed.
+
+## Fix round 3/5 — substantive business-definition enforcement
+
+The remaining official-flow gap is closed at the existing Task 1 author-contract boundary. `substantive_business_definition_errors()` now supplies the one canonical minimum for V2.5 approval: a nonempty, non-generated business effect; at least one normalized nonempty acceptance criterion; and either complete, uniquely identified invariant records or a normalized no-invariant reason. Existing `BusinessInvariantContract` parsing continues to own rule ID shape, strict positive version, required fields, types, and test-reference structure; no parallel rule schema or maturity system was added.
+
+`build_business_catalog_projection()` applies this minimum to every stable new or materially changed descriptor after verifying its exact content address. Only a capability whose key and business-definition hash exactly match the verified historical baseline receives the lower-maturity legacy exemption. Baseline creation and readback continue to derive that exemption exclusively from the exact historical Git Catalog. The canonical parser, signed gate, official command, and production-artifact consumer all pass the same trusted baseline into the same projection builder, so an exact approval or a correctly recomputed Catalog hash cannot rescue an empty definition. The checked-in 495-entry cutover projection remains accepted as legacy backlog.
+
+TDD and verification evidence:
+
+- RED: the new boundary suite initially reported `13 failed, 6 passed`; exact-content/hash catalogs with all fields empty, purpose only, whitespace-only acceptance, or acceptance without an invariant declaration were not stopped at the business-definition boundary. The official command progressed past governance validation, and the projection API had no baseline-aware substantive contract.
+- GREEN: projection, actual command `main()`, production signed-report consumption, historical 495-entry positive, and prior trust-boundary cases passed `19/19` after the minimal shared fix.
+- Shared focused projection/gate/artifact run: `78 passed in 43.02s`. The seven additional shared-only tests belong to preserved static-gate hunks and were not staged.
+- Exact selective-index detached materialization: focused projection/gate/artifact run `71 passed in 44.19s`; offline strict acceptance exit `0`, status `passed`, 479 stable capabilities, `3353/3353` cases validated, zero failed/skipped, governance `passed_with_legacy_backlog`, machine true, human/runtime false, 495 legacy pending, zero governance blockers, report ID `sha256:f423d78547b09c7f0d3062c89d06dbf6c53082c0c0f1baba53563371758df44d`.
+- Selected `compileall`, `git diff --check`, and post-artifact clean-materialization `git status --short` passed/empty.
+
+The two previously separated stale acceptance assertions were not expanded or rewritten: one still assumes `completion.complete` despite intentional unapproved legacy backlog, and one hard-codes 1869 runtime cases while the current clean manifest has 3353. Unrelated shared CLI-wrapper, static-gate, generated-Catalog, acceptance-manifest, and UI/evidence changes remain unstaged. No push, merge, publish, baseline rewrite, or unrelated repair was performed.

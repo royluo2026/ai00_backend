@@ -78,7 +78,9 @@ def validate_release_report(
     projection = None
     try:
         projection = (
-            build_business_catalog_projection(expected_catalog)
+            build_business_catalog_projection(
+                expected_catalog, legacy_baseline=legacy_baseline,
+            )
             if expected_catalog is not None else None
         )
         governance_result = parse_business_governance_result(

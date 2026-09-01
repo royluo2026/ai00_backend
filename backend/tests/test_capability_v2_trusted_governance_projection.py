@@ -2,20 +2,28 @@ from __future__ import annotations
 
 from copy import deepcopy
 from datetime import UTC, datetime
+import base64
 import hashlib
 import json
 from pathlib import Path
 import subprocess
+import sys
 from types import SimpleNamespace
 
 import pytest
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 import backend.capability_v2.release_gate as release_gate_module
+import backend.scripts.build_capability_v2_production_artifact as artifact_builder
+from backend.scripts import check_capability_v2_release_gate as release_gate_command
 from backend.capability_v2.catalog import build_catalog_entry, build_release, load_catalog_release
 from backend.capability_v2.release_gate import (
+    BusinessGateCapability,
     BusinessGovernanceConfigurationError,
     build_business_catalog_projection,
     create_legacy_baseline,
+    evaluate_business_governance_gate,
     evaluate_catalog_business_governance,
     load_legacy_baseline,
     parse_business_governance_result,
@@ -29,7 +37,19 @@ def _catalog(*, count: int = 1, changed_first: bool = False) -> dict[str, object
     source = json.loads(
         (ROOT / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
     )
-    descriptors = list(load_catalog_release(source).descriptors[:count])
+    descriptors = [
+        item.model_copy(update={
+            "business_effect": f"Operators receive the governed {item.id} business result.",
+            "business_acceptance_criteria": (
+                "A successful invocation returns the declared schema-valid business result.",
+            ),
+            "business_invariants": (),
+            "no_business_invariant_reason": (
+                "No additional domain invariant applies beyond the declared contract."
+            ),
+        })
+        for item in load_catalog_release(source).descriptors[:count]
+    ]
     if changed_first:
         descriptors[0] = descriptors[0].model_copy(
             update={"business_effect": descriptors[0].business_effect + " Materially changed."}
@@ -38,6 +58,44 @@ def _catalog(*, count: int = 1, changed_first: bool = False) -> dict[str, object
     document = release.model_dump(mode="json")
     document["descriptors"] = [build_catalog_entry(item) for item in release.descriptors]
     return document
+
+
+def _incomplete_catalog(kind: str) -> dict[str, object]:
+    source = _catalog()
+    descriptor = load_catalog_release(source).descriptors[0]
+    updates: dict[str, object] = {
+        "business_effect": "Operators receive one governed business result.",
+        "business_acceptance_criteria": (
+            "A successful invocation returns the declared business result.",
+        ),
+        "business_invariants": (),
+        "no_business_invariant_reason": (
+            "No additional domain invariant applies beyond the declared contract."
+        ),
+    }
+    if kind == "all_empty":
+        updates.update(
+            business_effect="", business_acceptance_criteria=(),
+            no_business_invariant_reason=None,
+        )
+    elif kind == "purpose_only":
+        updates.update(business_acceptance_criteria=())
+    elif kind == "invalid_acceptance":
+        updates.update(business_acceptance_criteria=("   ",))
+    elif kind == "missing_invariant_declaration":
+        updates.update(no_business_invariant_reason=None)
+    else:  # pragma: no cover - the parameter list below is closed
+        raise AssertionError(kind)
+    descriptor = descriptor.model_copy(update=updates)
+    release = build_release((descriptor,), created_at=datetime(2026, 9, 2, tzinfo=UTC))
+    document = release.model_dump(mode="json")
+    document["descriptors"] = [build_catalog_entry(descriptor)]
+    return document
+
+
+INCOMPLETE_DEFINITIONS = (
+    "all_empty", "purpose_only", "invalid_acceptance", "missing_invariant_declaration",
+)
 
 
 def _approval_lookup(catalog: dict[str, object]) -> dict[tuple[str, str], str]:
@@ -150,6 +208,130 @@ def test_business_catalog_projection_rejects_non_business_or_empty_catalog():
         build_business_catalog_projection({"release_id": "rel_fake", "descriptors": []})
     with pytest.raises(BusinessGovernanceConfigurationError, match="business_catalog_invalid"):
         evaluate_catalog_business_governance({"capabilities": []}, {})
+
+
+@pytest.mark.parametrize("kind", INCOMPLETE_DEFINITIONS)
+def test_projection_rejects_exact_hash_nonlegacy_incomplete_business_definition(kind: str):
+    catalog = _incomplete_catalog(kind)
+
+    with pytest.raises(
+        BusinessGovernanceConfigurationError,
+        match="business_catalog_definition_invalid",
+    ):
+        build_business_catalog_projection(catalog, legacy_baseline={})
+
+
+def test_projection_accepts_exact_historical_cutover_catalog_as_legacy():
+    baseline_path = ROOT / "docs/governance/capability-business-governance-legacy-baseline.json"
+    baseline = load_legacy_baseline(baseline_path, repository_root=ROOT)
+    historical = subprocess.run(
+        (
+            "git", "show",
+            f"{baseline.source_revision}:docs/governance/capability-catalog-release.json",
+        ),
+        cwd=ROOT, check=True, capture_output=True,
+    )
+    catalog = json.loads(historical.stdout.decode("utf-8"))
+
+    projection = build_business_catalog_projection(
+        catalog, legacy_baseline=baseline.capabilities,
+    )
+
+    assert len(projection.capabilities) == 495
+
+
+@pytest.mark.parametrize("kind", INCOMPLETE_DEFINITIONS)
+def test_official_command_fails_closed_for_exact_hash_incomplete_business_definition(
+    kind: str, tmp_path: Path, monkeypatch,
+):
+    original = _catalog()
+    repository, business_catalog_path, _revision = _git_repository(tmp_path, original)
+    baseline_path = repository / "docs/governance/baseline.json"
+    create_legacy_baseline(business_catalog_path, baseline_path, source_revision="HEAD")
+    incomplete = _incomplete_catalog(kind)
+    business_catalog_path.write_text(json.dumps(incomplete), encoding="utf-8")
+    static_catalog_path = repository / "docs/capabilities/catalog.v2.json"
+    static_catalog_path.parent.mkdir(parents=True)
+    static_catalog_path.write_text(json.dumps({"capabilities": []}), encoding="utf-8")
+    atomicity_path = repository / "docs/governance/capability-atomicity-dispositions.json"
+    atomicity_path.write_text("{}", encoding="utf-8")
+    row = incomplete["descriptors"][0]
+    approval_path = repository / "approvals.json"
+    approval_path.write_text(json.dumps({
+        "schema_version": 1,
+        "catalog_release_id": incomplete["release_id"],
+        "approvals": [{
+            "capability_key": f"{row['id']}@{row['major_version']}",
+            "capability_version_gid": row["capability_version_gid"],
+            "definition_hash": row["business_definition_hash"],
+            "decision": "approved",
+        }],
+    }), encoding="utf-8")
+    _stub_non_business_gate(monkeypatch)
+
+    monkeypatch.setattr(sys, "argv", [
+        "check_capability_v2_release_gate.py",
+        "--root", str(repository),
+        "--web-root", str(repository),
+        "--catalog", str(static_catalog_path),
+        "--legacy-baseline", str(baseline_path),
+        "--business-approvals", str(approval_path),
+    ])
+
+    with pytest.raises(
+        BusinessGovernanceConfigurationError,
+        match="business_catalog_definition_invalid",
+    ):
+        release_gate_command.main()
+
+
+@pytest.mark.parametrize("kind", INCOMPLETE_DEFINITIONS)
+def test_production_consumer_rejects_signed_exact_hash_incomplete_business_definition(
+    kind: str, tmp_path: Path,
+):
+    catalog = _incomplete_catalog(kind)
+    row = catalog["descriptors"][0]
+    key = f"{row['id']}@{row['major_version']}"
+    legacy = {key: row["business_definition_hash"]}
+    approvals = {
+        (row["capability_version_gid"], row["business_definition_hash"]):
+            row["business_definition_hash"]
+    }
+    projection = build_business_catalog_projection(catalog, legacy_baseline=legacy)
+    governance = evaluate_business_governance_gate((BusinessGateCapability(
+        capability_key=key,
+        capability_version_gid=row["capability_version_gid"],
+        definition_hash=row["business_definition_hash"],
+        approved_definition_hash=row["business_definition_hash"],
+        change_kind="unchanged_legacy",
+        human_approved=True,
+        runtime_verified=True,
+    ),), catalog_binding=projection.binding).serialized()
+    private_key = Ed25519PrivateKey.generate()
+    public_key = private_key.public_key().public_bytes(
+        serialization.Encoding.PEM,
+        serialization.PublicFormat.SubjectPublicKeyInfo,
+    ).decode("utf-8")
+    report = {
+        "report_gid": "501", "code_revision": "rev-a",
+        "product_catalog_release_id": catalog["release_id"],
+        "snapshot_gid": "101", "test_run_gid": "201", "conclusion": "pass",
+        "blockers": [], "evidence_hash": "sha256:evidence",
+        "static_gate_hash": "sha256:static-gate",
+        "business_governance": governance, "signing_key_id": "release-test",
+    }
+    canonical = artifact_builder._canonical_release_report(report)
+    report["report_hash"] = "sha256:" + hashlib.sha256(canonical).hexdigest()
+    report["signature"] = base64.b64encode(private_key.sign(canonical)).decode("ascii")
+    report_path = tmp_path / "release-report.json"
+    report_path.write_text(json.dumps(report), encoding="utf-8")
+
+    errors = artifact_builder.validate_release_report(
+        report_path, {"release-test": public_key}, expected_catalog=catalog,
+        legacy_baseline={}, business_review_lookup=approvals,
+    )
+
+    assert "release_report_governance_invalid" in errors
 
 
 def _stub_non_business_gate(monkeypatch) -> None:

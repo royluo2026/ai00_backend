@@ -80,17 +80,25 @@ def test_release_gate_blocks_replaced_orchestration_target(tmp_path: Path, monke
         )
 
     monkeypatch.setattr(release_gate, "audit_catalog", audit_catalog)
+    business_catalog_path = (
+        Path(__file__).resolve().parents[2]
+        / "docs/governance/capability-catalog-release.json"
+    )
+    business_catalog = json.loads(business_catalog_path.read_text(encoding="utf-8"))
+    legacy_capabilities = {
+        f"{item['id']}@{item['major_version']}": item["business_definition_hash"]
+        for item in business_catalog["descriptors"]
+    }
     monkeypatch.setattr(
         release_gate, "load_legacy_baseline",
-        lambda *_args, **_kwargs: type("Baseline", (), {"capabilities": {}})(),
+        lambda *_args, **_kwargs: type(
+            "Baseline", (), {"capabilities": legacy_capabilities},
+        )(),
     )
 
     report = release_gate.evaluate_release_gate(
         tmp_path, web_root=tmp_path, catalog_path=catalog_path, atomicity_path=atomicity_path,
-        business_catalog_path=(
-            Path(__file__).resolve().parents[2]
-            / "docs/governance/capability-catalog-release.json"
-        ),
+        business_catalog_path=business_catalog_path,
     )
 
     assert report.orchestration[0].serialized()["target_failures"][0]["reason_code"] == "target_replaced"

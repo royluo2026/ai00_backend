@@ -114,7 +114,9 @@ def _business_governance_document(
     try:
         if expected_catalog is None or legacy_baseline is None or business_review_lookup is None:
             return {}
-        projection = build_business_catalog_projection(expected_catalog)
+        projection = build_business_catalog_projection(
+            expected_catalog, legacy_baseline=legacy_baseline,
+        )
         if candidate.product_catalog_release_id != projection.catalog_release_id:
             return {}
         return parse_business_governance_result(
