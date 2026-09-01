@@ -452,7 +452,14 @@ class CapabilityGovernanceService:
         offset = self._bounded_offset(payload.get("offset", 0))
         query = str(payload.get("query", "")).strip().lower()
         domain = str(payload.get("domain", "")).strip().lower()
-        entries = sorted(self._entries(), key=lambda item: str(getattr(item, "capability_id", "")))
+        snapshot = (
+            self._snapshot({"target_gid": payload.get("snapshot_gid")})
+            if payload.get("snapshot_gid") is not None else self._latest_snapshot()
+        )
+        entries = sorted(
+            tuple(getattr(snapshot, "entries", ())) if snapshot is not None else (),
+            key=lambda item: str(getattr(item, "capability_id", "")),
+        )
         matches = [
             item for item in entries
             if (not query or query in " ".join(
@@ -464,10 +471,9 @@ class CapabilityGovernanceService:
             item for item in matches
             if str(getattr(item, "capability_id", "")).lower().startswith("base.capability_")
         ]
-        latest = self._latest_snapshot()
         scanned = {
             (str(getattr(item, "capability_id", "")), int(getattr(item, "major_version", 0) or 0)): item
-            for item in getattr(getattr(latest, "document", None), "capabilities", ())
+            for item in getattr(getattr(snapshot, "document", None), "capabilities", ())
         }
         projected: list[Any] = []
         for item in matches[offset:offset + limit]:
@@ -491,6 +497,39 @@ class CapabilityGovernanceService:
             product_capability_total=len(matches) - len(extension_matches),
             governance_extension_capability_total=len(extension_matches),
         )
+
+    def business_audit_snapshot_projection(self, snapshot_gid: str | int) -> dict[str, Any]:
+        """Project one exact snapshot for the local read-only business audit."""
+        snapshot = self._snapshot({"target_gid": snapshot_gid})
+        document = getattr(snapshot, "document", None)
+        if document is None:
+            raise _business_error("governance_dependency_unavailable")
+
+        def record(value: Any, fields: tuple[str, ...]) -> dict[str, Any]:
+            return {
+                name: _business_contract_value(getattr(value, name, None))
+                for name in fields
+            }
+
+        loader = getattr(self._store, "list_relation_candidates", None) if self._store is not None else None
+        candidates = tuple(loader(int(getattr(snapshot, "snapshot_gid"))) if callable(loader) else ())
+        return {
+            "snapshot_gid": str(getattr(snapshot, "snapshot_gid")),
+            "source_revision": str(getattr(document, "code_revision", "")),
+            "nodes": tuple(record(item, (
+                "canonical_key", "owner_domain", "node_type", "source_path", "source_symbol",
+                "http_method", "route_path",
+            )) for item in getattr(document, "nodes", ())),
+            "bindings": tuple(record(item, (
+                "capability_id", "major_version", "node_canonical_key", "binding_type", "binding_hash",
+            )) for item in getattr(document, "bindings", ())),
+            "relation_candidates": tuple({
+                **record(item, (
+                    "candidate_hash", "relation_type", "source", "capability_keys", "status",
+                )),
+                "evidence": _business_contract_value(redact(getattr(item, "evidence", {}))),
+            } for item in candidates),
+        }
 
     def base_capability_governance_snapshot_summary_get(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
         """Return a bounded, agent-friendly summary of one verified snapshot.
