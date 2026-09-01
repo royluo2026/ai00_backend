@@ -382,6 +382,18 @@ class MemoryGovernanceStore(GovernanceStore):
         with self._lock:
             self._workflow_proposals[proposal.proposal_gid] = proposal
 
+    def transition_workflow_proposal(self, proposal: Any, resolved: Any) -> Any:
+        """CAS one ordinary proposal transition against the same durable row."""
+        with self._lock:
+            current = self._workflow_proposals.get(proposal.proposal_gid)
+            if (current is None or current.row_version != proposal.row_version
+                    or current.status != proposal.status):
+                raise ImmutableRecordError("row_version_conflict")
+            staged = dict(self._workflow_proposals)
+            staged[proposal.proposal_gid] = resolved
+            self._workflow_proposals = staged
+            return resolved
+
     def get_workflow_proposal(self, proposal_gid: int) -> Any | None:
         with self._lock:
             return self._workflow_proposals.get(proposal_gid)
@@ -411,9 +423,16 @@ class MemoryGovernanceStore(GovernanceStore):
                 raise ImmutableRecordError("business_review_reference_invalid")
             if review.review_gid in self._business_reviews:
                 raise ImmutableRecordError("business_review_gid_already_exists")
-            self._business_reviews[review.review_gid] = review
-            self._workflow_proposals[proposal.proposal_gid] = resolved
-            self._business_review_requests[idempotency_key] = (fingerprint, resolved)
+            # Stage every durable map before publishing any of the three writes.
+            staged_reviews = dict(self._business_reviews)
+            staged_proposals = dict(self._workflow_proposals)
+            staged_requests = dict(self._business_review_requests)
+            staged_reviews[review.review_gid] = review
+            staged_proposals[proposal.proposal_gid] = resolved
+            staged_requests[idempotency_key] = (fingerprint, resolved)
+            self._business_reviews = staged_reviews
+            self._workflow_proposals = staged_proposals
+            self._business_review_requests = staged_requests
             return resolved
 
     def current_business_review(
@@ -522,6 +541,39 @@ class SqlGovernanceStore(GovernanceStore):
             if callable(close):
                 close()
 
+    def get_workflow_proposal(self, proposal_gid: int) -> Any | None:
+        """Rehydrate the proposal state used for a cross-process decision CAS."""
+        cursor = self._connection.cursor()
+        try:
+            cursor.execute(
+                "SELECT proposal_gid, capability_version_gid, base_snapshot_gid, proposed_descriptor_hash, "
+                "status, submitted_by_gid, change_json, row_version "
+                "FROM workmanship_base_capability_change_proposals WHERE proposal_gid = %s",
+                (proposal_gid,),
+            )
+            row = cursor.fetchone()
+            if row is None:
+                return None
+            payload = _json_load(_row_value(row, "change_json", 6))
+            from .workflow import Proposal
+            return Proposal(
+                proposal_gid=int(_row_value(row, "proposal_gid", 0)),
+                capability_id=str(payload.get("capability_id", "")),
+                capability_version_gid=int(_row_value(row, "capability_version_gid", 1)),
+                base_snapshot_gid=int(_row_value(row, "base_snapshot_gid", 2)),
+                previous_hash=str(payload.get("previous_hash", "")),
+                proposed_descriptor_hash=_text_value(_row_value(row, "proposed_descriptor_hash", 3)),
+                evidence_hash=str(payload.get("evidence_hash", "")),
+                submitted_by_gid=str(_row_value(row, "submitted_by_gid", 5)),
+                status=str(_row_value(row, "status", 4)),
+                row_version=int(_row_value(row, "row_version", 7)),
+                review_kind=str(payload.get("review_kind", "business_definition")),
+            )
+        finally:
+            close = getattr(cursor, "close", None)
+            if callable(close):
+                close()
+
     def save_workflow_proposal(self, proposal: Any) -> None:
         """Persist the existing proposal state machine row for durable review CAS."""
         cursor = self._connection.cursor()
@@ -539,6 +591,30 @@ class SqlGovernanceStore(GovernanceStore):
                  proposal.row_version),
             )
             self._connection.commit()
+        except Exception:
+            self._connection.rollback()
+            raise
+        finally:
+            close = getattr(cursor, "close", None)
+            if callable(close):
+                close()
+
+    def transition_workflow_proposal(self, proposal: Any, resolved: Any) -> Any:
+        """Apply an ordinary proposal transition with the same SQL CAS as a review."""
+        cursor = self._connection.cursor()
+        try:
+            cursor.execute(
+                "UPDATE workmanship_base_capability_change_proposals "
+                "SET status = %s, row_version = row_version + 1 "
+                "WHERE proposal_gid = %s AND row_version = %s AND status = %s "
+                "AND proposed_descriptor_hash = BINARY %s",
+                (resolved.status, proposal.proposal_gid, proposal.row_version,
+                 proposal.status, proposal.proposed_descriptor_hash),
+            )
+            if getattr(cursor, "rowcount", 1) != 1:
+                raise ImmutableRecordError("row_version_conflict")
+            self._connection.commit()
+            return self.get_workflow_proposal(proposal.proposal_gid) or resolved
         except Exception:
             self._connection.rollback()
             raise
@@ -565,7 +641,7 @@ class SqlGovernanceStore(GovernanceStore):
                 if str(_row_value(replay, "request_fingerprint", 0)) != encoded:
                     raise ImmutableRecordError("idempotency_conflict")
                 self._connection.commit()
-                return resolved
+                return self.get_workflow_proposal(proposal.proposal_gid) or resolved
             cursor.execute(
                 "UPDATE workmanship_base_capability_change_proposals "
                 "SET status = %s, row_version = row_version + 1 "
@@ -589,7 +665,7 @@ class SqlGovernanceStore(GovernanceStore):
                 (idempotency_key, encoded, proposal.proposal_gid, review.review_gid),
             )
             self._connection.commit()
-            return resolved
+            return self.get_workflow_proposal(proposal.proposal_gid) or resolved
         except Exception:
             self._connection.rollback()
             raise

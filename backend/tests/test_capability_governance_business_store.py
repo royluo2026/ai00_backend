@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import FrozenInstanceError, replace
 from datetime import datetime, timedelta, timezone
+from concurrent.futures import ThreadPoolExecutor
+from threading import Barrier
 from types import SimpleNamespace
 
 import pytest
@@ -18,7 +20,7 @@ from backend.capability_governance_test.business_models import (
 )
 from backend.capability_governance_test.models import ImmutableRecordError
 from backend.capability_governance_test.store import MemoryGovernanceStore, SqlGovernanceStore
-from backend.capability_governance_test.workflow import ProposalService, ReviewerContext, WorkflowError
+from backend.capability_governance_test.workflow import Proposal, ProposalService, ReviewerContext, WorkflowError
 
 
 NOW = datetime(2026, 9, 1, tzinfo=timezone.utc)
@@ -273,19 +275,26 @@ def test_memory_atomic_business_decision_is_shared_across_workflow_instances():
     second = ProposalService(next_gid=iter(range(100, 200)).__next__, business_review_store=store)
     reviewer = ReviewerContext("reviewer", ("super_admin",), (), ())
 
-    approved = first.decide_business_definition(
-        pending.proposal_gid, reviewer_context=reviewer, definition_hash=HASH_1,
-        current_definition_hash=HASH_1, decision="approved", decision_reason="Evidence sufficient",
-        expected_row_version=pending.row_version, idempotency_key="approve",
-    )
-    with pytest.raises(WorkflowError, match="row_version_conflict"):
-        second.decide_business_definition(
-            pending.proposal_gid, reviewer_context=reviewer, definition_hash=HASH_1,
-            current_definition_hash=HASH_1, decision="rejected", decision_reason="Withdrawn",
-            expected_row_version=pending.row_version, idempotency_key="reject",
-        )
+    barrier = Barrier(2)
+    def decide(service: ProposalService, decision: str, key: str):
+        barrier.wait()
+        try:
+            return service.decide_business_definition(
+                pending.proposal_gid, reviewer_context=reviewer, definition_hash=HASH_1,
+                current_definition_hash=HASH_1, decision=decision, decision_reason="Evidence sufficient",
+                expected_row_version=pending.row_version, idempotency_key=key,
+            )
+        except WorkflowError as exc:
+            return exc
 
-    assert approved.status == "approved"
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        futures = tuple(pool.submit(decide, service, decision, key)
+                        for service, decision, key in ((first, "approved", "approve"), (second, "rejected", "reject")))
+        outcomes = tuple(future.result() for future in futures)
+
+    assert sum(isinstance(outcome, WorkflowError) for outcome in outcomes) == 1
+    assert sum(getattr(outcome, "status", None) in {"approved", "rejected"} for outcome in outcomes) == 1
+    assert next(outcome for outcome in outcomes if isinstance(outcome, WorkflowError)).args == ("row_version_conflict",)
     assert len(store._business_reviews) == 1
 
 
@@ -423,6 +432,139 @@ class _Connection:
 
     def rollback(self) -> None:
         self.rollbacks += 1
+
+
+class _BusinessDecisionCursor:
+    def __init__(self, connection):
+        self.connection, self.row, self.rowcount = connection, None, 0
+
+    def execute(self, query, parameters=()):
+        self.connection.calls.append((query, parameters))
+        database = self.connection
+        if query.startswith("SELECT request_fingerprint"):
+            request = database.staged_requests.get(parameters[0])
+            self.row = None if request is None else (request[0], request[1])
+        elif query.startswith("UPDATE workmanship_base_capability_change_proposals"):
+            status, proposal_gid, row_version, definition_hash = parameters
+            proposal = database.staged_proposal
+            self.rowcount = int(
+                proposal.proposal_gid == proposal_gid and proposal.row_version == row_version
+                and proposal.status == "pending_approval" and proposal.proposed_descriptor_hash == definition_hash
+            )
+            if self.rowcount:
+                database.staged_proposal = replace(proposal, status=status, row_version=row_version + 1)
+        elif query.startswith("INSERT INTO workmanship_base_capability_business_reviews"):
+            database.staged_reviews[parameters[0]] = tuple(parameters)
+        elif query.startswith("INSERT INTO workmanship_base_capability_business_review_requests"):
+            if database.fail_request_insert:
+                raise RuntimeError("request_insert_failed")
+            database.staged_requests[parameters[0]] = (parameters[1], parameters[2])
+        elif query.startswith("SELECT proposal_gid, capability_version_gid"):
+            proposal = database.committed_proposal
+            self.row = (
+                proposal.proposal_gid, proposal.capability_version_gid, proposal.base_snapshot_gid,
+                proposal.proposed_descriptor_hash, proposal.status, proposal.submitted_by_gid,
+                '{"capability_id":"person.height.read","previous_hash":"' + HASH_2
+                + '","evidence_hash":"' + HASH_2 + '","review_kind":"business_definition"}',
+                proposal.row_version,
+            )
+
+    def fetchone(self): return self.row
+    def close(self): pass
+
+
+class _BusinessDecisionConnection:
+    def __init__(self, proposal, *, fail_request_insert=False):
+        self.committed_proposal = self.staged_proposal = proposal
+        self.committed_reviews: dict[int, tuple[object, ...]] = {}
+        self.staged_reviews: dict[int, tuple[object, ...]] = {}
+        self.committed_requests: dict[str, tuple[object, int]] = {}
+        self.staged_requests: dict[str, tuple[object, int]] = {}
+        self.fail_request_insert, self.calls = fail_request_insert, []
+        self.commits = self.rollbacks = 0
+
+    def cursor(self): return _BusinessDecisionCursor(self)
+    def commit(self):
+        self.committed_proposal = self.staged_proposal
+        self.committed_reviews = dict(self.staged_reviews)
+        self.committed_requests = dict(self.staged_requests)
+        self.commits += 1
+    def rollback(self):
+        self.staged_proposal = self.committed_proposal
+        self.staged_reviews = dict(self.committed_reviews)
+        self.staged_requests = dict(self.committed_requests)
+        self.rollbacks += 1
+
+
+def _pending_business_proposal() -> Proposal:
+    return Proposal(
+        701, "person.height.read", 202, 501, HASH_2, HASH_1, HASH_2, "1",
+        status="pending_approval", row_version=5, review_kind="business_definition",
+    )
+
+
+def test_sql_business_decision_is_single_transaction_and_failure_rolls_back_every_row():
+    proposal = _pending_business_proposal()
+    review = CapabilityBusinessReview(801, 202, HASH_1, "approved", "Evidence sufficient", "9001", "super_admin", NOW, 701, 501)
+    resolved = replace(proposal, status="approved", row_version=6)
+    fingerprint = (701, HASH_1, "approved", "Evidence sufficient", 5, "9001")
+    connection = _BusinessDecisionConnection(proposal)
+
+    result = SqlGovernanceStore(connection).decide_business_review_atomic(
+        proposal, resolved, review, fingerprint, "decision-1",
+    )
+
+    assert result.status == "approved" and result.row_version == 6
+    assert connection.commits == 1 and connection.rollbacks == 0
+    assert connection.committed_proposal == resolved
+    assert set(connection.committed_reviews) == {801}
+    assert set(connection.committed_requests) == {"decision-1"}
+    write_queries = [query for query, _ in connection.calls if query.startswith(("UPDATE", "INSERT"))]
+    assert [query.split()[0:3] for query in write_queries] == [
+        ["UPDATE", "workmanship_base_capability_change_proposals", "SET"],
+        ["INSERT", "INTO", "workmanship_base_capability_business_reviews"],
+        ["INSERT", "INTO", "workmanship_base_capability_business_review_requests"],
+    ]
+
+    failing = _BusinessDecisionConnection(proposal, fail_request_insert=True)
+    with pytest.raises(RuntimeError, match="request_insert_failed"):
+        SqlGovernanceStore(failing).decide_business_review_atomic(
+            proposal, resolved, review, fingerprint, "decision-1",
+        )
+    assert failing.rollbacks == 1 and failing.commits == 0
+    assert failing.committed_proposal == proposal
+    assert failing.committed_reviews == {} and failing.committed_requests == {}
+
+
+def test_sql_persisted_proposal_cas_allows_one_of_two_independent_workflow_instances():
+    connection = _BusinessDecisionConnection(_pending_business_proposal())
+    first = ProposalService(next_gid=iter(range(801, 900)).__next__, business_review_store=SqlGovernanceStore(connection))
+    second = ProposalService(next_gid=iter(range(901, 1000)).__next__, business_review_store=SqlGovernanceStore(connection))
+    reviewer = ReviewerContext("9001", ("super_admin",), (), ())
+    barrier = Barrier(2)
+
+    def decide(service: ProposalService, decision: str, key: str):
+        barrier.wait()
+        try:
+            return service.decide_business_definition(
+                701, reviewer_context=reviewer, definition_hash=HASH_1,
+                current_definition_hash=HASH_1, decision=decision,
+                decision_reason="Evidence sufficient", expected_row_version=5,
+                idempotency_key=key,
+            )
+        except WorkflowError as exc:
+            return exc
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        outcomes = tuple(pool.submit(decide, service, decision, key)
+                         for service, decision, key in ((first, "approved", "approve"), (second, "rejected", "reject")))
+        outcomes = tuple(future.result() for future in outcomes)
+
+    assert sum(isinstance(outcome, WorkflowError) for outcome in outcomes) == 1
+    assert sum(getattr(outcome, "status", None) in {"approved", "rejected"} for outcome in outcomes) == 1
+    assert len(connection.committed_reviews) == 1
+    assert any("WHERE proposal_gid = %s AND row_version = %s AND status = 'pending_approval'" in query
+               for query, _ in connection.calls)
 
 
 def test_sql_projection_uses_parameterized_canonical_json_and_lists_relations():

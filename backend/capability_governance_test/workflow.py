@@ -204,7 +204,19 @@ class ProposalService:
             raise WorkflowError("row_version_conflict")
         if not _can_transition(PROPOSAL_TRANSITIONS, proposal.status, target):
             raise WorkflowError("invalid_transition")
-        return self._record(key, replace(proposal, status=target, row_version=proposal.row_version + 1), operation="proposal", actor_gid=proposal.submitted_by_gid)
+        candidate = replace(proposal, status=target, row_version=proposal.row_version + 1)
+        atomic = getattr(self._business_review_store, "transition_workflow_proposal", None)
+        if proposal.review_kind == "business_definition" and callable(atomic):
+            try:
+                resolved = atomic(proposal, candidate)
+            except Exception as exc:
+                raise WorkflowError(str(exc)) from exc
+            self._proposals[proposal_gid] = resolved
+            self._idempotency[key] = resolved
+            self._audit(operation="proposal", entity_gid=proposal_gid, actor_gid=proposal.submitted_by_gid,
+                        idempotency_key=key, detail={"status": resolved.status, "capability_id": resolved.capability_id})
+            return resolved
+        return self._record(key, candidate, operation="proposal", actor_gid=proposal.submitted_by_gid)
 
     def submit(self, proposal_gid: int, *, expected_row_version: int, idempotency_key: str) -> Proposal:
         return self.transition(proposal_gid, "submitted", expected_row_version=expected_row_version, idempotency_key=idempotency_key)
