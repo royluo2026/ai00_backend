@@ -91,6 +91,62 @@ def test_work_package_uses_keyset_page_and_batches_links_for_returned_gids_only(
     assert link_params[-2:] == ("e1", "e2")
 
 
+def test_work_package_projects_bounded_primary_entity_cards_and_entry_fields():
+    rows = [
+        {
+            "gid": "e1", "parent_gid": "line1", "node_type": "process",
+            "sort_order": 1.0, "title": "P1", "vpps": "v1",
+            "meta": '{"critical_process":true}', "process_flow_pic": "[]",
+            "process_chart_pic": '[{"name":"chart"}]', "bom_row_id": "BOM-1",
+        },
+        {
+            "gid": "e2", "parent_gid": "e1", "node_type": "operation",
+            "sort_order": 2.0, "title": "O1", "vpps": "v2",
+            "meta": {}, "process_flow_pic": None,
+            "process_chart_pic": None, "bom_row_id": None,
+        },
+    ]
+    repository, _cursor = _repository([
+        {"one": {"revision": 7}},
+        {"one": {"gid": "line1", "node_type": "line_process"}},
+        {"all": rows},
+        {"one": {"total_count": 2}},
+        {"all": [
+            {
+                "link_gid": "link-1", "entry_gid": "e1", "version_gid": "version1",
+                "link_type": "bop_process", "entity_gid": "process-1", "is_primary": 1,
+                "entity_data": '{"gid":"process-1","name":"P1","standard_time":12.5,"ext":{"sequence_color":"red"},"secret":"must-not-leak"}',
+            },
+            {
+                "link_gid": "link-2", "entry_gid": "e2", "version_gid": "version1",
+                "link_type": "unsupported", "entity_gid": "missing-1", "is_primary": 1,
+                "entity_data": None,
+            },
+        ]},
+        {"one": {"revision": 7}},
+    ])
+
+    result = repository.get_work_package_page(
+        "version1", 7, "line", "line1", cursor=None, page_size=2,
+    )
+
+    process, operation = result["nodes"]
+    assert process["meta"] == {"critical_process": True}
+    assert process["process_flow_pic"] == []
+    assert process["process_chart_pic"] == [{"name": "chart"}]
+    assert process["bom_row_id"] == "BOM-1"
+    assert process["primary_link_count"] == 1
+    assert process["primary_link"] == {
+        "link_gid": "link-1", "entry_gid": "e1", "version_gid": "version1",
+        "link_type": "bop_process", "entity_gid": "process-1", "is_primary": True,
+    }
+    assert process["entity_data"]["standard_time"] == 12.5
+    assert process["entity_data"]["ext"] == {"sequence_color": "red"}
+    assert "secret" not in process["entity_data"]
+    assert operation["primary_link_count"] == 1
+    assert operation["entity_data"] is None
+
+
 def test_revision_change_after_page_assembly_returns_conflict():
     repository, _cursor = _repository([
         {"one": {"revision": 7}},
@@ -105,6 +161,40 @@ def test_revision_change_after_page_assembly_returns_conflict():
             "version1", 7, "line", "line1", cursor=None, page_size=2,
         )
     assert raised.value.code == "revision_conflict"
+
+
+def test_work_package_pages_preserve_cross_page_parent_child_identity_without_duplicates():
+    parent = {
+        "gid": "process-1", "parent_gid": "line1", "node_type": "process",
+        "sort_order": 1.0, "title": "Process", "vpps": None,
+        "meta": {}, "process_flow_pic": [], "process_chart_pic": [], "bom_row_id": None,
+    }
+    child = {
+        "gid": "operation-1", "parent_gid": "process-1", "node_type": "operation",
+        "sort_order": 2.0, "title": "Operation", "vpps": None,
+        "meta": {}, "process_flow_pic": [], "process_chart_pic": [], "bom_row_id": None,
+    }
+    repository, _cursor = _repository([
+        {"one": {"revision": 9}}, {"one": {"gid": "line1", "node_type": "line_process"}},
+        {"all": [parent, child]}, {"one": {"total_count": 2}}, {"all": []},
+        {"one": {"revision": 9}},
+        {"one": {"revision": 9}}, {"one": {"gid": "line1", "node_type": "line_process"}},
+        {"all": [child]}, {"one": {"total_count": 2}}, {"all": []},
+        {"one": {"revision": 9}},
+    ])
+
+    first = repository.get_work_package_page(
+        "version1", 9, "line", "line1", cursor=None, page_size=1,
+    )
+    second = repository.get_work_package_page(
+        "version1", 9, "line", "line1", cursor=first["next_cursor"], page_size=1,
+    )
+
+    combined = first["nodes"] + second["nodes"]
+    assert [row["gid"] for row in combined] == ["process-1", "operation-1"]
+    assert len({row["gid"] for row in combined}) == 2
+    assert second["nodes"][0]["parent_gid"] == first["nodes"][0]["gid"]
+    assert second["next_cursor"] is None
 
 
 def test_outline_is_bounded_and_counts_only_current_page_lines():
@@ -158,8 +248,10 @@ def test_entry_detail_decodes_json_and_transports_datetimes():
             "created_at": datetime(2026, 8, 18, tzinfo=UTC), "updated_at": None,
         }},
         {"all": [{
-            "entry_gid": "e1", "link_type": "pbom_part", "entity_gid": "p1",
-            "is_primary": 1, "snapshot_data": '{"part_no":"P1"}',
+            "link_gid": "link-1", "entry_gid": "e1", "version_gid": "v1",
+            "link_type": "bop_steps", "entity_gid": "op1",
+            "is_primary": 1, "snapshot_data": '{"operation_code":"OP-10"}',
+            "entity_data": '{"gid":"op1","name":"Operation","operation_code":"OP-10","process_flow_pic":[]}',
         }]},
         {"one": {"revision": 5}},
     ])
@@ -168,7 +260,11 @@ def test_entry_detail_decodes_json_and_transports_datetimes():
 
     assert result["entry"]["meta"] == {"a": 1}
     assert result["entry"]["created_at"] == "2026-08-18T00:00:00+00:00"
-    assert result["links"][0]["snapshot_data"] == {"part_no": "P1"}
+    assert result["entry"]["primary_link_count"] == 1
+    assert result["entry"]["primary_link"]["link_gid"] == "link-1"
+    assert result["entry"]["entity_data"]["operation_code"] == "OP-10"
+    assert result["links"][0]["snapshot_data"] == {"operation_code": "OP-10"}
+    assert "entity_data" not in result["links"][0]
 
 
 def test_entry_reference_resolves_current_version_and_revision():

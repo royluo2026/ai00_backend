@@ -11,7 +11,10 @@ def _fold(value: Any) -> str:
 def concept_summary(item: Mapping[str, Any]) -> dict[str, Any]:
     return {
         key: item.get(key)
-        for key in ("kind", "stable_gid", "external_id", "name", "label_zh", "label_en", "description", "deprecated")
+        for key in (
+            "kind", "stable_gid", "external_id", "node_type_binding", "name",
+            "label_zh", "label_en", "description", "deprecated",
+        )
         if item.get(key) is not None
     }
 
@@ -30,6 +33,21 @@ def resolve_term(term: str, objects: list[dict[str, Any]]) -> dict[str, Any]:
         return {"status": "resolved", "matched_by": "external_id", "concept": external[0], "candidates": []}
     if len(external) > 1:
         return {"status": "ambiguous", "matched_by": "external_id", "concept": None, "candidates": external}
+
+    node_type = [
+        item for item in objects
+        if item.get("node_type_binding") and _fold(item.get("node_type_binding")) == needle
+    ]
+    if len(node_type) == 1:
+        return {
+            "status": "resolved", "matched_by": "node_type_binding",
+            "concept": node_type[0], "candidates": [],
+        }
+    if len(node_type) > 1:
+        return {
+            "status": "ambiguous", "matched_by": "node_type_binding",
+            "concept": None, "candidates": node_type,
+        }
 
     exact = []
     for item in objects:

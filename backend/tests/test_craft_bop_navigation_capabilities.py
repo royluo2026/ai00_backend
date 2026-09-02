@@ -49,6 +49,23 @@ def test_navigation_descriptors_are_closed_versioned_and_resource_bounded():
         ("craft.bop.work_package.get", 1)
     ].spec.input_schema
 
+    work_node_schema = registrations[("craft.bop.work_package.get", 2)].descriptor.output_schema[
+        "properties"
+    ]["nodes"]["items"]
+    for field in (
+        "meta", "process_flow_pic", "process_chart_pic", "bom_row_id",
+        "primary_link_count", "primary_link", "entity_data",
+    ):
+        assert field in work_node_schema["properties"]
+        assert field not in work_node_schema["required"]
+
+    detail_entry_schema = registrations[("craft.bop.entry.detail.get", 1)].descriptor.output_schema[
+        "properties"
+    ]["entry"]
+    for field in ("primary_link_count", "primary_link", "entity_data"):
+        assert field in detail_entry_schema["properties"]
+        assert field not in detail_entry_schema["required"]
+
 
 def test_navigation_handlers_delegate_exact_bounded_arguments(monkeypatch):
     calls = []

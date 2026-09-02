@@ -138,7 +138,47 @@ def test_tc_import_commits_entries_and_independent_resource_links(monkeypatch) -
     assert connection.commits == 1
     assert len(connection.cursor_value.entry_rows) == 5
     assert [row[4] for row in connection.cursor_value.link_rows] == [
+        "bop_line", "resource_socket", "resource_tool", "resource_fixture", "resource_equipment",
+    ]
+    assert [row[4] for row in connection.cursor_value.link_rows[1:]] == [
         "resource_socket", "resource_tool", "resource_fixture", "resource_equipment",
+    ]
+
+
+def test_tc_import_links_every_normal_entity_as_primary(monkeypatch) -> None:
+    from plugins.craft.craft_backend.routers._bop import entries
+
+    connection = _ImportConnection()
+    gids = iter(f"gid-{index}" for index in range(100))
+    monkeypatch.setattr(entries, "get_conn", lambda: connection)
+    monkeypatch.setattr(entries, "next_gid", lambda: next(gids))
+    rows = [
+        {"_level": 1, "node_type": "line_process", "title": "Line"},
+        {"_level": 2, "node_type": "station_process", "title": "Station"},
+        {"_level": 3, "node_type": "process", "title": "Process"},
+        {"_level": 4, "node_type": "operation", "title": "Operation"},
+        {"_level": 4, "node_type": "operator_process", "title": "Operator"},
+        {"_level": 5, "node_type": "part", "title": "Part"},
+        {"_level": 5, "node_type": "non_standard_part", "title": "NS Part"},
+        {"_level": 5, "node_type": "standard_part", "title": "Std Part"},
+        {"_level": 5, "node_type": "support_material", "title": "Material"},
+    ]
+
+    result = apply_bop_entry_bulk_change(
+        {"operation": "import_tc", "version_gid": "version-1", "rows": rows},
+        _context(),
+    )
+
+    assert result["data"]["count"] == len(rows)
+    assert [row[4] for row in connection.cursor_value.link_rows] == [
+        "bop_line", "bop_station", "bop_process", "bop_steps", "bop_operator",
+        "pbom_part", "pbom_part", "pbom_part", "pbom_part",
+    ]
+    assert [row[2] for row in connection.cursor_value.link_rows] == [
+        f"gid-{index}" for index in range(len(rows))
+    ]
+    assert [row[3] for row in connection.cursor_value.link_rows] == [
+        f"gid-{index}" for index in range(len(rows), len(rows) * 2)
     ]
 
 

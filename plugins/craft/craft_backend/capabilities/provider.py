@@ -36,6 +36,8 @@ _RESOURCE_FIELDS: dict[str, tuple[tuple[str, str], ...]] = {
     "craft.bop.work_package.get": (("craft-bop-version", "version_gid"),),
     "craft.bop.structure.outline.get": (("craft-bop-version", "version_gid"),),
     "craft.bop.entry.detail.get": (("craft-bop-version", "version_gid"),),
+    "craft.bop.entry.relation.list": (("craft-bop-version", "version_gid"),),
+    "craft.bop.linked_entity.detail.get": (("craft-bop-version", "version_gid"),),
     "craft.bop.version.compare": (
         ("craft-bop-version", "from_version_gid"),
         ("craft-bop-version", "to_version_gid"),
@@ -74,6 +76,98 @@ _STANDARD_OPERATION_READ_ID = "craft.standard_operation.read"
 _BOP_IMPORT_PREVIEW_ID = "craft.bop.import.preview"
 _BOP_ENTRY_BULK_CHANGE_ID = "craft.bop.entry.bulk.change.apply"
 _LIBRARY_CHANGE_ID = "craft.library.change.apply"
+_CRAFT_BUSINESS_DEFINITIONS = {
+    "craft.bop.entry.detail.get": (
+        "Return the governed BOP entry, its bounded links and allowlisted linked-entity projection at one exact revision.",
+        (
+            "The returned entry and every link belong to the requested BOP version and revision.",
+            "At most 500 links are returned and arbitrary linked tables or columns cannot be requested.",
+            "The detail read does not mutate BOP or linked-entity records.",
+        ),
+        "This read projects existing governed records; exact-revision scoping, result bounds and field allowlisting are enforced by its repository and closed contract.",
+    ),
+    "craft.bop.lifecycle.state.change.apply": (
+        "Initialize or advance the governed lifecycle state of one caller-scoped BOP version.",
+        (
+            "Initialization changes only the requested BOP version lifecycle state.",
+            "Phase confirmation advances only from the version's current valid lifecycle phase.",
+            "Rejected transitions return a stable domain error without partially changing lifecycle state.",
+        ),
+        "Lifecycle transition rules are owned and enforced by the existing lifecycle service; this capability adds only the governed transport boundary.",
+    ),
+    "craft.bop.lifecycle.state.read": (
+        "Return the bounded lifecycle dashboard state for one caller-scoped BOP version.",
+        (
+            "The result belongs only to the requested BOP version.",
+            "The projection reports the persisted current phase, checklist and route state.",
+            "The lifecycle-state read does not mutate lifecycle or BOP records.",
+        ),
+        "This read projects lifecycle state already governed by the lifecycle service and introduces no additional state decision.",
+    ),
+    "craft.bop.lifecycle.stats.refresh.apply": (
+        "Recompute and persist the lifecycle statistics snapshot for one caller-scoped BOP version.",
+        (
+            "Statistics are derived only from records belonging to the requested BOP version.",
+            "A successful result returns the newly persisted lifecycle statistics snapshot.",
+            "A failed refresh does not report a successful snapshot.",
+        ),
+        "Metric definitions and persistence rules remain owned by the existing lifecycle statistics service; this capability adds only the governed command boundary.",
+    ),
+    "craft.bop.linked_parts.get": (
+        "Return a bounded list of PBOM parts linked to one BOP version with their governed usage locations.",
+        (
+            "Every returned part is linked to the requested BOP version.",
+            "Usage locations identify only entries within that BOP version.",
+            "The linked-parts read does not mutate PBOM parts, BOP entries or links.",
+        ),
+        "This read projects existing governed links and introduces no additional business-state decision.",
+    ),
+    "craft.bop.version.get": (
+        "Return the identity, lifecycle state and revision evidence for one exact BOP version.",
+        (
+            "The result identity matches the requested BOP version GID.",
+            "The result exposes the persisted current revision and lifecycle evidence.",
+            "The version read does not mutate BOP records.",
+        ),
+        "This read projects one existing governed BOP version and introduces no additional business-state decision.",
+    ),
+    "craft.bop.work_package.get": (
+        "Return one bounded page of BOP work-package nodes with reference summaries for a governed line, station or role scope.",
+        (
+            "Every returned node belongs to the requested BOP version, revision and work-package scope.",
+            "A page contains at most 200 nodes and returns an opaque continuation cursor when more nodes exist.",
+            "Entity summaries expose only allowlisted fields and the work-package read does not mutate domain records.",
+        ),
+        "This read projects existing governed BOP records; scope, pagination and field allowlisting are enforced by its repository and closed contract.",
+    ),
+    "craft.library.read": (
+        "Return bounded caller-visible manufacturing resource library records for the requested governed collection.",
+        (
+            "Results contain only records from the requested Craft library collection.",
+            "List operations respect the published collection bound and closed output schema.",
+            "Library reads do not mutate manufacturing resource records.",
+        ),
+        "This read projects existing governed library records and introduces no additional business-state decision.",
+    ),
+    "craft.vpps_audit.change.apply": (
+        "Apply one governed bulk-ignore or revert operation to the caller-scoped PBOM VPPS audit state.",
+        (
+            "A bulk-ignore changes only the selected Rule4 audit rows in the requested PBOM scope.",
+            "A revert targets one recorded audit operation and restores only its governed changes.",
+            "Rejected operations return a stable domain error without reporting success.",
+        ),
+        "VPPS audit selection, ignore and revert rules remain owned by the existing audit service; this capability adds only the governed command boundary.",
+    ),
+    "craft.vpps_audit.read": (
+        "Return bounded caller-visible PBOM VPPS audit history or Rule4 ignore state.",
+        (
+            "Results belong only to the requested PBOM audit scope.",
+            "History and Rule4 state are returned through the published bounded output contract.",
+            "VPPS audit reads do not mutate audit or PBOM records.",
+        ),
+        "This read projects existing governed audit records and introduces no additional business-state decision.",
+    ),
+}
 _BOP_ENTRY_BULK_CHANGE_RULES = (
     BusinessInvariantContract(
         rule_id="craft.bop.entry.bulk.import_tc.atomicity",
@@ -376,6 +470,14 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             "domain_errors": tuple(_DOMAIN_ERROR_BY_CODE[code] for code in _RESOURCE_ERROR_CODES[action]),
             "domain_errors_complete": True,
         })
+    elif spec.id in _CRAFT_BUSINESS_DEFINITIONS:
+        effect, criteria, reason = _CRAFT_BUSINESS_DEFINITIONS[spec.id]
+        updates.update({
+            "business_effect": effect,
+            "business_acceptance_criteria": criteria,
+            "business_invariants": (),
+            "no_business_invariant_reason": reason,
+        })
     elif spec.id == _LIBRARY_CHANGE_ID:
         updates.update({
             "business_effect": (
@@ -458,6 +560,36 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             ),
             "business_invariants": _BOP_ENTRY_BULK_CHANGE_RULES,
             "no_business_invariant_reason": None,
+        })
+    elif spec.id == "craft.bop.entry.relation.list":
+        updates.update({
+            "business_effect": (
+                "Return one cursor-bounded page of direct or descendant relations for a caller-scoped BOP entry."
+            ),
+            "business_acceptance_criteria": (
+                "Every returned relation belongs to the requested BOP version and revision.",
+                "A page contains at most 200 relations and exposes an opaque continuation cursor when more rows exist.",
+                "Relation reads do not mutate BOP entries, links or linked business entities.",
+            ),
+            "business_invariants": (),
+            "no_business_invariant_reason": (
+                "This capability projects existing governed BOP links; version scoping, traversal bounds and the closed result shape are enforced by its repository and contract."
+            ),
+        })
+    elif spec.id == "craft.bop.linked_entity.detail.get":
+        updates.update({
+            "business_effect": (
+                "Return the allowlisted business card for one entity reached through a caller-scoped BOP link identity."
+            ),
+            "business_acceptance_criteria": (
+                "The BOP link must belong to the requested BOP version and revision.",
+                "Only fields from the registered entity-type projection are returned; arbitrary tables and columns cannot be requested.",
+                "Linked-entity detail reads do not mutate BOP links or linked business entities.",
+            ),
+            "business_invariants": (),
+            "no_business_invariant_reason": (
+                "This capability projects one existing governed entity card; link identity, version scoping and field allowlisting are enforced by its repository and closed output contract."
+            ),
         })
     return CapabilityDescriptorV2.model_validate({**descriptor.model_dump(), **updates})
 

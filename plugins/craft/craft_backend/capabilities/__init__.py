@@ -5,6 +5,7 @@ from typing import Any
 from .bop_compare import register_bop_compare_capability
 from .bop_structure import register_bop_structure_capabilities
 from .bop_navigation import register_bop_navigation_capabilities
+from .bop_entry_relations import register_bop_entry_relation_capabilities
 from .bop_versions import register_bop_version_capabilities
 from .gbop_descriptors import register_gbop_capabilities
 from .rule_descriptors import register_rule_capabilities
@@ -90,6 +91,7 @@ def register_capabilities(registry: Any) -> None:
     register_bop_version_capabilities(native)
     register_bop_structure_capabilities(native)
     register_bop_navigation_capabilities(native)
+    register_bop_entry_relation_capabilities(native)
     register_bop_compare_capability(native)
     register_pbom_capabilities(native)
     register_gbop_capabilities(native)

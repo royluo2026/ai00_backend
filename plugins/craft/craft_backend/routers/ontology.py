@@ -173,10 +173,15 @@ async def delete_axiom(gid: str, _u=Depends(get_current_user), _p=Depends(get_au
 @router.get("/api/ontology/schema/{node_type}")
 async def get_class_schema(node_type: str, _u=Depends(get_current_user), _p=Depends(get_authenticated_principal)):
     resolved = await _invoke("ontology.concept.resolve", {"term": node_type}, _u, _p)
-    stable_gid = (resolved or {}).get("stable_gid")
+    concept = (resolved or {}).get("concept") or {}
+    stable_gid = concept.get("stable_gid")
     if not stable_gid:
         raise HTTPException(status_code=404, detail={"code": "resource_not_found"})
-    return await _invoke("ontology.concept.get", {"stable_gid": stable_gid, "kind": "concept", "view": "schema"}, _u, _p)
+    payload = {"stable_gid": stable_gid, "kind": "concept", "view": "schema"}
+    release_gid = (resolved or {}).get("release_gid")
+    if release_gid:
+        payload["release_gid"] = release_gid
+    return await _invoke("ontology.concept.get", payload, _u, _p)
 
 
 @router.get("/api/ontology/graph")

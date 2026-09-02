@@ -71,6 +71,50 @@ def test_resolve_stable_gid_is_deterministic():
     }
 
 
+def test_resolve_bop_node_type_bindings_is_exact_and_deterministic():
+    node_types = (
+        "factory_bop", "line_process", "station_process", "operator_process",
+        "process", "operation", "part", "non_standard_part", "standard_part",
+        "support_material", "socket_need", "tool_need", "fixture_need", "equipment_need",
+    )
+    original = list(Repository.objects)
+    Repository.objects.extend(
+        {
+            "kind": "concept", "stable_gid": f"concept.{node_type}",
+            "name": f"Concept {index}", "node_type_binding": node_type,
+        }
+        for index, node_type in enumerate(node_types)
+    )
+    try:
+        with _repository():
+            results = [resolve_concept({"term": node_type}, CONTEXT).data for node_type in node_types]
+    finally:
+        Repository.objects[:] = original
+
+    assert [result["status"] for result in results] == ["resolved"] * len(node_types)
+    assert [result["matched_by"] for result in results] == ["node_type_binding"] * len(node_types)
+    assert [result["concept"]["stable_gid"] for result in results] == [
+        f"concept.{node_type}" for node_type in node_types
+    ]
+
+
+def test_duplicate_node_type_bindings_are_ambiguous():
+    original = list(Repository.objects)
+    Repository.objects.extend([
+        {"kind": "concept", "stable_gid": "concept.process-a", "name": "A", "node_type_binding": "process"},
+        {"kind": "concept", "stable_gid": "concept.process-b", "name": "B", "node_type_binding": "process"},
+    ])
+    try:
+        with _repository():
+            result = resolve_concept({"term": "process"}, CONTEXT).data
+    finally:
+        Repository.objects[:] = original
+
+    assert result["status"] == "ambiguous"
+    assert result["matched_by"] == "node_type_binding"
+    assert len(result["candidates"]) == 2
+
+
 def test_get_schema_is_version_pinned_and_does_not_return_arbitrary_graph():
     with _repository():
         result = get_concept(

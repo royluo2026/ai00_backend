@@ -12,9 +12,7 @@ from plugins.craft.craft_backend.routers._bop import entries
 
 ROUTES = (
     "auto_link_preview",
-    "list_entry_links",
     "get_link_summary",
-    "get_entity_detail",
     "resolve_gids",
     "search_pbom_parts",
     "list_pbom_snapshots",
@@ -47,9 +45,7 @@ def test_legacy_entry_read_capability_declared():
 
     assert set(OPERATIONS) == {
         "auto_link_preview",
-        "entry_links",
         "link_summary",
-        "entity_detail",
         "resolve_gids",
         "pbom_search",
         "pbom_snapshots",
@@ -59,6 +55,13 @@ def test_legacy_entry_read_capability_declared():
         "entry_history",
         "version_entries",
     }
+
+
+def test_relation_routes_use_atomic_read_capabilities():
+    assert "craft.bop.entry.relation.list" in inspect.getsource(entries.list_entry_links)
+    assert "craft.bop.linked_entity.detail.get" in inspect.getsource(entries.get_entity_detail)
+    assert "craft.bop.entry.legacy_read" not in inspect.getsource(entries.list_entry_links)
+    assert "craft.bop.entry.legacy_read" not in inspect.getsource(entries.get_entity_detail)
 
 
 def test_version_entries_rejects_unbounded_pages():

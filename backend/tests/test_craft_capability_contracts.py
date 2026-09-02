@@ -23,8 +23,10 @@ STABLE_CAPABILITIES = {
     "craft.bop.execution_structure.get",
     "craft.bop.execution_structure.preview",
     "craft.bop.entry.detail.get",
+    "craft.bop.entry.relation.list",
     "craft.bop.import.preview",
     "craft.bop.linked_parts.get",
+    "craft.bop.linked_entity.detail.get",
     "craft.bop.structure.outline.get",
     "craft.bop.version.archive",
     "craft.bop.version.compare",
@@ -170,6 +172,31 @@ def test_all_stable_craft_capabilities_have_native_open_contracts():
         assert descriptor.domain_errors_complete is True
         assert descriptor.domain_errors
         assert item.spec.plugin_callable is True
+
+
+def test_changed_craft_provider_descriptors_have_substantive_business_definitions():
+    registrations = _registrations()
+    changed = {
+        "craft.bop.entry.detail.get",
+        "craft.bop.entry.relation.list",
+        "craft.bop.lifecycle.state.change.apply",
+        "craft.bop.lifecycle.state.read",
+        "craft.bop.lifecycle.stats.refresh.apply",
+        "craft.bop.linked_entity.detail.get",
+        "craft.bop.linked_parts.get",
+        "craft.bop.version.get",
+        "craft.bop.work_package.get",
+        "craft.library.read",
+        "craft.vpps_audit.change.apply",
+        "craft.vpps_audit.read",
+    }
+
+    assert {
+        capability_id: substantive_business_definition_errors(
+            registrations[capability_id].descriptor
+        )
+        for capability_id in changed
+    } == {capability_id: () for capability_id in changed}
 
 
 def test_bop_import_preview_contract_accepts_the_document_shape_used_by_the_web_importer():

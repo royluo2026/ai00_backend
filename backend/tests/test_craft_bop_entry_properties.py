@@ -109,7 +109,7 @@ def test_gateway_invokes_named_dynamic_property_update() -> None:
         CatalogResolver(store, registry),
         _Policy(),
         reliability=ReliabilityCoordinator(InMemoryOutcomeStore(), InMemoryRateLimiter(limit=10)),
-    )
+    ).bind_release(release.release_id)
     envelope = InvocationEnvelope(
         capability_id=source.spec.id,
         major_version=1,

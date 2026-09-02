@@ -1216,6 +1216,8 @@ def _legacy_import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_
                         entity_info = None
                     else:
                         entity_info = _IMPORT_ENTITY_MAP.get(node_type)
+                        if entity_info:
+                            link_entity_gid = ent_gid
 
                     # entity 表逐行 INSERT IGNORE（各实体表结构不同，不能批量）
                     if entity_info:
@@ -1651,12 +1653,25 @@ def _legacy_auto_link_entries(version_gid: str, body: AutoLinkBody = AutoLinkBod
 async def list_entry_links(
     entry_gid: Optional[str] = Query(None),
     recursive: bool = Query(False),
+    cursor: Optional[str] = Query(None),
+    page_size: int = Query(100, ge=1, le=200),
     request: Request = None,
     _u=Depends(_READ),
     principal=Depends(get_authenticated_principal),
     gateway=Depends(get_default_gateway),
 ):
-    return await _invoke_legacy_entry_read(request, _u, principal, gateway, "entry_links", {"entry_gid": entry_gid, "recursive": recursive}, capability_id="craft.bop.entry.legacy_read")
+    if not entry_gid:
+        raise HTTPException(400, "需要 entry_gid 参数")
+    reference = _bop_navigation_repository.resolve_entry_reference(entry_gid)
+    payload = {
+        **reference, "entry_gid": entry_gid, "recursive": recursive, "page_size": page_size,
+    }
+    if cursor:
+        payload["cursor"] = cursor
+    data = await _invoke_factory(
+        request, _u, principal, gateway, "craft.bop.entry.relation.list", payload,
+    )
+    return {"data": data.get("items", []), "next_cursor": data.get("next_cursor")}
 
 
 def _legacy_list_entry_links(
@@ -1890,14 +1905,22 @@ def _legacy_get_link_summary(
 
 @router.get("/entity-detail")
 async def get_entity_detail(
-    link_type: str = Query(...),
-    ref_gid: str = Query(...),
+    version_gid: str = Query(...),
+    revision: int = Query(..., ge=1),
+    link_gid: str = Query(...),
     request: Request = None,
     _u=Depends(_READ),
     principal=Depends(get_authenticated_principal),
     gateway=Depends(get_default_gateway),
 ):
-    return await _invoke_legacy_entry_read(request, _u, principal, gateway, "entity_detail", {"link_type": link_type, "ref_gid": ref_gid}, capability_id="craft.bop.entry.legacy_read")
+    data = await _invoke_factory(
+        request, _u, principal, gateway, "craft.bop.linked_entity.detail.get",
+        {"version_gid": version_gid, "revision": revision, "link_gid": link_gid},
+    )
+    return {
+        "data": data.get("entity_data"), "link": data.get("link"),
+        "readable": data.get("readable", False),
+    }
 
 
 def _legacy_get_entity_detail(

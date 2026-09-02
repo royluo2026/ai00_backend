@@ -52,6 +52,75 @@ _COUNT_GROUP = {
     "tool_need": "resources",
     "fixture_need": "resources",
 }
+_PUBLIC_LINK_FIELDS = (
+    "link_gid", "entry_gid", "version_gid", "link_type", "entity_gid", "is_primary",
+)
+_ENTITY_CARD_FIELDS = frozenset({
+    "gid", "project_gid", "bop_version_gid", "snapshot_gid", "name", "title",
+    "part_no", "code", "resource_type", "status", "vpps", "vpps_desc", "version_no",
+    "process_code", "operation_code", "operator_code", "unit", "material", "parent_gid",
+    "owner_gid", "modified_type", "sequence_color", "position", "bom_row_id", "vpps_part",
+    "standard_time", "station_height", "height_mm", "height", "headcount", "quantity",
+    "critical_process", "part_feed", "ext", "meta", "params", "attributes",
+    "process_flow_pic", "process_chart_pic",
+})
+_ENTITY_CARD_EXPRESSION = """
+CASE
+        WHEN v.frozen_at IS NOT NULL AND l.snapshot_data IS NOT NULL THEN l.snapshot_data
+        WHEN l.link_type='bop_line' AND ln.gid IS NOT NULL THEN JSON_OBJECT(
+            'gid',ln.gid,'project_gid',ln.project_gid,'name',ln.title,
+            'vpps',ln.vpps,'version_no',ln.version_no,'owner_gid',ln.owner_gid,
+            'ext',ln.ext)
+        WHEN l.link_type='bop_station' AND st.gid IS NOT NULL THEN JSON_OBJECT(
+            'gid',st.gid,'project_gid',st.project_gid,'name',st.title,
+            'vpps',st.vpps,'version_no',st.version_no,'owner_gid',st.owner_gid,
+            'height_mm',JSON_EXTRACT(st.ext,'$.height_mm'),
+            'height',JSON_EXTRACT(st.ext,'$.height'),'ext',st.ext)
+        WHEN l.link_type='bop_process' AND pr.gid IS NOT NULL THEN JSON_OBJECT(
+            'gid',pr.gid,'project_gid',pr.project_gid,'bop_version_gid',pr.bop_version_gid,
+            'name',pr.name,'process_code',pr.process_code,'standard_time',pr.standard_time,
+            'vpps',pr.vpps,'vpps_desc',pr.vpps_desc,'params',pr.params,
+            'modified_type',JSON_UNQUOTE(JSON_EXTRACT(pr.ext,'$.modified_type')),
+            'critical_process',JSON_EXTRACT(pr.ext,'$.critical_process'),
+            'sequence_color',JSON_UNQUOTE(JSON_EXTRACT(pr.ext,'$.sequence_color')),
+            'ext',pr.ext)
+        WHEN l.link_type='bop_steps' AND op.gid IS NOT NULL THEN JSON_OBJECT(
+            'gid',op.gid,'project_gid',op.project_gid,'name',op.title,
+            'operation_code',op.operation_code,'station_height',op.station_height,
+            'vpps',op.vpps,'vpps_desc',op.vpps_desc,'params',op.params,
+            'process_flow_pic',op.process_flow_pic,'process_chart_pic',op.process_chart_pic,
+            'vpps_part',op.vpps_part,'part_feed',op.part_feed,'ext',op.ext)
+        WHEN l.link_type='bop_operator' AND opr.gid IS NOT NULL THEN JSON_OBJECT(
+            'gid',opr.gid,'project_gid',opr.project_gid,'name',opr.title,
+            'operator_code',opr.operator_code,'headcount',opr.headcount,
+            'vpps',opr.vpps,'version_no',opr.version_no,'owner_gid',opr.owner_gid,
+            'position',JSON_UNQUOTE(JSON_EXTRACT(opr.ext,'$.position')),'ext',opr.ext)
+        WHEN l.link_type='pbom_part' AND pb.gid IS NOT NULL THEN JSON_OBJECT(
+            'gid',pb.gid,'snapshot_gid',pb.snapshot_gid,'part_no',pb.part_no,
+            'name',pb.title,'quantity',pb.quantity,'unit',pb.unit,'material',pb.material,
+            'parent_gid',pb.parent_gid,'vpps',pb.vpps,'vpps_desc',pb.vpps_desc,
+            'bom_row_id',pb.bom_row,'meta',pb.meta)
+        WHEN l.link_type IN ('resource_socket','resource_tool','resource_fixture','resource_equipment')
+             AND rr.gid IS NOT NULL THEN JSON_OBJECT(
+            'gid',rr.gid,'resource_type',rr.resource_type,'code',rr.code,'name',rr.name,
+            'status',rr.status,'attributes',rr.attributes)
+END
+"""
+_PRIMARY_CARD_EXPRESSION = f"CASE WHEN l.is_primary=1 THEN {_ENTITY_CARD_EXPRESSION} END"
+_LINK_CARD_SELECT = f"""
+SELECT l.gid AS link_gid,l.entry_gid,l.version_gid,l.link_type,l.entity_gid,l.is_primary,
+       l.snapshot_data,{_PRIMARY_CARD_EXPRESSION} AS entity_data
+FROM workmanship_bop_bop_entry_links l
+JOIN workmanship_bop_bop_versions v ON v.gid=l.version_gid
+LEFT JOIN workmanship_bop_bop_line ln ON ln.gid=l.entity_gid AND l.link_type='bop_line'
+LEFT JOIN workmanship_bop_bop_station st ON st.gid=l.entity_gid AND l.link_type='bop_station'
+LEFT JOIN workmanship_bop_bop_process pr ON pr.gid=l.entity_gid AND l.link_type='bop_process'
+LEFT JOIN workmanship_bop_bop_steps op ON op.gid=l.entity_gid AND l.link_type='bop_steps'
+LEFT JOIN workmanship_bop_bop_operator opr ON opr.gid=l.entity_gid AND l.link_type='bop_operator'
+LEFT JOIN workmanship_bop_pbom pb ON pb.gid=l.entity_gid AND l.link_type='pbom_part'
+LEFT JOIN workmanship_craft_resource_requirements rr ON rr.gid=l.entity_gid
+    AND l.link_type IN ('resource_socket','resource_tool','resource_fixture','resource_equipment')
+"""
 
 
 def _error(code: str, message: str, **details: Any) -> CapabilityBusinessError:
@@ -97,6 +166,44 @@ def _json_value(value: Any, fallback: Any) -> Any:
 
 def _transport(value: Any) -> Any:
     return value.isoformat() if isinstance(value, (datetime, date)) else value
+
+
+def _entity_card(value: Any) -> dict[str, Any] | None:
+    card = _json_value(value, None)
+    if not isinstance(card, dict):
+        return None
+    card = {key: item for key, item in card.items() if key in _ENTITY_CARD_FIELDS}
+    for field in ("ext", "meta", "params", "attributes"):
+        if field in card:
+            card[field] = _json_value(card.get(field), {})
+    for field in ("process_flow_pic", "process_chart_pic"):
+        if field in card:
+            card[field] = _json_value(card.get(field), [])
+    return {key: _transport(item) for key, item in card.items()}
+
+
+def _public_link(link: Mapping[str, Any], *, include_snapshot: bool = False) -> dict[str, Any]:
+    projected = {key: link.get(key) for key in _PUBLIC_LINK_FIELDS if key in link}
+    if "is_primary" in projected:
+        projected["is_primary"] = bool(projected["is_primary"])
+    if include_snapshot:
+        projected["snapshot_data"] = _json_value(link.get("snapshot_data"), {})
+    return projected
+
+
+def _add_primary_projection(row: dict[str, Any], links: list[dict[str, Any]]) -> dict[str, Any]:
+    primary = [link for link in links if bool(link.get("is_primary"))]
+    row["primary_link_count"] = len(primary)
+    row["primary_link"] = _public_link(primary[0]) if primary else None
+    row["entity_data"] = _entity_card(primary[0].get("entity_data")) if primary else None
+    return row
+
+
+def _normalize_entry_fields(row: dict[str, Any]) -> dict[str, Any]:
+    row["meta"] = _json_value(row.get("meta"), {})
+    row["process_flow_pic"] = _json_value(row.get("process_flow_pic"), [])
+    row["process_chart_pic"] = _json_value(row.get("process_chart_pic"), [])
+    return row
 
 
 class BopNavigationRepository:
@@ -221,7 +328,9 @@ class BopNavigationRepository:
                 )
                 db.execute(
                     cte +
-                    "SELECT e.gid,e.parent_gid,e.node_type,e.sort_order,e.title,e.vpps "
+                    "SELECT e.gid,e.parent_gid,e.node_type,e.sort_order,e.title,e.vpps,"
+                    "e.meta,e.process_flow_pic,e.process_chart_pic,"
+                    "JSON_UNQUOTE(JSON_EXTRACT(e.meta,'$.tc_key')) AS bom_row_id "
                     "FROM workmanship_bop_bop_entries e JOIN scoped s ON s.gid=e.gid "
                     "WHERE e.version_gid=%s "
                     "AND (e.sort_order > %s OR (e.sort_order = %s AND e.gid > %s)) "
@@ -240,10 +349,10 @@ class BopNavigationRepository:
                 if page:
                     placeholders = ",".join("%s" for _ in page)
                     db.execute(
-                        "SELECT entry_gid,link_type,entity_gid,is_primary "
-                        "FROM workmanship_bop_bop_entry_links WHERE version_gid=%s "
-                        f"AND is_deleted=0 AND entry_gid IN ({placeholders}) "
-                        "ORDER BY entry_gid,link_type,entity_gid",
+                        _LINK_CARD_SELECT +
+                        f" WHERE l.version_gid=%s AND l.is_deleted=0 AND l.deleted_at IS NULL"
+                        f" AND l.entry_gid IN ({placeholders})"
+                        " ORDER BY l.entry_gid,l.is_primary DESC,l.link_type,l.entity_gid",
                         (version_gid, *(row["gid"] for row in page)),
                     )
                     links = [dict(row) for row in db.fetchall()]
@@ -256,10 +365,14 @@ class BopNavigationRepository:
             if mapping and entity_gid and entry_gid in refs:
                 field, prefix = mapping
                 refs[entry_gid][field].append(f"{prefix}:{entity_gid}")
+        links_by_entry: dict[str, list[dict[str, Any]]] = {}
+        for link in links:
+            links_by_entry.setdefault(str(link.get("entry_gid")), []).append(link)
         nodes = []
         for row in page:
             node_refs = {key: sorted(set(values)) for key, values in refs[str(row["gid"])].items()}
-            nodes.append({**row, **node_refs})
+            node = _normalize_entry_fields({**row, **node_refs})
+            nodes.append(_add_primary_projection(node, links_by_entry.get(str(row["gid"]), [])))
         next_cursor = (
             encode_cursor(page[-1]["sort_order"], page[-1]["gid"])
             if len(raw_nodes) > size and page else None
@@ -267,7 +380,7 @@ class BopNavigationRepository:
         return {
             "version_gid": version_gid, "revision": revision,
             "scope": {"kind": scope_kind, "gid": scope_gid},
-            "nodes": nodes, "links": links,
+            "nodes": nodes, "links": [_public_link(link) for link in links],
             "total_count": int(total_row.get("total_count") or 0),
             "next_cursor": next_cursor,
         }
@@ -289,9 +402,9 @@ class BopNavigationRepository:
                 if not row:
                     raise _error("entry_not_found", "BOP entry was not found", entry_gid=entry_gid)
                 db.execute(
-                    "SELECT entry_gid,link_type,entity_gid,is_primary,snapshot_data "
-                    "FROM workmanship_bop_bop_entry_links WHERE version_gid=%s "
-                    "AND entry_gid=%s AND is_deleted=0 ORDER BY link_type,entity_gid LIMIT %s",
+                    _LINK_CARD_SELECT +
+                    " WHERE l.version_gid=%s AND l.entry_gid=%s AND l.is_deleted=0"
+                    " AND l.deleted_at IS NULL ORDER BY l.is_primary DESC,l.link_type,l.entity_gid LIMIT %s",
                     (version_gid, entry_gid, 501),
                 )
                 links = [dict(item) for item in db.fetchall()]
@@ -304,14 +417,11 @@ class BopNavigationRepository:
                 self._assert_revision(db, version_gid, revision)
         detail = dict(row)
         detail = {key: _transport(value) for key, value in detail.items()}
-        detail["meta"] = _json_value(detail.get("meta"), {})
-        detail["process_flow_pic"] = _json_value(detail.get("process_flow_pic"), [])
-        detail["process_chart_pic"] = _json_value(detail.get("process_chart_pic"), [])
-        for link in links:
-            link["snapshot_data"] = _json_value(link.get("snapshot_data"), {})
+        detail = _normalize_entry_fields(detail)
+        detail = _add_primary_projection(detail, links)
         return {
             "version_gid": version_gid, "revision": revision,
-            "entry": detail, "links": links,
+            "entry": detail, "links": [_public_link(link, include_snapshot=True) for link in links],
         }
 
     def resolve_entry_reference(self, entry_gid: str) -> dict[str, Any]:

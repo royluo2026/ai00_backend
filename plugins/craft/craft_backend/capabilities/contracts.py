@@ -487,10 +487,39 @@ _OUTLINE_LINE = _object({
     "counts": _COUNT_SCHEMA,
 }, required=("gid", "parent_gid", "node_type", "sort_order", "title", "counts"))
 _REF_ARRAY = {"type": "array", "items": STRING}
+_ANY_JSON = {"type": ["object", "array", "string", "number", "boolean", "null"]}
+_NULLABLE_NUMBER = {"type": ["number", "null"]}
+_NULLABLE_BOOLEAN = {"type": ["boolean", "integer", "null"]}
+_PRIMARY_LINK = _object({
+    "link_gid": _NULLABLE_STRING, "entry_gid": STRING, "version_gid": STRING,
+    "link_type": STRING, "entity_gid": _NULLABLE_STRING,
+    "is_primary": {"anyOf": [{"type": "boolean"}, {"type": "integer"}]},
+})
+_ENTITY_CARD = _object({
+    **{name: _NULLABLE_STRING for name in (
+        "gid", "project_gid", "bop_version_gid", "snapshot_gid", "name", "title",
+        "part_no", "code", "resource_type", "status", "vpps", "vpps_desc",
+        "version_no", "process_code", "operation_code", "operator_code", "unit",
+        "material", "parent_gid", "owner_gid", "modified_type", "sequence_color",
+        "position", "bom_row_id", "vpps_part",
+    )},
+    **{name: _NULLABLE_NUMBER for name in (
+        "standard_time", "station_height", "height_mm", "height", "headcount", "quantity",
+    )},
+    "critical_process": _NULLABLE_BOOLEAN, "part_feed": _NULLABLE_BOOLEAN,
+    **{name: _ANY_JSON for name in (
+        "ext", "meta", "params", "attributes", "process_flow_pic", "process_chart_pic",
+    )},
+})
 _WORK_NODE = _object({
     "gid": STRING, "parent_gid": _NULLABLE_STRING, "node_type": STRING,
     "sort_order": {"type": "number"}, "title": _NULLABLE_STRING,
     "vpps": _NULLABLE_STRING,
+    "meta": _ANY_JSON, "process_flow_pic": _ANY_JSON, "process_chart_pic": _ANY_JSON,
+    "bom_row_id": _NULLABLE_STRING,
+    "primary_link_count": {"type": "integer", "minimum": 0},
+    "primary_link": {"anyOf": [_PRIMARY_LINK, {"type": "null"}]},
+    "entity_data": {"anyOf": [_ENTITY_CARD, {"type": "null"}]},
     **{name: _REF_ARRAY for name in (
         "part_refs", "tool_refs", "fixture_refs", "equipment_refs",
         "knowledge_refs", "rule_refs",
@@ -500,10 +529,10 @@ _WORK_NODE = _object({
     "part_refs", "tool_refs", "fixture_refs", "equipment_refs", "knowledge_refs", "rule_refs",
 ))
 _LINK = _object({
+    "link_gid": _NULLABLE_STRING, "version_gid": STRING,
     "entry_gid": STRING, "link_type": STRING, "entity_gid": _NULLABLE_STRING,
     "is_primary": {"anyOf": [{"type": "boolean"}, {"type": "integer"}]},
 }, required=("entry_gid", "link_type", "entity_gid", "is_primary"))
-_ANY_JSON = {"type": ["object", "array", "string", "number", "boolean", "null"]}
 
 INPUT_SCHEMAS.update({
     ("craft.bop.structure.outline.get", 1): _object({
@@ -520,6 +549,15 @@ INPUT_SCHEMAS.update({
         "version_gid": STRING, "revision": {"type": "integer", "minimum": 1},
         "entry_gid": STRING,
     }, required=("version_gid", "revision", "entry_gid")),
+    ("craft.bop.entry.relation.list", 1): _object({
+        "version_gid": STRING, "revision": {"type": "integer", "minimum": 1},
+        "entry_gid": STRING, "recursive": {"type": "boolean"}, "cursor": STRING,
+        "page_size": {"type": "integer", "minimum": 1, "maximum": 200},
+    }, required=("version_gid", "revision", "entry_gid")),
+    ("craft.bop.linked_entity.detail.get", 1): _object({
+        "version_gid": STRING, "revision": {"type": "integer", "minimum": 1},
+        "link_gid": STRING,
+    }, required=("version_gid", "revision", "link_gid")),
 })
 OUTPUT_SCHEMAS.update({
     ("craft.bop.structure.outline.get", 1): _object({
@@ -543,11 +581,35 @@ OUTPUT_SCHEMAS.update({
                 "ai00_level", "title", "vpps", "vpps_desc", "owner_gid", "created_at", "updated_at",
             ),
             "meta": _ANY_JSON, "process_flow_pic": _ANY_JSON, "process_chart_pic": _ANY_JSON,
+            "primary_link_count": {"type": "integer", "minimum": 0},
+            "primary_link": {"anyOf": [_PRIMARY_LINK, {"type": "null"}]},
+            "entity_data": {"anyOf": [_ENTITY_CARD, {"type": "null"}]},
         }, required=("gid", "version_gid", "node_type", "sort_order", "meta")),
         "links": {"type": "array", "maxItems": 500, "items": _object({
             **_LINK["properties"], "snapshot_data": _ANY_JSON,
         }, required=("entry_gid", "link_type", "entity_gid", "is_primary", "snapshot_data"))},
     }, required=("version_gid", "revision", "entry", "links")),
+    ("craft.bop.entry.relation.list", 1): _object({
+        "version_gid": STRING, "revision": {"type": "integer", "minimum": 1},
+        "entry_gid": STRING, "recursive": {"type": "boolean"},
+        "items": {"type": "array", "maxItems": 200, "items": _object({
+            "link_gid": STRING, "source_entry_gid": STRING,
+            "source_entry_title": _NULLABLE_STRING, "link_type": STRING,
+            "target_ref": _object({"type": STRING, "gid": _NULLABLE_STRING}, required=("type", "gid")),
+            "is_primary": {"type": "boolean"}, "is_inherited": {"type": "boolean"},
+            "target_summary": {"anyOf": [_ENTITY_CARD, {"type": "null"}]},
+            "created_at": _NULLABLE_STRING,
+        }, required=(
+            "link_gid", "source_entry_gid", "source_entry_title", "link_type", "target_ref",
+            "is_primary", "is_inherited", "target_summary", "created_at",
+        ))},
+        "next_cursor": _NULLABLE_CURSOR,
+    }, required=("version_gid", "revision", "entry_gid", "recursive", "items", "next_cursor")),
+    ("craft.bop.linked_entity.detail.get", 1): _object({
+        "version_gid": STRING, "revision": {"type": "integer", "minimum": 1},
+        "link": _PRIMARY_LINK, "readable": {"type": "boolean"},
+        "entity_data": {"anyOf": [_ENTITY_CARD, {"type": "null"}]},
+    }, required=("version_gid", "revision", "link", "readable", "entity_data")),
 })
 
 INPUT_SCHEMAS[("craft.library.read", 1)] = _object({

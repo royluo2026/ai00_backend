@@ -19,7 +19,7 @@ from ..routers._bop._constants import (
 )
 
 OPERATIONS = (
-    "auto_link_preview", "entry_links", "link_summary", "entity_detail", "resolve_gids",
+    "auto_link_preview", "link_summary", "resolve_gids",
     "pbom_search", "pbom_snapshots", "project_bop_lines", "line_operations", "version_history", "entry_history",
     "version_entries",
 )
