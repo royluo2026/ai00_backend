@@ -8,7 +8,7 @@ Convert a requested schema or mapping change into a governed Ontology proposal.
 - 不适用：The caller expects direct mutable schema CRUD.
 - 生命周期：`stable`
 - 所属领域：`ontology`
-- Catalog Release：`rel_707763f9d1ab3592731dbfc1c976b757`
+- Catalog Release：`rel_25187843ae26709ef856a3b5c2d3740e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -95,7 +95,7 @@ Convert a requested schema or mapping change into a governed Ontology proposal.
 ```json
 {
   "capability_id": "ontology.mapping.change.apply",
-  "catalog_release": "rel_707763f9d1ab3592731dbfc1c976b757",
+  "catalog_release": "rel_25187843ae26709ef856a3b5c2d3740e",
   "major_version": 1,
   "payload": {
     "base_release_gid": "example",

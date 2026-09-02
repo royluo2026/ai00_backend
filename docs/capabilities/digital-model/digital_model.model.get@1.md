@@ -8,7 +8,7 @@ Read a governed Digital Model identity.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`digital_model`
-- Catalog Release：`rel_707763f9d1ab3592731dbfc1c976b757`
+- Catalog Release：`rel_25187843ae26709ef856a3b5c2d3740e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -86,7 +86,7 @@ Read a governed Digital Model identity.
 ```json
 {
   "capability_id": "digital_model.model.get",
-  "catalog_release": "rel_707763f9d1ab3592731dbfc1c976b757",
+  "catalog_release": "rel_25187843ae26709ef856a3b5c2d3740e",
   "major_version": 1,
   "payload": {
     "model_id": "example"

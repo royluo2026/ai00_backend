@@ -8,7 +8,7 @@ Read bounded BOP lifecycle history, checkpoints and operation logs.
 - 不适用：The request changes lifecycle state, checkpoints, or operation history.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_707763f9d1ab3592731dbfc1c976b757`
+- Catalog Release：`rel_25187843ae26709ef856a3b5c2d3740e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -104,7 +104,7 @@ Read bounded BOP lifecycle history, checkpoints and operation logs.
 ```json
 {
   "capability_id": "craft.bop.lifecycle.read",
-  "catalog_release": "rel_707763f9d1ab3592731dbfc1c976b757",
+  "catalog_release": "rel_25187843ae26709ef856a3b5c2d3740e",
   "major_version": 1,
   "payload": {
     "gid": "example",

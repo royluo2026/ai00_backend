@@ -8,7 +8,7 @@ Execute Project Management operation task_templates.delete.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_707763f9d1ab3592731dbfc1c976b757`
+- Catalog Release：`rel_25187843ae26709ef856a3b5c2d3740e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -329,7 +329,7 @@ Execute Project Management operation task_templates.delete.
 ```json
 {
   "capability_id": "project.task_template.change.apply.atomic.task_templates_delete",
-  "catalog_release": "rel_707763f9d1ab3592731dbfc1c976b757",
+  "catalog_release": "rel_25187843ae26709ef856a3b5c2d3740e",
   "major_version": 1,
   "payload": {
     "arguments": {}

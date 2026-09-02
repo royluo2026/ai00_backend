@@ -27,8 +27,9 @@ def test_entry_bulk_validates_required_fields_before_io() -> None:
 
 
 class _ImportCursor:
-    def __init__(self, *, fail_links: bool = False):
+    def __init__(self, *, fail_links: bool = False, enforce_entry_parent_order: bool = False):
         self.fail_links = fail_links
+        self.enforce_entry_parent_order = enforce_entry_parent_order
         self._one = None
         self._many = []
         self.entry_rows = []
@@ -60,6 +61,12 @@ class _ImportCursor:
         normalized = " ".join(sql.split())
         if normalized.startswith("INSERT INTO workmanship_bop_bop_entries"):
             self.entry_rows = list(rows)
+            if self.enforce_entry_parent_order:
+                inserted = set()
+                for row in self.entry_rows:
+                    if row[2] is not None and row[2] not in inserted:
+                        raise RuntimeError("parent FK violation")
+                    inserted.add(row[0])
         elif normalized.startswith("INSERT INTO workmanship_bop_bop_entry_links"):
             if self.fail_links:
                 raise RuntimeError("injected link failure")
@@ -73,8 +80,11 @@ class _ImportCursor:
 
 
 class _ImportConnection:
-    def __init__(self, *, fail_links: bool = False):
-        self.cursor_value = _ImportCursor(fail_links=fail_links)
+    def __init__(self, *, fail_links: bool = False, enforce_entry_parent_order: bool = False):
+        self.cursor_value = _ImportCursor(
+            fail_links=fail_links,
+            enforce_entry_parent_order=enforce_entry_parent_order,
+        )
         self.commits = 0
         self.rollbacks = 0
 
@@ -151,3 +161,39 @@ def test_tc_import_rolls_back_entries_when_resource_link_write_fails(monkeypatch
     assert connection.rollbacks == 1
     assert connection.cursor_value.entry_rows == []
     assert connection.cursor_value.link_rows == []
+
+
+def test_tc_import_orders_parent_entries_before_children(monkeypatch) -> None:
+    from plugins.craft.craft_backend.routers._bop import entries
+
+    connection = _ImportConnection(enforce_entry_parent_order=True)
+    gids = iter(f"gid-{index}" for index in range(100))
+    monkeypatch.setattr(entries, "get_conn", lambda: connection)
+    monkeypatch.setattr(entries, "next_gid", lambda: next(gids))
+
+    result = apply_bop_entry_bulk_change(
+        {
+            "operation": "import_tc",
+            "version_gid": "version-1",
+            "rows": [
+                {
+                    "_level": 2,
+                    "node_type": "process",
+                    "title": "Child",
+                    "label": "child",
+                    "parent_label": "parent",
+                },
+                {
+                    "_level": 2,
+                    "node_type": "line_process",
+                    "title": "Parent",
+                    "label": "parent",
+                },
+            ],
+        },
+        _context(),
+    )
+
+    assert result["data"]["count"] == 2
+    assert [row[0] for row in connection.cursor_value.entry_rows] == ["gid-1", "gid-0"]
+    assert connection.cursor_value.entry_rows[1][2] == "gid-1"

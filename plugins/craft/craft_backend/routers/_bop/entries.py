@@ -958,6 +958,32 @@ async def import_tc_entries(version_gid: str, body: ImportTcBody, request: Reque
     return await _invoke_entry_bulk_change(request, _u, principal, gateway, {"operation": "import_tc", "version_gid": version_gid, "rows": body.rows})
 
 
+def _order_entry_rows_by_parent(entry_rows):
+    """Return rows in stable parent-before-child order for immediate FK checks."""
+    rows_by_gid = {row[0]: row for row in entry_rows}
+    children_by_parent = {}
+    ready = []
+
+    for row in entry_rows:
+        parent_gid = row[2]
+        if parent_gid in rows_by_gid:
+            children_by_parent.setdefault(parent_gid, []).append(row[0])
+        else:
+            ready.append(row[0])
+
+    ordered = []
+    ready_index = 0
+    while ready_index < len(ready):
+        gid = ready[ready_index]
+        ready_index += 1
+        ordered.append(rows_by_gid[gid])
+        ready.extend(children_by_parent.get(gid, ()))
+
+    if len(ordered) != len(entry_rows):
+        raise HTTPException(status_code=400, detail="TC hierarchy contains a parent cycle")
+    return ordered
+
+
 def _legacy_import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
     """批量导入 TC CSV 解析结果"""
     from ...capabilities.resource_requirements import TC_RESOURCE_NODES, resolve_tc_resource_for_import
@@ -1284,6 +1310,7 @@ def _legacy_import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_
 
                 # ── 批量写入 entries 和 links ────────────────────────────
                 if entry_rows:
+                    entry_rows = _order_entry_rows_by_parent(entry_rows)
                     cur.executemany(
                         "INSERT INTO workmanship_bop_bop_entries"
                         "(gid, version_gid, parent_gid, node_type,"

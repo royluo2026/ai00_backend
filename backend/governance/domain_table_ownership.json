@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "registry_version": 1,
-  "table_count": 244,
+  "table_count": 248,
   "tables": [
     {
       "table": "workmanship_agent_canvas_audit_events",

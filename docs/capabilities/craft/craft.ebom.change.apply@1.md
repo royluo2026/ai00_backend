@@ -8,7 +8,7 @@ Apply bounded PBOM compatibility snapshot and part mutations through the governe
 - 不适用：The operation is a read, PBOM version lifecycle transition, or BOP/GBOP mutation.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_707763f9d1ab3592731dbfc1c976b757`
+- Catalog Release：`rel_25187843ae26709ef856a3b5c2d3740e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -136,7 +136,7 @@ Apply bounded PBOM compatibility snapshot and part mutations through the governe
 ```json
 {
   "capability_id": "craft.ebom.change.apply",
-  "catalog_release": "rel_707763f9d1ab3592731dbfc1c976b757",
+  "catalog_release": "rel_25187843ae26709ef856a3b5c2d3740e",
   "major_version": 1,
   "payload": {
     "operation": "snapshot.delete"
