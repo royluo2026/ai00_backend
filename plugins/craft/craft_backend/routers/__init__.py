@@ -25,6 +25,7 @@ from .item_entries import router as item_entries_router
 from .permission_requests import router as permission_requests_router
 from .share_links import router as share_links_router
 from .shares import router as shares_router
+from .resource_requirements import router as resource_requirements_router
 
 
 def get_routers():
@@ -36,6 +37,7 @@ def get_routers():
         vpps_audit_router, promotion_router, ontology_router, rule_engine_router, rules_router, lists_router,
         collab_router, change_logs_router, item_entries_router,
         permission_requests_router, share_links_router, shares_router,
+        resource_requirements_router,
     ]
 
 
@@ -43,5 +45,5 @@ def get_routers():
 OWNED_MODULES = {
     "bop", "gbop", "ebom", "factory", "craft_library", "std_op",
     "projects", "approval", "canvases", "import_export",
-    "task_templates", "vpps_audit", "promotion", "ontology", "rule_engine", "rules", "lists", "collab", "change_logs", "item_entries", "permission_requests", "share_links", "shares",
+    "task_templates", "vpps_audit", "promotion", "ontology", "rule_engine", "rules", "lists", "collab", "change_logs", "item_entries", "permission_requests", "share_links", "shares", "resource_requirements",
 }

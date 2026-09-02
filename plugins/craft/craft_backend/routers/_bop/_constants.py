@@ -171,7 +171,7 @@ _AI00_LEVEL: dict = {
     'knowledge': 5, 'rule': 5,
     'floor_height_factory': 5,
     'part': 6, 'non_standard_part': 6, 'standard_part': 6,
-    'support_material': 6, 'tool_need': 6, 'fixture_need': 6,
+    'support_material': 6, 'socket_need': 6, 'tool_need': 6, 'fixture_need': 6,
     'jack_pos': 6,
 }
 
@@ -323,6 +323,11 @@ _LINK_TARGET_TABLES = {
     'project_tooling':      ('workmanship_bop_bop_fixtures',            'gid', None),
     'project_tools':        ('workmanship_bop_bop_tools',               'gid', None),
     'project_roles':        ('workmanship_bop_project_roles',           'gid', None),
+    # VPPS process resource requirement standards
+    'resource_socket':      ('workmanship_craft_resource_requirements', 'gid', None),
+    'resource_tool':        ('workmanship_craft_resource_requirements', 'gid', None),
+    'resource_fixture':     ('workmanship_craft_resource_requirements', 'gid', None),
+    'resource_equipment':   ('workmanship_craft_resource_requirements', 'gid', None),
     # 附属信息
     'floor_height':         ('workmanship_bop_bop_floor_height',        'gid', None),
     'control_plan':         ('workmanship_bop_bop_control_plan',        'gid', None),

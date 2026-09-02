@@ -71,6 +71,35 @@ def test_catalog_hash_is_order_independent_and_binds_provider_artifacts():
     assert forward.catalog_hash != changed_provider.catalog_hash
 
 
+def test_resource_requirement_catalog_uses_verified_web_consumers():
+    from backend.scripts.build_capability_catalog import _verified_consumer_refs
+
+    search_consumers = {
+        item["consumer_id"]
+        for item in _verified_consumer_refs("craft.resource_requirement.search")
+    }
+    write_consumers = {
+        item["consumer_id"]
+        for item in _verified_consumer_refs("craft.resource_requirement.alias.create")
+    }
+
+    assert search_consumers == {
+        "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+        "web/knowledge_hub/pages/gbop_vpps.html",
+    }
+    assert write_consumers == {"web/knowledge_hub/pages/gbop_vpps.html"}
+    staging_consumers = {
+        item["consumer_id"]
+        for capability_id in (
+            "craft.resource_requirement.staging.search",
+            "craft.resource_requirement.staging.resolve",
+            "craft.resource_requirement.staging.ignore",
+        )
+        for item in _verified_consumer_refs(capability_id)
+    }
+    assert staging_consumers == {"packages/craft-plugin/web/lineage_view/staging_panel.js"}
+
+
 def test_catalog_projects_business_definition_hash():
     descriptor = CapabilityDescriptorV2.model_validate(_descriptor("person.height.write").model_dump(mode="json") | {
         "business_acceptance_criteria": ["The normalized height is stored."],
@@ -198,8 +227,8 @@ def test_checked_in_catalog_has_verified_stable_descriptor_pin():
     release = load_catalog_release(catalog_path.read_text(encoding="utf-8"))
     stable_count = sum(item.lifecycle_status is LifecycleStatus.STABLE for item in release.descriptors)
 
-    assert len(release.descriptors) == 495
-    assert stable_count == 479
+    assert len(release.descriptors) == 504
+    assert stable_count == 488
     assert PINNED_STABLE_PRODUCT_DESCRIPTOR_COUNT == stable_count
 
 

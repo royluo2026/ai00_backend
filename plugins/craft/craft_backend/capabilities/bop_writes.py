@@ -4,7 +4,7 @@ import copy, hashlib, json, re, time
 from datetime import datetime, timezone
 from dataclasses import dataclass, field
 from typing import Any, Mapping
-from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
+from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilityExecutionBudget, CapabilityOutput, CapabilitySpec, EvidenceRef
 from backend.platform_sdk.ids import next_gid
 from ..data.connection import get_craft_conn
 
@@ -297,7 +297,7 @@ class MysqlBopWriteRepository(BopWriteRepository):
         with get_craft_conn() as conn, conn.cursor() as cur:
             cur.execute(
                 "SELECT document_json FROM workmanship_craft_bop_import_previews "
-                "WHERE gid=%s AND expires_at>NOW(6)", (preview_gid,),
+                "WHERE gid=%s AND expires_at>UTC_TIMESTAMP(6)", (preview_gid,),
             ); row = cur.fetchone()
         document = self._json(row["document_json"]) if row else None
         return dict(document) if isinstance(document, Mapping) else None
@@ -422,6 +422,11 @@ def create_bop_version(payload, context):
         clean_name = str(requested_name or "").strip()
     pbom_version_gid = payload.get("pbom_version_gid", source_version.get("pbom_version_gid"))
     repository.assert_pbom_ready(pbom_version_gid)
+    takt_time = payload.get("takt_time")
+    if takt_time is None:
+        takt_time = source_version.get("takt_time")
+    if takt_time is None:
+        takt_time = 60
     version.update({
         "gid": version_gid,
         "version_tag": version_tag,
@@ -433,9 +438,9 @@ def create_bop_version(payload, context):
         "project_gid": payload.get("project_gid", source_version.get("project_gid")),
         "factory_gid": payload.get("factory_gid", source_version.get("factory_gid")),
         "vehicle_model_gid": payload.get("vehicle_model_gid", source_version.get("vehicle_model_gid")),
-        "maturity": payload.get("maturity", source_version.get("maturity")),
-        "takt_time": payload.get("takt_time", source_version.get("takt_time")),
-        "version_type": payload.get("version_type", source_version.get("version_type")),
+        "maturity": payload.get("maturity") or source_version.get("maturity") or "concept",
+        "takt_time": takt_time,
+        "version_type": payload.get("version_type") or source_version.get("version_type") or "working",
         "pbom_version_gid": pbom_version_gid,
         "owner_gid": payload.get("owner_gid", source_version.get("owner_gid")),
         "data_stage": payload.get("data_stage", source_version.get("data_stage")),
@@ -482,4 +487,4 @@ def register_bop_write_capabilities(registry):
     registry.register(CapabilitySpec(id="craft.bop.draft.change.apply", description="Apply one exact typed BOP draft preview atomically.", risk="write", confirmation="user", idempotent=True, input_schema={"type": "object", "required": ["preview_gid"]}, output_schema={"type": "object", "required": ["version_gid", "revision", "before_hash", "after_hash"]}, **common), apply_draft_change)
     registry.register(CapabilitySpec(id="craft.bop.version.create", description="Create a BOP draft from an empty, version, template or import preview source.", risk="write", confirmation="user", idempotent=False, input_schema={"type": "object", "required": ["source", "version_tag"], "properties": {"source": {"type": "string"}, "version_tag": {"type": "string"}, "bop_name": {"type": "string"}, "version_family_gid": {"type": "string"}, "source_gid": {"type": "string"}, "template_gid": {"type": "string"}, "import_preview_gid": {"type": "string"}, "project_gid": {"type": "string"}, "factory_gid": {"type": "string"}, "vehicle_model_gid": {"type": "string"}, "maturity": {"type": "string"}, "takt_time": {"type": "number"}, "version_type": {"type": "string"}, "pbom_version_gid": {"type": "string"}, "owner_gid": {"type": "string"}, "data_stage": {"type": "string"}}, "additionalProperties": False}, output_schema={"type": "object", "required": ["version_gid", "status", "revision", "entries_count"]}, **common), create_bop_version)
     registry.register(CapabilitySpec(id="craft.bop.version.archive", description="Archive a BOP version without deleting its snapshot or references.", risk="write", confirmation="user", idempotent=True, input_schema={"type": "object", "required": ["version_gid", "expected_revision"]}, output_schema={"type": "object", "required": ["version_gid", "status", "revision", "before_hash", "after_hash"]}, **common), archive_bop_version)
-    registry.register(CapabilitySpec(id="craft.bop.import.preview", description="Parse and hash a BOP import document without mutating Craft state.", risk="read", input_schema={"type": "object", "required": ["document"]}, output_schema={"type": "object", "required": ["import_preview_gid", "content_hash", "entry_count", "expires_at"]}, **common), import_preview)
+    registry.register(CapabilitySpec(id="craft.bop.import.preview", description="Parse and hash a BOP import document without mutating Craft state.", risk="read", input_schema={"type": "object", "required": ["document"]}, output_schema={"type": "object", "required": ["import_preview_gid", "content_hash", "entry_count", "expires_at"]}, execution_budget=CapabilityExecutionBudget(memory_class="medium", max_input_bytes=4 * 1024 * 1024), **common), import_preview)

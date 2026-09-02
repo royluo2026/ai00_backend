@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from backend.capability_v2.provider_contracts import CapabilityContext, CapabilitySpec
+from backend.capability_v2.provider_contracts import CapabilityContext, CapabilityExecutionBudget, CapabilitySpec
 
 OPERATIONS = (
     "create", "purge", "import_tc", "copy", "copy_from_gbop",
@@ -72,6 +72,7 @@ def register_bop_entry_bulk_change_capability(registry: Any) -> None:
         risk="write", confirmation="user", idempotent=False, permissions=("craft.write",),
         input_schema={"type": "object", "required": ["operation"], "additionalProperties": False},
         output_schema={"type": "object", "required": ["data"], "properties": {"data": {"type": "object", "additionalProperties": True}}, "additionalProperties": False},
+        execution_budget=CapabilityExecutionBudget(memory_class="large", max_input_bytes=64 * 1024 * 1024),
         tags=("craft", "bop", "entry", "bulk", "write"),
     ), apply_bop_entry_bulk_change)
 

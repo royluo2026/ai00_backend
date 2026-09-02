@@ -36,6 +36,41 @@ ARRAY = {
     "items": {"description": "Provider-validated transport value."},
 }
 
+LIFECYCLE_CHECKLIST = _object({
+    key: BOOLEAN for key in (
+        "version_created", "lines_added", "stations_added", "processes_added",
+        "template_selected", "source_selected", "layers_selected",
+        "pbom_preprocessed", "tc_imported", "vpps_imported",
+        "pbom_vpps_checked", "pbom_linked", "vehicle_ops_prep", "vehicle_ops_linked",
+    )
+})
+LIFECYCLE_STATE = _object({
+    "init": _object({
+        "route": {"type": ["string", "null"]},
+        "checklist": LIFECYCLE_CHECKLIST,
+    }),
+    "refine_stats": {"description": "Provider-validated legacy lifecycle statistics."},
+})
+TC_IMPORT_ROW = _object({
+    "_level": {"type": "integer", "minimum": 0},
+    "ai00_level": {"type": ["integer", "null"]},
+    "node_type": STRING,
+    **{
+        key: {"type": ["string", "null"]}
+        for key in (
+            "title", "bom_row_label", "bom_row_id", "bom_row_owner", "bop_name",
+            "parent_bop_label", "parent_label", "vpps", "vpps_part", "vpps_desc",
+            "parent_vpps", "parent_vpps_name", "catia_occurrence_name", "quantity",
+            "torque", "torque_importance", "label", "operation_code", "role_type",
+            "factory_role_ref_gid", "pbom_version_gid",
+        )
+    },
+    "headcount": {"type": ["number", "string", "null"]},
+    "part_feed": {"type": ["boolean", "string", "null"]},
+    "seq_no": {"type": ["number", "string", "null"]},
+    "sort_order": {"type": ["number", "string", "null"]},
+})
+
 
 SchemaKey = str | tuple[str, int]
 INPUT_SCHEMAS: dict[SchemaKey, dict[str, Any]] = {
@@ -126,10 +161,14 @@ INPUT_SCHEMAS: dict[SchemaKey, dict[str, Any]] = {
     "craft.bop.import.preview": _object(
         {
             "document": _object({
-                "version_tag": {},
-                "bop_name": {},
-                "entries": ARRAY,
-            })
+                "version_tag": STRING,
+                "bop_name": STRING,
+                "entries": {
+                    "type": "array",
+                    "maxItems": 10_000,
+                    "items": {"description": "Provider-validated BOP import row."},
+                },
+            }, required=("version_tag", "bop_name", "entries"))
         },
         required=("document",),
     ),
@@ -210,6 +249,12 @@ _FAMILY_VERSION = _object(_fields(
     "gid", "version_tag", "bop_name", "version_family_gid", "data_stage",
     "status", "change_note", "archived_at", "frozen_at", "published_at", "is_deleted",
 ))
+
+_LIFECYCLE_STATS_REFRESH_RESULT = _object({
+    "accepted": {"type": "boolean"},
+    "version_gid": STRING,
+    "refreshed_lines": INTEGER,
+}, required=("accepted", "version_gid", "refreshed_lines"))
 
 OUTPUT_SCHEMAS: dict[SchemaKey, dict[str, Any]] = {
     "craft.bop.version.get": _object(_fields(*_VERSION_DETAIL), required=("version_gid", "revision", "lifecycle")),
@@ -511,9 +556,20 @@ INPUT_SCHEMAS[("craft.library.read", 1)] = _object({
     ]},
     "q": {"type": "string", "maxLength": 200},
 }, required=("operation",))
+_LIBRARY_ITEM_FIELDS = (
+    "gid", "vpps", "name", "gun_model", "matou_part_no", "importance", "gun_type",
+    "wireless", "output_square", "torque_min", "torque_recommended", "cad_model_no",
+    "socket_model", "fastener_type", "fastener_params", "extension_model", "socket_cad_no",
+    "extension_cad_no", "category", "spec", "part_no", "thread_spec", "model",
+    "shank_length", "guide_type", "guide_length", "has_adhesive", "drive_size",
+    "flange_diameter", "first_vehicle", "vpps_description", "part_category", "description",
+    "level", "vpps_desc_cn", "vehicle_model", "parent_vpps", "status", "meta", "flex_type",
+    "ref_main_vpps", "ref_main_vpps_desc", "ref_install_direction", "ref_static_clearance",
+    "ref_install_clearance", "alias", "created_at",
+)
 OUTPUT_SCHEMAS[("craft.library.read", 1)] = _object({
-    "items": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}},
-    "total": {"type": "integer", "minimum": 0, "maximum": 500},
+    "items": {"type": "array", "maxItems": 10_000, "items": _object(_fields(*_LIBRARY_ITEM_FIELDS))},
+    "total": {"type": "integer", "minimum": 0, "maximum": 10_000},
     "operation": {"type": "string"},
 }, required=("items", "total", "operation"))
 _LIBRARY_CHANGE_OPERATIONS = [
@@ -521,21 +577,30 @@ _LIBRARY_CHANGE_OPERATIONS = [
     "equipments.create", "equipments.update", "equipments.obsolete",
     "fixtures.create", "fixtures.update", "fixtures.obsolete",
     "fasteners.create", "fasteners.update", "fasteners.delete",
-    "part_names.create", "part_names.update", "part_names.delete",
+    "part_names.create", "part_names.update", "part_names.delete", "part_names.bulk_import",
     "part_names.batch_add_from_pbom", "part_names.batch_accept_alias", "part_names.accept_alias",
 ]
+_PART_NAME_IMPORT_FIELDS = (
+    "vpps_description", "part_category", "description", "level", "vpps_desc_cn", "vpps",
+    "importance", "vehicle_model", "parent_vpps", "status", "meta", "flex_type",
+    "ref_main_vpps", "ref_main_vpps_desc", "ref_install_direction", "ref_static_clearance",
+    "ref_install_clearance", "alias",
+)
 INPUT_SCHEMAS[("craft.library.change.apply", 1)] = _object({
     "operation": {"type": "string", "enum": _LIBRARY_CHANGE_OPERATIONS},
     "gid": {"type": "string", "maxLength": 128},
     "record": {"type": "object", "maxProperties": 40, "additionalProperties": True},
-    "items": {"type": "array", "maxItems": 500, "items": {"type": "object", "maxProperties": 40, "additionalProperties": True}},
+    "items": {"type": "array", "maxItems": 10_000, "items": _object(_fields(*_PART_NAME_IMPORT_FIELDS))},
     "meta": {"type": "object", "maxProperties": 20, "additionalProperties": True},
     "alias": {"type": "string", "maxLength": 500},
+    "conflict": {"type": "string", "enum": ["skip"]},
 }, required=("operation",))
 OUTPUT_SCHEMAS[("craft.library.change.apply", 1)] = _object({
     "success": {"type": "boolean"}, "data": {"type": "object", "additionalProperties": True},
     "added": {"type": "integer", "minimum": 0}, "skipped": {"type": "integer", "minimum": 0},
     "processed": {"type": "integer", "minimum": 0}, "failed": {"type": "integer", "minimum": 0},
+    "created_count": {"type": "integer", "minimum": 0}, "skipped_count": {"type": "integer", "minimum": 0},
+    "updated_count": {"type": "integer", "minimum": 0},
     "accepted_by": {"type": "string"}, "accepted_at": {"type": "string"},
 }, required=("success",))
 INPUT_SCHEMAS[("craft.canvas.read", 1)] = _object({
@@ -555,14 +620,51 @@ INPUT_SCHEMAS[("craft.standard_operation.read", 1)] = _object({
     "operation": {"type": "string", "enum": ["list", "get"]}, "gid": STRING, "status": STRING,
 }, required=("operation",))
 OUTPUT_SCHEMAS[("craft.standard_operation.read", 1)] = _object({
-    "items": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}},
-    "gid": STRING, "data": {"type": "object", "additionalProperties": True},
+    "items": {"type": "array", "maxItems": 500, "items": _object({
+        "gid": STRING, "display_id": {"type": "string"}, "code": {"type": "string"},
+        "name": {"type": "string"}, "status": {"type": "string"}, "standard_time": {"type": "number"},
+        "importance": {"type": "string"}, "description": {"type": "string"}, "level": {"type": "string"},
+        "vpps_attr": {"type": "string"}, "vpps": {"type": ["string", "null"]},
+        "vpps_desc": {"type": "string"}, "torque_importance": {"type": "string"},
+        "vehicle_model": {"type": "string"}, "parent_vpps": {"type": "string"},
+        "share_scope": {"type": "string"}, "version": INTEGER, "created_by": {"type": "string"},
+        "created_at": {"type": "string"}, "updated_at": {"type": "string"},
+    })},
+    "gid": STRING, "display_id": {"type": "string"}, "code": {"type": "string"},
+    "name": {"type": "string"}, "status": {"type": "string"}, "standard_time": {"type": "number"},
+    "importance": {"type": "string"}, "description": {"type": "string"},
+    "steps": {"type": "array", "maxItems": 200, "items": {"description": "Provider-validated step."}},
+    "required_tools": {"type": "array", "maxItems": 200, "items": {"description": "Provider-validated tool reference."}},
+    "parameters": _object({}),
+    "created_by": {"type": "string"}, "version": INTEGER,
+    "created_at": {"type": "string"}, "updated_at": {"type": "string"},
 })
 INPUT_SCHEMAS[("craft.standard_operation.change.apply", 1)] = _object({
-    "operation": {"type": "string", "enum": ["create", "update", "delete", "publish", "deprecate"]},
-    "gid": STRING, "record": {"type": "object", "maxProperties": 30, "additionalProperties": True},
+    "operation": {"type": "string", "enum": ["create", "bulk_import", "update", "delete", "publish", "deprecate"]},
+    "gid": STRING,
+    "record": _object({
+        **{name: {"type": "string"} for name in (
+            "code", "name", "importance", "description", "level", "vpps_attr", "vpps",
+            "vpps_desc", "torque_importance", "vehicle_model", "parent_vpps",
+        )},
+        "standard_time": {"type": "number", "minimum": 0},
+        "steps": {"type": "array", "maxItems": 200, "items": {"description": "Provider-validated step."}},
+        "required_tools": {"type": "array", "maxItems": 200, "items": {"description": "Provider-validated tool reference."}},
+        "parameters": _object({}),
+    }),
+    "records": {"type": "array", "maxItems": 10_000, "items": _object({
+        **{name: {"type": "string"} for name in (
+            "code", "name", "importance", "description", "level", "vpps_attr", "vpps",
+            "vpps_desc", "torque_importance", "vehicle_model", "parent_vpps",
+        )},
+        "standard_time": {"type": "number", "minimum": 0},
+        "steps": {"type": "array", "maxItems": 200, "items": {"description": "Provider-validated step."}},
+        "required_tools": {"type": "array", "maxItems": 200, "items": {"description": "Provider-validated tool reference."}},
+        "parameters": _object({}),
+    })},
+    "conflict": {"type": "string", "enum": ["skip", "overwrite", "append"]},
 }, required=("operation",))
-OUTPUT_SCHEMAS[("craft.standard_operation.change.apply", 1)] = _object({"success": {"type": "boolean"}, "gid": STRING}, required=("success", "gid"))
+OUTPUT_SCHEMAS[("craft.standard_operation.change.apply", 1)] = _object({"success": {"type": "boolean"}, "gid": STRING, "created_count": INTEGER, "skipped_count": INTEGER, "updated_count": INTEGER}, required=("success", "gid"))
 INPUT_SCHEMAS[("craft.vpps_audit.read", 1)] = _object({
     "operation": {"type": "string", "enum": ["list", "rule4_ignores"]}, "pbom_version_gid": STRING, "operation_type": STRING,
 }, required=("operation", "pbom_version_gid"))
@@ -695,8 +797,8 @@ OUTPUT_SCHEMAS[("craft.bop.entry.change.apply", 1)] = _object({
 }, required=("data",))
 INPUT_SCHEMAS[("craft.bop.picture.upload", 1)] = _object({"filename": STRING, "mime": STRING, "data_b64": STRING}, required=("filename", "mime", "data_b64"))
 OUTPUT_SCHEMAS[("craft.bop.picture.upload", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
-INPUT_SCHEMAS[("craft.bop.lifecycle.state.change.apply", 1)] = _object({"operation": {"type": "string", "enum": ["init.update", "phase.confirm"]}, "version_gid": STRING, "route": {"type": ["string", "null"]}, "checklist": {"type": "object", "additionalProperties": True}, "note": {"type": ["string", "null"]}}, required=("operation", "version_gid"))
-OUTPUT_SCHEMAS[("craft.bop.lifecycle.state.change.apply", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
+INPUT_SCHEMAS[("craft.bop.lifecycle.state.change.apply", 1)] = _object({"operation": {"type": "string", "enum": ["init.update", "phase.confirm"]}, "version_gid": STRING, "route": {"type": ["string", "null"]}, "checklist": LIFECYCLE_CHECKLIST, "note": {"type": ["string", "null"]}}, required=("operation", "version_gid"))
+OUTPUT_SCHEMAS[("craft.bop.lifecycle.state.change.apply", 1)] = _object({"data": _object({"lifecycle_state": LIFECYCLE_STATE, "lifecycle_phase": {"type": "string"}})}, required=("data",))
 INPUT_SCHEMAS[("craft.bop.lifecycle.checkpoint.change.apply", 1)] = _object({"operation": {"type": "string", "enum": ["create"]}, "version_gid": STRING, "line_gid": STRING, "label": {"type": ["string", "null"]}}, required=("operation", "version_gid", "line_gid"))
 OUTPUT_SCHEMAS[("craft.bop.lifecycle.checkpoint.change.apply", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
 INPUT_SCHEMAS[("craft.bop.lifecycle.checkpoint.rollback.apply", 1)] = _object({"version_gid": STRING, "line_gid": STRING, "checkpoint_gid": STRING}, required=("version_gid", "line_gid", "checkpoint_gid"))
@@ -706,7 +808,7 @@ OUTPUT_SCHEMAS[("craft.bop.lifecycle.history.change.apply", 1)] = _object({"data
 INPUT_SCHEMAS[("craft.bop.lifecycle.step.rollback.apply", 1)] = _object({"version_gid": STRING, "step_key": {"type": "string", "enum": ["lines_added", "stations_added", "processes_added", "vpps_imported", "pbom_vpps_checked"]}, "pbom_version_gid": {"type": ["string", "null"]}}, required=("version_gid", "step_key"))
 OUTPUT_SCHEMAS[("craft.bop.lifecycle.step.rollback.apply", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
 INPUT_SCHEMAS[("craft.bop.lifecycle.stats.refresh.apply", 1)] = _object({"version_gid": STRING}, required=("version_gid",))
-OUTPUT_SCHEMAS[("craft.bop.lifecycle.stats.refresh.apply", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
+OUTPUT_SCHEMAS[("craft.bop.lifecycle.stats.refresh.apply", 1)] = _object({"data": _LIFECYCLE_STATS_REFRESH_RESULT}, required=("data",))
 INPUT_SCHEMAS[("craft.bop.template.change.apply", 1)] = _object({"operation": {"type": "string", "enum": ["save_as_template", "update_from"]}, "source_version_gid": STRING, "template_gid": STRING, "factory_gid": STRING, "template_name": STRING, "copy_operator": {"type": "boolean"}}, required=("operation",))
 OUTPUT_SCHEMAS[("craft.bop.template.change.apply", 1)] = _object({"data": {"type": "object", "additionalProperties": True}, "entries_count": INTEGER}, required=("data",))
 INPUT_SCHEMAS[("craft.bop.version.snapshot.change.apply", 1)] = _object({"operation": {"type": "string", "enum": ["freeze_snapshot", "promote"]}, "version_gid": STRING, "target_data_stage": {"type": ["string", "null"]}, "change_note": {"type": ["string", "null"]}, "promote_to_m": {"type": "boolean"}, "bump_version_tag": {"type": "boolean"}, "same_stage": {"type": "boolean"}}, required=("operation", "version_gid"))
@@ -716,13 +818,13 @@ OUTPUT_SCHEMAS[("craft.bop.fork.change.apply", 1)] = _object({"data": {"type": "
 INPUT_SCHEMAS[("craft.bop.entry.bulk.change.apply", 1)] = _object({
     "operation": {"type": "string", "enum": ["create", "purge", "import_tc", "copy", "copy_from_gbop", "auto_link", "entity_detail.patch", "history.rollback"]},
     "version_gid": STRING, "bop_version_gid": STRING, "source_gid": STRING, "gid": STRING, "log_gid": STRING,
-    "mode": STRING, "step": STRING, "rows": {"type": "array", "maxItems": 5000, "items": {"type": "object", "additionalProperties": True}},
+    "mode": STRING, "step": STRING, "rows": {"type": "array", "maxItems": 100_000, "items": TC_IMPORT_ROW},
     "link_type": STRING, "ref_gid": STRING, "fields": {"type": "object", "additionalProperties": True},
     "parent_gid": {"type": ["string", "null"]}, "node_type": STRING, "sort_order": {"type": "number"}, "title": STRING,
     "vpps": {"type": ["string", "null"]}, "vpps_desc": {"type": ["string", "null"]}, "parent_bop_title": {"type": ["string", "null"]},
     "position": {"type": ["string", "null"]}, "meta": {"type": ["object", "null"], "additionalProperties": True},
 }, required=("operation",))
-OUTPUT_SCHEMAS[("craft.bop.entry.bulk.change.apply", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
+OUTPUT_SCHEMAS[("craft.bop.entry.bulk.change.apply", 1)] = _object({"data": {"description": "Provider-validated result for the selected bulk operation."}}, required=("data",))
 INPUT_SCHEMAS[("craft.bop.gbop.change.apply", 1)] = _object({
     "operation": {"type": "string", "enum": ["match_confirm", "auto_link"]},
     "pbom_gid": STRING, "bop_gid": STRING,
@@ -829,6 +931,13 @@ INPUT_SCHEMAS[("craft.ebom.vpps_check.read", 1)] = _object({"operation": {"type"
 OUTPUT_SCHEMAS[("craft.ebom.vpps_check.read", 1)] = _object({"snapshot": {"type": "object", "additionalProperties": True}, "summary": {"type": "object", "additionalProperties": True}, "errors": {"type": "object", "additionalProperties": True}, "alias_matches": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}}, "rule4_ignored": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}}}, required=("snapshot", "summary", "errors", "alias_matches", "rule4_ignored"))
 INPUT_SCHEMAS[("craft.bop.fork_preset.read", 1)] = _object({"operation": {"type": "string", "enum": ["list", "get"]}, "gid": STRING, "team_gid": STRING}, required=("operation",))
 OUTPUT_SCHEMAS[("craft.bop.fork_preset.read", 1)] = _object({"data": {"type": ["array", "object"], "maxItems": 500, "items": {"type": "object", "additionalProperties": True}}}, required=("data",))
+
+# Resource requirement schemas live beside their atomic handlers so Provider and
+# authoritative contract projections cannot drift.
+from .resource_requirements import SCHEMAS as _RESOURCE_REQUIREMENT_SCHEMAS
+for _capability_id, (_input_schema, _output_schema) in _RESOURCE_REQUIREMENT_SCHEMAS.items():
+    INPUT_SCHEMAS[(_capability_id, 1)] = _input_schema
+    OUTPUT_SCHEMAS[(_capability_id, 1)] = _output_schema
 
 
 def input_schema_for(capability_id: str, major_version: int) -> dict[str, Any]:

@@ -960,6 +960,8 @@ async def import_tc_entries(version_gid: str, body: ImportTcBody, request: Reque
 
 def _legacy_import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
     """批量导入 TC CSV 解析结果"""
+    from ...capabilities.resource_requirements import TC_RESOURCE_NODES, resolve_tc_resource_for_import
+
     _IMPORT_ENTITY_MAP = {
         'line_process':     ('workmanship_bop_bop_line',       'bop_line'),
         'station_process':  ('workmanship_bop_bop_station',    'bop_station'),
@@ -1045,6 +1047,11 @@ def _legacy_import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_
                 replaced = len(previous_tc_entry_gids)
                 if previous_tc_entry_gids:
                     placeholders = ','.join(['%s'] * len(previous_tc_entry_gids))
+                    cur.execute(
+                        f"DELETE FROM workmanship_craft_tc_resource_staging"
+                        f" WHERE version_gid=%s AND entry_gid IN ({placeholders})",
+                        (version_gid, *previous_tc_entry_gids),
+                    )
                     cur.execute(
                         f"SELECT entity_gid, link_type FROM workmanship_bop_bop_entry_links"
                         f" WHERE entry_gid IN ({placeholders}) AND deleted_at IS NULL",
@@ -1172,7 +1179,17 @@ def _legacy_import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_
                     else:
                         parent_gid = None
 
-                    entity_info = _IMPORT_ENTITY_MAP.get(node_type)
+                    staging_gid = None
+                    link_type = None
+                    link_entity_gid = None
+                    if node_type in TC_RESOURCE_NODES:
+                        link_entity_gid, staging_gid = resolve_tc_resource_for_import(
+                            cur, version_gid, e_gid, node_type, r
+                        )
+                        link_type = TC_RESOURCE_NODES[node_type][1]
+                        entity_info = None
+                    else:
+                        entity_info = _IMPORT_ENTITY_MAP.get(node_type)
 
                     # entity 表逐行 INSERT IGNORE（各实体表结构不同，不能批量）
                     if entity_info:
@@ -1208,14 +1225,6 @@ def _legacy_import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_
                                 " VALUES (%s,%s,%s,%s,%s,%s,'01','',FALSE,JSON_OBJECT(),JSON_OBJECT(),FALSE,FALSE)",
                                 (ent_gid, project_gid, version_gid, title, vpps, vpps_desc)
                             )
-                        elif node_type in ('equipment_need', 'fixture_need', 'tool_need'):
-                            cur.execute(
-                                f"INSERT IGNORE INTO {e_table}"
-                                f" (gid, project_gid, title, vpps, version_no, quantity, status,"
-                                f" ext, is_deleted, is_archived)"
-                                f" VALUES (%s,%s,%s,%s,'01',1,'pending',JSON_OBJECT(),FALSE,FALSE)",
-                                (ent_gid, project_gid, title, vpps)
-                            )
                         elif node_type in _PART_NODE_TYPES:
                             parent_part_gid = None
                             if parent_label:
@@ -1250,9 +1259,6 @@ def _legacy_import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_
                                 f" VALUES (%s,%s,%s,%s,'01',JSON_OBJECT(),FALSE,FALSE)",
                                 (ent_gid, project_gid, title, vpps)
                             )
-                    else:
-                        link_type = None
-
                     sort_val = r.get('seq_no', r.get('sort_order', i))
                     entry_rows.append((
                         e_gid, version_gid, parent_gid, node_type,
@@ -1263,12 +1269,13 @@ def _legacy_import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_
                         json.dumps({
                             'import_source': 'tc',
                             'tc_key': r.get('bom_row_id') or r.get('bom_row_label') or '',
+                            **({'tc_resource_staging_gid': staging_gid} if staging_gid else {}),
                         }, ensure_ascii=False),
                     ))
 
-                    if entity_info:
+                    if link_type and link_entity_gid:
                         link_rows.append((
-                            lnk_gid, version_gid, e_gid, ent_gid, link_type,
+                            lnk_gid, version_gid, e_gid, link_entity_gid, link_type,
                         ))
 
                     if parent_gid:
@@ -1695,8 +1702,12 @@ async def create_entry_link(body: CreateEntryLinkBody, request: Request, _u=Depe
 
 
 def _legacy_create_entry_link(body: CreateEntryLinkBody, _u=Depends(_WRITE)):
+    from ...capabilities.resource_requirements import RESOURCE_TYPES_BY_LINK, validate_resource_link
+
     with get_conn() as conn:
         with conn.cursor() as cur:
+            if body.link_type in RESOURCE_TYPES_BY_LINK:
+                validate_resource_link(body.link_type, body.entity_gid, cur)
             cur.execute(
                 "SELECT version_gid FROM workmanship_bop_bop_entries WHERE gid=%s",
                 (body.entry_gid,),

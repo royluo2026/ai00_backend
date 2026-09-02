@@ -5,6 +5,8 @@ import ast
 from pathlib import Path
 
 from backend.capabilities.registry_next import CapabilityRegistry
+from backend.capabilities.validation_next import validate_payload
+from backend.capability_v2.business_definition import substantive_business_definition_errors
 from backend.domain_ports.craft import CraftCommandPort, CraftQueryPort
 from plugins.craft.craft_backend.capabilities import register_capabilities
 from plugins.craft.craft_backend.capabilities.gbop_descriptors import GBOP_CAPABILITY_IDS
@@ -112,6 +114,25 @@ STABLE_CAPABILITIES = {
 STABLE_CAPABILITIES.update(GBOP_CAPABILITY_IDS)
 STABLE_CAPABILITIES.update(RULE_CAPABILITY_IDS)
 STABLE_CAPABILITIES.update(CRAFT_REVIEWED_CAPABILITIES)
+STABLE_CAPABILITIES.update({
+    "craft.ebom.part.bulk_create",
+    "craft.ebom.part.create",
+    "craft.ebom.part.delete",
+    "craft.ebom.part.update",
+    "craft.ebom.snapshot.delete",
+    "craft.ebom.snapshot.status.update",
+    "craft.ebom.snapshot.update",
+    "craft.ebom.snapshot.vpps_stats.update",
+    "craft.resource_requirement.alias.create",
+    "craft.resource_requirement.alias.delete",
+    "craft.resource_requirement.create",
+    "craft.resource_requirement.retire",
+    "craft.resource_requirement.search",
+    "craft.resource_requirement.staging.ignore",
+    "craft.resource_requirement.staging.resolve",
+    "craft.resource_requirement.staging.search",
+    "craft.resource_requirement.update",
+})
 
 
 def test_craft_publishes_query_and_command_ports_without_implementation_imports():
@@ -149,6 +170,80 @@ def test_all_stable_craft_capabilities_have_native_open_contracts():
         assert descriptor.domain_errors_complete is True
         assert descriptor.domain_errors
         assert item.spec.plugin_callable is True
+
+
+def test_bop_import_preview_contract_accepts_the_document_shape_used_by_the_web_importer():
+    descriptor = _registrations()["craft.bop.import.preview"].descriptor
+    document = descriptor.input_schema["properties"]["document"]
+
+    assert document["type"] == "object"
+    assert document["properties"]["version_tag"]["type"] == "string"
+    assert document["properties"]["bop_name"]["type"] == "string"
+    assert document["properties"]["entries"]["type"] == "array"
+    assert document["properties"]["entries"]["maxItems"] == 10_000
+    assert descriptor.execution_budget.max_input_bytes == 4 * 1024 * 1024
+    assert "spreadsheet" in descriptor.business_effect.lower()
+    assert descriptor.business_acceptance_criteria
+    assert descriptor.business_invariants
+
+
+def test_lifecycle_init_contract_accepts_the_closed_web_checklist_vocabulary():
+    descriptor = _registrations()["craft.bop.lifecycle.state.change.apply"].descriptor
+    checklist = descriptor.input_schema["properties"]["checklist"]
+    expected_keys = {
+        "version_created", "lines_added", "stations_added", "processes_added",
+        "template_selected", "source_selected", "layers_selected",
+        "pbom_preprocessed", "tc_imported", "vpps_imported",
+        "pbom_vpps_checked", "pbom_linked", "vehicle_ops_prep", "vehicle_ops_linked",
+    }
+
+    assert checklist["additionalProperties"] is False
+    assert expected_keys <= set(checklist["properties"])
+    validate_payload(descriptor.input_schema, {
+        "operation": "init.update",
+        "version_gid": "version-1",
+        "route": "tc_import",
+        "checklist": {"version_created": True, "pbom_preprocessed": False},
+    })
+
+
+def test_tc_import_contract_accepts_the_bounded_production_export_shape():
+    descriptor = _registrations()["craft.bop.entry.bulk.change.apply"].descriptor
+    rows = descriptor.input_schema["properties"]["rows"]
+    expected_fields = {
+        "_level", "node_type", "title", "bom_row_label", "bom_row_id",
+        "parent_bop_label", "bom_row_owner", "vpps", "vpps_part", "vpps_desc",
+        "parent_vpps", "parent_vpps_name", "catia_occurrence_name",
+        "quantity", "torque", "torque_importance",
+    }
+
+    assert rows["maxItems"] >= 60_000
+    assert rows["items"]["additionalProperties"] is False
+    assert expected_fields <= set(rows["items"]["properties"])
+    assert descriptor.execution_budget.max_input_bytes >= 64 * 1024 * 1024
+    validate_payload(descriptor.input_schema, {
+        "operation": "import_tc",
+        "version_gid": "version-1",
+        "rows": [{
+            "_level": 1,
+            "node_type": "line_process",
+            "title": "PBS装配线",
+            "bom_row_label": "AS-000083155/00;1-PBS装配线 (视图)",
+        }],
+    })
+    validate_payload(descriptor.output_schema, {
+        "data": {"count": 54_534, "skipped": 0, "replaced": 0},
+    }, label="output")
+
+
+def test_tc_import_capability_has_a_substantive_atomic_business_definition():
+    descriptor = _registrations()["craft.bop.entry.bulk.change.apply"].descriptor
+
+    assert substantive_business_definition_errors(descriptor) == ()
+    assert any(
+        rule.rule_id == "craft.bop.entry.bulk.import_tc.atomicity"
+        for rule in descriptor.business_invariants
+    )
 
 
 def test_craft_write_and_revision_contracts_are_governed():

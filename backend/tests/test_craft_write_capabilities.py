@@ -240,6 +240,20 @@ def test_create_preserves_legacy_version_identity_fields():
     }
 
 
+def test_create_empty_restores_legacy_dto_defaults():
+    repository = MemoryRepository()
+    with patch("plugins.craft.craft_backend.capabilities.bop_writes.repository", repository):
+        created = create_bop_version(
+            {"source": "empty", "version_tag": "V1", "project_gid": "project-1"},
+            ctx(),
+        ).data
+
+    version = repository.versions[created["version_gid"]]
+    assert version["maturity"] == "concept"
+    assert version["takt_time"] == 60
+    assert version["version_type"] == "working"
+
+
 def test_create_remaps_cloned_entry_parent_references_to_the_new_version():
     repository = MemoryRepository()
     repository.versions["v1"]["entries"].append({
@@ -355,6 +369,24 @@ def test_mysql_preview_commit_has_one_transaction_for_state_and_idempotency():
     assert connection.rollbacks == 0
     assert any("workmanship_craft_bop_change_previews" in sql for sql in statements)
     assert any("workmanship_craft_bop_write_idempotency" in sql for sql in statements)
+
+
+def test_mysql_import_preview_expiry_uses_the_same_utc_clock_as_persistence():
+    class Cursor(_SqlCursor):
+        def fetchone(self):
+            return None
+
+    cursor = Cursor()
+    connection = _SqlConnection(cursor)
+    with patch(
+        "plugins.craft.craft_backend.capabilities.bop_writes.get_craft_conn",
+        _connection_factory(connection),
+    ):
+        assert MysqlBopWriteRepository().get_import_preview("preview-1") is None
+
+    query = next(sql for sql, _params in cursor.calls if "workmanship_craft_bop_import_previews" in sql)
+    assert "expires_at>UTC_TIMESTAMP(6)" in query
+    assert "expires_at>NOW(6)" not in query
 
 
 def test_import_preview_does_not_write_business_state():

@@ -51,6 +51,28 @@ def test_discovers_only_selected_domain_migrations(tmp_path, craft_manifest):
     assert migrations[0].artifact_version == craft_manifest.artifact.version
 
 
+def test_craft_migrations_add_pbom_updated_at(craft_manifest):
+    migrations = discover_domain_migrations(ROOT, craft_manifest)
+
+    assert any(
+        "ALTER TABLE `workmanship_bop_pbom`" in item.sql
+        and "ADD COLUMN IF NOT EXISTS `updated_at`" in item.sql
+        for item in migrations
+    )
+
+
+def test_resource_requirement_backfill_qualifies_duplicate_gid(craft_manifest):
+    migration = next(
+        item for item in discover_domain_migrations(ROOT, craft_manifest)
+        if item.migration_id == "0004"
+    )
+
+    assert "ON DUPLICATE KEY UPDATE `gid`=`gid`" not in migration.sql
+    assert migration.sql.count(
+        "ON DUPLICATE KEY UPDATE `resource_version`=`resource_version`"
+    ) == 3
+
+
 def test_rejects_cross_database_identifier(tmp_path, craft_manifest):
     path = _migration_root(tmp_path, craft_manifest)
     (path / "0001_initial.sql").write_text(
@@ -112,6 +134,8 @@ class RecordingCursor:
             self._one = (1,)
         elif normalized.startswith("SELECT migration_id"):
             self._all = list(self.connection.ledger_rows)
+        elif "information_schema.TABLE_CONSTRAINTS" in normalized:
+            self._one = (0,)
 
     def fetchone(self):
         return self._one
@@ -167,6 +191,39 @@ def test_apply_uses_domain_lock_ledger_and_artifact_version(craft_manifest):
     assert any("RELEASE_LOCK" in sql for sql, _ in connection.statements)
 
 
+def test_marked_foreign_key_drop_is_replay_safe_when_constraint_is_absent(craft_manifest):
+    migration = DomainMigration(
+        migration_id="0002",
+        name="drop_legacy_fk",
+        path=Path("0002_drop_legacy_fk.sql"),
+        sql=(
+            "-- AI00: RESUMABLE DROP FOREIGN KEY\n"
+            "ALTER TABLE craft_versions DROP FOREIGN KEY craft_versions_ibfk_1;"
+        ),
+        checksum="b" * 64,
+        artifact_version=craft_manifest.artifact.version,
+    )
+    connection = RecordingConnection()
+
+    assert apply_domain_migrations(connection, craft_manifest, (migration,)) == ("0002",)
+    assert any("information_schema.TABLE_CONSTRAINTS" in sql for sql, _ in connection.statements)
+    assert not any(sql.startswith("ALTER TABLE craft_versions DROP FOREIGN KEY") for sql, _ in connection.statements)
+
+
+def test_socket_resource_backfill_is_a_follow_up_migration(craft_manifest):
+    migration = next(
+        item for item in discover_domain_migrations(ROOT, craft_manifest)
+        if item.migration_id == "0006"
+    )
+
+    assert "'socket'" in migration.sql
+    assert "socket_model" in migration.sql
+    assert "socket_cad_no" in migration.sql
+    assert "GROUP BY" in migration.sql.upper()
+    assert "FROM `workmanship_tpl_vpps_tools`" in migration.sql
+    assert "ON DUPLICATE KEY UPDATE `resource_version`=`resource_version`" in migration.sql
+
+
 def test_apply_rejects_changed_checksum_for_applied_migration(craft_manifest):
     migration = DomainMigration(
         migration_id="0001",
@@ -186,7 +243,7 @@ def test_apply_rejects_changed_checksum_for_applied_migration(craft_manifest):
 
 def test_check_mode_validates_empty_domain_without_connecting(capsys):
     assert main(["--domain", "craft", "--check"], root=ROOT, environ={}) == 0
-    assert capsys.readouterr().out.strip() == "domain=craft migrations=2 mode=check"
+    assert capsys.readouterr().out.strip() == "domain=craft migrations=6 mode=check"
 
 
 def test_apply_requires_only_the_selected_domains_ddl_credential(monkeypatch, capsys):
@@ -226,4 +283,4 @@ def test_apply_requires_only_the_selected_domains_ddl_credential(monkeypatch, ca
     assert result == 0
     assert captured[0].username == "craft_ddl"
     assert connection.closed is True
-    assert "domain=craft migrations=2 applied=0" in capsys.readouterr().out
+    assert "domain=craft migrations=6 applied=0" in capsys.readouterr().out
