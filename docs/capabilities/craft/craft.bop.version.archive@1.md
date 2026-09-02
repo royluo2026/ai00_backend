@@ -8,7 +8,7 @@ Archive a BOP version without deleting its snapshot or references.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_25187843ae26709ef856a3b5c2d3740e`
+- Catalog Release：`rel_7738c9526ffdac55e54d5793dcb3a7c5`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -92,7 +92,7 @@ Archive a BOP version without deleting its snapshot or references.
 ```json
 {
   "capability_id": "craft.bop.version.archive",
-  "catalog_release": "rel_25187843ae26709ef856a3b5c2d3740e",
+  "catalog_release": "rel_7738c9526ffdac55e54d5793dcb3a7c5",
   "major_version": 1,
   "payload": {
     "expected_revision": 1,

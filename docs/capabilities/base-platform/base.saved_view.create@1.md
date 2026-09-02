@@ -8,7 +8,7 @@ Execute exact Base outcome base.saved_view.create.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_25187843ae26709ef856a3b5c2d3740e`
+- Catalog Release：`rel_7738c9526ffdac55e54d5793dcb3a7c5`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -240,7 +240,7 @@ Execute exact Base outcome base.saved_view.create.
 ```json
 {
   "capability_id": "base.saved_view.create",
-  "catalog_release": "rel_25187843ae26709ef856a3b5c2d3740e",
+  "catalog_release": "rel_7738c9526ffdac55e54d5793dcb3a7c5",
   "major_version": 1,
   "payload": {
     "config": {

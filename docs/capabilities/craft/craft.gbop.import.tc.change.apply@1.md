@@ -8,7 +8,7 @@ Import a bounded Teamcenter Excel workbook into a GBOP version.
 - 不适用：The request imports parsed JSON rows or mutates individual GBOP entities.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_25187843ae26709ef856a3b5c2d3740e`
+- Catalog Release：`rel_7738c9526ffdac55e54d5793dcb3a7c5`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -103,7 +103,7 @@ Import a bounded Teamcenter Excel workbook into a GBOP version.
 ```json
 {
   "capability_id": "craft.gbop.import.tc.change.apply",
-  "catalog_release": "rel_25187843ae26709ef856a3b5c2d3740e",
+  "catalog_release": "rel_7738c9526ffdac55e54d5793dcb3a7c5",
   "major_version": 1,
   "payload": {
     "content_b64": "example",
