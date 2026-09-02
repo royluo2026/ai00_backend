@@ -108,6 +108,10 @@ def _input_schema(capability_id: str) -> dict[str, object]:
             "cursor": _SMALL_STRING_SCHEMA,
             "limit": _LIMIT_SCHEMA,
         })
+    if capability_id == "base.capability_analysis.run":
+        properties["web_revision"] = {
+            "type": "string", "pattern": r"^[0-9a-f]{40}$", "minLength": 40, "maxLength": 40,
+        }
     if capability_id == "base.capability_health.get":
         properties.update({
             "domains": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 11},
@@ -327,8 +331,8 @@ _SOURCE_REVISIONS_SCHEMA = _closed({
 }, ("backend", "web", "source"))
 _CATALOG_BINDING_SCHEMA = _closed({
     "catalog_release_id": _VERSION_SCHEMA,
-    "snapshot_hash": _VERSION_SCHEMA,
-})
+    "catalog_hash": _VERSION_SCHEMA,
+}, ("catalog_release_id", "catalog_hash"))
 _MATURITY_COUNTS_SCHEMA = _closed({f"L{index}": _COUNT_SCHEMA for index in range(7)}, tuple(f"L{index}" for index in range(7)))
 _LAYER_COUNTS_SCHEMA = _closed({layer: _COUNT_SCHEMA for layer in "ABCDEFG"}, tuple("ABCDEFG"))
 _BUSINESS_AUDIT_SCHEMA = _closed({
@@ -361,7 +365,7 @@ _BUSINESS_AUDIT_SCHEMA = _closed({
     "unbound_entries": {"type": "array", "items": _UNBOUND_ENTRY_SCHEMA, "maxItems": 200},
     "review_queue": {"type": "array", "items": _REVIEW_QUEUE_SCHEMA, "maxItems": 200},
 }, (
-    "snapshot_gid", "source_revisions", "finding_count", "root_cause_group_count",
+    "snapshot_gid", "source_revisions", "catalog_binding", "finding_count", "root_cause_group_count",
     "affected_capability_count", "affected_domains", "shared_remediation_family_count",
     "shared_remediation_families", "maturity_counts", "layer_counts", "machine_passed",
     "human_approved", "runtime_verified", "legacy_pending_review_count", "root_cause_count",
@@ -387,6 +391,7 @@ _PROPOSAL_SCHEMA = _closed({
 _PROPOSAL_ITEM_SCHEMA = _closed({
     "proposal_gid": GID_SCHEMA,
     "capability_id": STRING_SCHEMA,
+    "major_version": {"type": "integer", "minimum": 1},
     "capability_version_gid": GID_SCHEMA,
     "base_snapshot_gid": GID_SCHEMA,
     "previous_hash": _VERSION_SCHEMA,
@@ -399,8 +404,14 @@ _PROPOSAL_ITEM_SCHEMA = _closed({
     "status": _SMALL_STRING_SCHEMA,
     "row_version": _VERSION_SCHEMA,
     "domain": _SMALL_STRING_SCHEMA,
+    "review_total": _COUNT_SCHEMA,
+    "reviews_truncated": _BOOLEAN_SCHEMA,
     "reviews": {"type": "array", "maxItems": 20, "items": _closed({
         "review_gid": GID_SCHEMA,
+        "proposal_gid": GID_SCHEMA,
+        "capability_key": STRING_SCHEMA,
+        "base_snapshot_gid": GID_SCHEMA,
+        "definition_hash": _SHA256_SCHEMA,
         "review_stage": _SMALL_STRING_SCHEMA,
         "decision": _SMALL_STRING_SCHEMA,
         "reviewer_gid": _SMALL_STRING_SCHEMA,

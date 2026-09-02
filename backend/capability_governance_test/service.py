@@ -16,7 +16,9 @@ from backend.domain_ports.capability_governance_ai import GovernanceAdvisorPort
 
 from .ai_advisory import AdvisoryContractError, AdvisoryResult
 from .analysis import AnalysisRequest, run_deterministic_analysis
-from .business_audit import BusinessAuditReport, LAYERS, MATURITY_LEVELS
+from .business_audit import (
+    BusinessAuditReport, LAYERS, MATURITY_LEVELS, validate_business_audit_report,
+)
 from .business_relations import analyze_relationships
 from .prompting import PromptAuthorizationError, RedactedPrompt, _render_repair_prompt
 from .redaction import redact
@@ -177,7 +179,9 @@ def _analysis_evidence(value: Any, *, depth: int = 0) -> Any:
     raise ValueError("governance_result_invalid")
 
 
-def _business_audit_result(report: BusinessAuditReport, snapshot: Any) -> Mapping[str, Any]:
+def _business_audit_result(
+    report: BusinessAuditReport, snapshot: Any, *, expected_web_revision: str | None,
+) -> Mapping[str, Any]:
     snapshot_gid = _analysis_text(str(getattr(snapshot, "snapshot_gid", "")), maximum=19)
     if report.snapshot_gid != snapshot_gid:
         raise ValueError("governance_result_invalid")
@@ -191,8 +195,9 @@ def _business_audit_result(report: BusinessAuditReport, snapshot: Any) -> Mappin
     source_revision = _analysis_text(str(getattr(document, "code_revision", "")), maximum=40)
     if revisions["source"] != source_revision or revisions["backend"] != source_revision:
         raise ValueError("governance_result_invalid")
-    if set(report.maturity_counts) != set(MATURITY_LEVELS) or set(report.layer_counts) != set(LAYERS):
+    if expected_web_revision is None or revisions["web"] != expected_web_revision:
         raise ValueError("governance_result_invalid")
+    validate_business_audit_report(report)
 
     def bounded_rows(values: Any) -> tuple[Any, ...]:
         rows = tuple(values)
@@ -248,13 +253,14 @@ def _business_audit_result(report: BusinessAuditReport, snapshot: Any) -> Mappin
         }))
     review_queue = tuple(review_queue)
 
-    catalog_binding: dict[str, str] = {}
     catalog_release = str(getattr(document, "product_release_id", "") or "").strip()
-    snapshot_hash = str(getattr(document, "snapshot_hash", "") or "").strip()
-    if catalog_release:
-        catalog_binding["catalog_release_id"] = _analysis_text(catalog_release, maximum=255)
-    if snapshot_hash:
-        catalog_binding["snapshot_hash"] = _analysis_text(snapshot_hash, maximum=255)
+    catalog_hash = str(getattr(document, "snapshot_hash", "") or "").strip()
+    if not catalog_release or not catalog_hash:
+        raise ValueError("governance_result_invalid")
+    catalog_binding = {
+        "catalog_release_id": _analysis_text(catalog_release, maximum=255),
+        "catalog_hash": _analysis_text(catalog_hash, maximum=255),
+    }
     families = dict(report.shared_remediation_families)
     if len(families) > 200:
         raise ValueError("governance_result_invalid")
@@ -268,7 +274,7 @@ def _business_audit_result(report: BusinessAuditReport, snapshot: Any) -> Mappin
     result = {
         "snapshot_gid": snapshot_gid,
         "source_revisions": MappingProxyType(revisions),
-        **({"catalog_binding": MappingProxyType(catalog_binding)} if catalog_binding else {}),
+        "catalog_binding": MappingProxyType(catalog_binding),
         "finding_count": _analysis_count(report.finding_count),
         "root_cause_group_count": _analysis_count(report.root_cause_group_count),
         "affected_capability_count": _analysis_count(report.affected_capability_count),
@@ -555,6 +561,7 @@ class GovernedRun:
     idempotency_key: str
     status: str = "queued"
     result: Mapping[str, Any] | None = None
+    web_revision: str | None = None
 
 
 class CapabilityGovernanceService:
@@ -1570,14 +1577,24 @@ class CapabilityGovernanceService:
         key = self._idempotency(payload)
         snapshot = self._snapshot(payload)
         snapshot_gid = str(getattr(snapshot, "snapshot_gid"))
+        web_revision = None
+        if kind == "analysis" and payload.get("web_revision") not in (None, ""):
+            web_revision = str(payload["web_revision"]).strip()
+            if re.fullmatch(r"[0-9a-f]{40}", web_revision) is None:
+                raise _business_error("invalid_input")
         run_key = (kind, snapshot_gid, key)
         run = self._runs.get(run_key)
         if run is not None:
+            if run.web_revision != web_revision:
+                raise _business_error("idempotency_conflict")
             return self._accepted(
                 capability_id, run_gid=run.run_gid, snapshot_gid=run.snapshot_gid,
                 run_status=run.status,
             )
-        run = GovernedRun(str(self._next_run_gid), snapshot_gid, kind, _context_user(context), key)
+        run = GovernedRun(
+            str(self._next_run_gid), snapshot_gid, kind, _context_user(context), key,
+            web_revision=web_revision,
+        )
         self._next_run_gid += 1
         self._runs[run_key] = run
         self._persist_governed_run(run)
@@ -1589,7 +1606,9 @@ class CapabilityGovernanceService:
                 heartbeat=heartbeat,
             )
             if kind == "analysis":
-                projection = self._analysis_run_result(raw_result, snapshot)
+                projection = self._analysis_run_result(
+                    raw_result, snapshot, expected_web_revision=run.web_revision,
+                )
                 if projection is not None:
                     completed_run = replace(self._runs.get(run_key, run), status="completed", result=projection)
                     self._runs[run_key] = completed_run
@@ -1624,7 +1643,9 @@ class CapabilityGovernanceService:
         )
 
     @staticmethod
-    def _analysis_run_result(raw_result: Any, snapshot: Any) -> Mapping[str, Any] | None:
+    def _analysis_run_result(
+        raw_result: Any, snapshot: Any, *, expected_web_revision: str | None,
+    ) -> Mapping[str, Any] | None:
         if isinstance(raw_result, BusinessAuditReport):
             report = raw_result
         elif isinstance(raw_result, Mapping):
@@ -1634,7 +1655,9 @@ class CapabilityGovernanceService:
         else:
             return None
         try:
-            audit_result = _business_audit_result(report, snapshot)
+            audit_result = _business_audit_result(
+                report, snapshot, expected_web_revision=expected_web_revision,
+            )
         except (AttributeError, KeyError, TypeError, ValueError) as exc:
             raise _business_error("governance_result_invalid") from exc
         return MappingProxyType({"business_audit": audit_result})
@@ -1836,6 +1859,12 @@ class CapabilityGovernanceService:
         for proposal in sorted(values, key=lambda item: int(getattr(item, "proposal_gid", 0))):
             capability_id = str(getattr(proposal, "capability_id", ""))
             business = getattr(proposal, "review_kind", "standard") == "business_definition"
+            evidence = self._proposal_business_evidence(proposal) if business and may_read_business_evidence else {}
+            all_reviews = tuple(getattr(proposal, "reviews", ())) if may_read_business_evidence or not business else ()
+            visible_reviews = all_reviews[-20:]
+            major_version = int(evidence.get("major_version", 0) or 0) if evidence else 0
+            capability_key = str(evidence.get("capability_key", "")) if evidence else ""
+            definition_hash = str(evidence.get("definition_hash", "")) if evidence else ""
             records.append({
                 "proposal_gid": str(getattr(proposal, "proposal_gid", "")),
                 "capability_id": capability_id,
@@ -1851,15 +1880,26 @@ class CapabilityGovernanceService:
                 "status": str(getattr(proposal, "status", "detected")),
                 "row_version": str(getattr(proposal, "row_version", "1")),
                 "domain": capability_id.split(".", 1)[0] if "." in capability_id else "base",
-                "reviews": tuple(self._review_record(review) for review in getattr(proposal, "reviews", ()))[:20] if may_read_business_evidence or not business else (),
-                "review_evidence": self._proposal_business_evidence(proposal) if business and may_read_business_evidence else {},
+                "major_version": major_version or None,
+                "review_total": len(all_reviews),
+                "reviews_truncated": len(all_reviews) > len(visible_reviews),
+                "reviews": tuple(self._review_record(
+                    review, capability_key=capability_key, definition_hash=definition_hash,
+                ) for review in visible_reviews),
+                "review_evidence": evidence,
             })
         return tuple(records)
 
     @staticmethod
-    def _review_record(review: Any) -> dict[str, Any]:
+    def _review_record(
+        review: Any, *, capability_key: str = "", definition_hash: str = "",
+    ) -> dict[str, Any]:
         return {
             "review_gid": str(getattr(review, "review_gid", "")),
+            "proposal_gid": str(getattr(review, "proposal_gid", "")),
+            "capability_key": capability_key,
+            "base_snapshot_gid": str(getattr(review, "base_snapshot_gid", "")),
+            "definition_hash": definition_hash or str(getattr(review, "descriptor_hash", "")),
             "review_stage": str(getattr(review, "review_stage", "")),
             "decision": str(getattr(review, "decision", "")),
             "reviewer_gid": str(getattr(review, "reviewer_gid", "")),

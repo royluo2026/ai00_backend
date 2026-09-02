@@ -49,7 +49,10 @@ def _json(value: Any) -> Any:
     if isinstance(value, tuple):
         return [_json(item) for item in value]
     if hasattr(value, "__dataclass_fields__"):
-        return {item.name: _json(getattr(value, item.name)) for item in fields(value)}
+        return {
+            item.name: _json(getattr(value, item.name))
+            for item in fields(value) if item.metadata.get("serialize", True)
+        }
     return value
 
 
@@ -195,6 +198,9 @@ class BusinessAuditReport:
     human_approved: bool
     runtime_verified: bool
     legacy_pending_review_count: int
+    governance_capabilities: tuple[Any, ...] = field(
+        default=(), repr=False, metadata={"serialize": False},
+    )
 
     def to_dict(self) -> dict[str, Any]:
         return _json(self)
@@ -246,6 +252,152 @@ def _review_queue(capabilities: tuple[AuditCapability, ...], relations: tuple[Au
     return tuple(sorted(queued, key=lambda item: (item.priority, item.domain, item.capability_key)))
 
 
+def _root_cause_groups(evidence_rows: tuple[AuditEvidence, ...]) -> tuple[RootCauseGroup, ...]:
+    groups: dict[str, list[AuditEvidence]] = defaultdict(list)
+    for item in evidence_rows:
+        groups[item.group_key].append(item)
+    result: list[RootCauseGroup] = []
+    for key, values in sorted(groups.items()):
+        capability_keys = {
+            related for value in values for related in (value.related_capability_keys or (value.capability_key,))
+        }
+        domains = {domain for value in values for domain in (value.related_domains or (value.domain,)) if domain}
+        severity = max(
+            (value.severity for value in values),
+            key=lambda item: {"blocking": 4, "critical": 3, "error": 2, "warning": 1}.get(item.lower(), 0),
+        )
+        result.append(RootCauseGroup(
+            key, values[0].reason_code, tuple(sorted(capability_keys)), tuple(sorted(domains)),
+            tuple(sorted({value.evidence_ref for value in values if value.evidence_ref})), len(values),
+            values[0].remediation_family, severity,
+        ))
+    return tuple(result)
+
+
+def validate_business_audit_report(report: BusinessAuditReport) -> None:
+    """Reconcile a frozen report with the records that produced its aggregates."""
+    if set(report.maturity_counts) != set(MATURITY_LEVELS) or set(report.maturity_evidence) != set(MATURITY_LEVELS):
+        raise ValueError("business_audit_maturity_invalid")
+    maturity_keys: list[str] = []
+    for level in MATURITY_LEVELS:
+        keys = tuple(report.maturity_evidence[level])
+        if report.maturity_counts[level] != len(keys) or len(keys) != len(set(keys)):
+            raise ValueError("business_audit_maturity_invalid")
+        for key in keys:
+            _split_capability_key(key)
+        maturity_keys.extend(keys)
+    if len(maturity_keys) != len(set(maturity_keys)):
+        raise ValueError("business_audit_maturity_invalid")
+
+    if set(report.layer_counts) != set(LAYERS) or set(report.layer_evidence) != set(LAYERS):
+        raise ValueError("business_audit_layer_invalid")
+    capability_keys = set(maturity_keys)
+    for layer in LAYERS:
+        evidence = report.layer_evidence[layer]
+        if report.layer_counts[layer] != len(evidence) or not set(evidence).issubset(capability_keys):
+            raise ValueError("business_audit_layer_invalid")
+        if any(not tuple(refs) or len(tuple(refs)) != len(set(refs)) for refs in evidence.values()):
+            raise ValueError("business_audit_layer_invalid")
+
+    finding_identities = [(
+        item.group_key, item.capability_key, item.domain, item.layer, item.evidence_ref,
+        item.remediation_family, item.severity, item.rule_id,
+        tuple(item.related_capability_keys), tuple(item.related_domains),
+    ) for item in report.findings]
+    if report.finding_count != len(report.findings) or len(finding_identities) != len(set(finding_identities)):
+        raise ValueError("business_audit_finding_invalid")
+    root_causes = _root_cause_groups(tuple(report.findings))
+    if report.root_cause_group_count != len(root_causes) or tuple(report.root_causes) != root_causes:
+        raise ValueError("business_audit_root_cause_invalid")
+    affected_capabilities = tuple(sorted({key for group in root_causes for key in group.capability_keys}))
+    affected_domains = tuple(sorted({domain for group in root_causes for domain in group.domains}))
+    if (
+        report.affected_capability_count != len(affected_capabilities)
+        or tuple(report.affected_capabilities) != affected_capabilities
+        or tuple(report.affected_domains) != affected_domains
+    ):
+        raise ValueError("business_audit_affected_invalid")
+    remediation = dict(sorted(Counter(
+        item.remediation_family for item in report.findings if item.remediation_family
+    ).items()))
+    if (
+        report.shared_remediation_family_count != len(remediation)
+        or dict(report.shared_remediation_families) != remediation
+    ):
+        raise ValueError("business_audit_remediation_invalid")
+
+    queue = tuple(report.review_queue)
+    if (
+        len({item.capability_key for item in queue}) != len(queue)
+        or queue != tuple(sorted(queue, key=lambda item: (item.priority, item.domain, item.capability_key)))
+        or {item.capability_key for item in queue} != {
+            key for level in MATURITY_LEVELS[:5] for key in report.maturity_evidence[level]
+        }
+    ):
+        raise ValueError("business_audit_review_queue_invalid")
+    maturity_by_key = {
+        key: level for level in MATURITY_LEVELS for key in report.maturity_evidence[level]
+    }
+    if any(item.maturity != maturity_by_key.get(item.capability_key) for item in queue):
+        raise ValueError("business_audit_review_queue_invalid")
+
+    relation_ids = [item.candidate_hash for item in report.relations]
+    if (
+        any(not value for value in relation_ids)
+        or len(relation_ids) != len(set(relation_ids))
+        or tuple(report.relations) != tuple(sorted(
+            report.relations, key=lambda item: (item.relation_type, item.capability_keys, item.candidate_hash)
+        ))
+        or any(not item.capability_keys or len(item.capability_keys) != len(set(item.capability_keys)) for item in report.relations)
+    ):
+        raise ValueError("business_audit_relation_invalid")
+    unbound_ids = [(item.entry_type, item.canonical_key) for item in report.unbound_entries]
+    if (
+        any(not entry_type or not key for entry_type, key in unbound_ids)
+        or len(unbound_ids) != len(set(unbound_ids))
+        or tuple(report.unbound_entries) != tuple(sorted(
+            report.unbound_entries, key=lambda item: (item.entry_type, item.canonical_key)
+        ))
+    ):
+        raise ValueError("business_audit_unbound_invalid")
+    gate_rows = tuple(report.governance_capabilities)
+    gate_keys = [str(_value(item, "capability_key", "")) for item in gate_rows]
+    if (
+        len(gate_keys) != len(set(gate_keys)) or (gate_rows and set(gate_keys) != capability_keys)
+        or any(
+            type(_value(item, field_name)) is not bool
+            for item in gate_rows for field_name in ("machine_passed", "human_approved", "runtime_verified")
+        )
+        or any(
+            str(_value(item, "governance_status", "")) not in {"blocked", "legacy_pending_review", "passed"}
+            for item in gate_rows
+        )
+        or any(
+            str(_value(item, "governance_status", "")) == "legacy_pending_review"
+            and (not _value(item, "machine_passed") or _value(item, "human_approved"))
+            for item in gate_rows
+        )
+        or any(
+            str(_value(item, "governance_status", "")) == "passed"
+            and (not _value(item, "machine_passed") or not _value(item, "human_approved"))
+            for item in gate_rows
+        )
+    ):
+        raise ValueError("business_audit_gate_invalid")
+    expected_gate = (
+        bool(gate_rows) and all(bool(_value(item, "machine_passed", False)) for item in gate_rows),
+        bool(gate_rows) and all(bool(_value(item, "human_approved", False)) for item in gate_rows),
+        bool(gate_rows) and all(bool(_value(item, "runtime_verified", False)) for item in gate_rows),
+        sum(str(_value(item, "governance_status", "")) == "legacy_pending_review" for item in gate_rows),
+    )
+    if (
+        (report.machine_passed, report.human_approved, report.runtime_verified,
+         report.legacy_pending_review_count) != expected_gate
+        or report.legacy_pending_review_count > len(queue)
+    ):
+        raise ValueError("business_audit_gate_invalid")
+
+
 def _build_report(
     findings: Iterable[AuditEvidence], *, capabilities: Iterable[AuditCapability] = (),
     snapshot_gid: str, source_revisions: Mapping[str, str] | None = None,
@@ -282,21 +434,7 @@ def _build_report(
         }
         for layer in LAYERS
     }
-    groups: dict[str, list[AuditEvidence]] = defaultdict(list)
-    for item in evidence_rows:
-        groups[item.group_key].append(item)
-    root_causes: list[RootCauseGroup] = []
-    for key, values in sorted(groups.items()):
-        capability_keys = {
-            related for value in values for related in (value.related_capability_keys or (value.capability_key,))
-        }
-        domains = {domain for value in values for domain in (value.related_domains or (value.domain,)) if domain}
-        severity = max((value.severity for value in values), key=lambda item: {"blocking": 4, "critical": 3, "error": 2, "warning": 1}.get(item.lower(), 0))
-        root_causes.append(RootCauseGroup(
-            key, values[0].reason_code, tuple(sorted(capability_keys)), tuple(sorted(domains)),
-            tuple(sorted({value.evidence_ref for value in values if value.evidence_ref})), len(values),
-            values[0].remediation_family, severity,
-        ))
+    root_causes = _root_cause_groups(evidence_rows)
     affected_capabilities = tuple(sorted({key for group in root_causes for key in group.capability_keys}))
     affected_domains = tuple(sorted({domain for group in root_causes for domain in group.domains}))
     remediation_counts = dict(sorted(Counter(item.remediation_family for item in evidence_rows if item.remediation_family).items()))
@@ -310,13 +448,16 @@ def _build_report(
         affected_capability_count=len(affected_capabilities), affected_capabilities=affected_capabilities,
         affected_domains=affected_domains, shared_remediation_family_count=len(remediation_counts),
         shared_remediation_families=_freeze_mapping(remediation_counts), findings=evidence_rows,
-        root_causes=tuple(root_causes), relations=relation_rows,
+        root_causes=root_causes, relations=relation_rows,
         unbound_entries=tuple(sorted(unbound_entries, key=lambda item: (item.entry_type, item.canonical_key))),
         review_queue=_review_queue(capability_rows, relation_rows),
         machine_passed=bool(_value(gate_result, "machine_passed", False)),
         human_approved=bool(_value(gate_result, "human_approved", False)),
         runtime_verified=bool(_value(gate_result, "runtime_verified", False)),
         legacy_pending_review_count=int(_value(gate_result, "legacy_pending_review_count", 0) or 0),
+        governance_capabilities=tuple(
+            gate_rows[key] for key in sorted(gate_rows)
+        ),
     )
 
 
@@ -524,4 +665,5 @@ def _remediation_family(reason: str) -> str:
 __all__ = [
     "AuditCapability", "AuditEvidence", "AuditRelation", "BusinessAuditReport", "ReviewQueueEntry",
     "RootCauseGroup", "UnboundPublicEntry", "audit", "collect_business_audit", "root_cause_key",
+    "validate_business_audit_report",
 ]

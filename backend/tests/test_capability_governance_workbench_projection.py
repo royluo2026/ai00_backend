@@ -18,6 +18,7 @@ from backend.capability_governance_test.business_audit import (
 from backend.capability_governance_test.contracts import OUTPUT_SCHEMAS
 from backend.capability_governance_test.provider import _safe_response, register_governance_capabilities
 from backend.capability_governance_test.service import CapabilityGovernanceService, GovernedRun
+from backend.capability_governance_test.workflow import Review
 from backend.capability_v2.contracts import (
     ActorIdentity,
     ConsumerDescriptor,
@@ -115,7 +116,7 @@ class _RunStore:
 def _run_report(store: _RunStore, report=None) -> tuple[CapabilityGovernanceService, str]:
     service = CapabilityGovernanceService(store, analysis_runner=lambda snapshot, request: report or _report())
     accepted = service.base_capability_analysis_run(
-        {"target_gid": "100", "idempotency_key": "task9-analysis"}, _context(),
+        {"target_gid": "100", "web_revision": WEB_REVISION, "idempotency_key": "task9-analysis"}, _context(),
     )
     return service, accepted["run_gid"]
 
@@ -141,7 +142,7 @@ def test_business_audit_result_is_immutable_redacted_and_survives_supported_stor
     assert isinstance(in_memory.result, MappingProxyType)
     assert in_memory.result["business_audit"]["snapshot_gid"] == "100"
     assert in_memory.result["business_audit"]["catalog_binding"] == {
-        "catalog_release_id": "catalog-r9", "snapshot_hash": "sha256:" + "d" * 64,
+        "catalog_release_id": "catalog-r9", "catalog_hash": "sha256:" + "d" * 64,
     }
     with pytest.raises(TypeError):
         in_memory.result["business_audit"]["finding_count"] = 0
@@ -246,7 +247,7 @@ def test_analysis_result_rejects_arbitrary_or_stale_runner_output(runner_result)
 
     with pytest.raises(CapabilityBusinessError, match="governance_result_invalid"):
         service.base_capability_analysis_run(
-            {"target_gid": "100", "idempotency_key": "bad-analysis"}, _context(),
+            {"target_gid": "100", "web_revision": WEB_REVISION, "idempotency_key": "bad-analysis"}, _context(),
         )
 
 
@@ -271,8 +272,92 @@ def test_analysis_result_rejects_invalid_types_counts_and_relation_enums(report)
 
     with pytest.raises(CapabilityBusinessError, match="governance_result_invalid"):
         service.base_capability_analysis_run(
-            {"target_gid": "100", "idempotency_key": "malformed-analysis"}, _context(),
+            {"target_gid": "100", "web_revision": WEB_REVISION, "idempotency_key": "malformed-analysis"}, _context(),
         )
+
+
+@pytest.mark.parametrize(
+    "report",
+    (
+        replace(_report(), maturity_counts={**_report().maturity_counts, "L1": 494}),
+        replace(_report(), layer_counts={**_report().layer_counts, "C": 1}),
+        replace(_report(), affected_domains=()),
+        replace(_report(), affected_capability_count=494),
+        replace(_report(), shared_remediation_families={"declare_business_rule": 494}),
+        replace(_report(), shared_remediation_family_count=2),
+        replace(_report(), legacy_pending_review_count=496),
+        replace(_report(), human_approved=True, machine_passed=False),
+        replace(_report(), runtime_verified=True, human_approved=False),
+        replace(_report(), review_queue=_report().review_queue + (_report().review_queue[0],)),
+        replace(_report(), root_causes=_report().root_causes + (_report().root_causes[0],)),
+        replace(_report(), unbound_entries=_report().unbound_entries + (_report().unbound_entries[0],)),
+        replace(_report(), relations=_report().relations + (_report().relations[0],)),
+        replace(_report(), findings=_report().findings + (_report().findings[0],), finding_count=496),
+        replace(
+            _report(),
+            root_causes=(replace(_report().root_causes[0], finding_count=2),) + _report().root_causes[1:],
+        ),
+    ),
+)
+def test_analysis_result_reconciles_every_aggregate_and_stable_identity(report):
+    service = CapabilityGovernanceService(
+        _RunStore(), analysis_runner=lambda snapshot, request: report,
+    )
+
+    with pytest.raises(CapabilityBusinessError, match="governance_result_invalid"):
+        service.base_capability_analysis_run({
+            "target_gid": "100", "web_revision": WEB_REVISION,
+            "idempotency_key": "inconsistent-analysis",
+        }, _context())
+
+
+def test_enriched_analysis_requires_exact_persisted_web_and_catalog_binding():
+    store = _RunStore()
+    service = CapabilityGovernanceService(store, analysis_runner=lambda snapshot, request: _report())
+
+    with pytest.raises(CapabilityBusinessError, match="governance_result_invalid"):
+        service.base_capability_analysis_run({
+            "target_gid": "100", "idempotency_key": "missing-web-revision",
+        }, _context())
+    with pytest.raises(CapabilityBusinessError, match="governance_result_invalid"):
+        service.base_capability_analysis_run({
+            "target_gid": "100", "web_revision": "e" * 40,
+            "idempotency_key": "wrong-web-revision",
+        }, _context())
+
+    store.snapshot.document.product_release_id = ""
+    with pytest.raises(CapabilityBusinessError, match="governance_result_invalid"):
+        service.base_capability_analysis_run({
+            "target_gid": "100", "web_revision": WEB_REVISION,
+            "idempotency_key": "missing-catalog-release",
+        }, _context())
+    store.snapshot.document.product_release_id = "catalog-r9"
+    store.snapshot.document.snapshot_hash = ""
+    with pytest.raises(CapabilityBusinessError, match="governance_result_invalid"):
+        service.base_capability_analysis_run({
+            "target_gid": "100", "web_revision": WEB_REVISION,
+            "idempotency_key": "missing-catalog-hash",
+        }, _context())
+
+
+def test_legacy_run_only_analysis_remains_backward_compatible_without_web_revision():
+    service = CapabilityGovernanceService(_RunStore(), analysis_runner=lambda snapshot, request: None)
+
+    accepted = service.base_capability_analysis_run({
+        "target_gid": "100", "idempotency_key": "legacy-run-only",
+    }, _context())
+
+    assert accepted["run_status"] == "completed"
+
+
+def test_analysis_idempotency_cannot_rebind_an_existing_run_to_another_web_revision():
+    service, _ = _run_report(_RunStore())
+
+    with pytest.raises(CapabilityBusinessError, match="idempotency_conflict"):
+        service.base_capability_analysis_run({
+            "target_gid": "100", "web_revision": "e" * 40,
+            "idempotency_key": "task9-analysis",
+        }, _context())
 
 
 def test_provider_rejects_extra_keys_in_a_business_audit_result_instead_of_dropping_them():
@@ -393,3 +478,33 @@ def test_proposal_detail_fails_closed_when_proposal_hash_no_longer_matches_pinne
     result = service.base_capability_proposal_search({"limit": 1}, _context(super_admin=True))
 
     assert result["items"][0]["review_evidence"] == {}
+
+
+def test_proposal_detail_binds_canonical_identity_and_returns_newest_review_window():
+    service = _proposal_service(_ProposalStore())
+    proposal = next(iter(service._proposals._proposals.values()))
+    reviews = tuple(Review(
+        review_gid=index, proposal_gid=proposal.proposal_gid, review_stage="business",
+        decision="changes_requested", reviewer_gid=f"reviewer-{index}",
+        base_snapshot_gid=proposal.base_snapshot_gid, descriptor_hash=DEFINITION_HASH,
+        evidence_snapshot_hash=proposal.evidence_hash,
+        decided_at=datetime(2026, 9, 2, tzinfo=timezone.utc), decision_reason=f"reason-{index}",
+        review_type="business_definition",
+    ) for index in range(1, 26))
+    service._proposals._proposals[proposal.proposal_gid] = replace(proposal, reviews=reviews)
+
+    projected = _safe_response(
+        "base.capability_proposal.search",
+        service.base_capability_proposal_search({"limit": 1}, _context(super_admin=True)),
+    )
+    item = projected["items"][0]
+
+    assert item["major_version"] == 1
+    assert item["review_total"] == 25
+    assert item["reviews_truncated"] is True
+    assert [review["review_gid"] for review in item["reviews"]] == [str(index) for index in range(6, 26)]
+    assert all(review["proposal_gid"] == item["proposal_gid"] for review in item["reviews"])
+    assert all(review["capability_key"] == "craft.factory.create@1" for review in item["reviews"])
+    assert all(review["base_snapshot_gid"] == item["base_snapshot_gid"] for review in item["reviews"])
+    assert all(review["definition_hash"] == item["business_definition_hash"] for review in item["reviews"])
+    validate_payload(OUTPUT_SCHEMAS["base.capability_proposal.search"], projected, label="output")

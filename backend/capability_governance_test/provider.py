@@ -147,7 +147,8 @@ def _business_rule_projection(record: Any) -> dict[str, Any]:
 
 def _review_projection(record: Any) -> dict[str, Any]:
     return _projection(record, (
-        "review_gid", "review_stage", "decision", "reviewer_gid", "decision_reason", "review_type",
+        "review_gid", "proposal_gid", "capability_key", "base_snapshot_gid", "definition_hash",
+        "review_stage", "decision", "reviewer_gid", "decision_reason", "review_type",
     ))
 
 
@@ -206,7 +207,7 @@ def _business_audit_projection(value: Any) -> dict[str, Any]:
     ):
         raise CapabilityBusinessError("provider_invalid_response", "provider_invalid_response")
     binding = value.get("catalog_binding")
-    if isinstance(binding, Mapping) and set(binding) - {"catalog_release_id", "snapshot_hash"}:
+    if not isinstance(binding, Mapping) or set(binding) != {"catalog_release_id", "catalog_hash"}:
         raise CapabilityBusinessError("provider_invalid_response", "provider_invalid_response")
     result = _projection(value, (
         "snapshot_gid", "collection", "limit", "finding_count", "root_cause_group_count",
@@ -215,8 +216,9 @@ def _business_audit_projection(value: Any) -> dict[str, Any]:
         "relation_count", "unbound_entry_count", "review_queue_count",
     ))
     result["source_revisions"] = _projection(value.get("source_revisions", {}), ("backend", "web", "source"))
-    if isinstance(value.get("catalog_binding"), Mapping):
-        result["catalog_binding"] = _projection(value["catalog_binding"], ("catalog_release_id", "snapshot_hash"))
+    result["catalog_binding"] = _projection(
+        value["catalog_binding"], ("catalog_release_id", "catalog_hash"),
+    )
     result["affected_domains"] = _string_list(value.get("affected_domains"), maximum=11, item_length=64)
     result["maturity_counts"] = _projection(value.get("maturity_counts", {}), tuple(f"L{index}" for index in range(7)))
     result["layer_counts"] = _projection(value.get("layer_counts", {}), tuple("ABCDEFG"))
@@ -340,7 +342,7 @@ def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, A
                 "proposal_gid", "capability_id", "capability_version_gid", "base_snapshot_gid",
                 "previous_hash", "proposed_descriptor_hash", "proposed_descriptor_hash_label",
                 "business_definition_hash", "review_type", "evidence_hash", "submitted_by_gid",
-                "status", "row_version", "domain",
+                "status", "row_version", "domain", "major_version", "review_total", "reviews_truncated",
             ))
             item["reviews"] = [
                 _review_projection(review) for review in tuple(_value(proposal, "reviews") or ())[:20]
