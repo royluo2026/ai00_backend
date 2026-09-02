@@ -70,6 +70,35 @@ def _verified_consumer_refs(capability_id: str) -> tuple[dict[str, str], ...]:
             "consumer_type": "web",
             "version_constraint": ">=1",
         })
+    if capability_id in {
+        "craft.resource_requirement.search",
+        "craft.resource_requirement.create",
+        "craft.resource_requirement.update",
+        "craft.resource_requirement.retire",
+        "craft.resource_requirement.alias.create",
+        "craft.resource_requirement.alias.delete",
+    }:
+        consumers.append({
+            "consumer_id": "web/knowledge_hub/pages/gbop_vpps.html",
+            "consumer_type": "web",
+            "version_constraint": ">=1",
+        })
+    if capability_id == "craft.resource_requirement.search":
+        consumers.append({
+            "consumer_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+            "consumer_type": "web",
+            "version_constraint": ">=1",
+        })
+    if capability_id in {
+        "craft.resource_requirement.staging.search",
+        "craft.resource_requirement.staging.resolve",
+        "craft.resource_requirement.staging.ignore",
+    }:
+        consumers.append({
+            "consumer_id": "packages/craft-plugin/web/lineage_view/staging_panel.js",
+            "consumer_type": "web",
+            "version_constraint": ">=1",
+        })
     if capability_id in {"agent.flow.read", "agent.flow.change.apply"}:
         consumers.extend((
             {"consumer_id": "agent-plugin/flow_canvas/flow_editor.js", "consumer_type": "web", "version_constraint": ">=1"},
