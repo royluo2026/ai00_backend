@@ -85,6 +85,22 @@ def test_approval_is_bound_to_agent_run_resource_policy_and_payload_and_is_one_t
         issued.token, _descriptor(), _envelope("run_b"),
         resource_refs=("project:p1",), policy_version="policy-7",
     ) is False
+
+
+def test_approval_cannot_be_replayed_across_catalog_releases():
+    service = ApprovalService(InMemoryApprovalStore())
+    issued = service.issue(
+        _descriptor(), _envelope(), resource_refs=("project:p1",),
+        policy_version="policy-7", ttl_seconds=60,
+    )
+    next_release = _envelope(approval=issued.token).model_copy(
+        update={"catalog_release": "rel_2"}
+    )
+
+    assert service.consume(
+        issued.token, _descriptor(), next_release,
+        resource_refs=("project:p1",), policy_version="policy-7",
+    ) is False
     assert service.consume(
         issued.token, _descriptor(), _envelope(approval=issued.token),
         resource_refs=("project:p1",), policy_version="policy-7",
@@ -114,6 +130,19 @@ def test_idempotency_scope_includes_consumer_and_normalized_payload_hash():
         _envelope("run_b", value=2, key="idem_1"), _descriptor(), policy_version="policy-7"
     )
     assert other_consumer.replay_result is None
+
+
+def test_idempotency_scope_isolated_by_catalog_release():
+    coordinator = ReliabilityCoordinator(InMemoryOutcomeStore(), InMemoryRateLimiter(limit=100))
+    first_envelope = _envelope("run_a", value=1, key="same-key")
+    first = coordinator.begin(first_envelope, _descriptor(), policy_version="policy-7")
+    coordinator.complete(first, _result(first_envelope))
+    next_release = first_envelope.model_copy(update={"catalog_release": "rel_2"})
+
+    second = coordinator.begin(next_release, _descriptor(), policy_version="policy-7")
+
+    assert second.replay_result is None
+    assert second.operation_id != first.operation_id
 
 
 def test_completed_write_survives_audit_delivery_failure_and_outbox_remains_pending():

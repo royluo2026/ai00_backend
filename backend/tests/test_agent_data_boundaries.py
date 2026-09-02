@@ -70,13 +70,14 @@ class AgentDataBoundaryTests(unittest.TestCase):
     def test_agent_routers_have_no_runtime_ddl_or_base_db_import(self):
         root = Path(__file__).resolve().parents[2]
         paths = [
-            root / "plugins/agent/agent_backend/routers/skills.py",
+            root / "plugins/agent/agent_backend/routers/skills_v2.py",
             root / "plugins/agent/agent_backend/routers/ai_audit.py",
         ]
         text = "\n".join(path.read_text(encoding="utf-8") for path in paths)
         self.assertNotIn("from backend.db", text)
         self.assertNotIn("CREATE TABLE", text.upper())
-        self.assertIn("owner_gid=%s OR owner_gid='__system__' OR scope='global'", text)
+        repository = (root / "plugins/agent/agent_backend/infrastructure/repository.py").read_text(encoding="utf-8")
+        self.assertIn("owner_gid=%s OR scope='team' OR (scope='global' AND status='active')", repository)
 
 
 if __name__ == "__main__":

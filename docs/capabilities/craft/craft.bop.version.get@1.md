@@ -8,7 +8,7 @@ Read one BOP version identity, lifecycle and revision evidence.
 - 不适用：The caller needs to discover or compare versions.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_0b584b19349bc98727900583bb19f687`
+- Catalog Release：`rel_fb3c151fd2c880f3d35fc1c786444b0e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -87,7 +87,7 @@ Read one BOP version identity, lifecycle and revision evidence.
 ```json
 {
   "capability_id": "craft.bop.version.get",
-  "catalog_release": "rel_0b584b19349bc98727900583bb19f687",
+  "catalog_release": "rel_fb3c151fd2c880f3d35fc1c786444b0e",
   "major_version": 1,
   "payload": {
     "version_gid": "example"
@@ -104,6 +104,9 @@ Read one BOP version identity, lifecycle and revision evidence.
   "additionalProperties": false,
   "properties": {
     "archived": {
+      "description": "Provider-validated transport value."
+    },
+    "archived_at": {
       "description": "Provider-validated transport value."
     },
     "bop_name": {
@@ -127,6 +130,9 @@ Read one BOP version identity, lifecycle and revision evidence.
     "family_gid": {
       "description": "Provider-validated transport value."
     },
+    "frozen_at": {
+      "description": "Provider-validated transport value."
+    },
     "lifecycle": {
       "description": "Provider-validated transport value."
     },
@@ -146,6 +152,9 @@ Read one BOP version identity, lifecycle and revision evidence.
       "description": "Provider-validated transport value."
     },
     "project_gid": {
+      "description": "Provider-validated transport value."
+    },
+    "published_at": {
       "description": "Provider-validated transport value."
     },
     "revision": {

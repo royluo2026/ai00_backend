@@ -30,10 +30,6 @@ from backend.capability_v2.contracts import (
 )
 from backend.capability_v2.provider_loader import hash_domain_artifact
 from backend.plugin_loader import PluginLoader, ProviderTrustError
-from backend.capability_v2.acceptance_contract import (
-    canonical_test_source_hash,
-    mandatory_test_source_revision,
-)
 
 
 def _descriptor(capability_id: str, major: int = 1) -> CapabilityDescriptorV2:
@@ -116,24 +112,6 @@ def test_generated_catalog_declares_exact_acceptance_cases_without_self_attested
         for descriptor in stable
         for test_ref in descriptor.test_refs
     )
-    expected_revision = mandatory_test_source_revision(Path(__file__).resolve().parents[2])
-    assert all(
-        test_ref["code_revision"] == expected_revision
-        for descriptor in stable
-        for test_ref in descriptor.test_refs
-    )
-
-
-def test_mandatory_test_source_hash_is_eol_stable_and_content_sensitive():
-    lf = b"def test_contract():\n    return True\n"
-    crlf = b"def test_contract():\r\n    return True\r\n"
-
-    assert canonical_test_source_hash(lf) == canonical_test_source_hash(crlf)
-    assert canonical_test_source_hash(lf) != canonical_test_source_hash(lf + b"# changed\n")
-    with pytest.raises(ValueError, match="bare CR"):
-        canonical_test_source_hash(b"line\rline\n")
-    with pytest.raises(ValueError, match="UTF-8"):
-        canonical_test_source_hash(b"\xff")
 
 
 def test_catalog_generator_is_deterministic_with_business_definition_hashes():

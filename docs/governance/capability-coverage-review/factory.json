@@ -3,9 +3,9 @@
   "domain": "Factory",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:272ec997281749bc6c291b6224d46c83fb3813be8d61963f02694d23ed5a9cec",
-    "catalog_release": "rel_9f169ceddb4f7eb3e6c30f63861e655b",
-    "catalog_sha256": "sha256:0fff5c1a428105031e095deede46c517260707e5f1f23933c2564c82ef673b11"
+    "registry_sha256": "sha256:0f0d81ef5b60bb103f657d4b4a62afc096b4793f85f204805298389c01e8049a",
+    "catalog_release": "rel_04c998e59a4188758c8eda43f25b0488",
+    "catalog_sha256": "sha256:1be2b5f26178a57830b0ae1f54bbb170b6ca35e062bb1044abc2da19eba7fa02"
   },
   "unreviewed_functions": {},
   "excluded_functions": {},

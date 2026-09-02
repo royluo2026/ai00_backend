@@ -98,3 +98,14 @@ def test_hub_item_routes_use_governed_capabilities():
         assert isinstance(function, ast.AsyncFunctionDef)
         assert "_invoke" in names
         assert "get_conn" not in names
+
+
+def test_atomic_hub_adapter_omits_undefined_optional_arguments():
+    from plugins.knowledge.knowledge_backend.api.knowledge_hub_legacy import _defined_arguments
+
+    assert _defined_arguments({
+        "scope_type": "public",
+        "team_gid": None,
+        "folder_gid": None,
+        "show_hidden": False,
+    }) == {"scope_type": "public", "show_hidden": False}

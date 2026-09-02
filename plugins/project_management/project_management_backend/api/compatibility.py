@@ -22,7 +22,8 @@ def _atomic_web_target(capability_id: str, payload: dict[str, Any]) -> tuple[str
     if capability_id not in SUPPORTED_OPERATIONS or not isinstance(operation, str):
         return capability_id, payload
     atomic_id = f"{capability_id}.atomic.{operation.replace('.', '_')}"
-    return atomic_id, payload.get("arguments", {}) if isinstance(payload.get("arguments"), dict) else {}
+    arguments = payload.get("arguments", {}) if isinstance(payload.get("arguments"), dict) else {}
+    return atomic_id, {"arguments": arguments}
 
 
 def build_web_compatibility_envelope(

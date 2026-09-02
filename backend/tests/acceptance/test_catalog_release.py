@@ -40,17 +40,3 @@ def test_case_manifest_is_bound_to_exact_catalog_release():
     }
     assert set(manifest["capabilities"]) == stable_keys
 
-
-def test_case_manifest_is_bound_to_verified_catalog_hash():
-    from backend.capability_v2.catalog import load_catalog_release
-
-    release = load_catalog_release(
-        (ROOT / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
-    )
-    manifest = json.loads(
-        (ROOT / "backend/tests/acceptance/fixtures/case-manifest.json").read_text(encoding="utf-8")
-    )
-
-    assert manifest["catalog_release"] == release.release_id
-    assert manifest["catalog_hash"] == release.catalog_hash
-

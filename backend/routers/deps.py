@@ -339,6 +339,10 @@ def build_profile(user: dict) -> dict:
         v2_perms.add("craft.read")
     if "craft.write_direct" in perms:
         v2_perms.add("craft.write")
+    if "knowledge.view" in perms:
+        v2_perms.add("knowledge.read")
+    if "knowledge.manage" in perms:
+        v2_perms.add("knowledge.write")
     # Physical factory topology is an independent Capability V2 domain.  The
     # legacy UI exposed its read routes to every role that could view craft,
     # so project that existing entitlement instead of making the Factory

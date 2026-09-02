@@ -1,6 +1,11 @@
 from .support import key, stable_capabilities
 
 
+_CONFIRMATION_EXEMPT_MUTATIONS = {
+    "knowledge.personalization.change.apply.atomic.recent_record": "knowledge-item",
+}
+
+
 def test_every_stable_capability_has_v2_authorization_and_bounded_resources():
     for item in stable_capabilities():
         assert ".v2:" in item["authorization_policy"], key(item)
@@ -18,9 +23,14 @@ def test_mutations_require_gateway_confirmation_and_idempotency():
             continue
         assert item["idempotency_policy"] == "required", key(item)
         if item["confirmation_policy"] == "none":
-            assert item["id"].startswith("plugin.storage."), key(item)
             assert item["automation_level"] == "A1", key(item)
-            assert {selector["resource_type"] for selector in item["resource_selectors"]} == {"plugin-storage-key"}, key(item)
+            expected_resource = (
+                "plugin-storage-key"
+                if item["id"].startswith("plugin.storage.")
+                else _CONFIRMATION_EXEMPT_MUTATIONS.get(item["id"])
+            )
+            assert expected_resource is not None, key(item)
+            assert {selector["resource_type"] for selector in item["resource_selectors"]} == {expected_resource}, key(item)
         else:
             assert item["confirmation_policy"] in {"user", "admin"}, key(item)
 

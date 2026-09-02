@@ -57,7 +57,11 @@ INPUT_SCHEMAS: dict[SchemaKey, dict[str, Any]] = {
         required=("version_gid", "expected_revision"),
     ),
     "craft.bop.linked_parts.get": _object(
-        {"version_gid": STRING}, required=("version_gid",)
+        {
+            "version_gid": STRING,
+            "cursor": {"type": "string", "pattern": "^[0-9]+$"},
+            "page_size": {"type": "integer", "minimum": 1, "maximum": 500},
+        }, required=("version_gid",)
     ),
     "craft.bop.work_package.get": _object(
         {
@@ -137,7 +141,7 @@ _VERSION_DETAIL = (
     "lifecycle_phase", "revision", "updated_at", "archived", "factory_gid",
     "vehicle_model_gid", "parent_version_gid", "pbom_version_gid", "owner_gid",
     "version_type", "maturity", "data_stage", "visibility", "takt_time", "change_note",
-    "lifecycle", "content_hash", "created_at",
+    "frozen_at", "published_at", "archived_at", "lifecycle", "content_hash", "created_at",
 )
 
 _NULLABLE_STRING = {"anyOf": [{"type": "string"}, {"type": "null"}]}
@@ -175,6 +179,38 @@ _VERSION_SUMMARY = _object(
     required=tuple(_VERSION_SUMMARY_PROPERTIES),
 )
 
+_LIFECYCLE_CHECKLIST_KEYS = (
+    "version_created", "lines_added", "stations_added", "processes_added",
+    "template_selected", "source_selected", "tc_imported", "vpps_imported",
+    "pbom_vpps_checked", "pbom_linked", "vehicle_ops_prep", "vehicle_ops_linked",
+)
+_LIFECYCLE_STATE = _object({
+    "init": _object({
+        "route": {"type": ["string", "null"]},
+        "checklist": _object({name: BOOLEAN for name in _LIFECYCLE_CHECKLIST_KEYS}),
+    }),
+})
+_LIFECYCLE_STATS_FIELDS = (
+    "gid", "version_gid", "line_gid", "stats_snapshot_date", "nok_vpps",
+    "nok_unbound_parts", "nok_unbound_ops", "tools_bound", "tools_total",
+    "fixtures_bound", "fixtures_total", "equipment_bound", "equipment_total",
+    "coverage_ok", "balance_ok", "tasks_done", "tasks_total", "issues_open",
+    "rules_warn", "rules_block", "refreshed_at", "_rn",
+)
+_LIFECYCLE_STATS = _object(_fields(*_LIFECYCLE_STATS_FIELDS))
+_LIFECYCLE_HISTORY = _object(_fields(
+    "gid", "version_gid", "phase", "entered_at", "confirmed_at",
+    "confirmed_by_gid", "confirmed_by_name", "note",
+))
+_LIFECYCLE_LINE = _object(_fields("gid", "title"))
+_PBOM_MATCH = _object(_fields("pbom_version_gid", "unlinked_ignored"))
+_PBOM_VPPS_CHECK = _object(_fields("total", "nok", "ignored"))
+_VEHICLE_OPS_PREP = _object(_fields("confirmed", "skipped", "total"))
+_FAMILY_VERSION = _object(_fields(
+    "gid", "version_tag", "bop_name", "version_family_gid", "data_stage",
+    "status", "change_note", "archived_at", "frozen_at", "published_at", "is_deleted",
+))
+
 OUTPUT_SCHEMAS: dict[SchemaKey, dict[str, Any]] = {
     "craft.bop.version.get": _object(_fields(*_VERSION_DETAIL), required=("version_gid", "revision", "lifecycle")),
     "craft.bop.version.list": _object({
@@ -209,7 +245,9 @@ OUTPUT_SCHEMAS: dict[SchemaKey, dict[str, Any]] = {
                 "seq_no", "quantity", "unit", "part_number", "created_at", "updated_at",
             ),
         }},
-    }, required=("version_gid", "revision", "items")),
+        "total": {"type": "integer", "minimum": 0},
+        "next_cursor": {"type": ["string", "null"]},
+    }, required=("version_gid", "revision", "items", "total", "next_cursor")),
     "craft.bop.work_package.get": _object(
         _fields("version_gid", "revision", "scope", "work_items", "parts", "tools", "fixtures", "equipment_requirements", "knowledge_refs", "rule_refs"),
         required=("version_gid", "revision", "scope", "work_items", "parts", "tools", "fixtures", "equipment_requirements", "knowledge_refs", "rule_refs"),
@@ -528,15 +566,32 @@ OUTPUT_SCHEMAS[("craft.standard_operation.change.apply", 1)] = _object({"success
 INPUT_SCHEMAS[("craft.vpps_audit.read", 1)] = _object({
     "operation": {"type": "string", "enum": ["list", "rule4_ignores"]}, "pbom_version_gid": STRING, "operation_type": STRING,
 }, required=("operation", "pbom_version_gid"))
+_VPPS_OPERATION = _object({
+    "gid": STRING, "pbom_version_gid": STRING, "pbom_row_gid": STRING,
+    "operation_type": STRING, "rule_no": {"type": ["integer", "null"]},
+    "field_name": {"type": ["string", "null"]},
+    "original_value": {"type": ["string", "null"]},
+    "new_value": {"type": ["string", "null"]}, "actor_gid": STRING,
+    "actor_name": {"type": ["string", "null"]},
+    "created_at": {"type": ["string", "null"]},
+    "notes": {"type": ["string", "null"]}, "is_active": BOOLEAN,
+    "reverted_at": {"type": ["string", "null"]},
+    "reverted_by_gid": {"type": ["string", "null"]},
+    "reverted_by_name": {"type": ["string", "null"]},
+})
 OUTPUT_SCHEMAS[("craft.vpps_audit.read", 1)] = _object({
-    "success": {"type": "boolean"}, "items": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}},
-    "ignored_row_gids": {"type": "array", "maxItems": 500, "items": STRING}, "operations": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}},
+    "success": BOOLEAN, "items": {"type": "array", "maxItems": 500, "items": _VPPS_OPERATION},
+    "ignored_row_gids": {"type": "array", "maxItems": 500, "items": STRING}, "operations": {"type": "array", "maxItems": 500, "items": _VPPS_OPERATION},
 })
 INPUT_SCHEMAS[("craft.vpps_audit.change.apply", 1)] = _object({
     "operation": {"type": "string", "enum": ["rule4_bulk_ignore", "revert"]}, "gid": STRING, "pbom_version_gid": STRING,
-    "rows": {"type": "array", "maxItems": 500, "items": {"type": "object", "maxProperties": 10, "additionalProperties": True}}, "actor_gid": STRING, "actor_name": STRING,
+    "rows": {"type": "array", "maxItems": 500, "items": _object({
+        "pbom_row_gid": STRING,
+        "original_vpps_desc": {"type": ["string", "null"]},
+        "notes": {"type": ["string", "null"]},
+    }, required=("pbom_row_gid",))}, "actor_gid": STRING, "actor_name": STRING,
 }, required=("operation",))
-OUTPUT_SCHEMAS[("craft.vpps_audit.change.apply", 1)] = _object({"success": {"type": "boolean"}, "created": {"type": "integer", "minimum": 0}, "operations": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}}, "operation": {"type": "object", "additionalProperties": True}}, required=("success",))
+OUTPUT_SCHEMAS[("craft.vpps_audit.change.apply", 1)] = _object({"success": BOOLEAN, "created": {"type": "integer", "minimum": 0}, "operations": {"type": "array", "maxItems": 500, "items": _VPPS_OPERATION}, "operation": _VPPS_OPERATION}, required=("success",))
 INPUT_SCHEMAS[("craft.rule.engine.evaluate", 1)] = _object({
     "operation": {"type": "string", "enum": ["check", "audit"]}, "rule_gid": STRING,
     "context": {"type": "object", "maxProperties": 50, "additionalProperties": True}, "version_gid": STRING,
@@ -711,7 +766,19 @@ INPUT_SCHEMAS[("craft.bop.staging.change.apply", 1)] = _object({
     "sort_order": {"type": "number"}, "updates": {"type": "object", "additionalProperties": True},
 }, required=("operation",))
 OUTPUT_SCHEMAS[("craft.bop.staging.change.apply", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
-OUTPUT_SCHEMAS[("craft.bop.lifecycle.state.read", 1)] = _object({"lifecycle_phase": {"type": ["string", "null"]}, "lifecycle_state": {"type": "object", "additionalProperties": True}, "bop_name": {"type": ["string", "null"]}, "version_tag": {"type": ["string", "null"]}, "data_stage": {"type": ["string", "null"]}, "version_family_gid": {"type": "string"}, "stats": {"type": ["object", "null"], "additionalProperties": True}, "line_stats": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}}, "history": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}}, "lines": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}}, "pbom_match": {"type": "object", "additionalProperties": True}, "pbom_vpps_check": {"type": "object", "additionalProperties": True}, "family_lifecycle_phase": {"type": "string"}, "pbom_diff_queue_pending": {"type": "integer"}, "vehicle_ops_prep": {"type": "object", "additionalProperties": True}, "all_versions_in_family": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}}}, required=("lifecycle_phase", "lifecycle_state", "version_family_gid"))
+OUTPUT_SCHEMAS[("craft.bop.lifecycle.state.read", 1)] = _object({
+    "lifecycle_phase": {"type": ["string", "null"]}, "lifecycle_state": _LIFECYCLE_STATE,
+    "bop_name": {"type": ["string", "null"]}, "version_tag": {"type": ["string", "null"]},
+    "data_stage": {"type": ["string", "null"]}, "version_family_gid": {"type": "string"},
+    "stats": {"anyOf": [_LIFECYCLE_STATS, {"type": "null"}]},
+    "line_stats": {"type": "array", "maxItems": 500, "items": _LIFECYCLE_STATS},
+    "history": {"type": "array", "maxItems": 500, "items": _LIFECYCLE_HISTORY},
+    "lines": {"type": "array", "maxItems": 500, "items": _LIFECYCLE_LINE},
+    "pbom_match": _PBOM_MATCH, "pbom_vpps_check": _PBOM_VPPS_CHECK,
+    "family_lifecycle_phase": {"type": "string"}, "pbom_diff_queue_pending": {"type": "integer"},
+    "vehicle_ops_prep": _VEHICLE_OPS_PREP,
+    "all_versions_in_family": {"type": "array", "maxItems": 500, "items": _FAMILY_VERSION},
+}, required=("lifecycle_phase", "lifecycle_state", "version_family_gid"))
 INPUT_SCHEMAS[("craft.ebom.change.apply", 1)] = _object({
     "operation": {"type": "string", "enum": ["snapshot.delete", "snapshot.patch", "snapshot.status.patch", "snapshot.vpps_stats.patch", "part.add", "part.add_batch", "part.update", "part.delete"]},
     "snapshot_gid": STRING, "status": STRING, "nok": INTEGER, "ignored": INTEGER, "total": INTEGER,

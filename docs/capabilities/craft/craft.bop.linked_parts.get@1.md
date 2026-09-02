@@ -8,7 +8,7 @@ Read PBOM parts explicitly linked to a BOP and their usage locations.
 - 不适用：The caller is searching PBOM candidate parts.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_0b584b19349bc98727900583bb19f687`
+- Catalog Release：`rel_fb3c151fd2c880f3d35fc1c786444b0e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -70,6 +70,15 @@ Read PBOM parts explicitly linked to a BOP and their usage locations.
 {
   "additionalProperties": false,
   "properties": {
+    "cursor": {
+      "pattern": "^[0-9]+$",
+      "type": "string"
+    },
+    "page_size": {
+      "maximum": 500,
+      "minimum": 1,
+      "type": "integer"
+    },
     "version_gid": {
       "minLength": 1,
       "type": "string"
@@ -87,7 +96,7 @@ Read PBOM parts explicitly linked to a BOP and their usage locations.
 ```json
 {
   "capability_id": "craft.bop.linked_parts.get",
-  "catalog_release": "rel_0b584b19349bc98727900583bb19f687",
+  "catalog_release": "rel_fb3c151fd2c880f3d35fc1c786444b0e",
   "major_version": 1,
   "payload": {
     "version_gid": "example"
@@ -202,8 +211,18 @@ Read PBOM parts explicitly linked to a BOP and their usage locations.
       "maxItems": 500,
       "type": "array"
     },
+    "next_cursor": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "revision": {
       "description": "Provider-validated transport value."
+    },
+    "total": {
+      "minimum": 0,
+      "type": "integer"
     },
     "version_gid": {
       "description": "Provider-validated transport value."
@@ -212,7 +231,9 @@ Read PBOM parts explicitly linked to a BOP and their usage locations.
   "required": [
     "version_gid",
     "revision",
-    "items"
+    "items",
+    "total",
+    "next_cursor"
   ],
   "type": "object"
 }

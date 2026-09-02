@@ -312,6 +312,33 @@ def compatibility_errors(previous: CatalogRelease, candidate: CatalogRelease) ->
                 f"stable capability execution budget changed without major version bump: {label}"
             )
             continue
+        frozen_policy_fields = (
+            "authorization_policy",
+            "resource_selectors",
+            "data_classification",
+            "required_auth_freshness_seconds",
+            "delegation_policy",
+            "artifact_policy",
+            "operation_policy",
+            "concurrency_policy",
+            "expected_version_payload_path",
+            "idempotency_policy",
+            "replay_data_policy",
+            "consistency_policy",
+            "confirmation_policy",
+            "evidence_policy",
+            "audit_policy",
+            "domain_errors",
+            "error_schema",
+            "transaction_policy",
+            "timeout_seconds",
+            "rate_limit_cost",
+        )
+        for field in frozen_policy_fields:
+            if getattr(new, field) != getattr(old, field):
+                errors.append(
+                    f"stable capability {field} changed without major version bump: {label}"
+                )
         if new.owner_domain != old.owner_domain:
             errors.append(f"stable capability owner changed without major version bump: {label}")
         if (new.side_effect_level, new.execution_mode) != (old.side_effect_level, old.execution_mode):
@@ -349,9 +376,38 @@ class CatalogResolver:
         if release.descriptor(capability_id, major_version) is None:
             raise CatalogResolutionError("capability_not_in_release")
         try:
-            return self._registry.get(capability_id, major_version)
+            registered = self._registry.get(capability_id, major_version)
         except KeyError as exc:
             raise CatalogResolutionError("provider_registration_missing") from exc
+        self._verify_provider_artifact(release, registered)
+        return registered
+
+    def _verify_provider_artifact(
+        self,
+        release: CatalogRelease,
+        registered: "RegisteredCapability",
+    ) -> None:
+        if not release.provider_artifacts:
+            return
+        runtime = self._registry.provider_artifact(registered.spec.owner)
+        if runtime is None:
+            raise CatalogResolutionError("provider_artifact_unbound")
+        expected = next(
+            (item for item in release.provider_artifacts if item.plugin_id == runtime.plugin_id),
+            None,
+        )
+        if expected is None:
+            raise CatalogResolutionError("provider_artifact_not_in_release")
+        if (
+            expected.module,
+            expected.version,
+            expected.artifact_hash,
+        ) != (
+            runtime.module,
+            runtime.version,
+            runtime.artifact_hash,
+        ):
+            raise CatalogResolutionError("provider_artifact_mismatch")
 
     def descriptor(self, release_id: str, capability_id: str,
                    major_version: int | None) -> CapabilityDescriptorV2:

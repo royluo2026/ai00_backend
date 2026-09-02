@@ -11,6 +11,41 @@ from ..vpps_audit import MySqlVppsOperationRepository, VppsAuditService
 READ_OPERATIONS = ("list", "rule4_ignores")
 CHANGE_OPERATIONS = ("rule4_bulk_ignore", "revert")
 
+_NULLABLE_STRING = {"type": ["string", "null"]}
+_OPERATION_PROPERTIES = {
+    "gid": {"type": "string"},
+    "pbom_version_gid": {"type": "string"},
+    "pbom_row_gid": {"type": "string"},
+    "operation_type": {"type": "string"},
+    "rule_no": {"type": ["integer", "null"]},
+    "field_name": _NULLABLE_STRING,
+    "original_value": _NULLABLE_STRING,
+    "new_value": _NULLABLE_STRING,
+    "actor_gid": {"type": "string"},
+    "actor_name": _NULLABLE_STRING,
+    "created_at": _NULLABLE_STRING,
+    "notes": _NULLABLE_STRING,
+    "is_active": {"type": "boolean"},
+    "reverted_at": _NULLABLE_STRING,
+    "reverted_by_gid": _NULLABLE_STRING,
+    "reverted_by_name": _NULLABLE_STRING,
+}
+_OPERATION_SCHEMA = {
+    "type": "object",
+    "properties": _OPERATION_PROPERTIES,
+    "additionalProperties": False,
+}
+_IGNORE_ROW_SCHEMA = {
+    "type": "object",
+    "required": ["pbom_row_gid"],
+    "properties": {
+        "pbom_row_gid": {"type": "string"},
+        "original_vpps_desc": _NULLABLE_STRING,
+        "notes": _NULLABLE_STRING,
+    },
+    "additionalProperties": False,
+}
+
 
 def _op_to_dict(op: Any) -> dict[str, Any]:
     return {
@@ -61,10 +96,10 @@ def change_vpps_audit(payload: dict[str, Any], context: CapabilityContext) -> Ca
         op = service.revert_operation(gid, actor_gid, actor_name)
         conn.commit()
     if not op:
-        raise ValueError("operation not found or already reverted")
+        raise LookupError("operation not found or already reverted")
     return CapabilityOutput(data={"success": True, "operation": _op_to_dict(op)})
 
 
 def register_vpps_audit_capabilities(registry: Any) -> None:
-    registry.register(CapabilitySpec(id="craft.vpps_audit.read", owner="craft", description="Read bounded PBOM VPPS operation audit records.", use_when="A governed consumer needs VPPS operation audit history or Rule4 ignore state.", do_not_use_when="The request changes PBOM content itself.", risk="read", permissions=("craft.read",), input_schema={"type": "object", "required": ["operation", "pbom_version_gid"], "properties": {"operation": {"type": "string", "enum": list(READ_OPERATIONS)}, "pbom_version_gid": {"type": "string"}, "operation_type": {"type": "string"}}, "additionalProperties": False}, output_schema={"type": "object", "additionalProperties": False, "properties": {"success": {"type": "boolean"}, "items": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}}, "ignored_row_gids": {"type": "array", "maxItems": 500, "items": {"type": "string"}}, "operations": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}}}}, tags=("craft", "vpps_audit", "read")), read_vpps_audit)
-    registry.register(CapabilitySpec(id="craft.vpps_audit.change.apply", owner="craft", description="Apply governed PBOM VPPS operation audit changes.", use_when="A governed consumer needs to bulk-ignore Rule4 rows or revert an audit operation.", do_not_use_when="The request changes PBOM structure or version content.", risk="write", confirmation="user", permissions=("craft.write",), input_schema={"type": "object", "required": ["operation"], "properties": {"operation": {"type": "string", "enum": list(CHANGE_OPERATIONS)}, "gid": {"type": "string"}, "pbom_version_gid": {"type": "string"}, "rows": {"type": "array", "maxItems": 500, "items": {"type": "object", "maxProperties": 10, "additionalProperties": True}}, "actor_gid": {"type": "string"}, "actor_name": {"type": "string"}}, "additionalProperties": False}, output_schema={"type": "object", "required": ["success"], "properties": {"success": {"type": "boolean"}, "created": {"type": "integer", "minimum": 0}, "operations": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}}, "operation": {"type": "object", "additionalProperties": True}}}, tags=("craft", "vpps_audit", "write")), change_vpps_audit)
+    registry.register(CapabilitySpec(id="craft.vpps_audit.read", owner="craft", description="Read bounded PBOM VPPS operation audit records.", use_when="A governed consumer needs VPPS operation audit history or Rule4 ignore state.", do_not_use_when="The request changes PBOM content itself.", risk="read", permissions=("craft.read",), input_schema={"type": "object", "required": ["operation", "pbom_version_gid"], "properties": {"operation": {"type": "string", "enum": list(READ_OPERATIONS)}, "pbom_version_gid": {"type": "string"}, "operation_type": {"type": "string"}}, "additionalProperties": False}, output_schema={"type": "object", "additionalProperties": False, "properties": {"success": {"type": "boolean"}, "items": {"type": "array", "maxItems": 500, "items": _OPERATION_SCHEMA}, "ignored_row_gids": {"type": "array", "maxItems": 500, "items": {"type": "string"}}, "operations": {"type": "array", "maxItems": 500, "items": _OPERATION_SCHEMA}}}, tags=("craft", "vpps_audit", "read")), read_vpps_audit)
+    registry.register(CapabilitySpec(id="craft.vpps_audit.change.apply", owner="craft", description="Apply governed PBOM VPPS operation audit changes.", use_when="A governed consumer needs to bulk-ignore Rule4 rows or revert an audit operation.", do_not_use_when="The request changes PBOM structure or version content.", risk="write", confirmation="user", permissions=("craft.write",), input_schema={"type": "object", "required": ["operation"], "properties": {"operation": {"type": "string", "enum": list(CHANGE_OPERATIONS)}, "gid": {"type": "string"}, "pbom_version_gid": {"type": "string"}, "rows": {"type": "array", "maxItems": 500, "items": _IGNORE_ROW_SCHEMA}, "actor_gid": {"type": "string"}, "actor_name": {"type": "string"}}, "additionalProperties": False}, output_schema={"type": "object", "required": ["success"], "properties": {"success": {"type": "boolean"}, "created": {"type": "integer", "minimum": 0}, "operations": {"type": "array", "maxItems": 500, "items": _OPERATION_SCHEMA}, "operation": _OPERATION_SCHEMA}, "additionalProperties": False}, tags=("craft", "vpps_audit", "write")), change_vpps_audit)

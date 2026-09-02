@@ -10,15 +10,12 @@ Knowledge-owned compatibility routes for historical entry APIs.
   PATCH  /api/knowledge_entries/{gid}    → 更新
   DELETE /api/knowledge_entries/{gid}    → 删除
 """
-import json
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 
-from ..data.connection import get_knowledge_conn as get_conn
-from backend.platform_sdk.auth import build_profile, get_current_user
-from backend.platform_sdk.identity import get_active_team_member_gids
+from backend.platform_sdk.auth import get_current_user
 from backend.platform_sdk.ids import next_gid
 from backend.capability_v2.gateway import get_default_gateway
 from backend.platform_sdk.auth import get_authenticated_principal
@@ -50,48 +47,6 @@ async def _invoke_knowledge(request, current_user, principal, gateway, capabilit
     return result.data["data"]
 
 
-def next_display_id(seq_name: str) -> int:
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "INSERT INTO workmanship_know_display_counters (seq_name,val) VALUES (%s,1) "
-                "ON DUPLICATE KEY UPDATE val=LAST_INSERT_ID(val+1)", (seq_name,),
-            )
-            cur.execute("SELECT val FROM workmanship_know_display_counters WHERE seq_name=%s", (seq_name,))
-            value = int(cur.fetchone()["val"])
-        conn.commit()
-    return value
-
-
-def _permissions(user: dict) -> set[str]:
-    return set(build_profile(user).get("permissions", []))
-
-
-def _visible_sql(user: dict, alias: str = "") -> tuple[str, list]:
-    if "knowledge.view" not in _permissions(user) and "knowledge.manage" not in _permissions(user):
-        raise HTTPException(status_code=403, detail="缺少知识查看权限")
-    prefix = f"{alias}." if alias else ""
-    if (user.get("org_role") or user.get("system_role")) == "super_admin":
-        return "1=1", []
-    uid = str(user.get("gid") or "")
-    members = get_active_team_member_gids(str(user.get("team_id") or ""))
-    clauses = [f"{prefix}share_scope='global'", f"{prefix}creator_gid=%s"]
-    params: list = [uid]
-    if members:
-        placeholders = ",".join(["%s"] * len(members))
-        clauses.append(f"({prefix}share_scope='team' AND {prefix}creator_gid IN ({placeholders}))")
-        params.extend(members)
-    return "(" + " OR ".join(clauses) + ")", params
-
-
-def _assert_writable(row: dict, user: dict) -> None:
-    if str(row.get("creator_gid") or "") == str(user.get("gid") or ""):
-        return
-    if str(row.get("share_scope") or "team") in {"team", "global"} and "knowledge.manage" in _permissions(user):
-        return
-    raise HTTPException(status_code=403, detail="无权修改该知识条目")
-
-
 class KnowledgeBody(BaseModel):
     title: str
     entry_type: str = "guide"
@@ -107,31 +62,6 @@ class KnowledgeBody(BaseModel):
     content_ref: dict = {}
     related_part_nos: list = []
     related_operation_gids: list = []
-
-
-def _row_to_dict(r: dict) -> dict:
-    return {
-        "gid":                    r["gid"],
-        "display_id":             r.get("display_id") or "",
-        "title":                  r["title"],
-        "entry_type":             r["entry_type"],
-        "status":                 r["status"],
-        "share_scope":            r["share_scope"],
-        "list_gid":               r.get("list_gid"),
-        "source_gid":             r.get("source_gid"),
-        "source_label":           r.get("source_label") or "",
-        "maintainer_gid":         r.get("maintainer_gid") or "",
-        "contributors":           r.get("contributors") or [],
-        "attachments":            r.get("attachments") or [],
-        "tags":                   r.get("tags") or [],
-        "content_ref":            r.get("content_ref") or {},
-        "related_part_nos":       r.get("related_part_nos") or [],
-        "related_operation_gids": r.get("related_operation_gids") or [],
-        "creator_gid":            r.get("creator_gid") or "",
-        "source_project_gid":     r.get("source_project_gid"),
-        "created_at":             str(r["created_at"]),
-        "updated_at":             str(r["updated_at"]),
-    }
 
 
 @router.get("/api/knowledge_entries")

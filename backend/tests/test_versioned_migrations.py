@@ -33,14 +33,28 @@ def test_applied_0004_checksum_remains_the_historical_object_checksum():
 def test_upgrade_chain_contains_one_forward_only_historical_tenant_repair():
     migrations = discover_migrations(MIGRATIONS)
 
-    assert [item.migration_id for item in migrations][-3:] == [
-        "202608280004",
+    assert [item.migration_id for item in migrations][-6:] == [
         "202608280005",
         "202608280006",
+        "202608310001",
+        "202609010001",
+        "202609010002",
+        "202609010003",
     ]
-    repair = migrations[-1]
+    repair = next(item for item in migrations if item.migration_id == "202608280006")
     assert repair.name == "historical_tenant_repair"
     assert "202608280006" in repair.sql
+
+
+def test_upgrade_chain_adds_forward_only_craft_rule_identity_compatibility():
+    migration = next(
+        item for item in discover_migrations(MIGRATIONS)
+        if item.migration_id == "202609010001"
+    )
+
+    assert migration.migration_id == "202609010001"
+    assert migration.name == "rule_identity_compatibility"
+    assert "ADD COLUMN IF NOT EXISTS creator_gid" in migration.sql
 
 
 class _Cursor:
@@ -106,8 +120,8 @@ def test_pre_0004_and_original_0004_ledgers_apply_only_the_forward_migrations_on
     )
 
     for ledger, expected in (
-        (prior_ledger, ["202608280004", "202608280005", "202608280006"]),
-        (prior_ledger + ({"migration_id": "202608280004", "checksum": old_0004.checksum, "status": "applied"},), ["202608280005", "202608280006"]),
+        (prior_ledger, ["202608280004", "202608280005", "202608280006", "202608310001", "202609010001", "202609010002", "202609010003"]),
+        (prior_ledger + ({"migration_id": "202608280004", "checksum": old_0004.checksum, "status": "applied"},), ["202608280005", "202608280006", "202608310001", "202609010001", "202609010002", "202609010003"]),
     ):
         connection = _Connection(ledger)
         assert apply_migrations(connection, directory=MIGRATIONS) == expected

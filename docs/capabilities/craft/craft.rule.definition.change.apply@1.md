@@ -8,7 +8,7 @@ Apply one closed, revision-pinned Craft rule definition change.
 - 不适用：The caller supplies rule source, compiled artifacts, ownership, or audit fields.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_0b584b19349bc98727900583bb19f687`
+- Catalog Release：`rel_fb3c151fd2c880f3d35fc1c786444b0e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -154,7 +154,7 @@ Apply one closed, revision-pinned Craft rule definition change.
 ```json
 {
   "capability_id": "craft.rule.definition.change.apply",
-  "catalog_release": "rel_0b584b19349bc98727900583bb19f687",
+  "catalog_release": "rel_fb3c151fd2c880f3d35fc1c786444b0e",
   "major_version": 1,
   "payload": {
     "changes": {},

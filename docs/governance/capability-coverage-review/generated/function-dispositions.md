@@ -17,6 +17,9 @@
 | Agent | `rest:GET:/api/ai/balance` | existing_capability | `agent.audit.read` |
 | Agent | `capability:agent.audit.record` | existing_capability | `agent.audit.record` |
 | Agent | `rest:POST:/api/ai/audit` | existing_capability | `agent.audit.record` |
+| Agent | `capability:agent.canvas.execution.resume` | existing_capability | `agent.canvas.execution.resume` |
+| Agent | `capability:agent.canvas.execution.start` | existing_capability | `agent.canvas.execution.start` |
+| Agent | `capability:agent.canvas.options.resolve` | existing_capability | `agent.canvas.options.resolve` |
 | Agent | `capability:agent.flow.change.apply` | existing_capability | `agent.flow.change.apply` |
 | Agent | `rest:DELETE:/api/flows/{gid}` | existing_capability | `agent.flow.change.apply` |
 | Agent | `rest:POST:/api/flows` | existing_capability | `agent.flow.change.apply` |
@@ -75,6 +78,7 @@
 | Agent | `capability:agent.skill.read` | existing_capability | `agent.skill.read` |
 | Agent | `rest:GET:/api/skills` | existing_capability | `agent.skill.read` |
 | Agent | `capability:agent.tool_catalog.read` | existing_capability | `agent.tool_catalog.read` |
+| Agent | `capability:agent.workflow.node.test.execute` | existing_capability | `agent.workflow.node.test.execute` |
 | Base Platform | `capability:plugin.upgrade.finish` | excluded | — |
 | Base Platform | `capability:system.worker.outbox.health` | excluded | — |
 | Base Platform | `rest:DELETE:/admin/config/{key}` | excluded | — |
@@ -589,12 +593,14 @@
 | Craft | `rest:DELETE:/api/rules/{gid}` | existing_capability | `craft.rule.change.apply` |
 | Craft | `rest:PATCH:/api/rules/{gid}` | existing_capability | `craft.rule.change.apply` |
 | Craft | `rest:POST:/api/rules` | existing_capability | `craft.rule.change.apply` |
+| Craft | `capability:craft.rule.definition.change.apply` | existing_capability | `craft.rule.definition.change.apply` |
 | Craft | `capability:craft.rule.draft.create` | existing_capability | `craft.rule.draft.create` |
 | Craft | `capability:craft.rule.draft.get` | existing_capability | `craft.rule.draft.get` |
 | Craft | `capability:craft.rule.draft.revise` | existing_capability | `craft.rule.draft.revise` |
 | Craft | `capability:craft.rule.draft.search` | existing_capability | `craft.rule.draft.search` |
 | Craft | `capability:craft.rule.draft.submit` | existing_capability | `craft.rule.draft.submit` |
 | Craft | `capability:craft.rule.engine.evaluate` | existing_capability | `craft.rule.engine.evaluate` |
+| Craft | `capability:craft.rule.entry.evaluate` | existing_capability | `craft.rule.entry.evaluate` |
 | Craft | `capability:craft.rule.evaluate` | existing_capability | `craft.rule.evaluate` |
 | Craft | `capability:craft.rule.library.change.apply` | existing_capability | `craft.rule.library.change.apply` |
 | Craft | `capability:craft.rule.library.read` | existing_capability | `craft.rule.library.read` |
@@ -673,12 +679,18 @@
 | Integration | `capability:integration.connector.schema.discover` | existing_capability | `integration.connector.schema.discover` |
 | Integration | `capability:integration.connector.search` | existing_capability | `integration.connector.search` |
 | Integration | `capability:integration.connector.update` | existing_capability | `integration.connector.update` |
+| Integration | `capability:integration.field_mapping.batch.update` | existing_capability | `integration.field_mapping.batch.update` |
+| Integration | `capability:integration.field_mapping.search` | existing_capability | `integration.field_mapping.search` |
 | Integration | `capability:integration.mapping.archive` | existing_capability | `integration.mapping.archive` |
 | Integration | `capability:integration.mapping.create` | existing_capability | `integration.mapping.create` |
 | Integration | `capability:integration.mapping.get` | existing_capability | `integration.mapping.get` |
+| Integration | `capability:integration.mapping.import.start` | existing_capability | `integration.mapping.import.start` |
 | Integration | `capability:integration.mapping.preview` | existing_capability | `integration.mapping.preview` |
 | Integration | `capability:integration.mapping.search` | existing_capability | `integration.mapping.search` |
+| Integration | `capability:integration.mapping.source_columns.discover` | existing_capability | `integration.mapping.source_columns.discover` |
 | Integration | `capability:integration.mapping.update` | existing_capability | `integration.mapping.update` |
+| Integration | `capability:integration.mapping_target.search` | existing_capability | `integration.mapping_target.search` |
+| Integration | `capability:integration.mapping_target.upsert` | existing_capability | `integration.mapping_target.upsert` |
 | Integration | `capability:integration.sync.start` | existing_capability | `integration.sync.start` |
 | Knowledge | `agent_tool:recommend_practice` | existing_capability | `knowledge.context.retrieve` |
 | Knowledge | `agent_tool:search_knowledge` | existing_capability | `knowledge.context.retrieve` |
@@ -713,6 +725,7 @@
 | Knowledge | `capability:knowledge.propose` | existing_capability | `knowledge.propose` |
 | Knowledge | `capability:knowledge.reference_data.change.apply` | existing_capability | `knowledge.reference_data.change.apply` |
 | Knowledge | `capability:knowledge.reference_data.read` | existing_capability | `knowledge.reference_data.read` |
+| Knowledge | `capability:knowledge.reference_dataset.publish` | existing_capability | `knowledge.reference_dataset.publish` |
 | Knowledge | `agent_tool:find_similar_cases` | existing_capability | `knowledge.search` |
 | Knowledge | `capability:knowledge.search` | existing_capability | `knowledge.search` |
 | Knowledge | `capability:knowledge.space.change.apply` | existing_capability | `knowledge.space.change.apply` |
@@ -776,6 +789,7 @@
 | Project Management | `rest:POST:/api/approval/orders/{gid}/approve` | existing_capability | `project.approval.change.apply` |
 | Project Management | `rest:POST:/api/approval/orders/{gid}/start` | existing_capability | `project.approval.change.apply` |
 | Project Management | `rest:POST:/api/approval/orders/{gid}/withdraw` | existing_capability | `project.approval.change.apply` |
+| Project Management | `capability:project.approval.order.reject` | existing_capability | `project.approval.order.reject` |
 | Project Management | `agent_tool:list_approval_orders` | existing_capability | `project.approval.read` |
 | Project Management | `capability:project.approval.read` | existing_capability | `project.approval.read` |
 | Project Management | `rest:GET:/api/approval/orders` | existing_capability | `project.approval.read` |

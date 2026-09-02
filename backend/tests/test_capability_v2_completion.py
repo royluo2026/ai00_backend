@@ -1172,13 +1172,13 @@ def test_frozen_review_exposes_exact_capability_ids() -> None:
     assert "base.annotation.change.apply" in base_ids
     assert "system.worker.outbox.health" not in base_ids
     assert "plugin.upgrade.finish" not in base_ids
-    assert len(base_ids) == 37
+    assert len(base_ids) == 75
 
     integration_ids = review.capability_ids("integration")
     assert "integration.connector.create" in integration_ids
     assert "integration.mapping.preview" in integration_ids
     assert "integration.sync.start" in integration_ids
-    assert len(integration_ids) == 13
+    assert len(integration_ids) == 19
 
 
 def test_completion_cli_reports_complete_in_progress_and_strict_modes() -> None:
@@ -1202,12 +1202,9 @@ def test_completion_cli_reports_complete_in_progress_and_strict_modes() -> None:
 
     assert progress.returncode == 0
     assert json.loads(progress.stdout)["complete"] is True
-    assert strict.returncode == 1
-    assert json.loads(strict.stdout)["complete"] is False
-    assert any(
-        reason.startswith("web_route_inventory_unresolved:")
-        for reason in json.loads(strict.stdout)["failed"]
-    )
+    assert strict.returncode == 0
+    assert json.loads(strict.stdout)["complete"] is True
+    assert json.loads(strict.stdout)["failed"] == []
     assert json.loads(strict.stdout)["cross_domain_sql"] == 0
 
 
@@ -1223,9 +1220,6 @@ def test_completion_cli_static_only_alias_runs_the_strict_static_gate() -> None:
         check=False,
     )
 
-    assert result.returncode == 1, result.stderr
-    assert json.loads(result.stdout)["complete"] is False
-    assert any(
-        reason.startswith("web_route_inventory_unresolved:")
-        for reason in json.loads(result.stdout)["failed"]
-    )
+    assert result.returncode == 0, result.stderr
+    assert json.loads(result.stdout)["complete"] is True
+    assert json.loads(result.stdout)["failed"] == []

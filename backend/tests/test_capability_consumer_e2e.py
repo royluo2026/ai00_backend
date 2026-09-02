@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 from backend.capability_v2.identity import AuthenticatedPrincipal
 from backend.capability_v2.contracts import CapabilityResultV2, CapabilityStatus, CorrelationRef
 from backend.capability_v2.reliability import ApprovalChallenge, IssuedApproval
+from backend.capability_v2.gateway import get_default_gateway
 from backend.main import app
 from backend.routers.deps import get_authenticated_principal, get_current_user
 from backend.routers.capabilities import _web_identity
@@ -25,8 +26,11 @@ def test_agent_catalog_is_server_filtered_by_permissions_and_deprecation():
         return {"gid": "u1", "team_id": "t1", "system_role": "engineer", "is_active": True}
     app.dependency_overrides[get_current_user] = user
     try:
-        with TestClient(app) as client:
+        client = TestClient(app)
+        try:
             response = client.get("/api/v1/capabilities?consumer=agent")
+        finally:
+            client.close()
         assert response.status_code == 200
         specs = response.json()["data"]
         ids = {item["id"] for item in specs}
@@ -72,8 +76,10 @@ def test_public_rest_returns_same_versioned_result_error_evidence_shape(monkeypa
         lambda _gid: {"gid": "u1", "system_role": "engineer", "is_active": True},
     )
     monkeypatch.setattr("backend.routers.capabilities.get_default_gateway", lambda: Gateway())
+    app.dependency_overrides[get_default_gateway] = lambda: Gateway()
     try:
-        with TestClient(app) as client:
+        client = TestClient(app)
+        try:
             response = client.post(
                 "/api/v1/capabilities/test.web.read:invoke",
                 json={"version": 1, "payload": {}},
@@ -85,6 +91,8 @@ def test_public_rest_returns_same_versioned_result_error_evidence_shape(monkeypa
                     "X-Trace-ID": "t" * 300,
                 },
             )
+        finally:
+            client.close()
         assert response.status_code == 200
         result = response.json()["data"]
         assert result["ok"] is True
@@ -129,13 +137,17 @@ def test_confirmation_route_uses_gateway_and_server_constructed_web_identity(mon
     app.dependency_overrides[get_current_user] = user
     app.dependency_overrides[get_authenticated_principal] = principal
     monkeypatch.setattr("backend.routers.capabilities.get_default_gateway", lambda: Gateway())
+    app.dependency_overrides[get_default_gateway] = lambda: Gateway()
     try:
-        with TestClient(app) as client:
+        client = TestClient(app)
+        try:
             response = client.post(
                 "/api/v1/capabilities/craft.routing.update:confirm",
                 json={"version": 1, "payload": {}},
                 headers={"X-AI00-Source": "agent", "X-AI00-Agent-Run-ID": "forged"},
             )
+        finally:
+            client.close()
         assert response.status_code == 200
         assert response.json()["data"]["approval_id"] == "approval_1"
         assert captured[0].identity.consumer.type.value == "web"

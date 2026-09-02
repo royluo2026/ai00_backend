@@ -115,6 +115,24 @@ def test_get_returns_identity_lifecycle_and_evidence():
     assert result.evidence[0].digest == "sha256:abc"
 
 
+def test_get_output_contract_accepts_complete_version_detail():
+    registry = _registry()
+    descriptor = registry.get("craft.bop.version.get").descriptor
+    row = {
+        "gid": "v1", "version_family_gid": "family-1", "project_gid": "project-1",
+        "version_tag": "V3", "version_no": "3", "bop_name": "总装 BOP",
+        "status": "baseline", "lifecycle_phase": "released",
+        "lifecycle_state": '{"init":{"route":"blank","checklist":{}}}',
+        "meta": '{"content_hash":"sha256:abc"}', "frozen_at": None,
+        "published_at": "2026-08-02 09:00:00", "archived_at": None,
+        "created_at": "2026-08-01 10:00:00", "updated_at": "2026-08-02 10:00:00",
+    }
+    with patch.object(repository, "get_version", return_value=row):
+        result = get_bop_version({"version_gid": "v1"}, CapabilityContext(user_gid="user-1"))
+
+    validate_payload(dict(descriptor.output_schema), result.data, label="output")
+
+
 def test_get_uses_stable_business_error_for_missing_version():
     with patch.object(repository, "get_version", return_value=None):
         with pytest.raises(CapabilityBusinessError) as caught:

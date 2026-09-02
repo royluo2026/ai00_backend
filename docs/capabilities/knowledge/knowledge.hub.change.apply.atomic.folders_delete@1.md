@@ -8,7 +8,7 @@ Execute Knowledge operation folders.delete.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_0b584b19349bc98727900583bb19f687`
+- Catalog Release：`rel_fb3c151fd2c880f3d35fc1c786444b0e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -196,7 +196,7 @@ Execute Knowledge operation folders.delete.
 ```json
 {
   "capability_id": "knowledge.hub.change.apply.atomic.folders_delete",
-  "catalog_release": "rel_0b584b19349bc98727900583bb19f687",
+  "catalog_release": "rel_fb3c151fd2c880f3d35fc1c786444b0e",
   "major_version": 1,
   "payload": {}
 }
@@ -212,7 +212,11 @@ Execute Knowledge operation folders.delete.
   "properties": {
     "data": {
       "additionalProperties": false,
-      "properties": {},
+      "properties": {
+        "deleted_folders": {
+          "type": "integer"
+        }
+      },
       "type": "object"
     }
   },

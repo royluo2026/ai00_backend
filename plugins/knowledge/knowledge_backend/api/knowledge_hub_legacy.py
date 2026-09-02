@@ -14,9 +14,14 @@ from backend.platform_sdk.ids import next_gid
 router = APIRouter(prefix="/api/knowledge_hub", tags=["knowledge_hub"])
 
 
+def _defined_arguments(arguments: dict[str, Any]) -> dict[str, Any]:
+    """Translate omitted REST query fields into omitted capability fields."""
+    return {key: value for key, value in arguments.items() if value is not None}
+
+
 async def _invoke(request, current_user, principal, gateway, capability_id, operation, arguments=None, *, write=False):
     capability_id = f"{capability_id}.atomic.{operation.replace('.', '_')}"
-    atomic_payload = arguments or {}
+    atomic_payload = _defined_arguments(arguments or {})
     request_id = request.headers.get("X-Request-ID") or f"knowledge_hub_legacy_{next_gid()}"
     result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
         gateway, capability_id=capability_id, payload=atomic_payload,

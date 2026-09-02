@@ -3,9 +3,13 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from backend.capability_v2.catalog_audit import CatalogAuditReport
+from backend.capability_v2.atomicity import AtomicityAudit
 from backend.capability_v2.completion import CompletionReport
 from backend.capability_v2 import release_gate
+from backend.capability_v2.orchestration_audit import OrchestrationAudit
 from backend.capability_v2.release_gate import ReleaseGateReport
 
 
@@ -103,3 +107,47 @@ def test_release_gate_blocks_replaced_orchestration_target(tmp_path: Path, monke
 
     assert report.orchestration[0].serialized()["target_failures"][0]["reason_code"] == "target_replaced"
     assert audit_calls == [(catalog_path, tmp_path)]
+
+
+def _passing_release_gate_report(**audit_overrides: int) -> ReleaseGateReport:
+    completion = CompletionReport(
+        domains=(), plugin_agent_gateway_only=True, independent_domains=11,
+        sync_production_paths=0, async_production_paths=0, cross_domain_sql=0,
+        internal_imports=0, consumer_bypasses=0, catalog_capabilities=1,
+        failed=(), web_consumer_bypasses=0,
+    )
+    audit_values = {
+        "stable_count": 1,
+        "generic_operation_count": 0,
+        "open_arguments_count": 0,
+        "default_all_exposure_count": 0,
+        "generic_operation_ids": (),
+    }
+    audit_values.update(audit_overrides)
+    audit = CatalogAuditReport(**audit_values)
+    atomicity = AtomicityAudit((), (), (), (), ())
+    orchestration = tuple(
+        OrchestrationAudit(kind, 0, (), (), ())
+        for kind in ("task_tool", "bff_capability", "business_capability")
+    )
+    return ReleaseGateReport(
+        completion=completion,
+        audit=audit,
+        atomicity=atomicity,
+        orchestration=orchestration,
+    )
+
+
+def test_release_gate_passes_only_when_every_audit_counter_is_zero() -> None:
+    assert _passing_release_gate_report().passed is True
+
+
+@pytest.mark.parametrize("field", [
+    "invalid_consumer_ref_count",
+    "invalid_business_effect_count",
+    "invalid_side_effect_count",
+    "test_evidence_failed_count",
+    "self_attested_test_result_count",
+])
+def test_release_gate_blocks_every_invalid_or_failed_audit_counter(field: str) -> None:
+    assert _passing_release_gate_report(**{field: 1}).passed is False

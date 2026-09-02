@@ -34,7 +34,7 @@
   ],
   "coverage_invariants": {
     "domains": 11,
-    "stable_functions": 920,
+    "stable_functions": 936,
     "resolutions.unreviewed": 0
   },
   "starting_snapshot": {

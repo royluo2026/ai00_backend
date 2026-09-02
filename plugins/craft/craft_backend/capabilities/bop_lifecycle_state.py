@@ -2,10 +2,51 @@
 from __future__ import annotations
 
 import json
+from datetime import date, datetime
 from typing import Any
 
 from backend.capability_v2.provider_contracts import CapabilityContext, CapabilityOutput, CapabilitySpec
 from ..data.connection import get_craft_conn
+
+
+_CHECKLIST_KEYS = {
+    "version_created", "lines_added", "stations_added", "processes_added",
+    "template_selected", "source_selected", "tc_imported", "vpps_imported",
+    "pbom_vpps_checked", "pbom_linked", "vehicle_ops_prep", "vehicle_ops_linked",
+}
+_STATS_KEYS = {
+    "gid", "version_gid", "line_gid", "stats_snapshot_date", "nok_vpps",
+    "nok_unbound_parts", "nok_unbound_ops", "tools_bound", "tools_total",
+    "fixtures_bound", "fixtures_total", "equipment_bound", "equipment_total",
+    "coverage_ok", "balance_ok", "tasks_done", "tasks_total", "issues_open",
+    "rules_warn", "rules_block", "refreshed_at", "_rn",
+}
+
+
+def _projection(value: Any, allowed: set[str]) -> dict[str, Any]:
+    return {key: _transport_value(value[key]) for key in allowed if isinstance(value, dict) and key in value}
+
+
+def _transport_value(value: Any) -> Any:
+    if isinstance(value, (datetime, date)):
+        return value.isoformat()
+    if isinstance(value, dict):
+        return {key: _transport_value(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_transport_value(item) for item in value]
+    return value
+
+
+def _lifecycle_state(value: Any) -> dict[str, Any]:
+    if not isinstance(value, dict) or not isinstance(value.get("init"), dict):
+        return {}
+    init = value["init"]
+    projected: dict[str, Any] = {}
+    if "route" in init:
+        projected["route"] = init.get("route")
+    if isinstance(init.get("checklist"), dict):
+        projected["checklist"] = _projection(init["checklist"], _CHECKLIST_KEYS)
+    return {"init": projected}
 
 
 def read_bop_lifecycle_state(payload: dict[str, Any], _context: CapabilityContext) -> CapabilityOutput:
@@ -54,7 +95,9 @@ def read_bop_lifecycle_state(payload: dict[str, Any], _context: CapabilityContex
     if isinstance(state, str):
         try: state = json.loads(state) if state else {}
         except Exception: state = {}
-    return CapabilityOutput(data={"lifecycle_phase": ver.get("lifecycle_phase"), "lifecycle_state": state, "bop_name": ver.get("bop_name"), "version_tag": ver.get("version_tag"), "data_stage": ver.get("data_stage"), "version_family_gid": family_gid, "stats": stats, "line_stats": line_stats, "history": history, "lines": lines, "pbom_match": pbom_match, "pbom_vpps_check": pbom_check, "family_lifecycle_phase": family_phase, "pbom_diff_queue_pending": pending, "vehicle_ops_prep": bop_meta.get("vehicle_ops_prep", {}), "all_versions_in_family": family_versions})
+    history_keys = {"gid", "version_gid", "phase", "entered_at", "confirmed_at", "confirmed_by_gid", "confirmed_by_name", "note"}
+    family_keys = {"gid", "version_tag", "bop_name", "version_family_gid", "data_stage", "status", "change_note", "archived_at", "frozen_at", "published_at", "is_deleted"}
+    return CapabilityOutput(data={"lifecycle_phase": ver.get("lifecycle_phase"), "lifecycle_state": _lifecycle_state(state), "bop_name": ver.get("bop_name"), "version_tag": ver.get("version_tag"), "data_stage": ver.get("data_stage"), "version_family_gid": family_gid, "stats": _projection(stats, _STATS_KEYS) if stats else None, "line_stats": [_projection(row, _STATS_KEYS) for row in line_stats], "history": [_projection(row, history_keys) for row in history], "lines": [_projection(row, {"gid", "title"}) for row in lines], "pbom_match": _projection(pbom_match, {"pbom_version_gid", "unlinked_ignored"}), "pbom_vpps_check": _projection(pbom_check, {"total", "nok", "ignored"}), "family_lifecycle_phase": family_phase, "pbom_diff_queue_pending": pending, "vehicle_ops_prep": _projection(bop_meta.get("vehicle_ops_prep", {}), {"confirmed", "skipped", "total"}), "all_versions_in_family": [_projection(row, family_keys) for row in family_versions]})
 
 
 def register_bop_lifecycle_state_capability(registry: Any) -> None:

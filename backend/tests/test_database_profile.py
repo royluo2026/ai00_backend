@@ -46,6 +46,19 @@ def test_single_database_runtime_accepts_one_shared_url_for_all_domains(manifest
     assert load_runtime_database_url(manifests.require("device"), env, profile).username == "runtime"
 
 
+def test_single_database_runtime_accepts_explicit_deployment_database_name(manifests):
+    profile = load_database_profile(SINGLE_DATABASE_PROFILE, manifests)
+    env = {
+        "AI00_SHARED_RUNTIME_DB_URL":
+            "mysql://runtime:runtime-secret@db.example:2881/sht_mes_tool",
+        "AI00_SHARED_DATABASE_NAME": "sht_mes_tool",
+    }
+
+    url = load_runtime_database_url(manifests.require("craft"), env, profile)
+
+    assert url.database == "sht_mes_tool"
+
+
 def test_single_database_profile_has_no_runtime_ddl_path(manifests):
     profile = load_database_profile(SINGLE_DATABASE_PROFILE, manifests)
 
@@ -73,6 +86,28 @@ def test_base_runtime_connection_uses_single_database_profile(monkeypatch):
     assert connection == "connection"
     assert captured[0].database == "ai00_test"
     assert captured[0].username == "runtime"
+
+
+def test_base_inbox_connection_uses_single_database_profile(monkeypatch):
+    from backend.base import inbox
+
+    monkeypatch.delenv("AI00_BASE_DB_URL", raising=False)
+    monkeypatch.setenv(
+        "AI00_SHARED_RUNTIME_DB_URL",
+        "mysql://runtime:runtime-secret@db.example:2881/sht_mes_tool",
+    )
+    monkeypatch.setenv("AI00_SHARED_DATABASE_NAME", "sht_mes_tool")
+    captured = []
+    monkeypatch.setattr(
+        inbox,
+        "connect_domain_database",
+        lambda url: captured.append(url) or "connection",
+    )
+
+    connection = inbox._base_connection()
+
+    assert connection == "connection"
+    assert captured[0].database == "sht_mes_tool"
 
 
 def test_profile_rejects_incomplete_domain_coverage(tmp_path: Path, manifests):

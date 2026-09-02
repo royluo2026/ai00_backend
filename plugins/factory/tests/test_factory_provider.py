@@ -93,6 +93,37 @@ def test_factory_provider_registers_only_factory_owned_stable_descriptors():
     assert all(spec.confirmation == ("none" if spec.risk.value == "read" else "user") for spec, _, _ in registry.items)
 
 
+def test_factory_provider_normalizes_database_scalars_before_gateway_serialization(monkeypatch):
+    from datetime import datetime
+    from decimal import Decimal
+
+    from plugins.factory.factory_backend import capabilities
+
+    class Registry:
+        def __init__(self):
+            self.items = []
+
+        def register(self, spec, handler, *, descriptor=None):
+            self.items.append((spec, handler, descriptor))
+
+    monkeypatch.setattr(
+        capabilities.application,
+        "invoke",
+        lambda capability_id, payload, context: [{
+            "created_at": datetime(2026, 9, 1, 12, 30),
+            "capacity": Decimal("12.5"),
+        }],
+    )
+    registry = Registry()
+    capabilities.register_capabilities(registry)
+    handler = next(handler for spec, handler, _ in registry.items if spec.id == "factory.structure.search")
+
+    output = handler({}, SimpleNamespace(tenant_gid="tenant-1"))
+
+    assert output == {"data": [{"created_at": "2026-09-01T12:30:00", "capacity": 12.5}]}
+    json.dumps(output)
+
+
 def test_factory_writes_use_domain_transactions_without_platform_enlistment():
     from plugins.factory.factory_backend.capabilities import register_capabilities
 

@@ -5,6 +5,9 @@
 
 | Agent | `agent.audit.read` | rest |
 | Agent | `agent.audit.record` | rest |
+| Agent | `agent.canvas.execution.resume` | none |
+| Agent | `agent.canvas.execution.start` | none |
+| Agent | `agent.canvas.options.resolve` | none |
 | Agent | `agent.flow.change.apply` | rest |
 | Agent | `agent.flow.read` | rest |
 | Agent | `agent.interaction.cancel` | none |
@@ -21,6 +24,7 @@
 | Agent | `agent.skill.change.apply` | rest |
 | Agent | `agent.skill.read` | rest |
 | Agent | `agent.tool_catalog.read` | none |
+| Agent | `agent.workflow.node.test.execute` | none |
 | Base Platform | `base.annotation.change.apply` | rest |
 | Base Platform | `base.annotation.read` | rest |
 | Base Platform | `base.authorization.grant.change.apply` | rest |
@@ -169,12 +173,14 @@
 | Craft | `craft.pbom.version.search` | rest |
 | Craft | `craft.pbom.version.submit` | none |
 | Craft | `craft.rule.change.apply` | rest |
+| Craft | `craft.rule.definition.change.apply` | none |
 | Craft | `craft.rule.draft.create` | none |
 | Craft | `craft.rule.draft.get` | none |
 | Craft | `craft.rule.draft.revise` | none |
 | Craft | `craft.rule.draft.search` | none |
 | Craft | `craft.rule.draft.submit` | none |
 | Craft | `craft.rule.engine.evaluate` | web, rest |
+| Craft | `craft.rule.entry.evaluate` | none |
 | Craft | `craft.rule.evaluate` | none |
 | Craft | `craft.rule.library.change.apply` | web, rest |
 | Craft | `craft.rule.library.read` | web, rest |
@@ -233,12 +239,18 @@
 | Integration | `integration.connector.schema.discover` | none |
 | Integration | `integration.connector.search` | none |
 | Integration | `integration.connector.update` | none |
+| Integration | `integration.field_mapping.batch.update` | none |
+| Integration | `integration.field_mapping.search` | none |
 | Integration | `integration.mapping.archive` | none |
 | Integration | `integration.mapping.create` | none |
 | Integration | `integration.mapping.get` | none |
+| Integration | `integration.mapping.import.start` | none |
 | Integration | `integration.mapping.preview` | none |
 | Integration | `integration.mapping.search` | none |
+| Integration | `integration.mapping.source_columns.discover` | none |
 | Integration | `integration.mapping.update` | none |
+| Integration | `integration.mapping_target.search` | none |
+| Integration | `integration.mapping_target.upsert` | none |
 | Integration | `integration.sync.start` | none |
 | Knowledge | `knowledge.context.retrieve` | rest, agent |
 | Knowledge | `knowledge.document.acl.grant` | none |
@@ -269,6 +281,7 @@
 | Knowledge | `knowledge.propose` | none |
 | Knowledge | `knowledge.reference_data.change.apply` | none |
 | Knowledge | `knowledge.reference_data.read` | none |
+| Knowledge | `knowledge.reference_dataset.publish` | none |
 | Knowledge | `knowledge.search` | rest, agent |
 | Knowledge | `knowledge.space.change.apply` | none |
 | Knowledge | `knowledge.space.create` | rest |
@@ -292,6 +305,7 @@
 | Project Management | `base.project.search` | rest, agent |
 | Project Management | `project.activity.aggregate` | agent |
 | Project Management | `project.approval.change.apply` | rest, agent |
+| Project Management | `project.approval.order.reject` | none |
 | Project Management | `project.approval.read` | rest, agent |
 | Project Management | `project.bitable_binding.change.apply` | none |
 | Project Management | `project.bitable_binding.read` | none |

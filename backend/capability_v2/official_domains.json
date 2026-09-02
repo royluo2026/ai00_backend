@@ -36,7 +36,7 @@
         "plugin_id": "official.base",
         "module": "backend.base.official_provider",
         "version": "1.0.0",
-        "artifact_hash": "sha256:e3deb234e9239be4ef588555424f36cadae9d0ee04f7431771add9ffddce33b3"
+        "artifact_hash": "sha256:e4fe99f64700faf73e0b1433c2d68327e94a73ab4552c11b4271b9f16a503ad9"
       },
       "artifact_path": "backend/base",
       "allowed_owners": [
@@ -60,7 +60,14 @@
           "backend/db/migrations/202608100003_base_capability_outcomes_and_approvals.sql",
           "backend/db/migrations/202608100004_base_artifacts_and_operations.sql",
           "backend/db/migrations/202608100005_base_plugin_mount_sessions.sql",
-          "backend/db/migrations/202608100007_base_revision_lineage.sql"
+          "backend/db/migrations/202608100007_base_revision_lineage.sql",
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql",
+          "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql",
+          "backend/db/migrations/202608280004_base_plugin_lifecycle_idempotency_scope.sql",
+          "backend/db/migrations/202608280005_base_structural_owner_hardening.sql",
+          "backend/db/migrations/202608280006_base_historical_tenant_repair.sql",
+          "backend/db/migrations/202609010002_base_self_annotation_collation.sql",
+          "backend/db/migrations/202609010003_base_capability_release_binding.sql"
         ]
       },
       "search_export": {
@@ -83,7 +90,7 @@
         "plugin_id": "official.craft",
         "module": "craft_backend.capabilities",
         "version": "1.2.0",
-        "artifact_hash": "sha256:ebef086355e0584a847bfcd8f670f91e7d492af158739aa464d314d126fbb392"
+        "artifact_hash": "sha256:a9005e12e7f3c8919c103f665ae32c7bec593fe7eb83fc23023f5dee8974416c"
       },
       "artifact_path": "plugins/craft/craft_backend",
       "allowed_owners": [
@@ -101,7 +108,9 @@
           "backend/db/migrations/202608050004_craft_bop_version_contract.sql",
           "backend/db/migrations/202608060001_craft_bop_revision.sql",
           "backend/db/migrations/202608060004_craft_validation_policies.sql",
-          "backend/db/migrations/202608070001_craft_bop_write_governance.sql"
+          "backend/db/migrations/202608070001_craft_bop_write_governance.sql",
+          "backend/db/migrations/202608310001_craft_rule_identity_backfill.sql",
+          "backend/db/migrations/202609010001_craft_rule_identity_compatibility.sql"
         ]
       },
       "search_export": null,
@@ -164,7 +173,7 @@
         "plugin_id": "official.factory",
         "module": "factory_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:cf420e668159b24e8451268f95e6cbb90f2d8fad7dc317a897ee8f13195c062f"
+        "artifact_hash": "sha256:b8ef025ef217326566397d743ed91a2ed3e703bf6a0fb12db6bed82b7e98c71b"
       },
       "artifact_path": "plugins/factory/factory_backend",
       "allowed_owners": [
@@ -191,7 +200,7 @@
         "plugin_id": "official.integration",
         "module": "integration_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:dca7bac708a60458433417f7fd7a83b7f16b2ca65783c9fa63f26333f7d862d1"
+        "artifact_hash": "sha256:53defdf4f33e5fa0cbcd70df5cb7b352f16c78c3d1164c9f74b95ca38e0345f4"
       },
       "artifact_path": "plugins/integration/integration_backend",
       "allowed_owners": [
@@ -215,7 +224,7 @@
         "plugin_id": "official.knowledge",
         "module": "knowledge_backend.capabilities",
         "version": "2.0.0",
-        "artifact_hash": "sha256:d0e8844007a5def8e471e4628053158737a5890b447fcae1a6a37d7df3906146"
+        "artifact_hash": "sha256:e373ffa7314fc0c6d7bbd7a828f48c083d76e3702c537cb9edfae9a63feac64f"
       },
       "artifact_path": "plugins/knowledge/knowledge_backend",
       "allowed_owners": [
@@ -269,7 +278,7 @@
         "plugin_id": "official.project-management",
         "module": "project_management_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:5c7427b832c18a10adc55cfc6ada09a96c377111c0df7c060fd1f779e42c8bbb"
+        "artifact_hash": "sha256:5807ab5a2945b4ff1f6e7b8ccd6ba8f5b32417a500edc016f311cce3c0e319f3"
       },
       "artifact_path": "plugins/project_management/project_management_backend",
       "allowed_owners": [

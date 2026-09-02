@@ -121,9 +121,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
-          "source_sha256": "8f22a4db822c9ff66600e8c0e3ae1ea0593fa0dcb80cca248f821ce4706c6e2a",
-          "start_line": 235,
-          "end_line": 235,
+          "source_sha256": "6ddecca4af1e7a26edbd873ba0a94ef29e1b7012a0bd15c61e2b63de208dbcb4",
+          "start_line": 165,
+          "end_line": 165,
           "sha256": "5820ad80e23b7f09e15fd77e25211cdb171632ae2bda9b975aaea45f9466377e",
           "needle": "entries.delete"
         }
@@ -737,9 +737,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
-          "source_sha256": "8f22a4db822c9ff66600e8c0e3ae1ea0593fa0dcb80cca248f821ce4706c6e2a",
-          "start_line": 153,
-          "end_line": 153,
+          "source_sha256": "6ddecca4af1e7a26edbd873ba0a94ef29e1b7012a0bd15c61e2b63de208dbcb4",
+          "start_line": 83,
+          "end_line": 83,
           "sha256": "e2c28e3005559720fed366c5c5e9b6b212703fbc36f26990e27ceb31f637d70d",
           "needle": "\"knowledge.search\""
         }
@@ -826,9 +826,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
-          "source_sha256": "8f22a4db822c9ff66600e8c0e3ae1ea0593fa0dcb80cca248f821ce4706c6e2a",
-          "start_line": 195,
-          "end_line": 195,
+          "source_sha256": "6ddecca4af1e7a26edbd873ba0a94ef29e1b7012a0bd15c61e2b63de208dbcb4",
+          "start_line": 125,
+          "end_line": 125,
           "sha256": "84a56cb1a25a824bde10cdb18309d84ad6a05c2db162a83da37c60855007ce9f",
           "needle": "\"knowledge.get\""
         }
@@ -1929,9 +1929,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
-          "source_sha256": "8f22a4db822c9ff66600e8c0e3ae1ea0593fa0dcb80cca248f821ce4706c6e2a",
-          "start_line": 215,
-          "end_line": 215,
+          "source_sha256": "6ddecca4af1e7a26edbd873ba0a94ef29e1b7012a0bd15c61e2b63de208dbcb4",
+          "start_line": 145,
+          "end_line": 145,
           "sha256": "32e3ff6e2143a63860403d61d2ad92797453979bb349360375149db70026e0b6",
           "needle": "entries.update"
         }
@@ -2613,9 +2613,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
-          "source_sha256": "8f22a4db822c9ff66600e8c0e3ae1ea0593fa0dcb80cca248f821ce4706c6e2a",
-          "start_line": 180,
-          "end_line": 180,
+          "source_sha256": "6ddecca4af1e7a26edbd873ba0a94ef29e1b7012a0bd15c61e2b63de208dbcb4",
+          "start_line": 110,
+          "end_line": 110,
           "sha256": "efa98709952f0ae8ca3b8f7dd9f302073fe3fc3f78bb4166e59c16ba8cfcda1a",
           "needle": "entries.create"
         }
@@ -3315,9 +3315,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
-          "source_sha256": "8f22a4db822c9ff66600e8c0e3ae1ea0593fa0dcb80cca248f821ce4706c6e2a",
-          "start_line": 215,
-          "end_line": 215,
+          "source_sha256": "6ddecca4af1e7a26edbd873ba0a94ef29e1b7012a0bd15c61e2b63de208dbcb4",
+          "start_line": 145,
+          "end_line": 145,
           "sha256": "32e3ff6e2143a63860403d61d2ad92797453979bb349360375149db70026e0b6",
           "needle": "entries.update"
         }
@@ -3386,9 +3386,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
-          "source_sha256": "8f22a4db822c9ff66600e8c0e3ae1ea0593fa0dcb80cca248f821ce4706c6e2a",
-          "start_line": 215,
-          "end_line": 215,
+          "source_sha256": "6ddecca4af1e7a26edbd873ba0a94ef29e1b7012a0bd15c61e2b63de208dbcb4",
+          "start_line": 145,
+          "end_line": 145,
           "sha256": "32e3ff6e2143a63860403d61d2ad92797453979bb349360375149db70026e0b6",
           "needle": "entries.update"
         }
@@ -3455,9 +3455,9 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
-            "start_line": 577,
-            "end_line": 577,
+            "source_sha256": "9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
+            "start_line": 594,
+            "end_line": 594,
             "sha256": "87996e6eb263b446ffb01e10d1cdbd92be0299705262028f64b237aa97d299d9",
             "needle": "INPUT_SCHEMAS[(\"craft.rule.library.change.apply\", 1)]"
           }

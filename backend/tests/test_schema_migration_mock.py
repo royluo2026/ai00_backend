@@ -218,12 +218,8 @@ def mock_conn():
         "backend.db.connection.get_conn",
         "backend.db.sequences.get_conn",
         "backend.platform_sdk.access.get_conn",
-        "knowledge_backend.api.knowledge_entries_legacy.get_conn",
-        "knowledge_backend.api.knowledge_hub_legacy.get_conn",
-        "backend.routers.views.get_conn",
-            "agent_backend.infrastructure.repository.get_agent_conn",
-        "craft_backend.routers.lists.get_conn",
-        "craft_backend.routers.rules.get_conn",
+        "backend.base.saved_views.get_conn",
+        "agent_backend.infrastructure.repository.get_agent_conn",
     )
     with ExitStack() as stack:
         for target in targets:
@@ -264,10 +260,12 @@ def client(mock_conn):
     app.dependency_overrides[get_current_user] = _fake_user
     app.dependency_overrides[get_current_user_optional] = _fake_user_optional
 
-    with TestClient(app) as c:
+    c = TestClient(app)
+    try:
         yield c
-
-    app.dependency_overrides.clear()
+    finally:
+        c.close()
+        app.dependency_overrides.clear()
 
 
 # =====================================================================

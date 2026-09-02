@@ -8,7 +8,7 @@ Apply governed PBOM VPPS operation audit changes.
 - 不适用：The request changes PBOM structure or version content.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_0b584b19349bc98727900583bb19f687`
+- Catalog Release：`rel_fb3c151fd2c880f3d35fc1c786444b0e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -96,8 +96,27 @@ Apply governed PBOM VPPS operation audit changes.
     "rows": {
       "items": {
         "additionalProperties": false,
-        "maxProperties": 10,
-        "properties": {},
+        "properties": {
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "original_vpps_desc": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "pbom_row_gid": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "pbom_row_gid"
+        ],
         "type": "object"
       },
       "maxItems": 500,
@@ -116,7 +135,7 @@ Apply governed PBOM VPPS operation audit changes.
 ```json
 {
   "capability_id": "craft.vpps_audit.change.apply",
-  "catalog_release": "rel_0b584b19349bc98727900583bb19f687",
+  "catalog_release": "rel_fb3c151fd2c880f3d35fc1c786444b0e",
   "major_version": 1,
   "payload": {
     "operation": "rule4_bulk_ignore"
@@ -138,13 +157,181 @@ Apply governed PBOM VPPS operation audit changes.
     },
     "operation": {
       "additionalProperties": false,
-      "properties": {},
+      "properties": {
+        "actor_gid": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "actor_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "created_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "field_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "gid": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "is_active": {
+          "type": "boolean"
+        },
+        "new_value": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "operation_type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "original_value": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "pbom_row_gid": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "pbom_version_gid": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "reverted_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reverted_by_gid": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reverted_by_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "rule_no": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
       "type": "object"
     },
     "operations": {
       "items": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "actor_gid": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "actor_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "field_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "gid": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "new_value": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "operation_type": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "original_value": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "pbom_row_gid": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "pbom_version_gid": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "reverted_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reverted_by_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reverted_by_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "rule_no": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
         "type": "object"
       },
       "maxItems": 500,

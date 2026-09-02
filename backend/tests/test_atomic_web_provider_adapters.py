@@ -35,10 +35,12 @@ def test_capability_and_rest_share_the_grant_owner_service(monkeypatch):
 
 
 def test_provider_output_is_typed_and_rejected_when_service_shape_is_wrong(monkeypatch):
-    from backend.base import plugin_inventory
     from backend.base.web_atomic import register_atomic_web_capabilities
 
-    monkeypatch.setattr(plugin_inventory, "list_installed_plugins", lambda: {"success": True, "data": [{"plugin_id": "p"}]})
+    class PluginService:
+        def list_installed(self, *, actor):
+            return {"installations": [{"plugin_id": "p"}]}
+    monkeypatch.setattr("backend.plugin_platform.service.PluginPlatformService", PluginService)
     registry = CapabilityRegistry()
     register_atomic_web_capabilities(registry)
     with pytest.raises(ValueError, match="missing required field"):

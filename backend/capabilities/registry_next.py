@@ -24,9 +24,17 @@ class RegisteredCapability:
     handler: CapabilityHandler
     descriptor: Any | None = None
 
+@dataclass(frozen=True)
+class ProviderArtifactBinding:
+    plugin_id: str
+    module: str
+    version: str
+    artifact_hash: str
+
 class CapabilityRegistry:
     def __init__(self) -> None:
         self._items: dict[tuple[str, int], RegisteredCapability] = {}
+        self._provider_artifacts: dict[str, ProviderArtifactBinding] = {}
         self._lifecycles: dict[str, tuple[Callable[[], Awaitable[None]], Callable[[], Awaitable[None]]]] = {}
         self._lifecycle_health: dict[str, Callable[[], Mapping[str, Any]]] = {}
         self._lifecycle_signals: dict[str, deque[dict[str, Any]]] = {}
@@ -60,6 +68,19 @@ class CapabilityRegistry:
     def keys(self) -> tuple[tuple[str, int], ...]:
         """Return stable public identities without exposing registry storage."""
         return tuple(sorted(self._items))
+    def bind_provider_artifact(self, owner: str, artifact: Any) -> None:
+        binding = ProviderArtifactBinding(
+            plugin_id=str(artifact.plugin_id),
+            module=str(artifact.module),
+            version=str(artifact.version),
+            artifact_hash=str(artifact.artifact_hash),
+        )
+        current = self._provider_artifacts.get(owner)
+        if current is not None and current != binding:
+            raise ValueError(f"Provider artifact already bound for owner: {owner}")
+        self._provider_artifacts[owner] = binding
+    def provider_artifact(self, owner: str) -> ProviderArtifactBinding | None:
+        return self._provider_artifacts.get(owner)
     def register_lifecycle(
         self, name: str, start: Callable[[], Awaitable[None]], stop: Callable[[], Awaitable[None]],
         *, health: Callable[[], Mapping[str, Any]] | None = None,

@@ -1,10 +1,10 @@
 {
   "execution_mode": "unit",
-  "failed": 0,
+  "failed": 1,
   "hashes": {
-    "governance_extension": "sha256:613561741a977d2a336275fa52c45f1ff2f9590d66b4c7733d8b067a18ccdc1e",
-    "product_catalog": "sha256:118d91d38b08fcecd96ddea0005a02b5c81cc121f93b4028b33b15fe91bfb29f",
-    "snapshot": "sha256:0c1e5978489a61efe6b0ae5e493b28e8e7afe848f7802e3be53dc93911f6a004"
+    "governance_extension": "sha256:18918ddafb18ff46c61f0e7505cadb4d0c29c29a40c7d0484204cae09a3cb835",
+    "product_catalog": "sha256:81405cb071346de9a5de1bd025d642f2ecb2629cb8e379eff9b5de1641a3af01",
+    "snapshot": ""
   },
   "mandatory_sections": [
     "agent_delegation",
@@ -22,8 +22,8 @@
     "ui",
     "workflow"
   ],
-  "report_gid": "215561807941767168",
-  "report_hash": "sha256:ecd7b0a31d9b10b2719d5c9be9869b3f8796f9296deab4c7b934b99121b56900",
+  "report_gid": "220503982202851328",
+  "report_hash": "sha256:8e018fdeb160f1c56be530bbf922e91d04eee2bd450e812d5760ab1173947493",
   "sections": {
     "agent_delegation": {
       "evidence": {
@@ -55,9 +55,9 @@
     "catalog_separation": {
       "evidence": {
         "collision_free": true,
-        "effective_catalog_hash": "sha256:8e256e49fc1347f44ea0a53f6866fd36fe272c13e258bf8d2a61c3396768962a",
-        "governance_extension_id": "rel_613561741a977d2a336275fa52c45f1f",
-        "product_catalog_id": "rel_118d91d38b08fcecd96ddea0005a02b5"
+        "effective_catalog_hash": "sha256:ba23090106501ccd31ef2286e60088020cce842af0e77c9c9845d5caffca026d",
+        "governance_extension_id": "rel_18918ddafb18ff46c61f0e7505cadb4d",
+        "product_catalog_id": "rel_81405cb071346de9a5de1bd025d642f2"
       },
       "status": "passed"
     },
@@ -69,15 +69,15 @@
           "gap": "provider_missing",
           "transaction_provider": "transaction_participant_missing"
         },
-        "finding_hash": "sha256:7b7c2aa7d67ece826e5dfde6e055d618ff63512db4d3425bc1eb4c559ca53bb8"
+        "finding_hash": "sha256:1a7c0de657b2de6809173b4bb3011c89424ea6958a35c0a4c25dd94fcdf2964a"
       },
       "status": "passed"
     },
     "graph": {
       "evidence": {
-        "graph_hash": "sha256:92e33d4e2bfc70fdf4dfbf83c415ea74470ddd9742d3659faf0a8383febe3b62",
-        "node_count": 1942,
-        "relation_count": 586
+        "graph_hash": "sha256:05825ea5795ed409b348e04d54dfc087bf08fcf040d820a6ed465a88e8f5d553",
+        "node_count": 5165,
+        "relation_count": 5754
       },
       "status": "passed"
     },
@@ -94,7 +94,7 @@
       "evidence": {
         "machine_id": 41,
         "profile": "test-governance",
-        "report_gid": "215561764371337216"
+        "report_gid": "220503746130644992"
       },
       "status": "passed"
     },
@@ -109,8 +109,8 @@
     "permissions": {
       "evidence": {
         "allowed_invocations": 2,
-        "capability_count": 14,
-        "permission_contract_hash": "sha256:be64d678ab361f64b669c59ae564d93f8b747b06d06446ff207c8ead7babc8bc"
+        "capability_count": 18,
+        "permission_contract_hash": "sha256:390a5f22bf8541dcc1fb47e4d71ba87c255aeca734e9a11d6a8e799c9a920db7"
       },
       "status": "passed"
     },
@@ -125,23 +125,21 @@
     "release_gate": {
       "evidence": {
         "release_report_gid": "501",
-        "release_report_hash": "sha256:602598551ae4e61e8485713166cf0b241791092682746927951b2726777b28b3",
+        "release_report_hash": "sha256:c282b392f2aca0e49c6090eade652c4b9bdecc97242fa36ae3347ace1e2fb776",
         "stale_release": "failed"
       },
       "status": "passed"
     },
     "snapshot": {
       "evidence": {
-        "repeated_scan_hash": "sha256:0c1e5978489a61efe6b0ae5e493b28e8e7afe848f7802e3be53dc93911f6a004",
-        "snapshot_gid": "101",
-        "snapshot_hash": "sha256:0c1e5978489a61efe6b0ae5e493b28e8e7afe848f7802e3be53dc93911f6a004"
+        "error_code": "RuntimeError"
       },
-      "status": "passed"
+      "status": "failed"
     },
     "ui": {
       "evidence": {
-        "asset_hash": "sha256:04543174110923d158aee56d18616f00361d9a0e1e4e24674213eee22e1e5e3d",
-        "css_asset_hash": "sha256:2ab005ece610aae1f27f0b920216ce2c447dfcad270a463d86096c3b93696b57",
+        "asset_hash": "sha256:b57e77630796dd942efd25e719460336b0f9afb402a9a8710f4abac7ef797160",
+        "css_asset_hash": "sha256:a522df6b9914be654dc0a74a2c7b9bf645ede63e760200b850c4ffcc5a7d25d9",
         "test_governance_ui": "dist/web/admin/capability_governance/index.html"
       },
       "status": "passed"
@@ -155,5 +153,5 @@
     }
   },
   "skipped": 0,
-  "status": "passed"
+  "status": "failed"
 }

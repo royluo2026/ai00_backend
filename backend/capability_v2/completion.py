@@ -798,8 +798,22 @@ def evaluate_completion(
                     field="web_lexical_non_routes_artifact",
                 )
             )
+        scan_roots = _web_scan_roots(web_root)
+        source_documents = None
+        source_root_names = None
+        frontend_revision = _web_frontend_revision(web_root)
+        if (web_root / ".git").exists() and any(
+            (web_root / name).exists() for name in ("web", "packages")
+        ):
+            # Release evidence is about the immutable commit, never whatever
+            # uncommitted files happen to be present beside it.
+            from backend.scripts.check_web_capability_routes import _git_tree_documents
+
+            frontend_revision, source_documents, _ = _git_tree_documents(web_root, "HEAD")
+            scan_roots = ()
+            source_root_names = ("web", "packages")
         web_scan = scan_web_api_routes(
-            _web_scan_roots(web_root),
+            scan_roots,
             legacy_index=_web_route_index(
                 root, configuration, "legacy_route_inventory_artifact"
             ),
@@ -807,10 +821,12 @@ def evaluate_completion(
                 root, configuration, "bff_route_inventory_artifact"
             ),
             exclusions=exclusions,
-            frontend_revision=_web_frontend_revision(web_root),
+            frontend_revision=frontend_revision,
             classification_prefixes=tuple(web_prefixes),
             lexical_non_routes=lexical_non_routes,
             wrapper_contracts=_web_wrapper_contracts(root, configuration),
+            source_documents=source_documents,
+            source_root_names=source_root_names,
         )
         web_consumer_bypasses = web_scan.unresolved_count
         lexical_unmatched = len(web_scan.lexical_audit.unmatched_tokens)

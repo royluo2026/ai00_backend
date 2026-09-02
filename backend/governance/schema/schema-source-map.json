@@ -1,7 +1,249 @@
 {
-  "schema_sha256": "sha256:d3b1ab1322b5b28ad480039756ea4f70f7aa25e8d90e3a774ee9e96327516d23",
+  "schema_sha256": "sha256:3acf0f1fbdb002e995855f0f1dec580ae2c055a3ad8f84e5a55b55e3c626c49c",
   "schema_version": 1,
   "tables": [
+    {
+      "columns": {
+        "actor_gid": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "error_code": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "event_id": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "invocation_id": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "revision": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "run_id": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "team_gid": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ]
+      },
+      "constraints": {
+        "fk_agent_canvas_audit_invocation": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "idx_agent_canvas_audit_invocation": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+      ],
+      "table": "workmanship_agent_canvas_audit_events"
+    },
+    {
+      "columns": {
+        "actor_gid": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "attempt_count": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "capability_id": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "error_code": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "idempotency_key": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "invocation_id": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "lease_expires_at": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "lease_owner": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "lease_token": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "next_attempt_at": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "payload_hash": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "request_json": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "result_json": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "revision": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "run_id": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "target_dispatched_at": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "target_state": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "team_gid": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ]
+      },
+      "constraints": {
+        "fk_agent_canvas_invocation_run": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "idx_agent_canvas_invocation_claim": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "uq_agent_canvas_invocation_idempotency": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+      ],
+      "table": "workmanship_agent_canvas_invocations"
+    },
+    {
+      "columns": {
+        "actor_gid": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "checkpoint_json": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "pause_token_hash": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "result_json": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "revision": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "run_id": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "run_token_hash": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "skill_gid": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "skill_revision": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "team_gid": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "idx_agent_canvas_run_principal": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "uq_agent_canvas_run_token": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+      ],
+      "table": "workmanship_agent_canvas_runs"
+    },
+    {
+      "columns": {
+        "actor_gid": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "completed_at": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "invocation_id": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "result_json": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "revision": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "run_id": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "team_gid": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ]
+      },
+      "constraints": {
+        "fk_agent_canvas_runtime_result_invocation": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "fk_agent_canvas_runtime_result_run": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
+        "idx_agent_canvas_runtime_result_principal": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+      ],
+      "table": "workmanship_agent_canvas_runtime_results"
+    },
     {
       "columns": {
         "content_json": [
@@ -749,9 +991,12 @@
           "backend/db/mysql_schema.sql"
         ],
         "owner_user_gid": [
-          "backend/db/migrations/202608030003_agent_private_flows.sql"
+          "backend/db/mysql_schema.sql"
         ],
         "status": [
+          "backend/db/mysql_schema.sql"
+        ],
+        "team_gid": [
           "backend/db/mysql_schema.sql"
         ],
         "updated_at": [
@@ -766,12 +1011,16 @@
         "idx_agent_flows_owner_updated": [
           "backend/db/migrations/202608030003_agent_private_flows.sql"
         ],
+        "idx_agent_flows_team_owner_updated": [
+          "backend/db/migrations/domains/agent/0002_canvas_query_tenant.sql"
+        ],
         "idx_flows_status": [
           "backend/db/mysql_schema.sql"
         ]
       },
       "sources": [
         "backend/db/migrations/202608030003_agent_private_flows.sql",
+        "backend/db/migrations/domains/agent/0002_canvas_query_tenant.sql",
         "backend/db/mysql_schema.sql"
       ],
       "table": "workmanship_app_flows"
@@ -852,6 +1101,9 @@
         "owner_gid": [
           "backend/db/mysql_schema.sql"
         ],
+        "revision": [
+          "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+        ],
         "scope": [
           "backend/db/mysql_schema.sql"
         ],
@@ -867,6 +1119,9 @@
         "tags": [
           "backend/db/mysql_schema.sql"
         ],
+        "team_gid": [
+          "backend/db/mysql_schema.sql"
+        ],
         "title": [
           "backend/db/mysql_schema.sql"
         ],
@@ -878,6 +1133,9 @@
       "indexes": {
         "PRIMARY": [
           "backend/db/mysql_schema.sql"
+        ],
+        "idx_agent_skills_team_owner_scope": [
+          "backend/db/migrations/domains/agent/0002_canvas_query_tenant.sql"
         ],
         "idx_skills_name": [
           "backend/db/mysql_schema.sql"
@@ -891,6 +1149,8 @@
       },
       "sources": [
         "backend/db/migrations/202608030002_agent_memory_skills_audit.sql",
+        "backend/db/migrations/domains/agent/0002_canvas_query_tenant.sql",
+        "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql",
         "backend/db/mysql_schema.sql"
       ],
       "table": "workmanship_app_skills"
@@ -947,6 +1207,9 @@
         "owner_gid": [
           "backend/db/mysql_schema.sql"
         ],
+        "tenant_gid": [
+          "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+        ],
         "updated_at": [
           "backend/db/mysql_schema.sql"
         ]
@@ -955,6 +1218,9 @@
       "indexes": {
         "PRIMARY": [
           "backend/db/mysql_schema.sql"
+        ],
+        "idx_base_saved_view_tenant": [
+          "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
         ],
         "idx_view_configs_list_gid": [
           "backend/db/mysql_schema.sql"
@@ -967,6 +1233,7 @@
         ]
       },
       "sources": [
+        "backend/db/migrations/202608280005_base_structural_owner_hardening.sql",
         "backend/db/mysql_schema.sql"
       ],
       "table": "workmanship_app_view_configs"
@@ -1615,11 +1882,56 @@
     },
     {
       "columns": {
+        "actor_gid": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "attachment_gid": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "checksum": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "display_name": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "media_type": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "registered_at": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "size": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ]
+      },
+      "constraints": {
+        "chk_base_attachment_reference_size": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+      ],
+      "table": "workmanship_base_attachment_references"
+    },
+    {
+      "columns": {
         "approval_id": [
           "backend/db/migrations/202608100003_base_capability_outcomes_and_approvals.sql"
         ],
         "capability_id": [
           "backend/db/migrations/202608100003_base_capability_outcomes_and_approvals.sql"
+        ],
+        "catalog_release": [
+          "backend/db/migrations/202609010003_base_capability_release_binding.sql"
         ],
         "confirmation_policy": [
           "backend/db/migrations/202608100003_base_capability_outcomes_and_approvals.sql"
@@ -1665,7 +1977,8 @@
         ]
       },
       "sources": [
-        "backend/db/migrations/202608100003_base_capability_outcomes_and_approvals.sql"
+        "backend/db/migrations/202608100003_base_capability_outcomes_and_approvals.sql",
+        "backend/db/migrations/202609010003_base_capability_release_binding.sql"
       ],
       "table": "workmanship_base_capability_approvals"
     },
@@ -2474,6 +2787,45 @@
     },
     {
       "columns": {
+        "actor_gid": [
+          "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql"
+        ],
+        "command_sha256": [
+          "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql"
+        ],
+        "completed_at": [
+          "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql"
+        ],
+        "idempotency_key": [
+          "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql"
+        ],
+        "operation": [
+          "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql"
+        ],
+        "result_json": [
+          "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql"
+        ],
+        "status": [
+          "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/202608280004_base_plugin_lifecycle_idempotency_scope.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql",
+        "backend/db/migrations/202608280004_base_plugin_lifecycle_idempotency_scope.sql"
+      ],
+      "table": "workmanship_base_plugin_lifecycle_idempotency"
+    },
+    {
+      "columns": {
         "approval_policy": [
           "backend/db/migrations/202608100007_base_revision_lineage.sql"
         ],
@@ -2790,6 +3142,150 @@
     },
     {
       "columns": {
+        "actor_gid": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "details_json": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "idempotency_key": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "operation": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "status": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+        ],
+        "view_gid": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "idx_base_saved_view_audit_actor": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "idx_base_saved_view_audit_view": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/202608280001_base_saved_view_governance.sql",
+        "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+      ],
+      "table": "workmanship_base_saved_view_audit_events"
+    },
+    {
+      "columns": {
+        "actor_gid": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "command_digest": [
+          "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+        ],
+        "completed_at": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "idempotency_key": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "operation": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "result_json": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "status": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+        ],
+        "view_gid": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+        ],
+        "idx_base_saved_view_replay_view": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/202608280001_base_saved_view_governance.sql",
+        "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+      ],
+      "table": "workmanship_base_saved_view_idempotency"
+    },
+    {
+      "columns": {
+        "created_at": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "deleted": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "grants_json": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "restore_json": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "revision": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "share_scope": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "team_gids_json": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ],
+        "view_gid": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+        ],
+        "idx_base_saved_view_state_scope": [
+          "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/202608280001_base_saved_view_governance.sql",
+        "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+      ],
+      "table": "workmanship_base_saved_view_states"
+    },
+    {
+      "columns": {
         "applied_at": [
           "backend/db/migrations/domains/base/0001_base_platform.sql"
         ],
@@ -2860,8 +3356,126 @@
     },
     {
       "columns": {
+        "actor_gid": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "details_json": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "idempotency_key": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
         "item_gid": [
-          "backend/db/migrations/202608030010_base_self_annotations.sql"
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "operation": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "status": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/202608280002_base_self_annotation_governance.sql",
+        "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+      ],
+      "table": "workmanship_base_self_annotation_audit_events"
+    },
+    {
+      "columns": {
+        "actor_gid": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "command_digest": [
+          "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+        ],
+        "completed_at": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "idempotency_key": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "item_gid": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "operation": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "result_json": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "status": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/202608280002_base_self_annotation_governance.sql",
+        "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+      ],
+      "table": "workmanship_base_self_annotation_idempotency"
+    },
+    {
+      "columns": {
+        "deleted": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "item_gid": [
+          "backend/db/migrations/202609010002_base_self_annotation_collation.sql"
+        ],
+        "restore_json": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "revision": [
+          "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/202609010002_base_self_annotation_collation.sql"
+        ],
+        "user_gid": [
+          "backend/db/migrations/202609010002_base_self_annotation_collation.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/202608280002_base_self_annotation_governance.sql",
+        "backend/db/migrations/202608280005_base_structural_owner_hardening.sql",
+        "backend/db/migrations/202609010002_base_self_annotation_collation.sql"
+      ],
+      "table": "workmanship_base_self_annotation_states"
+    },
+    {
+      "columns": {
+        "item_gid": [
+          "backend/db/migrations/202609010002_base_self_annotation_collation.sql"
         ],
         "item_title": [
           "backend/db/migrations/202608030010_base_self_annotations.sql"
@@ -2881,17 +3495,20 @@
         "self_status": [
           "backend/db/migrations/202608030010_base_self_annotations.sql"
         ],
+        "tenant_gid": [
+          "backend/db/migrations/202609010002_base_self_annotation_collation.sql"
+        ],
         "updated_at": [
           "backend/db/migrations/202608030010_base_self_annotations.sql"
         ],
         "user_gid": [
-          "backend/db/migrations/202608030010_base_self_annotations.sql"
+          "backend/db/migrations/202609010002_base_self_annotation_collation.sql"
         ]
       },
       "constraints": {},
       "indexes": {
         "PRIMARY": [
-          "backend/db/migrations/202608030010_base_self_annotations.sql"
+          "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
         ],
         "idx_self_annotations_module": [
           "backend/db/migrations/202608030010_base_self_annotations.sql"
@@ -2901,7 +3518,9 @@
         ]
       },
       "sources": [
-        "backend/db/migrations/202608030010_base_self_annotations.sql"
+        "backend/db/migrations/202608030010_base_self_annotations.sql",
+        "backend/db/migrations/202608280005_base_structural_owner_hardening.sql",
+        "backend/db/migrations/202609010002_base_self_annotation_collation.sql"
       ],
       "table": "workmanship_base_self_annotations"
     },
@@ -3188,9 +3807,16 @@
         ],
         "idx_bop_entries_source": [
           "backend/db/mysql_schema.sql"
+        ],
+        "idx_bop_nav_parent_order": [
+          "backend/db/migrations/domains/craft/0002_bop_navigation_indexes.sql"
+        ],
+        "idx_bop_nav_type_order": [
+          "backend/db/migrations/domains/craft/0002_bop_navigation_indexes.sql"
         ]
       },
       "sources": [
+        "backend/db/migrations/domains/craft/0002_bop_navigation_indexes.sql",
         "backend/db/mysql_schema.sql"
       ],
       "table": "workmanship_bop_bop_entries"
@@ -3263,11 +3889,15 @@
         "idx_bop_links_version": [
           "backend/db/mysql_schema.sql"
         ],
+        "idx_bop_nav_links_page": [
+          "backend/db/migrations/domains/craft/0002_bop_navigation_indexes.sql"
+        ],
         "uq_bop_entry_links": [
           "backend/db/mysql_schema.sql"
         ]
       },
       "sources": [
+        "backend/db/migrations/domains/craft/0002_bop_navigation_indexes.sql",
         "backend/db/mysql_schema.sql"
       ],
       "table": "workmanship_bop_bop_entry_links"
@@ -6101,6 +6731,53 @@
     },
     {
       "columns": {
+        "capability_id": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "error_code": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "event_id": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "operation_id": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "operation_version": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "owner_gid": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "team_gid": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "idx_int_audit_operation": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "idx_int_audit_owner": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+      ],
+      "table": "workmanship_int_audit_events"
+    },
+    {
+      "columns": {
         "created_at": [
           "backend/db/mysql_schema.sql"
         ],
@@ -6179,6 +6856,9 @@
         "onto_property_gid": [
           "backend/db/mysql_schema.sql"
         ],
+        "revision": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
         "sort_order": [
           "backend/db/mysql_schema.sql"
         ],
@@ -6200,6 +6880,7 @@
       },
       "sources": [
         "backend/db/migrations/domains/integration/0001_integration.sql",
+        "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql",
         "backend/db/mysql_schema.sql"
       ],
       "table": "workmanship_int_ext_field_mappings"
@@ -6233,6 +6914,18 @@
         "onto_class_gid": [
           "backend/db/mysql_schema.sql"
         ],
+        "target_binding_id": [
+          "backend/db/migrations/domains/integration/0003_integration_mapping_target_bindings.sql"
+        ],
+        "target_expected_version": [
+          "backend/db/migrations/domains/integration/0003_integration_mapping_target_bindings.sql"
+        ],
+        "target_input_contract": [
+          "backend/db/migrations/domains/integration/0003_integration_mapping_target_bindings.sql"
+        ],
+        "target_resource_gid": [
+          "backend/db/migrations/domains/integration/0003_integration_mapping_target_bindings.sql"
+        ],
         "unique_key_col": [
           "backend/db/mysql_schema.sql"
         ]
@@ -6248,9 +6941,145 @@
       },
       "sources": [
         "backend/db/migrations/domains/integration/0001_integration.sql",
+        "backend/db/migrations/domains/integration/0003_integration_mapping_target_bindings.sql",
         "backend/db/mysql_schema.sql"
       ],
       "table": "workmanship_int_ext_mappings"
+    },
+    {
+      "columns": {
+        "active": [
+          "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+        ],
+        "binding_gid": [
+          "backend/db/migrations/domains/integration/0006_integration_binding_tenant_identity.sql"
+        ],
+        "binding_id": [
+          "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+        ],
+        "expected_version": [
+          "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+        ],
+        "input_contract": [
+          "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+        ],
+        "last_idempotency_key": [
+          "backend/db/migrations/domains/integration/0005_integration_execution_control.sql"
+        ],
+        "minimum_catalog_release": [
+          "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+        ],
+        "ontology_object_gid": [
+          "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+        ],
+        "owner_gid": [
+          "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+        ],
+        "resource_gid": [
+          "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+        ],
+        "revision": [
+          "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+        ],
+        "semantic_key": [
+          "backend/db/migrations/domains/integration/0006_integration_binding_tenant_identity.sql"
+        ],
+        "target_capability_id": [
+          "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+        ],
+        "target_domain": [
+          "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+        ],
+        "target_major_version": [
+          "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+        ],
+        "team_gid": [
+          "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/integration/0006_integration_binding_tenant_identity.sql"
+        ],
+        "idx_int_target_binding_projection": [
+          "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+        ],
+        "uk_int_target_binding_scope": [
+          "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+        ],
+        "uk_int_target_binding_tenant_semantic": [
+          "backend/db/migrations/domains/integration/0006_integration_binding_tenant_identity.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql",
+        "backend/db/migrations/domains/integration/0005_integration_execution_control.sql",
+        "backend/db/migrations/domains/integration/0006_integration_binding_tenant_identity.sql"
+      ],
+      "table": "workmanship_int_mapping_target_bindings"
+    },
+    {
+      "columns": {
+        "capability_id": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "error_code": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "idempotency_key": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "operation_id": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "operation_version": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "owner_gid": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "payload_hash": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "result_json": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "team_gid": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "idx_int_operation_team_status": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
+        "uq_int_operation_idempotency": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+      ],
+      "table": "workmanship_int_operations"
     },
     {
       "columns": {
@@ -6277,8 +7106,17 @@
     },
     {
       "columns": {
+        "attempt_count": [
+          "backend/db/migrations/domains/integration/0005_integration_execution_control.sql"
+        ],
         "catalog_release": [
           "backend/db/migrations/domains/integration/0001_integration.sql"
+        ],
+        "claim_token": [
+          "backend/db/migrations/domains/integration/0005_integration_execution_control.sql"
+        ],
+        "claimed_at": [
+          "backend/db/migrations/domains/integration/0005_integration_execution_control.sql"
         ],
         "created_at": [
           "backend/db/migrations/domains/integration/0001_integration.sql"
@@ -6286,8 +7124,17 @@
         "cursor_json": [
           "backend/db/migrations/domains/integration/0001_integration.sql"
         ],
+        "error_code": [
+          "backend/db/migrations/domains/integration/0005_integration_execution_control.sql"
+        ],
+        "idempotency_key": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+        ],
         "mapping_gid": [
           "backend/db/migrations/domains/integration/0001_integration.sql"
+        ],
+        "next_attempt_at": [
+          "backend/db/migrations/domains/integration/0005_integration_execution_control.sql"
         ],
         "operation_id": [
           "backend/db/migrations/domains/integration/0001_integration.sql"
@@ -6303,6 +7150,18 @@
         ],
         "target_capability_id": [
           "backend/db/migrations/domains/integration/0001_integration.sql"
+        ],
+        "target_dispatched_at": [
+          "backend/db/migrations/domains/integration/0005_integration_execution_control.sql"
+        ],
+        "target_idempotency_key": [
+          "backend/db/migrations/domains/integration/0005_integration_execution_control.sql"
+        ],
+        "target_invocation_json": [
+          "backend/db/migrations/domains/integration/0003_integration_mapping_target_bindings.sql"
+        ],
+        "target_major_version": [
+          "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
         ],
         "team_gid": [
           "backend/db/migrations/domains/integration/0001_integration.sql"
@@ -6321,7 +7180,10 @@
         ]
       },
       "sources": [
-        "backend/db/migrations/domains/integration/0001_integration.sql"
+        "backend/db/migrations/domains/integration/0001_integration.sql",
+        "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql",
+        "backend/db/migrations/domains/integration/0003_integration_mapping_target_bindings.sql",
+        "backend/db/migrations/domains/integration/0005_integration_execution_control.sql"
       ],
       "table": "workmanship_int_sync_runs"
     },
@@ -6341,6 +7203,9 @@
         ],
         "created_at": [
           "backend/db/mysql_schema.sql"
+        ],
+        "creator_gid": [
+          "backend/db/migrations/202609010001_craft_rule_identity_compatibility.sql"
         ],
         "display_id": [
           "backend/db/mysql_schema.sql"
@@ -6404,6 +7269,7 @@
         ]
       },
       "sources": [
+        "backend/db/migrations/202609010001_craft_rule_identity_compatibility.sql",
         "backend/db/mysql_schema.sql"
       ],
       "table": "workmanship_know_craft_rules"
@@ -7874,6 +8740,9 @@
         "previous_version": [
           "backend/db/migrations/202608030006_base_platform_runtime_tables.sql"
         ],
+        "revision": [
+          "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql"
+        ],
         "state": [
           "backend/db/migrations/202608030006_base_platform_runtime_tables.sql"
         ],
@@ -7895,7 +8764,8 @@
       },
       "sources": [
         "backend/db/migrations/202608030006_base_platform_runtime_tables.sql",
-        "backend/db/migrations/202608100005_base_plugin_mount_sessions.sql"
+        "backend/db/migrations/202608100005_base_plugin_mount_sessions.sql",
+        "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql"
       ],
       "table": "workmanship_plugin_installations"
     },
@@ -8274,6 +9144,50 @@
     },
     {
       "columns": {
+        "actor_gid": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "idempotency_key": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "operation": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "order_gid": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "revision": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "team_gid": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "idx_proj_approval_audit_order": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+      ],
+      "table": "workmanship_proj_approval_audit_events"
+    },
+    {
+      "columns": {
         "applicant_gid": [
           "backend/db/mysql_schema.sql"
         ],
@@ -8301,6 +9215,9 @@
         "reviewer_gid": [
           "backend/db/mysql_schema.sql"
         ],
+        "revision": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
         "share_scope": [
           "backend/db/mysql_schema.sql"
         ],
@@ -8309,6 +9226,9 @@
         ],
         "status": [
           "backend/db/mysql_schema.sql"
+        ],
+        "team_gid": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
         ],
         "title": [
           "backend/db/mysql_schema.sql"
@@ -8334,9 +9254,57 @@
       },
       "sources": [
         "backend/db/migrations/domains/project_management/0001_project_management.sql",
+        "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql",
         "backend/db/mysql_schema.sql"
       ],
       "table": "workmanship_proj_approval_orders"
+    },
+    {
+      "columns": {
+        "actor_gid": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "capability_id": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "completed_at": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "idempotency_key": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "order_gid": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "payload_hash": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "result_text": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "team_gid": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "idx_proj_approval_rejection_order": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+      ],
+      "table": "workmanship_proj_approval_rejection_operations"
     },
     {
       "columns": {
@@ -8499,6 +9467,56 @@
         "backend/db/mysql_schema.sql"
       ],
       "table": "workmanship_proj_issues"
+    },
+    {
+      "columns": {
+        "attempts": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "event_type": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "last_error": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "order_gid": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "payload": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "recipient_gid": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "team_gid": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ],
+        "idx_proj_notification_outbox_delivery": [
+          "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+      ],
+      "table": "workmanship_proj_notification_outbox"
     },
     {
       "columns": {

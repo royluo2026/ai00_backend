@@ -7,7 +7,14 @@ from .wiring import AdapterFactory, build_application, register_import_worker_li
 
 
 def register_capabilities(registry, *, adapter_factory: AdapterFactory | None = None) -> None:
-    application = build_application(adapter_factory)
+    application = build_application(adapter_factory) if adapter_factory is not None else None
+
+    def resolve_application():
+        nonlocal application
+        if application is None:
+            application = build_application()
+        return application
+
     # The production CapabilityRegistry owns lifecycle hooks. Lightweight
     # descriptor collectors intentionally expose only ``register``.
     if hasattr(registry, "register_lifecycle"):
@@ -16,7 +23,7 @@ def register_capabilities(registry, *, adapter_factory: AdapterFactory | None = 
         capability_id = spec.id
 
         async def handler(payload, context, *, _capability_id=capability_id):
-            return await application.invoke(_capability_id, payload, context)
+            return await resolve_application().invoke(_capability_id, payload, context)
 
         governed = spec.model_copy(update={"plugin_callable": True})
         registry.register(governed, handler, descriptor=descriptor_for(governed))

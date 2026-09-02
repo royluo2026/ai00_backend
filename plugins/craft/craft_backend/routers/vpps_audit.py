@@ -47,7 +47,10 @@ async def _invoke_vpps_audit(request, current_user, principal, gateway, capabili
     if not result.ok:
         code = result.error.code if result.error else "provider_error"
         raise HTTPException(status_code={"resource_not_found": 404, "permission_denied": 403, "invalid_input": 400}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
-    return result.data["data"]
+    data = result.data
+    if operation == "list":
+        return {"success": data["success"], "data": data["items"]}
+    return data
 
 
 @router.post("/rule4-bulk-ignore", dependencies=[Depends(_WRITE)])

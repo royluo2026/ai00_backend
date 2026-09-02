@@ -142,14 +142,6 @@ class MysqlRuleDefinitionRepository(RuleDefinitionRepository):
                         "INSERT INTO workmanship_craft_bop_write_idempotency (idempotency_key,capability_id,version_gid,result_json,created_by) VALUES (%s,%s,%s,%s,%s)",
                         (idempotency_key, "craft.rule.definition.change.apply", rule_gid, json.dumps({"actor_gid": actor_gid, "team_gid": team_gid, "rule_gid": rule_gid, "command_digest": command_digest, "result": result}, ensure_ascii=False), actor_gid),
                     )
-                    cur.execute(
-                        "INSERT INTO workmanship_app_capability_audit (event_type,capability_id,version,user_gid,source,request_id,payload_hash,status) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-                        ("rule_definition_operation", "craft.rule.definition.change.apply", 1, actor_gid, "craft", idempotency_key, command_digest, "completed"),
-                    )
-                    cur.execute(
-                        "INSERT INTO workmanship_app_capability_audit (event_type,capability_id,version,user_gid,source,request_id,payload_hash,status) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-                        ("rule_definition_changed", "craft.rule.definition.change.apply", 1, actor_gid, "craft", idempotency_key, command_digest, "succeeded"),
-                    )
                 conn.commit()
                 return result
             except Exception:

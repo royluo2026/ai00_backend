@@ -8,7 +8,7 @@ Test runtime database connectivity without persisting submitted values.
 - 不适用：A business domain needs to access its own governed database.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_0b584b19349bc98727900583bb19f687`
+- Catalog Release：`rel_fb3c151fd2c880f3d35fc1c786444b0e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -106,7 +106,7 @@ Test runtime database connectivity without persisting submitted values.
 ```json
 {
   "capability_id": "base.runtime.database_connection.test",
-  "catalog_release": "rel_0b584b19349bc98727900583bb19f687",
+  "catalog_release": "rel_fb3c151fd2c880f3d35fc1c786444b0e",
   "major_version": 1,
   "payload": {
     "collab_db": "example",

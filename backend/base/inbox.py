@@ -5,15 +5,22 @@ import json
 import os
 from pathlib import Path
 
-from backend.capability_v2.domain_database import connect_domain_database, load_domain_database_url
+from backend.capability_v2.database_profile import load_database_profile
+from backend.capability_v2.domain_database import connect_domain_database, load_runtime_database_url
 from backend.capability_v2.domain_events import DomainEventEnvelope
 from backend.capability_v2.domain_manifest import load_domain_manifests
 
 
 def _base_connection():
     root = Path(__file__).resolve().parents[2]
-    manifest = load_domain_manifests(root / "backend/capability_v2/official_domains.json").require("base")
-    return connect_domain_database(load_domain_database_url(manifest, os.environ, role="runtime"))
+    manifests = load_domain_manifests(root / "backend/capability_v2/official_domains.json")
+    profile = load_database_profile(
+        root / "backend/capability_v2/database_profiles/single_database.json",
+        manifests,
+    )
+    return connect_domain_database(
+        load_runtime_database_url(manifests.require("base"), os.environ, profile)
+    )
 
 
 class BaseInboxProjector:

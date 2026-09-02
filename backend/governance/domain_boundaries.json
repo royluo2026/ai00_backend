@@ -158,6 +158,7 @@
     "backend/db/run_diff.py",
     "backend/capability_v2/database_isolation.py",
     "backend/capability_v2/schema_sql.py",
+    "backend/scripts/build_craft_agent_project_structural_web_remediation.py",
     "backend/scripts/verify_domain_db_isolation.py"
   ],
   "ignored_identifiers": [

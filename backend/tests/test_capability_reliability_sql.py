@@ -62,6 +62,8 @@ def test_sql_approval_store_persists_only_token_hash():
     assert "token_hash" in sql
     assert issued.token not in params
     assert issued.challenge.token_hash in params
+    assert issued.challenge.catalog_release in params
+    assert "catalog_release" in sql
     assert len(entries) == 1
 
 
@@ -112,3 +114,14 @@ def test_reliability_migration_has_hash_only_approval_and_atomic_outcome_tables(
     ).read_text(encoding="utf-8")
     assert "deliver_capability_audit_once" in worker
     assert "INSERT IGNORE INTO workmanship_base_capability_audit_ledger" in worker
+
+
+def test_release_binding_migration_adds_catalog_release_to_approval_records():
+    root = Path(__file__).resolve().parents[2]
+    sql = (
+        root / "backend/db/migrations/202609010003_base_capability_release_binding.sql"
+    ).read_text(encoding="utf-8").lower()
+
+    assert "workmanship_base_capability_approvals" in sql
+    assert "catalog_release" in sql
+    assert "not null" in sql

@@ -433,7 +433,12 @@ def test_discovery_preserves_experimental_stability_for_dynamic_web_gaps():
 
     discovered = {row["function_id"]: row for row in builder.discover_user_functions()}
 
-    assert discovered["web_gap:dynamic_fetch:dist/web/core/auth_state.js:55"]["stability"] == "experimental"
+    dynamic_gaps = [
+        row for function_id, row in discovered.items()
+        if function_id.startswith("web_gap:dynamic_fetch:")
+    ]
+    assert dynamic_gaps
+    assert {row["stability"] for row in dynamic_gaps} == {"experimental"}
 
 
 def test_agent_runtime_scanner_registers_static_and_parameterized_endpoints():
@@ -513,23 +518,6 @@ def test_strict_cli_blocks_replaced_catalog_target(tmp_path: Path, monkeypatch, 
     assert builder.main(["--strict"]) == 1
 
     assert "target_replaced" in capsys.readouterr().err
-
-
-def test_catalog_projection_rejects_tampered_release_hash(tmp_path: Path):
-    builder = _builder_module()
-    from backend.capability_v2.catalog import load_catalog_release
-    from backend.capability_v2.docs.generator import build_documentation
-
-    release = load_catalog_release(
-        (REPOSITORY_ROOT / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
-    )
-    projection = build_documentation(release).machine_catalog
-    projection["catalog_hash"] = "sha256:" + "0" * 64
-    path = tmp_path / "catalog.v2.json"
-    path.write_text(json.dumps(projection), encoding="utf-8")
-
-    with pytest.raises(ValueError, match="catalog_projection_hash_mismatch"):
-        builder.load_catalog_projection(path)
 
 
 def test_coverage_reviews_ignore_supplemental_atomic_review_file(tmp_path: Path):

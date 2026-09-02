@@ -39,6 +39,8 @@ class ReleaseReport:
     candidate: ReleaseCandidate
     conclusion: Literal["pass", "fail", "expired"]
     blockers: tuple[str, ...]
+    evidence_hash: str
+    static_gate_hash: str
     business_governance: dict[str, Any]
     report_hash: str
     signing_key_id: str
@@ -54,6 +56,8 @@ class ReleaseReport:
             "test_run_gid": str(self.candidate.test_run_gid),
             "conclusion": self.conclusion,
             "blockers": list(self.blockers),
+            "evidence_hash": self.evidence_hash,
+            "static_gate_hash": self.static_gate_hash,
             "business_governance": self.business_governance,
             "report_hash": self.report_hash,
             "signing_key_id": self.signing_key_id,
@@ -66,6 +70,8 @@ def _canonical(
     report_gid: int,
     conclusion: str,
     blockers: Iterable[str],
+    evidence_hash: str,
+    static_gate_hash: str,
     business_governance: Mapping[str, Any],
     signing_key_id: str,
 ) -> bytes:
@@ -77,6 +83,8 @@ def _canonical(
         "test_run_gid": str(candidate.test_run_gid),
         "conclusion": conclusion,
         "blockers": sorted(set(str(value) for value in blockers)),
+        "evidence_hash": evidence_hash,
+        "static_gate_hash": static_gate_hash,
         "business_governance": business_governance,
         "signing_key_id": signing_key_id,
     }
@@ -162,6 +170,8 @@ class ReleaseGate:
             report_gid,
             "expired",
             report.blockers,
+            report.evidence_hash,
+            report.static_gate_hash,
             report.business_governance,
             report.signing_key_id,
         )
@@ -175,6 +185,8 @@ class ReleaseGate:
             report.candidate,
             "expired",
             report.blockers,
+            report.evidence_hash,
+            report.static_gate_hash,
             report.business_governance,
             digest,
             report.signing_key_id,
@@ -199,12 +211,16 @@ class ReleaseGate:
     def _expire_prior_passes(
         self,
         candidate: ReleaseCandidate,
+        evidence_hash: str,
+        static_gate_hash: str,
         business_governance: Mapping[str, Any],
     ) -> tuple[int, ...]:
         expired: list[int] = []
         for gid, report in tuple(self._reports.items()):
             if report.conclusion == "pass" and (
                 report.candidate != candidate
+                or report.evidence_hash != evidence_hash
+                or report.static_gate_hash != static_gate_hash
                 or report.business_governance != business_governance
             ):
                 expired.append(self._append_expiry(report))
@@ -215,7 +231,10 @@ class ReleaseGate:
         for gid, report in tuple(self._reports.items()):
             if report.conclusion != "pass":
                 continue
-            if any(getattr(report.candidate, field) != value for field, value in candidate_inputs.items()):
+            if any(
+                getattr(report, field, getattr(report.candidate, field, None)) != value
+                for field, value in candidate_inputs.items()
+            ):
                 expired.append(self._append_expiry(report))
         return tuple(expired)
 
@@ -248,7 +267,7 @@ class ReleaseGate:
         if self._audit_sink is not None:
             self._audit_sink.append(operation="gate", entity_gid=report.release_report_gid, actor_gid=actor_gid, request_gid=idempotency_key, detail={"conclusion": report.conclusion, "blockers": report.blockers}, idempotency_key=f"gate:{idempotency_key}")
 
-    def evaluate(self, candidate: ReleaseCandidate, *, available: bool = True, test_status: str | None = None, findings: Iterable[Any] = (), stale_evidence: bool = False, waivers: Iterable[Any] = (), approvals_complete: bool = False, data_complete: bool = False, evidence_hash: str = "", business_governance: BusinessGateResult | Mapping[str, Any] | None = None, business_catalog: Mapping[str, object] | None = None, legacy_baseline: Mapping[str, str] | None = None, business_review_lookup: Mapping[tuple[str, str], object] | Callable[[str, str], object] | None = None, now: datetime | None = None, idempotency_key: str | None = None, evaluated_by_gid: str = "release_gate", **unknown: Any) -> ReleaseReport:
+    def evaluate(self, candidate: ReleaseCandidate, *, available: bool = True, test_status: str | None = None, findings: Iterable[Any] = (), stale_evidence: bool = False, waivers: Iterable[Any] = (), approvals_complete: bool = False, data_complete: bool = False, evidence_hash: str = "", static_gate_status: str | None = None, static_gate_hash: str = "", business_governance: BusinessGateResult | Mapping[str, Any] | None = None, business_catalog: Mapping[str, object] | None = None, legacy_baseline: Mapping[str, str] | None = None, business_review_lookup: Mapping[tuple[str, str], object] | Callable[[str, str], object] | None = None, now: datetime | None = None, idempotency_key: str | None = None, evaluated_by_gid: str = "release_gate", **unknown: Any) -> ReleaseReport:
         key = str(idempotency_key or "").strip()
         if not key:
             raise ReleaseGateError("idempotency_key_required")
@@ -262,7 +281,7 @@ class ReleaseGate:
             business_review_lookup=business_review_lookup,
         )
         self._expire_prior_passes(
-            candidate, governance_document,
+            candidate, str(evidence_hash), str(static_gate_hash), governance_document,
         )
         blockers: set[str] = set()
         if not available:
@@ -284,6 +303,10 @@ class ReleaseGate:
             blockers.add("incomplete_approvals")
         if not data_complete:
             blockers.add("missing_required_data")
+        if not str(evidence_hash).strip():
+            blockers.add("missing_required_data")
+        if static_gate_status != "passed" or not str(static_gate_hash).strip():
+            blockers.add("static_gate_not_passed")
         if not governance_document:
             blockers.add("business_governance_missing")
         elif governance_document["status"] == "blocked":
@@ -297,7 +320,7 @@ class ReleaseGate:
             key_id = "configured-release-key"
         canonical = _canonical(
             candidate, report_gid, conclusion, blockers,
-            governance_document, key_id,
+            str(evidence_hash), str(static_gate_hash), governance_document, key_id,
         )
         digest = "sha256:" + hashlib.sha256(canonical).hexdigest()
         signature = ""
@@ -308,12 +331,12 @@ class ReleaseGate:
             conclusion = "fail"
             canonical = _canonical(
                 candidate, report_gid, conclusion, blockers,
-                governance_document, key_id,
+                str(evidence_hash), str(static_gate_hash), governance_document, key_id,
             )
             digest = "sha256:" + hashlib.sha256(canonical).hexdigest()
         report = ReleaseReport(
             report_gid, candidate, conclusion, tuple(sorted(blockers)),
-            governance_document,
+            str(evidence_hash), str(static_gate_hash), governance_document,
             digest, key_id, signature,
         )
         report = self._store(report, key)

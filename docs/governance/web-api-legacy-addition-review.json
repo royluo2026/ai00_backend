@@ -324,9 +324,9 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/vpps_audit.py",
-          "start_line": 68,
-          "end_line": 70,
-          "sha256": "8fb96495c87564713272f82a3d12621b44a50f08409425ebed37bf8408dc2ea5"
+          "start_line": 72,
+          "end_line": 73,
+          "sha256": "d2d30b12fbecf8ba7c84d9a4addd11183dc5a7cb3a00652b9daac5c9af006006"
         },
         "expected_target_invocation": "_invoke_vpps_audit(request, user, principal, gateway, \"craft.vpps_audit.change.apply\", \"revert\", gid=gid, actor_gid=body.reverted_by_gid or user.get(\"gid\"), actor_name=body.reverted_by_name or user.get(\"name\", \"\"))"
       }
@@ -594,9 +594,9 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/vpps_audit.py",
-          "start_line": 53,
-          "end_line": 55,
-          "sha256": "a0481f80f670bb430cb49ff371fc1c3e00519848d34604484115a155f8e15716"
+          "start_line": 57,
+          "end_line": 58,
+          "sha256": "e63a2a8451b1f13e2c6cb978a92c01b5c34b839ea2ab7bce208da1a62eadb520"
         },
         "expected_target_invocation": "_invoke_vpps_audit(request, user, principal, gateway, \"craft.vpps_audit.change.apply\", \"rule4_bulk_ignore\", pbom_version_gid=body.pbom_version_gid, rows=[row.model_dump() for row in body.rows], actor_gid=body.actor_gid or user.get(\"gid\"), actor_name=body.actor_name or user.get(\"name\", \"\"))"
       }
@@ -2427,9 +2427,9 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/vpps_audit.py",
-          "start_line": 63,
-          "end_line": 65,
-          "sha256": "eb6d0e6f115aecdad65c7d4294bdbf537f2a15e29bad331c84b5829f6e9b2264"
+          "start_line": 67,
+          "end_line": 68,
+          "sha256": "3c214acb9862c7010f3ce75f64a7432d23629f25c0c6a13638e52c12dd51ebbc"
         },
         "expected_target_invocation": "_invoke_vpps_audit(request, user, principal, gateway, \"craft.vpps_audit.read\", \"rule4_ignores\", pbom_version_gid=pbom_version_gid)"
       }
@@ -2894,9 +2894,9 @@
         "kind": "atomic_composition_invocation",
         "handler": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 80,
-          "end_line": 82,
-          "sha256": "c810a51e147c752465fbc7fb544581d6e4e935b1fedbd147a174a1a5fb4a36e4"
+          "start_line": 84,
+          "end_line": 86,
+          "sha256": "a14d890fa1e74664ca1ada659203dcd6b98e3fdf58529d00c0a556f9c80b9f07"
         },
         "facade_capability": "knowledge.hub.read",
         "operation": "folders.list",
@@ -2904,9 +2904,9 @@
         "composition_symbol": "_invoke",
         "binding": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 17,
-          "end_line": 31,
-          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+          "start_line": 22,
+          "end_line": 36,
+          "sha256": "2e63a949f634babb4b29281f96fb173dfc8b4715d8dfeb63b78c9fbaf590988d"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
       },
@@ -2924,8 +2924,8 @@
         "kind": "atomic_composition_invocation",
         "handler": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 86,
-          "end_line": 87,
+          "start_line": 91,
+          "end_line": 92,
           "sha256": "f8019d2609b2c6f30ee1d381f72a601670c8d7f4984058de6126b50d18603188"
         },
         "facade_capability": "knowledge.hub.change.apply",
@@ -2934,9 +2934,9 @@
         "composition_symbol": "_invoke",
         "binding": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 17,
-          "end_line": 31,
-          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+          "start_line": 22,
+          "end_line": 36,
+          "sha256": "2e63a949f634babb4b29281f96fb173dfc8b4715d8dfeb63b78c9fbaf590988d"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
       },
@@ -2954,8 +2954,8 @@
         "kind": "atomic_composition_invocation",
         "handler": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 91,
-          "end_line": 93,
+          "start_line": 96,
+          "end_line": 98,
           "sha256": "bd276ddc65d8d015d83015b6ac4e4a2adbd3cff94cf62eee4d2d05fd6ce77fc3"
         },
         "facade_capability": "knowledge.hub.change.apply",
@@ -2964,9 +2964,9 @@
         "composition_symbol": "_invoke",
         "binding": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 17,
-          "end_line": 31,
-          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+          "start_line": 22,
+          "end_line": 36,
+          "sha256": "2e63a949f634babb4b29281f96fb173dfc8b4715d8dfeb63b78c9fbaf590988d"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
       },
@@ -2984,8 +2984,8 @@
         "kind": "atomic_composition_invocation",
         "handler": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 97,
-          "end_line": 99,
+          "start_line": 102,
+          "end_line": 104,
           "sha256": "38476eaa3714c26af665b71f41728cfab8966f4d5ffaa4336c81249550010d95"
         },
         "facade_capability": "knowledge.hub.change.apply",
@@ -2994,9 +2994,9 @@
         "composition_symbol": "_invoke",
         "binding": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 17,
-          "end_line": 31,
-          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+          "start_line": 22,
+          "end_line": 36,
+          "sha256": "2e63a949f634babb4b29281f96fb173dfc8b4715d8dfeb63b78c9fbaf590988d"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
       },
@@ -3014,8 +3014,8 @@
         "kind": "atomic_composition_invocation",
         "handler": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 103,
-          "end_line": 105,
+          "start_line": 108,
+          "end_line": 110,
           "sha256": "82f2b27e49a0d8324037bf0d55f987f633c3603bbeeea767c0fd2962e2bf50ef"
         },
         "facade_capability": "knowledge.hub.read",
@@ -3024,9 +3024,9 @@
         "composition_symbol": "_invoke",
         "binding": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 17,
-          "end_line": 31,
-          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+          "start_line": 22,
+          "end_line": 36,
+          "sha256": "2e63a949f634babb4b29281f96fb173dfc8b4715d8dfeb63b78c9fbaf590988d"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
       },
@@ -3044,8 +3044,8 @@
         "kind": "atomic_composition_invocation",
         "handler": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 109,
-          "end_line": 110,
+          "start_line": 114,
+          "end_line": 115,
           "sha256": "1a2f6b7135a89c0fbd7ecbb15354d769aabd0dc2ccbdeb103f5a02da1dab0799"
         },
         "facade_capability": "knowledge.hub.read",
@@ -3054,9 +3054,9 @@
         "composition_symbol": "_invoke",
         "binding": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 17,
-          "end_line": 31,
-          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+          "start_line": 22,
+          "end_line": 36,
+          "sha256": "2e63a949f634babb4b29281f96fb173dfc8b4715d8dfeb63b78c9fbaf590988d"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
       },
@@ -3074,8 +3074,8 @@
         "kind": "atomic_composition_invocation",
         "handler": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 114,
-          "end_line": 115,
+          "start_line": 119,
+          "end_line": 120,
           "sha256": "2b2a1fe1c5d206522e24c327e111b71c60408cae5a607e2422857fbbc3540902"
         },
         "facade_capability": "knowledge.hub.change.apply",
@@ -3084,9 +3084,9 @@
         "composition_symbol": "_invoke",
         "binding": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 17,
-          "end_line": 31,
-          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+          "start_line": 22,
+          "end_line": 36,
+          "sha256": "2e63a949f634babb4b29281f96fb173dfc8b4715d8dfeb63b78c9fbaf590988d"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
       },
@@ -3104,8 +3104,8 @@
         "kind": "atomic_composition_invocation",
         "handler": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 119,
-          "end_line": 121,
+          "start_line": 124,
+          "end_line": 126,
           "sha256": "1173ab40538e7b8ab9e2bc7a28d429a20dedc85ae0b09614d693ea57bdf400da"
         },
         "facade_capability": "knowledge.hub.change.apply",
@@ -3114,9 +3114,9 @@
         "composition_symbol": "_invoke",
         "binding": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 17,
-          "end_line": 31,
-          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+          "start_line": 22,
+          "end_line": 36,
+          "sha256": "2e63a949f634babb4b29281f96fb173dfc8b4715d8dfeb63b78c9fbaf590988d"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
       },
@@ -3134,8 +3134,8 @@
         "kind": "atomic_composition_invocation",
         "handler": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 125,
-          "end_line": 127,
+          "start_line": 130,
+          "end_line": 132,
           "sha256": "560c1a03c36627b6fd3f0ffdc586a76b678049fc2b85128db43d37f8e142d0c4"
         },
         "facade_capability": "knowledge.hub.read",
@@ -3144,9 +3144,9 @@
         "composition_symbol": "_invoke",
         "binding": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 17,
-          "end_line": 31,
-          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+          "start_line": 22,
+          "end_line": 36,
+          "sha256": "2e63a949f634babb4b29281f96fb173dfc8b4715d8dfeb63b78c9fbaf590988d"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
       },
@@ -3164,8 +3164,8 @@
         "kind": "atomic_composition_invocation",
         "handler": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 131,
-          "end_line": 133,
+          "start_line": 136,
+          "end_line": 138,
           "sha256": "8d3e8c00666ea1fed394a69a61bc899e72ddae086a38dcfcde16976d1c7d0b59"
         },
         "facade_capability": "knowledge.hub.change.apply",
@@ -3174,9 +3174,9 @@
         "composition_symbol": "_invoke",
         "binding": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 17,
-          "end_line": 31,
-          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+          "start_line": 22,
+          "end_line": 36,
+          "sha256": "2e63a949f634babb4b29281f96fb173dfc8b4715d8dfeb63b78c9fbaf590988d"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
       },
@@ -3194,8 +3194,8 @@
         "kind": "atomic_composition_invocation",
         "handler": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 143,
-          "end_line": 145,
+          "start_line": 148,
+          "end_line": 150,
           "sha256": "2af8ce4cee4b594678b82e1e5fa555642e22910aef4acf836257183043e88e05"
         },
         "facade_capability": "knowledge.personalization.read",
@@ -3204,9 +3204,9 @@
         "composition_symbol": "_invoke",
         "binding": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 17,
-          "end_line": 31,
-          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+          "start_line": 22,
+          "end_line": 36,
+          "sha256": "2e63a949f634babb4b29281f96fb173dfc8b4715d8dfeb63b78c9fbaf590988d"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
       },
@@ -3224,8 +3224,8 @@
         "kind": "atomic_composition_invocation",
         "handler": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 149,
-          "end_line": 151,
+          "start_line": 154,
+          "end_line": 156,
           "sha256": "2f96f5279a56fafb7fdb6e06b8989920d732c69d8b301e2b9a6180a5f8db6b98"
         },
         "facade_capability": "knowledge.personalization.change.apply",
@@ -3234,9 +3234,9 @@
         "composition_symbol": "_invoke",
         "binding": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 17,
-          "end_line": 31,
-          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+          "start_line": 22,
+          "end_line": 36,
+          "sha256": "2e63a949f634babb4b29281f96fb173dfc8b4715d8dfeb63b78c9fbaf590988d"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
       },
@@ -3254,8 +3254,8 @@
         "kind": "atomic_composition_invocation",
         "handler": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 155,
-          "end_line": 157,
+          "start_line": 160,
+          "end_line": 162,
           "sha256": "37d9f3d225202e66e7616467776c9b4e197f0a712b739f448339a4ccea8c0e1f"
         },
         "facade_capability": "knowledge.personalization.read",
@@ -3264,9 +3264,9 @@
         "composition_symbol": "_invoke",
         "binding": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py",
-          "start_line": 17,
-          "end_line": 31,
-          "sha256": "8cb04cba0f17f49550d532cd73a778a38da53e9d96c69b2e9bb4509fc8dcabc9"
+          "start_line": 22,
+          "end_line": 36,
+          "sha256": "2e63a949f634babb4b29281f96fb173dfc8b4715d8dfeb63b78c9fbaf590988d"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
       },
@@ -3284,8 +3284,8 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
-          "start_line": 138,
-          "end_line": 163,
+          "start_line": 68,
+          "end_line": 93,
           "sha256": "8d03a4a27c2c6d345594a51a706e1f8c22dbd6ec5e52e0b10e8fc2b8ba530730"
         },
         "expected_target_invocation": "_invoke_knowledge(\n        request,\n        current_user,\n        principal,\n        gateway,\n        \"knowledge.search\",\n        {\n            \"query\": \"\",\n            \"entry_type\": entry_type,\n            \"list_gid\": list_gid,\n            \"context_class_gid\": context_class_gid,\n            \"include_content\": True,\n            \"limit\": limit,\n        },\n    )"
@@ -3304,8 +3304,8 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
-          "start_line": 187,
-          "end_line": 197,
+          "start_line": 117,
+          "end_line": 127,
           "sha256": "90e94ca7d02767a679a51e9e68d96a2fc726e8a5e246a6cd341d0da156be29fe"
         },
         "expected_target_invocation": "_invoke_knowledge(\n        request, current_user, principal, gateway, \"knowledge.get\", {\"gid\": gid}\n    )"
@@ -3324,8 +3324,8 @@
         "kind": "atomic_composition_invocation",
         "handler": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
-          "start_line": 167,
-          "end_line": 183,
+          "start_line": 97,
+          "end_line": 113,
           "sha256": "0a3623e981fd819e295813cf5207302a9b383b1ec45104cf038cf707485e2db9"
         },
         "facade_capability": "knowledge.entry.change.apply",
@@ -3334,8 +3334,8 @@
         "composition_symbol": "_invoke_knowledge",
         "binding": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
-          "start_line": 30,
-          "end_line": 50,
+          "start_line": 27,
+          "end_line": 47,
           "sha256": "f7eb59b6b0c04cfcc1fab401c6b728d9a17d319ca625ff32c88ea1b4ead8d0f7"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
@@ -3354,8 +3354,8 @@
         "kind": "atomic_composition_invocation",
         "handler": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
-          "start_line": 201,
-          "end_line": 218,
+          "start_line": 131,
+          "end_line": 148,
           "sha256": "65ddcc9ef57f1a51f9c88de9a72f6c52bb2d7bfc6185c4550213460011d9e1ae"
         },
         "facade_capability": "knowledge.entry.change.apply",
@@ -3364,8 +3364,8 @@
         "composition_symbol": "_invoke_knowledge",
         "binding": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
-          "start_line": 30,
-          "end_line": 50,
+          "start_line": 27,
+          "end_line": 47,
           "sha256": "f7eb59b6b0c04cfcc1fab401c6b728d9a17d319ca625ff32c88ea1b4ead8d0f7"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
@@ -3384,8 +3384,8 @@
         "kind": "atomic_composition_invocation",
         "handler": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
-          "start_line": 222,
-          "end_line": 238,
+          "start_line": 152,
+          "end_line": 168,
           "sha256": "487e16bac8972e7307c33a045cebfc008be7c6f7e20ac41df6a560fe39e976b9"
         },
         "facade_capability": "knowledge.entry.change.apply",
@@ -3394,8 +3394,8 @@
         "composition_symbol": "_invoke_knowledge",
         "binding": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
-          "start_line": 30,
-          "end_line": 50,
+          "start_line": 27,
+          "end_line": 47,
           "sha256": "f7eb59b6b0c04cfcc1fab401c6b728d9a17d319ca625ff32c88ea1b4ead8d0f7"
         },
         "expected_target_construction": "capability_id = f\"{capability_id}.atomic.{operation.replace('.', '_')}\""
@@ -3494,8 +3494,8 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/vpps_audit.py",
-          "start_line": 59,
-          "end_line": 60,
+          "start_line": 62,
+          "end_line": 63,
           "sha256": "578ddeaf55c5ce37aa2f50872296325b83b5ea621ef73ce343a91e356bf6a75c"
         },
         "expected_target_invocation": "_invoke_vpps_audit(request, user, principal, gateway, \"craft.vpps_audit.read\", \"list\", pbom_version_gid=pbom_version_gid, operation_type=operation_type)"

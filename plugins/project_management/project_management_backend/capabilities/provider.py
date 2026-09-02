@@ -1,6 +1,7 @@
 """Native stable descriptors for the reviewed Project Management surface."""
 from __future__ import annotations
 
+import hashlib
 from typing import Any
 
 from backend.capability_v2.contracts import (
@@ -38,11 +39,15 @@ DEPRECATED_CAPABILITY_IDS = frozenset({
 
 def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
     descriptor = descriptor_from_provider_spec(spec)
+    capability_version_gid = "cv2_" + hashlib.sha256(
+        f"{descriptor.id}@{descriptor.major_version}:{descriptor.schema_hash}".encode("utf-8")
+    ).hexdigest()[:24]
     is_write = descriptor.side_effect_level is not SideEffectLevel.READ
     is_approval_rejection = spec.id == "project.approval.order.reject" and spec.version == 1
     return CapabilityDescriptorV2.model_validate(
         {
             **descriptor.model_dump(),
+            "capability_version_gid": capability_version_gid,
             "lifecycle_status": (
                 LifecycleStatus.DEPRECATED
                 if spec.id in DEPRECATED_CAPABILITY_IDS

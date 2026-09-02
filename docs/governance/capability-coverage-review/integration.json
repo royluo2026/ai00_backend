@@ -3,9 +3,9 @@
   "domain": "Integration",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:272ec997281749bc6c291b6224d46c83fb3813be8d61963f02694d23ed5a9cec",
-    "catalog_release": "rel_9f169ceddb4f7eb3e6c30f63861e655b",
-    "catalog_sha256": "sha256:0fff5c1a428105031e095deede46c517260707e5f1f23933c2564c82ef673b11"
+    "registry_sha256": "sha256:0f0d81ef5b60bb103f657d4b4a62afc096b4793f85f204805298389c01e8049a",
+    "catalog_release": "rel_04c998e59a4188758c8eda43f25b0488",
+    "catalog_sha256": "sha256:1be2b5f26178a57830b0ae1f54bbb170b6ca35e062bb1044abc2da19eba7fa02"
   },
   "unreviewed_functions": {},
   "excluded_functions": {},
@@ -68,7 +68,8 @@
           "source_paths": [
             "backend/capabilities/agreed_catalog.py",
             "plugins/integration/integration_backend/capabilities/contracts.py",
-            "plugins/integration/integration_backend/capabilities/descriptors.py"
+            "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "plugins/integration/integration_backend/capabilities/provider.py"
           ],
           "owner": "Integration",
           "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
@@ -118,7 +119,8 @@
           "source_paths": [
             "backend/capabilities/agreed_catalog.py",
             "plugins/integration/integration_backend/capabilities/contracts.py",
-            "plugins/integration/integration_backend/capabilities/descriptors.py"
+            "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "plugins/integration/integration_backend/capabilities/provider.py"
           ],
           "owner": "Integration",
           "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
@@ -168,7 +170,8 @@
           "source_paths": [
             "backend/capabilities/agreed_catalog.py",
             "plugins/integration/integration_backend/capabilities/contracts.py",
-            "plugins/integration/integration_backend/capabilities/descriptors.py"
+            "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "plugins/integration/integration_backend/capabilities/provider.py"
           ],
           "owner": "Integration",
           "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
@@ -267,6 +270,106 @@
           "resolution": "existing_capability",
           "source_paths": [
             "backend/capabilities/agreed_catalog.py",
+            "plugins/integration/integration_backend/capabilities/contracts.py",
+            "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "plugins/integration/integration_backend/capabilities/provider.py"
+          ],
+          "owner": "Integration",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "integration.field_mapping.batch.update": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:integration.field_mapping.batch.update": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/integration/integration_backend/capabilities/contracts.py",
+            "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "plugins/integration/integration_backend/capabilities/provider.py"
+          ],
+          "owner": "Integration",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "integration.field_mapping.search": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:integration.field_mapping.search": {
+          "resolution": "existing_capability",
+          "source_paths": [
             "plugins/integration/integration_backend/capabilities/contracts.py",
             "plugins/integration/integration_backend/capabilities/descriptors.py"
           ],
@@ -368,7 +471,8 @@
           "source_paths": [
             "backend/capabilities/agreed_catalog.py",
             "plugins/integration/integration_backend/capabilities/contracts.py",
-            "plugins/integration/integration_backend/capabilities/descriptors.py"
+            "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "plugins/integration/integration_backend/capabilities/provider.py"
           ],
           "owner": "Integration",
           "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
@@ -460,6 +564,56 @@
         }
       }
     },
+    "integration.mapping.import.start": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:integration.mapping.import.start": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/integration/integration_backend/capabilities/contracts.py",
+            "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "plugins/integration/integration_backend/capabilities/provider.py"
+          ],
+          "owner": "Integration",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
     "integration.mapping.preview": {
       "kind": "existing",
       "function_dispositions": {
@@ -468,7 +622,8 @@
           "source_paths": [
             "backend/capabilities/agreed_catalog.py",
             "plugins/integration/integration_backend/capabilities/contracts.py",
-            "plugins/integration/integration_backend/capabilities/descriptors.py"
+            "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "plugins/integration/integration_backend/capabilities/provider.py"
           ],
           "owner": "Integration",
           "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
@@ -560,6 +715,56 @@
         }
       }
     },
+    "integration.mapping.source_columns.discover": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:integration.mapping.source_columns.discover": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/integration/integration_backend/capabilities/contracts.py",
+            "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "plugins/integration/integration_backend/capabilities/provider.py"
+          ],
+          "owner": "Integration",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
     "integration.mapping.update": {
       "kind": "existing",
       "function_dispositions": {
@@ -569,6 +774,105 @@
             "backend/capabilities/agreed_catalog.py",
             "plugins/integration/integration_backend/capabilities/contracts.py",
             "plugins/integration/integration_backend/capabilities/descriptors.py"
+          ],
+          "owner": "Integration",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "integration.mapping_target.search": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:integration.mapping_target.search": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/integration/integration_backend/capabilities/contracts.py",
+            "plugins/integration/integration_backend/capabilities/descriptors.py"
+          ],
+          "owner": "Integration",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "integration.mapping_target.upsert": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:integration.mapping_target.upsert": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/integration/integration_backend/capabilities/contracts.py",
+            "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "plugins/integration/integration_backend/capabilities/provider.py"
           ],
           "owner": "Integration",
           "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
@@ -665,6 +969,13 @@
   "code_extractions": [],
   "database_boundaries": [
     {
+      "table": "workmanship_int_audit_events",
+      "owner_domain": "Integration",
+      "access_mode": "read_write",
+      "migration_stream": "integration",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
       "table": "workmanship_int_ext_datasources",
       "owner_domain": "Integration",
       "access_mode": "read_write",
@@ -680,6 +991,20 @@
     },
     {
       "table": "workmanship_int_ext_mappings",
+      "owner_domain": "Integration",
+      "access_mode": "read_write",
+      "migration_stream": "integration",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_int_mapping_target_bindings",
+      "owner_domain": "Integration",
+      "access_mode": "read_write",
+      "migration_stream": "integration",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_int_operations",
       "owner_domain": "Integration",
       "access_mode": "read_write",
       "migration_stream": "integration",

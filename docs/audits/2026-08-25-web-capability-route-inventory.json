@@ -1,0 +1,359 @@
+{
+  "roots": [
+    "."
+  ],
+  "legacy_prefixes": [
+    "/api/bop",
+    "/api/gbop",
+    "/api/ontology",
+    "/api/projects",
+    "/api/flows",
+    "/api/factory",
+    "/api/simulation",
+    "/api/device"
+  ],
+  "counts": {
+    "legacy": 0,
+    "capability": 36,
+    "allowlisted": 6,
+    "total": 42
+  },
+  "routes": [
+    {
+      "source": "packages/agent-plugin/web/automation_hub/skill_lib.js",
+      "line": 55,
+      "column": 31,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
+      "line": 20,
+      "column": 29,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
+      "line": 77,
+      "column": 32,
+      "route": "/api/flows/capability-manifest",
+      "kind": "allowlisted",
+      "method": null
+    },
+    {
+      "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
+      "line": 756,
+      "column": 32,
+      "route": "/api/flows/test-node",
+      "kind": "allowlisted",
+      "method": "POST"
+    },
+    {
+      "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
+      "line": 798,
+      "column": 32,
+      "route": "/api/flows/gen-script",
+      "kind": "allowlisted",
+      "method": null
+    },
+    {
+      "source": "packages/agent-plugin/web/wfc_window/wfc_window.js",
+      "line": 1705,
+      "column": 46,
+      "route": "/api/v1/capabilities/craft.bop.entry.legacy_read:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/bop/bop.js",
+      "line": 93,
+      "column": 40,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/bop_nav/bop_nav.js",
+      "line": 22,
+      "column": 30,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/ebom/ebom.js",
+      "line": 37,
+      "column": 30,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/factory_resource/factory_resource.js",
+      "line": 29,
+      "column": 40,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/gbop/gbop.js",
+      "line": 63,
+      "column": 40,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/gbop_lineage/lineage.js",
+      "line": 50,
+      "column": 30,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/issue/issue.js",
+      "line": 46,
+      "column": 40,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/assoc_panel.js",
+      "line": 15,
+      "column": 29,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+      "line": 223,
+      "column": 39,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/layout_mode.js",
+      "line": 49,
+      "column": 30,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/lifecycle_panel.js",
+      "line": 50,
+      "column": 37,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/lineage.js",
+      "line": 178,
+      "column": 30,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/lineage_version_mgr.js",
+      "line": 129,
+      "column": 37,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/staging_panel.js",
+      "line": 42,
+      "column": 37,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/pbom_check/pbom_check.js",
+      "line": 21,
+      "column": 30,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/craft-plugin/web/project/project.js",
+      "line": 17,
+      "column": 29,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "packages/sim-plugin/web/cad_sim/cad_sim.js",
+      "line": 44,
+      "column": 29,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "web/admin/capability_governance/governance_api.js",
+      "line": 94,
+      "column": 36,
+      "route": "/api/v1/capabilities/${capabilityId}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "web/admin/capability_governance/governance_api.js",
+      "line": 137,
+      "column": 42,
+      "route": "/api/v1/capabilities/${capabilityId}:confirm",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "web/canvas/types/flow_type.js",
+      "line": 112,
+      "column": 33,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "web/canvas/types/flow_type.js",
+      "line": 129,
+      "column": 19,
+      "route": "/api/flows/capability-manifest",
+      "kind": "allowlisted",
+      "method": null
+    },
+    {
+      "source": "web/canvas/types/flow_type.js",
+      "line": 145,
+      "column": 19,
+      "route": "/api/flows/test-node",
+      "kind": "allowlisted",
+      "method": "POST"
+    },
+    {
+      "source": "web/canvas/types/flow_type.js",
+      "line": 782,
+      "column": 45,
+      "route": "/api/flows/gen-script",
+      "kind": "allowlisted",
+      "method": null
+    },
+    {
+      "source": "web/components/list_sidebar.js",
+      "line": 110,
+      "column": 37,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "web/components/list_tree.html",
+      "line": 277,
+      "column": 31,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "web/components/quick_list.html",
+      "line": 314,
+      "column": 29,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "web/components/visibility_selector.js",
+      "line": 52,
+      "column": 31,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "web/core/global_search.js",
+      "line": 34,
+      "column": 47,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "web/ext_datasource/ext_ds.js",
+      "line": 13,
+      "column": 30,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "web/knowledge_hub/pages/factory_info.html",
+      "line": 324,
+      "column": 29,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "web/knowledge_hub/pages/project_info.html",
+      "line": 233,
+      "column": 29,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "web/my_files/my_files.js",
+      "line": 92,
+      "column": 30,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "web/ontology/ontology.js",
+      "line": 25,
+      "column": 30,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "web/org_mgmt/org_mgmt.js",
+      "line": 30,
+      "column": 29,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "web/rule_mgmt/rule_mgmt.js",
+      "line": 52,
+      "column": 38,
+      "route": "/api/v1/capabilities/ontology.object.list:invoke",
+      "kind": "capability",
+      "method": null
+    },
+    {
+      "source": "web/workbench/workbench.js",
+      "line": 1183,
+      "column": 31,
+      "route": "/api/v1/capabilities/${id}:invoke",
+      "kind": "capability",
+      "method": null
+    }
+  ]
+}

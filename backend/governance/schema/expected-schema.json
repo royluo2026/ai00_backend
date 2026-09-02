@@ -1,9 +1,760 @@
 {
   "database_name": "ai00_test",
   "isolation_profile": "single_database_domain_tables",
-  "schema_sha256": "sha256:d3b1ab1322b5b28ad480039756ea4f70f7aa25e8d90e3a774ee9e96327516d23",
+  "schema_sha256": "sha256:3acf0f1fbdb002e995855f0f1dec580ae2c055a3ad8f84e5a55b55e3c626c49c",
   "schema_version": 1,
   "tables": [
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "event_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "invocation_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "run_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "actor_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "revision",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "error_code",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [
+            "invocation_id"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_agent_canvas_audit_invocation",
+          "referenced_columns": [
+            "invocation_id"
+          ],
+          "referenced_table": "workmanship_agent_canvas_invocations",
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "event_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "invocation_id",
+            "created_at"
+          ],
+          "name": "idx_agent_canvas_audit_invocation",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_agent_canvas_audit_events",
+      "owner": "agent",
+      "runtime_domain": "agent",
+      "sources": [
+        "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "invocation_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "run_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "actor_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "capability_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "idempotency_key",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "payload_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "target_state",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "request_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "revision",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "lease_owner",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "lease_token",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "lease_expires_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "INT UNSIGNED",
+          "default": "0",
+          "extra": "",
+          "name": "attempt_count",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "target_dispatched_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "next_attempt_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "result_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "error_code",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [
+            "run_id"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_agent_canvas_invocation_run",
+          "referenced_columns": [
+            "run_id"
+          ],
+          "referenced_table": "workmanship_agent_canvas_runs",
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "invocation_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "status",
+            "next_attempt_at",
+            "lease_expires_at",
+            "created_at"
+          ],
+          "name": "idx_agent_canvas_invocation_claim",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "actor_gid",
+            "team_gid",
+            "capability_id",
+            "idempotency_key"
+          ],
+          "name": "uq_agent_canvas_invocation_idempotency",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_agent_canvas_invocations",
+      "owner": "agent",
+      "runtime_domain": "agent",
+      "sources": [
+        "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "run_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "run_token_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "actor_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "skill_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "skill_revision",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "revision",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "pause_token_hash",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "checkpoint_json",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "result_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "run_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "team_gid",
+            "actor_gid",
+            "status",
+            "updated_at"
+          ],
+          "name": "idx_agent_canvas_run_principal",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "run_token_hash"
+          ],
+          "name": "uq_agent_canvas_run_token",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_agent_canvas_runs",
+      "owner": "agent",
+      "runtime_domain": "agent",
+      "sources": [
+        "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "invocation_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "run_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "actor_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "revision",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "result_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "completed_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [
+            "invocation_id"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_agent_canvas_runtime_result_invocation",
+          "referenced_columns": [
+            "invocation_id"
+          ],
+          "referenced_table": "workmanship_agent_canvas_invocations",
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        },
+        {
+          "columns": [
+            "run_id"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_agent_canvas_runtime_result_run",
+          "referenced_columns": [
+            "run_id"
+          ],
+          "referenced_table": "workmanship_agent_canvas_runs",
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "invocation_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "team_gid",
+            "actor_gid",
+            "completed_at"
+          ],
+          "name": "idx_agent_canvas_runtime_result_principal",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_agent_canvas_runtime_results",
+      "owner": "agent",
+      "runtime_domain": "agent",
+      "sources": [
+        "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+      ]
+    },
     {
       "columns": [
         {
@@ -2151,6 +2902,26 @@
           ]
         },
         {
+          "data_type": "VARCHAR(191)",
+          "default": "('')",
+          "extra": "",
+          "name": "owner_user_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/mysql_schema.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/mysql_schema.sql"
+          ]
+        },
+        {
           "data_type": "TEXT",
           "default": null,
           "extra": "",
@@ -2229,16 +3000,6 @@
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
-        },
-        {
-          "data_type": "VARCHAR(191)",
-          "default": "''",
-          "extra": "",
-          "name": "owner_user_gid",
-          "nullable": false,
-          "sources": [
-            "backend/db/migrations/202608030003_agent_private_flows.sql"
-          ]
         }
       ],
       "constraints": [],
@@ -2268,6 +3029,19 @@
         },
         {
           "columns": [
+            "team_gid",
+            "owner_user_gid",
+            "updated_at"
+          ],
+          "name": "idx_agent_flows_team_owner_updated",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0002_canvas_query_tenant.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
             "status(32)"
           ],
           "name": "idx_flows_status",
@@ -2284,6 +3058,7 @@
       "runtime_domain": "agent",
       "sources": [
         "backend/db/migrations/202608030003_agent_private_flows.sql",
+        "backend/db/migrations/domains/agent/0002_canvas_query_tenant.sql",
         "backend/db/mysql_schema.sql"
       ]
     },
@@ -2499,6 +3274,16 @@
           ]
         },
         {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/mysql_schema.sql"
+          ]
+        },
+        {
           "data_type": "TINYINT(1)",
           "default": "0",
           "extra": "",
@@ -2587,6 +3372,16 @@
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": "1",
+          "extra": "",
+          "name": "revision",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql"
+          ]
         }
       ],
       "constraints": [],
@@ -2601,6 +3396,20 @@
             "backend/db/mysql_schema.sql"
           ],
           "unique": true
+        },
+        {
+          "columns": [
+            "team_gid",
+            "owner_gid",
+            "scope",
+            "status"
+          ],
+          "name": "idx_agent_skills_team_owner_scope",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0002_canvas_query_tenant.sql"
+          ],
+          "unique": false
         },
         {
           "columns": [
@@ -2643,6 +3452,8 @@
       "runtime_domain": "agent",
       "sources": [
         "backend/db/migrations/202608030002_agent_memory_skills_audit.sql",
+        "backend/db/migrations/domains/agent/0002_canvas_query_tenant.sql",
+        "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql",
         "backend/db/mysql_schema.sql"
       ]
     },
@@ -2802,6 +3613,16 @@
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+          ]
         }
       ],
       "constraints": [],
@@ -2816,6 +3637,18 @@
             "backend/db/mysql_schema.sql"
           ],
           "unique": true
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "gid"
+          ],
+          "name": "idx_base_saved_view_tenant",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+          ],
+          "unique": false
         },
         {
           "columns": [
@@ -2856,6 +3689,7 @@
       "owner": "base",
       "runtime_domain": "base",
       "sources": [
+        "backend/db/migrations/202608280005_base_structural_owner_hardening.sql",
         "backend/db/mysql_schema.sql"
       ]
     },
@@ -4710,6 +5544,125 @@
     {
       "columns": [
         {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "attachment_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "actor_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "media_type",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(512)",
+          "default": null,
+          "extra": "",
+          "name": "display_name",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": null,
+          "extra": "",
+          "name": "size",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(80)",
+          "default": null,
+          "extra": "",
+          "name": "checksum",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "registered_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [],
+          "expression": "size >= 0 AND size <= 52428800",
+          "kind": "check",
+          "name": "chk_base_attachment_reference_size",
+          "referenced_columns": [],
+          "referenced_table": null,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "attachment_gid",
+            "actor_gid",
+            "tenant_gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_base_attachment_references",
+      "owner": "base",
+      "runtime_domain": "base",
+      "sources": [
+        "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
           "data_type": "VARCHAR(64)",
           "default": null,
           "extra": "",
@@ -4828,6 +5781,16 @@
           "sources": [
             "backend/db/migrations/202608100003_base_capability_outcomes_and_approvals.sql"
           ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "catalog_release",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202609010003_base_capability_release_binding.sql"
+          ]
         }
       ],
       "constraints": [],
@@ -4871,7 +5834,8 @@
       "owner": "base",
       "runtime_domain": "base",
       "sources": [
-        "backend/db/migrations/202608100003_base_capability_outcomes_and_approvals.sql"
+        "backend/db/migrations/202608100003_base_capability_outcomes_and_approvals.sql",
+        "backend/db/migrations/202609010003_base_capability_release_binding.sql"
       ]
     },
     {
@@ -7223,6 +8187,115 @@
     {
       "columns": [
         {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "actor_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "operation",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(512)",
+          "default": null,
+          "extra": "",
+          "name": "idempotency_key",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "command_sha256",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "result_json",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "completed_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "tenant_gid",
+            "actor_gid",
+            "operation",
+            "idempotency_key"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/202608280004_base_plugin_lifecycle_idempotency_scope.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_base_plugin_lifecycle_idempotency",
+      "owner": "base",
+      "runtime_domain": "base",
+      "sources": [
+        "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql",
+        "backend/db/migrations/202608280004_base_plugin_lifecycle_idempotency_scope.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
           "data_type": "VARCHAR(256)",
           "default": null,
           "extra": "",
@@ -8149,6 +9222,427 @@
     {
       "columns": [
         {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "view_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "actor_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "operation",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(512)",
+          "default": null,
+          "extra": "",
+          "name": "idempotency_key",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "details_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "actor_gid",
+            "created_at"
+          ],
+          "name": "idx_base_saved_view_audit_actor",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "view_gid",
+            "created_at"
+          ],
+          "name": "idx_base_saved_view_audit_view",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_base_saved_view_audit_events",
+      "owner": "base",
+      "runtime_domain": "base",
+      "sources": [
+        "backend/db/migrations/202608280001_base_saved_view_governance.sql",
+        "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "actor_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "operation",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(512)",
+          "default": null,
+          "extra": "",
+          "name": "idempotency_key",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "view_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "result_json",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "completed_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "command_digest",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "tenant_gid",
+            "actor_gid",
+            "operation",
+            "idempotency_key"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "view_gid",
+            "created_at"
+          ],
+          "name": "idx_base_saved_view_replay_view",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_base_saved_view_idempotency",
+      "owner": "base",
+      "runtime_domain": "base",
+      "sources": [
+        "backend/db/migrations/202608280001_base_saved_view_governance.sql",
+        "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "view_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": "1",
+          "extra": "",
+          "name": "revision",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "TINYINT(1)",
+          "default": "0",
+          "extra": "",
+          "name": "deleted",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": "'private'",
+          "extra": "",
+          "name": "share_scope",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "grants_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "team_gids_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "restore_json",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "tenant_gid",
+            "view_gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "share_scope",
+            "deleted",
+            "updated_at"
+          ],
+          "name": "idx_base_saved_view_state_scope",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/202608280001_base_saved_view_governance.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_base_saved_view_states",
+      "owner": "base",
+      "runtime_domain": "base",
+      "sources": [
+        "backend/db/migrations/202608280001_base_saved_view_governance.sql",
+        "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
           "data_type": "VARCHAR(12)",
           "default": null,
           "extra": "",
@@ -8343,10 +9837,245 @@
           "data_type": "VARCHAR(128)",
           "default": null,
           "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
           "name": "item_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/202608030010_base_self_annotations.sql"
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "actor_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "operation",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(512)",
+          "default": null,
+          "extra": "",
+          "name": "idempotency_key",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "details_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_base_self_annotation_audit_events",
+      "owner": "base",
+      "runtime_domain": "base",
+      "sources": [
+        "backend/db/migrations/202608280002_base_self_annotation_governance.sql",
+        "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "actor_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "operation",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(512)",
+          "default": null,
+          "extra": "",
+          "name": "idempotency_key",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "item_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "result_json",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "completed_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "command_digest",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "tenant_gid",
+            "actor_gid",
+            "operation",
+            "idempotency_key"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_base_self_annotation_idempotency",
+      "owner": "base",
+      "runtime_domain": "base",
+      "sources": [
+        "backend/db/migrations/202608280002_base_self_annotation_governance.sql",
+        "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "item_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202609010002_base_self_annotation_collation.sql"
           ]
         },
         {
@@ -8356,7 +10085,96 @@
           "name": "user_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/202608030010_base_self_annotations.sql"
+            "backend/db/migrations/202609010002_base_self_annotation_collation.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": "1",
+          "extra": "",
+          "name": "revision",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "TINYINT(1)",
+          "default": "0",
+          "extra": "",
+          "name": "deleted",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "restore_json",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/202608280002_base_self_annotation_governance.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202609010002_base_self_annotation_collation.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "tenant_gid",
+            "item_gid",
+            "user_gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_base_self_annotation_states",
+      "owner": "base",
+      "runtime_domain": "base",
+      "sources": [
+        "backend/db/migrations/202608280002_base_self_annotation_governance.sql",
+        "backend/db/migrations/202608280005_base_structural_owner_hardening.sql",
+        "backend/db/migrations/202609010002_base_self_annotation_collation.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "item_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202609010002_base_self_annotation_collation.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "user_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202609010002_base_self_annotation_collation.sql"
           ]
         },
         {
@@ -8428,19 +10246,30 @@
           "sources": [
             "backend/db/migrations/202608030010_base_self_annotations.sql"
           ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202609010002_base_self_annotation_collation.sql"
+          ]
         }
       ],
       "constraints": [],
       "indexes": [
         {
           "columns": [
+            "tenant_gid",
             "item_gid",
             "user_gid"
           ],
           "name": "PRIMARY",
           "primary": true,
           "sources": [
-            "backend/db/migrations/202608030010_base_self_annotations.sql"
+            "backend/db/migrations/202608280005_base_structural_owner_hardening.sql"
           ],
           "unique": true
         },
@@ -8475,7 +10304,9 @@
       "owner": "base",
       "runtime_domain": "base",
       "sources": [
-        "backend/db/migrations/202608030010_base_self_annotations.sql"
+        "backend/db/migrations/202608030010_base_self_annotations.sql",
+        "backend/db/migrations/202608280005_base_structural_owner_hardening.sql",
+        "backend/db/migrations/202609010002_base_self_annotation_collation.sql"
       ]
     },
     {
@@ -9363,6 +11194,36 @@
             "backend/db/mysql_schema.sql"
           ],
           "unique": false
+        },
+        {
+          "columns": [
+            "version_gid",
+            "is_deleted",
+            "parent_gid",
+            "sort_order",
+            "gid"
+          ],
+          "name": "idx_bop_nav_parent_order",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0002_bop_navigation_indexes.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "version_gid",
+            "is_deleted",
+            "node_type(64)",
+            "sort_order",
+            "gid"
+          ],
+          "name": "idx_bop_nav_type_order",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0002_bop_navigation_indexes.sql"
+          ],
+          "unique": false
         }
       ],
       "legacy_name": true,
@@ -9370,6 +11231,7 @@
       "owner": "craft",
       "runtime_domain": "craft",
       "sources": [
+        "backend/db/migrations/domains/craft/0002_bop_navigation_indexes.sql",
         "backend/db/mysql_schema.sql"
       ]
     },
@@ -9598,6 +11460,19 @@
         },
         {
           "columns": [
+            "version_gid",
+            "is_deleted",
+            "entry_gid"
+          ],
+          "name": "idx_bop_nav_links_page",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0002_bop_navigation_indexes.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
             "entry_gid",
             "link_type(64)",
             "entity_gid(191)"
@@ -9615,6 +11490,7 @@
       "owner": "craft",
       "runtime_domain": "craft",
       "sources": [
+        "backend/db/migrations/domains/craft/0002_bop_navigation_indexes.sql",
         "backend/db/mysql_schema.sql"
       ]
     },
@@ -18052,6 +19928,145 @@
     {
       "columns": [
         {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "event_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "operation_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "owner_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "capability_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": null,
+          "extra": "",
+          "name": "operation_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "error_code",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "event_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "operation_id",
+            "operation_version"
+          ],
+          "name": "idx_int_audit_operation",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "owner_gid",
+            "created_at"
+          ],
+          "name": "idx_int_audit_owner",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_int_audit_events",
+      "owner": "integration",
+      "runtime_domain": "integration",
+      "sources": [
+        "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
           "data_type": "CHAR(36)",
           "default": null,
           "extra": "",
@@ -18316,6 +20331,16 @@
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
+        },
+        {
+          "data_type": "INT",
+          "default": "1",
+          "extra": "",
+          "name": "revision",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
         }
       ],
       "constraints": [],
@@ -18349,6 +20374,7 @@
       "runtime_domain": "integration",
       "sources": [
         "backend/db/migrations/domains/integration/0001_integration.sql",
+        "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql",
         "backend/db/mysql_schema.sql"
       ]
     },
@@ -18453,6 +20479,46 @@
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "target_binding_id",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/integration/0003_integration_mapping_target_bindings.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "target_input_contract",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/integration/0003_integration_mapping_target_bindings.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "target_resource_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/integration/0003_integration_mapping_target_bindings.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": null,
+          "extra": "",
+          "name": "target_expected_version",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/integration/0003_integration_mapping_target_bindings.sql"
+          ]
         }
       ],
       "constraints": [],
@@ -18486,7 +20552,426 @@
       "runtime_domain": "integration",
       "sources": [
         "backend/db/migrations/domains/integration/0001_integration.sql",
+        "backend/db/migrations/domains/integration/0003_integration_mapping_target_bindings.sql",
         "backend/db/mysql_schema.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "binding_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "ontology_object_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "target_domain",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "target_capability_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": null,
+          "extra": "",
+          "name": "target_major_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "minimum_catalog_release",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "input_contract",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "resource_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": null,
+          "extra": "",
+          "name": "expected_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "owner_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+          ]
+        },
+        {
+          "data_type": "TINYINT(1)",
+          "default": "1",
+          "extra": "",
+          "name": "active",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": "1",
+          "extra": "",
+          "name": "revision",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+          ]
+        },
+        {
+          "data_type": "TIMESTAMP(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+          ]
+        },
+        {
+          "data_type": "TIMESTAMP(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "last_idempotency_key",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/integration/0005_integration_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "binding_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0006_integration_binding_tenant_identity.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "semantic_key",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0006_integration_binding_tenant_identity.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "binding_gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/integration/0006_integration_binding_tenant_identity.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "owner_gid",
+            "team_gid",
+            "ontology_object_gid",
+            "active"
+          ],
+          "name": "idx_int_target_binding_projection",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "owner_gid",
+            "team_gid",
+            "ontology_object_gid",
+            "binding_id"
+          ],
+          "name": "uk_int_target_binding_scope",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "team_gid",
+            "semantic_key"
+          ],
+          "name": "uk_int_target_binding_tenant_semantic",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0006_integration_binding_tenant_identity.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_int_mapping_target_bindings",
+      "owner": "integration",
+      "runtime_domain": "integration",
+      "sources": [
+        "backend/db/migrations/domains/integration/0004_integration_target_catalog.sql",
+        "backend/db/migrations/domains/integration/0005_integration_execution_control.sql",
+        "backend/db/migrations/domains/integration/0006_integration_binding_tenant_identity.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "operation_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "owner_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "capability_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "idempotency_key",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "payload_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": "1",
+          "extra": "",
+          "name": "operation_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "result_json",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "error_code",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "operation_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "team_gid",
+            "status",
+            "updated_at"
+          ],
+          "name": "idx_int_operation_team_status",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "owner_gid",
+            "capability_id",
+            "idempotency_key"
+          ],
+          "name": "uq_int_operation_idempotency",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_int_operations",
+      "owner": "integration",
+      "runtime_domain": "integration",
+      "sources": [
+        "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
       ]
     },
     {
@@ -18655,6 +21140,106 @@
           "sources": [
             "backend/db/migrations/domains/integration/0001_integration.sql"
           ]
+        },
+        {
+          "data_type": "INT",
+          "default": "1",
+          "extra": "",
+          "name": "target_major_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "idempotency_key",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "target_invocation_json",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/integration/0003_integration_mapping_target_bindings.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "claim_token",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/integration/0005_integration_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "claimed_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/integration/0005_integration_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "error_code",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/integration/0005_integration_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": "0",
+          "extra": "",
+          "name": "attempt_count",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/integration/0005_integration_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "next_attempt_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/integration/0005_integration_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "target_dispatched_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/integration/0005_integration_execution_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "target_idempotency_key",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/integration/0005_integration_execution_control.sql"
+          ]
         }
       ],
       "constraints": [],
@@ -18687,7 +21272,10 @@
       "owner": "integration",
       "runtime_domain": "integration",
       "sources": [
-        "backend/db/migrations/domains/integration/0001_integration.sql"
+        "backend/db/migrations/domains/integration/0001_integration.sql",
+        "backend/db/migrations/domains/integration/0002_integration_structural_operations.sql",
+        "backend/db/migrations/domains/integration/0003_integration_mapping_target_bindings.sql",
+        "backend/db/migrations/domains/integration/0005_integration_execution_control.sql"
       ]
     },
     {
@@ -18881,6 +21469,16 @@
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
+        },
+        {
+          "data_type": "CHAR(36)",
+          "default": null,
+          "extra": "",
+          "name": "creator_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/202609010001_craft_rule_identity_compatibility.sql"
+          ]
         }
       ],
       "constraints": [],
@@ -18946,6 +21544,7 @@
       "owner": "craft",
       "runtime_domain": "craft",
       "sources": [
+        "backend/db/migrations/202609010001_craft_rule_identity_compatibility.sql",
         "backend/db/mysql_schema.sql"
       ]
     },
@@ -23280,6 +25879,16 @@
           "sources": [
             "backend/db/migrations/202608100005_base_plugin_mount_sessions.sql"
           ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": "1",
+          "extra": "",
+          "name": "revision",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql"
+          ]
         }
       ],
       "constraints": [],
@@ -23315,7 +25924,8 @@
       "runtime_domain": "base",
       "sources": [
         "backend/db/migrations/202608030006_base_platform_runtime_tables.sql",
-        "backend/db/migrations/202608100005_base_plugin_mount_sessions.sql"
+        "backend/db/migrations/202608100005_base_plugin_mount_sessions.sql",
+        "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql"
       ]
     },
     {
@@ -24428,6 +27038,133 @@
           "name": "gid",
           "nullable": false,
           "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(36)",
+          "default": null,
+          "extra": "",
+          "name": "order_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "actor_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "operation",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "idempotency_key",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": null,
+          "extra": "",
+          "name": "revision",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "order_gid",
+            "created_at"
+          ],
+          "name": "idx_proj_approval_audit_order",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": true,
+      "name": "workmanship_proj_approval_audit_events",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "sources": [
+        "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "CHAR(36)",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
             "backend/db/mysql_schema.sql"
           ]
         },
@@ -24560,6 +27297,26 @@
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
+        },
+        {
+          "data_type": "CHAR(36)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": "1",
+          "extra": "",
+          "name": "revision",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
         }
       ],
       "constraints": [],
@@ -24615,7 +27372,147 @@
       "runtime_domain": "project_management",
       "sources": [
         "backend/db/migrations/domains/project_management/0001_project_management.sql",
+        "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql",
         "backend/db/mysql_schema.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "actor_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "capability_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "idempotency_key",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "payload_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(36)",
+          "default": null,
+          "extra": "",
+          "name": "order_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "TEXT",
+          "default": null,
+          "extra": "",
+          "name": "result_text",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "completed_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "actor_gid",
+            "team_gid",
+            "capability_id",
+            "idempotency_key"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "order_gid"
+          ],
+          "name": "idx_proj_approval_rejection_order",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": true,
+      "name": "workmanship_proj_approval_rejection_operations",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "sources": [
+        "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
       ]
     },
     {
@@ -25112,6 +28009,153 @@
       "sources": [
         "backend/db/migrations/domains/project_management/0001_project_management.sql",
         "backend/db/mysql_schema.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "CHAR(36)",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "event_type",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(36)",
+          "default": null,
+          "extra": "",
+          "name": "order_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "recipient_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "payload",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": "'pending'",
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": "0",
+          "extra": "",
+          "name": "attempts",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "TEXT",
+          "default": null,
+          "extra": "",
+          "name": "last_error",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "status",
+            "created_at"
+          ],
+          "name": "idx_proj_notification_outbox_delivery",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": true,
+      "name": "workmanship_proj_notification_outbox",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "sources": [
+        "backend/db/migrations/domains/project_management/0002_approval_notification_outbox.sql"
       ]
     },
     {

@@ -50,6 +50,9 @@ def _passing_inputs(**overrides):
         "waivers": (),
         "approvals_complete": True,
         "data_complete": True,
+        "static_gate_status": "passed",
+        "static_gate_hash": "sha256:static-gate",
+        "evidence_hash": "sha256:evidence",
         "business_governance": evaluate_catalog_business_governance(
             CATALOG, {}, business_review_lookup=APPROVALS,
             runtime_verification={CAPABILITY_KEY: True},
@@ -68,6 +71,25 @@ def test_release_gate_fails_when_required_runner_is_unavailable():
 
     assert report.conclusion == "fail"
     assert "required_test_unavailable" in report.blockers
+
+
+def test_release_gate_fails_when_static_gate_is_missing_or_failed():
+    missing = ReleaseGate(
+        next_gid=iter(range(1, 10)).__next__, signer=lambda value: "sig"
+    ).evaluate(_candidate(), **_passing_inputs(
+        static_gate_status=None,
+        static_gate_hash="",
+        idempotency_key="missing-static",
+    ))
+    failed = ReleaseGate(
+        next_gid=iter(range(20, 30)).__next__, signer=lambda value: "sig"
+    ).evaluate(_candidate(), **_passing_inputs(
+        static_gate_status="failed",
+        idempotency_key="failed-static",
+    ))
+
+    assert "static_gate_not_passed" in missing.blockers
+    assert "static_gate_not_passed" in failed.blockers
 
 
 def test_signed_report_preserves_legacy_backlog_without_claiming_human_or_runtime_verification():
@@ -122,6 +144,10 @@ def test_passing_report_is_immutable_signed_and_expires_when_pinned_input_change
     assert report.conclusion == "pass"
     assert report.signature.startswith("signature:")
     assert report.report_hash.startswith("sha256:")
+    assert report.evidence_hash == "sha256:evidence"
+    assert report.static_gate_hash == "sha256:static-gate"
+    assert report.to_document()["evidence_hash"] == "sha256:evidence"
+    assert report.to_document()["static_gate_hash"] == "sha256:static-gate"
     expired = gate.expire_changed_inputs(code_revision="rev-b")
     assert expired != (report.release_report_gid,)
     assert gate.get(report.release_report_gid) == report

@@ -82,6 +82,8 @@ def signed_release_report(private_key: Ed25519PrivateKey, signing_key_id: str = 
         "test_run_gid": "201",
         "conclusion": "pass",
         "blockers": [],
+        "evidence_hash": "sha256:evidence",
+        "static_gate_hash": "sha256:static-gate",
         "business_governance": governance,
         "signing_key_id": signing_key_id,
     }

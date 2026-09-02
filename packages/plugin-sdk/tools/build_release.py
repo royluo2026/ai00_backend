@@ -42,6 +42,7 @@ def descriptor(source: Path, version_override: str | None = None) -> dict:
     # Otherwise the server's strict Manifest model adds them after upload and
     # verifies a different byte sequence than the publisher signed.
     value.setdefault("capabilities", {"required": [], "optional": []})
+    value.setdefault("plugins", {"required": [], "optional": []})
     web = value.get("runtimes", {}).get("web", {})
     entry = PurePosixPath(str(web.get("entry", "")))
     if not str(entry) or entry.is_absolute() or ".." in entry.parts or not (source / entry).is_file():

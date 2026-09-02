@@ -10,7 +10,7 @@
     "no silent REST fallback"
   ],
   "artifact_id": "capability-v2-structural-remediation-plan",
-  "content_sha256": "sha256:93c57a789a066a833fec1ca1bc06369573acc59f4eb98038c3fe0ddbd7525cf0",
+  "content_sha256": "sha256:5e57cb78f28bb3c7a37aa83efee44f7bef0c88a346f197e77c6ff49aa2c28e3f",
   "counts": {
     "groups": 37,
     "occurrences": 45
@@ -185,14 +185,14 @@
             "end_line": 127,
             "snippet_sha256": "sha256:5f9ed937924d85be4b24a9232e57060e554d36997185df61f581a7b87a8b20f4",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
+            "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
             "start_line": 118
           },
           "output": {
             "end_line": 247,
             "snippet_sha256": "sha256:ca535816e2e539c3ff631a470d974a9000a06fce80a92cea0dcce59d729c2bdf",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
+            "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
             "start_line": 237
           }
         },
@@ -1583,14 +1583,14 @@
             "end_line": 52,
             "snippet_sha256": "sha256:46237d107dc7b2c14a3a9693472d9a0b6a4ad619ad4b52cc6862025eadf6fdb8",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
+            "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
             "start_line": 43
           },
           "output": {
             "end_line": 196,
             "snippet_sha256": "sha256:bc7b40d0bc7e9c9178feb7316c934e4a5068ef0dbe5df0b38c74c0a65858ca65",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
+            "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
             "start_line": 180
           }
         },
@@ -1676,11 +1676,11 @@
         "canonical_occurrences": [],
         "contract_evidence": {
           "input_output": {
-            "end_line": 563,
+            "end_line": 580,
             "snippet_sha256": "sha256:3f92d0ce0e0a126194894968ce9bf05c12547a49bac61eae524d07f6bb29eb01",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
-            "start_line": 549
+            "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
+            "start_line": 566
           }
         },
         "final_inventory_mapping": "capability",
@@ -4903,11 +4903,11 @@
     },
     {
       "path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-      "sha256": "sha256:09c31126cfc0ae0619892548db1b5fd81bdb7fb37a08f93716adf3c4f274d3dc"
+      "sha256": "sha256:a4b5a775c6ad6a47b5ae860c9b683db11111403364149470f10ba6dd3844c939"
     },
     {
       "path": "docs\\governance\\capability-coverage-review\\generated\\web_route_inventory.json",
-      "sha256": "sha256:0caa92c2adfe5f23e197a9aec02882fb155046c42ff44ed4362434828610631c"
+      "sha256": "sha256:0fde4d9cc411171afc7708918c08044fe6098b0c1b3c221c67d2b212da0d3d9a"
     }
   ]
 }

@@ -471,7 +471,7 @@
   },
   "closure_baseline_revision": "614805f59294006b8802ae01869dc9d7fe3cf694",
   "closure_baseline_sha256": "sha256:fca8beb006ff0fcac9fdad79d1ad19ef97633ed90217c45600e78c9e5e5754c0",
-  "content_sha256": "sha256:3e4daf840b1ab4e98786f602e8a9271ec38deb9a6c32db5639ac97a69fdc1cc8",
+  "content_sha256": "sha256:42b725a7389a09ed04dff6b2a03f97d6a80a305496c7d7bd7f01924ddc6af8be",
   "counts": {
     "groups": 14,
     "migrated_groups": 9,
@@ -657,11 +657,11 @@
         "candidate_capability": "craft.rule.entry.evaluate@1",
         "contract_evidence": {
           "input_output": {
-            "end_line": 563,
+            "end_line": 580,
             "snippet_sha256": "sha256:3f92d0ce0e0a126194894968ce9bf05c12547a49bac61eae524d07f6bb29eb01",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
-            "start_line": 549
+            "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
+            "start_line": 566
           }
         },
         "frontend_call_sites": [
@@ -949,14 +949,14 @@
           "end_line": 127,
           "snippet_sha256": "sha256:5f9ed937924d85be4b24a9232e57060e554d36997185df61f581a7b87a8b20f4",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
+          "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
           "start_line": 118
         },
         "output": {
           "end_line": 247,
           "snippet_sha256": "sha256:ca535816e2e539c3ff631a470d974a9000a06fce80a92cea0dcce59d729c2bdf",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
+          "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
           "start_line": 237
         }
       },
@@ -991,14 +991,14 @@
           "end_line": 127,
           "snippet_sha256": "sha256:5f9ed937924d85be4b24a9232e57060e554d36997185df61f581a7b87a8b20f4",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
+          "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
           "start_line": 118
         },
         "output": {
           "end_line": 247,
           "snippet_sha256": "sha256:ca535816e2e539c3ff631a470d974a9000a06fce80a92cea0dcce59d729c2bdf",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
+          "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
           "start_line": 237
         }
       },
@@ -1015,14 +1015,14 @@
             "end_line": 127,
             "snippet_sha256": "sha256:5f9ed937924d85be4b24a9232e57060e554d36997185df61f581a7b87a8b20f4",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
+            "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
             "start_line": 118
           },
           "output": {
             "end_line": 247,
             "snippet_sha256": "sha256:ca535816e2e539c3ff631a470d974a9000a06fce80a92cea0dcce59d729c2bdf",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
+            "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
             "start_line": 237
           }
         },
@@ -1143,14 +1143,14 @@
           "end_line": 52,
           "snippet_sha256": "sha256:46237d107dc7b2c14a3a9693472d9a0b6a4ad619ad4b52cc6862025eadf6fdb8",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
+          "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
           "start_line": 43
         },
         "output": {
           "end_line": 196,
           "snippet_sha256": "sha256:bc7b40d0bc7e9c9178feb7316c934e4a5068ef0dbe5df0b38c74c0a65858ca65",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
+          "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
           "start_line": 180
         }
       },
@@ -1171,14 +1171,14 @@
           "end_line": 52,
           "snippet_sha256": "sha256:46237d107dc7b2c14a3a9693472d9a0b6a4ad619ad4b52cc6862025eadf6fdb8",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
+          "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
           "start_line": 43
         },
         "output": {
           "end_line": 196,
           "snippet_sha256": "sha256:bc7b40d0bc7e9c9178feb7316c934e4a5068ef0dbe5df0b38c74c0a65858ca65",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
+          "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
           "start_line": 180
         }
       },
@@ -1195,14 +1195,14 @@
             "end_line": 52,
             "snippet_sha256": "sha256:46237d107dc7b2c14a3a9693472d9a0b6a4ad619ad4b52cc6862025eadf6fdb8",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
+            "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
             "start_line": 43
           },
           "output": {
             "end_line": 196,
             "snippet_sha256": "sha256:bc7b40d0bc7e9c9178feb7316c934e4a5068ef0dbe5df0b38c74c0a65858ca65",
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
+            "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
             "start_line": 180
           }
         },
@@ -1423,11 +1423,11 @@
       "candidate_capability": "craft.rule.entry.evaluate@1",
       "contract_evidence": {
         "input_output": {
-          "end_line": 563,
+          "end_line": 580,
           "snippet_sha256": "sha256:3f92d0ce0e0a126194894968ce9bf05c12547a49bac61eae524d07f6bb29eb01",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
-          "start_line": 549
+          "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
+          "start_line": 566
         }
       },
       "final_disposition": "migrated",
@@ -1474,11 +1474,11 @@
       },
       "input_output_contract": {
         "input_output": {
-          "end_line": 563,
+          "end_line": 580,
           "snippet_sha256": "sha256:3f92d0ce0e0a126194894968ce9bf05c12547a49bac61eae524d07f6bb29eb01",
           "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-          "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
-          "start_line": 549
+          "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
+          "start_line": 566
         }
       },
       "legacy_route_absent": true,
@@ -2898,14 +2898,14 @@
         "end_line": 127,
         "snippet_sha256": "sha256:5f9ed937924d85be4b24a9232e57060e554d36997185df61f581a7b87a8b20f4",
         "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-        "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
+        "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
         "start_line": 118
       },
       "craft_archive_output_contract": {
         "end_line": 247,
         "snippet_sha256": "sha256:ca535816e2e539c3ff631a470d974a9000a06fce80a92cea0dcce59d729c2bdf",
         "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-        "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
+        "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
         "start_line": 237
       },
       "craft_archive_provider": {
@@ -2919,14 +2919,14 @@
         "end_line": 52,
         "snippet_sha256": "sha256:46237d107dc7b2c14a3a9693472d9a0b6a4ad619ad4b52cc6862025eadf6fdb8",
         "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-        "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
+        "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
         "start_line": 43
       },
       "craft_list_output_contract": {
         "end_line": 196,
         "snippet_sha256": "sha256:bc7b40d0bc7e9c9178feb7316c934e4a5068ef0dbe5df0b38c74c0a65858ca65",
         "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-        "source_sha256": "sha256:c327d40c43e8487957a5ab2eac20437bf6b622615a96e49f1a4bf489df4c12ea",
+        "source_sha256": "sha256:9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
         "start_line": 180
       },
       "craft_list_provider": {

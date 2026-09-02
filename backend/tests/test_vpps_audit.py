@@ -138,14 +138,45 @@ def mock_conn():
     from backend.main import app as _registered_app  # noqa: F401
 
     mc, conn = _make_cursor_and_conn()
-    with patch("craft_backend.routers.vpps_audit.get_conn", return_value=conn):
+    with patch("craft_backend.capabilities.vpps_audit.get_conn", return_value=conn):
         yield conn, mc
 
 
 @pytest.fixture
 def client(mock_conn):
     from backend.main import app
-    from backend.routers.deps import get_current_user
+    from backend.capability_v2.authorization import AuthorizationGrants
+    from backend.capability_v2.gateway import CapabilityGatewayService, get_default_gateway
+    from backend.capability_v2.identity import AuthenticatedPrincipal
+    from backend.capability_v2.outcomes import InMemoryOutcomeStore
+    from backend.capability_v2.policies import LegacyServerGatewayPolicy
+    from backend.capability_v2.reliability import (
+        ApprovalService,
+        InMemoryApprovalStore,
+        InMemoryRateLimiter,
+        ReliabilityCoordinator,
+    )
+    from backend.routers.deps import get_authenticated_principal, get_current_user
+
+    production_gateway = get_default_gateway()
+    approval_service = ApprovalService(InMemoryApprovalStore())
+    test_gateway = CapabilityGatewayService(
+        production_gateway._resolver,
+        LegacyServerGatewayPolicy(
+            user_loader=lambda _gid: {"is_active": True},
+            grants_resolver=lambda identity, _user: AuthorizationGrants(
+                permissions=("craft.read", "craft.write"),
+                resource_scopes=("*",),
+                data_scopes=("confidential",),
+                policy_version="test",
+                tenant_id=identity.tenant.tenant_id,
+            ),
+            approval_service=approval_service,
+        ),
+        reliability=ReliabilityCoordinator(
+            InMemoryOutcomeStore(), InMemoryRateLimiter(limit=1000)
+        ),
+    ).bind_release(production_gateway.catalog_release)
 
     async def _fake_user():
         return {
@@ -161,10 +192,22 @@ def client(mock_conn):
             "notification_prefs": {},
         }
 
+    def _fake_principal():
+        return AuthenticatedPrincipal(
+            user_id="test_user_gid",
+            authentication_method="test-jwt",
+            authenticated_at=_NOW,
+        )
+
     app.dependency_overrides[get_current_user] = _fake_user
-    with TestClient(app) as c:
+    app.dependency_overrides[get_authenticated_principal] = _fake_principal
+    app.dependency_overrides[get_default_gateway] = lambda: test_gateway
+    c = TestClient(app)
+    try:
         yield c
-    app.dependency_overrides.clear()
+    finally:
+        c.close()
+        app.dependency_overrides.clear()
 
 
 # ─────────────────────────────────────────────────────────────────────────────

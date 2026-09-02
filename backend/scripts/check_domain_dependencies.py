@@ -91,6 +91,11 @@ def discover_violations(ownership: dict) -> tuple[list[dict], list[str]]:
             "unsupported shared import prefixes: " + ", ".join(sorted(unsupported_shared))
         )
     sources: dict[str, tuple[Path, str]] = {}
+    test_patterns = tuple(
+        pattern
+        for descriptor in ownership["domains"].values()
+        for pattern in descriptor.get("test_paths", ())
+    )
     candidate_paths: set[Path] = set()
     for descriptor in ownership["domains"].values():
         for pattern in descriptor["code_paths"]:
@@ -105,6 +110,8 @@ def discover_violations(ownership: dict) -> tuple[list[dict], list[str]]:
         candidate_paths.update(sdk_root.rglob("*.py"))
     for path in sorted(candidate_paths):
         relative = path.relative_to(REPOSITORY_ROOT).as_posix()
+        if any(fnmatch(relative, pattern) for pattern in test_patterns):
+            continue
         if relative.startswith("backend/platform_sdk/"):
             sources[relative] = (path, "Shared Platform SDK")
             continue

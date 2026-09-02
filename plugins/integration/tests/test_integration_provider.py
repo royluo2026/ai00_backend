@@ -302,14 +302,24 @@ def _registrations():
     return {spec.id: (spec, descriptor) for spec, _, descriptor in registry.items}
 
 
-def test_provider_fails_startup_when_required_adapter_factory_is_unavailable(monkeypatch):
+def test_provider_registers_without_runtime_factory_but_invocation_fails_closed(monkeypatch):
     class Registry:
-        def register(self, *_args, **_kwargs):
-            pytest.fail("unconfigured provider must fail before registering handlers")
+        def __init__(self):
+            self.handlers = {}
+
+        def register(self, spec, handler, *, descriptor=None):
+            self.handlers[spec.id] = handler
 
     monkeypatch.delenv("AI00_INTEGRATION_ADAPTER_FACTORY", raising=False)
+    registry = Registry()
+
+    register_capabilities(registry)
+
+    assert "integration.connector.search" in registry.handlers
     with pytest.raises(RuntimeError, match="AI00_INTEGRATION_ADAPTER_FACTORY"):
-        register_capabilities(Registry())
+        asyncio.run(registry.handlers["integration.connector.search"](
+            {}, CapabilityContext(user_gid="actor-1", team_gid="team-1", request_id="no-runtime"),
+        ))
 
 
 def test_provider_rejects_synchronous_runtime_before_handler_publication():

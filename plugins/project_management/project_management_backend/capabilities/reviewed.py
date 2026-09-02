@@ -75,6 +75,143 @@ _ARGUMENT_FIELDS = {
 }
 
 
+def _object(properties: dict[str, Any], *, required: tuple[str, ...] = ()) -> dict[str, Any]:
+    schema: dict[str, Any] = {
+        "type": "object", "properties": properties, "additionalProperties": False,
+    }
+    if required:
+        schema["required"] = list(required)
+    return schema
+
+
+_TEXT = {"type": "string"}
+_NULLABLE_TEXT = {"type": ["string", "null"]}
+_STRING_LIST = {"type": "array", "items": _TEXT, "maxItems": 200}
+_SCOPE = _object({
+    "user_gid": _TEXT,
+    "team_gids": _STRING_LIST,
+    "team_member_gids": _STRING_LIST,
+    "project_gids": _STRING_LIST,
+    "is_admin": {"type": "boolean"},
+}, required=("user_gid",))
+
+_ATOMIC_ARGUMENT_SCHEMAS: dict[str, dict[str, Any]] = {
+    "projects.search": _object({
+        "include_deleted": {"type": "boolean"},
+        "include_archived": {"type": "boolean"},
+        "scope": _SCOPE,
+    }),
+    "tasks.search": _object({
+        "project_gid": _NULLABLE_TEXT,
+        "status": _NULLABLE_TEXT,
+        "list_gid": _NULLABLE_TEXT,
+        "scheduled_date_from": _NULLABLE_TEXT,
+        "q": _NULLABLE_TEXT,
+        "page_size": {"type": "integer", "minimum": 1, "maximum": 500},
+        "scope": _SCOPE,
+    }),
+    "issues.search": _object({
+        "project_gid": _NULLABLE_TEXT,
+        "status": _NULLABLE_TEXT,
+        "list_gid": _NULLABLE_TEXT,
+        "q": _NULLABLE_TEXT,
+        "page_size": {"type": "integer", "minimum": 1, "maximum": 500},
+        "scope": _SCOPE,
+    }),
+    "lists.search": _object({
+        "item_type": _NULLABLE_TEXT,
+        "owner_team_gid": _NULLABLE_TEXT,
+        "q": _NULLABLE_TEXT,
+        "scope": _SCOPE,
+    }),
+    "follows.list": _object({"item_type": _NULLABLE_TEXT}),
+    "notifications.unread_count": _object({}),
+}
+
+_PROJECT = _object({
+    "gid": _TEXT, "name": _TEXT, "project_code": _TEXT,
+    "model_year": {"type": ["integer", "null"]}, "suffix": _TEXT,
+    "description": _TEXT, "status": _TEXT,
+    "vehicle_model_gid": _NULLABLE_TEXT, "factory_gid": _NULLABLE_TEXT,
+    "team_id": _NULLABLE_TEXT, "owner_gid": _NULLABLE_TEXT,
+    "owner_name": _TEXT, "share_scope": _TEXT,
+    "jph": {"type": ["integer", "number", "null"]},
+    "is_deleted": {"type": "boolean"}, "is_archived": {"type": "boolean"},
+    "deleted_at": _NULLABLE_TEXT, "archived_at": _NULLABLE_TEXT,
+    "created_at": _TEXT, "updated_at": _TEXT,
+})
+
+_WORK_ITEM = _object({
+    name: schema for name, schema in {
+        **{name: _NULLABLE_TEXT for name in (
+            "gid", "display_id", "title", "description", "owner_gid", "owner_user_gid",
+            "assignee_team_gid", "project_gid", "status", "share_scope", "list_gid",
+            "priority", "review_date", "meeting_level", "meeting_doc_link", "due_date",
+            "plan_start", "plan_end", "actual_start", "actual_end", "scheduled_date",
+            "scheduled_start_time", "parent_task_gid", "node_type", "canvas_icon",
+            "canvas_row_gid", "canvas_col_gid",
+            "feishu_assignee_open_id", "feishu_assignee_name", "feishu_group_chat_id",
+            "feishu_group_name", "severity", "occurrence_root_cause", "escape_root_cause",
+            "interim_action", "permanent_action", "related_task_gid", "related_knowledge_gid",
+            "approval_order_gid", "bop_entry_gid", "owner_name", "created_at", "updated_at",
+            "deleted_at",
+        )},
+        "source_ref": _object({}),
+        "attachments": {"type": "array", "items": {}, "maxItems": 200},
+        "progress_logs": {"type": "array", "items": {}, "maxItems": 200},
+        "tracking_refs": {"type": "array", "items": {}, "maxItems": 200},
+        "feishu_groups": {"type": "array", "items": {}, "maxItems": 200},
+        "feishu_docs": {"type": "array", "items": {}, "maxItems": 200},
+        "is_deleted": {"type": "boolean"},
+        "completion": {"type": ["integer", "number", "null"]},
+        "time_estimate": {"type": ["integer", "null"]},
+        "canvas_x": {"type": ["integer", "number", "null"]},
+        "canvas_y": {"type": ["integer", "number", "null"]},
+    }.items()
+})
+
+_PROJECT_LIST = _object({
+    "gid": _TEXT, "name": _TEXT, "color": _TEXT, "storage_scope": _TEXT,
+    "owner_type": _TEXT, "owner_gid": _TEXT, "creator_gid": _TEXT,
+    "visibility": _TEXT, "read_scope": _TEXT, "write_scope": _TEXT,
+    "deleted_at": _NULLABLE_TEXT, "item_type": _TEXT,
+    "sort_order": {"type": "integer"}, "created_at": _TEXT,
+    "project_gid": _NULLABLE_TEXT,
+})
+
+_FOLLOW = _object({
+    "gid": _TEXT, "item_type": _TEXT, "item_gid": _TEXT,
+    "item_title": _TEXT, "notify_on": _STRING_LIST, "created_at": _TEXT,
+})
+
+_VEHICLE_MODEL = _object({
+    "gid": _TEXT, "name": _TEXT, "brand": _TEXT, "platform": _TEXT,
+    "vehicle_type": _TEXT, "created_at": _TEXT,
+})
+
+
+def _application_result(data_schema: dict[str, Any]) -> dict[str, Any]:
+    return _object(
+        {"success": {"type": "boolean"}, "data": data_schema},
+        required=("success", "data"),
+    )
+
+
+_ATOMIC_OUTPUT_SCHEMAS: dict[str, dict[str, Any]] = {
+    "projects.search": _application_result({"type": "array", "items": _PROJECT, "maxItems": 500}),
+    "tasks.search": _application_result({"type": "array", "items": _WORK_ITEM, "maxItems": 500}),
+    "issues.search": _application_result({"type": "array", "items": _WORK_ITEM, "maxItems": 500}),
+    "lists.search": _application_result({"type": "array", "items": _PROJECT_LIST, "maxItems": 500}),
+    "follows.list": _application_result({"type": "array", "items": _FOLLOW, "maxItems": 500}),
+    "notifications.unread_count": _application_result(
+        _object({"count": {"type": "integer", "minimum": 0}}, required=("count",))
+    ),
+    "vehicle_models.list": _application_result(
+        {"type": "array", "items": _VEHICLE_MODEL, "maxItems": 500}
+    ),
+}
+
+
 def _operation_schema(capability_id: str) -> dict[str, Any]:
     operations = SUPPORTED_OPERATIONS.get(capability_id, frozenset())
     if not operations:
@@ -229,12 +366,14 @@ def register_reviewed_capabilities(registry: Any) -> None:
                     risk=CapabilityRisk.WRITE if is_write else CapabilityRisk.READ,
                     confirmation="user" if is_write else "none",
                     permissions=("project.manage_any",) if is_write else ("project.view",),
-                    input_schema={
-                        "type": "object", "properties": {
-                            "arguments": {"type": "object", "properties": _ARGUMENT_FIELDS, "additionalProperties": False},
-                        }, "additionalProperties": False,
-                    },
-                    output_schema={"type": "object", "required": ["data"], "properties": {"data": {}}},
+                    input_schema=_object({
+                        "arguments": _ATOMIC_ARGUMENT_SCHEMAS.get(
+                            operation, _object(_ARGUMENT_FIELDS)
+                        ),
+                    }, required=("arguments",)),
+                    output_schema=_object({
+                        "data": _ATOMIC_OUTPUT_SCHEMAS.get(operation, _object({})),
+                    }, required=("data",)),
                     tags=("project_management", "atomic", operation),
                 ),
                 _atomic_handler(capability_id, operation),

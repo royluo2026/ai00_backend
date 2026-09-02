@@ -3,7 +3,7 @@ import re
 import pytest
 
 from backend.capability_v2.schema_diff import SchemaDiff, SchemaDifference
-from backend.capability_v2.schema_model import ColumnSpec, ExpectedSchema, IndexSpec, TableSpec
+from backend.capability_v2.schema_model import ColumnSpec, ConstraintSpec, ExpectedSchema, IndexSpec, TableSpec
 from backend.capability_v2.schema_sql import SchemaPlanError, build_execution_package
 
 
@@ -24,7 +24,7 @@ def _expected():
 
 def _safe_diff(expected):
     assets, new = expected.tables
-    return SchemaDiff("ai00_test", expected.schema_sha256, (
+    return SchemaDiff(expected.database_name, expected.schema_sha256, (
         SchemaDifference("missing_table", new.name, expected_object=new),
         SchemaDifference("missing_nullable_column", assets.name, "status", expected_object=assets.columns[1]),
         SchemaDifference("missing_index", assets.name, "ix_status", expected_object=assets.indexes[1]),
@@ -50,6 +50,20 @@ def test_generated_sql_is_non_destructive_and_targets_ai00_test(tmp_path):
     assert not re.search(r"\b(DROP|TRUNCATE|DELETE|RENAME)\b", sql, re.I)
     assert "ADD COLUMN" in sql and "ADD INDEX" in sql
     assert "ENGINE=InnoDB" not in sql
+
+
+def test_generated_sql_targets_explicit_single_database_name(tmp_path):
+    baseline = _expected()
+    expected = ExpectedSchema(baseline.tables, database_name="sht_mes_tool")
+
+    build_execution_package(expected=expected, diff=_safe_diff(expected), output=tmp_path)
+
+    sql = "\n".join(path.read_text(encoding="utf-8") for path in tmp_path.glob("*.sql"))
+    checklist = (tmp_path / "execution-checklist.md").read_text(encoding="utf-8")
+    assert "`sht_mes_tool`" in sql
+    assert "TABLE_SCHEMA = 'sht_mes_tool'" in sql
+    assert "ai00_test" not in sql
+    assert "`sht_mes_tool`" in checklist
 
 
 def test_preflight_does_not_use_oceanbase_reserved_keyword_as_alias(tmp_path):
@@ -91,6 +105,34 @@ def test_generated_sql_unwraps_parenthesized_scalar_defaults(tmp_path):
     assert "DEFAULT ('in_use')" not in ddl
     assert "DEFAULT (1)" not in ddl
     assert "DEFAULT (CURRENT_DATE)" not in ddl
+
+
+def test_missing_tables_are_created_after_their_foreign_key_dependencies(tmp_path):
+    parent = TableSpec(
+        "workmanship_agent_runs", "agent", "agent", False,
+        columns=(ColumnSpec("gid", "CHAR(36)", False),),
+        indexes=(IndexSpec("PRIMARY", ("gid",), True, True),),
+    )
+    child = TableSpec(
+        "workmanship_agent_audit", "agent", "agent", False,
+        columns=(ColumnSpec("gid", "CHAR(36)", False), ColumnSpec("run_gid", "CHAR(36)", False)),
+        indexes=(IndexSpec("PRIMARY", ("gid",), True, True),),
+        constraints=(ConstraintSpec(
+            "fk_agent_audit_run", "foreign_key", ("run_gid",), parent.name, ("gid",),
+        ),),
+    )
+    expected = ExpectedSchema((child, parent), database_name="ai00_test")
+    diff = SchemaDiff("ai00_test", expected.schema_sha256, (
+        SchemaDifference("missing_table", child.name, expected_object=child),
+        SchemaDifference("missing_table", parent.name, expected_object=parent),
+    ), ())
+
+    build_execution_package(expected=expected, diff=diff, output=tmp_path)
+
+    ddl = (tmp_path / "10-create-missing-tables.sql").read_text(encoding="utf-8")
+    assert ddl.index(f"CREATE TABLE IF NOT EXISTS `{parent.name}`") < ddl.index(
+        f"CREATE TABLE IF NOT EXISTS `{child.name}`"
+    )
 
 
 def test_manual_diff_blocks_ddl_generation(tmp_path):

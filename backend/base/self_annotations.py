@@ -116,7 +116,10 @@ class SqlSelfAnnotationRepository:
         return (
             "SELECT a.item_gid,a.user_gid,a.tenant_gid,a.module,a.item_title,a.self_status,a.self_schedule,a.self_note,a.self_attachments,"
             "s.revision,s.deleted,s.restore_json FROM workmanship_base_self_annotations a "
-            "LEFT JOIN workmanship_base_self_annotation_states s ON s.tenant_gid=a.tenant_gid AND s.item_gid=a.item_gid AND s.user_gid=a.user_gid"
+            "LEFT JOIN workmanship_base_self_annotation_states s ON "
+            "s.tenant_gid COLLATE utf8mb4_unicode_ci=a.tenant_gid COLLATE utf8mb4_unicode_ci AND "
+            "s.item_gid COLLATE utf8mb4_unicode_ci=a.item_gid COLLATE utf8mb4_unicode_ci AND "
+            "s.user_gid COLLATE utf8mb4_unicode_ci=a.user_gid COLLATE utf8mb4_unicode_ci"
         )
 
     def get(self, *, tenant_gid: str, actor_gid: str, item_gid: str, lock: bool = False) -> dict[str, Any] | None:

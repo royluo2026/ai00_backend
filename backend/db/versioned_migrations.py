@@ -262,6 +262,39 @@ def is_resumable_ddl(statement: str) -> bool:
 
 def prepare_resumable_statement(conn, statement: str) -> str | None:
     """Translate declarative IF NOT EXISTS DDL for OceanBase 4.3.5."""
+    if re.search(r"\bworkmanship_base_self_annotations\s+a\b", statement, re.I):
+        # The legacy annotation table can retain utf8mb4_general_ci while the
+        # governed state/idempotency/audit tables use utf8mb4_unicode_ci.
+        # Keep the immutable migration artifact unchanged and make its one-time
+        # cross-table backfills explicit for OceanBase error 1267.
+        statement = re.sub(
+            r"\ba\.(item_gid|user_gid)\s*=\s*([a-z]\.(?:item_gid|user_gid|actor_gid))",
+            r"a.\1 COLLATE utf8mb4_unicode_ci=\2",
+            statement,
+            flags=re.I,
+        )
+        statement = re.sub(
+            r"\b([a-z]\.(?:gid|item_gid|user_gid|actor_gid))\s*=\s*a\.(item_gid|user_gid)",
+            r"\1=a.\2 COLLATE utf8mb4_unicode_ci",
+            statement,
+            flags=re.I,
+        )
+
+    if re.search(
+        r"\bUPDATE\s+workmanship_know_craft_rules\s+SET\s+owner_user_gid\s*=\s*creator_gid\b",
+        strip_sql_comments(statement),
+        re.I,
+    ):
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT COUNT(*) FROM information_schema.COLUMNS "
+                "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s AND COLUMN_NAME=%s",
+                ("workmanship_know_craft_rules", "creator_gid"),
+            )
+            creator_exists = int(_scalar(cur.fetchone())) > 0
+        if not creator_exists:
+            return None
+
     add_column = re.search(
         r"\bALTER\s+TABLE\s+`?([A-Za-z0-9_]+)`?\s+ADD\s+COLUMN\s+"
         r"IF\s+NOT\s+EXISTS\s+`?([A-Za-z0-9_]+)`?",

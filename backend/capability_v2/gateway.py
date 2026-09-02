@@ -8,6 +8,7 @@ import json
 import logging
 import os
 import time
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -82,12 +83,9 @@ class CapabilityGatewayService:
 
     async def request_approval(self, envelope: InvocationEnvelope) -> IssuedApproval:
         try:
-            descriptor = self._resolver.descriptor(
-                envelope.catalog_release, envelope.capability_id, envelope.major_version
-            )
-            provider = self._resolver.resolve(
-                envelope.catalog_release, envelope.capability_id, envelope.major_version
-            )
+            descriptor, provider = self._resolve_envelope(envelope)
+        except GatewayPolicyError:
+            raise
         except CatalogResolutionError as exc:
             raise GatewayPolicyError(
                 "catalog_resolution_failed", "Capability catalog resolution failed."
@@ -133,12 +131,9 @@ class CapabilityGatewayService:
 
     async def invoke(self, envelope: InvocationEnvelope) -> CapabilityResultV2:
         try:
-            descriptor = self._resolver.descriptor(
-                envelope.catalog_release, envelope.capability_id, envelope.major_version
-            )
-            provider = self._resolver.resolve(
-                envelope.catalog_release, envelope.capability_id, envelope.major_version
-            )
+            descriptor, provider = self._resolve_envelope(envelope)
+        except GatewayPolicyError as exc:
+            return self._rejected(envelope, exc.code, exc.message)
         except CatalogResolutionError:
             return self._rejected(
                 envelope, "catalog_resolution_failed", "Capability catalog resolution failed."
@@ -307,7 +302,17 @@ class CapabilityGatewayService:
             try:
                 value = provider.handler(dict(envelope.payload), context)
                 if inspect.isawaitable(value):
-                    value = await value
+                    try:
+                        value = await asyncio.wait_for(
+                            value,
+                            timeout=self._provider_timeout_seconds(descriptor, envelope),
+                        )
+                    except TimeoutError as exc:
+                        raise CapabilityBusinessError(
+                            "runtime_timeout",
+                            "Capability provider exceeded its execution deadline.",
+                            retryable=True,
+                        ) from exc
             except LookupError as exc:
                 raise CapabilityBusinessError(
                     "resource_not_found", "The requested resource was not found."
@@ -334,6 +339,16 @@ class CapabilityGatewayService:
                     summary=item.summary,
                 ) for item in value.evidence)
                 value = value.data
+            if is_write and descriptor.consistency_policy == "strong" and transaction is None:
+                raise CapabilityBusinessError(
+                    "transaction_participant_required",
+                    "Strong writes require an open transaction participant.",
+                )
+            if descriptor.evidence_policy == "required" and not evidence:
+                raise CapabilityBusinessError(
+                    "evidence_required",
+                    "Capability provider did not return required evidence.",
+                )
             validate_payload(dict(descriptor.output_schema), value, label="output")
             output_bytes = self._json_size(value)
             if output_bytes > descriptor.execution_budget.max_output_bytes:
@@ -471,10 +486,90 @@ class CapabilityGatewayService:
             envelope.identity,
             data_scopes=authorization.data_scopes if authorization is not None else (),
         )
+        if projected_result.ok and projected_result.data is not None:
+            projection_schema = (
+                descriptor.agent_output_schema
+                if envelope.identity.consumer.type.value in {"agent", "mcp"}
+                and descriptor.agent_output_schema is not None
+                else descriptor.output_schema
+            )
+            try:
+                validate_payload(
+                    dict(projection_schema), projected_result.data, label="projected_output"
+                )
+            except (TypeError, ValueError):
+                projected_result = project_result(
+                    self._failed(
+                        envelope,
+                        "projection_contract_failed",
+                        "Capability projection violated its declared output contract.",
+                    ),
+                    descriptor,
+                    envelope.identity,
+                    data_scopes=(
+                        authorization.data_scopes if authorization is not None else ()
+                    ),
+                )
         self._record_metric(
             descriptor, envelope, started, before, output_bytes, projected_result, capability_key,
         )
         return projected_result
+
+    def _resolve_envelope(self, envelope: InvocationEnvelope):
+        if self._catalog_release is None:
+            raise GatewayPolicyError(
+                "catalog_release_unbound", "Gateway catalog release is not bound."
+            )
+        if envelope.catalog_release != self._catalog_release:
+            raise GatewayPolicyError(
+                "catalog_resolution_failed", "Capability catalog resolution failed."
+            )
+        descriptor = self._resolver.descriptor(
+            envelope.catalog_release, envelope.capability_id, envelope.major_version
+        )
+        now = datetime.now(UTC)
+        if envelope.deadline is not None:
+            if envelope.deadline.tzinfo is None or envelope.deadline.utcoffset() is None:
+                raise GatewayPolicyError(
+                    "deadline_invalid", "Invocation deadline must be timezone-aware."
+                )
+            if envelope.deadline.astimezone(UTC) <= now:
+                raise GatewayPolicyError(
+                    "deadline_exceeded", "Invocation deadline has expired."
+                )
+        if descriptor.required_auth_freshness_seconds > 0:
+            authenticated_at = envelope.identity.actor.authenticated_at
+            if authenticated_at.tzinfo is None or authenticated_at.utcoffset() is None:
+                raise GatewayPolicyError(
+                    "authentication_stale", "Authentication freshness cannot be verified."
+                )
+            oldest = now - timedelta(seconds=descriptor.required_auth_freshness_seconds)
+            if authenticated_at.astimezone(UTC) < oldest:
+                raise GatewayPolicyError(
+                    "authentication_stale", "Authentication is older than the capability policy allows."
+                )
+        if descriptor.lifecycle_status.value == "retired":
+            raise GatewayPolicyError(
+                "capability_lifecycle_not_invocable", "Retired capability cannot be invoked."
+            )
+        provider = self._resolver.resolve(
+            envelope.catalog_release, envelope.capability_id, envelope.major_version
+        )
+        return descriptor, provider
+
+    @staticmethod
+    def _provider_timeout_seconds(descriptor, envelope: InvocationEnvelope) -> float:
+        timeout = float(descriptor.timeout_seconds)
+        if envelope.deadline is not None:
+            remaining = (envelope.deadline.astimezone(UTC) - datetime.now(UTC)).total_seconds()
+            timeout = min(timeout, remaining)
+        if timeout <= 0:
+            raise CapabilityBusinessError(
+                "runtime_timeout",
+                "Capability provider exceeded its execution deadline.",
+                retryable=True,
+            )
+        return timeout
 
     @staticmethod
     def _json_size(value: Any) -> int:

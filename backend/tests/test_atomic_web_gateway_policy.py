@@ -37,6 +37,8 @@ def test_atomic_permissions_reuse_legacy_role_boundaries_not_broad_domain_flags(
         "base.notification.preference.atomic.update",
         "base.identity.directory.feishu.sync",
         "base.plugin.installed.list",
+        "base.plugin.installation.request.create",
+        "base.plugin.installation.transition.uninstall",
         "base.identity.user.search",
         "base.organization.team.directory.list",
         "base.team.directory.list",
@@ -62,6 +64,8 @@ def test_atomic_permissions_reuse_legacy_role_boundaries_not_broad_domain_flags(
     assert specs["base.identity.directory.feishu.sync"].permissions == (
         "system.tech_config",
     )
+    assert specs["base.plugin.installation.request.create"].permissions == ("system.plugin.manage",)
+    assert specs["base.plugin.installation.transition.uninstall"].permissions == ("system.plugin.manage",)
     for capability_id in {
         "base.notification.preference.atomic.get",
         "base.notification.preference.atomic.update",
@@ -150,11 +154,14 @@ def _envelope(gateway, capability_id: str, role: str, payload: dict, *, service=
 
 
 def test_production_gateway_role_matrix_for_authenticated_and_grant_manager_reads(monkeypatch):
-    from backend.base import grant_service, plugin_inventory
+    from backend.base import grant_service
     from backend.routers import deps
 
     monkeypatch.setattr(deps, "_get_user_grants", lambda _gid: [])
-    monkeypatch.setattr(plugin_inventory, "list_installed_plugins", lambda: {"success": True, "data": []})
+    class PluginService:
+        def list_installed(self, *, actor):
+            return {"installations": []}
+    monkeypatch.setattr("backend.plugin_platform.service.PluginPlatformService", PluginService)
     monkeypatch.setattr(grant_service, "list_grants", lambda **_kwargs: {"grants": []})
     users = {
         role: {"gid": role, "system_role": role, "org_role": "super_admin" if role == "super_admin" else "member", "is_active": True}
@@ -200,11 +207,13 @@ def test_production_gateway_super_admin_write_confirmation_and_member_denial(mon
 
 
 def test_production_gateway_rejects_malformed_typed_provider_output(monkeypatch):
-    from backend.base import plugin_inventory
     from backend.routers import deps
 
     monkeypatch.setattr(deps, "_get_user_grants", lambda _gid: [])
-    monkeypatch.setattr(plugin_inventory, "list_installed_plugins", lambda: {"success": True, "data": [{"plugin_id": "p"}]})
+    class PluginService:
+        def list_installed(self, *, actor):
+            return {"installations": [{"plugin_id": "p"}]}
+    monkeypatch.setattr("backend.plugin_platform.service.PluginPlatformService", PluginService)
     user = {"gid": "member", "system_role": "member", "org_role": "member", "is_active": True}
     gateway = _gateway("base.plugin.installed.list", {"member": user})
     result = asyncio.run(gateway.invoke(_envelope(gateway, "base.plugin.installed.list", "member", {})))

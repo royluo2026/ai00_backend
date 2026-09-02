@@ -203,6 +203,10 @@ def compile_expected_schema(root: Path) -> ExpectedSchema:
                 r"^(CREATE\s+DATABASE|USE\s+|SET\s+|INSERT\s+IGNORE\s+INTO\s+)", statement, re.I
             ):
                 continue
+            # Backfill DML is validated by the migration and domain-ownership
+            # gates; it does not contribute to the expected DDL projection.
+            if re.match(r"^(INSERT|UPDATE|DELETE)\b", statement, re.I):
+                continue
             if re.match(r"^(DROP|RENAME|TRUNCATE)\b", statement, re.I):
                 raise SchemaCompileError(f"destructive_ddl:{source}:1")
             create = re.match(r"^CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?([^\s(]+)\s*\((.*)\)\s*(?:ENGINE\b.*)?$", statement, re.I | re.S)
@@ -227,11 +231,19 @@ def compile_expected_schema(root: Path) -> ExpectedSchema:
                 if name not in tables: raise SchemaCompileError(f"alter_before_create:{name}:{source}:1")
                 table = tables[name]; table.sources.add(source)
                 for action in _parts(alter.group(2)):
+                    drop_primary = re.match(r"^DROP\s+PRIMARY\s+KEY$", action, re.I)
+                    add_primary = re.match(r"^ADD\s+PRIMARY\s+KEY\s*\((.+)\)$", action, re.I | re.S)
                     add_column = re.match(r"^ADD\s+(?:COLUMN\s+)?(IF\s+NOT\s+EXISTS\s+)?(.+)$", action, re.I | re.S)
                     modify = re.match(r"^MODIFY\s+(?:COLUMN\s+)?(?:IF\s+EXISTS\s+)?(.+)$", action, re.I | re.S)
                     change = re.match(rf"^CHANGE\s+(?:COLUMN\s+)?{IDENT}\s+{IDENT}\s+(.+)$", action, re.I | re.S)
                     add_index = re.match(rf"^ADD\s+(UNIQUE\s+)?(?:KEY|INDEX)\s+(?:IF\s+NOT\s+EXISTS\s+)?{IDENT}\s*\((.+)\)$", action, re.I | re.S)
-                    if add_index:
+                    if drop_primary:
+                        table.indexes.pop("PRIMARY", None)
+                    elif add_primary:
+                        table.indexes["PRIMARY"] = IndexSpec(
+                            "PRIMARY", _index_columns(add_primary.group(1)), True, True, (source,)
+                        )
+                    elif add_index:
                         _merge_index(table, IndexSpec(add_index.group(2), _index_columns(add_index.group(3)), bool(add_index.group(1)), False, (source,)), source)
                     elif add_column:
                         column = _column(add_column.group(2), source)

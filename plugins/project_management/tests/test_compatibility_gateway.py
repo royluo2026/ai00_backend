@@ -115,7 +115,9 @@ def test_legacy_web_adapter_builds_a_server_derived_gateway_envelope():
     assert envelope.identity.tenant.tenant_id == "team-1"
     assert envelope.identity.tenant.active_roles == ("member",)
     assert envelope.identity.consumer.consumer_id == "ai00.web.compatibility"
-    assert envelope.payload == {"item_type": "task", "item_gid": "task-1"}
+    assert envelope.payload == {
+        "arguments": {"item_type": "task", "item_gid": "task-1"}
+    }
     context = CapabilityGatewayService._legacy_context(envelope)
     assert context.active_roles == ("member",)
 
@@ -147,7 +149,9 @@ def test_legacy_item_entry_read_uses_gateway_and_preserves_response_shape():
     assert response.json() == {"entries": []}
     assert len(gateway.envelopes) == 1
     assert gateway.envelopes[0].capability_id == "project.list.read.atomic.item_entries_get"
-    assert gateway.envelopes[0].payload == {"item_type": "task", "item_gid": "task-1"}
+    assert gateway.envelopes[0].payload == {
+        "arguments": {"item_type": "task", "item_gid": "task-1"}
+    }
 
 
 def test_legacy_item_entry_writes_use_gateway_governance_headers():
@@ -231,13 +235,13 @@ def test_legacy_change_log_read_uses_gateway_and_preserves_response_shape():
         }
     ]
     assert gateway.envelopes[0].capability_id == "project.change_log.read.atomic.change_logs_search"
-    assert gateway.envelopes[0].payload == {
+    assert gateway.envelopes[0].payload == {"arguments": {
         "item_type": "task",
         "item_gid": "task-1",
         "list_gid": None,
         "limit": 25,
         "offset": 0,
-    }
+    }}
 
 
 def test_legacy_collaboration_routes_use_read_and_governed_write_capabilities():
@@ -293,4 +297,4 @@ def test_legacy_share_link_resolve_uses_project_sharing_capability():
     assert response.status_code == 200
     assert response.json()["current_permission"] == "read"
     assert gateway.envelopes[0].capability_id == "project.sharing.read.atomic.share_links_resolve"
-    assert gateway.envelopes[0].payload == {"token": "token-1"}
+    assert gateway.envelopes[0].payload == {"arguments": {"token": "token-1"}}

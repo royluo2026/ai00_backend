@@ -28,6 +28,12 @@
 /backend/db/migrations/202608100004_base_artifacts_and_operations.sql @ai00/base-maintainers
 /backend/db/migrations/202608100005_base_plugin_mount_sessions.sql @ai00/base-maintainers
 /backend/db/migrations/202608100007_base_revision_lineage.sql @ai00/base-maintainers
+/backend/db/migrations/202608280001_base_saved_view_governance.sql @ai00/base-maintainers
+/backend/db/migrations/202608280002_base_self_annotation_governance.sql @ai00/base-maintainers
+/backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql @ai00/base-maintainers
+/backend/db/migrations/202608280004_base_plugin_lifecycle_idempotency_scope.sql @ai00/base-maintainers
+/backend/db/migrations/202608280005_base_structural_owner_hardening.sql @ai00/base-maintainers
+/backend/db/migrations/202608280006_base_historical_tenant_repair.sql @ai00/base-maintainers
 
 # Agent
 /plugins/agent/** @ai00/agent-maintainers
@@ -48,6 +54,7 @@
 /backend/db/migrations/202608060001_craft_bop_revision.sql @ai00/craft-maintainers
 /backend/db/migrations/202608060004_craft_validation_policies.sql @ai00/craft-maintainers
 /backend/db/migrations/202608070001_craft_bop_write_governance.sql @ai00/craft-maintainers
+/backend/db/migrations/202608310001_craft_rule_identity_backfill.sql @ai00/craft-maintainers
 
 # Digital Model
 /plugins/digital_model/** @ai00/digital-model-maintainers

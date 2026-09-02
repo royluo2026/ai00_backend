@@ -8,7 +8,7 @@ Execute Knowledge operation favorites.list.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_0b584b19349bc98727900583bb19f687`
+- Catalog Release：`rel_fb3c151fd2c880f3d35fc1c786444b0e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -85,7 +85,7 @@ Execute Knowledge operation favorites.list.
 ```json
 {
   "capability_id": "knowledge.personalization.read.atomic.favorites_list",
-  "catalog_release": "rel_0b584b19349bc98727900583bb19f687",
+  "catalog_release": "rel_fb3c151fd2c880f3d35fc1c786444b0e",
   "major_version": 1,
   "payload": {}
 }
@@ -101,7 +101,144 @@ Execute Knowledge operation favorites.list.
   "properties": {
     "data": {
       "additionalProperties": false,
-      "properties": {},
+      "properties": {
+        "items": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "content_body": {
+                "type": [
+                  "object",
+                  "array",
+                  "string",
+                  "null"
+                ]
+              },
+              "content_md": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "created_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "creator_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "file_path": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "folder_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "is_hidden": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "is_pinned": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "is_system": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "item_type": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "personalization_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "scope_type": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "site_ref": {
+                "type": [
+                  "object",
+                  "array",
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "tags": {
+                "type": [
+                  "object",
+                  "array",
+                  "string",
+                  "null"
+                ]
+              },
+              "team_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "title": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "updated_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "url": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "type": "object"
+          },
+          "maxItems": 200,
+          "type": "array"
+        }
+      },
       "type": "object"
     }
   },

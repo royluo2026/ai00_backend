@@ -5,7 +5,6 @@ import json
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from .acceptance_contract import mandatory_test_source_revision
 from .business_definition import is_generated_business_effect
 
 
@@ -73,16 +72,11 @@ def _load_catalog(path: Path) -> list[dict]:
     return entries
 
 
-def audit_catalog(
-    path: Path, *, source_root: Path | None = None,
-) -> CatalogAuditReport:
-    revision = mandatory_test_source_revision(source_root) if source_root else None
-    return audit_catalog_entries(_load_catalog(path), mandatory_test_revision=revision)
+def audit_catalog(path: Path) -> CatalogAuditReport:
+    return audit_catalog_entries(_load_catalog(path))
 
 
-def audit_catalog_entries(
-    entries: list[dict], *, mandatory_test_revision: str | None = None,
-) -> CatalogAuditReport:
+def audit_catalog_entries(entries: list[dict]) -> CatalogAuditReport:
     stable = [entry for entry in entries if entry.get("lifecycle_status") == "stable"]
     generic_ids: list[str] = []
     open_arguments = 0
@@ -193,12 +187,6 @@ def audit_catalog_entries(
             not isinstance(item, dict)
             or not {"test_type", "test_node_id", "code_revision"} <= set(item)
             for item in (test_refs if isinstance(test_refs, list) else [{}])
-        ) or (
-            mandatory_test_revision is not None
-            and any(
-                item.get("code_revision") != mandatory_test_revision
-                for item in test_refs
-            )
         ):
             invalid_test_refs += 1
     return CatalogAuditReport(

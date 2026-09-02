@@ -73,7 +73,10 @@ def test_lifecycle_upgrade_rollback_and_invalid_transition():
     assert (result.state, result.previous_version) == ("upgrading", "1.0.0")
     restored = rollback(result.current_version, result.previous_version)
     assert (restored.current_version, restored.state) == ("1.0.0", "rolled_back")
-    with pytest.raises(LifecycleError): require_transition("enabled", "uninstalled")
+    # Direct uninstall is a governed production transition; rollback without an
+    # in-progress/failed upgrade remains invalid.
+    require_transition("enabled", "uninstalled")
+    with pytest.raises(LifecycleError): require_transition("enabled", "rolled_back")
 
 
 def test_compatibility_ranges():

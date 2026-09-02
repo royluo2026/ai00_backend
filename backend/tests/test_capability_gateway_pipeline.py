@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -19,6 +19,7 @@ from backend.capability_v2.contracts import (
     ConsumerType,
     ExposurePolicy,
     InvocationEnvelope,
+    LifecycleStatus,
     SideEffectLevel,
     TenantIdentity,
 )
@@ -76,7 +77,7 @@ def _gateway(descriptor, handler, policy, reliability=None, operations=None):
     store.publish(release)
     return CapabilityGatewayService(
         CatalogResolver(store, registry), policy, reliability=reliability, operations=operations
-    ), release
+    ).bind_release(release.release_id), release
 
 
 def _envelope(release, consumer_type=ConsumerType.WEB):
@@ -128,6 +129,142 @@ def test_gateway_executes_fixed_validate_authorize_approve_dispatch_project_orde
     assert result.ok is True
     assert result.data == {"routing_id": "routing_1"}
     assert events == ["authorize", "approve", "dispatch", "project"]
+
+
+def test_gateway_rejects_stored_but_inactive_catalog_release_before_dispatch():
+    events = []
+
+    class Policy:
+        def authorize(self, *_args):
+            events.append("authorize")
+            return AuthorizationDecision(allowed=True, code="allowed", policy_version="p1")
+        def approve(self, *_args):
+            events.append("approve")
+        def project(self, _descriptor, _identity, data):
+            return data
+
+    descriptor = _descriptor()
+    previous = build_release([descriptor])
+    active = build_release([descriptor.model_copy(update={"title": "Get active routing"})])
+    registry = CapabilityRegistry()
+    registry.register(
+        CapabilitySpec(
+            id=descriptor.id,
+            version=descriptor.major_version,
+            owner=descriptor.owner_domain,
+            input_schema=descriptor.input_schema,
+            output_schema=descriptor.output_schema,
+        ),
+        lambda _payload, _context: events.append("dispatch") or {"routing_id": "r1"},
+    )
+    store = InMemoryCatalogStore()
+    store.publish(previous)
+    store.publish(active)
+    gateway = CapabilityGatewayService(CatalogResolver(store, registry), Policy()).bind_release(active.release_id)
+
+    result = asyncio.run(gateway.invoke(_envelope(previous)))
+
+    assert result.ok is False
+    assert result.error.code == "catalog_resolution_failed"
+    assert events == []
+
+
+def test_gateway_rejects_retired_capability_before_authorization_or_dispatch():
+    events = []
+
+    class Policy:
+        def authorize(self, *_args):
+            events.append("authorize")
+            return AuthorizationDecision(allowed=True, code="allowed", policy_version="p1")
+        def approve(self, *_args):
+            events.append("approve")
+        def project(self, _descriptor, _identity, data):
+            return data
+
+    gateway, release = _gateway(
+        _descriptor().model_copy(update={"lifecycle_status": LifecycleStatus.RETIRED}),
+        lambda _payload, _context: events.append("dispatch") or {"routing_id": "r1"},
+        Policy(),
+    )
+
+    result = asyncio.run(gateway.invoke(_envelope(release)))
+
+    assert result.ok is False
+    assert result.error.code == "capability_lifecycle_not_invocable"
+    assert events == []
+
+
+def test_gateway_rejects_expired_deadline_before_authorization_or_dispatch():
+    events = []
+
+    class Policy:
+        def authorize(self, *_args): events.append("authorize")
+        def approve(self, *_args): events.append("approve")
+        def project(self, _descriptor, _identity, data): return data
+
+    gateway, release = _gateway(
+        _descriptor(),
+        lambda *_args: events.append("dispatch") or {"routing_id": "routing_1"},
+        Policy(),
+    )
+    envelope = _envelope(release).model_copy(update={
+        "deadline": datetime.now(UTC) - timedelta(seconds=1),
+    })
+
+    result = asyncio.run(gateway.invoke(envelope))
+
+    assert result.error.code == "deadline_exceeded"
+    assert events == []
+
+
+def test_gateway_rejects_stale_authentication_before_authorization_or_dispatch():
+    events = []
+
+    class Policy:
+        def authorize(self, *_args): events.append("authorize")
+        def approve(self, *_args): events.append("approve")
+        def project(self, _descriptor, _identity, data): return data
+
+    descriptor = _descriptor().model_copy(update={"required_auth_freshness_seconds": 60})
+    gateway, release = _gateway(
+        descriptor,
+        lambda *_args: events.append("dispatch") or {"routing_id": "routing_1"},
+        Policy(),
+    )
+    stale_actor = ActorIdentity(
+        user_id="user_1",
+        authentication_method="jwt",
+        authenticated_at=datetime.now(UTC) - timedelta(minutes=5),
+    )
+    envelope = _envelope(release).model_copy(update={
+        "identity": _identity(ConsumerType.WEB).model_copy(update={"actor": stale_actor}),
+    })
+
+    result = asyncio.run(gateway.invoke(envelope))
+
+    assert result.error.code == "authentication_stale"
+    assert events == []
+
+
+def test_gateway_times_out_async_provider_at_invocation_deadline():
+    class Policy:
+        def authorize(self, *_args):
+            return AuthorizationDecision(allowed=True, code="allowed", policy_version="p1")
+        def approve(self, *_args): return None
+        def project(self, _descriptor, _identity, data): return data
+
+    async def handler(*_args):
+        await asyncio.sleep(0.2)
+        return {"routing_id": "routing_1"}
+
+    gateway, release = _gateway(_descriptor(), handler, Policy())
+    envelope = _envelope(release).model_copy(update={
+        "deadline": datetime.now(UTC) + timedelta(milliseconds=30),
+    })
+
+    result = asyncio.run(gateway.invoke(envelope))
+
+    assert result.error.code == "runtime_timeout"
 
 
 def test_required_async_operation_is_created_before_dispatch_and_returned_as_accepted():
@@ -323,6 +460,23 @@ def test_gateway_maps_provider_boundary_errors_without_leaking_details(error, co
 def test_gateway_applies_ai_projection_with_authorized_data_scopes():
     descriptor = _descriptor().model_copy(update={
         "exposure": ExposurePolicy(web=True, agent=True),
+        "agent_output_schema": {
+            "type": "object",
+            "properties": {
+                "routing_id": {
+                    "type": "object",
+                    "properties": {
+                        "kind": {"type": "string"},
+                        "text": {"type": "string"},
+                        "source": {"type": "string"},
+                    },
+                    "required": ["kind", "text", "source"],
+                    "additionalProperties": False,
+                },
+            },
+            "required": ["routing_id"],
+            "additionalProperties": False,
+        },
     })
 
     class Policy:
@@ -343,6 +497,28 @@ def test_gateway_applies_ai_projection_with_authorized_data_scopes():
 
     assert result.data["routing_id"]["kind"] == "untrusted_text"
     assert "ai_untrusted_content" in result.warnings
+
+
+def test_gateway_rejects_ai_projection_that_violates_agent_output_schema():
+    descriptor = _descriptor().model_copy(update={
+        "exposure": ExposurePolicy(web=True, agent=True),
+        "agent_output_schema": _descriptor().output_schema,
+    })
+
+    class Policy:
+        def authorize(self, *_args):
+            return AuthorizationDecision(allowed=True, code="allowed", policy_version="policy-7")
+        def approve(self, *_args): return None
+        def project(self, _descriptor, _identity, data): return data
+
+    gateway, release = _gateway(
+        descriptor, lambda _payload, _context: {"routing_id": "routing_1"}, Policy()
+    )
+
+    result = asyncio.run(gateway.invoke(_envelope(release, ConsumerType.AGENT)))
+
+    assert result.ok is False
+    assert result.error.code == "projection_contract_failed"
 
 
 def test_gateway_sanitizes_business_error_details_for_ai_consumers():
@@ -595,3 +771,53 @@ def test_gateway_rejects_strong_write_before_nontransactional_provider_dispatch(
 
     assert result.error.code == "transaction_participant_required"
     assert dispatched == []
+
+
+def test_gateway_rejects_decorated_strong_write_without_transaction_output():
+    descriptor = _descriptor().model_copy(update={
+        "side_effect_level": SideEffectLevel.WRITE,
+        "idempotency_policy": "required",
+        "consistency_policy": "strong",
+    })
+
+    class Policy:
+        def authorize(self, *_args):
+            return AuthorizationDecision(allowed=True, code="allowed", policy_version="policy-7")
+        def approve(self, *_args): return None
+        def project(self, _descriptor, _identity, data): return data
+
+    @transactional_provider
+    def handler(*_args):
+        return {"routing_id": "routing_1"}
+
+    gateway, release = _gateway(
+        descriptor,
+        handler,
+        Policy(),
+        ReliabilityCoordinator(InMemoryOutcomeStore(), InMemoryRateLimiter(limit=100)),
+    )
+    envelope = _envelope(release).model_copy(update={"idempotency_key": "idem_1"})
+
+    result = asyncio.run(gateway.invoke(envelope))
+
+    assert result.error.code == "transaction_participant_required"
+
+
+def test_gateway_requires_declared_evidence_before_success():
+    descriptor = _descriptor().model_copy(update={"evidence_policy": "required"})
+
+    class Policy:
+        def authorize(self, *_args):
+            return AuthorizationDecision(allowed=True, code="allowed", policy_version="policy-7")
+        def approve(self, *_args): return None
+        def project(self, _descriptor, _identity, data): return data
+
+    gateway, release = _gateway(
+        descriptor,
+        lambda *_args: {"routing_id": "routing_1"},
+        Policy(),
+    )
+
+    result = asyncio.run(gateway.invoke(_envelope(release)))
+
+    assert result.error.code == "evidence_required"

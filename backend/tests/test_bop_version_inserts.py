@@ -90,8 +90,8 @@ def test_update_version_uses_revision_pinned_preview_and_apply(monkeypatch):
     calls = []
 
     async def invoke(*args, **kwargs):
-        capability = args[4]
-        payload = args[5]
+        capability = kwargs["capability_id"]
+        payload = kwargs["payload"]
         calls.append((capability, payload, kwargs.get("write", False)))
         if capability == "craft.bop.version.get":
             if len([item for item in calls if item[0] == capability]) == 1:

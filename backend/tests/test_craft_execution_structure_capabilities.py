@@ -1,4 +1,5 @@
 import copy
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -124,6 +125,27 @@ def test_linked_parts_reports_usage_locations():
     ]
 
 
+def test_linked_parts_is_bounded_with_cursor_pagination():
+    aggregate = _aggregate()
+    aggregate = BopAggregate(
+        version=aggregate.version,
+        entries=aggregate.entries,
+        links=(
+            aggregate.links[0],
+            {**aggregate.links[0], "entry_gid": "op-2", "entity_gid": "part-2", "entity_data": {"part_no": "A-2", "name": "Bolt"}},
+        ),
+    )
+    with patch.object(repository, "load_bop_aggregate", return_value=aggregate):
+        first = get_linked_parts({"version_gid": "v1", "page_size": 1}, CapabilityContext(user_gid="u1"))
+        second = get_linked_parts({"version_gid": "v1", "page_size": 1, "cursor": first.data["next_cursor"]}, CapabilityContext(user_gid="u1"))
+
+    assert first.data["total"] == 2
+    assert len(first.data["items"]) == 1
+    assert first.data["next_cursor"] == "1"
+    assert [item["part_gid"] for item in second.data["items"]] == ["part-2"]
+    assert second.data["next_cursor"] is None
+
+
 def test_linked_parts_exposes_legacy_compatibility_rows():
     aggregate = _aggregate()
     with patch.object(repository, "load_bop_aggregate", return_value=aggregate):
@@ -148,6 +170,14 @@ def test_linked_parts_exposes_legacy_compatibility_rows():
             "created_at": None,
         }
     ]
+
+
+def test_linked_parts_repository_uses_declared_pbom_columns():
+    source = Path("plugins/craft/craft_backend/services/execution_structure.py").read_text(encoding="utf-8")
+    query = source[source.index('"SELECT l.gid AS link_gid'):source.index('"WHERE l.version_gid = %s AND l.is_deleted = 0"')]
+
+    for nonexistent in ("p.updated_at", "p.parent_part_gid", "p.node_type", "p.bom_row_id", "p.seq_no", "p.part_number"):
+        assert nonexistent not in query
 
 
 def test_linked_parts_exposes_legacy_pbom_rows():

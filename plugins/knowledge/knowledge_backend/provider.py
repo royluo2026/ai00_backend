@@ -30,6 +30,7 @@ _RESOURCE_FIELDS = {
     "knowledge.proposal.get": ("knowledge-proposal", "proposal_gid"),
     "knowledge.proposal.review": ("knowledge-proposal", "proposal_gid"),
     "knowledge.proposal.outbox.retry": ("knowledge-outbox", "outbox_gid"),
+    "knowledge.personalization.change.apply.atomic.recent_record": ("knowledge-item", "gid"),
 }
 
 _DOMAIN_ERRORS = (

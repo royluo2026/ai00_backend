@@ -186,3 +186,24 @@ def test_knowledge_search_supports_legacy_list_filters_and_full_projection(monke
     assert item["content_md"] == "Body"
     assert item["list_gid"] == "list1"
     assert item["context_class_gid"] == "class1"
+
+
+def test_reviewed_hub_atomic_outputs_publish_real_closed_projections():
+    from plugins.knowledge.knowledge_backend.capabilities.reviewed import OUTPUT_SCHEMAS, _transport
+
+    folders = OUTPUT_SCHEMAS[("knowledge.hub.read", "folders.list")]
+    items = OUTPUT_SCHEMAS[("knowledge.hub.read", "items.list")]
+    assert folders["properties"]["items"]["items"]["additionalProperties"] is False
+    assert "gid" in folders["properties"]["items"]["items"]["properties"]
+    assert items["properties"]["items"]["items"]["additionalProperties"] is False
+    assert "title" in items["properties"]["items"]["items"]["properties"]
+    assert _transport({"is_system": 1, "is_pinned": 0, "is_hidden": None}) == {
+        "is_system": True, "is_pinned": False, "is_hidden": None,
+    }
+
+
+def test_automatic_recent_tracking_does_not_require_an_interactive_confirmation():
+    registration = capability_registry.get(
+        "knowledge.personalization.change.apply.atomic.recent_record"
+    )
+    assert registration.spec.confirmation == "none"

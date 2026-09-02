@@ -8,7 +8,7 @@ Execute knowledge.hub.read.
 - 不适用：The resource belongs to another domain.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_0b584b19349bc98727900583bb19f687`
+- Catalog Release：`rel_fb3c151fd2c880f3d35fc1c786444b0e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -122,7 +122,7 @@ Execute knowledge.hub.read.
 ```json
 {
   "capability_id": "knowledge.hub.read",
-  "catalog_release": "rel_0b584b19349bc98727900583bb19f687",
+  "catalog_release": "rel_fb3c151fd2c880f3d35fc1c786444b0e",
   "major_version": 1,
   "payload": {
     "arguments": {},
@@ -140,9 +140,398 @@ Execute knowledge.hub.read.
   "additionalProperties": false,
   "properties": {
     "data": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "items": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "created_at": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "creator_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "parent_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "scope_type": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "sort_order": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "team_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "updated_at": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "type": "object"
+              },
+              "maxItems": 500,
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "items": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "content_body": {
+                    "type": [
+                      "object",
+                      "array",
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_md": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "created_at": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "creator_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "file_path": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "folder_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "is_hidden": {
+                    "type": [
+                      "boolean",
+                      "null"
+                    ]
+                  },
+                  "is_pinned": {
+                    "type": [
+                      "boolean",
+                      "null"
+                    ]
+                  },
+                  "is_system": {
+                    "type": [
+                      "boolean",
+                      "null"
+                    ]
+                  },
+                  "item_type": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "personalization_at": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "scope_type": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "site_ref": {
+                    "type": [
+                      "object",
+                      "array",
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "status": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "tags": {
+                    "type": [
+                      "object",
+                      "array",
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "team_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "title": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "updated_at": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "url": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "type": "object"
+              },
+              "maxItems": 500,
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "content_body": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "null"
+              ]
+            },
+            "content_md": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "created_at": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "creator_gid": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "file_path": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "folder_gid": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "gid": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "is_hidden": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "is_pinned": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "is_system": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "item_type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "personalization_at": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "scope_type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "site_ref": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "null"
+              ]
+            },
+            "status": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "tags": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "null"
+              ]
+            },
+            "team_gid": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "title": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "updated_at": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "url": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "items": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "created_at": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "id": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  }
+                },
+                "type": "object"
+              },
+              "maxItems": 500,
+              "type": "array"
+            }
+          },
+          "type": "object"
+        }
+      ]
     }
   },
   "required": [

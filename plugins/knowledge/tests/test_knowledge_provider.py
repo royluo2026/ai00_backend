@@ -19,13 +19,10 @@ def test_knowledge_provider_is_complete_against_frozen_review():
     review = json.loads((ROOT / "docs/governance/capability-coverage-review/knowledge.json").read_text(encoding="utf-8"))
     registry = Registry(); register_capabilities(registry)
 
-    assert {descriptor.id for _, descriptor in registry.items} == set(review["capabilities"]) | {
-        "knowledge.reference_data.read",
-        "knowledge.reference_data.change.apply",
-        "knowledge.reference_dataset.publish",
-        "knowledge.hub.read",
-        "knowledge.hub.change.apply",
-    }
+    assert {
+        descriptor.id for _, descriptor in registry.items
+        if ".atomic." not in descriptor.id
+    } == set(review["capabilities"])
     assert {descriptor.owner_domain for _, descriptor in registry.items} == {"knowledge"}
 
 

@@ -669,7 +669,12 @@ class ReleaseGateReport:
             and required_fields_complete
             and self.audit.invalid_error_schema_count == 0
             and self.audit.test_evidence_not_run_count == 0
+            and self.audit.test_evidence_failed_count == 0
+            and self.audit.self_attested_test_result_count == 0
             and self.audit.invalid_test_ref_count == 0
+            and self.audit.invalid_consumer_ref_count == 0
+            and self.audit.invalid_business_effect_count == 0
+            and self.audit.invalid_side_effect_count == 0
             and self.atomicity is not None
             and self.atomicity.passed
             and len(self.orchestration) == 3

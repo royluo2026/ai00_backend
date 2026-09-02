@@ -278,8 +278,12 @@ def test_mysql_rule_definition_repository_replays_before_revision_check(monkeypa
     assert replay == first
     assert connection.commits == 2
     assert connection.rollbacks == 0
-    events = [params[0] for sql, params in connection.cursor_value.calls if "INSERT INTO workmanship_app_capability_audit" in sql]
-    assert events == ["rule_definition_operation", "rule_definition_changed"]
+    cross_domain_audit_writes = [
+        sql for sql, _params in connection.cursor_value.calls
+        if "workmanship_app_capability_audit" in sql
+    ]
+    assert cross_domain_audit_writes == []
+    assert sum(sql.startswith("UPDATE workmanship_know_craft_rules") for sql, _ in connection.cursor_value.calls) == 1
 
 
 def test_mysql_rule_definition_replay_requires_the_current_team_scope(monkeypatch):

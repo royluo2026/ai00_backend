@@ -93,6 +93,8 @@ class DomainProviderLoader:
             }
             if not owners <= set(manifest.allowed_owners):
                 raise ProviderTrustError(f"provider_owner_mismatch: {manifest.domain_id}")
+            for owner in manifest.allowed_owners:
+                registry.bind_provider_artifact(owner, manifest.artifact)
 
         self._validate_search_exports(registry)
         return tuple(item.domain_id for item in ordered)

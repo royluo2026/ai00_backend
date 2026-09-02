@@ -113,32 +113,42 @@ def get_linked_parts(
     payload: dict[str, Any],
     _context: CapabilityContext,
 ) -> CapabilityOutput:
-    _reject_unknown(payload, {"version_gid"})
+    _reject_unknown(payload, {"version_gid", "cursor", "page_size"})
     version_gid = _required_text(payload, "version_gid")
+    page_size = payload.get("page_size", 200)
+    if isinstance(page_size, bool) or not isinstance(page_size, int) or not 1 <= page_size <= 500:
+        raise ValueError("page_size must be an integer between 1 and 500")
+    cursor = payload.get("cursor")
+    if cursor in (None, ""):
+        offset = 0
+    elif isinstance(cursor, str) and cursor.isdigit():
+        offset = int(cursor)
+    else:
+        raise ValueError("cursor is invalid")
     aggregate = repository.load_bop_aggregate(version_gid, expected_revision=None)
     revision = aggregate.version["revision"]
     items = linked_parts(aggregate)
     legacy_items = legacy_linked_parts(aggregate)
     legacy_pbom = legacy_pbom_items(aggregate)
-    if len(legacy_items) > 500 or len(legacy_pbom) > 500:
-        raise CapabilityBusinessError(
-            "dataset_too_large",
-            "Linked PBOM parts exceed the bounded compatibility response limit",
-            details={"limit": 500, "linked_count": len(legacy_items), "pbom_count": len(legacy_pbom)},
-        )
+    total = max(len(items), len(legacy_items), len(legacy_pbom))
+    if offset > total:
+        raise ValueError("cursor is invalid")
+    end = min(offset + page_size, total)
     evidence = EvidenceRef(
         kind="craft.bop.linked_parts",
         reference=f"craft://bop/version/{version_gid}/linked-parts/r{revision}",
         summary=f"Linked PBOM parts for BOP {version_gid}",
-        metadata={"version_gid": version_gid, "revision": revision},
+        metadata={"version_gid": version_gid, "revision": revision, "total": total},
     )
     return CapabilityOutput(
         data={
             "version_gid": version_gid,
             "revision": revision,
-            "items": items,
-            "legacy_items": legacy_items,
-            "legacy_pbom_items": legacy_pbom,
+            "items": items[offset:end],
+            "legacy_items": legacy_items[offset:end],
+            "legacy_pbom_items": legacy_pbom[offset:end],
+            "total": total,
+            "next_cursor": str(end) if end < total else None,
         },
         evidence=(evidence,),
     )

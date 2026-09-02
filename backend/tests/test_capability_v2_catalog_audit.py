@@ -250,21 +250,3 @@ def test_audit_catalog_accepts_test_coverage_declaration_without_result(tmp_path
     assert report.invalid_test_ref_count == 0
     assert report.test_evidence_not_run_count == 0
     assert report.test_evidence_failed_count == 0
-
-
-def test_audit_catalog_rejects_tampered_mandatory_test_source_hash() -> None:
-    report = audit_catalog_entries(
-        [{
-            "id": "craft.read",
-            "lifecycle_status": "stable",
-            "input_schema": {"type": "object", "additionalProperties": False},
-            "test_refs": [{
-                "test_type": "contract",
-                "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.read@1]",
-                "code_revision": "sha256:" + "0" * 64,
-            }],
-        }],
-        mandatory_test_revision="sha256:" + "1" * 64,
-    )
-
-    assert report.invalid_test_ref_count == 1

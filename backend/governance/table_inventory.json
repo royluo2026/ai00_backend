@@ -1,7 +1,27 @@
 {
   "registry_version": 1,
-  "table_count": 234,
+  "table_count": 244,
   "tables": [
+    {
+      "table": "workmanship_agent_canvas_audit_events",
+      "owner": "agent",
+      "runtime_domain": "agent"
+    },
+    {
+      "table": "workmanship_agent_canvas_invocations",
+      "owner": "agent",
+      "runtime_domain": "agent"
+    },
+    {
+      "table": "workmanship_agent_canvas_runs",
+      "owner": "agent",
+      "runtime_domain": "agent"
+    },
+    {
+      "table": "workmanship_agent_canvas_runtime_results",
+      "owner": "agent",
+      "runtime_domain": "agent"
+    },
     {
       "table": "workmanship_agent_capability_resources",
       "owner": "agent",
@@ -743,6 +763,11 @@
       "runtime_domain": "factory"
     },
     {
+      "table": "workmanship_int_audit_events",
+      "owner": "integration",
+      "runtime_domain": "integration"
+    },
+    {
       "table": "workmanship_int_ext_datasources",
       "owner": "integration",
       "runtime_domain": "integration"
@@ -754,6 +779,16 @@
     },
     {
       "table": "workmanship_int_ext_mappings",
+      "owner": "integration",
+      "runtime_domain": "integration"
+    },
+    {
+      "table": "workmanship_int_mapping_target_bindings",
+      "owner": "integration",
+      "runtime_domain": "integration"
+    },
+    {
+      "table": "workmanship_int_operations",
       "owner": "integration",
       "runtime_domain": "integration"
     },
@@ -958,7 +993,17 @@
       "runtime_domain": "base"
     },
     {
+      "table": "workmanship_proj_approval_audit_events",
+      "owner": "project_management",
+      "runtime_domain": "project_management"
+    },
+    {
       "table": "workmanship_proj_approval_orders",
+      "owner": "project_management",
+      "runtime_domain": "project_management"
+    },
+    {
+      "table": "workmanship_proj_approval_rejection_operations",
       "owner": "project_management",
       "runtime_domain": "project_management"
     },
@@ -969,6 +1014,11 @@
     },
     {
       "table": "workmanship_proj_issues",
+      "owner": "project_management",
+      "runtime_domain": "project_management"
+    },
+    {
+      "table": "workmanship_proj_notification_outbox",
       "owner": "project_management",
       "runtime_domain": "project_management"
     },

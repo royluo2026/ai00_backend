@@ -136,7 +136,11 @@ def load_runtime_database_url(
     value = str(environ.get(env_name, "")).strip()
     if not value:
         raise DomainDatabaseConfigurationError(f"missing_domain_database_url: {env_name}")
-    return _parse_url(value, env_name=env_name, database_name=profile.database_name)
+    database_name = (
+        str(environ.get("AI00_SHARED_DATABASE_NAME", "")).strip()
+        or profile.database_name
+    )
+    return _parse_url(value, env_name=env_name, database_name=database_name)
 
 
 def load_ddl_database_url(

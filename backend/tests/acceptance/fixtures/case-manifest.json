@@ -4312,8 +4312,7 @@
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[vismockup.visibility@1]"
     }
   },
-  "catalog_hash": "sha256:0b584b19349bc98727900583bb19f687a093b3ce91431fb384795034d690ab60",
-  "catalog_release": "rel_0b584b19349bc98727900583bb19f687",
+  "catalog_release": "rel_fb3c151fd2c880f3d35fc1c786444b0e",
   "mandatory_cases": [
     "success",
     "invalid_input",
@@ -4323,5 +4322,5 @@
     "consumer_contract",
     "version_pin"
   ],
-  "schema_version": 2
+  "schema_version": 1
 }

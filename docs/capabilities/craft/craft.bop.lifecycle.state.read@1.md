@@ -8,7 +8,7 @@ Read the bounded aggregate lifecycle state for one BOP version.
 - 不适用：The request changes lifecycle state or refreshes lifecycle statistics.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_0b584b19349bc98727900583bb19f687`
+- Catalog Release：`rel_fb3c151fd2c880f3d35fc1c786444b0e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -86,7 +86,7 @@ Read the bounded aggregate lifecycle state for one BOP version.
 ```json
 {
   "capability_id": "craft.bop.lifecycle.state.read",
-  "catalog_release": "rel_0b584b19349bc98727900583bb19f687",
+  "catalog_release": "rel_fb3c151fd2c880f3d35fc1c786444b0e",
   "major_version": 1,
   "payload": {
     "version_gid": "example"
@@ -105,7 +105,41 @@ Read the bounded aggregate lifecycle state for one BOP version.
     "all_versions_in_family": {
       "items": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "archived_at": {
+            "description": "Provider-validated transport value."
+          },
+          "bop_name": {
+            "description": "Provider-validated transport value."
+          },
+          "change_note": {
+            "description": "Provider-validated transport value."
+          },
+          "data_stage": {
+            "description": "Provider-validated transport value."
+          },
+          "frozen_at": {
+            "description": "Provider-validated transport value."
+          },
+          "gid": {
+            "description": "Provider-validated transport value."
+          },
+          "is_deleted": {
+            "description": "Provider-validated transport value."
+          },
+          "published_at": {
+            "description": "Provider-validated transport value."
+          },
+          "status": {
+            "description": "Provider-validated transport value."
+          },
+          "version_family_gid": {
+            "description": "Provider-validated transport value."
+          },
+          "version_tag": {
+            "description": "Provider-validated transport value."
+          }
+        },
         "type": "object"
       },
       "maxItems": 500,
@@ -129,7 +163,32 @@ Read the bounded aggregate lifecycle state for one BOP version.
     "history": {
       "items": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "confirmed_at": {
+            "description": "Provider-validated transport value."
+          },
+          "confirmed_by_gid": {
+            "description": "Provider-validated transport value."
+          },
+          "confirmed_by_name": {
+            "description": "Provider-validated transport value."
+          },
+          "entered_at": {
+            "description": "Provider-validated transport value."
+          },
+          "gid": {
+            "description": "Provider-validated transport value."
+          },
+          "note": {
+            "description": "Provider-validated transport value."
+          },
+          "phase": {
+            "description": "Provider-validated transport value."
+          },
+          "version_gid": {
+            "description": "Provider-validated transport value."
+          }
+        },
         "type": "object"
       },
       "maxItems": 500,
@@ -143,13 +202,135 @@ Read the bounded aggregate lifecycle state for one BOP version.
     },
     "lifecycle_state": {
       "additionalProperties": false,
-      "properties": {},
+      "properties": {
+        "init": {
+          "additionalProperties": false,
+          "properties": {
+            "checklist": {
+              "additionalProperties": false,
+              "properties": {
+                "lines_added": {
+                  "type": "boolean"
+                },
+                "pbom_linked": {
+                  "type": "boolean"
+                },
+                "pbom_vpps_checked": {
+                  "type": "boolean"
+                },
+                "processes_added": {
+                  "type": "boolean"
+                },
+                "source_selected": {
+                  "type": "boolean"
+                },
+                "stations_added": {
+                  "type": "boolean"
+                },
+                "tc_imported": {
+                  "type": "boolean"
+                },
+                "template_selected": {
+                  "type": "boolean"
+                },
+                "vehicle_ops_linked": {
+                  "type": "boolean"
+                },
+                "vehicle_ops_prep": {
+                  "type": "boolean"
+                },
+                "version_created": {
+                  "type": "boolean"
+                },
+                "vpps_imported": {
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            },
+            "route": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
       "type": "object"
     },
     "line_stats": {
       "items": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "_rn": {
+            "description": "Provider-validated transport value."
+          },
+          "balance_ok": {
+            "description": "Provider-validated transport value."
+          },
+          "coverage_ok": {
+            "description": "Provider-validated transport value."
+          },
+          "equipment_bound": {
+            "description": "Provider-validated transport value."
+          },
+          "equipment_total": {
+            "description": "Provider-validated transport value."
+          },
+          "fixtures_bound": {
+            "description": "Provider-validated transport value."
+          },
+          "fixtures_total": {
+            "description": "Provider-validated transport value."
+          },
+          "gid": {
+            "description": "Provider-validated transport value."
+          },
+          "issues_open": {
+            "description": "Provider-validated transport value."
+          },
+          "line_gid": {
+            "description": "Provider-validated transport value."
+          },
+          "nok_unbound_ops": {
+            "description": "Provider-validated transport value."
+          },
+          "nok_unbound_parts": {
+            "description": "Provider-validated transport value."
+          },
+          "nok_vpps": {
+            "description": "Provider-validated transport value."
+          },
+          "refreshed_at": {
+            "description": "Provider-validated transport value."
+          },
+          "rules_block": {
+            "description": "Provider-validated transport value."
+          },
+          "rules_warn": {
+            "description": "Provider-validated transport value."
+          },
+          "stats_snapshot_date": {
+            "description": "Provider-validated transport value."
+          },
+          "tasks_done": {
+            "description": "Provider-validated transport value."
+          },
+          "tasks_total": {
+            "description": "Provider-validated transport value."
+          },
+          "tools_bound": {
+            "description": "Provider-validated transport value."
+          },
+          "tools_total": {
+            "description": "Provider-validated transport value."
+          },
+          "version_gid": {
+            "description": "Provider-validated transport value."
+          }
+        },
         "type": "object"
       },
       "maxItems": 500,
@@ -158,7 +339,14 @@ Read the bounded aggregate lifecycle state for one BOP version.
     "lines": {
       "items": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "gid": {
+            "description": "Provider-validated transport value."
+          },
+          "title": {
+            "description": "Provider-validated transport value."
+          }
+        },
         "type": "object"
       },
       "maxItems": 500,
@@ -169,24 +357,123 @@ Read the bounded aggregate lifecycle state for one BOP version.
     },
     "pbom_match": {
       "additionalProperties": false,
-      "properties": {},
+      "properties": {
+        "pbom_version_gid": {
+          "description": "Provider-validated transport value."
+        },
+        "unlinked_ignored": {
+          "description": "Provider-validated transport value."
+        }
+      },
       "type": "object"
     },
     "pbom_vpps_check": {
       "additionalProperties": false,
-      "properties": {},
+      "properties": {
+        "ignored": {
+          "description": "Provider-validated transport value."
+        },
+        "nok": {
+          "description": "Provider-validated transport value."
+        },
+        "total": {
+          "description": "Provider-validated transport value."
+        }
+      },
       "type": "object"
     },
     "stats": {
-      "additionalProperties": true,
-      "type": [
-        "object",
-        "null"
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "_rn": {
+              "description": "Provider-validated transport value."
+            },
+            "balance_ok": {
+              "description": "Provider-validated transport value."
+            },
+            "coverage_ok": {
+              "description": "Provider-validated transport value."
+            },
+            "equipment_bound": {
+              "description": "Provider-validated transport value."
+            },
+            "equipment_total": {
+              "description": "Provider-validated transport value."
+            },
+            "fixtures_bound": {
+              "description": "Provider-validated transport value."
+            },
+            "fixtures_total": {
+              "description": "Provider-validated transport value."
+            },
+            "gid": {
+              "description": "Provider-validated transport value."
+            },
+            "issues_open": {
+              "description": "Provider-validated transport value."
+            },
+            "line_gid": {
+              "description": "Provider-validated transport value."
+            },
+            "nok_unbound_ops": {
+              "description": "Provider-validated transport value."
+            },
+            "nok_unbound_parts": {
+              "description": "Provider-validated transport value."
+            },
+            "nok_vpps": {
+              "description": "Provider-validated transport value."
+            },
+            "refreshed_at": {
+              "description": "Provider-validated transport value."
+            },
+            "rules_block": {
+              "description": "Provider-validated transport value."
+            },
+            "rules_warn": {
+              "description": "Provider-validated transport value."
+            },
+            "stats_snapshot_date": {
+              "description": "Provider-validated transport value."
+            },
+            "tasks_done": {
+              "description": "Provider-validated transport value."
+            },
+            "tasks_total": {
+              "description": "Provider-validated transport value."
+            },
+            "tools_bound": {
+              "description": "Provider-validated transport value."
+            },
+            "tools_total": {
+              "description": "Provider-validated transport value."
+            },
+            "version_gid": {
+              "description": "Provider-validated transport value."
+            }
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "vehicle_ops_prep": {
       "additionalProperties": false,
-      "properties": {},
+      "properties": {
+        "confirmed": {
+          "description": "Provider-validated transport value."
+        },
+        "skipped": {
+          "description": "Provider-validated transport value."
+        },
+        "total": {
+          "description": "Provider-validated transport value."
+        }
+      },
       "type": "object"
     },
     "version_family_gid": {

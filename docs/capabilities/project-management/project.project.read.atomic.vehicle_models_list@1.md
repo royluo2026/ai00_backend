@@ -8,7 +8,7 @@ Execute Project Management operation vehicle_models.list.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_0b584b19349bc98727900583bb19f687`
+- Catalog Release：`rel_fb3c151fd2c880f3d35fc1c786444b0e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -317,6 +317,9 @@ Execute Project Management operation vehicle_models.list.
       "type": "object"
     }
   },
+  "required": [
+    "arguments"
+  ],
   "type": "object"
 }
 ```
@@ -326,9 +329,11 @@ Execute Project Management operation vehicle_models.list.
 ```json
 {
   "capability_id": "project.project.read.atomic.vehicle_models_list",
-  "catalog_release": "rel_0b584b19349bc98727900583bb19f687",
+  "catalog_release": "rel_fb3c151fd2c880f3d35fc1c786444b0e",
   "major_version": 1,
-  "payload": {}
+  "payload": {
+    "arguments": {}
+  }
 }
 ```
 
@@ -342,7 +347,43 @@ Execute Project Management operation vehicle_models.list.
   "properties": {
     "data": {
       "additionalProperties": false,
-      "properties": {},
+      "properties": {
+        "data": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "brand": {
+                "type": "string"
+              },
+              "created_at": {
+                "type": "string"
+              },
+              "gid": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "platform": {
+                "type": "string"
+              },
+              "vehicle_type": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "maxItems": 500,
+          "type": "array"
+        },
+        "success": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ],
       "type": "object"
     }
   },

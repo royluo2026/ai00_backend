@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -11,11 +12,7 @@ if str(REPOSITORY_ROOT) not in sys.path:
     sys.path.insert(0, str(REPOSITORY_ROOT))
 
 from backend.capability_v2.bootstrap import build_capability_registry
-from backend.capability_v2.acceptance_contract import (
-    TEST_MODULE,
-    coverage_declarations,
-    mandatory_test_source_revision,
-)
+from backend.capability_v2.acceptance_contract import TEST_MODULE, coverage_declarations
 from backend.capability_v2.catalog import (
     CatalogRelease,
     ProviderArtifact,
@@ -33,6 +30,7 @@ from backend.capability_v2.descriptor_adapter import descriptor_from_provider_sp
 DEFAULT_OUTPUT = REPOSITORY_ROOT / "docs" / "governance" / "capability-catalog-release.json"
 DEFAULT_LINEAGE = REPOSITORY_ROOT / "docs" / "governance" / "capability-catalog-lineage.json"
 PROVIDERS_PATH = REPOSITORY_ROOT / "backend" / "capability_v2" / "official_domains.json"
+CONTRACT_TEST = REPOSITORY_ROOT / TEST_MODULE
 
 
 def _release_document(release: CatalogRelease) -> dict[str, object]:
@@ -81,7 +79,8 @@ def _verified_consumer_refs(capability_id: str) -> tuple[dict[str, str], ...]:
 
 
 def _contract_test_revision() -> str:
-    return mandatory_test_source_revision(REPOSITORY_ROOT)
+    digest = hashlib.sha256(CONTRACT_TEST.read_bytes()).hexdigest()
+    return f"sha256:{digest}"
 
 
 def _providers() -> tuple[ProviderArtifact, ...]:

@@ -159,7 +159,7 @@ def audit_sql_text(
 def audit_repository(root: Path, registry: DomainRegistry) -> tuple[list[Violation], list[str]]:
     violations: list[Violation] = []
     tables: set[str] = set()
-    ignored_dirs = {".git", "dist", "node_modules", "__pycache__", ".venv", "venv", ".test-tmp", ".test-runs"}
+    ignored_dirs = {".git", ".runtime", "dist", "node_modules", "__pycache__", ".venv", "venv", ".test-tmp", ".test-runs"}
 
     def ignored(path: Path) -> bool:
         return any(

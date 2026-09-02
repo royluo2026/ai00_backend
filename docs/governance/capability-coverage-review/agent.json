@@ -3,9 +3,9 @@
   "domain": "Agent",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:272ec997281749bc6c291b6224d46c83fb3813be8d61963f02694d23ed5a9cec",
-    "catalog_release": "rel_9f169ceddb4f7eb3e6c30f63861e655b",
-    "catalog_sha256": "sha256:0fff5c1a428105031e095deede46c517260707e5f1f23933c2564c82ef673b11"
+    "registry_sha256": "sha256:0f0d81ef5b60bb103f657d4b4a62afc096b4793f85f204805298389c01e8049a",
+    "catalog_release": "rel_04c998e59a4188758c8eda43f25b0488",
+    "catalog_sha256": "sha256:1be2b5f26178a57830b0ae1f54bbb170b6ca35e062bb1044abc2da19eba7fa02"
   },
   "unreviewed_functions": {},
   "excluded_functions": {
@@ -253,6 +253,157 @@
           "enabled": false,
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "agent.audit.record"
+        }
+      }
+    },
+    "agent.canvas.execution.resume": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:agent.canvas.execution.resume": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/capabilities/__init__.py",
+            "plugins/agent/agent_backend/capabilities/contracts.py",
+            "plugins/agent/agent_backend/capabilities/provider.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "agent.canvas.execution.start": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:agent.canvas.execution.start": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/capabilities/__init__.py",
+            "plugins/agent/agent_backend/capabilities/contracts.py",
+            "plugins/agent/agent_backend/capabilities/provider.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "agent.canvas.options.resolve": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:agent.canvas.options.resolve": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/capabilities/__init__.py",
+            "plugins/agent/agent_backend/capabilities/contracts.py",
+            "plugins/agent/agent_backend/capabilities/descriptors.py",
+            "plugins/agent/agent_backend/capabilities/provider.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
       }
     },
@@ -1457,6 +1608,56 @@
           "policy_ref": "existing-registry-policy"
         }
       }
+    },
+    "agent.workflow.node.test.execute": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:agent.workflow.node.test.execute": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/capabilities/__init__.py",
+            "plugins/agent/agent_backend/capabilities/contracts.py",
+            "plugins/agent/agent_backend/capabilities/provider.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
     }
   },
   "code_extractions": [
@@ -1472,6 +1673,34 @@
     }
   ],
   "database_boundaries": [
+    {
+      "table": "workmanship_agent_canvas_audit_events",
+      "owner_domain": "Agent",
+      "access_mode": "read_write",
+      "migration_stream": "agent",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_agent_canvas_invocations",
+      "owner_domain": "Agent",
+      "access_mode": "read_write",
+      "migration_stream": "agent",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_agent_canvas_runs",
+      "owner_domain": "Agent",
+      "access_mode": "read_write",
+      "migration_stream": "agent",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_agent_canvas_runtime_results",
+      "owner_domain": "Agent",
+      "access_mode": "read_write",
+      "migration_stream": "agent",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
     {
       "table": "workmanship_agent_capability_resources",
       "owner_domain": "Agent",

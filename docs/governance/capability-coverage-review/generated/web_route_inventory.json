@@ -1,6 +1,6 @@
 {
-  "frontend_revision": "9ae7f814d2b94c34bbbe246fdd9c9c3461611e78",
-  "content_hash": "d3154ce47292b3b9f4daabb5df6c611c3415790336f280b0e8630bb9d16e30b0",
+  "frontend_revision": "b48b630b8ade831f2f8bd31275d7629aeb5af434",
+  "content_hash": "542ec6458c6869b75da9f91e3b83c47a86eee70825676404f16f3531654688b8",
   "wrapper_contracts_hash": "0f099242269e21253ae02e3c54184b8ff0ec2ade1f98b59dbe8937778178a760",
   "scan_roots": [
     "web",
@@ -31,7 +31,7 @@
   },
   "lexical_audit": {
     "token_count": 387,
-    "token_hash": "4a11daf037446d5535aec4b3f056b0f66114bd5b2a9d28610405a1b389f48092",
+    "token_hash": "0a2c1a924de1ffe0bc7922550cc8392030ad51298bd5899d82556d68631787b6",
     "mapped_count": 369,
     "reviewed_non_route_count": 18,
     "reviewed_non_route_tokens": [
@@ -320,24 +320,24 @@
     },
     {
       "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
-      "line": 87,
+      "line": 102,
       "column": 35,
       "raw_route": "/api/flows/capability-manifest",
       "normalized_route": "/api/flows/capability-manifest",
       "method": "GET",
       "disposition": "operations_excluded",
-      "occurrence_id": "packages/agent-plugin/web/flow_canvas/flow_editor.js:87:35:GET:/api/flows/capability-manifest",
+      "occurrence_id": "packages/agent-plugin/web/flow_canvas/flow_editor.js:102:35:GET:/api/flows/capability-manifest",
       "classification_prefix": "/api/flows"
     },
     {
       "source": "packages/agent-plugin/web/flow_canvas/flow_editor.js",
-      "line": 809,
+      "line": 841,
       "column": 36,
       "raw_route": "/api/flows/gen-script",
       "normalized_route": "/api/flows/gen-script",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "packages/agent-plugin/web/flow_canvas/flow_editor.js:809:36:POST:/api/flows/gen-script",
+      "occurrence_id": "packages/agent-plugin/web/flow_canvas/flow_editor.js:841:36:POST:/api/flows/gen-script",
       "classification_prefix": "/api/flows"
     },
     {
@@ -1562,34 +1562,34 @@
     },
     {
       "source": "web/canvas/types/flow_type.js",
-      "line": 132,
+      "line": 162,
       "column": 43,
       "raw_route": "/api/v1/capabilities/${id}:invoke",
       "normalized_route": "/api/v1/capabilities/{dynamic}:invoke",
       "method": "POST",
       "disposition": "capability",
-      "occurrence_id": "web/canvas/types/flow_type.js:132:43:POST:/api/v1/capabilities/{dynamic}:invoke"
+      "occurrence_id": "web/canvas/types/flow_type.js:162:43:POST:/api/v1/capabilities/{dynamic}:invoke"
     },
     {
       "source": "web/canvas/types/flow_type.js",
-      "line": 148,
+      "line": 178,
       "column": 29,
       "raw_route": "/api/flows/capability-manifest",
       "normalized_route": "/api/flows/capability-manifest",
       "method": "GET",
       "disposition": "operations_excluded",
-      "occurrence_id": "web/canvas/types/flow_type.js:148:29:GET:/api/flows/capability-manifest",
+      "occurrence_id": "web/canvas/types/flow_type.js:178:29:GET:/api/flows/capability-manifest",
       "classification_prefix": "/api/flows"
     },
     {
       "source": "web/canvas/types/flow_type.js",
-      "line": 800,
+      "line": 836,
       "column": 40,
       "raw_route": "/api/flows/gen-script",
       "normalized_route": "/api/flows/gen-script",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/canvas/types/flow_type.js:800:40:POST:/api/flows/gen-script",
+      "occurrence_id": "web/canvas/types/flow_type.js:836:40:POST:/api/flows/gen-script",
       "classification_prefix": "/api/flows"
     },
     {
@@ -3324,83 +3324,83 @@
     },
     {
       "source": "web/settings/settings.js",
-      "line": 292,
+      "line": 329,
       "column": 36,
       "raw_route": "/api/file-store/config",
       "normalized_route": "/api/file-store/config",
       "method": "POST",
       "disposition": "operations_excluded",
-      "occurrence_id": "web/settings/settings.js:292:36:POST:/api/file-store/config"
+      "occurrence_id": "web/settings/settings.js:329:36:POST:/api/file-store/config"
     },
     {
       "source": "web/settings/settings.js",
-      "line": 309,
+      "line": 346,
       "column": 34,
       "raw_route": "/api/file-store/test",
       "normalized_route": "/api/file-store/test",
       "method": "POST",
       "disposition": "operations_excluded",
-      "occurrence_id": "web/settings/settings.js:309:34:POST:/api/file-store/test"
+      "occurrence_id": "web/settings/settings.js:346:34:POST:/api/file-store/test"
     },
     {
       "source": "web/settings/settings.js",
-      "line": 334,
+      "line": 371,
       "column": 36,
       "raw_route": "/api/file-store/ois-config",
       "normalized_route": "/api/file-store/ois-config",
       "method": "POST",
       "disposition": "operations_excluded",
-      "occurrence_id": "web/settings/settings.js:334:36:POST:/api/file-store/ois-config"
+      "occurrence_id": "web/settings/settings.js:371:36:POST:/api/file-store/ois-config"
     },
     {
       "source": "web/settings/settings.js",
-      "line": 357,
+      "line": 394,
       "column": 30,
       "raw_route": "/api/file-store/ois-test",
       "normalized_route": "/api/file-store/ois-test",
       "method": "POST",
       "disposition": "operations_excluded",
-      "occurrence_id": "web/settings/settings.js:357:30:POST:/api/file-store/ois-test"
+      "occurrence_id": "web/settings/settings.js:394:30:POST:/api/file-store/ois-test"
     },
     {
       "source": "web/settings/settings.js",
-      "line": 1413,
+      "line": 1450,
       "column": 41,
       "raw_route": "/api/follows",
       "normalized_route": "/api/follows",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/settings/settings.js:1413:41:GET:/api/follows"
+      "occurrence_id": "web/settings/settings.js:1450:41:GET:/api/follows"
     },
     {
       "source": "web/settings/settings.js",
-      "line": 1422,
+      "line": 1459,
       "column": 44,
       "raw_route": "/api/tasks/${item_gid}",
       "normalized_route": "/api/tasks/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/settings/settings.js:1422:44:GET:/api/tasks/{dynamic}"
+      "occurrence_id": "web/settings/settings.js:1459:44:GET:/api/tasks/{dynamic}"
     },
     {
       "source": "web/settings/settings.js",
-      "line": 1427,
+      "line": 1464,
       "column": 44,
       "raw_route": "/api/issues/${item_gid}",
       "normalized_route": "/api/issues/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/settings/settings.js:1427:44:GET:/api/issues/{dynamic}"
+      "occurrence_id": "web/settings/settings.js:1464:44:GET:/api/issues/{dynamic}"
     },
     {
       "source": "web/settings/settings.js",
-      "line": 1439,
+      "line": 1476,
       "column": 30,
       "raw_route": "/api/follows/${fGid}",
       "normalized_route": "/api/follows/{dynamic}",
       "method": "DELETE",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/settings/settings.js:1439:30:DELETE:/api/follows/{dynamic}"
+      "occurrence_id": "web/settings/settings.js:1476:30:DELETE:/api/follows/{dynamic}"
     },
     {
       "source": "web/share/issues.html",

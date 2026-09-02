@@ -164,7 +164,9 @@
         "backend/db/migrations/202608280001_base_saved_view_governance.sql",
         "backend/db/migrations/202608280002_base_self_annotation_governance.sql",
         "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql",
-        "backend/db/migrations/202608280004_base_plugin_lifecycle_idempotency_scope.sql"
+        "backend/db/migrations/202608280004_base_plugin_lifecycle_idempotency_scope.sql",
+        "backend/db/migrations/202608280005_base_structural_owner_hardening.sql",
+        "backend/db/migrations/202608280006_base_historical_tenant_repair.sql"
       ],
       "test_paths": ["backend/tests/test_base_*.py"],
       "documentation_paths": ["docs/capabilities/base-platform/**"]
@@ -206,7 +208,8 @@
         "backend/db/migrations/202608050004_craft_bop_version_contract.sql",
         "backend/db/migrations/202608060001_craft_bop_revision.sql",
         "backend/db/migrations/202608060004_craft_validation_policies.sql",
-        "backend/db/migrations/202608070001_craft_bop_write_governance.sql"
+        "backend/db/migrations/202608070001_craft_bop_write_governance.sql",
+        "backend/db/migrations/202608310001_craft_rule_identity_backfill.sql"
       ],
       "test_paths": ["plugins/craft/**/test_*.py", "backend/tests/test_craft_*.py"],
       "documentation_paths": ["docs/capabilities/craft/**"]

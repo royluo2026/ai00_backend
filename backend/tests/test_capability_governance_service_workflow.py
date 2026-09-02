@@ -145,6 +145,7 @@ def test_release_handler_uses_authoritative_pinned_evidence_instead_of_caller_st
                 "snapshot_gid": 101, "test_run_gid": 201,
                 "code_revision": "rev-authoritative", "product_catalog_release_id": "catalog-authoritative",
                 "snapshot_hash": "sha256:snapshot", "test_status": "failed",
+                "static_gate_status": "passed", "static_gate_hash": "sha256:static",
                 "findings": (), "stale_evidence": False, "waivers": (),
                 "approvals_complete": True, "data_complete": True,
                 "evidence_hash": "sha256:authoritative",

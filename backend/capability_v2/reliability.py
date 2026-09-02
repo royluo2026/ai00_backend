@@ -25,6 +25,7 @@ class ApprovalChallenge(FrozenModel):
     token_hash: str
     capability_id: str
     major_version: int
+    catalog_release: str
     consumer_fingerprint: str
     resource_refs: tuple[str, ...]
     policy_version: str
@@ -80,7 +81,7 @@ class InMemoryApprovalStore:
             if current is None or current.consumed_at is not None or current.expires_at <= self._clock():
                 return False
             comparable = (
-                "capability_id", "major_version", "consumer_fingerprint", "resource_refs",
+                "capability_id", "major_version", "catalog_release", "consumer_fingerprint", "resource_refs",
                 "policy_version", "payload_hash",
                 "confirmation_policy",
             )
@@ -103,13 +104,13 @@ class SqlApprovalStore:
             with conn.cursor() as cursor:
                 cursor.execute(
                     f"INSERT INTO {self.TABLE} "
-                    "(approval_id,token_hash,capability_id,major_version,consumer_fingerprint,"
+                    "(approval_id,token_hash,capability_id,major_version,catalog_release,consumer_fingerprint,"
                     "resource_refs_json,policy_version,confirmation_policy,payload_hash,"
                     "expires_at,consumed_at) "
-                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                     (
                         challenge.approval_id, challenge.token_hash, challenge.capability_id,
-                        challenge.major_version, challenge.consumer_fingerprint,
+                        challenge.major_version, challenge.catalog_release, challenge.consumer_fingerprint,
                         json.dumps(challenge.resource_refs), challenge.policy_version,
                         challenge.confirmation_policy,
                         challenge.payload_hash, challenge.expires_at, challenge.consumed_at,
@@ -133,12 +134,12 @@ class SqlApprovalStore:
                 if isinstance(refs, str):
                     refs = json.loads(refs)
                 actual = (
-                    row["capability_id"], int(row["major_version"]),
+                    row["capability_id"], int(row["major_version"]), row["catalog_release"],
                     row["consumer_fingerprint"], tuple(refs), row["policy_version"],
                     row["payload_hash"], row["confirmation_policy"],
                 )
                 wanted = (
-                    expected.capability_id, expected.major_version,
+                    expected.capability_id, expected.major_version, expected.catalog_release,
                     expected.consumer_fingerprint, expected.resource_refs,
                     expected.policy_version, expected.payload_hash, expected.confirmation_policy,
                 )
@@ -198,6 +199,7 @@ class ApprovalService:
             token_hash=token_hash,
             capability_id=descriptor.id,
             major_version=descriptor.major_version,
+            catalog_release=envelope.catalog_release,
             consumer_fingerprint=consumer_fingerprint(envelope),
             resource_refs=tuple(sorted(resource_refs)),
             policy_version=policy_version,
@@ -389,7 +391,7 @@ def idempotency_scope(envelope: InvocationEnvelope) -> str:
     key = envelope.idempotency_key or envelope.request_id
     material = (
         f"{envelope.identity.tenant.tenant_id}|{consumer_fingerprint(envelope)}|"
-        f"{envelope.capability_id}|{envelope.major_version}|{key}"
+        f"{envelope.catalog_release}|{envelope.capability_id}|{envelope.major_version}|{key}"
     )
     return "idem:" + hashlib.sha256(material.encode("utf-8")).hexdigest()
 

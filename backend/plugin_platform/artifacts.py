@@ -47,10 +47,11 @@ def validate_package(data: bytes, manifest: PluginManifestV2) -> str:
             # be embedded. plugin.json is the descriptor; artifact metadata is detached.
             submitted_descriptor = manifest.model_dump(mode="json")
             submitted_descriptor.pop("artifact", None)
-            if "capabilities" not in embedded and submitted_descriptor.get("capabilities") == {
-                "required": [], "optional": [],
-            }:
-                submitted_descriptor.pop("capabilities")
+            for optional_dependency in ("capabilities", "plugins"):
+                if optional_dependency not in embedded and submitted_descriptor.get(optional_dependency) == {
+                    "required": [], "optional": [],
+                }:
+                    submitted_descriptor.pop(optional_dependency)
             if embedded != submitted_descriptor:
                 raise ArtifactError("embedded plugin.json differs from signed release descriptor")
     except ArtifactError:

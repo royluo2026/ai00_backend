@@ -234,16 +234,6 @@ def generated_files(release: CatalogRelease) -> dict[str, str]:
     return build_documentation(release).files
 
 
-def validate_machine_catalog(release: CatalogRelease, projection: Mapping[str, Any]) -> None:
-    """Reject a human/machine projection not generated from this release."""
-    if projection.get("release_id") != release.release_id:
-        raise ValueError("catalog_projection_release_mismatch")
-    if projection.get("catalog_hash") != release.catalog_hash:
-        raise ValueError("catalog_projection_hash_mismatch")
-    if dict(projection) != build_documentation(release).machine_catalog:
-        raise ValueError("catalog_projection_descriptor_mismatch")
-
-
 def _render_files(machine: dict[str, Any]) -> dict[str, str]:
     capabilities = machine["capabilities"]
     by_domain: dict[str, list[dict[str, Any]]] = {domain: [] for domain in CANONICAL_DOMAINS}

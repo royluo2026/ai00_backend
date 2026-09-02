@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "domains": 11,
-  "stable_functions": 922,
+  "stable_functions": 936,
   "resolutions": {
-    "existing_capability": 810,
+    "existing_capability": 824,
     "new_capability": 0,
     "excluded": 112,
     "unreviewed": 0
@@ -12,7 +12,7 @@
   "candidate_additions_by_domain": {},
   "function_dispositions_by_domain": {
     "Agent": {
-      "existing_capability": 63,
+      "existing_capability": 67,
       "new_capability": 0,
       "excluded": 9,
       "unreviewed": 0
@@ -24,7 +24,7 @@
       "unreviewed": 0
     },
     "Craft": {
-      "existing_capability": 384,
+      "existing_capability": 386,
       "new_capability": 0,
       "excluded": 5,
       "unreviewed": 0
@@ -48,13 +48,13 @@
       "unreviewed": 0
     },
     "Integration": {
-      "existing_capability": 13,
+      "existing_capability": 19,
       "new_capability": 0,
       "excluded": 0,
       "unreviewed": 0
     },
     "Knowledge": {
-      "existing_capability": 39,
+      "existing_capability": 40,
       "new_capability": 0,
       "excluded": 0,
       "unreviewed": 0
@@ -66,7 +66,7 @@
       "unreviewed": 0
     },
     "Project Management": {
-      "existing_capability": 143,
+      "existing_capability": 144,
       "new_capability": 0,
       "excluded": 1,
       "unreviewed": 0
@@ -93,15 +93,15 @@
   },
   "code_extractions": 58,
   "debt_backlog": {},
-  "catalog_descriptors": 481,
-  "current_catalog_capabilities": 465,
-  "proposed_final_catalog_capabilities": 465,
+  "catalog_descriptors": 495,
+  "current_catalog_capabilities": 479,
+  "proposed_final_catalog_capabilities": 479,
   "evidence": {
     "module_dependencies": 0,
     "boundary_violations": 0,
     "cross_domain_sql": 0,
     "internal_import": 0,
-    "tables": 226,
-    "migrations": 39
+    "tables": 244,
+    "migrations": 42
   }
 }

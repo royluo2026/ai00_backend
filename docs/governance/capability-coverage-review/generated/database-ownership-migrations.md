@@ -3,6 +3,10 @@
 | Domain | Table | Owner | Migration stream |
 |---|---|---|---|
 
+| Agent | `workmanship_agent_canvas_audit_events` | Agent | agent |
+| Agent | `workmanship_agent_canvas_invocations` | Agent | agent |
+| Agent | `workmanship_agent_canvas_runs` | Agent | agent |
+| Agent | `workmanship_agent_canvas_runtime_results` | Agent | agent |
 | Agent | `workmanship_agent_capability_resources` | Agent | agent |
 | Agent | `workmanship_agent_run_approvals` | Agent | agent |
 | Agent | `workmanship_agent_run_participants` | Agent | agent |
@@ -33,6 +37,7 @@
 | Base Platform | `workmanship_base_approvals` | Base Platform | base |
 | Base Platform | `workmanship_base_artifact_upload_sessions` | Base Platform | base |
 | Base Platform | `workmanship_base_artifacts` | Base Platform | base |
+| Base Platform | `workmanship_base_attachment_references` | Base Platform | base |
 | Base Platform | `workmanship_base_capability_analysis_runs` | Base Platform | base |
 | Base Platform | `workmanship_base_capability_approvals` | Base Platform | base |
 | Base Platform | `workmanship_base_capability_audit_events` | Base Platform | base |
@@ -67,6 +72,7 @@
 | Base Platform | `workmanship_base_notification_preferences` | Base Platform | base |
 | Base Platform | `workmanship_base_notifications` | Base Platform | base |
 | Base Platform | `workmanship_base_plugin_invocation_audit` | Base Platform | base |
+| Base Platform | `workmanship_base_plugin_lifecycle_idempotency` | Base Platform | base |
 | Base Platform | `workmanship_base_revision_branches` | Base Platform | base |
 | Base Platform | `workmanship_base_revision_changesets` | Base Platform | base |
 | Base Platform | `workmanship_base_revision_commit_parents` | Base Platform | base |
@@ -75,8 +81,14 @@
 | Base Platform | `workmanship_base_revision_lineage_edges` | Base Platform | base |
 | Base Platform | `workmanship_base_revision_repositories` | Base Platform | base |
 | Base Platform | `workmanship_base_revision_snapshots` | Base Platform | base |
+| Base Platform | `workmanship_base_saved_view_audit_events` | Base Platform | base |
+| Base Platform | `workmanship_base_saved_view_idempotency` | Base Platform | base |
+| Base Platform | `workmanship_base_saved_view_states` | Base Platform | base |
 | Base Platform | `workmanship_base_schema_migrations` | Base Platform | base |
 | Base Platform | `workmanship_base_search_projection` | Base Platform | base |
+| Base Platform | `workmanship_base_self_annotation_audit_events` | Base Platform | base |
+| Base Platform | `workmanship_base_self_annotation_idempotency` | Base Platform | base |
+| Base Platform | `workmanship_base_self_annotation_states` | Base Platform | base |
 | Base Platform | `workmanship_base_self_annotations` | Base Platform | base |
 | Base Platform | `workmanship_base_workspace_templates` | Base Platform | base |
 | Base Platform | `workmanship_display_id_counters` | Base Platform | base |
@@ -162,9 +174,12 @@
 | Factory | `workmanship_factory_resource_catalog` | Factory | factory |
 | Factory | `workmanship_factory_schema_migrations` | Factory | factory |
 | Factory | `workmanship_factory_structures` | Factory | factory |
+| Integration | `workmanship_int_audit_events` | Integration | integration |
 | Integration | `workmanship_int_ext_datasources` | Integration | integration |
 | Integration | `workmanship_int_ext_field_mappings` | Integration | integration |
 | Integration | `workmanship_int_ext_mappings` | Integration | integration |
+| Integration | `workmanship_int_mapping_target_bindings` | Integration | integration |
+| Integration | `workmanship_int_operations` | Integration | integration |
 | Integration | `workmanship_int_schema_migrations` | Integration | integration |
 | Integration | `workmanship_int_sync_runs` | Integration | integration |
 | Knowledge | `workmanship_know_display_counters` | Knowledge | knowledge |
@@ -200,9 +215,12 @@
 | Project Management | `workmanship_app_wb_annotations` | Project Management | project_management |
 | Project Management | `workmanship_app_workbench_configs` | Project Management | project_management |
 | Project Management | `workmanship_app_workbench_member_overrides` | Project Management | project_management |
+| Project Management | `workmanship_proj_approval_audit_events` | Project Management | project_management |
 | Project Management | `workmanship_proj_approval_orders` | Project Management | project_management |
+| Project Management | `workmanship_proj_approval_rejection_operations` | Project Management | project_management |
 | Project Management | `workmanship_proj_collab_sessions` | Project Management | project_management |
 | Project Management | `workmanship_proj_issues` | Project Management | project_management |
+| Project Management | `workmanship_proj_notification_outbox` | Project Management | project_management |
 | Project Management | `workmanship_proj_projects` | Project Management | project_management |
 | Project Management | `workmanship_proj_task_dependencies` | Project Management | project_management |
 | Project Management | `workmanship_proj_tasks` | Project Management | project_management |
@@ -268,3 +286,6 @@
 | Base Platform | `backend/db/migrations/202608280002_base_self_annotation_governance.sql` | migration | base |
 | Base Platform | `backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql` | migration | base |
 | Base Platform | `backend/db/migrations/202608280004_base_plugin_lifecycle_idempotency_scope.sql` | migration | base |
+| Base Platform | `backend/db/migrations/202608280005_base_structural_owner_hardening.sql` | migration | base |
+| Base Platform | `backend/db/migrations/202608280006_base_historical_tenant_repair.sql` | migration | base |
+| Craft | `backend/db/migrations/202608310001_craft_rule_identity_backfill.sql` | migration | craft |

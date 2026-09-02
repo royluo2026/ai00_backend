@@ -108,8 +108,10 @@ class ExecutionStructureRepository:
                 cursor.execute(
                     "SELECT l.gid AS link_gid, l.entry_gid, l.link_type, l.entity_gid, l.is_primary, "
                     "l.snapshot_data, p.part_no, p.title AS part_name, p.parent_gid, "
-                    "p.quantity, p.unit, p.snapshot_gid, p.material, p.meta, p.created_at, p.updated_at, "
-                    "p.vpps, p.parent_part_gid, p.node_type, p.bom_row_id, p.seq_no, p.part_number "
+                    "p.quantity, p.unit, p.snapshot_gid, p.material, p.meta, p.created_at, "
+                    "p.created_at AS updated_at, p.vpps, p.parent_gid AS parent_part_gid, "
+                    "p.component_type AS node_type, p.bom_row AS bom_row_id, "
+                    "p.level AS seq_no, p.part_no AS part_number "
                     "FROM workmanship_bop_bop_entry_links l "
                     "LEFT JOIN workmanship_bop_pbom p "
                     "ON l.link_type = 'pbom_part' AND p.gid = l.entity_gid "
@@ -138,6 +140,8 @@ class ExecutionStructureRepository:
                             entity_data["meta"] = _json_object(entity_data["meta"])
                         if "created_at" in entity_data:
                             entity_data["created_at"] = _transport(entity_data["created_at"])
+                        if "updated_at" in entity_data:
+                            entity_data["updated_at"] = _transport(entity_data["updated_at"])
                     link["entity_data"] = entity_data
                     links.append(link)
 
