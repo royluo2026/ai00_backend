@@ -21,7 +21,7 @@ def _capability(domain: str, policy: str = "read") -> ScannedCapability:
 
 
 def _snapshot(capabilities: tuple[ScannedCapability, ...]) -> SnapshotDocument:
-    document = SnapshotDocument("product-test", None, "revision", "", capabilities, (), (), ())
+    document = SnapshotDocument("product-test", None, "revision", "", capabilities, (), (), (), catalog_hash="sha256:" + "9" * 64)
     return replace(document, snapshot_hash=snapshot_fingerprint(document))
 
 

@@ -197,7 +197,7 @@ def test_service_persists_candidates_once_when_identical_snapshot_is_scanned_aga
         _capability("person.height.write"),
         _capability("ergonomics.height.write", domain="ergonomics"),
     )
-    document = SnapshotDocument("catalog", None, "revision", "", capabilities, (), (), ())
+    document = SnapshotDocument("catalog", None, "revision", "", capabilities, (), (), (), catalog_hash="sha256:" + "9" * 64)
     document = replace(document, snapshot_hash=snapshot_fingerprint(document))
 
     class Scanner:
@@ -220,7 +220,7 @@ def test_advisory_failure_cannot_remove_persisted_deterministic_evidence():
         _capability("person.height.write"),
         _capability("ergonomics.height.write", domain="ergonomics"),
     )
-    document = SnapshotDocument("catalog", None, "revision", "", capabilities, (), (), ())
+    document = SnapshotDocument("catalog", None, "revision", "", capabilities, (), (), (), catalog_hash="sha256:" + "9" * 64)
     document = replace(document, snapshot_hash=snapshot_fingerprint(document))
 
     class Scanner:

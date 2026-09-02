@@ -1,4 +1,5 @@
 {
   "release_id": "invalid-product-fixture",
+  "catalog_hash": "sha256:9999999999999999999999999999999999999999999999999999999999999999",
   "descriptors": [{"id": "craft.bop.factory.create", "major_version": 1, "owner_domain": "craft", "lifecycle_status": "stable", "side_effect_level": "write"}]
 }

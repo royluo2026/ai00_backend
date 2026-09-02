@@ -231,9 +231,15 @@ def _business_audit_projection(value: Any) -> dict[str, Any]:
     cursor = value.get("next_cursor")
     result["next_cursor"] = None if cursor is None else str(cursor)[:255]
     if "review_queue" in value:
-        result["review_queue"] = [_projection(item, (
-            "capability_key", "domain", "maturity", "priority", "reason",
-        )) for item in tuple(value.get("review_queue", ()))[:200]]
+        result["review_queue"] = [{
+            **_projection(item, (
+                "capability_key", "capability_id", "major_version", "capability_version_gid",
+                "business_definition_hash", "domain", "maturity", "priority", "reason",
+                "governance_status",
+            )),
+            "owner_domains": _string_list(item.get("owner_domains"), maximum=11, item_length=64),
+            "relationship_signals": _string_list(item.get("relationship_signals"), maximum=200, item_length=255),
+        } for item in tuple(value.get("review_queue", ()))[:200] if isinstance(item, Mapping)]
     if "root_causes" in value:
         result["root_causes"] = [{
             **_projection(item, (

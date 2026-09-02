@@ -49,6 +49,7 @@ def _snapshot(
 ) -> SnapshotDocument:
     document = SnapshotDocument(
         "product-test", None, "revision", "", (capability or _capability,), nodes, bindings, relations,
+        catalog_hash="sha256:" + "9" * 64,
     )
     return replace(document, snapshot_hash=snapshot_fingerprint(document))
 

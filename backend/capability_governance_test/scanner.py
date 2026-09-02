@@ -384,6 +384,7 @@ class GovernanceScanner:
         scan_status = "blocked" if scan_findings else "completed"
         snapshot_hash = _digest({
             "product_release_id": str(product.get("release_id", "")),
+            "catalog_hash": str(product.get("catalog_hash", "")),
             "extension_release_id": str(extension.get("release_id", "")) if extension else None,
             "code_revision": code_revision,
             "capabilities": [item.to_json() for item in ordered_capabilities],
@@ -395,6 +396,7 @@ class GovernanceScanner:
         })
         return SnapshotDocument(
             product_release_id=str(product.get("release_id", "")),
+            catalog_hash=str(product.get("catalog_hash", "")),
             extension_release_id=str(extension.get("release_id", "")) if extension else None,
             code_revision=code_revision,
             snapshot_hash=snapshot_hash,
@@ -421,16 +423,24 @@ class GovernanceScanner:
             source_path=source_path, message=message,
         )
         product_release = ""
+        catalog_hash = "sha256:" + "0" * 64
         if isinstance(self._product_catalog, Mapping):
             product_release = str(self._product_catalog.get("release_id") or "")
+            candidate_hash = str(self._product_catalog.get("catalog_hash") or "")
+            if candidate_hash:
+                catalog_hash = candidate_hash
+        elif hasattr(self._product_catalog, "catalog_hash"):
+            catalog_hash = str(self._product_catalog.catalog_hash)
         payload = {
-            "product_release_id": product_release, "extension_release_id": None,
+            "product_release_id": product_release, "catalog_hash": catalog_hash,
+            "extension_release_id": None,
             "code_revision": code_revision, "capabilities": [], "nodes": [],
             "bindings": [], "relations": [], "scan_findings": [finding.to_json()],
             "scan_status": "blocked",
         }
         return SnapshotDocument(
             product_release, None, code_revision, _digest(payload), (), (), (), (), (finding,), "blocked",
+            catalog_hash=catalog_hash,
         )
 
     @staticmethod

@@ -639,6 +639,7 @@ def test_blocked_scan_is_persisted_and_reachable_through_finding_provider():
         "catalog-test", None, "revision", "", (), (), (), (),
         (ScanFinding("scan_configuration_error", "blocking", "configuration", "product_catalog", "invalid"),),
         "blocked",
+        catalog_hash="sha256:" + "9" * 64,
     )
     document = replace(draft, snapshot_hash=snapshot_fingerprint(draft))
     store = MemoryGovernanceStore(next_ids=iter(range(100, 200)).__next__)
@@ -664,7 +665,7 @@ def test_scan_finding_pagination_deduplicates_analysis_without_merging_evidence(
         ScanFinding("scan_configuration_error", "blocking", "configuration", "product_catalog", "invalid"),
         ScanFinding("scan_configuration_error", "blocking", "configuration", "extension_catalog", "invalid"),
     )
-    draft = SnapshotDocument("catalog-test", None, "revision", "", (), (), (), (), findings, "blocked")
+    draft = SnapshotDocument("catalog-test", None, "revision", "", (), (), (), (), findings, "blocked", catalog_hash="sha256:" + "9" * 64)
     document = replace(draft, snapshot_hash=snapshot_fingerprint(draft))
     store = MemoryGovernanceStore(next_ids=iter(range(200, 300)).__next__)
     snapshot = store.import_snapshot(document)

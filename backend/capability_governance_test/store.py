@@ -1021,7 +1021,7 @@ class SqlGovernanceStore(GovernanceStore):
         cursor = self._connection.cursor()
         try:
             cursor.execute(
-                "SELECT snapshot_gid, scan_run_gid, snapshot_hash, code_revision, catalog_release_id, "
+                "SELECT snapshot_gid, scan_run_gid, snapshot_hash, code_revision, catalog_release_id, catalog_hash, "
                 "(SELECT status FROM workmanship_base_capability_scan_runs AS scan_run "
                 "WHERE scan_run.scan_run_gid = workmanship_base_capability_snapshots.scan_run_gid) AS scan_status "
                 "FROM workmanship_base_capability_snapshots WHERE snapshot_gid = %s",
@@ -1035,7 +1035,8 @@ class SqlGovernanceStore(GovernanceStore):
             snapshot_hash = str(_row_value(row, "snapshot_hash", 2))
             code_revision = str(_row_value(row, "code_revision", 3))
             product_release = str(_row_value(row, "catalog_release_id", 4))
-            scan_status = str(_row_value(row, "scan_status", 5))
+            catalog_hash = str(_row_value(row, "catalog_hash", 5))
+            scan_status = str(_row_value(row, "scan_status", 6))
 
             cursor.execute(
                 "SELECT snapshot_entry_gid, capability_entry.capability_gid, "
@@ -1173,6 +1174,7 @@ class SqlGovernanceStore(GovernanceStore):
             document = SnapshotDocument(
                 product_release, None, code_revision, snapshot_hash,
                 tuple(capabilities), tuple(nodes), tuple(bindings), tuple(relations), scan_findings, scan_status,
+                catalog_hash=catalog_hash,
             )
             return SnapshotRecord(
                 snapshot_id, scan_run_gid, document, tuple(entries), node_gids,
@@ -1518,7 +1520,7 @@ class SqlGovernanceStore(GovernanceStore):
     @staticmethod
     def _select_snapshot(cursor: Any, snapshot_hash: str) -> Any:
         cursor.execute(
-            "SELECT snapshot_gid, scan_run_gid, snapshot_hash, code_revision, catalog_release_id, descriptor_count "
+            "SELECT snapshot_gid, scan_run_gid, snapshot_hash, code_revision, catalog_release_id, catalog_hash, descriptor_count "
             "FROM workmanship_base_capability_snapshots WHERE snapshot_hash = %s",
             (snapshot_hash,),
         )
@@ -1530,7 +1532,8 @@ class SqlGovernanceStore(GovernanceStore):
         if (_row_value(row, "snapshot_hash", 2) != document.snapshot_hash
                 or _row_value(row, "code_revision", 3) != document.code_revision
                 or _row_value(row, "catalog_release_id", 4) != document.product_release_id
-                or int(_row_value(row, "descriptor_count", 5)) != len(document.capabilities)):
+                or _row_value(row, "catalog_hash", 5) != document.catalog_hash
+                or int(_row_value(row, "descriptor_count", 6)) != len(document.capabilities)):
             raise ImmutableRecordError("snapshot_hash_conflict")
         cursor.execute(
             "SELECT snapshot_entry_gid, capability_entry.capability_gid, "
@@ -1640,10 +1643,10 @@ class SqlGovernanceStore(GovernanceStore):
     def _insert_snapshot(cursor: Any, snapshot_gid: int, scan_run_gid: int, document: SnapshotDocument, created_at: datetime) -> None:
         cursor.execute(
             "INSERT INTO workmanship_base_capability_snapshots "
-            "(snapshot_gid, scan_run_gid, snapshot_hash, code_revision, catalog_release_id, descriptor_count, created_at) "
-            "VALUES (%s, %s, %s, %s, %s, %s, %s)",
+            "(snapshot_gid, scan_run_gid, snapshot_hash, code_revision, catalog_release_id, catalog_hash, descriptor_count, created_at) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
             (snapshot_gid, scan_run_gid, document.snapshot_hash, document.code_revision,
-             document.product_release_id, len(document.capabilities), created_at),
+             document.product_release_id, document.catalog_hash, len(document.capabilities), created_at),
         )
 
     def _insert_snapshot_entries(self, cursor: Any, snapshot_gid: int, projections: tuple[CapabilityProjection, ...], document: SnapshotDocument, created_at: datetime) -> tuple[SnapshotEntry, ...]:

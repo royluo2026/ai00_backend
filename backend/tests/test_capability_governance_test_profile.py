@@ -30,10 +30,12 @@ def test_test_profile_accepts_seeded_store_and_exposes_authoritative_graph_data(
     )
     draft = SnapshotDocument(
         "product-1", "extension-1", "revision-1", "", (capability,), (node,), (binding,), (),
+        catalog_hash=_hash("9"),
     )
     document = SnapshotDocument(
         draft.product_release_id, draft.extension_release_id, draft.code_revision,
         snapshot_fingerprint(draft), draft.capabilities, draft.nodes, draft.bindings, draft.relations,
+        catalog_hash=draft.catalog_hash,
     )
     ids = iter(range(100, 1000)).__next__
     store = MemoryGovernanceStore(next_ids=ids)

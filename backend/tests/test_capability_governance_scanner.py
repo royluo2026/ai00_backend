@@ -87,7 +87,25 @@ def test_scan_does_not_execute_scanned_modules_and_preserves_catalog_separation(
         ("craft.bop.factory.create", 1),
     ]
     assert document.product_release_id == "product-fixture"
+    assert document.catalog_hash == "sha256:" + "9" * 64
     assert document.extension_release_id == "extension-fixture"
+
+
+def test_scanner_fails_closed_when_catalog_hash_is_missing(valid_fixture: Path) -> None:
+    product = json.loads((valid_fixture / "product_catalog.json").read_text(encoding="utf-8"))
+    product.pop("catalog_hash")
+    scanner = GovernanceScanner(
+        GovernanceSettings("test-governance", valid_fixture, ("plugins",)),
+        product_catalog=product,
+        extension_catalog=json.loads((valid_fixture / "extension_catalog.json").read_text(encoding="utf-8")),
+        domain_manifests=json.loads((valid_fixture / "official_domains.json").read_text(encoding="utf-8")),
+        registry_snapshot=_fixture_registry(),
+    )
+
+    document = scanner.scan("fixture-revision")
+
+    assert document.scan_status == "blocked"
+    assert document.catalog_hash == "sha256:" + "0" * 64
 
 
 def test_scanner_can_bind_registry_snapshot_after_construction(valid_fixture: Path) -> None:

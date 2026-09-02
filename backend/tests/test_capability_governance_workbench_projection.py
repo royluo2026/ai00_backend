@@ -19,6 +19,7 @@ from backend.capability_governance_test.contracts import OUTPUT_SCHEMAS
 from backend.capability_governance_test.provider import _safe_response, register_governance_capabilities
 from backend.capability_governance_test.service import CapabilityGovernanceService, GovernedRun
 from backend.capability_governance_test.workflow import Review
+from backend.capability_v2.release_gate import BusinessGateCapability, evaluate_business_governance_gate
 from backend.capability_v2.contracts import (
     ActorIdentity,
     ConsumerDescriptor,
@@ -31,6 +32,7 @@ from backend.capability_v2.contracts import (
 SOURCE_REVISION = "a" * 40
 WEB_REVISION = "b" * 40
 DEFINITION_HASH = "sha256:" + "c" * 64
+CATALOG_HASH = "sha256:" + "d" * 64
 
 
 def _context(*, super_admin: bool = False) -> CapabilityContext:
@@ -54,6 +56,9 @@ def _report(*, snapshot_gid: str = "100", source_revision: str = SOURCE_REVISION
         AuditCapability(
             capability_id=f"craft.review.item_{index:03d}", major_version=1,
             domain="craft", maturity="L1", semantic_class="write",
+            capability_version_gid=str(1000 + index),
+            business_definition_hash=f"sha256:{index:064x}",
+            snapshot_capability_version_gid=str(1000 + index),
         )
         for index in range(495)
     )
@@ -82,24 +87,42 @@ def _report(*, snapshot_gid: str = "100", source_revision: str = SOURCE_REVISION
         )
         for index in range(205)
     )
+    gate = evaluate_business_governance_gate(tuple(
+        BusinessGateCapability(
+            capability_key=item.capability_key,
+            capability_version_gid=item.capability_version_gid,
+            definition_hash=item.business_definition_hash,
+            change_kind="unchanged_legacy",
+        )
+        for item in capabilities
+    ))
     return audit(
         findings, capabilities=capabilities, snapshot_gid=snapshot_gid,
         source_revisions={"backend": source_revision, "web": WEB_REVISION, "source": source_revision},
-        relations=relations, unbound_entries=unbound,
+        relations=relations, unbound_entries=unbound, gate_result=gate,
     )
 
 
 class _RunStore:
     def __init__(self) -> None:
+        capabilities = tuple(SimpleNamespace(
+            capability_id=f"craft.review.item_{index:03d}", major_version=1,
+            owner_domain="craft", descriptor={"business_definition_hash": f"sha256:{index:064x}"},
+        ) for index in range(495))
+        entries = tuple(SimpleNamespace(
+            capability_id=f"craft.review.item_{index:03d}", major_version=1,
+            capability_version_gid=1000 + index,
+        ) for index in range(495))
         self.snapshot = SimpleNamespace(
             snapshot_gid=100,
             document=SimpleNamespace(
                 code_revision=SOURCE_REVISION,
                 product_release_id="catalog-r9",
-                snapshot_hash="sha256:" + "d" * 64,
-                capabilities=(), nodes=(), bindings=(), relations=(),
+                catalog_hash=CATALOG_HASH,
+                snapshot_hash="sha256:" + "e" * 64,
+                capabilities=capabilities, nodes=(), bindings=(), relations=(),
             ),
-            entries=(),
+            entries=entries,
         )
         self.runs: dict[str, GovernedRun] = {}
 
@@ -114,7 +137,10 @@ class _RunStore:
 
 
 def _run_report(store: _RunStore, report=None) -> tuple[CapabilityGovernanceService, str]:
-    service = CapabilityGovernanceService(store, analysis_runner=lambda snapshot, request: report or _report())
+    service = CapabilityGovernanceService(
+        store, analysis_runner=lambda snapshot, request: report or _report(),
+        web_revision_provider=lambda: WEB_REVISION,
+    )
     accepted = service.base_capability_analysis_run(
         {"target_gid": "100", "web_revision": WEB_REVISION, "idempotency_key": "task9-analysis"}, _context(),
     )
@@ -142,7 +168,7 @@ def test_business_audit_result_is_immutable_redacted_and_survives_supported_stor
     assert isinstance(in_memory.result, MappingProxyType)
     assert in_memory.result["business_audit"]["snapshot_gid"] == "100"
     assert in_memory.result["business_audit"]["catalog_binding"] == {
-        "catalog_release_id": "catalog-r9", "catalog_hash": "sha256:" + "d" * 64,
+        "catalog_release_id": "catalog-r9", "catalog_hash": CATALOG_HASH,
     }
     with pytest.raises(TypeError):
         in_memory.result["business_audit"]["finding_count"] = 0
@@ -311,33 +337,114 @@ def test_analysis_result_reconciles_every_aggregate_and_stable_identity(report):
         }, _context())
 
 
-def test_enriched_analysis_requires_exact_persisted_web_and_catalog_binding():
-    store = _RunStore()
-    service = CapabilityGovernanceService(store, analysis_runner=lambda snapshot, request: _report())
+@pytest.mark.parametrize("field,value", (
+    ("domain", "forged"),
+    ("reason", "forged_reason"),
+    ("priority", 99),
+    ("capability_version_gid", "forged-version"),
+    ("business_definition_hash", "sha256:" + "f" * 64),
+    ("governance_status", "passed"),
+    ("relationship_signals", ("forged-relation",)),
+))
+def test_analysis_result_recomputes_every_review_queue_field(field, value):
+    report = _report()
+    forged = replace(report.review_queue[0], **{field: value})
+    report = replace(report, review_queue=(forged,) + report.review_queue[1:])
+    service = CapabilityGovernanceService(
+        _RunStore(), analysis_runner=lambda snapshot, request: report,
+        web_revision_provider=lambda: WEB_REVISION,
+    )
 
     with pytest.raises(CapabilityBusinessError, match="governance_result_invalid"):
         service.base_capability_analysis_run({
-            "target_gid": "100", "idempotency_key": "missing-web-revision",
+            "target_gid": "100", "idempotency_key": f"forged-queue-{field}",
         }, _context())
+
+
+def test_analysis_result_cannot_replace_authoritative_snapshot_capability_and_matching_queue_together():
+    report = _report()
+    changed_capability = replace(report.audit_capabilities[0], domain="forged")
+    changed_queue = replace(report.review_queue[0], domain="forged", owner_domains=("forged",))
+    report = replace(
+        report,
+        audit_capabilities=(changed_capability,) + report.audit_capabilities[1:],
+        review_queue=(changed_queue,) + report.review_queue[1:],
+    )
+    service = CapabilityGovernanceService(
+        _RunStore(), analysis_runner=lambda snapshot, request: report,
+        web_revision_provider=lambda: WEB_REVISION,
+    )
+
     with pytest.raises(CapabilityBusinessError, match="governance_result_invalid"):
         service.base_capability_analysis_run({
+            "target_gid": "100", "idempotency_key": "replaced-authoritative-capability",
+        }, _context())
+
+
+def test_enriched_analysis_rejects_missing_or_incomplete_gate_rows():
+    report = _report()
+    service = CapabilityGovernanceService(
+        _RunStore(), analysis_runner=lambda snapshot, request: replace(report, governance_capabilities=()),
+        web_revision_provider=lambda: WEB_REVISION,
+    )
+
+    with pytest.raises(CapabilityBusinessError, match="governance_result_invalid"):
+        service.base_capability_analysis_run({
+            "target_gid": "100", "idempotency_key": "missing-gate-rows",
+        }, _context())
+
+
+def test_enriched_analysis_uses_server_owned_web_and_exact_catalog_binding():
+    store = _RunStore()
+    service = CapabilityGovernanceService(
+        store, analysis_runner=lambda snapshot, request: _report(),
+        web_revision_provider=lambda: WEB_REVISION,
+    )
+
+    accepted = service.base_capability_analysis_run({
+        "target_gid": "100", "idempotency_key": "server-web-revision",
+    }, _context())
+    assert accepted["run_status"] == "completed"
+
+    with pytest.raises(CapabilityBusinessError, match="invalid_input"):
+        service.base_capability_analysis_run({
             "target_gid": "100", "web_revision": "e" * 40,
-            "idempotency_key": "wrong-web-revision",
+            "idempotency_key": "spoofed-client-web-revision",
         }, _context())
 
     store.snapshot.document.product_release_id = ""
     with pytest.raises(CapabilityBusinessError, match="governance_result_invalid"):
         service.base_capability_analysis_run({
-            "target_gid": "100", "web_revision": WEB_REVISION,
+            "target_gid": "100",
             "idempotency_key": "missing-catalog-release",
         }, _context())
     store.snapshot.document.product_release_id = "catalog-r9"
-    store.snapshot.document.snapshot_hash = ""
+    store.snapshot.document.catalog_hash = ""
     with pytest.raises(CapabilityBusinessError, match="governance_result_invalid"):
         service.base_capability_analysis_run({
-            "target_gid": "100", "web_revision": WEB_REVISION,
+            "target_gid": "100",
             "idempotency_key": "missing-catalog-hash",
         }, _context())
+
+
+def test_enriched_analysis_fails_closed_without_server_web_binding_but_run_only_remains_legacy_compatible():
+    enriched = CapabilityGovernanceService(
+        _RunStore(), analysis_runner=lambda snapshot, request: _report(),
+        web_revision_provider=lambda: None,
+    )
+    with pytest.raises(CapabilityBusinessError, match="governance_result_invalid"):
+        enriched.base_capability_analysis_run({
+            "target_gid": "100", "web_revision": WEB_REVISION,
+            "idempotency_key": "untrusted-client-only-web",
+        }, _context())
+
+    run_only = CapabilityGovernanceService(
+        _RunStore(), analysis_runner=lambda snapshot, request: None,
+        web_revision_provider=lambda: None,
+    )
+    assert run_only.base_capability_analysis_run({
+        "target_gid": "100", "idempotency_key": "legacy-no-server-web",
+    }, _context())["run_status"] == "completed"
 
 
 def test_legacy_run_only_analysis_remains_backward_compatible_without_web_revision():

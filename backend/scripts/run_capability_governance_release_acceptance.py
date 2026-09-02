@@ -188,6 +188,8 @@ def _release_evidence() -> dict[str, Any]:
         approvals_complete=True,
         data_complete=True,
         evidence_hash="sha256:unit-evidence",
+        static_gate_status="passed",
+        static_gate_hash="sha256:unit-static-gate",
         business_governance=governance,
         business_catalog=catalog,
         legacy_baseline=baseline.capabilities,
@@ -282,6 +284,7 @@ def _finding_evidence(path: Path) -> dict[str, Any]:
     # the required controlled-fixture categories without persisting payloads.
     snapshot = SnapshotDocument(
         product_release_id=document["product_release_id"], extension_release_id=document["extension_release_id"], code_revision=document["code_revision"], snapshot_hash=document["snapshot_hash"],
+        catalog_hash=document["catalog_hash"],
         capabilities=tuple(ScannedCapability(**item) for item in document["capabilities"]),
         nodes=tuple(ImplementationNode(**item) for item in document["nodes"]),
         bindings=tuple(CapabilityBinding(**item) for item in document["bindings"]),
@@ -318,7 +321,10 @@ def _controlled_fixture_codes() -> dict[str, str]:
             {"business_object": "order", "operation_family": "submit", "side_effect_level": "strong_write" if strong else "read", "authorization_policy": {"family": "shared", "scope": policy}},
         )
     def snapshot(capabilities, nodes=(), bindings=()):
-        return SnapshotDocument("rel_product", "rel_extension", "fixture", digest("f"), tuple(capabilities), tuple(nodes), tuple(bindings), ())
+        return SnapshotDocument(
+            "rel_product", "rel_extension", "fixture", digest("f"),
+            tuple(capabilities), tuple(nodes), tuple(bindings), (), catalog_hash=digest("9"),
+        )
     def codes(document: SnapshotDocument) -> set[str]:
         return {finding.code for finding in run_deterministic_analysis(document, AnalysisRequest()).findings}
 
@@ -604,10 +610,16 @@ def _ui_evidence(root: Path) -> dict[str, Any]:
     if not page.is_file():
         raise RuntimeError("test_governance_ui_missing")
     html = page.read_text(encoding="utf-8")
-    match = re.search(r'href="/assets/([A-Za-z0-9_.-]+\.css)"', html)
+    match = re.search(r'href="(?P<href>[^"?#]+\.css)(?:\?[^"#]*)?"', html)
     if match is None:
         raise RuntimeError("test_governance_ui_asset_reference_missing")
-    stylesheet = root / "dist" / "assets" / match.group(1)
+    href = match.group("href")
+    stylesheet = (root / href.lstrip("/")) if href.startswith("/") else (page.parent / href)
+    stylesheet = stylesheet.resolve()
+    try:
+        stylesheet.relative_to(root)
+    except ValueError as exc:
+        raise RuntimeError("test_governance_ui_asset_outside_artifact") from exc
     if not stylesheet.is_file():
         raise RuntimeError("test_governance_ui_asset_missing")
     return {

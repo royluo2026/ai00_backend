@@ -108,6 +108,7 @@ def _blocked_document() -> SnapshotDocument:
         "catalog-test", None, "revision", "", (), (), (), (),
         (ScanFinding("scan_configuration_error", "blocking", "configuration", "product_catalog", "invalid"),),
         "blocked",
+        catalog_hash="sha256:" + "9" * 64,
     )
     return replace(draft, snapshot_hash=snapshot_fingerprint(draft))
 
@@ -147,6 +148,7 @@ def test_sql_rehydration_restores_business_evidence_and_scan_findings():
         snapshot_rows=({
             "snapshot_gid": 700, "scan_run_gid": 701, "snapshot_hash": document.snapshot_hash,
             "code_revision": document.code_revision, "catalog_release_id": document.product_release_id,
+            "catalog_hash": document.catalog_hash,
             "scan_status": "completed",
         },),
         snapshot_entry_rows=({
@@ -195,6 +197,7 @@ def test_sql_repeat_import_reuses_existing_immutable_snapshot_without_inserts():
     connection = _Connection(
         snapshot_rows=({"snapshot_gid": 700, "scan_run_gid": 701, "snapshot_hash": document.snapshot_hash,
                         "code_revision": document.code_revision, "catalog_release_id": document.product_release_id,
+                        "catalog_hash": document.catalog_hash,
                         "descriptor_count": 1},),
         snapshot_entry_rows=({"snapshot_entry_gid": 702, "capability_gid": 703, "capability_version_gid": 704,
                               "capability_id": "craft.bop.version.list", "major_version": 1, "owner_domain": "craft",
@@ -218,6 +221,7 @@ def test_sql_existing_snapshot_rejects_changed_document_with_reused_hash():
     connection = _Connection(
         snapshot_rows=({"snapshot_gid": 700, "scan_run_gid": 701, "snapshot_hash": document.snapshot_hash,
                         "code_revision": document.code_revision, "catalog_release_id": document.product_release_id,
+                        "catalog_hash": document.catalog_hash,
                         "descriptor_count": 1},),
         snapshot_entry_rows=({"snapshot_entry_gid": 702, "capability_gid": 703, "capability_version_gid": 704,
                               "capability_id": "craft.bop.version.list", "major_version": 1, "owner_domain": "craft",
@@ -234,6 +238,7 @@ def test_sql_snapshot_duplicate_race_rolls_back_provisional_scan_and_reuses_winn
     connection = _Connection(
         snapshot_rows=(None, {"snapshot_gid": 700, "scan_run_gid": 701, "snapshot_hash": document.snapshot_hash,
                               "code_revision": document.code_revision, "catalog_release_id": document.product_release_id,
+                              "catalog_hash": document.catalog_hash,
                               "descriptor_count": 1}),
         snapshot_entry_rows=({"snapshot_entry_gid": 702, "capability_gid": 703, "capability_version_gid": 704,
                               "capability_id": "craft.bop.version.list", "major_version": 1, "owner_domain": "craft",

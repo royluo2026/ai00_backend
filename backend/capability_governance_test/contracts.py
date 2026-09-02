@@ -319,11 +319,22 @@ _UNBOUND_ENTRY_SCHEMA = _closed({
 })
 _REVIEW_QUEUE_SCHEMA = _closed({
     "capability_key": STRING_SCHEMA,
+    "capability_id": _SMALL_STRING_SCHEMA,
+    "major_version": {"type": "integer", "minimum": 1},
+    "capability_version_gid": _VERSION_SCHEMA,
+    "business_definition_hash": _SHA256_SCHEMA,
     "domain": _SMALL_STRING_SCHEMA,
+    "owner_domains": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 11},
     "maturity": {"type": "string", "enum": [f"L{index}" for index in range(7)]},
     "priority": _COUNT_SCHEMA,
     "reason": _SMALL_STRING_SCHEMA,
-})
+    "governance_status": _SMALL_STRING_SCHEMA,
+    "relationship_signals": {"type": "array", "items": _VERSION_SCHEMA, "maxItems": 200},
+}, (
+    "capability_key", "capability_id", "major_version", "capability_version_gid",
+    "business_definition_hash", "domain", "owner_domains", "maturity", "priority",
+    "reason", "governance_status", "relationship_signals",
+))
 _SOURCE_REVISIONS_SCHEMA = _closed({
     "backend": {"type": "string", "pattern": r"^[0-9a-f]{40}$", "minLength": 40, "maxLength": 40},
     "web": {"type": "string", "pattern": r"^[0-9a-f]{40}$", "minLength": 40, "maxLength": 40},

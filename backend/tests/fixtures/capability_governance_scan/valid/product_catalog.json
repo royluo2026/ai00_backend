@@ -1,5 +1,6 @@
 {
   "release_id": "product-fixture",
+  "catalog_hash": "sha256:9999999999999999999999999999999999999999999999999999999999999999",
   "descriptors": [
     {
       "id": "craft.bop.factory.create",

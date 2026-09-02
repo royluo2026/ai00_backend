@@ -197,7 +197,8 @@ def _business_audit_result(
         raise ValueError("governance_result_invalid")
     if expected_web_revision is None or revisions["web"] != expected_web_revision:
         raise ValueError("governance_result_invalid")
-    validate_business_audit_report(report)
+    validate_business_audit_report(report, require_gate=True)
+    _validate_business_audit_snapshot_capabilities(report, snapshot)
 
     def bounded_rows(values: Any) -> tuple[Any, ...]:
         rows = tuple(values)
@@ -246,15 +247,22 @@ def _business_audit_result(
             raise ValueError("governance_result_invalid")
         review_queue.append(MappingProxyType({
             "capability_key": _analysis_text(item.capability_key, maximum=255),
+            "capability_id": _analysis_text(item.capability_id, maximum=255),
+            "major_version": int(item.major_version),
+            "capability_version_gid": _analysis_text(item.capability_version_gid, maximum=255),
+            "business_definition_hash": _analysis_text(item.business_definition_hash, maximum=255),
             "domain": _analysis_text(item.domain, maximum=64),
+            "owner_domains": _analysis_strings(item.owner_domains, maximum=11, item_length=64),
             "maturity": maturity,
             "priority": _analysis_count(item.priority),
             "reason": _analysis_text(item.reason, maximum=255),
+            "governance_status": _analysis_text(item.governance_status, maximum=64),
+            "relationship_signals": _analysis_strings(item.relationship_signals, maximum=200, item_length=255),
         }))
     review_queue = tuple(review_queue)
 
     catalog_release = str(getattr(document, "product_release_id", "") or "").strip()
-    catalog_hash = str(getattr(document, "snapshot_hash", "") or "").strip()
+    catalog_hash = str(getattr(document, "catalog_hash", "") or "").strip()
     if not catalog_release or not catalog_hash:
         raise ValueError("governance_result_invalid")
     catalog_binding = {
@@ -299,6 +307,32 @@ def _business_audit_result(
         "review_queue": review_queue,
     }
     return MappingProxyType(result)
+
+
+def _validate_business_audit_snapshot_capabilities(report: BusinessAuditReport, snapshot: Any) -> None:
+    document = getattr(snapshot, "document", None)
+    snapshot_capabilities = tuple(getattr(document, "capabilities", ()) or ())
+    entries = {
+        (str(getattr(item, "capability_id", "")), int(getattr(item, "major_version", 0) or 0)):
+        str(getattr(item, "capability_version_gid", ""))
+        for item in tuple(getattr(snapshot, "entries", ()) or ())
+    }
+    authoritative = {}
+    for item in snapshot_capabilities:
+        descriptor = getattr(item, "descriptor", {})
+        definition_hash = descriptor.get("business_definition_hash") if isinstance(descriptor, Mapping) else None
+        key = (str(getattr(item, "capability_id", "")), int(getattr(item, "major_version", 0) or 0))
+        authoritative[key] = (
+            str(getattr(item, "owner_domain", "")), str(definition_hash or ""), entries.get(key, ""),
+        )
+    audit_rows = {
+        (item.capability_id, item.major_version): (
+            item.domain, item.business_definition_hash, item.snapshot_capability_version_gid,
+        )
+        for item in report.audit_capabilities
+    }
+    if not authoritative or authoritative != audit_rows:
+        raise ValueError("business_audit_snapshot_capability_mismatch")
 
 
 def _paged_business_audit(result: Mapping[str, Any], payload: Mapping[str, Any]) -> Mapping[str, Any]:
@@ -586,6 +620,7 @@ class CapabilityGovernanceService:
         release_gate: ReleaseGate | None = None,
         release_evidence_port: Any | None = None,
         workflow_port: Any | None = None,
+        web_revision_provider: Callable[[], str | None] | None = None,
     ) -> None:
         self._store = store
         self._scanner = scanner
@@ -594,6 +629,7 @@ class CapabilityGovernanceService:
         self._worker = _InlineGovernanceWorker() if worker is _DEFAULT_PORT else worker
         self._advisor = advisor
         self._audit_sink = audit_sink
+        self._web_revision_provider = web_revision_provider
         self._runs: dict[tuple[str, str, str], GovernedRun] = {}
         self._prompt_records: dict[str, dict[str, str]] = {}
         self._prompt_texts: dict[str, str] = {}
@@ -1577,20 +1613,25 @@ class CapabilityGovernanceService:
         key = self._idempotency(payload)
         snapshot = self._snapshot(payload)
         snapshot_gid = str(getattr(snapshot, "snapshot_gid"))
-        web_revision = None
+        client_web_revision = None
         if kind == "analysis" and payload.get("web_revision") not in (None, ""):
-            web_revision = str(payload["web_revision"]).strip()
-            if re.fullmatch(r"[0-9a-f]{40}", web_revision) is None:
+            client_web_revision = str(payload["web_revision"]).strip()
+            if re.fullmatch(r"[0-9a-f]{40}", client_web_revision) is None:
                 raise _business_error("invalid_input")
+        web_revision = self._trusted_web_revision() if kind == "analysis" else None
         run_key = (kind, snapshot_gid, key)
         run = self._runs.get(run_key)
         if run is not None:
-            if run.web_revision != web_revision:
+            if run.web_revision != web_revision or (
+                client_web_revision is not None and run.web_revision != client_web_revision
+            ):
                 raise _business_error("idempotency_conflict")
             return self._accepted(
                 capability_id, run_gid=run.run_gid, snapshot_gid=run.snapshot_gid,
                 run_status=run.status,
             )
+        if client_web_revision is not None and web_revision is not None and client_web_revision != web_revision:
+            raise _business_error("invalid_input")
         run = GovernedRun(
             str(self._next_run_gid), snapshot_gid, kind, _context_user(context), key,
             web_revision=web_revision,
@@ -1641,6 +1682,20 @@ class CapabilityGovernanceService:
             capability_id, run_gid=run.run_gid, snapshot_gid=run.snapshot_gid,
             run_status=updated.status,
         )
+
+    def _trusted_web_revision(self) -> str | None:
+        if self._web_revision_provider is None:
+            return None
+        try:
+            revision = self._web_revision_provider()
+        except Exception as exc:
+            raise _business_error("governance_dependency_unavailable") from exc
+        if revision in (None, ""):
+            return None
+        value = str(revision).strip()
+        if re.fullmatch(r"[0-9a-f]{40}", value) is None:
+            raise _business_error("governance_dependency_unavailable")
+        return value
 
     @staticmethod
     def _analysis_run_result(

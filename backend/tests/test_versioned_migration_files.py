@@ -23,6 +23,7 @@ class VersionedMigrationFileTests(unittest.TestCase):
         matches = (MIGRATION_FILE_RE.fullmatch(path.name) for path in TEST_GOVERNANCE_DIR.glob("*.sql"))
         ids = {match.group("id") for match in matches if match is not None}
         self.assertIn("0005", ids)
+        self.assertIn("0006", ids)
 
     def test_bootstrap_stays_in_selected_database(self):
         statements = bootstrap_statements(
@@ -136,6 +137,41 @@ class VersionedMigrationFileTests(unittest.TestCase):
         self.assertIsNone(
             prepare_resumable_statement(MetadataConnection("varbinary(71)"), statement),
         )
+
+    def test_historical_self_annotation_backfill_normalizes_join_collations(self):
+        statement = """-- AI00: RESUMABLE BACKFILL
+        UPDATE workmanship_base_self_annotations a
+        LEFT JOIN workmanship_auth_users u ON u.gid=a.user_gid
+        SET a.tenant_gid=u.team_id;
+        UPDATE workmanship_base_self_annotation_states s
+        JOIN workmanship_base_self_annotations a
+          ON a.item_gid=s.item_gid AND a.user_gid=s.user_gid
+        SET s.tenant_gid=a.tenant_gid
+        """
+
+        prepared = prepare_resumable_statement(object(), statement)
+
+        self.assertIn("u.gid=a.user_gid COLLATE utf8mb4_unicode_ci", prepared)
+        self.assertIn("a.item_gid COLLATE utf8mb4_unicode_ci=s.item_gid", prepared)
+        self.assertIn("a.user_gid COLLATE utf8mb4_unicode_ci=s.user_gid", prepared)
+
+    def test_legacy_rule_owner_backfill_is_skipped_when_creator_column_is_absent(self):
+        class Cursor:
+            def __enter__(self): return self
+            def __exit__(self, *_args): return False
+            def execute(self, _sql, _params=()): self.row = (0,)
+            def fetchone(self): return self.row
+
+        class Connection:
+            def cursor(self): return Cursor()
+
+        statement = """-- AI00: RESUMABLE BACKFILL
+        UPDATE workmanship_know_craft_rules
+        SET owner_user_gid = creator_gid
+        WHERE owner_user_gid IS NULL AND creator_gid IS NOT NULL
+        """
+
+        self.assertIsNone(prepare_resumable_statement(Connection(), statement))
 
 
 if __name__ == "__main__":

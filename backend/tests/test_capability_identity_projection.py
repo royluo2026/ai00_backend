@@ -41,6 +41,7 @@ def snapshot(capability_id: str, major_version: int) -> SnapshotDocument:
     )
     document = SnapshotDocument(
         product_release_id="product-2026.08",
+        catalog_hash="sha256:" + "9" * 64,
         extension_release_id="governance-1.0",
         code_revision="abc123",
         snapshot_hash="",
@@ -104,7 +105,8 @@ def test_models_deep_freeze_payloads_and_coerce_document_collections_to_tuples()
     node = ImplementationNode("provider:craft.bop", "craft", "provider", "plugins/craft/provider.py", "sha256:" + "1" * 64, metadata=metadata)
     document = SnapshotDocument("product-2026.08", "governance-1.0", "abc123", "sha256:" + "2" * 64,
         [capability], [node], [CapabilityBinding(capability.capability_id, 1, node.canonical_key, "provider", "sha256:" + "3" * 64)],
-        [ImplementationRelation(node.canonical_key, node.canonical_key, "contains", "sha256:" + "4" * 64)],)
+        [ImplementationRelation(node.canonical_key, node.canonical_key, "contains", "sha256:" + "4" * 64)],
+        catalog_hash="sha256:" + "9" * 64,)
 
     fingerprint_before = canonical_fingerprint(document.to_json())
     descriptor["nested"]["items"].append("caller-change")

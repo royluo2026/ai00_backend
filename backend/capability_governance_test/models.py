@@ -185,6 +185,7 @@ class CapabilityProjection:
 @dataclass(frozen=True)
 class SnapshotDocument:
     product_release_id: str
+    catalog_hash: str = field(kw_only=True)
     extension_release_id: str | None
     code_revision: str
     snapshot_hash: str
@@ -196,6 +197,12 @@ class SnapshotDocument:
     scan_status: str = "completed"
 
     def __post_init__(self) -> None:
+        if (
+            not self.catalog_hash.startswith("sha256:")
+            or len(self.catalog_hash) != 71
+            or any(character not in "0123456789abcdef" for character in self.catalog_hash[7:])
+        ):
+            raise ValueError("snapshot_catalog_hash_invalid")
         object.__setattr__(self, "capabilities", tuple(self.capabilities))
         object.__setattr__(self, "nodes", tuple(self.nodes))
         object.__setattr__(self, "bindings", tuple(self.bindings))
@@ -207,6 +214,7 @@ class SnapshotDocument:
     def to_json(self) -> dict[str, Any]:
         return {
             "product_release_id": self.product_release_id,
+            "catalog_hash": self.catalog_hash,
             "extension_release_id": self.extension_release_id,
             "code_revision": self.code_revision,
             "snapshot_hash": self.snapshot_hash,

@@ -34,7 +34,7 @@ def _capability(domain: str, name: str = "resource.create", **descriptor_overrid
 
 
 def _document(*capabilities: ScannedCapability, nodes=(), bindings=()):
-    document = SnapshotDocument("product-test", None, "revision", "", tuple(capabilities), tuple(nodes), tuple(bindings), ())
+    document = SnapshotDocument("product-test", None, "revision", "", tuple(capabilities), tuple(nodes), tuple(bindings), (), catalog_hash="sha256:" + "9" * 64)
     return replace(document, snapshot_hash=snapshot_fingerprint(document))
 
 

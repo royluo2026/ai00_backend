@@ -45,7 +45,10 @@ def _blocked_document(source_path: str, message: str) -> SnapshotDocument:
     finding = ScanFinding(
         "scan_configuration_error", "blocking", "configuration", source_path, message,
     )
-    draft = SnapshotDocument("", None, "offline", "", (), (), (), (), (finding,), "blocked")
+    draft = SnapshotDocument(
+        "", None, "offline", "", (), (), (), (), (finding,), "blocked",
+        catalog_hash="sha256:" + "0" * 64,
+    )
     return replace(draft, snapshot_hash=snapshot_fingerprint(draft))
 
 

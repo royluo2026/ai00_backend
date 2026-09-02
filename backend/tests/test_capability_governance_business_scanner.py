@@ -71,6 +71,7 @@ def _scan_author_release(scanner: GovernanceScanner, release: CatalogRelease):
 def catalog() -> dict[str, object]:
     return {
         "release_id": "catalog-business-test",
+        "catalog_hash": "sha256:" + "9" * 64,
         "descriptors": [{
             "id": "person.height.write",
             "major_version": 1,

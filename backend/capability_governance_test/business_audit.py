@@ -168,10 +168,17 @@ class UnboundPublicEntry:
 @dataclass(frozen=True)
 class ReviewQueueEntry:
     capability_key: str
+    capability_id: str
+    major_version: int
+    capability_version_gid: str
+    business_definition_hash: str
     domain: str
+    owner_domains: tuple[str, ...]
     maturity: str
     priority: int
     reason: str
+    governance_status: str
+    relationship_signals: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -199,6 +206,9 @@ class BusinessAuditReport:
     runtime_verified: bool
     legacy_pending_review_count: int
     governance_capabilities: tuple[Any, ...] = field(
+        default=(), repr=False, metadata={"serialize": False},
+    )
+    audit_capabilities: tuple[AuditCapability, ...] = field(
         default=(), repr=False, metadata={"serialize": False},
     )
 
@@ -248,7 +258,24 @@ def _review_queue(capabilities: tuple[AuditCapability, ...], relations: tuple[Au
             priority, reason = 5, "write_pending_review"
         else:
             priority, reason = 6, "read_pending_review"
-        queued.append(ReviewQueueEntry(item.capability_key, item.domain, item.maturity, priority, reason))
+        relation_signals = tuple(sorted(
+            relation.candidate_hash for relation in relations
+            if item.capability_key in relation.capability_keys
+        ))
+        queued.append(ReviewQueueEntry(
+            capability_key=item.capability_key,
+            capability_id=item.capability_id,
+            major_version=item.major_version,
+            capability_version_gid=item.snapshot_capability_version_gid or item.capability_version_gid,
+            business_definition_hash=item.business_definition_hash,
+            domain=item.domain,
+            owner_domains=(item.domain,),
+            maturity=item.maturity,
+            priority=priority,
+            reason=reason,
+            governance_status=item.governance_status,
+            relationship_signals=relation_signals,
+        ))
     return tuple(sorted(queued, key=lambda item: (item.priority, item.domain, item.capability_key)))
 
 
@@ -274,7 +301,7 @@ def _root_cause_groups(evidence_rows: tuple[AuditEvidence, ...]) -> tuple[RootCa
     return tuple(result)
 
 
-def validate_business_audit_report(report: BusinessAuditReport) -> None:
+def validate_business_audit_report(report: BusinessAuditReport, *, require_gate: bool = False) -> None:
     """Reconcile a frozen report with the records that produced its aggregates."""
     if set(report.maturity_counts) != set(MATURITY_LEVELS) or set(report.maturity_evidence) != set(MATURITY_LEVELS):
         raise ValueError("business_audit_maturity_invalid")
@@ -327,12 +354,11 @@ def validate_business_audit_report(report: BusinessAuditReport) -> None:
         raise ValueError("business_audit_remediation_invalid")
 
     queue = tuple(report.review_queue)
+    canonical_queue = _review_queue(tuple(report.audit_capabilities), tuple(report.relations))
     if (
-        len({item.capability_key for item in queue}) != len(queue)
-        or queue != tuple(sorted(queue, key=lambda item: (item.priority, item.domain, item.capability_key)))
-        or {item.capability_key for item in queue} != {
-            key for level in MATURITY_LEVELS[:5] for key in report.maturity_evidence[level]
-        }
+        not report.audit_capabilities
+        or len({item.capability_key for item in report.audit_capabilities}) != len(report.audit_capabilities)
+        or queue != canonical_queue
     ):
         raise ValueError("business_audit_review_queue_invalid")
     maturity_by_key = {
@@ -363,7 +389,8 @@ def validate_business_audit_report(report: BusinessAuditReport) -> None:
     gate_rows = tuple(report.governance_capabilities)
     gate_keys = [str(_value(item, "capability_key", "")) for item in gate_rows]
     if (
-        len(gate_keys) != len(set(gate_keys)) or (gate_rows and set(gate_keys) != capability_keys)
+        (require_gate and not gate_rows)
+        or len(gate_keys) != len(set(gate_keys)) or (gate_rows and set(gate_keys) != capability_keys)
         or any(
             type(_value(item, field_name)) is not bool
             for item in gate_rows for field_name in ("machine_passed", "human_approved", "runtime_verified")
@@ -381,6 +408,18 @@ def validate_business_audit_report(report: BusinessAuditReport) -> None:
             str(_value(item, "governance_status", "")) == "passed"
             and (not _value(item, "machine_passed") or not _value(item, "human_approved"))
             for item in gate_rows
+        )
+        or any(
+            str(_value(item, "capability_version_gid", "")) != capability.capability_version_gid
+            or str(_value(item, "definition_hash", "")) != capability.business_definition_hash
+            or str(_value(item, "governance_status", "")) != capability.governance_status
+            for capability in report.audit_capabilities
+            for item in gate_rows if str(_value(item, "capability_key", "")) == capability.capability_key
+        )
+        or any(
+            str(_value(item, "change_kind", "")) != capability.change_kind
+            for capability in report.audit_capabilities
+            for item in gate_rows if str(_value(item, "capability_key", "")) == capability.capability_key
         )
     ):
         raise ValueError("business_audit_gate_invalid")
@@ -458,6 +497,7 @@ def _build_report(
         governance_capabilities=tuple(
             gate_rows[key] for key in sorted(gate_rows)
         ),
+        audit_capabilities=capability_rows,
     )
 
 
@@ -465,11 +505,13 @@ def audit(
     findings: Iterable[AuditEvidence], *, capabilities: Iterable[AuditCapability] = (),
     snapshot_gid: str, source_revisions: Mapping[str, str] | None = None,
     relations: Iterable[AuditRelation] = (), unbound_entries: Iterable[UnboundPublicEntry] = (),
+    gate_result: Any | None = None,
 ) -> BusinessAuditReport:
     """Aggregate evidence without accepting untrusted release-state assertions."""
     return _build_report(
         findings, capabilities=capabilities, snapshot_gid=snapshot_gid,
         source_revisions=source_revisions, relations=relations, unbound_entries=unbound_entries,
+        gate_result=gate_result,
     )
 
 
