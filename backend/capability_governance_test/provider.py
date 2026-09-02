@@ -177,8 +177,13 @@ def _review_evidence_projection(value: Any) -> dict[str, Any]:
         result["evidence"] = _projection(evidence, (
             "redacted", "snapshot_gid", "source_revision", "catalog_release_id",
         ))
-    for field in ("deterministic_relation_candidates", "ai_advisory_relation_candidates"):
+    for field, source in (
+        ("deterministic_relation_candidates", "deterministic"),
+        ("ai_advisory_relation_candidates", "advisory"),
+    ):
         relations = value.get(field)
+        if any(str(item.get("source", "")) != source for item in tuple(relations or ()) if isinstance(item, Mapping)):
+            raise CapabilityBusinessError("provider_invalid_response", "provider_invalid_response")
         result[field] = [
             _business_relation_projection(item)
             for item in tuple(relations or ())[:20] if isinstance(item, Mapping)

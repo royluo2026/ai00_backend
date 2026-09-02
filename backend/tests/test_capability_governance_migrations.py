@@ -91,6 +91,18 @@ def test_business_governance_hash_columns_are_binary_exact():
     assert "CANDIDATE_HASH VARBINARY(71) NOT NULL" in sql
 
 
+def test_snapshot_catalog_hash_uses_the_next_unique_resumable_migration():
+    compiled = compile_governance_migrations(ROOT)
+    ids = [item.migration_id for item in compiled.migrations]
+    migration = next(item for item in compiled.migrations if item.migration_id == "0009")
+
+    assert len(ids) == len(set(ids))
+    assert migration.path.name == "0009_snapshot_catalog_hash.sql"
+    assert "-- AI00: RESUMABLE BACKFILL" in migration.sql
+    assert "WHERE snapshot.catalog_hash IS NULL" in migration.sql
+    assert "MODIFY COLUMN catalog_hash VARCHAR(71) NOT NULL" in migration.sql
+
+
 def test_cli_failure_redacts_configuration_and_traceback():
     environment = os.environ.copy()
     environment["AI00_DEPLOYMENT_PROFILE"] = "test-governance"

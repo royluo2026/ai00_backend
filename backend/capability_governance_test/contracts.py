@@ -289,14 +289,20 @@ _RELATION_CANDIDATE_SCHEMA = _closed({
         }, ("key", "value_json", "value_hash", "truncated"))},
     }, ("entries",)), "status": _SMALL_STRING_SCHEMA,
 })
-_BUSINESS_RELATION_SCHEMA = _closed({
-    "candidate_hash": _VERSION_SCHEMA,
-    "relation_type": _SMALL_STRING_SCHEMA,
-    "source": {"type": "string", "enum": ["deterministic", "advisory"]},
-    "capability_keys": {"type": "array", "items": STRING_SCHEMA, "maxItems": 20},
-    "evidence": _RELATION_CANDIDATE_SCHEMA["properties"]["evidence"],
-    "status": _SMALL_STRING_SCHEMA,
-})
+def _business_relation_schema(*sources: str) -> dict[str, Any]:
+    return _closed({
+        "candidate_hash": _VERSION_SCHEMA,
+        "relation_type": _SMALL_STRING_SCHEMA,
+        "source": {"type": "string", "enum": list(sources)},
+        "capability_keys": {"type": "array", "items": STRING_SCHEMA, "maxItems": 20},
+        "evidence": _RELATION_CANDIDATE_SCHEMA["properties"]["evidence"],
+        "status": _SMALL_STRING_SCHEMA,
+    })
+
+
+_BUSINESS_RELATION_SCHEMA = _business_relation_schema("deterministic", "advisory")
+_DETERMINISTIC_BUSINESS_RELATION_SCHEMA = _business_relation_schema("deterministic")
+_ADVISORY_BUSINESS_RELATION_SCHEMA = _business_relation_schema("advisory")
 _BUSINESS_ROOT_CAUSE_SCHEMA = _closed({
     "root_cause_key": STRING_SCHEMA,
     "reason_code": _SMALL_STRING_SCHEMA,
@@ -464,8 +470,8 @@ _PROPOSAL_ITEM_SCHEMA = _closed({
             "source_revision": {"type": "string", "maxLength": 255},
             "catalog_release_id": {"type": "string", "maxLength": 255},
         }),
-        "deterministic_relation_candidates": {"type": "array", "items": _BUSINESS_RELATION_SCHEMA, "maxItems": 20},
-        "ai_advisory_relation_candidates": {"type": "array", "items": _BUSINESS_RELATION_SCHEMA, "maxItems": 20},
+        "deterministic_relation_candidates": {"type": "array", "items": _DETERMINISTIC_BUSINESS_RELATION_SCHEMA, "maxItems": 20},
+        "ai_advisory_relation_candidates": {"type": "array", "items": _ADVISORY_BUSINESS_RELATION_SCHEMA, "maxItems": 20},
     }),
 })
 _HEALTH_ITEM_SCHEMA = _closed({

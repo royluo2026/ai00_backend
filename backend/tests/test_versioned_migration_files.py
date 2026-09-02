@@ -24,6 +24,7 @@ class VersionedMigrationFileTests(unittest.TestCase):
         ids = {match.group("id") for match in matches if match is not None}
         self.assertIn("0005", ids)
         self.assertIn("0006", ids)
+        self.assertIn("0009", ids)
 
     def test_bootstrap_stays_in_selected_database(self):
         statements = bootstrap_statements(

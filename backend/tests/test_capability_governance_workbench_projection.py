@@ -35,6 +35,38 @@ DEFINITION_HASH = "sha256:" + "c" * 64
 CATALOG_HASH = "sha256:" + "d" * 64
 
 
+def _audit_capabilities():
+    return tuple(
+        AuditCapability(
+            capability_id=f"craft.review.item_{index:03d}", major_version=1,
+            domain="craft", maturity="L1", semantic_class="write",
+            capability_version_gid=str(1000 + index),
+            business_definition_hash=f"sha256:{index:064x}",
+            snapshot_capability_version_gid=str(1000 + index),
+        )
+        for index in range(495)
+    )
+
+
+def _canonical_gate(capabilities=None, *, approved_first=False, blocker_first=False):
+    rows = tuple(capabilities or _audit_capabilities())
+    return evaluate_business_governance_gate(tuple(
+        BusinessGateCapability(
+            capability_key=item.capability_key,
+            capability_version_gid=item.capability_version_gid,
+            definition_hash=item.business_definition_hash,
+            approved_definition_hash=item.business_definition_hash if approved_first and index == 0 else None,
+            human_approved=approved_first and index == 0,
+            deterministic_blockers=("forged_blocker",) if blocker_first and index == 0 else (),
+            change_kind="unchanged_legacy",
+        )
+        for index, item in enumerate(rows)
+    ), catalog_binding={
+        "catalog_release_id": "catalog-r9", "catalog_hash": CATALOG_HASH,
+        "projection_hash": "sha256:" + "9" * 64,
+    })
+
+
 def _context(*, super_admin: bool = False) -> CapabilityContext:
     identity = ConsumerIdentity(
         actor=ActorIdentity(
@@ -52,21 +84,13 @@ def _context(*, super_admin: bool = False) -> CapabilityContext:
 
 
 def _report(*, snapshot_gid: str = "100", source_revision: str = SOURCE_REVISION):
-    capabilities = tuple(
-        AuditCapability(
-            capability_id=f"craft.review.item_{index:03d}", major_version=1,
-            domain="craft", maturity="L1", semantic_class="write",
-            capability_version_gid=str(1000 + index),
-            business_definition_hash=f"sha256:{index:064x}",
-            snapshot_capability_version_gid=str(1000 + index),
-        )
-        for index in range(495)
-    )
+    capabilities = _audit_capabilities()
     findings = tuple(
         AuditEvidence(
             reason_code="business_rules_missing", capability_id=item.capability_id,
             major_version=1, domain="craft", layer="C",
             evidence_ref=f"catalog:{index}", remediation_family="declare_business_rule",
+            related_capability_keys=(item.capability_key,), related_domains=("craft",),
         )
         for index, item in enumerate(capabilities)
     )
@@ -87,15 +111,7 @@ def _report(*, snapshot_gid: str = "100", source_revision: str = SOURCE_REVISION
         )
         for index in range(205)
     )
-    gate = evaluate_business_governance_gate(tuple(
-        BusinessGateCapability(
-            capability_key=item.capability_key,
-            capability_version_gid=item.capability_version_gid,
-            definition_hash=item.business_definition_hash,
-            change_kind="unchanged_legacy",
-        )
-        for item in capabilities
-    ))
+    gate = _canonical_gate(capabilities)
     return audit(
         findings, capabilities=capabilities, snapshot_gid=snapshot_gid,
         source_revisions={"backend": source_revision, "web": WEB_REVISION, "source": source_revision},
@@ -107,12 +123,26 @@ class _RunStore:
     def __init__(self) -> None:
         capabilities = tuple(SimpleNamespace(
             capability_id=f"craft.review.item_{index:03d}", major_version=1,
-            owner_domain="craft", descriptor={"business_definition_hash": f"sha256:{index:064x}"},
+            owner_domain="craft", semantic_class="write", business_effect="",
+            lifecycle_status="stable", business_rules=(), business_layer_evidence={},
+            business_maturity=SimpleNamespace(level="L1", reason_codes=()),
+            descriptor={
+                "business_definition_hash": f"sha256:{index:064x}",
+                "capability_version_gid": str(1000 + index),
+            },
         ) for index in range(495))
         entries = tuple(SimpleNamespace(
             capability_id=f"craft.review.item_{index:03d}", major_version=1,
-            capability_version_gid=1000 + index,
+            capability_version_gid=1000 + index, owner_domain="craft",
+            semantic_class="write", business_effect="", lifecycle_status="stable",
+            descriptor_hash=f"sha256:{index:064x}",
         ) for index in range(495))
+        nodes = tuple(SimpleNamespace(
+            canonical_key=f"provider:craft:{index:03d}", owner_domain="craft",
+            node_type="provider", source_path=f"plugins/craft/provider_{index:03d}.py",
+            source_symbol=f"Provider{index:03d}", http_method=None, route_path=None,
+            metadata={"public_entry": True, "source_line": index + 1},
+        ) for index in range(205))
         self.snapshot = SimpleNamespace(
             snapshot_gid=100,
             document=SimpleNamespace(
@@ -120,14 +150,33 @@ class _RunStore:
                 product_release_id="catalog-r9",
                 catalog_hash=CATALOG_HASH,
                 snapshot_hash="sha256:" + "e" * 64,
-                capabilities=capabilities, nodes=(), bindings=(), relations=(),
+                capabilities=capabilities, nodes=nodes, bindings=(), relations=(),
             ),
             entries=entries,
         )
+        self.findings = tuple({
+            "code": "business_rules_missing", "reason_code": "business_rules_missing",
+            "severity": "warning", "status": "open", "fingerprint": f"finding-{index:03d}",
+            "remediation_boundary": "declare_business_rule", "layer": "C",
+            "subject_version_gids": (1000 + index,), "evidence": (f"catalog:{index}",),
+        } for index in range(495))
+        self.relations = tuple(SimpleNamespace(
+            candidate_hash=f"relation-{index:03d}", relation_type="overlap",
+            source="deterministic" if index % 2 == 0 else "advisory",
+            capability_keys=(f"craft.review.item_{index:03d}@1",),
+            evidence={"reason": f"evidence-{index}", "token": "must-not-cross"},
+            status="pending_review",
+        ) for index in range(205))
         self.runs: dict[str, GovernedRun] = {}
 
     def get_snapshot(self, snapshot_gid: int):
         return self.snapshot if snapshot_gid == 100 else None
+
+    def get_findings(self, snapshot_gid: int):
+        return self.findings if snapshot_gid == 100 else ()
+
+    def list_relation_candidates(self, snapshot_gid: int):
+        return self.relations if snapshot_gid == 100 else ()
 
     def save_governed_run(self, run: GovernedRun) -> None:
         self.runs[run.run_gid] = run
@@ -140,6 +189,7 @@ def _run_report(store: _RunStore, report=None) -> tuple[CapabilityGovernanceServ
     service = CapabilityGovernanceService(
         store, analysis_runner=lambda snapshot, request: report or _report(),
         web_revision_provider=lambda: WEB_REVISION,
+        business_gate_provider=lambda snapshot: _canonical_gate(),
     )
     accepted = service.base_capability_analysis_run(
         {"target_gid": "100", "web_revision": WEB_REVISION, "idempotency_key": "task9-analysis"}, _context(),
@@ -269,7 +319,11 @@ def test_business_audit_large_collections_have_collection_scoped_stable_cursors(
 )
 def test_analysis_result_rejects_arbitrary_or_stale_runner_output(runner_result):
     store = _RunStore()
-    service = CapabilityGovernanceService(store, analysis_runner=lambda snapshot, request: runner_result)
+    service = CapabilityGovernanceService(
+        store, analysis_runner=lambda snapshot, request: runner_result,
+        web_revision_provider=lambda: WEB_REVISION,
+        business_gate_provider=lambda snapshot: _canonical_gate(),
+    )
 
     with pytest.raises(CapabilityBusinessError, match="governance_result_invalid"):
         service.base_capability_analysis_run(
@@ -294,7 +348,11 @@ def test_analysis_result_rejects_arbitrary_or_stale_runner_output(runner_result)
 )
 def test_analysis_result_rejects_invalid_types_counts_and_relation_enums(report):
     store = _RunStore()
-    service = CapabilityGovernanceService(store, analysis_runner=lambda snapshot, request: report)
+    service = CapabilityGovernanceService(
+        store, analysis_runner=lambda snapshot, request: report,
+        web_revision_provider=lambda: WEB_REVISION,
+        business_gate_provider=lambda snapshot: _canonical_gate(),
+    )
 
     with pytest.raises(CapabilityBusinessError, match="governance_result_invalid"):
         service.base_capability_analysis_run(
@@ -328,6 +386,8 @@ def test_analysis_result_rejects_invalid_types_counts_and_relation_enums(report)
 def test_analysis_result_reconciles_every_aggregate_and_stable_identity(report):
     service = CapabilityGovernanceService(
         _RunStore(), analysis_runner=lambda snapshot, request: report,
+        web_revision_provider=lambda: WEB_REVISION,
+        business_gate_provider=lambda snapshot: _canonical_gate(),
     )
 
     with pytest.raises(CapabilityBusinessError, match="governance_result_invalid"):
@@ -353,6 +413,7 @@ def test_analysis_result_recomputes_every_review_queue_field(field, value):
     service = CapabilityGovernanceService(
         _RunStore(), analysis_runner=lambda snapshot, request: report,
         web_revision_provider=lambda: WEB_REVISION,
+        business_gate_provider=lambda snapshot: _canonical_gate(),
     )
 
     with pytest.raises(CapabilityBusinessError, match="governance_result_invalid"):
@@ -373,6 +434,7 @@ def test_analysis_result_cannot_replace_authoritative_snapshot_capability_and_ma
     service = CapabilityGovernanceService(
         _RunStore(), analysis_runner=lambda snapshot, request: report,
         web_revision_provider=lambda: WEB_REVISION,
+        business_gate_provider=lambda snapshot: _canonical_gate(),
     )
 
     with pytest.raises(CapabilityBusinessError, match="governance_result_invalid"):
@@ -381,11 +443,56 @@ def test_analysis_result_cannot_replace_authoritative_snapshot_capability_and_ma
         }, _context())
 
 
+@pytest.mark.parametrize("tamper", (
+    "maturity", "layers", "domain", "reason_code", "relation_source",
+    "gate_approved_hash", "gate_blockers",
+))
+def test_analysis_result_rebuilds_full_report_from_snapshot_store_and_trusted_gate(tamper):
+    report = _report()
+    capabilities = report.audit_capabilities
+    findings = report.findings
+    relations = report.relations
+    gate = _canonical_gate()
+    if tamper == "maturity":
+        capabilities = (replace(capabilities[0], maturity="L2"),) + capabilities[1:]
+    elif tamper == "layers":
+        capabilities = (replace(capabilities[0], layer_evidence={"A": ("forged",)}),) + capabilities[1:]
+    elif tamper == "domain":
+        capabilities = (replace(capabilities[0], domain="forged"),) + capabilities[1:]
+        findings = (replace(findings[0], domain="forged", related_domains=("forged",)),) + findings[1:]
+    elif tamper == "reason_code":
+        findings = (replace(
+            findings[0], reason_code="forged_reason", remediation_family="forged_family",
+        ),) + findings[1:]
+    elif tamper == "relation_source":
+        relations = (replace(relations[0], source="advisory"),) + relations[1:]
+    elif tamper == "gate_approved_hash":
+        gate = _canonical_gate(approved_first=True)
+    elif tamper == "gate_blockers":
+        gate = _canonical_gate(blocker_first=True)
+    report = audit(
+        findings, capabilities=capabilities, snapshot_gid=report.snapshot_gid,
+        source_revisions=report.source_revisions, relations=relations,
+        unbound_entries=report.unbound_entries, gate_result=gate,
+    )
+    service = CapabilityGovernanceService(
+        _RunStore(), analysis_runner=lambda snapshot, request: report,
+        web_revision_provider=lambda: WEB_REVISION,
+        business_gate_provider=lambda snapshot: _canonical_gate(),
+    )
+
+    with pytest.raises(CapabilityBusinessError, match="governance_result_invalid"):
+        service.base_capability_analysis_run({
+            "target_gid": "100", "idempotency_key": f"coordinated-{tamper}",
+        }, _context())
+
+
 def test_enriched_analysis_rejects_missing_or_incomplete_gate_rows():
     report = _report()
     service = CapabilityGovernanceService(
         _RunStore(), analysis_runner=lambda snapshot, request: replace(report, governance_capabilities=()),
         web_revision_provider=lambda: WEB_REVISION,
+        business_gate_provider=lambda snapshot: _canonical_gate(),
     )
 
     with pytest.raises(CapabilityBusinessError, match="governance_result_invalid"):
@@ -399,6 +506,7 @@ def test_enriched_analysis_uses_server_owned_web_and_exact_catalog_binding():
     service = CapabilityGovernanceService(
         store, analysis_runner=lambda snapshot, request: _report(),
         web_revision_provider=lambda: WEB_REVISION,
+        business_gate_provider=lambda snapshot: _canonical_gate(),
     )
 
     accepted = service.base_capability_analysis_run({
@@ -431,6 +539,7 @@ def test_enriched_analysis_fails_closed_without_server_web_binding_but_run_only_
     enriched = CapabilityGovernanceService(
         _RunStore(), analysis_runner=lambda snapshot, request: _report(),
         web_revision_provider=lambda: None,
+        business_gate_provider=lambda snapshot: _canonical_gate(),
     )
     with pytest.raises(CapabilityBusinessError, match="governance_result_invalid"):
         enriched.base_capability_analysis_run({
@@ -575,6 +684,27 @@ def test_proposal_detail_projects_exact_version_business_contract_and_closed_red
     assert [item["candidate_hash"] for item in evidence["deterministic_relation_candidates"]] == ["kept"]
     assert "hidden" not in repr(evidence)
     assert "must-not-cross" not in repr(evidence)
+
+
+@pytest.mark.parametrize(("field", "source"), (
+    ("deterministic_relation_candidates", "advisory"),
+    ("ai_advisory_relation_candidates", "deterministic"),
+    ("deterministic_relation_candidates", "unknown"),
+))
+def test_proposal_contract_binds_relation_source_to_its_category(field, source):
+    service = _proposal_service(_ProposalStore())
+    projected = _safe_response(
+        "base.capability_proposal.search",
+        service.base_capability_proposal_search({"limit": 1}, _context(super_admin=True)),
+    )
+    evidence = projected["items"][0]["review_evidence"]
+    relation = dict(evidence["deterministic_relation_candidates"][0], source=source)
+    evidence["deterministic_relation_candidates"] = []
+    evidence["ai_advisory_relation_candidates"] = []
+    evidence[field] = [relation]
+
+    with pytest.raises(ValueError):
+        validate_payload(OUTPUT_SCHEMAS["base.capability_proposal.search"], projected, label="output")
 
 
 def test_proposal_detail_fails_closed_when_proposal_hash_no_longer_matches_pinned_contract():

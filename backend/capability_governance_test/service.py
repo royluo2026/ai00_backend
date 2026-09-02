@@ -12,12 +12,16 @@ import re
 
 from backend.capabilities.models_next import CapabilityBusinessError
 from backend.capability_v2.contracts import ConsumerIdentity, ConsumerType
+from backend.capability_v2.release_gate import (
+    BusinessGateCapability, BusinessGateResult, evaluate_business_governance_gate,
+)
 from backend.domain_ports.capability_governance_ai import GovernanceAdvisorPort
 
 from .ai_advisory import AdvisoryContractError, AdvisoryResult
 from .analysis import AnalysisRequest, run_deterministic_analysis
 from .business_audit import (
-    BusinessAuditReport, LAYERS, MATURITY_LEVELS, validate_business_audit_report,
+    BusinessAuditReport, LAYERS, MATURITY_LEVELS, audit, collect_business_audit,
+    validate_business_audit_report,
 )
 from .business_relations import analyze_relationships
 from .prompting import PromptAuthorizationError, RedactedPrompt, _render_repair_prompt
@@ -621,6 +625,7 @@ class CapabilityGovernanceService:
         release_evidence_port: Any | None = None,
         workflow_port: Any | None = None,
         web_revision_provider: Callable[[], str | None] | None = None,
+        business_gate_provider: Callable[[Any], BusinessGateResult | None] | None = None,
     ) -> None:
         self._store = store
         self._scanner = scanner
@@ -630,6 +635,7 @@ class CapabilityGovernanceService:
         self._advisor = advisor
         self._audit_sink = audit_sink
         self._web_revision_provider = web_revision_provider
+        self._business_gate_provider = business_gate_provider
         self._runs: dict[tuple[str, str, str], GovernedRun] = {}
         self._prompt_records: dict[str, dict[str, str]] = {}
         self._prompt_texts: dict[str, str] = {}
@@ -1697,9 +1703,8 @@ class CapabilityGovernanceService:
             raise _business_error("governance_dependency_unavailable")
         return value
 
-    @staticmethod
     def _analysis_run_result(
-        raw_result: Any, snapshot: Any, *, expected_web_revision: str | None,
+        self, raw_result: Any, snapshot: Any, *, expected_web_revision: str | None,
     ) -> Mapping[str, Any] | None:
         if isinstance(raw_result, BusinessAuditReport):
             report = raw_result
@@ -1710,12 +1715,72 @@ class CapabilityGovernanceService:
         else:
             return None
         try:
-            audit_result = _business_audit_result(
+            canonical = self._canonical_business_audit(
                 report, snapshot, expected_web_revision=expected_web_revision,
+            )
+            audit_result = _business_audit_result(
+                canonical, snapshot, expected_web_revision=expected_web_revision,
             )
         except (AttributeError, KeyError, TypeError, ValueError) as exc:
             raise _business_error("governance_result_invalid") from exc
         return MappingProxyType({"business_audit": audit_result})
+
+    def _canonical_business_audit(
+        self, report: BusinessAuditReport, snapshot: Any, *, expected_web_revision: str | None,
+    ) -> BusinessAuditReport:
+        provider = self._business_gate_provider
+        if provider is None:
+            raise ValueError("business_audit_gate_provider_unavailable")
+        gate = provider(snapshot)
+        if not isinstance(gate, BusinessGateResult):
+            raise ValueError("business_audit_gate_invalid")
+        document = getattr(snapshot, "document", snapshot)
+        binding = dict(gate.catalog_binding)
+        if (
+            set(binding) != {"catalog_release_id", "catalog_hash", "projection_hash"}
+            or binding["catalog_release_id"] != str(getattr(document, "product_release_id", ""))
+            or binding["catalog_hash"] != str(getattr(document, "catalog_hash", ""))
+        ):
+            raise ValueError("business_audit_gate_invalid")
+        candidates = []
+        for row in gate.capabilities:
+            approval_blocker = f"business_definition_approval_missing:{row.capability_key}"
+            candidates.append(BusinessGateCapability(
+                capability_key=row.capability_key,
+                capability_version_gid=row.capability_version_gid,
+                definition_hash=row.definition_hash,
+                approved_definition_hash=row.approved_definition_hash,
+                change_kind=row.change_kind,
+                human_approved=row.human_approved,
+                runtime_verified=row.runtime_verified,
+                deterministic_blockers=tuple(
+                    blocker for blocker in row.blockers if blocker != approval_blocker
+                ),
+            ))
+        if evaluate_business_governance_gate(
+            candidates, catalog_binding=binding,
+        ).serialized() != gate.serialized():
+            raise ValueError("business_audit_gate_invalid")
+        source_revisions = dict(report.source_revisions)
+        base = collect_business_audit(
+            self, snapshot_gid=str(getattr(snapshot, "snapshot_gid", "")),
+            source_revisions=source_revisions,
+        )
+        canonical = audit(
+            base.findings, capabilities=base.audit_capabilities,
+            snapshot_gid=base.snapshot_gid, source_revisions=source_revisions,
+            relations=base.relations, unbound_entries=base.unbound_entries,
+            gate_result=gate,
+        )
+        if (
+            report.to_dict() != canonical.to_dict()
+            or tuple(report.audit_capabilities) != tuple(canonical.audit_capabilities)
+            or tuple(
+                item.serialized() for item in report.governance_capabilities
+            ) != tuple(item.serialized() for item in canonical.governance_capabilities)
+        ):
+            raise ValueError("business_audit_snapshot_report_mismatch")
+        return canonical
 
     def _persist_governed_run(self, run: GovernedRun) -> None:
         saver = getattr(self._store, "save_governed_run", None) if self._store is not None else None
