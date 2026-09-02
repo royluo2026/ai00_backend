@@ -232,8 +232,10 @@ def test_scanner_binds_explicit_capability_legacy_api(tmp_path: Path, valid_fixt
     )
 
 
-def test_scanner_binds_explicit_acceptance_manifest_cases(valid_fixture: Path) -> None:
+def test_scanner_binds_explicit_acceptance_manifest_cases(tmp_path: Path, valid_fixture: Path) -> None:
     """Only executable manifest node ids create tested_by evidence."""
+    root = tmp_path / "acceptance-manifest"
+    shutil.copytree(valid_fixture, root)
     manifest = {
         "schema_version": 1,
         "catalog_release": "product-fixture",
@@ -247,18 +249,21 @@ def test_scanner_binds_explicit_acceptance_manifest_cases(valid_fixture: Path) -
             },
         },
     }
+    manifest_path = root / "acceptance.json"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
 
     document = GovernanceScanner(
         GovernanceSettings(
             deployment_profile="test-governance",
-            repository_root=valid_fixture,
+            repository_root=root,
             allowlisted_relative_roots=("plugins",),
         ),
-        product_catalog=json.loads((valid_fixture / "product_catalog.json").read_text(encoding="utf-8")),
-        extension_catalog=json.loads((valid_fixture / "extension_catalog.json").read_text(encoding="utf-8")),
-        domain_manifests=json.loads((valid_fixture / "official_domains.json").read_text(encoding="utf-8")),
+        product_catalog=json.loads((root / "product_catalog.json").read_text(encoding="utf-8")),
+        extension_catalog=json.loads((root / "extension_catalog.json").read_text(encoding="utf-8")),
+        domain_manifests=json.loads((root / "official_domains.json").read_text(encoding="utf-8")),
         registry_snapshot=_fixture_registry(),
         acceptance_manifest=manifest,
+        acceptance_manifest_path="acceptance.json",
     ).scan(code_revision="fixture-acceptance")
 
     test_nodes = [node for node in document.nodes if node.node_type == "test_case"]

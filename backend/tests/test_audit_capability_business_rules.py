@@ -191,9 +191,6 @@ def test_stable_scan_records_exact_clean_backend_and_web_revisions():
 
 
 def _acceptance_fixture(tmp_path: Path, *, tracked_source: bool = True):
-    from backend.capability_governance_test.config import GovernanceSettings
-    from backend.capability_governance_test.scanner import GovernanceScanner
-
     source_fixture = Path(__file__).parent / "fixtures/capability_governance_scan/valid"
     root = tmp_path / "acceptance-provenance"
     shutil.copytree(source_fixture, root)
@@ -215,14 +212,48 @@ def _acceptance_fixture(tmp_path: Path, *, tracked_source: bool = True):
     if not tracked_source:
         subprocess.run(("git", "reset", "--", "acceptance/test_external.py"), cwd=root, check=True)
     subprocess.run(("git", "commit", "-m", "fixture"), cwd=root, check=True, capture_output=True)
+    scanner = _acceptance_scanner(root, manifest)
+    return root, scanner, acceptance_source, node_id
+
+
+def _acceptance_scanner(root: Path, manifest, *, manifest_path: str = "acceptance.json"):
+    from backend.capability_governance_test.config import GovernanceSettings
+    from backend.capability_governance_test.scanner import GovernanceScanner
+
     scanner = GovernanceScanner(
         GovernanceSettings("test-governance", root, ("plugins",)),
         product_catalog=json.loads((root / "product_catalog.json").read_text(encoding="utf-8")),
         extension_catalog=json.loads((root / "extension_catalog.json").read_text(encoding="utf-8")),
         domain_manifests=json.loads((root / "official_domains.json").read_text(encoding="utf-8")),
-        acceptance_manifest=manifest, acceptance_manifest_path="acceptance.json",
+        acceptance_manifest=manifest, acceptance_manifest_path=manifest_path,
     )
-    return root, scanner, acceptance_source, node_id
+    return scanner
+
+
+def _symlink_or_skip(link: Path, target: Path, *, target_is_directory: bool = False) -> None:
+    try:
+        link.symlink_to(target, target_is_directory=target_is_directory)
+        return
+    except (NotImplementedError, OSError) as exc:
+        if os.name == "nt" and target_is_directory:
+            junction = subprocess.run(
+                ("cmd", "/c", "mklink", "/J", str(link), str(target)),
+                capture_output=True,
+                text=True,
+            )
+            if junction.returncode == 0:
+                return
+        pytest.skip(f"host cannot create test symlink: {exc}")
+
+
+def _assert_acceptance_reference_rejected(scanner) -> None:
+    from backend.capability_governance_test.scanner import ScanPolicyError
+
+    with pytest.raises(ScanPolicyError, match="acceptance_manifest_case_invalid"):
+        scanner.source_input_paths()
+    document = scanner.scan("a" * 40)
+    assert document.scan_status == "blocked"
+    assert document.scan_findings[0].message == "acceptance_manifest_case_invalid"
 
 
 def test_scanner_discovery_includes_and_scan_hashes_acceptance_manifest_source(tmp_path):
@@ -238,20 +269,164 @@ def test_scanner_discovery_includes_and_scan_hashes_acceptance_manifest_source(t
     assert node.artifact_hash == expected
 
 
+def test_acceptance_source_rejects_final_file_symlink_before_resolution(tmp_path):
+    root, _scanner, source, node_id = _acceptance_fixture(tmp_path)
+    alias = source.with_name("test_alias.py")
+    _symlink_or_skip(alias, source)
+    manifest = {
+        "capabilities": {
+            "craft.bop.factory.create@1": {"success": node_id.replace("test_external.py", "test_alias.py")},
+        },
+    }
+
+    _assert_acceptance_reference_rejected(_acceptance_scanner(root, manifest))
+
+
+def test_acceptance_source_rejects_symlinked_directory_component(tmp_path):
+    root, _scanner, _source, node_id = _acceptance_fixture(tmp_path)
+    alias = root / "acceptance-alias"
+    _symlink_or_skip(alias, root / "acceptance", target_is_directory=True)
+    manifest = {
+        "capabilities": {
+            "craft.bop.factory.create@1": {
+                "success": node_id.replace("acceptance/test_external.py", "acceptance-alias/test_external.py"),
+            },
+        },
+    }
+
+    _assert_acceptance_reference_rejected(_acceptance_scanner(root, manifest))
+
+
+def test_acceptance_manifest_rejects_symlink_identity_before_resolution(tmp_path):
+    root, _scanner, _source, _node_id = _acceptance_fixture(tmp_path)
+    alias = root / "acceptance-alias.json"
+    _symlink_or_skip(alias, root / "acceptance.json")
+    manifest = json.loads((root / "acceptance.json").read_text(encoding="utf-8"))
+
+    _assert_acceptance_reference_rejected(
+        _acceptance_scanner(root, manifest, manifest_path="acceptance-alias.json"),
+    )
+
+
+@pytest.mark.parametrize(
+    "alias_path",
+    (
+        "acceptance/test_external.py",
+        "acceptance/./test_external.py",
+        "acceptance/nested/../test_external.py",
+        pytest.param(
+            r"acceptance\test_external.py",
+            marks=pytest.mark.skipif(os.name != "nt", reason="backslash is a path separator only on Windows"),
+        ),
+    ),
+)
+def test_acceptance_rejects_duplicate_canonical_source_and_exact_symbol(tmp_path, alias_path):
+    root, _scanner, _source, node_id = _acceptance_fixture(tmp_path)
+    _path, separator, symbol = node_id.partition("::")
+    manifest = {
+        "capabilities": {
+            "craft.bop.factory.create@1": {
+                "success": node_id,
+                "forbidden": f"{alias_path}{separator}{symbol}",
+            },
+        },
+    }
+
+    _assert_acceptance_reference_rejected(_acceptance_scanner(root, manifest))
+
+
+@pytest.mark.parametrize(
+    "alias_path",
+    (
+        "acceptance/./test_external.py",
+        "acceptance/nested/../test_external.py",
+        pytest.param(
+            r"acceptance\test_external.py",
+            marks=pytest.mark.skipif(os.name != "nt", reason="backslash is a path separator only on Windows"),
+        ),
+    ),
+)
+def test_acceptance_canonicalizes_safe_source_alias_for_node_and_fingerprint(tmp_path, alias_path):
+    root, _scanner, source, node_id = _acceptance_fixture(tmp_path)
+    _path, separator, symbol = node_id.partition("::")
+    canonical_node_id = f"acceptance/test_external.py{separator}{symbol}"
+    manifest = {
+        "capabilities": {
+            "craft.bop.factory.create@1": {"success": f"{alias_path}{separator}{symbol}"},
+        },
+    }
+    scanner = _acceptance_scanner(root, manifest)
+
+    assert "acceptance/test_external.py" in scanner.source_input_paths()
+    document = scanner.scan("a" * 40)
+    node = next(item for item in document.nodes if item.node_type == "test_case")
+    assert node.source_path == "acceptance/test_external.py"
+    assert node.source_symbol == canonical_node_id
+    assert node.metadata["test_node_id"] == canonical_node_id
+    assert node.artifact_hash == "sha256:" + hashlib.sha256(
+        source.read_text(encoding="utf-8").encode("utf-8"),
+    ).hexdigest()
+
+
+def test_acceptance_allows_distinct_exact_symbols_in_one_canonical_source(tmp_path):
+    root, _scanner, _source, node_id = _acceptance_fixture(tmp_path)
+    other_node_id = node_id.replace("test_success_case", "test_forbidden_case")
+    manifest = {
+        "capabilities": {
+            "craft.bop.factory.create@1": {
+                "success": node_id,
+                "forbidden": other_node_id,
+            },
+        },
+    }
+    document = _acceptance_scanner(root, manifest).scan("a" * 40)
+
+    assert document.scan_status == "completed"
+    assert {
+        item.source_symbol
+        for item in document.nodes
+        if item.node_type == "test_case" and item.source_path == "acceptance/test_external.py"
+    } == {node_id, other_node_id}
+
+
+def test_production_acceptance_manifest_keeps_all_3353_unique_references_valid():
+    from backend.capability_governance_test.config import GovernanceSettings
+    from backend.capability_governance_test.scanner import GovernanceScanner
+
+    root = Path(__file__).parents[2]
+    manifest_path = root / "backend/tests/acceptance/fixtures/case-manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert sum(len(cases) for cases in manifest["capabilities"].values()) == 3353
+    scanner = GovernanceScanner(
+        GovernanceSettings("test-governance", root),
+        acceptance_manifest=manifest,
+        acceptance_manifest_path=manifest_path.relative_to(root).as_posix(),
+    )
+
+    assert scanner.acceptance_input_paths() == (
+        "backend/tests/acceptance/fixtures/case-manifest.json",
+        "backend/tests/acceptance/test_mandatory_cases.py",
+    )
+
+
+@pytest.mark.parametrize("relative_path", ("acceptance.json", "acceptance/test_external.py"))
 @pytest.mark.parametrize("staged", (False, True))
-def test_acceptance_source_staged_and_unstaged_mutation_fail_provenance(tmp_path, staged):
+def test_acceptance_manifest_and_source_staged_and_unstaged_mutation_fail_provenance(
+    tmp_path, staged, relative_path,
+):
     from backend.scripts import audit_capability_business_rules as command
 
-    root, scanner, source, _node_id = _acceptance_fixture(tmp_path)
+    root, scanner, _source, _node_id = _acceptance_fixture(tmp_path)
     clean = command._capture_provenance(
         root, source_roots=scanner.source_roots(), input_paths=scanner.source_input_paths(),
     )
     assert clean.revision == subprocess.run(
         ("git", "rev-parse", "HEAD"), cwd=root, check=True, capture_output=True, text=True,
     ).stdout.strip()
-    source.write_text("def test_success_case():\n    assert False\n", encoding="utf-8")
+    source = root / relative_path
+    source.write_text(source.read_text(encoding="utf-8") + "\n", encoding="utf-8")
     if staged:
-        subprocess.run(("git", "add", "acceptance/test_external.py"), cwd=root, check=True)
+        subprocess.run(("git", "add", relative_path), cwd=root, check=True)
     with pytest.raises(RuntimeError, match="business_audit_relevant_tree_dirty"):
         command._capture_provenance(
             root, source_roots=scanner.source_roots(), input_paths=scanner.source_input_paths(),

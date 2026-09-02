@@ -4,6 +4,7 @@ from __future__ import annotations
 import ast
 import hashlib
 import re
+import stat
 from collections import defaultdict
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, replace
@@ -614,24 +615,44 @@ class GovernanceScanner:
         return tuple(sorted(paths))
 
     def _resolve_repository_input(self, relative_path: str, *, source_only: bool) -> tuple[str, Path]:
-        pure = PurePosixPath(relative_path)
-        if (
-            not relative_path or pure.is_absolute() or Path(relative_path).is_absolute()
-            or ".." in pure.parts
-        ):
-            raise ScanPolicyError("acceptance_manifest_case_invalid")
-        source = (self.settings.repository_root / Path(pure)).resolve()
         try:
-            source.relative_to(self.settings.repository_root.resolve())
-        except ValueError as exc:
+            raw = Path(relative_path)
+            if not relative_path or raw.is_absolute() or raw.drive or PurePosixPath(relative_path).is_absolute():
+                raise ValueError
+            parts: list[str] = []
+            for part in raw.parts:
+                if part in {"", "."}:
+                    continue
+                if part == "..":
+                    if not parts:
+                        raise ValueError
+                    parts.pop()
+                else:
+                    parts.append(part)
+            if not parts:
+                raise ValueError
+            repository = self.settings.repository_root.resolve(strict=True)
+            source = repository.joinpath(*parts)
+            current = repository
+            reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0)
+            for part in parts:
+                current /= part
+                file_stat = current.lstat()
+                if stat.S_ISLNK(file_stat.st_mode) or (
+                    reparse_flag and getattr(file_stat, "st_file_attributes", 0) & reparse_flag
+                ):
+                    raise ValueError
+            source = source.resolve(strict=True)
+            source.relative_to(repository)
+        except (OSError, TypeError, ValueError) as exc:
             raise ScanPolicyError("acceptance_manifest_case_invalid") from exc
         valid = (
-            self.is_source_input_file(source, self.settings.repository_root)
+            self.is_source_input_file(source, repository)
             if source_only else self._is_safe_repository_input(source)
         )
         if not valid:
             raise ScanPolicyError("acceptance_manifest_case_invalid")
-        return source.relative_to(self.settings.repository_root).as_posix(), source
+        return source.relative_to(repository).as_posix(), source
 
     @staticmethod
     def _is_safe_repository_input(path: Path) -> bool:
@@ -647,12 +668,13 @@ class GovernanceScanner:
     ) -> tuple[tuple[str, str, str, str, str, Path], ...]:
         if self._acceptance_manifest is None:
             return ()
+        self._resolve_repository_input(self._acceptance_manifest_path, source_only=False)
         manifest = _json_document(self._acceptance_manifest)
         declared = manifest.get("capabilities")
         if not isinstance(declared, Mapping):
             raise ScanPolicyError("acceptance_manifest_invalid")
         references: list[tuple[str, str, str, str, str, Path]] = []
-        seen_node_ids: set[str] = set()
+        seen_references: set[tuple[str, str]] = set()
         for raw_key, raw_cases in sorted(declared.items(), key=lambda item: str(item[0])):
             if not isinstance(raw_key, str) or not isinstance(raw_cases, Mapping):
                 raise ScanPolicyError("acceptance_manifest_capability_invalid")
@@ -662,12 +684,16 @@ class GovernanceScanner:
                 source_path, separator, source_symbol = raw_node_id.partition("::")
                 if (
                     not separator or not source_symbol.startswith("test_")
-                    or not source_path.endswith(".py") or raw_node_id in seen_node_ids
+                    or not source_path.endswith(".py")
                 ):
                     raise ScanPolicyError("acceptance_manifest_case_invalid")
-                seen_node_ids.add(raw_node_id)
                 relative_source, source = self._resolve_repository_input(source_path, source_only=True)
-                references.append((raw_key, case_name, raw_node_id, relative_source, source_symbol, source))
+                identity = (relative_source, source_symbol)
+                if identity in seen_references:
+                    raise ScanPolicyError("acceptance_manifest_case_invalid")
+                seen_references.add(identity)
+                canonical_node_id = f"{relative_source}::{source_symbol}"
+                references.append((raw_key, case_name, canonical_node_id, relative_source, source_symbol, source))
         return tuple(references)
 
     def acceptance_input_paths(self) -> tuple[str, ...]:
@@ -1185,6 +1211,9 @@ class GovernanceScanner:
         }
         bindings: list[CapabilityBinding] = []
         relations: list[ImplementationRelation] = []
+        acceptance_manifest_path, _manifest = self._resolve_repository_input(
+            self._acceptance_manifest_path, source_only=False,
+        )
         for raw_key, case_name, raw_node_id, relative_source, _source_symbol, source in self._acceptance_test_references():
             if raw_key not in by_key:
                 raise ScanPolicyError("acceptance_manifest_capability_invalid")
@@ -1206,7 +1235,7 @@ class GovernanceScanner:
                 metadata={
                     "case_type": case_name,
                     "test_node_id": raw_node_id,
-                    "acceptance_manifest": self._acceptance_manifest_path,
+                    "acceptance_manifest": acceptance_manifest_path,
                 },
             )
             bindings.append(self._binding(capability, key, "tested_by"))
