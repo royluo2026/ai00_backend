@@ -10,6 +10,7 @@ from backend.platform_sdk.ids import next_gid
 
 from ..data.connection import get_craft_conn
 from ..routers._bop._helpers import _check_line_editable, _log_entry_op
+from .resource_requirements import RESOURCE_TYPES_BY_LINK, validate_resource_link
 
 
 OPERATIONS = ("attach", "detach")
@@ -61,6 +62,8 @@ def apply_bop_entry_link_change(payload: dict[str, Any], context: CapabilityCont
                 raise CapabilityBusinessError("resource_not_found", f"BOP entry {entry_gid} does not exist")
             version_gid = entry.get("version_gid") if isinstance(entry, dict) else dict(entry)["version_gid"]
             _ensure_editable(cur, version_gid, entry_gid, context)
+            if link_type in RESOURCE_TYPES_BY_LINK:
+                validate_resource_link(link_type, entity_gid, cur)
             link_gid = str(next_gid())
             cur.execute(
                 "INSERT INTO workmanship_bop_bop_entry_links "
