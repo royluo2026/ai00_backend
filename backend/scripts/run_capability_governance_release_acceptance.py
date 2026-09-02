@@ -9,16 +9,22 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import base64
 import hashlib
+import inspect
 import json
 import os
 import re
 import sys
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime, timedelta
+from itertools import count
 from pathlib import Path
 from typing import Any
+
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -26,19 +32,39 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from backend.capability_governance_test.analysis import AnalysisRequest, run_deterministic_analysis
+from backend.capability_governance_test.business_models import CapabilityMaturity, RuleEffectivenessRecord
 from backend.capability_governance_test.contracts import ANALYZE_IDS, GOVERN_IDS, READ_IDS, RELEASE_IDS
-from backend.capability_governance_test.fingerprint import canonical_fingerprint
+from backend.capability_governance_test.fingerprint import canonical_fingerprint, snapshot_fingerprint
+from backend.capability_governance_test.models import CapabilityBinding, ImplementationNode, ScannedCapability, SnapshotDocument
 from backend.capability_governance_test.prompting import build_repair_prompt
 from backend.capability_governance_test.redaction import redact
 from backend.capability_governance_test.release_gate import ReleaseCandidate, ReleaseGate
+from backend.capability_governance_test.service import CapabilityGovernanceService
+from backend.capability_governance_test.store import MemoryGovernanceStore
 from backend.capability_governance_test.test_runner import RegisteredTestCase, run_fast_profile, run_release_e2e_profile
 from backend.capability_governance_test.workflow import ProposalService, ReviewerContext
-from backend.capability_v2.catalog import CatalogRelease, load_catalog_release
+from backend.capability_v2.catalog import (
+    CatalogRelease,
+    build_catalog_entry,
+    build_release,
+    complete_governance_metadata,
+    load_catalog_release,
+)
 from backend.capability_v2.catalog_overlay import compose_catalogs
+from backend.capability_v2.contracts import (
+    ActorIdentity,
+    BusinessInvariantContract,
+    ConsumerDescriptor,
+    ConsumerIdentity,
+    ConsumerType,
+    TenantIdentity,
+)
 from backend.capability_v2.release_gate import (
     evaluate_catalog_business_governance,
     load_legacy_baseline,
 )
+from backend.capabilities.models_next import CapabilityContext
+from backend.plugin_platform.signing import sign, verify
 from backend.scripts.check_frontend_deployment import check as check_frontend_deployment
 from backend.scripts.check_production_governance_exclusion import check_production_artifact
 from backend.scripts.generate_capability_governance_grants import render_grants
@@ -51,6 +77,7 @@ MANDATORY_SECTIONS = frozenset({
     "identity", "catalog_separation", "migration", "snapshot", "graph",
     "deterministic_findings", "permissions", "agent_delegation", "health",
     "workflow", "release_gate", "ai_redaction", "ui", "production_exclusion",
+    "business_control_loop",
 })
 _LIVE_REQUIRED = (
     "AI00_DEPLOYMENT_PROFILE", "AI00_GID_MACHINE_ID", "AI00_BASE_RUNTIME_DB_URL",
@@ -120,6 +147,363 @@ class FakeEnvironment:
             "AI00_DEPLOYMENT_PROFILE": "test-governance",
             "AI00_GID_MACHINE_ID": "41",
         }, root / "backend/tests/fixtures/capability_governance_production_artifact")
+
+
+@dataclass(frozen=True)
+class ControlledBusinessAnalysis:
+    machine_passed: bool
+    capability_version_gid: int
+    business_definition_hash: str
+
+
+class _ControlledScanner:
+    def __init__(self, document: SnapshotDocument) -> None:
+        self._document = document
+
+    def scan(self, code_revision: str) -> SnapshotDocument:
+        draft = replace(self._document, code_revision=code_revision, snapshot_hash="")
+        return replace(draft, snapshot_hash=snapshot_fingerprint(draft))
+
+
+def new_height_capability():
+    source = json.loads(
+        (ROOT / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
+    )
+    descriptor = load_catalog_release(source).descriptors[0]
+    invariant = BusinessInvariantContract(
+        rule_id="person.height.range",
+        version=1,
+        statement="Height must be between 0.3m and 2.5m.",
+        applies_when="A normalized height value is validated.",
+        enforcement_ref="backend.tests.integration.height:validate_height",
+        error_code="invalid_person_height",
+        test_refs=(
+            "backend/tests/integration/test_capability_business_governance_e2e.py::"
+            "test_new_capability_requires_exact_hash_super_admin_approval",
+        ),
+    )
+    descriptor = descriptor.model_copy(update={
+        "id": "agent.person_height.validate",
+        "capability_version_gid": None,
+        "title": "Validate person height",
+        "description": "Validate a normalized person height measurement.",
+        "business_effect": (
+            "Personnel records receive a normalized height measurement that is safe "
+            "for downstream planning."
+        ),
+        "business_acceptance_criteria": (
+            "A value from 0.3m through 2.5m is accepted.",
+            "A value outside the range is rejected with invalid_person_height.",
+        ),
+        "business_invariants": (invariant,),
+        "no_business_invariant_reason": None,
+        "api_refs": (),
+        "test_refs": (),
+    })
+    return complete_governance_metadata(
+        descriptor,
+        api_refs=(
+            "gateway:/api/v1/capabilities/agent.person_height.validate:invoke",
+        ),
+        test_refs=({
+            "test_type": "integration",
+            "test_node_id": (
+                "backend/tests/integration/"
+                "test_capability_business_governance_e2e.py::"
+                "test_new_capability_requires_exact_hash_super_admin_approval"
+            ),
+            "path": (
+                "backend/tests/integration/"
+                "test_capability_business_governance_e2e.py"
+            ),
+        },),
+    )
+
+
+class ControlledBusinessGovernanceRuntime:
+    """Test-only proof that existing governance components form one control loop."""
+
+    def __init__(self) -> None:
+        ids = count(1001)
+        self._store = MemoryGovernanceStore(next_ids=lambda: next(ids))
+        self._service: CapabilityGovernanceService | None = None
+        self._catalog: dict[str, Any] | None = None
+        self._snapshot = None
+        self._analysis: ControlledBusinessAnalysis | None = None
+        self._effectiveness_ids = count(5001)
+        self._reports = []
+        self._signed_payloads: dict[str, bytes] = {}
+        private_key = Ed25519PrivateKey.from_private_bytes(bytes(range(1, 33)))
+        self._private_key_pem = private_key.private_bytes(
+            serialization.Encoding.PEM,
+            serialization.PrivateFormat.PKCS8,
+            serialization.NoEncryption(),
+        ).decode("utf-8")
+        self._public_key_pem = private_key.public_key().public_bytes(
+            serialization.Encoding.PEM,
+            serialization.PublicFormat.SubjectPublicKeyInfo,
+        ).decode("utf-8")
+        report_ids = count(9001)
+        self._release_gate = ReleaseGate(
+            next_gid=lambda: next(report_ids),
+            signer=self._sign,
+            signing_key_id="controlled-business-governance",
+        )
+
+    @staticmethod
+    def _context(*, user: str = "acceptance", roles: tuple[str, ...] = ()) -> CapabilityContext:
+        identity = ConsumerIdentity(
+            actor=ActorIdentity(
+                user_id=user,
+                authentication_method="controlled-test",
+                authenticated_at=datetime(2026, 9, 2, tzinfo=UTC),
+            ),
+            tenant=TenantIdentity(
+                tenant_id="controlled-test", membership="member", active_roles=roles,
+            ),
+            consumer=ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="ai00.web"),
+        )
+        return CapabilityContext(user_gid=user, effective_identity=identity)
+
+    def _sign(self, payload: bytes) -> str:
+        signature = sign(self._private_key_pem, payload)
+        self._signed_payloads[signature] = payload
+        return signature
+
+    def scan(self, descriptor):
+        release = build_release((descriptor,), created_at=datetime(2026, 9, 2, tzinfo=UTC))
+        catalog = release.model_dump(mode="json")
+        row = build_catalog_entry(descriptor)
+        catalog["descriptors"] = [row]
+        self._catalog = catalog
+
+        input_hash = canonical_fingerprint(row["input_schema"])
+        output_hash = canonical_fingerprint(row["output_schema"])
+        error_hash = canonical_fingerprint(row["error_schema"])
+        policy_hash = canonical_fingerprint(row["authorization_policy"])
+        provider_hash = canonical_fingerprint(row["provider_ref"])
+        provider_key = f"provider:{row['id']}"
+        test_key = f"test:{row['id']}"
+        capability = ScannedCapability(
+            capability_id=row["id"],
+            major_version=int(row["major_version"]),
+            owner_domain=row["owner_domain"],
+            semantic_class=str(row["side_effect_level"]),
+            business_effect=row["business_effect"],
+            lifecycle_status=str(row["lifecycle_status"]),
+            descriptor_hash=canonical_fingerprint(row),
+            input_schema_hash=input_hash,
+            output_schema_hash=output_hash,
+            error_schema_hash=error_hash,
+            policy_hash=policy_hash,
+            provider_hash=provider_hash,
+            descriptor=row,
+            business_rules=tuple(row["business_invariants"]),
+            business_maturity=CapabilityMaturity("L4", ("machine_reviewed",)),
+        )
+        node = ImplementationNode(
+            canonical_key=provider_key,
+            owner_domain=row["owner_domain"],
+            node_type="provider",
+            source_path="backend/tests/integration/height.py",
+            artifact_hash=provider_hash,
+            source_symbol="validate_height",
+            metadata={
+                "input_schema_hash": input_hash,
+                "output_schema_hash": output_hash,
+                "error_schema_hash": error_hash,
+                "policy_hash": policy_hash,
+            },
+        )
+        test_node = ImplementationNode(
+            canonical_key=test_key,
+            owner_domain=row["owner_domain"],
+            node_type="test_case",
+            source_path=(
+                "backend/tests/integration/"
+                "test_capability_business_governance_e2e.py"
+            ),
+            artifact_hash=canonical_fingerprint({"test": row["id"]}),
+            source_symbol="test_new_capability_requires_exact_hash_super_admin_approval",
+        )
+        provider_binding = CapabilityBinding(
+            row["id"], int(row["major_version"]), provider_key,
+            "implemented_by", canonical_fingerprint((row["id"], provider_key)),
+        )
+        test_binding = CapabilityBinding(
+            row["id"], int(row["major_version"]), test_key,
+            "tested_by", canonical_fingerprint((row["id"], test_key)),
+        )
+        draft = SnapshotDocument(
+            product_release_id=catalog["release_id"],
+            catalog_hash=catalog["catalog_hash"],
+            extension_release_id=None,
+            code_revision="controlled",
+            snapshot_hash="",
+            capabilities=(capability,),
+            nodes=(node, test_node),
+            bindings=(provider_binding, test_binding),
+            relations=(),
+        )
+        document = replace(draft, snapshot_hash=snapshot_fingerprint(draft))
+        self._service = CapabilityGovernanceService(
+            self._store, scanner=_ControlledScanner(document),
+        )
+        result = self._service.base_capability_scan_run(
+            {"code_revision": "controlled-v25", "idempotency_key": "controlled-scan"},
+            self._context(),
+        )
+        self._snapshot = self._store.get_snapshot(int(result["snapshot_gid"]))
+        return self._snapshot
+
+    def analyze(self, snapshot_gid: int) -> ControlledBusinessAnalysis:
+        snapshot = self._require_snapshot(snapshot_gid)
+        result = run_deterministic_analysis(snapshot.document, AnalysisRequest())
+        blocking = any(item.severity in {"blocking", "critical"} for item in result.findings)
+        capability = snapshot.document.capabilities[0]
+        entry = snapshot.entries[0]
+        self._analysis = ControlledBusinessAnalysis(
+            machine_passed=result.status == "ok" and not blocking,
+            capability_version_gid=entry.capability_version_gid,
+            business_definition_hash=str(capability.descriptor["business_definition_hash"]),
+        )
+        return self._analysis
+
+    def approve(
+        self, *, snapshot, reviewer_role: str, definition_hash: str,
+        decision_reason: str,
+    ):
+        service = self._require_service()
+        analysis = self._require_analysis()
+        capability = snapshot.document.capabilities[0]
+        proposal = service.base_capability_proposal_submit({
+            "capability_id": capability.capability_id,
+            "capability_version_gid": str(analysis.capability_version_gid),
+            "base_snapshot_gid": str(snapshot.snapshot_gid),
+            "previous_hash": "sha256:" + "0" * 64,
+            "proposed_descriptor_hash": definition_hash,
+            "definition_hash": definition_hash,
+            "evidence_hash": snapshot.document.snapshot_hash,
+            "idempotency_key": "controlled-business-proposal",
+        }, self._context())["proposal"]
+        checking = service._proposals.transition(
+            proposal.proposal_gid, "checking", expected_row_version=proposal.row_version,
+            idempotency_key="controlled-business-checking",
+        )
+        pending = service._proposals.transition(
+            checking.proposal_gid, "pending_approval", expected_row_version=checking.row_version,
+            idempotency_key="controlled-business-pending",
+        )
+        service.base_capability_review_decide({
+            "proposal_gid": str(pending.proposal_gid),
+            "definition_hash": definition_hash,
+            "decision": "approved",
+            "decision_reason": decision_reason,
+            "row_version": str(pending.row_version),
+            "idempotency_key": "controlled-business-decision",
+        }, self._context(user="super-admin", roles=(reviewer_role,)))
+        review = self._store.current_business_review(
+            analysis.capability_version_gid, definition_hash,
+        )
+        if review is None:
+            raise RuntimeError("controlled_business_review_missing")
+        return review
+
+    def release(self, snapshot):
+        analysis = self._require_analysis()
+        catalog = self._require_catalog()
+        row = catalog["descriptors"][0]
+        key = f"{row['id']}@{row['major_version']}"
+        review = self._store.current_business_review(
+            analysis.capability_version_gid, analysis.business_definition_hash,
+        )
+        approvals = ({
+            (str(row["capability_version_gid"]), analysis.business_definition_hash):
+                analysis.business_definition_hash,
+        } if review is not None else {})
+        runtime_verified = bool(self._store.list_rule_effectiveness(
+            analysis.capability_version_gid, analysis.business_definition_hash,
+        ))
+        governance = evaluate_catalog_business_governance(
+            catalog,
+            {},
+            business_review_lookup=approvals,
+            runtime_verification={key: runtime_verified},
+        )
+        gate_inputs = {
+            "test_status": "passed",
+            "approvals_complete": True,
+            "data_complete": True,
+            "business_governance": governance,
+            "business_catalog": catalog,
+            "legacy_baseline": {},
+            "business_review_lookup": approvals,
+            "idempotency_key": f"controlled-release-{len(self._reports) + 1}",
+        }
+        gate_parameters = inspect.signature(self._release_gate.evaluate).parameters
+        if "static_gate_hash" in gate_parameters:
+            gate_inputs.update(
+                evidence_hash=snapshot.document.snapshot_hash,
+                static_gate_status="passed",
+                static_gate_hash=canonical_fingerprint({"controlled": True}),
+            )
+        report = self._release_gate.evaluate(
+            ReleaseCandidate(
+                "controlled-v25", catalog["release_id"], snapshot.snapshot_gid, 1,
+            ),
+            **gate_inputs,
+        )
+        self._reports.append(report)
+        return report
+
+    def verify_signature(self, report) -> bool:
+        payload = self._signed_payloads.get(report.signature)
+        if payload is None:
+            return False
+        if "sha256:" + hashlib.sha256(payload).hexdigest() != report.report_hash:
+            return False
+        try:
+            verify(self._public_key_pem, payload, report.signature)
+        except Exception:
+            return False
+        return True
+
+    def record_effectiveness(
+        self, *, capability_version_gid: int, definition_hash: str,
+        metric_name: str, metric_value: int,
+    ) -> None:
+        moment = datetime(2026, 9, 2, tzinfo=UTC)
+        self._store.save_rule_effectiveness(RuleEffectivenessRecord(
+            effectiveness_gid=next(self._effectiveness_ids),
+            capability_version_gid=capability_version_gid,
+            definition_hash=definition_hash,
+            metric_name=metric_name,
+            metric_value=metric_value,
+            evidence={"source": "controlled-e2e"},
+            measured_from=moment,
+            measured_to=moment,
+        ))
+
+    def _require_snapshot(self, snapshot_gid: int):
+        snapshot = self._store.get_snapshot(int(snapshot_gid))
+        if snapshot is None:
+            raise RuntimeError("controlled_snapshot_missing")
+        return snapshot
+
+    def _require_service(self) -> CapabilityGovernanceService:
+        if self._service is None:
+            raise RuntimeError("controlled_scan_required")
+        return self._service
+
+    def _require_analysis(self) -> ControlledBusinessAnalysis:
+        if self._analysis is None:
+            raise RuntimeError("controlled_analysis_required")
+        return self._analysis
+
+    def _require_catalog(self) -> dict[str, Any]:
+        if self._catalog is None:
+            raise RuntimeError("controlled_scan_required")
+        return self._catalog
 
 
 def _section(run) -> AcceptanceSection:
@@ -204,8 +588,48 @@ def _release_evidence() -> dict[str, Any]:
     return {"release_report_gid": gid_to_json(report.release_report_gid), "release_report_hash": report.report_hash, "stale_release": "failed"}
 
 
+def _business_control_loop_evidence() -> dict[str, Any]:
+    runtime = ControlledBusinessGovernanceRuntime()
+    snapshot = runtime.scan(new_height_capability())
+    analysis = runtime.analyze(snapshot.snapshot_gid)
+    blocked = runtime.release(snapshot)
+    review = runtime.approve(
+        snapshot=snapshot,
+        reviewer_role="super_admin",
+        definition_hash=analysis.business_definition_hash,
+        decision_reason="Purpose, invariant, implementation and tests agree",
+    )
+    passed = runtime.release(snapshot)
+    runtime.record_effectiveness(
+        capability_version_gid=analysis.capability_version_gid,
+        definition_hash=analysis.business_definition_hash,
+        metric_name="rule_rejection_count",
+        metric_value=1,
+    )
+    verified = runtime.release(snapshot)
+    if (
+        not analysis.machine_passed
+        or blocked.conclusion != "fail"
+        or "business_governance_blocked" not in blocked.blockers
+        or review.definition_hash != analysis.business_definition_hash
+        or passed.conclusion != "pass"
+        or not runtime.verify_signature(passed)
+        or not verified.business_governance["runtime_verified"]
+    ):
+        raise RuntimeError("business_control_loop_failed")
+    return {
+        "snapshot_gid": str(snapshot.snapshot_gid),
+        "machine_passed": True,
+        "human_approved": True,
+        "runtime_verified": True,
+        "definition_hash": analysis.business_definition_hash,
+        "release_report_gid": str(verified.release_report_gid),
+        "release_report_hash": verified.report_hash,
+    }
+
+
 def run_acceptance(environment: FakeEnvironment) -> AcceptanceReport:
-    """Execute all fourteen required checks in the isolated deterministic path."""
+    """Execute all required checks in the isolated deterministic path."""
     root = environment.root.resolve()
     product, extension = _catalogs(root)
     generator = SnowflakeGID(machine_id_from_environment(environment.environ))
@@ -226,6 +650,7 @@ def run_acceptance(environment: FakeEnvironment) -> AcceptanceReport:
     sections["health"] = _section(_health_evidence)
     sections["workflow"] = _section(_workflow_evidence)
     sections["release_gate"] = _section(_release_evidence)
+    sections["business_control_loop"] = _section(_business_control_loop_evidence)
     sections["ai_redaction"] = _section(_redaction_evidence)
     sections["ui"] = _section(lambda: _ui_evidence(root))
     sections["production_exclusion"] = _section(
@@ -672,6 +1097,76 @@ def run_real_acceptance(base_url: str, environ: Mapping[str, str] | None = None)
         gid_to_json(generator.next_id()), failed, {}, "live",
         "verifiable_live_acceptance_adapter_required",
     )
+
+
+def write_business_baseline(
+    report: Mapping[str, Any], *, json_path: Path, markdown_path: Path,
+) -> dict[str, Any]:
+    """Write the machine and human baselines from one immutable report value."""
+    document = dict(report)
+    document.pop("baseline_hash", None)
+    document["baseline_hash"] = canonical_fingerprint(document)
+    rendered_json = json.dumps(
+        document, ensure_ascii=False, indent=2, sort_keys=True,
+    ) + "\n"
+    json_path.parent.mkdir(parents=True, exist_ok=True)
+    markdown_path.parent.mkdir(parents=True, exist_ok=True)
+    json_path.write_text(rendered_json, encoding="utf-8", newline="\n")
+
+    domains = ", ".join(str(item) for item in document.get("affected_domains", ())) or "无"
+    revisions = document.get("source_revisions", {})
+    revision_rows = "\n".join(
+        f"| {key} | `{value}` |" for key, value in sorted(revisions.items())
+    ) if isinstance(revisions, Mapping) else ""
+    root_rows = []
+    for item in document.get("root_causes", ()):
+        if not isinstance(item, Mapping):
+            continue
+        values = (
+            item.get("root_cause_key", ""), item.get("reason_code", ""),
+            ", ".join(str(value) for value in item.get("capability_keys", ())),
+            item.get("finding_count", 0), item.get("severity", ""),
+            item.get("remediation_family", ""),
+        )
+        root_rows.append("| " + " | ".join(str(value).replace("|", "\\|") for value in values) + " |")
+    root_table = "\n".join(root_rows) or "| — | — | — | 0 | — | — |"
+    markdown = f"""# 原子业务能力治理 V2.5 基线审计
+
+> 本文与同名 JSON 由同一个只读审计报告对象生成，禁止人工修改统计值。
+> Baseline Hash：`{document['baseline_hash']}`
+
+## 总体统计
+
+| 指标 | 数量/状态 |
+|---|---:|
+| Snapshot GID | {document.get('snapshot_gid', '')} |
+| Finding 条目数 | {document.get('finding_count', 0)} |
+| 根因组数量 | {document.get('root_cause_group_count', 0)} |
+| 受影响 Capability | {document.get('affected_capability_count', 0)} |
+| 共性整改族 | {document.get('shared_remediation_family_count', 0)} |
+| 遗留待审核 | {document.get('legacy_pending_review_count', 0)} |
+| machine_passed | {str(bool(document.get('machine_passed'))).lower()} |
+| human_approved | {str(bool(document.get('human_approved'))).lower()} |
+| runtime_verified | {str(bool(document.get('runtime_verified'))).lower()} |
+
+受影响领域：{domains}
+
+## 源代码版本
+
+| 仓库 | Commit |
+|---|---|
+{revision_rows}
+
+## 根因清单
+
+| 根因键 | 原因类别 | Capability | Finding 数 | 严重级别 | 整改族 |
+|---|---|---|---:|---|---|
+{root_table}
+
+完整 Finding、关系候选、未绑定公开入口和审核队列见同名 JSON。
+"""
+    markdown_path.write_text(markdown, encoding="utf-8", newline="\n")
+    return document
 
 
 def main(argv: list[str] | None = None) -> int:

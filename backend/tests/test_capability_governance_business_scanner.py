@@ -300,7 +300,7 @@ def test_scanner_rejects_invalid_string_evidence_as_structured_configuration(sca
 
     assert document.scan_status == "blocked"
     assert document.scan_findings[0].category == "configuration"
-    assert document.scan_findings[0].message == "product_catalog_string_list_invalid"
+    assert document.scan_findings[0].message == "product_catalog_business_rule_scalar_invalid"
 
 
 def test_scanner_rejects_duplicate_rule_identity_deterministically(scanner, catalog):

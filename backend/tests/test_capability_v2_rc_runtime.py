@@ -80,7 +80,7 @@ def _probes() -> tuple[RuntimeProbeResult, ...]:
     )
 
 
-def test_build_runtime_evidence_maps_exact_1869_current_run_outcomes():
+def test_build_runtime_evidence_maps_exact_current_run_outcomes():
     manifest = _manifest()
     evidence = build_runtime_evidence(
         root=ROOT,
@@ -92,7 +92,7 @@ def test_build_runtime_evidence_maps_exact_1869_current_run_outcomes():
         outcome_sha256="sha256:" + "b" * 64,
     )
 
-    assert sum(len(cases) for cases in evidence["capabilities"].values()) == 1869
+    assert sum(len(cases) for cases in evidence["capabilities"].values()) == 3353
     assert set(evidence["capabilities"]) == set(manifest["capabilities"])
     assert all(
         result == "passed"
