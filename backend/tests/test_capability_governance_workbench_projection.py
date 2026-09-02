@@ -487,6 +487,119 @@ def test_analysis_result_rebuilds_full_report_from_snapshot_store_and_trusted_ga
         }, _context())
 
 
+def test_authoritative_reconstruction_reads_persisted_findings_without_rerunning_analysis():
+    calls = 0
+
+    def runner(snapshot, request):
+        nonlocal calls
+        calls += 1
+        return _report()
+
+    service = CapabilityGovernanceService(
+        _RunStore(), analysis_runner=runner,
+        web_revision_provider=lambda: WEB_REVISION,
+        business_gate_provider=lambda snapshot: _canonical_gate(),
+    )
+
+    accepted = service.base_capability_analysis_run({
+        "target_gid": "100", "idempotency_key": "persisted-findings-only",
+    }, _context())
+
+    assert accepted["run_status"] == "completed"
+    assert calls == 1
+
+
+def test_authoritative_reconstruction_rejects_stateful_forgery_without_persisted_finding_source():
+    base_store = _RunStore()
+
+    class Store:
+        snapshot = base_store.snapshot
+
+        @staticmethod
+        def get_snapshot(snapshot_gid):
+            return base_store.get_snapshot(snapshot_gid)
+
+        @staticmethod
+        def list_relation_candidates(snapshot_gid):
+            return base_store.list_relation_candidates(snapshot_gid)
+
+    first = _report()
+    forged_finding = AuditEvidence(
+        reason_code="forged_reason", capability_id=first.audit_capabilities[0].capability_id,
+        major_version=1, domain="craft", layer="C", evidence_ref="forged-ref",
+        remediation_family="forged_family",
+        related_capability_keys=(first.audit_capabilities[0].capability_key,),
+        related_domains=("craft",),
+    )
+    forged_report = audit(
+        (forged_finding,), capabilities=first.audit_capabilities,
+        snapshot_gid=first.snapshot_gid, source_revisions=first.source_revisions,
+        relations=first.relations, unbound_entries=first.unbound_entries,
+        gate_result=_canonical_gate(),
+    )
+    forged_candidate = SimpleNamespace(
+        code="forged_reason", fingerprint="stateful-forgery", severity="warning",
+        remediation_boundary="forged_family",
+        subjects=(SimpleNamespace(
+            capability_id=first.audit_capabilities[0].capability_id, major_version=1,
+        ),),
+        evidence_keys=("forged-ref",),
+    )
+    calls = 0
+
+    def runner(snapshot, request):
+        nonlocal calls
+        calls += 1
+        return forged_report if calls == 1 else SimpleNamespace(findings=(forged_candidate,))
+
+    service = CapabilityGovernanceService(
+        Store(), analysis_runner=runner,
+        web_revision_provider=lambda: WEB_REVISION,
+        business_gate_provider=lambda snapshot: _canonical_gate(),
+    )
+
+    with pytest.raises(CapabilityBusinessError, match="governance_result_invalid"):
+        service.base_capability_analysis_run({
+            "target_gid": "100", "idempotency_key": "stateful-forgery",
+        }, _context())
+    assert calls == 1
+
+
+def test_authoritative_persisted_finding_source_pages_205_rows_at_zero_and_200():
+    store = _RunStore()
+    store.findings = store.findings[:205]
+    base = _report()
+    report = audit(
+        base.findings[:205], capabilities=base.audit_capabilities,
+        snapshot_gid=base.snapshot_gid, source_revisions=base.source_revisions,
+        relations=base.relations, unbound_entries=base.unbound_entries,
+        gate_result=_canonical_gate(),
+    )
+    pages = []
+
+    class RecordingService(CapabilityGovernanceService):
+        def business_audit_persisted_finding_search(self, payload, context):
+            result = super().business_audit_persisted_finding_search(payload, context)
+            pages.append((
+                payload["offset"], payload["limit"],
+                len(result["findings"]), result["total"],
+            ))
+            return result
+
+    service = RecordingService(
+        store, analysis_runner=lambda snapshot, request: report,
+        web_revision_provider=lambda: WEB_REVISION,
+        business_gate_provider=lambda snapshot: _canonical_gate(),
+    )
+
+    accepted = service.base_capability_analysis_run({
+        "target_gid": "100", "idempotency_key": "persisted-findings-pages",
+    }, _context())
+
+    assert accepted["run_status"] == "completed"
+    assert pages == [(0, 200, 200, 205), (200, 200, 5, 205)]
+
+
 def test_enriched_analysis_rejects_missing_or_incomplete_gate_rows():
     report = _report()
     service = CapabilityGovernanceService(

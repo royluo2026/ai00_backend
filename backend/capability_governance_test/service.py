@@ -1156,6 +1156,37 @@ class CapabilityGovernanceService:
             total=len(projected), offset=offset, root_cause_total=len(root_counts),
         )
 
+    def business_audit_persisted_finding_search(
+        self, payload: Mapping[str, Any], context: object,
+    ) -> dict[str, Any]:
+        """Page exact-snapshot persisted findings without invoking analysis ports."""
+        del context
+        try:
+            limit = int(payload.get("limit", _MAX_SEARCH))
+            offset = int(payload.get("offset", 0))
+        except (TypeError, ValueError) as exc:
+            raise _business_error("invalid_input") from exc
+        if isinstance(payload.get("limit", _MAX_SEARCH), bool) or limit < 1 or limit > _MAX_SEARCH:
+            raise _business_error("invalid_input")
+        if isinstance(payload.get("offset", 0), bool) or offset < 0:
+            raise _business_error("invalid_input")
+        snapshot = self._snapshot({"target_gid": payload.get("target_gid")})
+        loader = getattr(self._store, "get_findings", None) if self._store is not None else None
+        if not callable(loader):
+            raise ValueError("persisted_findings_unavailable")
+        try:
+            stored = loader(int(getattr(snapshot, "snapshot_gid")))
+            if stored is None:
+                raise ValueError("persisted_findings_unavailable")
+            findings = tuple(_enrich_finding_record(snapshot, item) for item in tuple(stored))
+        except Exception as exc:
+            raise ValueError("persisted_findings_unavailable") from exc
+        return {
+            "findings": findings[offset:offset + limit],
+            "total": len(findings),
+            "offset": offset,
+        }
+
     def base_capability_analysis_get(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
         target = str(payload.get("target_gid", ""))
         run = next((item for item in self._runs.values() if item.run_gid == target), None)
@@ -1765,6 +1796,7 @@ class CapabilityGovernanceService:
         base = collect_business_audit(
             self, snapshot_gid=str(getattr(snapshot, "snapshot_gid", "")),
             source_revisions=source_revisions,
+            finding_search=self.business_audit_persisted_finding_search,
         )
         canonical = audit(
             base.findings, capabilities=base.audit_capabilities,

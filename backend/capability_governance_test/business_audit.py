@@ -515,12 +515,15 @@ def audit(
     )
 
 
-def _page(service: Any, method_name: str, *, snapshot_gid: str, item_key: str, limit: int) -> tuple[Any, ...]:
+def _page(
+    service: Any, method_name: str, *, snapshot_gid: str, item_key: str, limit: int,
+    source: Any = None,
+) -> tuple[Any, ...]:
     if limit < 1 or limit > 200:
         raise ValueError("business_audit_page_limit_invalid")
     offset, total = 0, 1
     items: list[Any] = []
-    method = getattr(service, method_name)
+    method = source if source is not None else getattr(service, method_name)
     while offset < total:
         payload = {"limit": limit, "offset": offset}
         payload["snapshot_gid" if method_name.endswith("registry_search") else "target_gid"] = snapshot_gid
@@ -568,6 +571,7 @@ def collect_business_audit(
     business_catalog: Mapping[str, object] | None = None,
     legacy_baseline: Mapping[str, str] | None = None,
     business_review_lookup: Any = None,
+    finding_search: Any = None,
 ) -> BusinessAuditReport:
     if set(source_revisions) != {"backend", "web", "source"} or any(
         _SHA.fullmatch(str(source_revisions[key])) is None for key in ("backend", "web", "source")
@@ -579,7 +583,10 @@ def collect_business_audit(
     if str(_value(projection, "source_revision", "")) != str(source_revisions["source"]):
         raise ValueError("business_audit_source_revision_mismatch")
     registry = _page(service, "base_capability_registry_search", snapshot_gid=str(snapshot_gid), item_key="items", limit=page_limit)
-    findings = _page(service, "base_capability_finding_search", snapshot_gid=str(snapshot_gid), item_key="findings", limit=page_limit)
+    findings = _page(
+        service, "base_capability_finding_search", snapshot_gid=str(snapshot_gid),
+        item_key="findings", limit=page_limit, source=finding_search,
+    )
     capabilities = tuple(_capability_from_projection(item) for item in registry)
     trusted_gate = None
     if gate_result is not None:
