@@ -8,7 +8,7 @@ Update BOP lifecycle initialization state or confirm and advance its current pha
 - 不适用：The request refreshes metrics, creates/restores checkpoints, or undoes/redoes history.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_fb3c151fd2c880f3d35fc1c786444b0e`
+- Catalog Release：`rel_707763f9d1ab3592731dbfc1c976b757`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -72,7 +72,50 @@ Update BOP lifecycle initialization state or confirm and advance its current pha
   "properties": {
     "checklist": {
       "additionalProperties": false,
-      "properties": {},
+      "properties": {
+        "layers_selected": {
+          "type": "boolean"
+        },
+        "lines_added": {
+          "type": "boolean"
+        },
+        "pbom_linked": {
+          "type": "boolean"
+        },
+        "pbom_preprocessed": {
+          "type": "boolean"
+        },
+        "pbom_vpps_checked": {
+          "type": "boolean"
+        },
+        "processes_added": {
+          "type": "boolean"
+        },
+        "source_selected": {
+          "type": "boolean"
+        },
+        "stations_added": {
+          "type": "boolean"
+        },
+        "tc_imported": {
+          "type": "boolean"
+        },
+        "template_selected": {
+          "type": "boolean"
+        },
+        "vehicle_ops_linked": {
+          "type": "boolean"
+        },
+        "vehicle_ops_prep": {
+          "type": "boolean"
+        },
+        "version_created": {
+          "type": "boolean"
+        },
+        "vpps_imported": {
+          "type": "boolean"
+        }
+      },
       "type": "object"
     },
     "note": {
@@ -112,7 +155,7 @@ Update BOP lifecycle initialization state or confirm and advance its current pha
 ```json
 {
   "capability_id": "craft.bop.lifecycle.state.change.apply",
-  "catalog_release": "rel_fb3c151fd2c880f3d35fc1c786444b0e",
+  "catalog_release": "rel_707763f9d1ab3592731dbfc1c976b757",
   "major_version": 1,
   "payload": {
     "operation": "init.update",
@@ -131,7 +174,80 @@ Update BOP lifecycle initialization state or confirm and advance its current pha
   "properties": {
     "data": {
       "additionalProperties": false,
-      "properties": {},
+      "properties": {
+        "lifecycle_phase": {
+          "type": "string"
+        },
+        "lifecycle_state": {
+          "additionalProperties": false,
+          "properties": {
+            "init": {
+              "additionalProperties": false,
+              "properties": {
+                "checklist": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "layers_selected": {
+                      "type": "boolean"
+                    },
+                    "lines_added": {
+                      "type": "boolean"
+                    },
+                    "pbom_linked": {
+                      "type": "boolean"
+                    },
+                    "pbom_preprocessed": {
+                      "type": "boolean"
+                    },
+                    "pbom_vpps_checked": {
+                      "type": "boolean"
+                    },
+                    "processes_added": {
+                      "type": "boolean"
+                    },
+                    "source_selected": {
+                      "type": "boolean"
+                    },
+                    "stations_added": {
+                      "type": "boolean"
+                    },
+                    "tc_imported": {
+                      "type": "boolean"
+                    },
+                    "template_selected": {
+                      "type": "boolean"
+                    },
+                    "vehicle_ops_linked": {
+                      "type": "boolean"
+                    },
+                    "vehicle_ops_prep": {
+                      "type": "boolean"
+                    },
+                    "version_created": {
+                      "type": "boolean"
+                    },
+                    "vpps_imported": {
+                      "type": "boolean"
+                    }
+                  },
+                  "type": "object"
+                },
+                "route": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "refine_stats": {
+              "description": "Provider-validated legacy lifecycle statistics."
+            }
+          },
+          "type": "object"
+        }
+      },
       "type": "object"
     }
   },
@@ -201,6 +317,15 @@ Update BOP lifecycle initialization state or confirm and advance its current pha
 - `rule_not_found`：The requested rule was not found.（retryable=false）
 - `evaluation_timeout`：Rule evaluation exceeded its bounded time limit.（retryable=false）
 - `evaluation_unavailable`：Rule evaluation could not produce a bounded result.（retryable=false）
+- `resource_not_found`：The requested active Craft resource requirement does not exist.（retryable=false）
+- `resource_code_conflict`：The resource type and code already identify another standard.（retryable=false）
+- `resource_version_conflict`：The resource requirement changed or is no longer active.（retryable=false）
+- `resource_in_use`：The resource requirement is still referenced by governed Craft data.（retryable=false）
+- `resource_alias_conflict`：The normalized alias already exists for this resource.（retryable=false）
+- `resource_alias_not_found`：The requested resource alias does not exist.（retryable=false）
+- `resource_staging_not_found`：The requested TC resource staging row does not exist.（retryable=false）
+- `resource_staging_conflict`：The staging row was already decided or changed.（retryable=false）
+- `resource_type_mismatch`：The selected standard does not match the staged resource type.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

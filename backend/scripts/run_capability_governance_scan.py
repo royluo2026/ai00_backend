@@ -29,7 +29,7 @@ EXPECTED_OFFICIAL_DOMAINS = (
     "agent", "base", "craft", "device", "digital_model", "factory", "integration",
     "knowledge", "ontology", "project_management", "simulation",
 )
-PINNED_STABLE_PRODUCT_DESCRIPTOR_COUNT = 479
+PINNED_STABLE_PRODUCT_DESCRIPTOR_COUNT = 488
 
 
 def _inside_repository(path: Path) -> Path:

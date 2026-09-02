@@ -1647,6 +1647,87 @@
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.pbom.version.submit@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.pbom.version.submit@1]"
     },
+    "craft.resource_requirement.alias.create@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.resource_requirement.alias.create@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.resource_requirement.alias.create@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.resource_requirement.alias.create@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.resource_requirement.alias.create@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.resource_requirement.alias.create@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.resource_requirement.alias.create@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.resource_requirement.alias.create@1]"
+    },
+    "craft.resource_requirement.alias.delete@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.resource_requirement.alias.delete@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.resource_requirement.alias.delete@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.resource_requirement.alias.delete@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.resource_requirement.alias.delete@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.resource_requirement.alias.delete@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.resource_requirement.alias.delete@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.resource_requirement.alias.delete@1]"
+    },
+    "craft.resource_requirement.create@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.resource_requirement.create@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.resource_requirement.create@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.resource_requirement.create@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.resource_requirement.create@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.resource_requirement.create@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.resource_requirement.create@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.resource_requirement.create@1]"
+    },
+    "craft.resource_requirement.retire@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.resource_requirement.retire@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.resource_requirement.retire@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.resource_requirement.retire@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.resource_requirement.retire@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.resource_requirement.retire@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.resource_requirement.retire@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.resource_requirement.retire@1]"
+    },
+    "craft.resource_requirement.search@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.resource_requirement.search@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.resource_requirement.search@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.resource_requirement.search@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.resource_requirement.search@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.resource_requirement.search@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.resource_requirement.search@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.resource_requirement.search@1]"
+    },
+    "craft.resource_requirement.staging.ignore@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.resource_requirement.staging.ignore@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.resource_requirement.staging.ignore@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.resource_requirement.staging.ignore@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.resource_requirement.staging.ignore@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.resource_requirement.staging.ignore@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.resource_requirement.staging.ignore@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.resource_requirement.staging.ignore@1]"
+    },
+    "craft.resource_requirement.staging.resolve@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.resource_requirement.staging.resolve@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.resource_requirement.staging.resolve@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.resource_requirement.staging.resolve@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.resource_requirement.staging.resolve@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.resource_requirement.staging.resolve@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.resource_requirement.staging.resolve@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.resource_requirement.staging.resolve@1]"
+    },
+    "craft.resource_requirement.staging.search@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.resource_requirement.staging.search@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.resource_requirement.staging.search@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.resource_requirement.staging.search@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.resource_requirement.staging.search@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.resource_requirement.staging.search@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.resource_requirement.staging.search@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.resource_requirement.staging.search@1]"
+    },
+    "craft.resource_requirement.update@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.resource_requirement.update@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.resource_requirement.update@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.resource_requirement.update@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.resource_requirement.update@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.resource_requirement.update@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.resource_requirement.update@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.resource_requirement.update@1]"
+    },
     "craft.rule.definition.change.apply@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.rule.definition.change.apply@1]",
       "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.rule.definition.change.apply@1]",
@@ -4312,7 +4393,7 @@
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[vismockup.visibility@1]"
     }
   },
-  "catalog_release": "rel_fb3c151fd2c880f3d35fc1c786444b0e",
+  "catalog_release": "rel_707763f9d1ab3592731dbfc1c976b757",
   "mandatory_cases": [
     "success",
     "invalid_input",

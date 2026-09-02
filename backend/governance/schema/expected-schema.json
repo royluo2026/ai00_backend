@@ -1,7 +1,7 @@
 {
   "database_name": "ai00_test",
   "isolation_profile": "single_database_domain_tables",
-  "schema_sha256": "sha256:3acf0f1fbdb002e995855f0f1dec580ae2c055a3ad8f84e5a55b55e3c626c49c",
+  "schema_sha256": "sha256:bf66b26303b7a31d648951ce251ac1d5bb9778b32bdb4d366dd67d4efb407c01",
   "schema_version": 1,
   "tables": [
     {
@@ -16953,6 +16953,16 @@
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0005_pbom_updated_at.sql"
+          ]
         }
       ],
       "constraints": [],
@@ -16997,6 +17007,7 @@
       "runtime_domain": "craft",
       "sources": [
         "backend/db/migrations/202608030008_craft_runtime_schema.sql",
+        "backend/db/migrations/domains/craft/0005_pbom_updated_at.sql",
         "backend/db/mysql_schema.sql"
       ]
     },
@@ -18061,6 +18072,310 @@
     {
       "columns": [
         {
+          "data_type": "CHAR(36)",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(36)",
+          "default": null,
+          "extra": "",
+          "name": "resource_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "alias_value",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "normalized_value",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": "''",
+          "extra": "",
+          "name": "created_by",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [
+            "resource_gid"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_craft_resource_alias_resource",
+          "referenced_columns": [
+            "gid"
+          ],
+          "referenced_table": "workmanship_craft_resource_requirements",
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "normalized_value"
+          ],
+          "name": "idx_craft_resource_alias_normalized",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "resource_gid",
+            "normalized_value"
+          ],
+          "name": "uq_craft_resource_alias",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_craft_resource_aliases",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "sources": [
+        "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "CHAR(36)",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(16)",
+          "default": null,
+          "extra": "",
+          "name": "resource_type",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "code",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "name",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "attributes",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": "'manual'",
+          "extra": "",
+          "name": "source",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(16)",
+          "default": "'active'",
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": "1",
+          "extra": "",
+          "name": "resource_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": "''",
+          "extra": "",
+          "name": "created_by",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": "''",
+          "extra": "",
+          "name": "updated_by",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "resource_type",
+            "status",
+            "gid"
+          ],
+          "name": "idx_craft_resource_status_gid",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "resource_type",
+            "code"
+          ],
+          "name": "uq_craft_resource_type_code",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_craft_resource_requirements",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "sources": [
+        "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
           "data_type": "VARCHAR(128)",
           "default": null,
           "extra": "",
@@ -18111,6 +18426,505 @@
       "runtime_domain": "craft",
       "sources": [
         "backend/db/migrations/domains/craft/0001_pbom.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "CHAR(36)",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": "''",
+          "extra": "",
+          "name": "display_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": "''",
+          "extra": "",
+          "name": "code",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(512)",
+          "default": "''",
+          "extra": "",
+          "name": "name",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "DOUBLE",
+          "default": "0",
+          "extra": "",
+          "name": "standard_time",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": "''",
+          "extra": "",
+          "name": "importance",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(2048)",
+          "default": "''",
+          "extra": "",
+          "name": "description",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": "''",
+          "extra": "",
+          "name": "level",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": "''",
+          "extra": "",
+          "name": "vpps_attr",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "TEXT",
+          "default": null,
+          "extra": "",
+          "name": "vpps",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(512)",
+          "default": "''",
+          "extra": "",
+          "name": "vpps_desc",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": "''",
+          "extra": "",
+          "name": "torque_importance",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": "''",
+          "extra": "",
+          "name": "vehicle_model",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": "''",
+          "extra": "",
+          "name": "parent_vpps",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "steps",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "required_tools",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "parameters",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": "'draft'",
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": "'team'",
+          "extra": "",
+          "name": "share_scope",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": "1",
+          "extra": "",
+          "name": "version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": "''",
+          "extra": "",
+          "name": "created_by",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "team_id",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "code"
+          ],
+          "name": "idx_standard_operations_code",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "team_id",
+            "created_by",
+            "share_scope"
+          ],
+          "name": "idx_standard_operations_scope",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_craft_standard_operations",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "sources": [
+        "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "CHAR(36)",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(36)",
+          "default": null,
+          "extra": "",
+          "name": "version_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(36)",
+          "default": null,
+          "extra": "",
+          "name": "entry_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(16)",
+          "default": null,
+          "extra": "",
+          "name": "resource_type",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "raw_name",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "raw_payload",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(16)",
+          "default": "'pending'",
+          "extra": "",
+          "name": "match_status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(36)",
+          "default": null,
+          "extra": "",
+          "name": "matched_resource_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "candidate_resource_gids",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(1000)",
+          "default": null,
+          "extra": "",
+          "name": "review_note",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": "1",
+          "extra": "",
+          "name": "resource_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "decided_by",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "decided_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "entry_gid"
+          ],
+          "name": "idx_craft_tc_resource_staging_entry",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "matched_resource_gid"
+          ],
+          "name": "idx_craft_tc_resource_staging_matched_resource",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "version_gid",
+            "match_status",
+            "gid"
+          ],
+          "name": "idx_craft_tc_resource_staging_version_status_gid",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_craft_tc_resource_staging",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "sources": [
+        "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
       ]
     },
     {

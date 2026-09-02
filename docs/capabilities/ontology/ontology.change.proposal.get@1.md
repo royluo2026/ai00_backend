@@ -8,7 +8,7 @@ Read the current immutable proposal revision.
 - 不适用：Searching proposals.
 - 生命周期：`stable`
 - 所属领域：`ontology`
-- Catalog Release：`rel_fb3c151fd2c880f3d35fc1c786444b0e`
+- Catalog Release：`rel_707763f9d1ab3592731dbfc1c976b757`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -86,7 +86,7 @@ Read the current immutable proposal revision.
 ```json
 {
   "capability_id": "ontology.change.proposal.get",
-  "catalog_release": "rel_fb3c151fd2c880f3d35fc1c786444b0e",
+  "catalog_release": "rel_707763f9d1ab3592731dbfc1c976b757",
   "major_version": 1,
   "payload": {
     "proposal_gid": "example"

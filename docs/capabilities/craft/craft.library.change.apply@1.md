@@ -8,7 +8,7 @@ Apply bounded, audited changes to Craft manufacturing resource library records.
 - 不适用：The change belongs to BOP, PBOM, GBOP or another domain capability.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_fb3c151fd2c880f3d35fc1c786444b0e`
+- Catalog Release：`rel_707763f9d1ab3592731dbfc1c976b757`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -74,6 +74,12 @@ Apply bounded, audited changes to Craft manufacturing resource library records.
       "maxLength": 500,
       "type": "string"
     },
+    "conflict": {
+      "enum": [
+        "skip"
+      ],
+      "type": "string"
+    },
     "gid": {
       "maxLength": 128,
       "type": "string"
@@ -81,11 +87,65 @@ Apply bounded, audited changes to Craft manufacturing resource library records.
     "items": {
       "items": {
         "additionalProperties": false,
-        "maxProperties": 40,
-        "properties": {},
+        "properties": {
+          "alias": {
+            "description": "Provider-validated transport value."
+          },
+          "description": {
+            "description": "Provider-validated transport value."
+          },
+          "flex_type": {
+            "description": "Provider-validated transport value."
+          },
+          "importance": {
+            "description": "Provider-validated transport value."
+          },
+          "level": {
+            "description": "Provider-validated transport value."
+          },
+          "meta": {
+            "description": "Provider-validated transport value."
+          },
+          "parent_vpps": {
+            "description": "Provider-validated transport value."
+          },
+          "part_category": {
+            "description": "Provider-validated transport value."
+          },
+          "ref_install_clearance": {
+            "description": "Provider-validated transport value."
+          },
+          "ref_install_direction": {
+            "description": "Provider-validated transport value."
+          },
+          "ref_main_vpps": {
+            "description": "Provider-validated transport value."
+          },
+          "ref_main_vpps_desc": {
+            "description": "Provider-validated transport value."
+          },
+          "ref_static_clearance": {
+            "description": "Provider-validated transport value."
+          },
+          "status": {
+            "description": "Provider-validated transport value."
+          },
+          "vehicle_model": {
+            "description": "Provider-validated transport value."
+          },
+          "vpps": {
+            "description": "Provider-validated transport value."
+          },
+          "vpps_desc_cn": {
+            "description": "Provider-validated transport value."
+          },
+          "vpps_description": {
+            "description": "Provider-validated transport value."
+          }
+        },
         "type": "object"
       },
-      "maxItems": 500,
+      "maxItems": 10000,
       "type": "array"
     },
     "meta": {
@@ -112,6 +172,7 @@ Apply bounded, audited changes to Craft manufacturing resource library records.
         "part_names.create",
         "part_names.update",
         "part_names.delete",
+        "part_names.bulk_import",
         "part_names.batch_add_from_pbom",
         "part_names.batch_accept_alias",
         "part_names.accept_alias"
@@ -137,7 +198,7 @@ Apply bounded, audited changes to Craft manufacturing resource library records.
 ```json
 {
   "capability_id": "craft.library.change.apply",
-  "catalog_release": "rel_fb3c151fd2c880f3d35fc1c786444b0e",
+  "catalog_release": "rel_707763f9d1ab3592731dbfc1c976b757",
   "major_version": 1,
   "payload": {
     "operation": "tools.create"
@@ -163,6 +224,10 @@ Apply bounded, audited changes to Craft manufacturing resource library records.
       "minimum": 0,
       "type": "integer"
     },
+    "created_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
     "data": {
       "additionalProperties": false,
       "properties": {},
@@ -180,8 +245,16 @@ Apply bounded, audited changes to Craft manufacturing resource library records.
       "minimum": 0,
       "type": "integer"
     },
+    "skipped_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
     "success": {
       "type": "boolean"
+    },
+    "updated_count": {
+      "minimum": 0,
+      "type": "integer"
     }
   },
   "required": [
@@ -250,6 +323,15 @@ Apply bounded, audited changes to Craft manufacturing resource library records.
 - `rule_not_found`：The requested rule was not found.（retryable=false）
 - `evaluation_timeout`：Rule evaluation exceeded its bounded time limit.（retryable=false）
 - `evaluation_unavailable`：Rule evaluation could not produce a bounded result.（retryable=false）
+- `resource_not_found`：The requested active Craft resource requirement does not exist.（retryable=false）
+- `resource_code_conflict`：The resource type and code already identify another standard.（retryable=false）
+- `resource_version_conflict`：The resource requirement changed or is no longer active.（retryable=false）
+- `resource_in_use`：The resource requirement is still referenced by governed Craft data.（retryable=false）
+- `resource_alias_conflict`：The normalized alias already exists for this resource.（retryable=false）
+- `resource_alias_not_found`：The requested resource alias does not exist.（retryable=false）
+- `resource_staging_not_found`：The requested TC resource staging row does not exist.（retryable=false）
+- `resource_staging_conflict`：The staging row was already decided or changed.（retryable=false）
+- `resource_type_mismatch`：The selected standard does not match the staged resource type.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

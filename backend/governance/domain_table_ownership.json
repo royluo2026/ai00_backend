@@ -820,7 +820,31 @@
       "legacy_name": false
     },
     {
+      "table": "workmanship_craft_resource_aliases",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_resource_requirements",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
       "table": "workmanship_craft_schema_migrations",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_standard_operations",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_tc_resource_staging",
       "owner": "craft",
       "runtime_domain": "craft",
       "legacy_name": false

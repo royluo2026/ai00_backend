@@ -8,7 +8,7 @@ Read bounded Craft standard operation library records.
 - 不适用：The outcome is a GBOP release or BOP execution operation.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_fb3c151fd2c880f3d35fc1c786444b0e`
+- Catalog Release：`rel_707763f9d1ab3592731dbfc1c976b757`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -98,7 +98,7 @@ Read bounded Craft standard operation library records.
 ```json
 {
   "capability_id": "craft.standard_operation.read",
-  "catalog_release": "rel_fb3c151fd2c880f3d35fc1c786444b0e",
+  "catalog_release": "rel_707763f9d1ab3592731dbfc1c976b757",
   "major_version": 1,
   "payload": {
     "operation": "list"
@@ -114,23 +114,135 @@ Read bounded Craft standard operation library records.
 {
   "additionalProperties": false,
   "properties": {
-    "data": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+    "code": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "created_by": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "display_id": {
+      "type": "string"
     },
     "gid": {
       "minLength": 1,
       "type": "string"
     },
+    "importance": {
+      "type": "string"
+    },
     "items": {
       "items": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "display_id": {
+            "type": "string"
+          },
+          "gid": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "importance": {
+            "type": "string"
+          },
+          "level": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parent_vpps": {
+            "type": "string"
+          },
+          "share_scope": {
+            "type": "string"
+          },
+          "standard_time": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          },
+          "torque_importance": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "vehicle_model": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "vpps": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "vpps_attr": {
+            "type": "string"
+          },
+          "vpps_desc": {
+            "type": "string"
+          }
+        },
         "type": "object"
       },
       "maxItems": 500,
       "type": "array"
+    },
+    "name": {
+      "type": "string"
+    },
+    "parameters": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "required_tools": {
+      "items": {
+        "description": "Provider-validated tool reference."
+      },
+      "maxItems": 200,
+      "type": "array"
+    },
+    "standard_time": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string"
+    },
+    "steps": {
+      "items": {
+        "description": "Provider-validated step."
+      },
+      "maxItems": 200,
+      "type": "array"
+    },
+    "updated_at": {
+      "type": "string"
+    },
+    "version": {
+      "type": "integer"
     }
   },
   "type": "object"
@@ -196,6 +308,15 @@ Read bounded Craft standard operation library records.
 - `rule_not_found`：The requested rule was not found.（retryable=false）
 - `evaluation_timeout`：Rule evaluation exceeded its bounded time limit.（retryable=false）
 - `evaluation_unavailable`：Rule evaluation could not produce a bounded result.（retryable=false）
+- `resource_not_found`：The requested active Craft resource requirement does not exist.（retryable=false）
+- `resource_code_conflict`：The resource type and code already identify another standard.（retryable=false）
+- `resource_version_conflict`：The resource requirement changed or is no longer active.（retryable=false）
+- `resource_in_use`：The resource requirement is still referenced by governed Craft data.（retryable=false）
+- `resource_alias_conflict`：The normalized alias already exists for this resource.（retryable=false）
+- `resource_alias_not_found`：The requested resource alias does not exist.（retryable=false）
+- `resource_staging_not_found`：The requested TC resource staging row does not exist.（retryable=false）
+- `resource_staging_conflict`：The staging row was already decided or changed.（retryable=false）
+- `resource_type_mismatch`：The selected standard does not match the staged resource type.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

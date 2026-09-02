@@ -8,7 +8,7 @@ craft.rule.waiver.search
 - 不适用：Rules are unreviewed or inputs are mutable.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_fb3c151fd2c880f3d35fc1c786444b0e`
+- Catalog Release：`rel_707763f9d1ab3592731dbfc1c976b757`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -101,7 +101,7 @@ craft.rule.waiver.search
 ```json
 {
   "capability_id": "craft.rule.waiver.search",
-  "catalog_release": "rel_fb3c151fd2c880f3d35fc1c786444b0e",
+  "catalog_release": "rel_707763f9d1ab3592731dbfc1c976b757",
   "major_version": 1,
   "payload": {}
 }
@@ -209,6 +209,15 @@ craft.rule.waiver.search
 - `rule_not_found`：The requested rule was not found.（retryable=false）
 - `evaluation_timeout`：Rule evaluation exceeded its bounded time limit.（retryable=false）
 - `evaluation_unavailable`：Rule evaluation could not produce a bounded result.（retryable=false）
+- `resource_not_found`：The requested active Craft resource requirement does not exist.（retryable=false）
+- `resource_code_conflict`：The resource type and code already identify another standard.（retryable=false）
+- `resource_version_conflict`：The resource requirement changed or is no longer active.（retryable=false）
+- `resource_in_use`：The resource requirement is still referenced by governed Craft data.（retryable=false）
+- `resource_alias_conflict`：The normalized alias already exists for this resource.（retryable=false）
+- `resource_alias_not_found`：The requested resource alias does not exist.（retryable=false）
+- `resource_staging_not_found`：The requested TC resource staging row does not exist.（retryable=false）
+- `resource_staging_conflict`：The staging row was already decided or changed.（retryable=false）
+- `resource_type_mismatch`：The selected standard does not match the staged resource type.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

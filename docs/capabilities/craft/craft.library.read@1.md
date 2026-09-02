@@ -8,7 +8,7 @@ Read bounded Craft manufacturing resource library collections.
 - 不适用：The caller needs to mutate library records or read BOP-linked resources.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_fb3c151fd2c880f3d35fc1c786444b0e`
+- Catalog Release：`rel_707763f9d1ab3592731dbfc1c976b757`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -97,7 +97,7 @@ Read bounded Craft manufacturing resource library collections.
 ```json
 {
   "capability_id": "craft.library.read",
-  "catalog_release": "rel_fb3c151fd2c880f3d35fc1c786444b0e",
+  "catalog_release": "rel_707763f9d1ab3592731dbfc1c976b757",
   "major_version": 1,
   "payload": {
     "operation": "tools.list"
@@ -116,17 +116,159 @@ Read bounded Craft manufacturing resource library collections.
     "items": {
       "items": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "alias": {
+            "description": "Provider-validated transport value."
+          },
+          "cad_model_no": {
+            "description": "Provider-validated transport value."
+          },
+          "category": {
+            "description": "Provider-validated transport value."
+          },
+          "created_at": {
+            "description": "Provider-validated transport value."
+          },
+          "description": {
+            "description": "Provider-validated transport value."
+          },
+          "drive_size": {
+            "description": "Provider-validated transport value."
+          },
+          "extension_cad_no": {
+            "description": "Provider-validated transport value."
+          },
+          "extension_model": {
+            "description": "Provider-validated transport value."
+          },
+          "fastener_params": {
+            "description": "Provider-validated transport value."
+          },
+          "fastener_type": {
+            "description": "Provider-validated transport value."
+          },
+          "first_vehicle": {
+            "description": "Provider-validated transport value."
+          },
+          "flange_diameter": {
+            "description": "Provider-validated transport value."
+          },
+          "flex_type": {
+            "description": "Provider-validated transport value."
+          },
+          "gid": {
+            "description": "Provider-validated transport value."
+          },
+          "guide_length": {
+            "description": "Provider-validated transport value."
+          },
+          "guide_type": {
+            "description": "Provider-validated transport value."
+          },
+          "gun_model": {
+            "description": "Provider-validated transport value."
+          },
+          "gun_type": {
+            "description": "Provider-validated transport value."
+          },
+          "has_adhesive": {
+            "description": "Provider-validated transport value."
+          },
+          "importance": {
+            "description": "Provider-validated transport value."
+          },
+          "level": {
+            "description": "Provider-validated transport value."
+          },
+          "matou_part_no": {
+            "description": "Provider-validated transport value."
+          },
+          "meta": {
+            "description": "Provider-validated transport value."
+          },
+          "model": {
+            "description": "Provider-validated transport value."
+          },
+          "name": {
+            "description": "Provider-validated transport value."
+          },
+          "output_square": {
+            "description": "Provider-validated transport value."
+          },
+          "parent_vpps": {
+            "description": "Provider-validated transport value."
+          },
+          "part_category": {
+            "description": "Provider-validated transport value."
+          },
+          "part_no": {
+            "description": "Provider-validated transport value."
+          },
+          "ref_install_clearance": {
+            "description": "Provider-validated transport value."
+          },
+          "ref_install_direction": {
+            "description": "Provider-validated transport value."
+          },
+          "ref_main_vpps": {
+            "description": "Provider-validated transport value."
+          },
+          "ref_main_vpps_desc": {
+            "description": "Provider-validated transport value."
+          },
+          "ref_static_clearance": {
+            "description": "Provider-validated transport value."
+          },
+          "shank_length": {
+            "description": "Provider-validated transport value."
+          },
+          "socket_cad_no": {
+            "description": "Provider-validated transport value."
+          },
+          "socket_model": {
+            "description": "Provider-validated transport value."
+          },
+          "spec": {
+            "description": "Provider-validated transport value."
+          },
+          "status": {
+            "description": "Provider-validated transport value."
+          },
+          "thread_spec": {
+            "description": "Provider-validated transport value."
+          },
+          "torque_min": {
+            "description": "Provider-validated transport value."
+          },
+          "torque_recommended": {
+            "description": "Provider-validated transport value."
+          },
+          "vehicle_model": {
+            "description": "Provider-validated transport value."
+          },
+          "vpps": {
+            "description": "Provider-validated transport value."
+          },
+          "vpps_desc_cn": {
+            "description": "Provider-validated transport value."
+          },
+          "vpps_description": {
+            "description": "Provider-validated transport value."
+          },
+          "wireless": {
+            "description": "Provider-validated transport value."
+          }
+        },
         "type": "object"
       },
-      "maxItems": 500,
+      "maxItems": 10000,
       "type": "array"
     },
     "operation": {
       "type": "string"
     },
     "total": {
-      "maximum": 500,
+      "maximum": 10000,
       "minimum": 0,
       "type": "integer"
     }
@@ -199,6 +341,15 @@ Read bounded Craft manufacturing resource library collections.
 - `rule_not_found`：The requested rule was not found.（retryable=false）
 - `evaluation_timeout`：Rule evaluation exceeded its bounded time limit.（retryable=false）
 - `evaluation_unavailable`：Rule evaluation could not produce a bounded result.（retryable=false）
+- `resource_not_found`：The requested active Craft resource requirement does not exist.（retryable=false）
+- `resource_code_conflict`：The resource type and code already identify another standard.（retryable=false）
+- `resource_version_conflict`：The resource requirement changed or is no longer active.（retryable=false）
+- `resource_in_use`：The resource requirement is still referenced by governed Craft data.（retryable=false）
+- `resource_alias_conflict`：The normalized alias already exists for this resource.（retryable=false）
+- `resource_alias_not_found`：The requested resource alias does not exist.（retryable=false）
+- `resource_staging_not_found`：The requested TC resource staging row does not exist.（retryable=false）
+- `resource_staging_conflict`：The staging row was already decided or changed.（retryable=false）
+- `resource_type_mismatch`：The selected standard does not match the staged resource type.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

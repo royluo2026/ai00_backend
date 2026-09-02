@@ -1,5 +1,5 @@
 {
-  "schema_sha256": "sha256:3acf0f1fbdb002e995855f0f1dec580ae2c055a3ad8f84e5a55b55e3c626c49c",
+  "schema_sha256": "sha256:bf66b26303b7a31d648951ce251ac1d5bb9778b32bdb4d366dd67d4efb407c01",
   "schema_version": 1,
   "tables": [
     {
@@ -5673,6 +5673,9 @@
         "unit": [
           "backend/db/mysql_schema.sql"
         ],
+        "updated_at": [
+          "backend/db/migrations/domains/craft/0005_pbom_updated_at.sql"
+        ],
         "variable_formula": [
           "backend/db/mysql_schema.sql"
         ],
@@ -5703,6 +5706,7 @@
       },
       "sources": [
         "backend/db/migrations/202608030008_craft_runtime_schema.sql",
+        "backend/db/migrations/domains/craft/0005_pbom_updated_at.sql",
         "backend/db/mysql_schema.sql"
       ],
       "table": "workmanship_bop_pbom"
@@ -6070,6 +6074,107 @@
     },
     {
       "columns": {
+        "alias_value": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "created_by": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "normalized_value": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "resource_gid": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ]
+      },
+      "constraints": {
+        "fk_craft_resource_alias_resource": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "idx_craft_resource_alias_normalized": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "uq_craft_resource_alias": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+      ],
+      "table": "workmanship_craft_resource_aliases"
+    },
+    {
+      "columns": {
+        "attributes": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "code": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "created_by": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "name": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "resource_type": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "resource_version": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "source": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "updated_by": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "idx_craft_resource_status_gid": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "uq_craft_resource_type_code": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+      ],
+      "table": "workmanship_craft_resource_requirements"
+    },
+    {
+      "columns": {
         "applied_at": [
           "backend/db/migrations/domains/craft/0001_pbom.sql"
         ],
@@ -6090,6 +6195,166 @@
         "backend/db/migrations/domains/craft/0001_pbom.sql"
       ],
       "table": "workmanship_craft_schema_migrations"
+    },
+    {
+      "columns": {
+        "code": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "created_by": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "description": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "display_id": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "importance": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "level": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "name": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "parameters": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "parent_vpps": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "required_tools": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "share_scope": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "standard_time": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "steps": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "team_id": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "torque_importance": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "vehicle_model": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "version": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "vpps": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "vpps_attr": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "vpps_desc": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "idx_standard_operations_code": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "idx_standard_operations_scope": [
+          "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+      ],
+      "table": "workmanship_craft_standard_operations"
+    },
+    {
+      "columns": {
+        "candidate_resource_gids": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "decided_at": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "decided_by": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "entry_gid": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "match_status": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "matched_resource_gid": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "raw_name": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "raw_payload": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "resource_type": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "resource_version": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "review_note": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "version_gid": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "idx_craft_tc_resource_staging_entry": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "idx_craft_tc_resource_staging_matched_resource": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ],
+        "idx_craft_tc_resource_staging_version_status_gid": [
+          "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0004_resource_requirements.sql"
+      ],
+      "table": "workmanship_craft_tc_resource_staging"
     },
     {
       "columns": {

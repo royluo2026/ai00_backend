@@ -1814,7 +1814,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/capabilities/bop_entry_bulk_change.py",
-        "plugins/craft/craft_backend/capabilities/contracts.py"
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
     "capability:craft.bop.entry.change.apply": {
@@ -2120,7 +2121,8 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/bop_writes.py",
-        "plugins/craft/craft_backend/capabilities/contracts.py"
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
     "capability:craft.bop.lifecycle.change.apply": {
@@ -3931,7 +3933,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/capabilities/contracts.py",
-        "plugins/craft/craft_backend/capabilities/library_change.py"
+        "plugins/craft/craft_backend/capabilities/library_change.py",
+        "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
     "capability:craft.library.read": {
@@ -4274,6 +4277,212 @@
         "plugins/craft/craft_backend/capabilities/contracts.py",
         "plugins/craft/craft_backend/capabilities/pbom_descriptors.py",
         "plugins/craft/craft_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:craft.resource_requirement.alias.create": {
+      "function_id": "capability:craft.resource_requirement.alias.create",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.resource_requirement.alias.create",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/provider.py",
+        "plugins/craft/craft_backend/capabilities/resource_requirements.py"
+      ]
+    },
+    "capability:craft.resource_requirement.alias.delete": {
+      "function_id": "capability:craft.resource_requirement.alias.delete",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.resource_requirement.alias.delete",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/provider.py",
+        "plugins/craft/craft_backend/capabilities/resource_requirements.py"
+      ]
+    },
+    "capability:craft.resource_requirement.create": {
+      "function_id": "capability:craft.resource_requirement.create",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.resource_requirement.create",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/provider.py",
+        "plugins/craft/craft_backend/capabilities/resource_requirements.py"
+      ]
+    },
+    "capability:craft.resource_requirement.retire": {
+      "function_id": "capability:craft.resource_requirement.retire",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.resource_requirement.retire",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/provider.py",
+        "plugins/craft/craft_backend/capabilities/resource_requirements.py"
+      ]
+    },
+    "capability:craft.resource_requirement.search": {
+      "function_id": "capability:craft.resource_requirement.search",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.resource_requirement.search",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/resource_requirements.py"
+      ]
+    },
+    "capability:craft.resource_requirement.staging.ignore": {
+      "function_id": "capability:craft.resource_requirement.staging.ignore",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.resource_requirement.staging.ignore",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/provider.py",
+        "plugins/craft/craft_backend/capabilities/resource_requirements.py"
+      ]
+    },
+    "capability:craft.resource_requirement.staging.resolve": {
+      "function_id": "capability:craft.resource_requirement.staging.resolve",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.resource_requirement.staging.resolve",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/provider.py",
+        "plugins/craft/craft_backend/capabilities/resource_requirements.py"
+      ]
+    },
+    "capability:craft.resource_requirement.staging.search": {
+      "function_id": "capability:craft.resource_requirement.staging.search",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.resource_requirement.staging.search",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/provider.py",
+        "plugins/craft/craft_backend/capabilities/resource_requirements.py"
+      ]
+    },
+    "capability:craft.resource_requirement.update": {
+      "function_id": "capability:craft.resource_requirement.update",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.resource_requirement.update",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/provider.py",
+        "plugins/craft/craft_backend/capabilities/resource_requirements.py"
       ]
     },
     "capability:craft.rule.change.apply": {
@@ -4757,6 +4966,7 @@
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/provider.py",
         "plugins/craft/craft_backend/capabilities/standard_operation.py"
       ]
     },
@@ -4780,6 +4990,7 @@
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/provider.py",
         "plugins/craft/craft_backend/capabilities/standard_operation.py"
       ]
     },
@@ -9439,6 +9650,28 @@
         "plugins/craft/craft_backend/routers/canvases.py"
       ]
     },
+    "rest:DELETE:/api/craft/resource-requirements/{resource_gid}/aliases/{alias_gid}": {
+      "function_id": "rest:DELETE:/api/craft/resource-requirements/{resource_gid}/aliases/{alias_gid}",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/resource_requirements.py"
+      ]
+    },
     "rest:DELETE:/api/craft_lib/fasteners/{gid}": {
       "function_id": "rest:DELETE:/api/craft_lib/fasteners/{gid}",
       "domain": "Craft",
@@ -12081,6 +12314,50 @@
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/collab.py"
+      ]
+    },
+    "rest:GET:/api/craft/resource-requirements": {
+      "function_id": "rest:GET:/api/craft/resource-requirements",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/resource_requirements.py"
+      ]
+    },
+    "rest:GET:/api/craft/tc-resource-staging": {
+      "function_id": "rest:GET:/api/craft/tc-resource-staging",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/resource_requirements.py"
       ]
     },
     "rest:GET:/api/craft_lib/equipments": {
@@ -15712,6 +15989,28 @@
         "plugins/craft/craft_backend/routers/canvases.py"
       ]
     },
+    "rest:PATCH:/api/craft/resource-requirements/{gid}": {
+      "function_id": "rest:PATCH:/api/craft/resource-requirements/{gid}",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/resource_requirements.py"
+      ]
+    },
     "rest:PATCH:/api/craft_lib/equipments/{gid}": {
       "function_id": "rest:PATCH:/api/craft_lib/equipments/{gid}",
       "domain": "Craft",
@@ -18312,6 +18611,116 @@
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/collab.py"
+      ]
+    },
+    "rest:POST:/api/craft/resource-requirements": {
+      "function_id": "rest:POST:/api/craft/resource-requirements",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/resource_requirements.py"
+      ]
+    },
+    "rest:POST:/api/craft/resource-requirements/{gid}/retire": {
+      "function_id": "rest:POST:/api/craft/resource-requirements/{gid}/retire",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/resource_requirements.py"
+      ]
+    },
+    "rest:POST:/api/craft/resource-requirements/{resource_gid}/aliases": {
+      "function_id": "rest:POST:/api/craft/resource-requirements/{resource_gid}/aliases",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/resource_requirements.py"
+      ]
+    },
+    "rest:POST:/api/craft/tc-resource-staging/{staging_gid}/ignore": {
+      "function_id": "rest:POST:/api/craft/tc-resource-staging/{staging_gid}/ignore",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/resource_requirements.py"
+      ]
+    },
+    "rest:POST:/api/craft/tc-resource-staging/{staging_gid}/resolve": {
+      "function_id": "rest:POST:/api/craft/tc-resource-staging/{staging_gid}/resolve",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/resource_requirements.py"
       ]
     },
     "rest:POST:/api/craft_lib/equipments": {
