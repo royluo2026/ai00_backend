@@ -105,6 +105,154 @@ def _release_projection(record: Any) -> dict[str, Any]:
     return response
 
 
+def _string_list(value: Any, *, maximum: int, item_length: int = 1000) -> list[str]:
+    if not isinstance(value, (tuple, list)):
+        return []
+    return [str(item)[:item_length] for item in value[:maximum] if str(item)]
+
+
+def _evidence_projection(value: Any) -> dict[str, Any]:
+    entries = []
+    if isinstance(value, Mapping):
+        for key, item in sorted(redact(dict(value)).items(), key=lambda pair: str(pair[0]))[:40]:
+            encoded = json.dumps(_transport_value(item, depth=0), sort_keys=True, separators=(",", ":"), ensure_ascii=True, default=str)
+            entries.append({
+                "key": str(key)[:255], "value_json": encoded[:512],
+                "value_hash": "sha256:" + hashlib.sha256(encoded.encode("utf-8")).hexdigest(),
+                "truncated": len(encoded) > 512,
+            })
+    return {"entries": entries}
+
+
+def _business_relation_projection(record: Any) -> dict[str, Any]:
+    return {
+        **_projection(record, ("candidate_hash", "relation_type", "source", "status")),
+        "capability_keys": _string_list(_value(record, "capability_keys"), maximum=20, item_length=255),
+        "evidence": _evidence_projection(_value(record, "evidence")),
+    }
+
+
+def _business_rule_projection(record: Any) -> dict[str, Any]:
+    result = _projection(record, (
+        "rule_id", "version", "statement", "applies_when", "enforcement_ref", "error_code",
+    ))
+    result["test_refs"] = _string_list(_value(record, "test_refs"), maximum=50)
+    constraints = _value(record, "machine_constraints")
+    if isinstance(constraints, Mapping):
+        result["machine_constraints"] = _projection(constraints, (
+            "field", "unit", "minimum", "maximum", "minimum_inclusive", "maximum_inclusive",
+        ))
+    return result
+
+
+def _review_projection(record: Any) -> dict[str, Any]:
+    return _projection(record, (
+        "review_gid", "review_stage", "decision", "reviewer_gid", "decision_reason", "review_type",
+    ))
+
+
+def _review_evidence_projection(value: Any) -> dict[str, Any]:
+    if not isinstance(value, Mapping):
+        return {}
+    result = _projection(value, (
+        "capability_key", "major_version", "capability_version_gid", "business_effect", "definition_hash",
+    ))
+    result["business_acceptance_criteria"] = _string_list(value.get("business_acceptance_criteria"), maximum=50, item_length=4000)
+    result["accepted_examples"] = _string_list(value.get("accepted_examples"), maximum=50, item_length=4000)
+    result["rejected_examples"] = _string_list(value.get("rejected_examples"), maximum=50, item_length=4000)
+    result["owner_domains"] = _string_list(value.get("owner_domains"), maximum=11, item_length=64)
+    rules = value.get("business_rules")
+    result["business_rules"] = [
+        _business_rule_projection(item) for item in tuple(rules or ())[:50] if isinstance(item, Mapping)
+    ]
+    maturity = value.get("business_maturity")
+    if isinstance(maturity, Mapping):
+        result["business_maturity"] = {
+            **_projection(maturity, ("level",)),
+            "reason_codes": _string_list(maturity.get("reason_codes"), maximum=50, item_length=255),
+        }
+    evidence = value.get("evidence")
+    if isinstance(evidence, Mapping):
+        result["evidence"] = _projection(evidence, (
+            "redacted", "snapshot_gid", "source_revision", "catalog_release_id",
+        ))
+    for field in ("deterministic_relation_candidates", "ai_advisory_relation_candidates"):
+        relations = value.get(field)
+        result[field] = [
+            _business_relation_projection(item)
+            for item in tuple(relations or ())[:20] if isinstance(item, Mapping)
+        ]
+    return result
+
+
+def _business_audit_projection(value: Any) -> dict[str, Any]:
+    if not isinstance(value, Mapping):
+        raise CapabilityBusinessError("provider_invalid_response", "provider_invalid_response")
+    scalar_fields = {
+        "snapshot_gid", "source_revisions", "catalog_binding", "finding_count", "root_cause_group_count",
+        "affected_capability_count", "affected_domains", "shared_remediation_family_count",
+        "shared_remediation_families", "maturity_counts", "layer_counts", "machine_passed",
+        "human_approved", "runtime_verified", "legacy_pending_review_count", "root_cause_count",
+        "relation_count", "unbound_entry_count", "review_queue_count", "collection", "limit", "next_cursor",
+    }
+    collections = {"root_causes", "relations", "unbound_entries", "review_queue"}
+    collection = value.get("collection")
+    if (
+        collection not in collections
+        or set(value) - scalar_fields - collections
+        or collection not in value
+        or (set(value) & collections) != {collection}
+        or set(value.get("source_revisions", {})) != {"backend", "web", "source"}
+    ):
+        raise CapabilityBusinessError("provider_invalid_response", "provider_invalid_response")
+    binding = value.get("catalog_binding")
+    if isinstance(binding, Mapping) and set(binding) - {"catalog_release_id", "snapshot_hash"}:
+        raise CapabilityBusinessError("provider_invalid_response", "provider_invalid_response")
+    result = _projection(value, (
+        "snapshot_gid", "collection", "limit", "finding_count", "root_cause_group_count",
+        "affected_capability_count", "shared_remediation_family_count", "machine_passed",
+        "human_approved", "runtime_verified", "legacy_pending_review_count", "root_cause_count",
+        "relation_count", "unbound_entry_count", "review_queue_count",
+    ))
+    result["source_revisions"] = _projection(value.get("source_revisions", {}), ("backend", "web", "source"))
+    if isinstance(value.get("catalog_binding"), Mapping):
+        result["catalog_binding"] = _projection(value["catalog_binding"], ("catalog_release_id", "snapshot_hash"))
+    result["affected_domains"] = _string_list(value.get("affected_domains"), maximum=11, item_length=64)
+    result["maturity_counts"] = _projection(value.get("maturity_counts", {}), tuple(f"L{index}" for index in range(7)))
+    result["layer_counts"] = _projection(value.get("layer_counts", {}), tuple("ABCDEFG"))
+    families = value.get("shared_remediation_families")
+    result["shared_remediation_families"] = [{
+        "family": str(key)[:255], "count": min(max(0, int(item)), 100000),
+    }
+        for key, item in tuple(families.items())[:200]
+    ] if isinstance(families, Mapping) else []
+    cursor = value.get("next_cursor")
+    result["next_cursor"] = None if cursor is None else str(cursor)[:255]
+    if "review_queue" in value:
+        result["review_queue"] = [_projection(item, (
+            "capability_key", "domain", "maturity", "priority", "reason",
+        )) for item in tuple(value.get("review_queue", ()))[:200]]
+    if "root_causes" in value:
+        result["root_causes"] = [{
+            **_projection(item, (
+                "root_cause_key", "reason_code", "finding_count", "remediation_family", "severity",
+            )),
+            "capability_keys": _string_list(_value(item, "capability_keys"), maximum=20, item_length=255),
+            "domains": _string_list(_value(item, "domains"), maximum=11, item_length=64),
+            "evidence_refs": _string_list(_value(item, "evidence_refs"), maximum=50),
+        } for item in tuple(value.get("root_causes", ()))[:200]]
+    if "unbound_entries" in value:
+        result["unbound_entries"] = [_projection(item, (
+            "entry_type", "canonical_key", "domain", "location", "source_path", "source_symbol",
+            "http_method", "route_path",
+        )) for item in tuple(value.get("unbound_entries", ()))[:200]]
+    if "relations" in value:
+        result["relations"] = [
+            _business_relation_projection(item) for item in tuple(value.get("relations", ()))[:200]
+        ]
+    return result
+
+
 def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, Any]:
     response: dict[str, Any] = {"capability_id": capability_id, "status": str(result["status"])}
     if isinstance(result.get("data"), Mapping):
@@ -186,12 +334,19 @@ def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, A
             "root_cause_key", "root_cause_label", "root_cause_count",
         )) for finding in tuple(result.get("findings", result.get("items", ())))[:200]]
     elif capability_id == "base.capability_proposal.search":
-        response["items"] = [_projection(proposal, (
-            "proposal_gid", "capability_id", "capability_version_gid", "base_snapshot_gid",
-            "previous_hash", "proposed_descriptor_hash", "proposed_descriptor_hash_label",
-            "business_definition_hash", "review_type", "evidence_hash", "submitted_by_gid",
-            "status", "row_version", "domain", "reviews", "review_evidence",
-        )) for proposal in tuple(result.get("items", ()))[:200]]
+        response["items"] = []
+        for proposal in tuple(result.get("items", ()))[:200]:
+            item = _projection(proposal, (
+                "proposal_gid", "capability_id", "capability_version_gid", "base_snapshot_gid",
+                "previous_hash", "proposed_descriptor_hash", "proposed_descriptor_hash_label",
+                "business_definition_hash", "review_type", "evidence_hash", "submitted_by_gid",
+                "status", "row_version", "domain",
+            ))
+            item["reviews"] = [
+                _review_projection(review) for review in tuple(_value(proposal, "reviews") or ())[:20]
+            ]
+            item["review_evidence"] = _review_evidence_projection(_value(proposal, "review_evidence"))
+            response["items"].append(item)
     elif capability_id == "base.capability_health.get":
         response["items"] = [_projection(item, (
             "domain", "status", "snapshot_gid", "checked_at", "entry_count", "finding_count",
@@ -208,6 +363,13 @@ def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, A
             run = {"run_gid": result.get("run_gid"), "snapshot_gid": result.get("snapshot_gid"), "kind": result.get("kind", "analysis"), "status": result.get("run_status", "queued")}
         if run is not None:
             response["run"] = _projection(run, ("run_gid", "snapshot_gid", "kind", "status"))
+            run_result = _value(run, "result")
+            if isinstance(run_result, Mapping) and set(run_result) != {"business_audit"}:
+                raise CapabilityBusinessError("provider_invalid_response", "provider_invalid_response")
+            if isinstance(run_result, Mapping) and isinstance(run_result.get("business_audit"), Mapping):
+                response["run"]["result"] = {
+                    "business_audit": _business_audit_projection(run_result["business_audit"]),
+                }
     elif capability_id == "base.capability_repair_prompt.generate":
         if result.get("snapshot_gid") is not None:
             response["snapshot"] = {
@@ -238,24 +400,11 @@ def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, A
 
 
 def _relation_candidate_projection(record: Any) -> dict[str, Any]:
-    evidence = _value(record, "evidence")
-    entries = []
-    if isinstance(evidence, Mapping):
-        # Redact the full mapping first: a secret-bearing *outer key* is as
-        # sensitive as a nested key and must affect neither JSON nor hash.
-        safe_evidence = redact(evidence)
-        for key, value in sorted(safe_evidence.items(), key=lambda item: str(item[0]))[:40]:
-            encoded = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True, default=str)
-            entries.append({
-                "key": str(key), "value_json": encoded[:512],
-                "value_hash": "sha256:" + hashlib.sha256(encoded.encode("utf-8")).hexdigest(),
-                "truncated": len(encoded) > 512,
-            })
     return {
         **_projection(record, (
             "relation_candidate_gid", "candidate_hash", "relation_type", "source", "capability_keys", "status",
         )),
-        "evidence": {"entries": entries},
+        "evidence": _evidence_projection(_value(record, "evidence")),
     }
 
 

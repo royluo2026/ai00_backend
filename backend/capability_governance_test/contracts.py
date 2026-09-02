@@ -102,6 +102,12 @@ def _input_schema(capability_id: str) -> dict[str, object]:
             "limit": _LIMIT_SCHEMA,
             "cursor": _SMALL_STRING_SCHEMA,
         })
+    if capability_id == "base.capability_analysis.get":
+        properties.update({
+            "collection": {"type": "string", "enum": ["review_queue", "root_causes", "unbound_entries", "relations"]},
+            "cursor": _SMALL_STRING_SCHEMA,
+            "limit": _LIMIT_SCHEMA,
+        })
     if capability_id == "base.capability_health.get":
         properties.update({
             "domains": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 11},
@@ -279,9 +285,92 @@ _RELATION_CANDIDATE_SCHEMA = _closed({
         }, ("key", "value_json", "value_hash", "truncated"))},
     }, ("entries",)), "status": _SMALL_STRING_SCHEMA,
 })
+_BUSINESS_RELATION_SCHEMA = _closed({
+    "candidate_hash": _VERSION_SCHEMA,
+    "relation_type": _SMALL_STRING_SCHEMA,
+    "source": {"type": "string", "enum": ["deterministic", "advisory"]},
+    "capability_keys": {"type": "array", "items": STRING_SCHEMA, "maxItems": 20},
+    "evidence": _RELATION_CANDIDATE_SCHEMA["properties"]["evidence"],
+    "status": _SMALL_STRING_SCHEMA,
+})
+_BUSINESS_ROOT_CAUSE_SCHEMA = _closed({
+    "root_cause_key": STRING_SCHEMA,
+    "reason_code": _SMALL_STRING_SCHEMA,
+    "capability_keys": {"type": "array", "items": STRING_SCHEMA, "maxItems": 20},
+    "domains": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 11},
+    "evidence_refs": {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 1000}, "maxItems": 50},
+    "finding_count": _COUNT_SCHEMA,
+    "remediation_family": _SMALL_STRING_SCHEMA,
+    "severity": _SMALL_STRING_SCHEMA,
+})
+_UNBOUND_ENTRY_SCHEMA = _closed({
+    "entry_type": _SMALL_STRING_SCHEMA,
+    "canonical_key": STRING_SCHEMA,
+    "domain": _SMALL_STRING_SCHEMA,
+    "location": {"type": "string", "minLength": 1, "maxLength": 1000},
+    "source_path": {"type": "string", "minLength": 1, "maxLength": 1000},
+    "source_symbol": STRING_SCHEMA,
+    "http_method": {"type": ["string", "null"], "maxLength": 16},
+    "route_path": {"type": ["string", "null"], "maxLength": 1000},
+})
+_REVIEW_QUEUE_SCHEMA = _closed({
+    "capability_key": STRING_SCHEMA,
+    "domain": _SMALL_STRING_SCHEMA,
+    "maturity": {"type": "string", "enum": [f"L{index}" for index in range(7)]},
+    "priority": _COUNT_SCHEMA,
+    "reason": _SMALL_STRING_SCHEMA,
+})
+_SOURCE_REVISIONS_SCHEMA = _closed({
+    "backend": {"type": "string", "pattern": r"^[0-9a-f]{40}$", "minLength": 40, "maxLength": 40},
+    "web": {"type": "string", "pattern": r"^[0-9a-f]{40}$", "minLength": 40, "maxLength": 40},
+    "source": {"type": "string", "pattern": r"^[0-9a-f]{40}$", "minLength": 40, "maxLength": 40},
+}, ("backend", "web", "source"))
+_CATALOG_BINDING_SCHEMA = _closed({
+    "catalog_release_id": _VERSION_SCHEMA,
+    "snapshot_hash": _VERSION_SCHEMA,
+})
+_MATURITY_COUNTS_SCHEMA = _closed({f"L{index}": _COUNT_SCHEMA for index in range(7)}, tuple(f"L{index}" for index in range(7)))
+_LAYER_COUNTS_SCHEMA = _closed({layer: _COUNT_SCHEMA for layer in "ABCDEFG"}, tuple("ABCDEFG"))
+_BUSINESS_AUDIT_SCHEMA = _closed({
+    "snapshot_gid": GID_SCHEMA,
+    "source_revisions": _SOURCE_REVISIONS_SCHEMA,
+    "catalog_binding": _CATALOG_BINDING_SCHEMA,
+    "finding_count": _COUNT_SCHEMA,
+    "root_cause_group_count": _COUNT_SCHEMA,
+    "affected_capability_count": _COUNT_SCHEMA,
+    "affected_domains": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 11},
+    "shared_remediation_family_count": _COUNT_SCHEMA,
+    "shared_remediation_families": {"type": "array", "maxItems": 200, "items": _closed({
+        "family": _SMALL_STRING_SCHEMA, "count": _COUNT_SCHEMA,
+    }, ("family", "count"))},
+    "maturity_counts": _MATURITY_COUNTS_SCHEMA,
+    "layer_counts": _LAYER_COUNTS_SCHEMA,
+    "machine_passed": _BOOLEAN_SCHEMA,
+    "human_approved": _BOOLEAN_SCHEMA,
+    "runtime_verified": _BOOLEAN_SCHEMA,
+    "legacy_pending_review_count": _COUNT_SCHEMA,
+    "root_cause_count": _COUNT_SCHEMA,
+    "relation_count": _COUNT_SCHEMA,
+    "unbound_entry_count": _COUNT_SCHEMA,
+    "review_queue_count": _COUNT_SCHEMA,
+    "collection": {"type": "string", "enum": ["review_queue", "root_causes", "unbound_entries", "relations"]},
+    "limit": _LIMIT_SCHEMA,
+    "next_cursor": {"type": ["string", "null"], "maxLength": 255},
+    "root_causes": {"type": "array", "items": _BUSINESS_ROOT_CAUSE_SCHEMA, "maxItems": 200},
+    "relations": {"type": "array", "items": _BUSINESS_RELATION_SCHEMA, "maxItems": 200},
+    "unbound_entries": {"type": "array", "items": _UNBOUND_ENTRY_SCHEMA, "maxItems": 200},
+    "review_queue": {"type": "array", "items": _REVIEW_QUEUE_SCHEMA, "maxItems": 200},
+}, (
+    "snapshot_gid", "source_revisions", "finding_count", "root_cause_group_count",
+    "affected_capability_count", "affected_domains", "shared_remediation_family_count",
+    "shared_remediation_families", "maturity_counts", "layer_counts", "machine_passed",
+    "human_approved", "runtime_verified", "legacy_pending_review_count", "root_cause_count",
+    "relation_count", "unbound_entry_count", "review_queue_count", "collection", "limit", "next_cursor",
+))
+_ANALYSIS_RESULT_SCHEMA = _closed({"business_audit": _BUSINESS_AUDIT_SCHEMA}, ("business_audit",))
 _RUN_SCHEMA = _closed({
     "run_gid": GID_SCHEMA, "snapshot_gid": GID_SCHEMA, "kind": _SMALL_STRING_SCHEMA,
-    "status": _SMALL_STRING_SCHEMA,
+    "status": _SMALL_STRING_SCHEMA, "result": _ANALYSIS_RESULT_SCHEMA,
 }, ("run_gid", "snapshot_gid", "kind", "status"))
 _SNAPSHOT_SCHEMA = _closed({"snapshot_gid": GID_SCHEMA, "snapshot_hash": _SMALL_STRING_SCHEMA})
 _PROMPT_SCHEMA = _closed({
@@ -309,8 +398,53 @@ _PROPOSAL_ITEM_SCHEMA = _closed({
     "submitted_by_gid": _SMALL_STRING_SCHEMA,
     "status": _SMALL_STRING_SCHEMA,
     "row_version": _VERSION_SCHEMA,
-    "reviews": {"type": "array", "maxItems": 20, "items": _BOUNDED_OBJECT_SCHEMA},
-    "review_evidence": _BOUNDED_OBJECT_SCHEMA,
+    "domain": _SMALL_STRING_SCHEMA,
+    "reviews": {"type": "array", "maxItems": 20, "items": _closed({
+        "review_gid": GID_SCHEMA,
+        "review_stage": _SMALL_STRING_SCHEMA,
+        "decision": _SMALL_STRING_SCHEMA,
+        "reviewer_gid": _SMALL_STRING_SCHEMA,
+        "decision_reason": {"type": "string", "minLength": 1, "maxLength": 2000},
+        "review_type": _SMALL_STRING_SCHEMA,
+    })},
+    "review_evidence": _closed({
+        "capability_key": STRING_SCHEMA,
+        "major_version": {"type": "integer", "minimum": 1},
+        "capability_version_gid": GID_SCHEMA,
+        "business_effect": {"type": "string", "maxLength": 4000},
+        "business_acceptance_criteria": {"type": "array", "items": {"type": "string", "maxLength": 4000}, "maxItems": 50},
+        "accepted_examples": {"type": "array", "items": {"type": "string", "maxLength": 4000}, "maxItems": 50},
+        "rejected_examples": {"type": "array", "items": {"type": "string", "maxLength": 4000}, "maxItems": 50},
+        "owner_domains": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 11},
+        "business_rules": {"type": "array", "maxItems": 50, "items": _closed({
+            "rule_id": _SMALL_STRING_SCHEMA,
+            "version": {"type": "integer", "minimum": 1},
+            "statement": {"type": "string", "maxLength": 4000},
+            "applies_when": {"type": "string", "maxLength": 4000},
+            "enforcement_ref": {"type": "string", "maxLength": 1000},
+            "error_code": _SMALL_STRING_SCHEMA,
+            "test_refs": {"type": "array", "items": {"type": "string", "maxLength": 1000}, "maxItems": 50},
+            "machine_constraints": _closed({
+                "field": _SMALL_STRING_SCHEMA, "unit": _SMALL_STRING_SCHEMA,
+                "minimum": {"type": ["integer", "number", "null"]},
+                "maximum": {"type": ["integer", "number", "null"]},
+                "minimum_inclusive": _BOOLEAN_SCHEMA, "maximum_inclusive": _BOOLEAN_SCHEMA,
+            }),
+        })},
+        "business_maturity": _closed({
+            "level": {"type": "string", "enum": [f"L{index}" for index in range(7)]},
+            "reason_codes": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 50},
+        }),
+        "definition_hash": _SHA256_SCHEMA,
+        "evidence": _closed({
+            "redacted": _BOOLEAN_SCHEMA,
+            "snapshot_gid": GID_SCHEMA,
+            "source_revision": {"type": "string", "maxLength": 255},
+            "catalog_release_id": {"type": "string", "maxLength": 255},
+        }),
+        "deterministic_relation_candidates": {"type": "array", "items": _BUSINESS_RELATION_SCHEMA, "maxItems": 20},
+        "ai_advisory_relation_candidates": {"type": "array", "items": _BUSINESS_RELATION_SCHEMA, "maxItems": 20},
+    }),
 })
 _HEALTH_ITEM_SCHEMA = _closed({
     "domain": _SMALL_STRING_SCHEMA,

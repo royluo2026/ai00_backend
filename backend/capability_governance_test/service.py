@@ -5,6 +5,8 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 import inspect
+import math
+from types import MappingProxyType
 from typing import Any
 import re
 
@@ -14,6 +16,7 @@ from backend.domain_ports.capability_governance_ai import GovernanceAdvisorPort
 
 from .ai_advisory import AdvisoryContractError, AdvisoryResult
 from .analysis import AnalysisRequest, run_deterministic_analysis
+from .business_audit import BusinessAuditReport, LAYERS, MATURITY_LEVELS
 from .business_relations import analyze_relationships
 from .prompting import PromptAuthorizationError, RedactedPrompt, _render_repair_prompt
 from .redaction import redact
@@ -28,6 +31,8 @@ _MAX_GRAPH_NODES = 500
 _PROMPT_READ_PERMISSION = "base.capability_repair_prompt.read"
 _DEFAULT_PORT = object()
 _MAX_OFFSET = 100000
+_MAX_ANALYSIS_COLLECTION_ITEMS = 5000
+_ANALYSIS_COLLECTIONS = ("review_queue", "root_causes", "unbound_entries", "relations")
 
 
 # Finding codes are the machine-stable NOK categories.  Keep their explanations
@@ -120,6 +125,207 @@ def _business_contract_value(value: Any) -> Any:
             for key, item in values.items() if not str(key).startswith("_")
         }
     return value
+
+
+def _analysis_text(value: Any, *, maximum: int, required: bool = True) -> str:
+    if not isinstance(value, str):
+        raise ValueError("governance_result_invalid")
+    text = value.strip()
+    if (required and not text) or len(text) > maximum:
+        raise ValueError("governance_result_invalid")
+    return text
+
+
+def _analysis_count(value: Any) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or not 0 <= value <= 100000:
+        raise ValueError("governance_result_invalid")
+    return value
+
+
+def _analysis_bool(value: Any) -> bool:
+    if not isinstance(value, bool):
+        raise ValueError("governance_result_invalid")
+    return value
+
+
+def _analysis_strings(value: Any, *, maximum: int, item_length: int = 512) -> tuple[str, ...]:
+    if not isinstance(value, (tuple, list)) or len(value) > maximum:
+        raise ValueError("governance_result_invalid")
+    return tuple(_analysis_text(item, maximum=item_length) for item in value)
+
+
+def _analysis_evidence(value: Any, *, depth: int = 0) -> Any:
+    if depth > 3:
+        raise ValueError("governance_result_invalid")
+    if isinstance(value, Mapping):
+        if len(value) > 40:
+            raise ValueError("governance_result_invalid")
+        return MappingProxyType({
+            _analysis_text(key, maximum=255): _analysis_evidence(item, depth=depth + 1)
+            for key, item in redact(dict(value)).items()
+        })
+    if isinstance(value, (tuple, list)):
+        if len(value) > 40:
+            raise ValueError("governance_result_invalid")
+        return tuple(_analysis_evidence(item, depth=depth + 1) for item in value)
+    if isinstance(value, str):
+        return _analysis_text(value, maximum=2000, required=False)
+    if isinstance(value, float) and not math.isfinite(value):
+        raise ValueError("governance_result_invalid")
+    if isinstance(value, (int, float, bool)) or value is None:
+        return value
+    raise ValueError("governance_result_invalid")
+
+
+def _business_audit_result(report: BusinessAuditReport, snapshot: Any) -> Mapping[str, Any]:
+    snapshot_gid = _analysis_text(str(getattr(snapshot, "snapshot_gid", "")), maximum=19)
+    if report.snapshot_gid != snapshot_gid:
+        raise ValueError("governance_result_invalid")
+    revisions = dict(report.source_revisions)
+    if set(revisions) != {"backend", "web", "source"}:
+        raise ValueError("governance_result_invalid")
+    revisions = {key: _analysis_text(value, maximum=40) for key, value in revisions.items()}
+    if any(re.fullmatch(r"[0-9a-f]{40}", value) is None for value in revisions.values()):
+        raise ValueError("governance_result_invalid")
+    document = getattr(snapshot, "document", snapshot)
+    source_revision = _analysis_text(str(getattr(document, "code_revision", "")), maximum=40)
+    if revisions["source"] != source_revision or revisions["backend"] != source_revision:
+        raise ValueError("governance_result_invalid")
+    if set(report.maturity_counts) != set(MATURITY_LEVELS) or set(report.layer_counts) != set(LAYERS):
+        raise ValueError("governance_result_invalid")
+
+    def bounded_rows(values: Any) -> tuple[Any, ...]:
+        rows = tuple(values)
+        if len(rows) > _MAX_ANALYSIS_COLLECTION_ITEMS:
+            raise ValueError("governance_result_invalid")
+        return rows
+
+    root_causes = tuple(MappingProxyType({
+        "root_cause_key": _analysis_text(item.root_cause_key, maximum=512),
+        "reason_code": _analysis_text(item.reason_code, maximum=255),
+        "capability_keys": _analysis_strings(item.capability_keys, maximum=20),
+        "domains": _analysis_strings(item.domains, maximum=11, item_length=64),
+        "evidence_refs": _analysis_strings(item.evidence_refs, maximum=50, item_length=1000),
+        "finding_count": _analysis_count(item.finding_count),
+        "remediation_family": _analysis_text(item.remediation_family, maximum=255),
+        "severity": _analysis_text(item.severity, maximum=32),
+    }) for item in bounded_rows(report.root_causes))
+    relations = []
+    for item in bounded_rows(report.relations):
+        source = _analysis_text(item.source, maximum=32)
+        if source not in {"deterministic", "advisory"}:
+            raise ValueError("governance_result_invalid")
+        relations.append(MappingProxyType({
+            "candidate_hash": _analysis_text(item.candidate_hash, maximum=255),
+            "relation_type": _analysis_text(item.relation_type, maximum=64),
+            "source": source,
+            "capability_keys": _analysis_strings(item.capability_keys, maximum=20),
+            "evidence": _analysis_evidence(item.evidence),
+            "status": _analysis_text(item.status, maximum=64),
+        }))
+    relations = tuple(relations)
+    unbound_entries = tuple(MappingProxyType({
+        "entry_type": _analysis_text(item.entry_type, maximum=64),
+        "canonical_key": _analysis_text(item.canonical_key, maximum=512),
+        "domain": _analysis_text(item.domain, maximum=64),
+        "location": _analysis_text(item.location, maximum=1000),
+        "source_path": _analysis_text(item.source_path, maximum=1000),
+        "source_symbol": _analysis_text(item.source_symbol, maximum=512),
+        "http_method": None if item.http_method is None else _analysis_text(item.http_method, maximum=16),
+        "route_path": None if item.route_path is None else _analysis_text(item.route_path, maximum=1000),
+    }) for item in bounded_rows(report.unbound_entries))
+    review_queue = []
+    for item in bounded_rows(report.review_queue):
+        maturity = _analysis_text(item.maturity, maximum=2)
+        if maturity not in MATURITY_LEVELS:
+            raise ValueError("governance_result_invalid")
+        review_queue.append(MappingProxyType({
+            "capability_key": _analysis_text(item.capability_key, maximum=255),
+            "domain": _analysis_text(item.domain, maximum=64),
+            "maturity": maturity,
+            "priority": _analysis_count(item.priority),
+            "reason": _analysis_text(item.reason, maximum=255),
+        }))
+    review_queue = tuple(review_queue)
+
+    catalog_binding: dict[str, str] = {}
+    catalog_release = str(getattr(document, "product_release_id", "") or "").strip()
+    snapshot_hash = str(getattr(document, "snapshot_hash", "") or "").strip()
+    if catalog_release:
+        catalog_binding["catalog_release_id"] = _analysis_text(catalog_release, maximum=255)
+    if snapshot_hash:
+        catalog_binding["snapshot_hash"] = _analysis_text(snapshot_hash, maximum=255)
+    families = dict(report.shared_remediation_families)
+    if len(families) > 200:
+        raise ValueError("governance_result_invalid")
+    if (
+        _analysis_count(report.finding_count) != len(tuple(report.findings))
+        or _analysis_count(report.root_cause_group_count) != len(root_causes)
+        or _analysis_count(report.affected_capability_count) != len(tuple(report.affected_capabilities))
+        or _analysis_count(report.shared_remediation_family_count) != len(families)
+    ):
+        raise ValueError("governance_result_invalid")
+    result = {
+        "snapshot_gid": snapshot_gid,
+        "source_revisions": MappingProxyType(revisions),
+        **({"catalog_binding": MappingProxyType(catalog_binding)} if catalog_binding else {}),
+        "finding_count": _analysis_count(report.finding_count),
+        "root_cause_group_count": _analysis_count(report.root_cause_group_count),
+        "affected_capability_count": _analysis_count(report.affected_capability_count),
+        "affected_domains": _analysis_strings(report.affected_domains, maximum=11, item_length=64),
+        "shared_remediation_family_count": _analysis_count(report.shared_remediation_family_count),
+        "shared_remediation_families": MappingProxyType({
+            _analysis_text(key, maximum=255): _analysis_count(value) for key, value in families.items()
+        }),
+        "maturity_counts": MappingProxyType({level: _analysis_count(report.maturity_counts[level]) for level in MATURITY_LEVELS}),
+        "layer_counts": MappingProxyType({layer: _analysis_count(report.layer_counts[layer]) for layer in LAYERS}),
+        "machine_passed": _analysis_bool(report.machine_passed),
+        "human_approved": _analysis_bool(report.human_approved),
+        "runtime_verified": _analysis_bool(report.runtime_verified),
+        "legacy_pending_review_count": _analysis_count(report.legacy_pending_review_count),
+        "root_cause_count": len(root_causes),
+        "relation_count": len(relations),
+        "unbound_entry_count": len(unbound_entries),
+        "review_queue_count": len(review_queue),
+        "root_causes": root_causes,
+        "relations": relations,
+        "unbound_entries": unbound_entries,
+        "review_queue": review_queue,
+    }
+    return MappingProxyType(result)
+
+
+def _paged_business_audit(result: Mapping[str, Any], payload: Mapping[str, Any]) -> Mapping[str, Any]:
+    report = result.get("business_audit")
+    if not isinstance(report, Mapping):
+        return result
+    collection = str(payload.get("collection", "review_queue")).strip()
+    if collection not in _ANALYSIS_COLLECTIONS:
+        raise _business_error("invalid_input")
+    try:
+        limit = min(max(1, int(payload.get("limit", 200))), 200)
+    except (TypeError, ValueError) as exc:
+        raise _business_error("invalid_input") from exc
+    cursor = str(payload.get("cursor", "")).strip()
+    offset = 0
+    if cursor:
+        cursor_collection, separator, raw_offset = cursor.rpartition(":")
+        if not separator or cursor_collection != collection:
+            raise _business_error("invalid_input")
+        try:
+            offset = int(raw_offset)
+        except ValueError as exc:
+            raise _business_error("invalid_input") from exc
+        if offset < 0 or offset > _MAX_OFFSET:
+            raise _business_error("invalid_input")
+    rows = tuple(report.get(collection, ()))
+    page = rows[offset:offset + limit]
+    next_cursor = f"{collection}:{offset + limit}" if offset + limit < len(rows) else None
+    metadata = {
+        key: value for key, value in report.items() if key not in _ANALYSIS_COLLECTIONS
+    }
+    metadata.update({"collection": collection, "limit": limit, collection: page, "next_cursor": next_cursor})
+    return MappingProxyType({"business_audit": MappingProxyType(metadata)})
 
 
 def _root_cause_capability_refs(record: Any, root_key: str = "") -> tuple[str, ...]:
@@ -348,6 +554,7 @@ class GovernedRun:
     requested_by: str
     idempotency_key: str
     status: str = "queued"
+    result: Mapping[str, Any] | None = None
 
 
 class CapabilityGovernanceService:
@@ -904,7 +1111,15 @@ class CapabilityGovernanceService:
         target = str(payload.get("target_gid", ""))
         run = next((item for item in self._runs.values() if item.run_gid == target), None)
         if run is None:
+            loader = getattr(self._store, "get_governed_run", None) if self._store is not None else None
+            loaded = loader(target) if callable(loader) else None
+            if loaded is not None and not isinstance(loaded, GovernedRun):
+                raise _business_error("governance_result_invalid")
+            run = loaded
+        if run is None:
             raise _business_error("resource_not_found")
+        if run.result is not None:
+            run = replace(run, result=_paged_business_audit(run.result, payload))
         return self._completed("base.capability_analysis.get", run=run)
 
     def base_capability_analysis_run(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
@@ -1365,31 +1580,69 @@ class CapabilityGovernanceService:
         run = GovernedRun(str(self._next_run_gid), snapshot_gid, kind, _context_user(context), key)
         self._next_run_gid += 1
         self._runs[run_key] = run
+        self._persist_governed_run(run)
 
         def execute(heartbeat: Any | None = None) -> Any:
-            return self._invoke_port(
+            raw_result = self._invoke_port(
                 runner, snapshot=snapshot, payload=payload, context=context,
                 kind=kind, run_gid=run.run_gid, request=AnalysisRequest(),
                 heartbeat=heartbeat,
             )
+            if kind == "analysis":
+                projection = self._analysis_run_result(raw_result, snapshot)
+                if projection is not None:
+                    completed_run = replace(self._runs.get(run_key, run), status="completed", result=projection)
+                    self._runs[run_key] = completed_run
+                    self._persist_governed_run(completed_run)
+            return raw_result
 
         try:
             completed = self._run_worker(kind, run.run_gid, execute)
         except CapabilityBusinessError:
-            self._runs[run_key] = replace(run, status="failed")
+            failed = replace(self._runs.get(run_key, run), status="failed", result=None)
+            self._runs[run_key] = failed
+            self._persist_governed_run(failed)
             raise
         except Exception as exc:
-            self._runs[run_key] = replace(run, status="failed")
+            failed = replace(self._runs.get(run_key, run), status="failed", result=None)
+            self._runs[run_key] = failed
+            self._persist_governed_run(failed)
             raise _business_error("governance_dependency_unavailable") from exc
         if completed is False:
-            self._runs[run_key] = replace(run, status="failed")
+            failed = replace(self._runs.get(run_key, run), status="failed", result=None)
+            self._runs[run_key] = failed
+            self._persist_governed_run(failed)
             raise _business_error("governance_worker_failed")
         status = "completed" if completed is True else "queued"
-        self._runs[run_key] = replace(run, status=status)
+        current = self._runs.get(run_key, run)
+        updated = replace(current, status=status if current.result is None else "completed")
+        self._runs[run_key] = updated
+        self._persist_governed_run(updated)
         return self._accepted(
             capability_id, run_gid=run.run_gid, snapshot_gid=run.snapshot_gid,
-            run_status=status,
+            run_status=updated.status,
         )
+
+    @staticmethod
+    def _analysis_run_result(raw_result: Any, snapshot: Any) -> Mapping[str, Any] | None:
+        if isinstance(raw_result, BusinessAuditReport):
+            report = raw_result
+        elif isinstance(raw_result, Mapping):
+            if set(raw_result) != {"business_audit"} or not isinstance(raw_result.get("business_audit"), BusinessAuditReport):
+                raise _business_error("governance_result_invalid")
+            report = raw_result["business_audit"]
+        else:
+            return None
+        try:
+            audit_result = _business_audit_result(report, snapshot)
+        except (AttributeError, KeyError, TypeError, ValueError) as exc:
+            raise _business_error("governance_result_invalid") from exc
+        return MappingProxyType({"business_audit": audit_result})
+
+    def _persist_governed_run(self, run: GovernedRun) -> None:
+        saver = getattr(self._store, "save_governed_run", None) if self._store is not None else None
+        if callable(saver):
+            saver(run)
 
     def _run_worker(self, kind: str, run_gid: str, execute: Callable[..., Any]) -> bool | None:
         worker = self._worker
@@ -1697,27 +1950,60 @@ class CapabilityGovernanceService:
                 str(getattr(capability, "capability_id", "")) == str(getattr(proposal, "capability_id", ""))
                 and int(getattr(capability, "major_version", 0) or 0) == int(getattr(version_entry, "major_version", 0) or 0)
             ):
+                descriptor = getattr(capability, "descriptor", {})
+                if not isinstance(descriptor, Mapping):
+                    return {}
+                definition_hash = descriptor.get("business_definition_hash")
+                if (
+                    not isinstance(definition_hash, str)
+                    or re.fullmatch(r"sha256:[0-9a-f]{64}", definition_hash) is None
+                    or definition_hash != str(getattr(proposal, "proposed_descriptor_hash", ""))
+                ):
+                    return {}
                 relation_loader = getattr(self._store, "list_relation_candidates", None) if self._store is not None else None
                 relations = tuple(relation_loader(int(getattr(snapshot, "snapshot_gid"))) if callable(relation_loader) else ())
                 capability_key = f"{capability.capability_id}@{capability.major_version}"
                 def project(source: str) -> list[dict[str, Any]]:
-                    return [
+                    return sorted([
                         {
                             "candidate_hash": str(getattr(item, "candidate_hash", "")),
                             "relation_type": str(getattr(item, "relation_type", "")),
+                            "source": source,
                             "capability_keys": list(getattr(item, "capability_keys", ()))[:20],
                             "evidence": _business_contract_value(redact(getattr(item, "evidence", {}))),
+                            "status": str(getattr(item, "status", "pending_review")),
                         }
                         for item in relations if (
                             str(getattr(item, "source", "")) == source
                             and capability_key in tuple(getattr(item, "capability_keys", ()))
                         )
-                    ][:20]
+                    ], key=lambda item: (item["candidate_hash"], item["relation_type"]))[:20]
+                accepted = descriptor.get("accepted_examples")
+                if accepted is None:
+                    accepted = (descriptor.get("use_when"),) if descriptor.get("use_when") else ()
+                rejected = descriptor.get("rejected_examples")
+                if rejected is None:
+                    rejected = (descriptor.get("do_not_use_when"),) if descriptor.get("do_not_use_when") else ()
+                criteria = descriptor.get("business_acceptance_criteria", ())
+                owner_domain = str(getattr(capability, "owner_domain", getattr(version_entry, "owner_domain", ""))).strip()
                 return {
+                    "capability_key": capability_key,
+                    "major_version": int(getattr(capability, "major_version", 0) or 0),
+                    "capability_version_gid": str(getattr(version_entry, "capability_version_gid", "")),
                     "business_effect": str(getattr(capability, "business_effect", ""))[:4000],
+                    "business_acceptance_criteria": _business_contract_value(criteria),
+                    "accepted_examples": _business_contract_value(accepted),
+                    "rejected_examples": _business_contract_value(rejected),
+                    "owner_domains": [owner_domain] if owner_domain else [],
                     "business_rules": _business_contract_value(getattr(capability, "business_rules", ())),
                     "business_maturity": _business_contract_value(getattr(capability, "business_maturity", None)),
-                    "definition_hash": str(getattr(proposal, "proposed_descriptor_hash", "")),
+                    "definition_hash": definition_hash,
+                    "evidence": {
+                        "redacted": True,
+                        "snapshot_gid": str(getattr(snapshot, "snapshot_gid", "")),
+                        "source_revision": str(getattr(document, "code_revision", "")),
+                        "catalog_release_id": str(getattr(document, "product_release_id", "")),
+                    },
                     "deterministic_relation_candidates": project("deterministic"),
                     "ai_advisory_relation_candidates": project("advisory"),
                 }
