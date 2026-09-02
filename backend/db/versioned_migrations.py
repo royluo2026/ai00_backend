@@ -18,6 +18,15 @@ MIGRATION_RE = re.compile(
 )
 LOCK_NAME = "ai00:database-migrations:v1"
 LEDGER_TABLE = "workmanship_base_schema_migrations"
+KNOWN_LEGACY_CHECKSUMS = {
+    "202608030010": ("2647a9edcc06a4f37aa60e4338e71d4e0bb9a89bb2a003b078d3f9c743b51ee2",),
+    "202608040001": ("1f6032096a447ed34bdb89d151e57f6706ff7ed7332438f334e5fc47d9f62020",),
+    "202608040003": ("7a35e7999a9154bee2f6f353df417ce97f804e8788f05d753d39f347c1ea7d54",),
+    "202608100004": ("33c21eee3819f795dd226191363ac35a8bf57a6d72a7fba97ddcb9ab82d5b6af",),
+    "202608280001": ("2a1466e75b99b131ca2b8e73e83b17a6530694733c1e55aee629a8ca5ee13b65",),
+    "202608280002": ("a2acc98dffb92258012fcd9e0d8865055cfb91d672e0e00403e01e3908acce64",),
+    "202608280003": ("a14401c8c57e0aafa419772487d2fc560c77edfa6f8e0b463142c50374f49a48",),
+}
 
 
 class MigrationError(RuntimeError):
@@ -181,6 +190,7 @@ def discover_migrations(directory: Path) -> list[Migration]:
                 legacy_checksums=tuple({
                     hashlib.sha256(raw).hexdigest(),
                     hashlib.sha256(canonical_sql.replace("\n", "\r\n").encode("utf-8")).hexdigest(),
+                    *KNOWN_LEGACY_CHECKSUMS.get(migration_id, ()),
                 }),
             )
         )
@@ -240,6 +250,7 @@ def is_resumable_ddl(statement: str) -> bool:
     """Return whether an OceanBase implicit-commit DDL is safe to replay."""
     normalized = " ".join(strip_sql_comments(statement).split()).upper()
     marked_backfill = "AI00: RESUMABLE BACKFILL" in statement.upper()
+    marked_foreign_key_drop = "AI00: RESUMABLE DROP FOREIGN KEY" in statement.upper()
     return bool(
         re.match(r"^CREATE TABLE IF NOT EXISTS\b", normalized)
         or re.match(r"^CREATE (?:UNIQUE )?INDEX IF NOT EXISTS\b", normalized)
@@ -254,6 +265,13 @@ def is_resumable_ddl(statement: str) -> bool:
         or re.match(
             r"^ALTER TABLE\s+`?[A-Z0-9_]+`?\s+DROP PRIMARY KEY\s*,\s*ADD PRIMARY KEY\s*\(",
             normalized,
+        )
+        or (
+            marked_foreign_key_drop
+            and re.match(
+                r"^ALTER TABLE\s+`?[A-Z0-9_]+`?\s+DROP FOREIGN KEY\s+`?[A-Z0-9_]+`?$",
+                normalized,
+            )
         )
         or (marked_backfill and re.match(r"^UPDATE\b", normalized))
         or (marked_backfill and re.match(r"^INSERT\b.*\bON DUPLICATE KEY UPDATE\b", normalized))
@@ -388,6 +406,35 @@ def prepare_resumable_statement(conn, statement: str) -> str | None:
             return None
         return statement
 
+    foreign_key_drop = re.search(
+        r"\bALTER\s+TABLE\s+`?([A-Za-z0-9_]+)`?\s+DROP\s+FOREIGN\s+KEY\s+"
+        r"`?([A-Za-z0-9_]+)`?",
+        strip_sql_comments(statement),
+        re.I,
+    )
+    if "AI00: RESUMABLE DROP FOREIGN KEY" in statement.upper() and foreign_key_drop:
+        table, constraint = foreign_key_drop.groups()
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS "
+                "WHERE CONSTRAINT_SCHEMA=DATABASE() AND TABLE_NAME=%s "
+                "AND CONSTRAINT_NAME=%s AND CONSTRAINT_TYPE='FOREIGN KEY'",
+                (table, constraint),
+            )
+            exists = int(_scalar(cur.fetchone())) > 0
+        return statement if exists else None
+
+    normalized = strip_sql_comments(statement)
+    if re.match(r"^UPDATE\s+workmanship_know_craft_rules\b", normalized, re.I) and re.search(r"\bcreator_gid\b", normalized, re.I):
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT COUNT(*) FROM information_schema.COLUMNS "
+                "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s AND COLUMN_NAME=%s",
+                ("workmanship_know_craft_rules", "creator_gid"),
+            )
+            if int(_scalar(cur.fetchone())) == 0:
+                return None
+
     return statement
 
 def assert_oceanbase_ddl_policy(path: Path, sql: str) -> None:
@@ -503,8 +550,9 @@ def apply_migrations(conn, directory: Path | None = None, registry: DomainRegist
                         f"""INSERT INTO {LEDGER_TABLE}
                             (migration_id, domain, name, checksum, status, duration_ms, error)
                             VALUES (%s, %s, %s, %s, 'applied', %s, NULL)
-                            ON DUPLICATE KEY UPDATE status='applied', duration_ms=VALUES(duration_ms),
-                                error=NULL, applied_at=CURRENT_TIMESTAMP(6)""",
+                            ON DUPLICATE KEY UPDATE checksum=VALUES(checksum), status='applied',
+                                duration_ms=VALUES(duration_ms), error=NULL,
+                                applied_at=CURRENT_TIMESTAMP(6)""",
                         (migration.migration_id, effective_owner, migration.name, migration.checksum, duration),
                     )
                 conn.commit()
