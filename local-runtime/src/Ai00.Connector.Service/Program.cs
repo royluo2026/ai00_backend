@@ -7,6 +7,10 @@ builder.Services.AddSingleton<IDeviceCredentialStore>(_ => new DeviceCredentialS
     Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "AI00", "Connector", "device.credential")));
 builder.Services.AddHttpClient<DeviceGatewayClient>();
 builder.Services.AddHttpClient<ConnectorGatewayClient>();
+builder.Services.AddSingleton<IConnectorHeartbeatSink>(service =>
+    service.GetRequiredService<ConnectorGatewayClient>());
+builder.Services.AddSingleton<IConnectorHealthSource, FileConnectorHealthSource>();
+builder.Services.AddSingleton<ConnectorHeartbeatReporter>();
 builder.Services.AddSingleton<IConnectorPlanGateway>(service =>
     service.GetRequiredService<ConnectorGatewayClient>());
 builder.Services.AddSingleton<SessionHostClient>();
@@ -22,4 +26,5 @@ builder.Services.AddSingleton<IConnectorPlanExecutor>(service =>
         service.GetRequiredService<ISystemPowerGuard>()));
 builder.Services.AddSingleton<PlanWorker>();
 builder.Services.AddHostedService<RuntimeWorker>();
+builder.Services.AddHostedService<ConnectorHeartbeatWorker>();
 await builder.Build().RunAsync();

@@ -2,6 +2,8 @@ using Ai00.Connector.Adapters.VisMockup;
 using Ai00.Connector.Contracts;
 using Ai00.Connector.SessionHost;
 using System.Security.Principal;
+using System.Diagnostics;
+using System.Text.Json;
 
 var options = SessionHostOptions.FromEnvironment();
 var deviceId = Environment.GetEnvironmentVariable("AI00_CONNECTOR_DEVICE_ID")
@@ -19,6 +21,37 @@ var host = new CommandPipeHost(
 var planHost = new PlanPipeHost(
     new ValidatedPlanDispatcher([adapter], options.OperationSigningKeys),
     ConnectorPipeName.PlanFor(deviceId, windowsSid));
-await Task.WhenAll(
-    host.RunAsync(CancellationToken.None),
-    planHost.RunAsync(CancellationToken.None));
+using var presenceCancellation = new CancellationTokenSource();
+var presence = PublishPresenceAsync(adapter, windowsSid, presenceCancellation.Token);
+try
+{
+    await Task.WhenAll(
+        host.RunAsync(CancellationToken.None),
+        planHost.RunAsync(CancellationToken.None));
+}
+finally
+{
+    presenceCancellation.Cancel();
+    try { await presence; } catch (OperationCanceledException) { }
+    if (File.Exists(SessionHostPresencePath.Value)) File.Delete(SessionHostPresencePath.Value);
+}
+
+static async Task PublishPresenceAsync(
+    VisMockupAdapter adapter, string windowsSid, CancellationToken cancellationToken)
+{
+    Directory.CreateDirectory(Path.GetDirectoryName(SessionHostPresencePath.Value)!);
+    using var timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
+    do
+    {
+        var health = await adapter.ProbeAsync(cancellationToken);
+        var advertised = string.IsNullOrWhiteSpace(health.ProductVersion)
+            ? adapter.Manifest
+            : adapter.Manifest with { ProductVersion = health.ProductVersion };
+        var value = new SessionHostPresence(
+            windowsSid, Process.GetCurrentProcess().SessionId, Environment.ProcessId,
+            advertised, DateTimeOffset.UtcNow);
+        var temporary = SessionHostPresencePath.Value + ".tmp-" + Guid.NewGuid().ToString("N");
+        await File.WriteAllTextAsync(temporary, JsonSerializer.Serialize(value), cancellationToken);
+        File.Move(temporary, SessionHostPresencePath.Value, true);
+    } while (await timer.WaitForNextTickAsync(cancellationToken));
+}

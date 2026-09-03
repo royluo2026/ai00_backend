@@ -8,7 +8,7 @@ namespace Ai00.Connector.Service;
 public sealed class ConnectorGatewayClient(
     HttpClient http,
     IOptions<RuntimeOptions> options,
-    IDeviceCredentialStore credentialStore) : IConnectorPlanGateway
+    IDeviceCredentialStore credentialStore) : IConnectorPlanGateway, IConnectorHeartbeatSink
 {
     private readonly RuntimeOptions _options = options.Value;
 
@@ -18,6 +18,9 @@ public sealed class ConnectorGatewayClient(
         using var response = await http.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
     }
+
+    public Task SendAsync(ConnectorHealthReport report, CancellationToken cancellationToken) =>
+        HeartbeatAsync(report, cancellationToken);
 
     public async Task<LeasedConnectorPlan?> LeaseAsync(CancellationToken cancellationToken)
     {
