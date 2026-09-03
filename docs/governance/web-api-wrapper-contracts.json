@@ -174,6 +174,91 @@
           "source_sha256": "02a0043e888e94172997f380ea5442d93ee7cc6d2efb8dcde44e183335cc587e"
         }
       ]
+    },
+    {
+      "source": "packages/sim-plugin/web/cad_sim/capture_workflow.js",
+      "source_sha256": "6bdc9fe658e63c523abe4a4730f58ac9f26441625516bda2ab503b71642546df",
+      "callee": "gatewayPost",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "constant",
+        "method": "POST"
+      },
+      "definition": {
+        "source_path": "packages/sim-plugin/web/cad_sim/capture_workflow.js",
+        "start_line": 72,
+        "end_line": 77,
+        "sha256": "5011956ffb3075e3cfac68b5dfa0bc1a75652885aee9a440db0b029db0f2be94"
+      },
+      "expected_definition": "return fetcher(route, {",
+      "binding": {
+        "kind": "function_declaration",
+        "parameters": [
+          "route",
+          "body"
+        ]
+      },
+      "call_sites": [
+        {
+          "source_path": "packages/sim-plugin/web/cad_sim/capture_workflow.js",
+          "line": 86,
+          "column": 10,
+          "raw_route": "/api/v1/capabilities/${encodeURIComponent(capabilityId)}:confirm",
+          "normalized_route": "/api/v1/capabilities/{dynamic}:confirm",
+          "source_sha256": "6bdc9fe658e63c523abe4a4730f58ac9f26441625516bda2ab503b71642546df"
+        },
+        {
+          "source_path": "packages/sim-plugin/web/cad_sim/capture_workflow.js",
+          "line": 124,
+          "column": 12,
+          "raw_route": "/api/v1/capabilities/${encodeURIComponent(capabilityId)}:invoke",
+          "normalized_route": "/api/v1/capabilities/{dynamic}:invoke",
+          "source_sha256": "6bdc9fe658e63c523abe4a4730f58ac9f26441625516bda2ab503b71642546df"
+        }
+      ]
+    },
+    {
+      "source": "web/simulation_connector/pair.js",
+      "source_sha256": "cada5b8869e5351d0cc7a9a028c84f838a1e4c4d335ccb55667e1a1be96607b7",
+      "callee": "request",
+      "signature": {
+        "route_argument": 0,
+        "method_source": "options_argument",
+        "method_argument": 1,
+        "default_method": "GET"
+      },
+      "definition": {
+        "source_path": "web/simulation_connector/pair.js",
+        "start_line": 9,
+        "end_line": 17,
+        "sha256": "c8b49dd8610d45b41e7dbc40c2d17f9a4234384de7d257c6adc3bb3df1ad1df7"
+      },
+      "expected_definition": "const response = await fetch(path, {",
+      "binding": {
+        "kind": "function_declaration",
+        "parameters": [
+          "path",
+          "options = {}"
+        ]
+      },
+      "call_sites": [
+        {
+          "source_path": "web/simulation_connector/pair.js",
+          "line": 25,
+          "column": 8,
+          "raw_route": "/api/v1/capabilities/${encodeURIComponent(capabilityId)}:confirm",
+          "normalized_route": "/api/v1/capabilities/{dynamic}:confirm",
+          "source_sha256": "cada5b8869e5351d0cc7a9a028c84f838a1e4c4d335ccb55667e1a1be96607b7"
+        },
+        {
+          "source_path": "web/simulation_connector/pair.js",
+          "line": 35,
+          "column": 6,
+          "raw_route": "/api/v1/capabilities/${encodeURIComponent(capabilityId)}:invoke",
+          "normalized_route": "/api/v1/capabilities/{dynamic}:invoke",
+          "source_sha256": "cada5b8869e5351d0cc7a9a028c84f838a1e4c4d335ccb55667e1a1be96607b7"
+        }
+      ]
     }
   ]
 }

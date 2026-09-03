@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 from pathlib import Path
 import subprocess
 
@@ -11,10 +12,16 @@ ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / "backend/scripts/build_craft_agent_project_structural_web_remediation.py"
 PLAN_SCRIPT = ROOT / "backend/scripts/check_structural_remediation_plan.py"
 LEDGER_SCRIPT = ROOT / "backend/scripts/build_web_route_root_cause_ledger.py"
-WEB_ROOT = ROOT.parent / "workmanship-web-capability-governance"
-CRAFT_FRONTEND_REVISION = "8ebc8de49b5d4f86c9360664fffa912c3d969102"
-AGENT_BACKEND_REVISION = "d56c743dee03112b2a3211a4ccb659ebed9cfda5"
-AGENT_FRONTEND_REVISION = "08359de59e756ce73c61df9818c7e7bcaeb86975"
+WEB_ROOT = Path(
+    os.environ.get(
+        "AI00_WEB_ROOT",
+        str(ROOT.parent / "workmanship-web-capability-governance"),
+    )
+)
+PROJECT_FRONTEND_REVISION = "c2cfd58dc153a7fd0d9f1b23e562037ffa3a87e9"
+CRAFT_FRONTEND_REVISION = PROJECT_FRONTEND_REVISION
+AGENT_BACKEND_REVISION = "94dc49eb18334f9a9201798ef984cde62ec032ce"
+AGENT_FRONTEND_REVISION = PROJECT_FRONTEND_REVISION
 
 
 def _module():
@@ -43,7 +50,7 @@ def _ledger_module():
 
 def _frontend_source(path: str) -> str:
     return subprocess.run(
-        ["git", "show", f"69e5e00054d3c1cff635fe41fcb96fbe150d25fb:{path}"],
+        ["git", "show", f"{PROJECT_FRONTEND_REVISION}:{path}"],
         cwd=WEB_ROOT, check=True, capture_output=True, text=True, encoding="utf-8",
     ).stdout
 
@@ -60,28 +67,28 @@ def test_agent_closure_evidence_freezes_exact_source_identities_and_anchors():
     evidence = _module().build_agent_closure_evidence(WEB_ROOT)
 
     assert evidence["backend_revision"] == AGENT_BACKEND_REVISION
-    assert evidence["backend_tree"] == "9ec7401102fc337bd2b1a77361eae9e52b817478"
+    assert evidence["backend_tree"] == "567f2aaecc52b4c4759c431e61b5082588cc4c00"
     assert evidence["frontend_revision"] == AGENT_FRONTEND_REVISION
     assert evidence["scanner_materialization"] == {
         "method": "git-tree-blobs-v1",
         "revision": AGENT_FRONTEND_REVISION,
-        "tree": "3c3156841af0d4bf2833dba8184b071265993965",
+        "tree": "3f16fd481d9b6417518a46a2d593f9b70b9c3f53",
         "roots": ["web", "packages"],
-        "document_count": 224,
-        "materialization_sha256": "sha256:2fe79af7f2d8b15397230b0c5383ea421e4ccff9e4581959e8da03ef206df992",
+        "document_count": 228,
+        "materialization_sha256": "sha256:8330fd04a403985d3d739b5ede4ae98e90cc15580ac433af8da5dd499f9ca833",
     }
     assert {
         path: item["blob"] for path, item in evidence["backend_files"].items()
     } == {
-        "backend/capability_v2/gateway.py": "6d8a3e052901df5bff607889b4163250b5c6370d",
+        "backend/capability_v2/gateway.py": "16e0e3c05a8a2f30996fc4ecda91ed4704d96c3f",
         "backend/db/migrations/domains/agent/0003_canvas_execution_control.sql": "5d1febea8ee0b44851029fc58716c2c387385384",
         "plugins/agent/agent_backend/application/canvas_runtime.py": "35b933b84af64e2dddd25122c56cde2ce2300820",
         "plugins/agent/agent_backend/application/service.py": "20999ec38b694bdec71f68d7bd382086de54fa60",
-        "plugins/agent/agent_backend/capabilities/__init__.py": "0b81093263520cf2a44670053562020a3ff858e9",
+        "plugins/agent/agent_backend/capabilities/__init__.py": "f2645adcb8c96714de912c4beccbb93d73c0314f",
         "plugins/agent/agent_backend/capabilities/contracts.py": "749473ea8336267cca1bd4b8bf884ed8e38e293f",
         "plugins/agent/agent_backend/capabilities/descriptors.py": "5795da4f92eab51e982ff53788b0524e03ac2422",
-        "plugins/agent/agent_backend/capabilities/provider.py": "78db671e0192d8d63226be6287d9aece312f444a",
-        "plugins/agent/agent_backend/infrastructure/repository.py": "594e9c7fd5e37e7518d18871891f86087aae8b5b",
+        "plugins/agent/agent_backend/capabilities/provider.py": "deeee1d5155456fb339809dfeab82660e2e59519",
+        "plugins/agent/agent_backend/infrastructure/repository.py": "1b95e9a7ec8bd38b73629ce9196074dd1e3a74ce",
     }
     assert {
         path: item["blob"] for path, item in evidence["frontend_files"].items()
@@ -134,30 +141,30 @@ def test_craft_closure_evidence_freezes_exact_source_identities_and_anchors():
     """Breaks if Craft closure drifts from the reviewed backend or frozen Web tree."""
     evidence = _module().build_craft_closure_evidence(WEB_ROOT)
 
-    assert evidence["backend_revision"] == "9cda07080f3e27b10d30ec6492ea875c31c82492"
-    assert evidence["backend_tree"] == "1c31a434c78243f163d3a1b7914ce64221a20796"
+    assert evidence["backend_revision"] == AGENT_BACKEND_REVISION
+    assert evidence["backend_tree"] == "567f2aaecc52b4c4759c431e61b5082588cc4c00"
     assert evidence["frontend_revision"] == CRAFT_FRONTEND_REVISION
     assert evidence["scanner_materialization"] == {
         "method": "git-tree-blobs-v1",
         "revision": CRAFT_FRONTEND_REVISION,
-        "tree": "8ffe4dde53f1b12f2a4cd55c2f7a1cf49aeb6992",
+        "tree": "3f16fd481d9b6417518a46a2d593f9b70b9c3f53",
         "roots": ["web", "packages"],
-        "document_count": 224,
-        "materialization_sha256": "sha256:76e0efa1eb50caa5bdcba9223964ff7494932f8c2f7ddeb38e71e57898a85d9c",
+        "document_count": 228,
+        "materialization_sha256": "sha256:8330fd04a403985d3d739b5ede4ae98e90cc15580ac433af8da5dd499f9ca833",
     }
     assert {
         path: item["blob"] for path, item in evidence["frontend_files"].items()
     } == {
-        "dist-production/packages/craft-plugin/web/lineage_view/layout_detail_panel.js": "790fa9303109bd4c914f043ea63e3d06a306ec91",
+        "dist-production/packages/craft-plugin/web/lineage_view/layout_detail_panel.js": "1d7df5e5e6b1e0a765c413228805eb9fc2d447b9",
         "dist-production/web/container_card/modes/container_item_detail.js": "f80b7f2f7168b3a1049989c21b93ef231b778b00",
         "dist-production/web/container_card/modes/mode_field_detail.js": "8111a1cb22209beb708be2dea177004f13788f3b",
-        "dist-production/web/knowledge_hub/pages/gbop_vpps.html": "b5f37566ebe00f00740691fb76a720aab3f46b87",
+        "dist-production/web/knowledge_hub/pages/gbop_vpps.html": "112f0b331c9d2ddabe534d6c2b0f1e872b4e0665",
         "dist-production/web/rule_mgmt/rule_mgmt.html": "eb7f87f7347e88247bd30cf5b9a895d751bbee99",
         "dist-production/web/rule_mgmt/rule_mgmt.js": "ec66cdda6154ac2cf3af143befedd933b210b392",
-        "packages/craft-plugin/web/lineage_view/layout_detail_panel.js": "790fa9303109bd4c914f043ea63e3d06a306ec91",
+        "packages/craft-plugin/web/lineage_view/layout_detail_panel.js": "1d7df5e5e6b1e0a765c413228805eb9fc2d447b9",
         "web/container_card/modes/container_item_detail.js": "7c72c1908cebea8d8cbdf72743f37366fc432f1c",
         "web/container_card/modes/mode_field_detail.js": "84f8f8a083169bc9d32870b539d739f50fd34adc",
-        "web/knowledge_hub/pages/gbop_vpps.html": "2ea909184bf3d6e7c67791eb9f258e04ca62a34f",
+        "web/knowledge_hub/pages/gbop_vpps.html": "a2f6e2a7f1f97399a21504d2d67363a3cff8b0bb",
         "web/rule_mgmt/rule_mgmt.html": "d4c58f1e74117a7cac19cdd141bbabbfd876c6bb",
         "web/rule_mgmt/rule_mgmt.js": "f6b03514744aece0c572090d8601865bb5df03a9",
     }
@@ -314,14 +321,14 @@ def test_project_closure_evidence_freezes_exact_frontend_commit_blobs_and_absenc
     """Breaks if closure can drift to another Web commit or retain one of the three legacy calls."""
     evidence = _module().build_project_closure_evidence(WEB_ROOT)
 
-    assert evidence["frontend_revision"] == "69e5e00054d3c1cff635fe41fcb96fbe150d25fb"
+    assert evidence["frontend_revision"] == PROJECT_FRONTEND_REVISION
     assert evidence["scanner_materialization"] == {
         "method": "git-tree-blobs-v1",
-        "revision": "69e5e00054d3c1cff635fe41fcb96fbe150d25fb",
-        "tree": "0eb308bf3f8ad300a584659a2d27c6b6de60bd95",
+        "revision": PROJECT_FRONTEND_REVISION,
+        "tree": "3f16fd481d9b6417518a46a2d593f9b70b9c3f53",
         "roots": ["web", "packages"],
-        "document_count": 224,
-        "materialization_sha256": "sha256:2bf2b224b9a09396811ec61a9a067f60eff6a1ce400ff9f56710557106c28e55",
+        "document_count": 228,
+        "materialization_sha256": "sha256:8330fd04a403985d3d739b5ede4ae98e90cc15580ac433af8da5dd499f9ca833",
     }
     assert {
         path: item["blob"] for path, item in evidence["frontend_files"].items()
@@ -439,10 +446,10 @@ def test_project_closure_evidence_pins_provider_contract_outbox_and_gateway_anch
     assert routes["POST /api/approval/orders/{dynamic}/reject"]["candidate_capability"] == "project.approval.order.reject@1"
     assert evidence["approval"]["provider_contract"] == {
         "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-        "start_line": 244,
-        "end_line": 281,
-        "source_sha256": "sha256:af0a539e6faebdb5e861318e9c8e38018f95cb3708578dd1e6cc1ecb7c56a091",
-        "snippet_sha256": "sha256:0d655febbfe0e66ea4304dc17c08542368095461299c5fe5c26e237e4ae1609c",
+        "start_line": 382,
+        "end_line": 418,
+        "source_sha256": "sha256:1961939cb68b9a1560730c7de75e25656ae49f3f9def8b8796fb03bdc167b034",
+        "snippet_sha256": "sha256:ce8a669908f093ec5b9590a7ccba1edcc67b76962baf7e761edd9511ce8c17a6",
     }
     assert evidence["approval"]["outbox_transaction"] == {
         "source_path": "plugins/project_management/project_management_backend/infrastructure/repository.py",
@@ -460,10 +467,10 @@ def test_project_closure_evidence_pins_provider_contract_outbox_and_gateway_anch
     }
     assert evidence["approval"]["gateway_context"] == {
         "source_path": "backend/capability_v2/gateway.py",
-        "start_line": 518,
-        "end_line": 532,
-        "source_sha256": "sha256:9f123749f61db87e7d1341bb4bfc938e4e54e4e30282a261bf879b054eb84f33",
-        "snippet_sha256": "sha256:3534699625178c993d9ea37f1c5ac9df2c81c934d339d1ad51a3cc57afbcc4f4",
+        "start_line": 979,
+        "end_line": 988,
+        "source_sha256": "sha256:d80ab0fba9ce1efae1ad4842313ad4caa3eae4e119eff2871e605ed2bf56f61d",
+        "snippet_sha256": "sha256:58332ce5ee3ea3d165f84a02f50150cf8ae156b70b65fdedf78eee9f4d211c44",
     }
     assert evidence["approval"]["gateway_integration"] == {
         "source_path": "plugins/project_management/tests/test_project_approval_reject_gateway_integration.py",

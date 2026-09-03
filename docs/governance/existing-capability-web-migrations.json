@@ -3,7 +3,7 @@
   "artifact_id": "existing-capability-web-migrations",
   "source_ledger": "docs/governance/web-route-root-cause-ledger.json",
   "baseline_revision": "2c17617c28e0bed2411763e9ae5520128f2804e0",
-  "frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
+  "frontend_revision": "c2cfd58dc153a7fd0d9f1b23e562037ffa3a87e9",
   "groups": [
     {
       "method": "DELETE",
@@ -63,7 +63,7 @@
         "candidate_contracts": [
           {
             "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
+            "source_sha256": "aed1fef36a72b9b17fc4f68acea32b07dc85be8b9f41e123729b6058083a0acb",
             "start_line": 26,
             "end_line": 26,
             "sha256": "aa2829e8f6b0aa737072c36bb362469d2fd37bb9f9c00c957241dbe21299a636",
@@ -121,7 +121,7 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
-          "source_sha256": "6ddecca4af1e7a26edbd873ba0a94ef29e1b7012a0bd15c61e2b63de208dbcb4",
+          "source_sha256": "b015175683eb8d031253adaf95de6c9a4206aeccbbbdac52ddc321e436485e67",
           "start_line": 165,
           "end_line": 165,
           "sha256": "5820ad80e23b7f09e15fd77e25211cdb171632ae2bda9b975aaea45f9466377e",
@@ -174,7 +174,7 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "source_sha256": "e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
           "start_line": 272,
           "end_line": 272,
           "sha256": "f7bcbf43257471c7a2821fbe4e1c9fddf6f1a87ff8ad68f6bd38c1f8cc363568",
@@ -234,7 +234,7 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "source_sha256": "e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
           "start_line": 287,
           "end_line": 287,
           "sha256": "56229834691651b93ee38d67bb2fa715d321afba6c0af79b064497283f1a380b",
@@ -292,7 +292,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
+            "source_sha256": "d0db753a993fa0d4dde2f0a44cf67eb0e5b0964dd322e58d51439762f2623558",
             "start_line": 10,
             "end_line": 10,
             "sha256": "67b261904167a24b4eada2398aa9292955ff80bce5f20dbff30d42687e409b33",
@@ -355,7 +355,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
+            "source_sha256": "d0db753a993fa0d4dde2f0a44cf67eb0e5b0964dd322e58d51439762f2623558",
             "start_line": 9,
             "end_line": 9,
             "sha256": "6dc486a5f1ef42a791813b6c31330cae66bad65a0d1a883e3f88eb2940563dd7",
@@ -418,7 +418,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
+            "source_sha256": "d0db753a993fa0d4dde2f0a44cf67eb0e5b0964dd322e58d51439762f2623558",
             "start_line": 11,
             "end_line": 11,
             "sha256": "ea7f3b9b8ee8c3ff58a4b894c1fb7bab4f8554540c868fc9ee72e6b6fbeac918",
@@ -481,7 +481,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
+            "source_sha256": "d0db753a993fa0d4dde2f0a44cf67eb0e5b0964dd322e58d51439762f2623558",
             "start_line": 13,
             "end_line": 13,
             "sha256": "a8142a0f6fc3010c3ff7ddebeb0c30ce810748a8d9ccf4e0b667191e64119fd3",
@@ -544,7 +544,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
+            "source_sha256": "d0db753a993fa0d4dde2f0a44cf67eb0e5b0964dd322e58d51439762f2623558",
             "start_line": 14,
             "end_line": 14,
             "sha256": "858fe3be1139880ee0608e8952d4a1bf0647b3974c91216ae3d91696f7b629b0",
@@ -607,7 +607,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
+            "source_sha256": "d0db753a993fa0d4dde2f0a44cf67eb0e5b0964dd322e58d51439762f2623558",
             "start_line": 13,
             "end_line": 13,
             "sha256": "a8142a0f6fc3010c3ff7ddebeb0c30ce810748a8d9ccf4e0b667191e64119fd3",
@@ -679,7 +679,7 @@
         "candidate_contracts": [
           {
             "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
+            "source_sha256": "aed1fef36a72b9b17fc4f68acea32b07dc85be8b9f41e123729b6058083a0acb",
             "start_line": 18,
             "end_line": 18,
             "sha256": "4eb35a25425a5ac399b25f774337ae872a15435ae59acd6d74e72cdc70697a81",
@@ -737,7 +737,7 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
-          "source_sha256": "6ddecca4af1e7a26edbd873ba0a94ef29e1b7012a0bd15c61e2b63de208dbcb4",
+          "source_sha256": "b015175683eb8d031253adaf95de6c9a4206aeccbbbdac52ddc321e436485e67",
           "start_line": 83,
           "end_line": 83,
           "sha256": "e2c28e3005559720fed366c5c5e9b6b212703fbc36f26990e27ceb31f637d70d",
@@ -826,7 +826,7 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
-          "source_sha256": "6ddecca4af1e7a26edbd873ba0a94ef29e1b7012a0bd15c61e2b63de208dbcb4",
+          "source_sha256": "b015175683eb8d031253adaf95de6c9a4206aeccbbbdac52ddc321e436485e67",
           "start_line": 125,
           "end_line": 125,
           "sha256": "84a56cb1a25a824bde10cdb18309d84ad6a05c2db162a83da37c60855007ce9f",
@@ -893,7 +893,7 @@
         "candidate_contracts": [
           {
             "source_path": "backend/base/collaboration.py",
-            "source_sha256": "84eb0572a67a6c872db27502e4a113007928a895dc8fbf06f08acfadf31eec80",
+            "source_sha256": "14dc9f1398016f9d7d0e7b617ed5f9ca872d46ddbd92f4c0c0340d9776fcf7dc",
             "start_line": 23,
             "end_line": 23,
             "sha256": "faa2e23dc925a7ca9830658365dbbd3c067239e515e5f3fbba0f094e22bc442b",
@@ -987,7 +987,7 @@
         "candidate_contracts": [
           {
             "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
+            "source_sha256": "aed1fef36a72b9b17fc4f68acea32b07dc85be8b9f41e123729b6058083a0acb",
             "start_line": 22,
             "end_line": 22,
             "sha256": "a72c615c37c0905b63e3a7ac9e656092f9efbe9cbab304f745d475169655eb7b",
@@ -1061,7 +1061,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/craft/craft_backend/capabilities/rule_engine.py",
-            "source_sha256": "989185e4b82b89f2864846c88157881d86fe1bacb495da8ef8d05ce6a7037e88",
+            "source_sha256": "be9c65272225675f04b837eaf1bac65da23b86a2da0277f0498e966e74ebd6b9",
             "start_line": 175,
             "end_line": 175,
             "sha256": "70894c43c2c5b0f52bb6a3a20e53eab6c624f41ef91801052aa58b2caf9b7390",
@@ -1177,7 +1177,7 @@
         "candidate_contracts": [
           {
             "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
+            "source_sha256": "aed1fef36a72b9b17fc4f68acea32b07dc85be8b9f41e123729b6058083a0acb",
             "start_line": 17,
             "end_line": 17,
             "sha256": "3d3cecb0574f6e96638c8874790dcbcb5b82e05e923654ccd3e3f97bf01925d7",
@@ -1268,17 +1268,17 @@
         },
         {
           "source_path": "web/knowledge_hub/knowledge_hub.js",
-          "line": 499,
-          "column": 41,
+          "line": 501,
+          "column": 39,
           "operation": "base.annotations.search",
-          "source_sha256": "c8454bfbb72276b6373ca72cc176dc2b83b5a88a5ade493596379f77d2f2e0de"
+          "source_sha256": "9d55922752d4a1bf0161ec721dc3f6f8b6a8b1165e8728ae327c0653f4f275dd"
         }
       ],
       "equivalence_evidence": {
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "source_sha256": "e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
           "start_line": 278,
           "end_line": 278,
           "sha256": "ba8c659ed3eed4912fc0cdeaab4c3f0466d25eb1a92fb775b6c28571cdb5c0f7",
@@ -1338,7 +1338,7 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "source_sha256": "e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
           "start_line": 277,
           "end_line": 277,
           "sha256": "0edcb0661f98ef845497594383b300542dd04c2746eb0498cc25acc8537588df",
@@ -1391,9 +1391,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-          "source_sha256": "af0a539e6faebdb5e861318e9c8e38018f95cb3708578dd1e6cc1ecb7c56a091",
-          "start_line": 156,
-          "end_line": 156,
+          "source_sha256": "bc93bd0eda04cc401468f6caced198532d8ee9a5f5d3d635b4a7c081a094eec9",
+          "start_line": 293,
+          "end_line": 293,
           "sha256": "521d0e298f3386b9d55e96c07369fbe02fde966f3967252b2396eee162f3ccd5",
           "needle": "payload.get(\"arguments\", payload)"
         }
@@ -1449,7 +1449,7 @@
         "candidate_contracts": [
           {
             "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
+            "source_sha256": "aed1fef36a72b9b17fc4f68acea32b07dc85be8b9f41e123729b6058083a0acb",
             "start_line": 22,
             "end_line": 22,
             "sha256": "a72c615c37c0905b63e3a7ac9e656092f9efbe9cbab304f745d475169655eb7b",
@@ -1576,7 +1576,7 @@
         "candidate_contracts": [
           {
             "source_path": "backend/capabilities/system_shared_next.py",
-            "source_sha256": "7742c103ac3c4845b43e2f7ef2d5925884b7099d73b3532f5c60266a8280e913",
+            "source_sha256": "d89df6fd3fe0694c566a256bd0d9e5fda720d7432d4012fe0651d23224d08337",
             "start_line": 110,
             "end_line": 110,
             "sha256": "58f1efe8d4b2e2c354bf1006e72446117b8520be9e3c30424bb2be7d9abdb925",
@@ -1631,17 +1631,17 @@
       "frontend_call_sites": [
         {
           "source_path": "packages/craft-plugin/web/lineage_view/lineage.js",
-          "line": 512,
+          "line": 517,
           "column": 40,
           "operation": "base.identity.session.profile.get",
-          "source_sha256": "8307da58c257c93d0c31b2ee2d124cd6b12fd532d30d018dae4301db0d65dcd2"
+          "source_sha256": "1540daf9e6611d152203504ab8e6bae0c991ef76b278ef1816f51d8aec3c0a79"
         }
       ],
       "equivalence_evidence": {
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "source_sha256": "e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
           "start_line": 280,
           "end_line": 280,
           "sha256": "d9e31fd15b3fc655e44c4700447418464354287cd1311a4e883ab8f44bad72d0",
@@ -1730,7 +1730,7 @@
         "candidate_contracts": [
           {
             "source_path": "backend/capabilities/system_shared_next.py",
-            "source_sha256": "7742c103ac3c4845b43e2f7ef2d5925884b7099d73b3532f5c60266a8280e913",
+            "source_sha256": "d89df6fd3fe0694c566a256bd0d9e5fda720d7432d4012fe0651d23224d08337",
             "start_line": 110,
             "end_line": 110,
             "sha256": "58f1efe8d4b2e2c354bf1006e72446117b8520be9e3c30424bb2be7d9abdb925",
@@ -1813,7 +1813,7 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "source_sha256": "e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
           "start_line": 283,
           "end_line": 283,
           "sha256": "21e5f4f93bdc09b1ba703dc17a13307584bfc738466d3a1b71e4a491ef61c806",
@@ -1871,7 +1871,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
+            "source_sha256": "d0db753a993fa0d4dde2f0a44cf67eb0e5b0964dd322e58d51439762f2623558",
             "start_line": 10,
             "end_line": 10,
             "sha256": "67b261904167a24b4eada2398aa9292955ff80bce5f20dbff30d42687e409b33",
@@ -1929,7 +1929,7 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
-          "source_sha256": "6ddecca4af1e7a26edbd873ba0a94ef29e1b7012a0bd15c61e2b63de208dbcb4",
+          "source_sha256": "b015175683eb8d031253adaf95de6c9a4206aeccbbbdac52ddc321e436485e67",
           "start_line": 145,
           "end_line": 145,
           "sha256": "32e3ff6e2143a63860403d61d2ad92797453979bb349360375149db70026e0b6",
@@ -1996,7 +1996,7 @@
         "candidate_contracts": [
           {
             "source_path": "backend/base/collaboration.py",
-            "source_sha256": "84eb0572a67a6c872db27502e4a113007928a895dc8fbf06f08acfadf31eec80",
+            "source_sha256": "14dc9f1398016f9d7d0e7b617ed5f9ca872d46ddbd92f4c0c0340d9776fcf7dc",
             "start_line": 24,
             "end_line": 24,
             "sha256": "b1d548f3459c8f7bf4b70c5f772331b1aeaf0b9b1098be5538e3af5b80f9a580",
@@ -2079,7 +2079,7 @@
         "candidate_contracts": [
           {
             "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
+            "source_sha256": "aed1fef36a72b9b17fc4f68acea32b07dc85be8b9f41e123729b6058083a0acb",
             "start_line": 28,
             "end_line": 28,
             "sha256": "b4300c57b7896175e14454a538d332b0d0123a3d381ceb99513dc21403a3edb7",
@@ -2162,7 +2162,7 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "source_sha256": "e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
           "start_line": 285,
           "end_line": 285,
           "sha256": "799823cab800457fc52e02ea377c4efecaf3f4fb565b0f2a67b8e1ec6425e8e4",
@@ -2220,7 +2220,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/project_management/project_management_backend/application/service.py",
-            "source_sha256": "bfb874c131fb9c882982118c6d2914ddc2993b6409b6117aa483bba29a74631f",
+            "source_sha256": "716f36ee09a872024b903afdf21b4c2e61fec97f3b9b440e6d659c61547798ff",
             "start_line": 198,
             "end_line": 198,
             "sha256": "7d0c4ce19b5a7f27f52c026c4f5d643ec320f98e8c445e0e496810063d178963",
@@ -2283,7 +2283,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
+            "source_sha256": "d0db753a993fa0d4dde2f0a44cf67eb0e5b0964dd322e58d51439762f2623558",
             "start_line": 9,
             "end_line": 9,
             "sha256": "6dc486a5f1ef42a791813b6c31330cae66bad65a0d1a883e3f88eb2940563dd7",
@@ -2346,7 +2346,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
+            "source_sha256": "d0db753a993fa0d4dde2f0a44cf67eb0e5b0964dd322e58d51439762f2623558",
             "start_line": 8,
             "end_line": 8,
             "sha256": "62dfdeab621d02456eeb44ba405ba5c0201139ac5c936f4f28900d046ce80641",
@@ -2409,7 +2409,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
+            "source_sha256": "d0db753a993fa0d4dde2f0a44cf67eb0e5b0964dd322e58d51439762f2623558",
             "start_line": 12,
             "end_line": 12,
             "sha256": "a264023a145eee05bdc60969d257465ac48eda20f1abd2c68d63c713357abcfd",
@@ -2472,7 +2472,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
+            "source_sha256": "d0db753a993fa0d4dde2f0a44cf67eb0e5b0964dd322e58d51439762f2623558",
             "start_line": 13,
             "end_line": 13,
             "sha256": "a8142a0f6fc3010c3ff7ddebeb0c30ce810748a8d9ccf4e0b667191e64119fd3",
@@ -2555,7 +2555,7 @@
         "candidate_contracts": [
           {
             "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
+            "source_sha256": "aed1fef36a72b9b17fc4f68acea32b07dc85be8b9f41e123729b6058083a0acb",
             "start_line": 26,
             "end_line": 26,
             "sha256": "aa2829e8f6b0aa737072c36bb362469d2fd37bb9f9c00c957241dbe21299a636",
@@ -2613,7 +2613,7 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
-          "source_sha256": "6ddecca4af1e7a26edbd873ba0a94ef29e1b7012a0bd15c61e2b63de208dbcb4",
+          "source_sha256": "b015175683eb8d031253adaf95de6c9a4206aeccbbbdac52ddc321e436485e67",
           "start_line": 110,
           "end_line": 110,
           "sha256": "efa98709952f0ae8ca3b8f7dd9f302073fe3fc3f78bb4166e59c16ba8cfcda1a",
@@ -2680,7 +2680,7 @@
         "candidate_contracts": [
           {
             "source_path": "backend/base/reviewed_capabilities.py",
-            "source_sha256": "3c128cf0a30b34f533e1b6e454efbc648e9072d6d809e36cdef73df7ea789178",
+            "source_sha256": "aed1fef36a72b9b17fc4f68acea32b07dc85be8b9f41e123729b6058083a0acb",
             "start_line": 27,
             "end_line": 27,
             "sha256": "da5b70d6470eafdc7ef4a412be798915b648d494ccc102ebc8fc3f630d959d0e",
@@ -2738,7 +2738,7 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "source_sha256": "e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
           "start_line": 271,
           "end_line": 271,
           "sha256": "34c9a56b6eb9924d2918aa691ef9ad3c25d95766958763f767d47eb52a5b8c07",
@@ -2796,7 +2796,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/craft/craft_backend/capabilities/rule_descriptors.py",
-            "source_sha256": "08a7b5a622b77b0af3054a6f8c66de96e0583abacf4f18c48b50d1db6fc81372",
+            "source_sha256": "b9646a63d1677418936eda29764bee94bbbf881214ade4f2bbb5a8fb3f82351e",
             "start_line": 8,
             "end_line": 8,
             "sha256": "82b6b2bd933714f5041b89d1d7b45dfe4b99606f7fa21b56a615b74bd0d37066",
@@ -2859,7 +2859,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/craft/craft_backend/capabilities/rule_descriptors.py",
-            "source_sha256": "08a7b5a622b77b0af3054a6f8c66de96e0583abacf4f18c48b50d1db6fc81372",
+            "source_sha256": "b9646a63d1677418936eda29764bee94bbbf881214ade4f2bbb5a8fb3f82351e",
             "start_line": 10,
             "end_line": 10,
             "sha256": "ca1b4a318ec059654cce4387a2f2a64dc4936c778fe17ae82d7f2f1b5bbcf452",
@@ -2922,7 +2922,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/agent/agent_backend/capabilities/contracts.py",
-            "source_sha256": "7ea052dc67d02ef815debeaf08c6e2030175ab81c0bd2d733ff3af70ef5010bf",
+            "source_sha256": "1c84e347eb77311dc731ee25fbd0dd17441b317c3d4b8f1ed3c8a7de3418c6f9",
             "start_line": 105,
             "end_line": 105,
             "sha256": "73f36236da2d0cb00dd035edaac2fe9a3e4b501efab50f1b6dbb89b65149a8a8",
@@ -2985,7 +2985,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/agent/agent_backend/capabilities/contracts.py",
-            "source_sha256": "7ea052dc67d02ef815debeaf08c6e2030175ab81c0bd2d733ff3af70ef5010bf",
+            "source_sha256": "1c84e347eb77311dc731ee25fbd0dd17441b317c3d4b8f1ed3c8a7de3418c6f9",
             "start_line": 105,
             "end_line": 105,
             "sha256": "73f36236da2d0cb00dd035edaac2fe9a3e4b501efab50f1b6dbb89b65149a8a8",
@@ -3068,7 +3068,7 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "source_sha256": "e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
           "start_line": 284,
           "end_line": 284,
           "sha256": "9d9ed3d4a5619754b9c0df361a0b2b4c01d1052d00d57414e9a50f40e172840c",
@@ -3128,7 +3128,7 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "source_sha256": "e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
           "start_line": 286,
           "end_line": 286,
           "sha256": "c68df23c39cb7979116bd209087170259a02fc5ec888ee1020a0dfd92f6c6848",
@@ -3186,7 +3186,7 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/integration/integration_backend/capabilities/descriptors.py",
-            "source_sha256": "b7afcba594a5179d7e61e540d1723e4592d13769ee223e0021d953c136ea0237",
+            "source_sha256": "d0db753a993fa0d4dde2f0a44cf67eb0e5b0964dd322e58d51439762f2623558",
             "start_line": 11,
             "end_line": 11,
             "sha256": "ea7f3b9b8ee8c3ff58a4b894c1fb7bab4f8554540c868fc9ee72e6b6fbeac918",
@@ -3262,9 +3262,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-          "source_sha256": "af0a539e6faebdb5e861318e9c8e38018f95cb3708578dd1e6cc1ecb7c56a091",
-          "start_line": 156,
-          "end_line": 156,
+          "source_sha256": "bc93bd0eda04cc401468f6caced198532d8ee9a5f5d3d635b4a7c081a094eec9",
+          "start_line": 293,
+          "end_line": 293,
           "sha256": "521d0e298f3386b9d55e96c07369fbe02fde966f3967252b2396eee162f3ccd5",
           "needle": "payload.get(\"arguments\", payload)"
         }
@@ -3315,7 +3315,7 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
-          "source_sha256": "6ddecca4af1e7a26edbd873ba0a94ef29e1b7012a0bd15c61e2b63de208dbcb4",
+          "source_sha256": "b015175683eb8d031253adaf95de6c9a4206aeccbbbdac52ddc321e436485e67",
           "start_line": 145,
           "end_line": 145,
           "sha256": "32e3ff6e2143a63860403d61d2ad92797453979bb349360375149db70026e0b6",
@@ -3386,7 +3386,7 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py",
-          "source_sha256": "6ddecca4af1e7a26edbd873ba0a94ef29e1b7012a0bd15c61e2b63de208dbcb4",
+          "source_sha256": "b015175683eb8d031253adaf95de6c9a4206aeccbbbdac52ddc321e436485e67",
           "start_line": 145,
           "end_line": 145,
           "sha256": "32e3ff6e2143a63860403d61d2ad92797453979bb349360375149db70026e0b6",
@@ -3455,9 +3455,9 @@
         "candidate_contracts": [
           {
             "source_path": "plugins/craft/craft_backend/capabilities/contracts.py",
-            "source_sha256": "9c46372543ba20a0580b34e5b8717c2769456b9ce2168589c4e2564bb4dc03e0",
-            "start_line": 594,
-            "end_line": 594,
+            "source_sha256": "ff3341d9db94363684817736fd4de75729a5b63c908b54bca77c89e26b5676d5",
+            "start_line": 796,
+            "end_line": 796,
             "sha256": "87996e6eb263b446ffb01e10d1cdbd92be0299705262028f64b237aa97d299d9",
             "needle": "INPUT_SCHEMAS[(\"craft.rule.library.change.apply\", 1)]"
           }
@@ -3520,7 +3520,7 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "backend/base/web_atomic.py",
-          "source_sha256": "0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+          "source_sha256": "e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
           "start_line": 279,
           "end_line": 279,
           "sha256": "c3860599d5ff529f59467bb49216cb62b04152c559aa2d9587ebff1871e8965e",
@@ -3591,9 +3591,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-          "source_sha256": "af0a539e6faebdb5e861318e9c8e38018f95cb3708578dd1e6cc1ecb7c56a091",
-          "start_line": 156,
-          "end_line": 156,
+          "source_sha256": "bc93bd0eda04cc401468f6caced198532d8ee9a5f5d3d635b4a7c081a094eec9",
+          "start_line": 293,
+          "end_line": 293,
           "sha256": "521d0e298f3386b9d55e96c07369fbe02fde966f3967252b2396eee162f3ccd5",
           "needle": "payload.get(\"arguments\", payload)"
         }
@@ -3644,9 +3644,9 @@
         "proof_kind": "provider_equivalent_adapter",
         "provider_contract": {
           "source_path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-          "source_sha256": "af0a539e6faebdb5e861318e9c8e38018f95cb3708578dd1e6cc1ecb7c56a091",
-          "start_line": 156,
-          "end_line": 156,
+          "source_sha256": "bc93bd0eda04cc401468f6caced198532d8ee9a5f5d3d635b4a7c081a094eec9",
+          "start_line": 293,
+          "end_line": 293,
           "sha256": "521d0e298f3386b9d55e96c07369fbe02fde966f3967252b2396eee162f3ccd5",
           "needle": "payload.get(\"arguments\", payload)"
         }

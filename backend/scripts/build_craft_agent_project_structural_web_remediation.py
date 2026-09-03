@@ -56,11 +56,11 @@ LISTS_SOURCE = "plugins/craft/craft_backend/routers/lists.py"
 APPROVAL_SOURCE = "plugins/craft/craft_backend/routers/approval.py"
 PROJECT_SERVICE_SOURCE = "plugins/project_management/project_management_backend/application/service.py"
 PROJECT_PROVIDER_SOURCE = "plugins/project_management/project_management_backend/capabilities/provider.py"
-PROJECT_FRONTEND_REVISION = "69e5e00054d3c1cff635fe41fcb96fbe150d25fb"
-CRAFT_FRONTEND_REVISION = "8ebc8de49b5d4f86c9360664fffa912c3d969102"
-CRAFT_BACKEND_REVISION = "9cda07080f3e27b10d30ec6492ea875c31c82492"
-AGENT_FRONTEND_REVISION = "08359de59e756ce73c61df9818c7e7bcaeb86975"
-AGENT_BACKEND_REVISION = "d56c743dee03112b2a3211a4ccb659ebed9cfda5"
+PROJECT_FRONTEND_REVISION = "c2cfd58dc153a7fd0d9f1b23e562037ffa3a87e9"
+CRAFT_FRONTEND_REVISION = "c2cfd58dc153a7fd0d9f1b23e562037ffa3a87e9"
+CRAFT_BACKEND_REVISION = "94dc49eb18334f9a9201798ef984cde62ec032ce"
+AGENT_FRONTEND_REVISION = "c2cfd58dc153a7fd0d9f1b23e562037ffa3a87e9"
+AGENT_BACKEND_REVISION = "94dc49eb18334f9a9201798ef984cde62ec032ce"
 PROJECT_CLOSURE_SCOPE = {
     ("GET", "/api/lists"),
     ("DELETE", "/api/lists/{dynamic}"),
@@ -137,12 +137,16 @@ def _sha256(value: bytes) -> str:
     return "sha256:" + hashlib.sha256(value).hexdigest()
 
 
+def _normalized_source_bytes(value: bytes) -> bytes:
+    return value.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+
+
 def _anchor(
     source_path: str, start_line: int, end_line: int, *needles: str,
     revision: str | None = None,
 ) -> dict[str, Any]:
     """Bind reviewed source semantics to both a line range and full-file content."""
-    data = (
+    data = _normalized_source_bytes(
         (ROOT / source_path).read_bytes()
         if revision is None else read_path(ROOT, revision, source_path)
     )
@@ -431,7 +435,7 @@ def build_project_closure_evidence(web_root: Path) -> dict[str, Any]:
 
     list_provider = _anchor(
         "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-        207, 235, "atomic_id =", "register_capability",
+        350, 379, "atomic_id =", "register_capability",
     )
     list_operations = _anchor(
         "plugins/project_management/project_management_backend/application/service.py",
@@ -452,36 +456,36 @@ def build_project_closure_evidence(web_root: Path) -> dict[str, Any]:
         "project_service": list_service,
         "craft_list_provider": _anchor(
             "plugins/craft/craft_backend/capabilities/bop_versions.py",
-            368, 395, 'id="craft.bop.version.list"', "list_bop_versions",
+            368, 397, 'id="craft.bop.version.list"', "list_bop_versions",
         ),
         "craft_list_input_contract": _anchor(
             "plugins/craft/craft_backend/capabilities/contracts.py",
-            43, 52, '"craft.bop.version.list"', "page_size",
+            78, 88, '"craft.bop.version.list"', "page_size",
         ),
         "craft_list_output_contract": _anchor(
             "plugins/craft/craft_backend/capabilities/contracts.py",
-            180, 196, '"craft.bop.version.list"', "next_cursor",
+            261, 264, '"craft.bop.version.list"', "next_cursor",
         ),
         "craft_archive_provider": _anchor(
             "plugins/craft/craft_backend/capabilities/bop_writes.py",
-            462, 484, "def archive_bop_version", 'id="craft.bop.version.archive"',
+            467, 489, "def archive_bop_version", 'id="craft.bop.version.archive"',
         ),
         "craft_archive_input_contract": _anchor(
             "plugins/craft/craft_backend/capabilities/contracts.py",
-            118, 127, '"craft.bop.version.archive"', "expected_revision",
+            157, 160, '"craft.bop.version.archive"', "expected_revision",
         ),
         "craft_archive_output_contract": _anchor(
             "plugins/craft/craft_backend/capabilities/contracts.py",
-            237, 247, '"craft.bop.version.archive"', "after_hash",
+            320, 323, '"craft.bop.version.archive"', "after_hash",
         ),
     }
     approval = {
         "provider_contract": _anchor(
             "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-            244, 281, "APPROVAL_REJECT_CAPABILITY_ID", "notification_event_gid",
+            382, 418, "APPROVAL_REJECT_CAPABILITY_ID", "notification_event_gid",
         ),
         "provider_policy": _anchor(
-            PROJECT_PROVIDER_SOURCE, 42, 75,
+            PROJECT_PROVIDER_SOURCE, 77, 110,
             'spec.id == "project.approval.order.reject"', '"replay_data_policy"',
             '"concurrency_policy"',
         ),
@@ -499,7 +503,7 @@ def build_project_closure_evidence(web_root: Path) -> dict[str, Any]:
             34, 46, "workmanship_proj_notification_outbox", "idx_proj_notification_outbox_delivery",
         ),
         "gateway_context": _anchor(
-            "backend/capability_v2/gateway.py", 518, 532,
+            "backend/capability_v2/gateway.py", 979, 988,
             "CapabilityContext", "idempotency_key=envelope.idempotency_key",
         ),
         "gateway_integration": _anchor(
@@ -572,7 +576,7 @@ def _dead_action_evidence(sources: Mapping[str, str]) -> dict[str, Any]:
         _source_block(sources[path], "rowContextMenu: (row) => {", "categoryField:", label="Craft row actions")
         for path in vpps_paths
     ]
-    vpps_guard = "if (key !== 'vpps_fixtures' && key !== 'vpps_equipments') {"
+    vpps_guard = "if (_isResourceSection(key) || (key !== 'vpps_fixtures' && key !== 'vpps_equipments')) {"
     if any(vpps_guard not in block for block in vpps_blocks):
         raise ValueError("dead Craft action source drift")
     forbidden_vpps = {
@@ -645,13 +649,13 @@ def build_craft_closure_evidence(web_root: Path) -> dict[str, Any]:
         # The VPPS schemas in the shared Craft contract module may be hardened
         # independently. Exact closure anchors below still bind the reviewed
         # rule contracts; unrelated contract additions do not reopen them.
-        if source_path != "plugins/craft/craft_backend/capabilities/contracts.py" and _sha256((ROOT / source_path).read_bytes()) != backend_files[source_path]["sha256"]:
+        if source_path != "plugins/craft/craft_backend/capabilities/contracts.py" and _sha256(_normalized_source_bytes((ROOT / source_path).read_bytes())) != backend_files[source_path]["sha256"]:
             raise ValueError(f"backend source drift: {source_path}")
 
     dead_actions = _dead_action_evidence(texts)
     vpps_anchor = _frontend_anchor(
         web_root, frontend_revision, "web/knowledge_hub/pages/gbop_vpps.html",
-        "if (key !== 'vpps_fixtures' && key !== 'vpps_equipments')",
+        "if (_isResourceSection(key) || (key !== 'vpps_fixtures' && key !== 'vpps_equipments'))",
     )
     rule_anchor = _frontend_anchor(
         web_root, frontend_revision, "web/rule_mgmt/rule_mgmt.js",
@@ -695,15 +699,15 @@ def build_craft_closure_evidence(web_root: Path) -> dict[str, Any]:
 
     gateway_anchor = {
         "invoke_pipeline": _anchor(
-            "backend/capability_v2/gateway.py", 134, 218,
+            "backend/capability_v2/gateway.py", 200, 285,
             "validate_payload", "idempotency_key_mismatch", "transaction_participant_required",
         ),
         "provider_descriptor": _anchor(
-            "plugins/craft/craft_backend/capabilities/provider.py", 90, 140,
+            "plugins/craft/craft_backend/capabilities/provider.py", 434, 475,
             "descriptor_for", "expected_revision", "idempotency_policy", "domain_errors_complete",
         ),
         "context": _anchor(
-            "backend/capability_v2/gateway.py", 520, 532,
+            "backend/capability_v2/gateway.py", 979, 988,
             "CapabilityContext", "confirmation_token", "idempotency_key",
         ),
     }
@@ -716,7 +720,7 @@ def build_craft_closure_evidence(web_root: Path) -> dict[str, Any]:
             ),
             "contract_evidence": {
                 "input_output": _anchor(
-                    "plugins/craft/craft_backend/capabilities/contracts.py", 566, 580,
+                    "plugins/craft/craft_backend/capabilities/contracts.py", 768, 787,
                     'INPUT_SCHEMAS[("craft.rule.entry.evaluate", 1)]',
                     'OUTPUT_SCHEMAS[("craft.rule.entry.evaluate", 1)]', "maxItems",
                 ),
@@ -808,7 +812,7 @@ def build_agent_closure_evidence(web_root: Path) -> dict[str, Any]:
         raise ValueError("Agent legacy route or fallback drift")
 
     provider = _anchor(
-        "plugins/agent/agent_backend/capabilities/provider.py", 21, 41,
+        "plugins/agent/agent_backend/capabilities/provider.py", 25, 52,
         "agent.canvas.execution.start", "agent.workflow.node.test.execute",
         '"idempotency_policy": "required"', '"evidence_policy": "required"',
         revision=backend_revision,
@@ -874,12 +878,12 @@ def build_agent_closure_evidence(web_root: Path) -> dict[str, Any]:
     }
     gateway = {
         "invoke_pipeline": _anchor(
-            "backend/capability_v2/gateway.py", 134, 218,
+            "backend/capability_v2/gateway.py", 200, 285,
             "validate_payload", "idempotency_key_mismatch", "transaction_participant_required",
             revision=backend_revision,
         ),
         "context": _anchor(
-            "backend/capability_v2/gateway.py", 520, 532,
+            "backend/capability_v2/gateway.py", 979, 988,
             "CapabilityContext", "confirmation_token", "idempotency_key",
             revision=backend_revision,
         ),

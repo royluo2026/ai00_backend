@@ -18,6 +18,87 @@
       "migration_deadline": "2027-08-27",
       "source": "backend/routers/workbench_home.py",
       "allowed_consumers": ["web", "rest"]
+    },
+    {
+      "route_path": "/api/craft/resource-requirements",
+      "method": "GET",
+      "owner": "craft",
+      "migration_target_capability": "craft.resource_requirement.search",
+      "migration_deadline": "2027-09-03",
+      "source": "plugins/craft/craft_backend/routers/resource_requirements.py",
+      "allowed_consumers": ["web", "rest"]
+    },
+    {
+      "route_path": "/api/craft/resource-requirements",
+      "method": "POST",
+      "owner": "craft",
+      "migration_target_capability": "craft.resource_requirement.create",
+      "migration_deadline": "2027-09-03",
+      "source": "plugins/craft/craft_backend/routers/resource_requirements.py",
+      "allowed_consumers": ["web", "rest"]
+    },
+    {
+      "route_path": "/api/craft/resource-requirements/{gid}",
+      "method": "PATCH",
+      "owner": "craft",
+      "migration_target_capability": "craft.resource_requirement.update",
+      "migration_deadline": "2027-09-03",
+      "source": "plugins/craft/craft_backend/routers/resource_requirements.py",
+      "allowed_consumers": ["web", "rest"]
+    },
+    {
+      "route_path": "/api/craft/resource-requirements/{gid}/retire",
+      "method": "POST",
+      "owner": "craft",
+      "migration_target_capability": "craft.resource_requirement.retire",
+      "migration_deadline": "2027-09-03",
+      "source": "plugins/craft/craft_backend/routers/resource_requirements.py",
+      "allowed_consumers": ["web", "rest"]
+    },
+    {
+      "route_path": "/api/craft/resource-requirements/{resource_gid}/aliases",
+      "method": "POST",
+      "owner": "craft",
+      "migration_target_capability": "craft.resource_requirement.alias.create",
+      "migration_deadline": "2027-09-03",
+      "source": "plugins/craft/craft_backend/routers/resource_requirements.py",
+      "allowed_consumers": ["web", "rest"]
+    },
+    {
+      "route_path": "/api/craft/resource-requirements/{resource_gid}/aliases/{alias_gid}",
+      "method": "DELETE",
+      "owner": "craft",
+      "migration_target_capability": "craft.resource_requirement.alias.delete",
+      "migration_deadline": "2027-09-03",
+      "source": "plugins/craft/craft_backend/routers/resource_requirements.py",
+      "allowed_consumers": ["web", "rest"]
+    },
+    {
+      "route_path": "/api/craft/tc-resource-staging",
+      "method": "GET",
+      "owner": "craft",
+      "migration_target_capability": "craft.resource_requirement.staging.search",
+      "migration_deadline": "2027-09-03",
+      "source": "plugins/craft/craft_backend/routers/resource_requirements.py",
+      "allowed_consumers": ["web", "rest"]
+    },
+    {
+      "route_path": "/api/craft/tc-resource-staging/{staging_gid}/resolve",
+      "method": "POST",
+      "owner": "craft",
+      "migration_target_capability": "craft.resource_requirement.staging.resolve",
+      "migration_deadline": "2027-09-03",
+      "source": "plugins/craft/craft_backend/routers/resource_requirements.py",
+      "allowed_consumers": ["web", "rest"]
+    },
+    {
+      "route_path": "/api/craft/tc-resource-staging/{staging_gid}/ignore",
+      "method": "POST",
+      "owner": "craft",
+      "migration_target_capability": "craft.resource_requirement.staging.ignore",
+      "migration_deadline": "2027-09-03",
+      "source": "plugins/craft/craft_backend/routers/resource_requirements.py",
+      "allowed_consumers": ["web", "rest"]
     }
   ]
 }

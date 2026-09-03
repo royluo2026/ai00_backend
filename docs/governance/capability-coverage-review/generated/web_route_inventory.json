@@ -1,7 +1,7 @@
 {
-  "frontend_revision": "b48b630b8ade831f2f8bd31275d7629aeb5af434",
-  "content_hash": "542ec6458c6869b75da9f91e3b83c47a86eee70825676404f16f3531654688b8",
-  "wrapper_contracts_hash": "0f099242269e21253ae02e3c54184b8ff0ec2ade1f98b59dbe8937778178a760",
+  "frontend_revision": "c2cfd58dc153a7fd0d9f1b23e562037ffa3a87e9",
+  "content_hash": "ceac515326d16f22877ae7d93ef06ce0f9ecdf0def492728ad8243c044bc9873",
+  "wrapper_contracts_hash": "de0d355bf4df0a0cf788f4d35c8e3837dce5240d02b378c6077b699627953bde",
   "scan_roots": [
     "web",
     "packages"
@@ -23,16 +23,16 @@
     "**/*.test.*"
   ],
   "counts": {
-    "capability": 38,
+    "capability": 44,
     "legacy_registered": 310,
-    "bff_registered": 2,
+    "bff_registered": 12,
     "operations_excluded": 19,
     "unresolved": 0
   },
   "lexical_audit": {
-    "token_count": 387,
-    "token_hash": "0a2c1a924de1ffe0bc7922550cc8392030ad51298bd5899d82556d68631787b6",
-    "mapped_count": 369,
+    "token_count": 403,
+    "token_hash": "76843838feee2e670fb0374f02a3eb7a6cf22a2728b73537e53879b7ed6da0c2",
+    "mapped_count": 385,
     "reviewed_non_route_count": 18,
     "reviewed_non_route_tokens": [
       "packages/craft-plugin/web/bop_nav/bop_nav.js:12:13:/api/",
@@ -40,7 +40,7 @@
       "packages/craft-plugin/web/gbop_lineage/layout_mode.js:48:32:/api/",
       "packages/craft-plugin/web/gbop_lineage/lineage.js:1417:10:/api/",
       "packages/craft-plugin/web/gbop_lineage/lineage.js:6:13:/api/",
-      "packages/craft-plugin/web/lineage_view/lineage.js:2618:10:/api/",
+      "packages/craft-plugin/web/lineage_view/lineage.js:2623:10:/api/",
       "packages/craft-plugin/web/pbom_check/pbom_check.js:6:23:/api/",
       "packages/plugin-sdk/frontend/plugin-sdk.js:43:42:/api/",
       "packages/plugin-sdk/frontend/plugin-sdk.js:8:20:/api/",
@@ -1022,13 +1022,13 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
-      "line": 243,
+      "line": 282,
       "column": 54,
       "raw_route": "/api/v1/capabilities/${id}:${suffix}",
       "normalized_route": "/api/v1/capabilities/{dynamic}:{dynamic}",
       "method": "POST",
       "disposition": "capability",
-      "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:243:54:POST:/api/v1/capabilities/{dynamic}:{dynamic}"
+      "occurrence_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js:282:54:POST:/api/v1/capabilities/{dynamic}:{dynamic}"
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/layout_mode.js",
@@ -1042,53 +1042,93 @@
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lifecycle_panel.js",
-      "line": 51,
+      "line": 50,
       "column": 41,
       "raw_route": "/api/v1/capabilities/${id}:invoke",
       "normalized_route": "/api/v1/capabilities/{dynamic}:invoke",
       "method": "POST",
       "disposition": "capability",
-      "occurrence_id": "packages/craft-plugin/web/lineage_view/lifecycle_panel.js:51:41:POST:/api/v1/capabilities/{dynamic}:invoke"
+      "occurrence_id": "packages/craft-plugin/web/lineage_view/lifecycle_panel.js:50:41:POST:/api/v1/capabilities/{dynamic}:invoke"
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 178,
+      "line": 183,
       "column": 39,
       "raw_route": "/api/v1/capabilities/${id}:invoke",
       "normalized_route": "/api/v1/capabilities/{dynamic}:invoke",
       "method": "POST",
       "disposition": "capability",
-      "occurrence_id": "packages/craft-plugin/web/lineage_view/lineage.js:178:39:POST:/api/v1/capabilities/{dynamic}:invoke"
+      "occurrence_id": "packages/craft-plugin/web/lineage_view/lineage.js:183:39:POST:/api/v1/capabilities/{dynamic}:invoke"
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage.js",
-      "line": 1218,
+      "line": 1223,
       "column": 43,
       "raw_route": "/api/uploads/ois/resolve",
       "normalized_route": "/api/uploads/ois/resolve",
       "method": "POST",
       "disposition": "operations_excluded",
-      "occurrence_id": "packages/craft-plugin/web/lineage_view/lineage.js:1218:43:POST:/api/uploads/ois/resolve"
+      "occurrence_id": "packages/craft-plugin/web/lineage_view/lineage.js:1223:43:POST:/api/uploads/ois/resolve"
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/lineage_version_mgr.js",
       "line": 130,
-      "column": 41,
+      "column": 49,
       "raw_route": "/api/v1/capabilities/${id}:invoke",
       "normalized_route": "/api/v1/capabilities/{dynamic}:invoke",
       "method": "POST",
       "disposition": "capability",
-      "occurrence_id": "packages/craft-plugin/web/lineage_view/lineage_version_mgr.js:130:41:POST:/api/v1/capabilities/{dynamic}:invoke"
+      "occurrence_id": "packages/craft-plugin/web/lineage_view/lineage_version_mgr.js:130:49:POST:/api/v1/capabilities/{dynamic}:invoke"
     },
     {
       "source": "packages/craft-plugin/web/lineage_view/staging_panel.js",
-      "line": 43,
+      "line": 46,
       "column": 41,
       "raw_route": "/api/v1/capabilities/${id}:invoke",
       "normalized_route": "/api/v1/capabilities/{dynamic}:invoke",
       "method": "POST",
       "disposition": "capability",
-      "occurrence_id": "packages/craft-plugin/web/lineage_view/staging_panel.js:43:41:POST:/api/v1/capabilities/{dynamic}:invoke"
+      "occurrence_id": "packages/craft-plugin/web/lineage_view/staging_panel.js:46:41:POST:/api/v1/capabilities/{dynamic}:invoke"
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/staging_panel.js",
+      "line": 75,
+      "column": 43,
+      "raw_route": "/api/craft/tc-resource-staging?version_gid=${encodeURIComponent(this._versionGid)}",
+      "normalized_route": "/api/craft/tc-resource-staging",
+      "method": "GET",
+      "disposition": "bff_registered",
+      "occurrence_id": "packages/craft-plugin/web/lineage_view/staging_panel.js:75:43:GET:/api/craft/tc-resource-staging"
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/staging_panel.js",
+      "line": 192,
+      "column": 43,
+      "raw_route": "/api/craft/resource-requirements?resource_type=${encodeURIComponent(item.resource_type)}",
+      "normalized_route": "/api/craft/resource-requirements",
+      "method": "GET",
+      "disposition": "bff_registered",
+      "occurrence_id": "packages/craft-plugin/web/lineage_view/staging_panel.js:192:43:GET:/api/craft/resource-requirements"
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/staging_panel.js",
+      "line": 202,
+      "column": 26,
+      "raw_route": "/api/craft/tc-resource-staging/${item.gid}/resolve",
+      "normalized_route": "/api/craft/tc-resource-staging/{dynamic}/resolve",
+      "method": "POST",
+      "disposition": "bff_registered",
+      "occurrence_id": "packages/craft-plugin/web/lineage_view/staging_panel.js:202:26:POST:/api/craft/tc-resource-staging/{dynamic}/resolve"
+    },
+    {
+      "source": "packages/craft-plugin/web/lineage_view/staging_panel.js",
+      "line": 215,
+      "column": 26,
+      "raw_route": "/api/craft/tc-resource-staging/${item.gid}/ignore",
+      "normalized_route": "/api/craft/tc-resource-staging/{dynamic}/ignore",
+      "method": "POST",
+      "disposition": "bff_registered",
+      "occurrence_id": "packages/craft-plugin/web/lineage_view/staging_panel.js:215:26:POST:/api/craft/tc-resource-staging/{dynamic}/ignore"
     },
     {
       "source": "packages/craft-plugin/web/pbom_check/pbom_check.js",
@@ -1412,13 +1452,33 @@
     },
     {
       "source": "packages/sim-plugin/web/cad_sim/cad_sim.js",
-      "line": 44,
+      "line": 23,
       "column": 39,
       "raw_route": "/api/v1/capabilities/${id}:invoke",
       "normalized_route": "/api/v1/capabilities/{dynamic}:invoke",
       "method": "POST",
       "disposition": "capability",
-      "occurrence_id": "packages/sim-plugin/web/cad_sim/cad_sim.js:44:39:POST:/api/v1/capabilities/{dynamic}:invoke"
+      "occurrence_id": "packages/sim-plugin/web/cad_sim/cad_sim.js:23:39:POST:/api/v1/capabilities/{dynamic}:invoke"
+    },
+    {
+      "source": "packages/sim-plugin/web/cad_sim/capture_workflow.js",
+      "line": 86,
+      "column": 10,
+      "raw_route": "/api/v1/capabilities/${encodeURIComponent(capabilityId)}:confirm",
+      "normalized_route": "/api/v1/capabilities/{dynamic}:confirm",
+      "method": "POST",
+      "disposition": "capability",
+      "occurrence_id": "packages/sim-plugin/web/cad_sim/capture_workflow.js:86:10:POST:/api/v1/capabilities/{dynamic}:confirm"
+    },
+    {
+      "source": "packages/sim-plugin/web/cad_sim/capture_workflow.js",
+      "line": 124,
+      "column": 12,
+      "raw_route": "/api/v1/capabilities/${encodeURIComponent(capabilityId)}:invoke",
+      "normalized_route": "/api/v1/capabilities/{dynamic}:invoke",
+      "method": "POST",
+      "disposition": "capability",
+      "occurrence_id": "packages/sim-plugin/web/cad_sim/capture_workflow.js:124:12:POST:/api/v1/capabilities/{dynamic}:invoke"
     },
     {
       "source": "web/admin/ai_audit.html",
@@ -1442,23 +1502,23 @@
     },
     {
       "source": "web/admin/capability_governance/governance_api.js",
-      "line": 98,
+      "line": 99,
       "column": 39,
       "raw_route": "/api/v1/capabilities/${capabilityId}:invoke",
       "normalized_route": "/api/v1/capabilities/{dynamic}:invoke",
       "method": "POST",
       "disposition": "capability",
-      "occurrence_id": "web/admin/capability_governance/governance_api.js:98:39:POST:/api/v1/capabilities/{dynamic}:invoke"
+      "occurrence_id": "web/admin/capability_governance/governance_api.js:99:39:POST:/api/v1/capabilities/{dynamic}:invoke"
     },
     {
       "source": "web/admin/capability_governance/governance_api.js",
-      "line": 141,
+      "line": 157,
       "column": 45,
       "raw_route": "/api/v1/capabilities/${capabilityId}:confirm",
       "normalized_route": "/api/v1/capabilities/{dynamic}:confirm",
       "method": "POST",
       "disposition": "capability",
-      "occurrence_id": "web/admin/capability_governance/governance_api.js:141:45:POST:/api/v1/capabilities/{dynamic}:confirm"
+      "occurrence_id": "web/admin/capability_governance/governance_api.js:157:45:POST:/api/v1/capabilities/{dynamic}:confirm"
     },
     {
       "source": "web/admin/task_planning.html",
@@ -2634,233 +2694,233 @@
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 180,
+      "line": 181,
       "column": 41,
       "raw_route": "/api/knowledge_hub/items/${_urlItemGid}",
       "normalized_route": "/api/knowledge_hub/items/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:180:41:GET:/api/knowledge_hub/items/{dynamic}"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:181:41:GET:/api/knowledge_hub/items/{dynamic}"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 361,
+      "line": 362,
       "column": 37,
       "raw_route": "/api/knowledge_hub/folders?${query}",
       "normalized_route": "/api/knowledge_hub/folders",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:361:37:GET:/api/knowledge_hub/folders"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:362:37:GET:/api/knowledge_hub/folders"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 515,
+      "line": 516,
       "column": 55,
       "raw_route": "/api/knowledge_hub/favorites",
       "normalized_route": "/api/knowledge_hub/favorites",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:515:55:GET:/api/knowledge_hub/favorites"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:516:55:GET:/api/knowledge_hub/favorites"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 525,
+      "line": 526,
       "column": 55,
       "raw_route": "/api/knowledge_hub/recent",
       "normalized_route": "/api/knowledge_hub/recent",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:525:55:GET:/api/knowledge_hub/recent"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:526:55:GET:/api/knowledge_hub/recent"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 544,
+      "line": 545,
       "column": 36,
       "raw_route": "/api/knowledge_hub/items?${query}",
       "normalized_route": "/api/knowledge_hub/items",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:544:36:GET:/api/knowledge_hub/items"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:545:36:GET:/api/knowledge_hub/items"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 729,
+      "line": 738,
       "column": 43,
       "raw_route": "/api/knowledge_hub/items/${item.gid}",
       "normalized_route": "/api/knowledge_hub/items/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:729:43:PATCH:/api/knowledge_hub/items/{dynamic}"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:738:43:PATCH:/api/knowledge_hub/items/{dynamic}"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 765,
+      "line": 774,
       "column": 43,
       "raw_route": "/api/knowledge_hub/items/${item.gid}",
       "normalized_route": "/api/knowledge_hub/items/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:765:43:PATCH:/api/knowledge_hub/items/{dynamic}"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:774:43:PATCH:/api/knowledge_hub/items/{dynamic}"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 795,
+      "line": 804,
       "column": 24,
       "raw_route": "/api/knowledge_hub/items/${item.gid}",
       "normalized_route": "/api/knowledge_hub/items/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:795:24:PATCH:/api/knowledge_hub/items/{dynamic}"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:804:24:PATCH:/api/knowledge_hub/items/{dynamic}"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 819,
+      "line": 828,
       "column": 43,
       "raw_route": "/api/knowledge_hub/items/${item.gid}",
       "normalized_route": "/api/knowledge_hub/items/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:819:43:PATCH:/api/knowledge_hub/items/{dynamic}"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:828:43:PATCH:/api/knowledge_hub/items/{dynamic}"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 839,
+      "line": 848,
       "column": 43,
       "raw_route": "/api/knowledge_hub/items/${item.gid}",
       "normalized_route": "/api/knowledge_hub/items/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:839:43:PATCH:/api/knowledge_hub/items/{dynamic}"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:848:43:PATCH:/api/knowledge_hub/items/{dynamic}"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 858,
+      "line": 867,
       "column": 43,
       "raw_route": "/api/knowledge_hub/items/${item.gid}",
       "normalized_route": "/api/knowledge_hub/items/{dynamic}",
       "method": "DELETE",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:858:43:DELETE:/api/knowledge_hub/items/{dynamic}"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:867:43:DELETE:/api/knowledge_hub/items/{dynamic}"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 1005,
+      "line": 1014,
       "column": 45,
       "raw_route": "/api/knowledge_hub/items/${item.gid}",
       "normalized_route": "/api/knowledge_hub/items/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1005:45:PATCH:/api/knowledge_hub/items/{dynamic}"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1014:45:PATCH:/api/knowledge_hub/items/{dynamic}"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 1040,
+      "line": 1049,
       "column": 37,
       "raw_route": "/api/knowledge_hub/items/${item.gid}/recent",
       "normalized_route": "/api/knowledge_hub/items/{dynamic}/recent",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1040:37:POST:/api/knowledge_hub/items/{dynamic}/recent"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1049:37:POST:/api/knowledge_hub/items/{dynamic}/recent"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 1130,
+      "line": 1139,
       "column": 42,
       "raw_route": "/api/knowledge_hub/items/${item.gid}/history",
       "normalized_route": "/api/knowledge_hub/items/{dynamic}/history",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1130:42:GET:/api/knowledge_hub/items/{dynamic}/history"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1139:42:GET:/api/knowledge_hub/items/{dynamic}/history"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 1153,
+      "line": 1162,
       "column": 39,
       "raw_route": "/api/item-entries/knowledge_item/${item.gid}",
       "normalized_route": "/api/item-entries/knowledge_item/{dynamic}",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1153:39:GET:/api/item-entries/knowledge_item/{dynamic}"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1162:39:GET:/api/item-entries/knowledge_item/{dynamic}"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 1175,
+      "line": 1184,
       "column": 40,
       "raw_route": "/api/knowledge_hub/folders",
       "normalized_route": "/api/knowledge_hub/folders",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1175:40:POST:/api/knowledge_hub/folders"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1184:40:POST:/api/knowledge_hub/folders"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 1206,
+      "line": 1215,
       "column": 43,
       "raw_route": "/api/knowledge_hub/folders/${folder.gid}",
       "normalized_route": "/api/knowledge_hub/folders/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1206:43:PATCH:/api/knowledge_hub/folders/{dynamic}"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1215:43:PATCH:/api/knowledge_hub/folders/{dynamic}"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 1245,
+      "line": 1254,
       "column": 45,
       "raw_route": "/api/knowledge_hub/folders/${folder.gid}",
       "normalized_route": "/api/knowledge_hub/folders/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1245:45:PATCH:/api/knowledge_hub/folders/{dynamic}"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1254:45:PATCH:/api/knowledge_hub/folders/{dynamic}"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 1275,
+      "line": 1284,
       "column": 43,
       "raw_route": "/api/knowledge_hub/folders/${folder.gid}",
       "normalized_route": "/api/knowledge_hub/folders/{dynamic}",
       "method": "DELETE",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1275:43:DELETE:/api/knowledge_hub/folders/{dynamic}"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1284:43:DELETE:/api/knowledge_hub/folders/{dynamic}"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 1418,
+      "line": 1427,
       "column": 45,
       "raw_route": "/api/knowledge_hub/folders/${dragData.gid}",
       "normalized_route": "/api/knowledge_hub/folders/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1418:45:PATCH:/api/knowledge_hub/folders/{dynamic}"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1427:45:PATCH:/api/knowledge_hub/folders/{dynamic}"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 1436,
+      "line": 1445,
       "column": 45,
       "raw_route": "/api/knowledge_hub/items/${dragData.gid}",
       "normalized_route": "/api/knowledge_hub/items/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1436:45:PATCH:/api/knowledge_hub/items/{dynamic}"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1445:45:PATCH:/api/knowledge_hub/items/{dynamic}"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 1567,
+      "line": 1576,
       "column": 40,
       "raw_route": "/api/knowledge_hub/items?scope_type=public&show_hidden=true",
       "normalized_route": "/api/knowledge_hub/items",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1567:40:GET:/api/knowledge_hub/items"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1576:40:GET:/api/knowledge_hub/items"
     },
     {
       "source": "web/knowledge_hub/knowledge_hub.js",
-      "line": 1702,
+      "line": 1711,
       "column": 33,
       "raw_route": "/api/knowledge_hub/items",
       "normalized_route": "/api/knowledge_hub/items",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1702:33:POST:/api/knowledge_hub/items"
+      "occurrence_id": "web/knowledge_hub/knowledge_hub.js:1711:33:POST:/api/knowledge_hub/items"
     },
     {
       "source": "web/knowledge_hub/pages/factory_info.html",
@@ -2884,243 +2944,323 @@
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 244,
+      "line": 251,
       "column": 36,
       "raw_route": "/api/craft_lib/part_names",
       "normalized_route": "/api/craft_lib/part_names",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:244:36:GET:/api/craft_lib/part_names"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:251:36:GET:/api/craft_lib/part_names"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 332,
+      "line": 339,
       "column": 59,
       "raw_route": "/api/craft_lib/part_names",
       "normalized_route": "/api/craft_lib/part_names",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:332:59:POST:/api/craft_lib/part_names"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:339:59:POST:/api/craft_lib/part_names"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 333,
+      "line": 340,
       "column": 64,
       "raw_route": "/api/craft_lib/part_names/${gid}",
       "normalized_route": "/api/craft_lib/part_names/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:333:64:PATCH:/api/craft_lib/part_names/{dynamic}"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:340:64:PATCH:/api/craft_lib/part_names/{dynamic}"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 334,
+      "line": 341,
       "column": 58,
       "raw_route": "/api/craft_lib/part_names/${gid}",
       "normalized_route": "/api/craft_lib/part_names/{dynamic}",
       "method": "DELETE",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:334:58:DELETE:/api/craft_lib/part_names/{dynamic}"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:341:58:DELETE:/api/craft_lib/part_names/{dynamic}"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 372,
+      "line": 379,
       "column": 62,
       "raw_route": "/api/craft_lib/part_names",
       "normalized_route": "/api/craft_lib/part_names",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:372:62:POST:/api/craft_lib/part_names"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:379:62:POST:/api/craft_lib/part_names"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 381,
+      "line": 383,
+      "column": 47,
+      "raw_route": "/api/v1/capabilities/craft.library.change.apply:confirm",
+      "normalized_route": "/api/v1/capabilities/craft.library.change.apply:confirm",
+      "method": "POST",
+      "disposition": "capability",
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:383:47:POST:/api/v1/capabilities/craft.library.change.apply:confirm"
+    },
+    {
+      "source": "web/knowledge_hub/pages/gbop_vpps.html",
+      "line": 389,
+      "column": 43,
+      "raw_route": "/api/v1/capabilities/craft.library.change.apply:invoke",
+      "normalized_route": "/api/v1/capabilities/craft.library.change.apply:invoke",
+      "method": "POST",
+      "disposition": "capability",
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:389:43:POST:/api/v1/capabilities/craft.library.change.apply:invoke"
+    },
+    {
+      "source": "web/knowledge_hub/pages/gbop_vpps.html",
+      "line": 413,
       "column": 36,
       "raw_route": "/api/craft_lib/fasteners",
       "normalized_route": "/api/craft_lib/fasteners",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:381:36:GET:/api/craft_lib/fasteners"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:413:36:GET:/api/craft_lib/fasteners"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 479,
+      "line": 511,
       "column": 59,
       "raw_route": "/api/craft_lib/fasteners",
       "normalized_route": "/api/craft_lib/fasteners",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:479:59:POST:/api/craft_lib/fasteners"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:511:59:POST:/api/craft_lib/fasteners"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 480,
+      "line": 512,
       "column": 64,
       "raw_route": "/api/craft_lib/fasteners/${gid}",
       "normalized_route": "/api/craft_lib/fasteners/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:480:64:PATCH:/api/craft_lib/fasteners/{dynamic}"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:512:64:PATCH:/api/craft_lib/fasteners/{dynamic}"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 481,
+      "line": 513,
       "column": 58,
       "raw_route": "/api/craft_lib/fasteners/${gid}",
       "normalized_route": "/api/craft_lib/fasteners/{dynamic}",
       "method": "DELETE",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:481:58:DELETE:/api/craft_lib/fasteners/{dynamic}"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:513:58:DELETE:/api/craft_lib/fasteners/{dynamic}"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 499,
+      "line": 531,
       "column": 62,
       "raw_route": "/api/craft_lib/fasteners",
       "normalized_route": "/api/craft_lib/fasteners",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:499:62:POST:/api/craft_lib/fasteners"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:531:62:POST:/api/craft_lib/fasteners"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 508,
+      "line": 540,
       "column": 36,
       "raw_route": "/api/craft_lib/tools",
       "normalized_route": "/api/craft_lib/tools",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:508:36:GET:/api/craft_lib/tools"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:540:36:GET:/api/craft_lib/tools"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 639,
+      "line": 671,
       "column": 59,
       "raw_route": "/api/craft_lib/tools",
       "normalized_route": "/api/craft_lib/tools",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:639:59:POST:/api/craft_lib/tools"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:671:59:POST:/api/craft_lib/tools"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 640,
+      "line": 672,
       "column": 64,
       "raw_route": "/api/craft_lib/tools/${gid}",
       "normalized_route": "/api/craft_lib/tools/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:640:64:PATCH:/api/craft_lib/tools/{dynamic}"
-    },
-    {
-      "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 641,
-      "column": 58,
-      "raw_route": "/api/craft_lib/tools/${gid}",
-      "normalized_route": "/api/craft_lib/tools/{dynamic}",
-      "method": "DELETE",
-      "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:641:58:DELETE:/api/craft_lib/tools/{dynamic}"
-    },
-    {
-      "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 664,
-      "column": 62,
-      "raw_route": "/api/craft_lib/tools",
-      "normalized_route": "/api/craft_lib/tools",
-      "method": "POST",
-      "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:664:62:POST:/api/craft_lib/tools"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:672:64:PATCH:/api/craft_lib/tools/{dynamic}"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
       "line": 673,
+      "column": 58,
+      "raw_route": "/api/craft_lib/tools/${gid}",
+      "normalized_route": "/api/craft_lib/tools/{dynamic}",
+      "method": "DELETE",
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:673:58:DELETE:/api/craft_lib/tools/{dynamic}"
+    },
+    {
+      "source": "web/knowledge_hub/pages/gbop_vpps.html",
+      "line": 696,
+      "column": 62,
+      "raw_route": "/api/craft_lib/tools",
+      "normalized_route": "/api/craft_lib/tools",
+      "method": "POST",
+      "disposition": "legacy_registered",
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:696:62:POST:/api/craft_lib/tools"
+    },
+    {
+      "source": "web/knowledge_hub/pages/gbop_vpps.html",
+      "line": 705,
       "column": 36,
       "raw_route": "/api/craft_lib/fixtures",
       "normalized_route": "/api/craft_lib/fixtures",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:673:36:GET:/api/craft_lib/fixtures"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:705:36:GET:/api/craft_lib/fixtures"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 712,
+      "line": 744,
       "column": 59,
       "raw_route": "/api/craft_lib/fixtures",
       "normalized_route": "/api/craft_lib/fixtures",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:712:59:POST:/api/craft_lib/fixtures"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:744:59:POST:/api/craft_lib/fixtures"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 713,
+      "line": 745,
       "column": 64,
       "raw_route": "/api/craft_lib/fixtures/${gid}",
       "normalized_route": "/api/craft_lib/fixtures/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:713:64:PATCH:/api/craft_lib/fixtures/{dynamic}"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:745:64:PATCH:/api/craft_lib/fixtures/{dynamic}"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 719,
+      "line": 751,
       "column": 62,
       "raw_route": "/api/craft_lib/fixtures",
       "normalized_route": "/api/craft_lib/fixtures",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:719:62:POST:/api/craft_lib/fixtures"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:751:62:POST:/api/craft_lib/fixtures"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 728,
+      "line": 760,
       "column": 36,
       "raw_route": "/api/craft_lib/equipments",
       "normalized_route": "/api/craft_lib/equipments",
       "method": "GET",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:728:36:GET:/api/craft_lib/equipments"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:760:36:GET:/api/craft_lib/equipments"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 767,
+      "line": 799,
       "column": 59,
       "raw_route": "/api/craft_lib/equipments",
       "normalized_route": "/api/craft_lib/equipments",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:767:59:POST:/api/craft_lib/equipments"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:799:59:POST:/api/craft_lib/equipments"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 768,
+      "line": 800,
       "column": 64,
       "raw_route": "/api/craft_lib/equipments/${gid}",
       "normalized_route": "/api/craft_lib/equipments/{dynamic}",
       "method": "PATCH",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:768:64:PATCH:/api/craft_lib/equipments/{dynamic}"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:800:64:PATCH:/api/craft_lib/equipments/{dynamic}"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 774,
+      "line": 806,
       "column": 62,
       "raw_route": "/api/craft_lib/equipments",
       "normalized_route": "/api/craft_lib/equipments",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:774:62:POST:/api/craft_lib/equipments"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:806:62:POST:/api/craft_lib/equipments"
     },
     {
       "source": "web/knowledge_hub/pages/gbop_vpps.html",
-      "line": 1071,
+      "line": 839,
+      "column": 47,
+      "raw_route": "/api/craft/resource-requirements?resource_type=${resourceType}",
+      "normalized_route": "/api/craft/resource-requirements",
+      "method": "GET",
+      "disposition": "bff_registered",
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:839:47:GET:/api/craft/resource-requirements"
+    },
+    {
+      "source": "web/knowledge_hub/pages/gbop_vpps.html",
+      "line": 859,
+      "column": 27,
+      "raw_route": "/api/craft/resource-requirements",
+      "normalized_route": "/api/craft/resource-requirements",
+      "method": "POST",
+      "disposition": "bff_registered",
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:859:27:POST:/api/craft/resource-requirements"
+    },
+    {
+      "source": "web/knowledge_hub/pages/gbop_vpps.html",
+      "line": 862,
+      "column": 27,
+      "raw_route": "/api/craft/resource-requirements/${gid}",
+      "normalized_route": "/api/craft/resource-requirements/{dynamic}",
+      "method": "PATCH",
+      "disposition": "bff_registered",
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:862:27:PATCH:/api/craft/resource-requirements/{dynamic}"
+    },
+    {
+      "source": "web/knowledge_hub/pages/gbop_vpps.html",
+      "line": 867,
+      "column": 27,
+      "raw_route": "/api/craft/resource-requirements/${gid}/retire",
+      "normalized_route": "/api/craft/resource-requirements/{dynamic}/retire",
+      "method": "POST",
+      "disposition": "bff_registered",
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:867:27:POST:/api/craft/resource-requirements/{dynamic}/retire"
+    },
+    {
+      "source": "web/knowledge_hub/pages/gbop_vpps.html",
+      "line": 1130,
+      "column": 26,
+      "raw_route": "/api/craft/resource-requirements/${gid}/aliases/${alias.gid}",
+      "normalized_route": "/api/craft/resource-requirements/{dynamic}/aliases/{dynamic}",
+      "method": "DELETE",
+      "disposition": "bff_registered",
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:1130:26:DELETE:/api/craft/resource-requirements/{dynamic}/aliases/{dynamic}"
+    },
+    {
+      "source": "web/knowledge_hub/pages/gbop_vpps.html",
+      "line": 1133,
+      "column": 26,
+      "raw_route": "/api/craft/resource-requirements/${gid}/aliases",
+      "normalized_route": "/api/craft/resource-requirements/{dynamic}/aliases",
+      "method": "POST",
+      "disposition": "bff_registered",
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:1133:26:POST:/api/craft/resource-requirements/{dynamic}/aliases"
+    },
+    {
+      "source": "web/knowledge_hub/pages/gbop_vpps.html",
+      "line": 1213,
       "column": 36,
       "raw_route": "/api/import-export/import/parse-excel",
       "normalized_route": "/api/import-export/import/parse-excel",
       "method": "POST",
       "disposition": "legacy_registered",
-      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:1071:36:POST:/api/import-export/import/parse-excel"
+      "occurrence_id": "web/knowledge_hub/pages/gbop_vpps.html:1213:36:POST:/api/import-export/import/parse-excel"
     },
     {
       "source": "web/knowledge_hub/pages/project_info.html",
@@ -3411,6 +3551,26 @@
       "method": "GET",
       "disposition": "legacy_registered",
       "occurrence_id": "web/share/issues.html:178:40:GET:/api/issues"
+    },
+    {
+      "source": "web/simulation_connector/pair.js",
+      "line": 25,
+      "column": 8,
+      "raw_route": "/api/v1/capabilities/${encodeURIComponent(capabilityId)}:confirm",
+      "normalized_route": "/api/v1/capabilities/{dynamic}:confirm",
+      "method": "POST",
+      "disposition": "capability",
+      "occurrence_id": "web/simulation_connector/pair.js:25:8:POST:/api/v1/capabilities/{dynamic}:confirm"
+    },
+    {
+      "source": "web/simulation_connector/pair.js",
+      "line": 35,
+      "column": 6,
+      "raw_route": "/api/v1/capabilities/${encodeURIComponent(capabilityId)}:invoke",
+      "normalized_route": "/api/v1/capabilities/{dynamic}:invoke",
+      "method": "POST",
+      "disposition": "capability",
+      "occurrence_id": "web/simulation_connector/pair.js:35:6:POST:/api/v1/capabilities/{dynamic}:invoke"
     },
     {
       "source": "web/workbench/workbench.js",

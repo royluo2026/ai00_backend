@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import Counter
 from dataclasses import replace
 import json
+import os
 from pathlib import Path
 import subprocess
 
@@ -17,7 +18,12 @@ from backend.capabilities.validation_next import validate_payload
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / "docs/governance/existing-capability-web-migrations.json"
 LEDGER = ROOT / "docs/governance/web-route-root-cause-ledger.json"
-WEB_ROOT = Path(r"E:\Projects\ai00_v3\.worktrees\workmanship-web-capability-governance")
+WEB_ROOT = Path(
+    os.environ.get(
+        "AI00_WEB_ROOT",
+        r"E:\Projects\ai00_v3\.worktrees\workmanship-web-capability-governance",
+    )
+)
 CATALOG = ROOT / "docs/capabilities/catalog.v2.json"
 
 

@@ -120,6 +120,9 @@ def test_release_bindings_cover_manifest_and_every_domain_migration():
         ("agent", "0001_agent.sql"),
         ("agent", "0002_canvas_query_tenant.sql"),
         ("agent", "0003_canvas_execution_control.sql"),
+        ("agent", "0004_confirmation_tokens.sql"),
+        ("agent", "0005_capability_outbox.sql"),
+        ("agent", "0006_capability_outbox_delivery.sql"),
         ("base", "0001_base_platform.sql"),
         ("base", "0002_domain_inbox.sql"),
         ("craft", "0001_pbom.sql"),
@@ -143,11 +146,16 @@ def test_release_bindings_cover_manifest_and_every_domain_migration():
         ("knowledge", "0004_resource_model_mappings.sql"),
         ("device", "0001_device.sql"),
         ("device", "0002_connector_control_plane.sql"),
+        ("device", "0003_connector_projection_outbox.sql"),
         ("ontology", "0001_ontology.sql"),
         ("project_management", "0001_project_management.sql"),
         ("project_management", "0002_approval_notification_outbox.sql"),
         ("simulation", "0001_simulation.sql"),
         ("simulation", "0002_connector_environments.sql"),
+        ("simulation", "0003_document_snapshots.sql"),
+        ("simulation", "0004_capture_dispatch_plans.sql"),
+        ("simulation", "0005_connector_control_plane.sql"),
+        ("simulation", "0006_capture_dispatch_compatibility.sql"),
     }
     assert all(row["sha256"].startswith("sha256:") for row in migration_bindings)
     assert all(row["artifact_version"] for row in migration_bindings)
