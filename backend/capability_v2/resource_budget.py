@@ -118,10 +118,10 @@ class AdmissionLease:
     async def release(self) -> None:
         if self._released:
             return
-        self._released = True
         await self._controller._release(
             self._capability_key, self._tenant_counter_key, self._consumer_counter_key,
         )
+        self._released = True
 
 
 class ResourceAdmissionController:

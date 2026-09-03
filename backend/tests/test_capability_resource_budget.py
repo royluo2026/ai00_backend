@@ -6,11 +6,31 @@ import pytest
 
 from backend.capability_v2.contracts import ExecutionBudget
 from backend.capability_v2.resource_budget import (
+    AdmissionLease,
     AdmissionRejected,
     MemoryPressureSampler,
     MemorySnapshot,
     ResourceAdmissionController,
 )
+
+
+def test_admission_release_can_retry_after_transient_cleanup_failure():
+    class Controller:
+        calls = 0
+        async def _release(self, *_args):
+            self.calls += 1
+            if self.calls == 1:
+                raise RuntimeError("transient cleanup failure")
+
+    async def scenario():
+        controller = Controller()
+        lease = AdmissionLease(controller, "agent.chat@2", ("t", "a"), ("c", "a"))
+        with pytest.raises(RuntimeError, match="transient"):
+            await lease.release()
+        await lease.release()
+        assert controller.calls == 2
+
+    asyncio.run(scenario())
 
 
 def _reader(values: dict[str, str]):

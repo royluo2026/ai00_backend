@@ -6,7 +6,10 @@ from datetime import UTC, datetime
 from pathlib import Path
 from types import SimpleNamespace
 
+import pytest
+
 from backend.capabilities.registry_next import CapabilityRegistry
+from backend.capabilities.models_next import CapabilityOutput
 from backend.capabilities.validation_next import validate_payload
 from backend.capability_v2.catalog import CatalogResolver, build_release
 from backend.capability_v2.catalog_store import InMemoryCatalogStore
@@ -16,9 +19,7 @@ from backend.capability_v2.contracts import (
 )
 from backend.capability_v2.gateway import CapabilityGatewayService
 from backend.capability_v2.outcomes import InMemoryOutcomeStore
-from backend.capability_v2.reliability import (
-    InMemoryRateLimiter, ReliabilityCoordinator, TransactionalCapabilityOutput,
-)
+from backend.capability_v2.reliability import InMemoryRateLimiter, ReliabilityCoordinator
 from plugins.agent.agent_backend.application.service import AgentApplication
 from plugins.agent.agent_backend.capabilities import register_capabilities
 from plugins.agent.agent_backend.capabilities.descriptors import specs
@@ -71,16 +72,30 @@ def test_registered_runtime_config_handler_matches_its_output_contract(monkeypat
     validate_payload(dict(provider.descriptor.output_schema), value, label="output")
 
 
-def test_registered_write_handler_matches_strong_transaction_and_evidence_contract(monkeypatch):
+def test_registered_write_handler_commits_agent_outbox_and_evidence_contract(monkeypatch):
     monkeypatch.setattr(
         "plugins.agent.agent_backend.capabilities.AgentCapabilityRepository.apply",
         lambda _self, _payload: {"resource_gid": "run-1"},
     )
+    transactions = []
+
+    class Transaction:
+        def __init__(self): self.events = []; self.committed = False
+        def record_outbox(self, *args): self.events.append(args)
+        def commit(self): self.committed = True
+        def rollback(self): pass
+        def close(self): pass
+
+    def transaction_factory():
+        transaction = Transaction(); transactions.append(transaction); return transaction
+
     registry = CapabilityRegistry()
-    register_capabilities(registry, canvas_runtime=None)
+    register_capabilities(
+        registry, canvas_runtime=None, transaction_factory=transaction_factory,
+    )
     provider = registry.get("agent.run.change.apply", 1)
 
-    assert provider.descriptor.consistency_policy == "strong"
+    assert provider.descriptor.consistency_policy == "eventual"
     assert provider.descriptor.evidence_policy == "required"
     value = provider.handler(
         {}, SimpleNamespace(
@@ -89,12 +104,12 @@ def test_registered_write_handler_matches_strong_transaction_and_evidence_contra
         ),
     )
 
-    assert getattr(provider.handler, "__capability_transactional__", False) is True
-    assert isinstance(value, TransactionalCapabilityOutput)
+    assert getattr(provider.handler, "__capability_transactional__", False) is False
+    assert isinstance(value, CapabilityOutput)
     assert value.evidence
+    assert transactions[0].committed is True
+    assert transactions[0].events[0][0] == "agent.run.change.apply"
     validate_payload(dict(provider.descriptor.output_schema), value.data, label="output")
-    value.transaction.rollback()
-    value.transaction.close()
 
 
 def test_real_gateway_commits_registered_agent_write_with_evidence(monkeypatch):
@@ -102,8 +117,22 @@ def test_real_gateway_commits_registered_agent_write_with_evidence(monkeypatch):
         "plugins.agent.agent_backend.capabilities.AgentCapabilityRepository.apply",
         lambda _self, _payload: {"resource_gid": "run-1"},
     )
+    transactions = []
+
+    class Transaction:
+        def __init__(self): self.events = []; self.committed = False
+        def record_outbox(self, *args): self.events.append(args)
+        def commit(self): self.committed = True
+        def rollback(self): pass
+        def close(self): pass
+
+    def transaction_factory():
+        transaction = Transaction(); transactions.append(transaction); return transaction
+
     registry = CapabilityRegistry()
-    register_capabilities(registry, canvas_runtime=None)
+    register_capabilities(
+        registry, canvas_runtime=None, transaction_factory=transaction_factory,
+    )
     provider = registry.get("agent.run.change.apply", 1)
     release = build_release([provider.descriptor])
     store = InMemoryCatalogStore(); store.publish(release)
@@ -131,3 +160,31 @@ def test_real_gateway_commits_registered_agent_write_with_evidence(monkeypatch):
     assert result.ok is True
     assert result.data["resource_gid"] == "run-1"
     assert result.evidence[0].kind == "agent.change"
+    assert transactions[0].committed is True
+    assert transactions[0].events
+
+
+def test_write_cleanup_preserves_provider_error_when_rollback_also_fails(monkeypatch):
+    original = ValueError("provider rejected input")
+    monkeypatch.setattr(
+        "plugins.agent.agent_backend.capabilities.AgentCapabilityRepository.apply",
+        lambda _self, _payload: (_ for _ in ()).throw(original),
+    )
+
+    class Transaction:
+        closed = False
+        def rollback(self): raise RuntimeError("rollback failed")
+        def close(self): self.closed = True
+
+    transaction = Transaction()
+    registry = CapabilityRegistry()
+    register_capabilities(
+        registry, canvas_runtime=None, transaction_factory=lambda: transaction,
+    )
+
+    with pytest.raises(ValueError, match="provider rejected input") as raised:
+        registry.get("agent.run.change.apply", 1).handler(
+            {}, SimpleNamespace(user_gid="u1", team_gid="t1", request_id="req-1"),
+        )
+    assert raised.value is original
+    assert transaction.closed is True

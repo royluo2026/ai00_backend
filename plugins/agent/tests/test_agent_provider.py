@@ -70,17 +70,18 @@ def test_agent_is_official_and_database_independent():
     assert "state VARCHAR(16) NOT NULL" in confirmation_sql
 
 
-def test_every_strong_agent_write_registers_a_transactional_handler():
+def test_agent_writes_use_eventual_outbox_contract_not_fake_strong_transactions():
     class Registry:
         def __init__(self): self.items = []
         def register(self, spec, handler, *, descriptor=None):
             self.items.append((handler, descriptor))
 
     registry = Registry(); register_capabilities(registry)
-    strong_writes = [
-        handler for handler, descriptor in registry.items
+    writes = [
+        (handler, descriptor) for handler, descriptor in registry.items
         if descriptor.side_effect_level.value != "read"
-        and descriptor.consistency_policy == "strong"
     ]
-    assert strong_writes
-    assert all(getattr(handler, "__capability_transactional__", False) for handler in strong_writes)
+    assert writes
+    assert all(descriptor.consistency_policy == "eventual" for _, descriptor in writes)
+    assert any(descriptor.evidence_policy == "required" for _, descriptor in writes)
+    assert all(not getattr(handler, "__capability_transactional__", False) for handler, _ in writes)

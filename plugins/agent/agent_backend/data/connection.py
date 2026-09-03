@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import os
-import re
+import json
+import uuid
 from contextlib import contextmanager
 from contextvars import ContextVar
 from threading import Lock
@@ -11,10 +12,6 @@ from backend.capability_v2.domain_resource_config import pool_limits
 _pool = None
 _pool_lock = Lock()
 _active_transaction = ContextVar("agent_transaction", default=None)
-_BASE_TRANSACTION_TABLES = (
-    "workmanship_base_capability_outcomes",
-    "workmanship_base_capability_audit_outbox",
-)
 
 
 def _connection_params() -> dict:
@@ -61,44 +58,13 @@ def _get_pool():
     return _pool
 
 
-def _database_name(env_name: str) -> str:
-    raw = os.environ.get(env_name, "")
-    name = urlparse(raw).path.lstrip("/") if raw else ""
-    if name and not re.fullmatch(r"[A-Za-z0-9_]+", name):
-        raise RuntimeError(f"{env_name} contains an invalid database name")
-    return name
-
-
-class _TransactionCursor:
-    def __init__(self, cursor, base_database: str):
-        self._cursor = cursor
-        self._base_database = base_database
-
-    def __enter__(self):
-        self._cursor.__enter__()
-        return self
-
-    def __exit__(self, *args):
-        return self._cursor.__exit__(*args)
-
-    def __getattr__(self, name):
-        return getattr(self._cursor, name)
-
-    def execute(self, query, args=None):
-        if self._base_database:
-            for table in _BASE_TRANSACTION_TABLES:
-                query = query.replace(table, f"`{self._base_database}`.`{table}`")
-        return self._cursor.execute(query, args)
-
-
 class AgentTransaction:
-    """Lazy Agent DB transaction that can atomically enlist Base outcome tables."""
+    """Lazy Agent-owned transaction for a domain write and its durable outbox event."""
 
     def __init__(self):
         self._connection = None
         self._closed = False
         self._token = _active_transaction.set(self)
-        self._base_database = _database_name("AI00_BASE_DB_URL")
 
     def connection(self):
         if self._closed:
@@ -107,8 +73,19 @@ class AgentTransaction:
             self._connection = _get_pool().connection()
         return self._connection
 
-    def cursor(self):
-        return _TransactionCursor(self.connection().cursor(), self._base_database)
+    def record_outbox(self, capability_id, context, output):
+        evidence = [item.model_dump(mode="json") for item in output.evidence]
+        with self.connection().cursor() as cursor:
+            cursor.execute(
+                "INSERT INTO workmanship_agent_capability_outbox "
+                "(event_id,operation_id,request_id,capability_id,payload_json,state) "
+                "VALUES (%s,%s,%s,%s,%s,'pending')",
+                (
+                    str(uuid.uuid4()), str(getattr(context, "operation_id", "") or ""),
+                    str(getattr(context, "request_id", "") or ""), capability_id,
+                    json.dumps({"data": output.data, "evidence": evidence}, ensure_ascii=False),
+                ),
+            )
 
     def commit(self):
         if self._connection is not None:
@@ -135,6 +112,20 @@ def begin_agent_transaction() -> AgentTransaction:
     if _active_transaction.get() is not None:
         raise RuntimeError("nested Agent transactions are not supported")
     return AgentTransaction()
+
+
+def rollback_agent_transaction(transaction) -> None:
+    try:
+        transaction.rollback()
+    except Exception:
+        pass
+
+
+def close_agent_transaction(transaction) -> None:
+    try:
+        transaction.close()
+    except Exception:
+        pass
 
 
 @contextmanager

@@ -494,7 +494,6 @@ class AgentCapabilityRepository:
         with get_agent_conn() as conn:
             with conn.cursor() as cur:
                 cur.execute("INSERT INTO workmanship_agent_capability_resources (resource_gid,resource_type,tenant_gid,owner_gid,version,status,content_json) VALUES (%s,%s,%s,%s,1,%s,%s) ON DUPLICATE KEY UPDATE version=version+1,status=VALUES(status),content_json=VALUES(content_json)", (gid, data["resource_type"], data["tenant_gid"], data["owner_gid"], data.get("status", "active"), json.dumps(data.get("content", {}))))
-            conn.commit()
         return {"resource_gid": gid, "version": int(data.get("expected_version", 0)) + 1, "status": data.get("status", "active")}
 
     def request_interaction(self, data: dict) -> dict:

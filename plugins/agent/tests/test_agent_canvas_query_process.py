@@ -157,8 +157,14 @@ def test_default_registered_handlers_use_production_repository_and_executor_path
         user_gid = "actor-1"
         team_gid = "team-2"
 
+    class Transaction:
+        def record_outbox(self, *_args): pass
+        def commit(self): pass
+        def rollback(self): pass
+        def close(self): pass
+
     registry = Registry()
-    capabilities.register_capabilities(registry)
+    capabilities.register_capabilities(registry, transaction_factory=Transaction)
     node_payload = {
         "flow_gid": "flow-1", "node_id": "node-1",
         "input_values": [{"name": "project_gid", "value": "p1"}],
@@ -170,7 +176,6 @@ def test_default_registered_handlers_use_production_repository_and_executor_path
 
     node_output = asyncio.run(registry.handlers["agent.workflow.node.test.execute"](node_payload, SameTeam()))
     node = node_output.data
-    node_output.transaction.rollback(); node_output.transaction.close()
     options = asyncio.run(registry.handlers["agent.canvas.options.resolve"](options_payload, SameTeam()))
     assert node["status"] == "completed"
     assert options == {

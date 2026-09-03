@@ -88,7 +88,7 @@ def test_agent_chat_registers_frozen_v1_and_corrected_v2() -> None:
     v2 = registry.get("agent.interaction.chat.change.apply", 2)
 
     assert v1.spec.confirmation == "user"
-    assert v1.descriptor.consistency_policy == "strong"
+    assert v1.descriptor.consistency_policy == "eventual"
     assert v1.descriptor.evidence_policy == "required"
     assert "context_json" not in v1.spec.input_schema["properties"]["body"]["properties"]
     assert set(v1.spec.output_schema["properties"]["data"]["properties"]) == {
@@ -212,6 +212,7 @@ def test_gateway_owns_stream_lifecycle_until_completion() -> None:
     registered = CapabilityRegistry(); register_interaction_chat_change_capability(registered)
     chat = registered.get("agent.interaction.chat.change.apply", 2)
     release_tail = asyncio.Event()
+    close_attempts = 0
 
     async def events():
         yield "data: first\n\n"
@@ -222,8 +223,21 @@ def test_gateway_owns_stream_lifecycle_until_completion() -> None:
         yield "data: first\n\n"
         raise RuntimeError("provider stream failed")
 
+    class RetryCloseEvents:
+        def __aiter__(self): return self
+        async def __anext__(self): return "data: unused\n\n"
+        async def aclose(self):
+            nonlocal close_attempts
+            close_attempts += 1
+            if close_attempts == 1:
+                raise RuntimeError("transient close failure")
+
     def stream_output(payload, *_args):
-        iterator = broken_events() if payload["body"]["message"] == "explode" else events()
+        message = payload["body"]["message"]
+        iterator = (
+            broken_events() if message == "explode" else
+            RetryCloseEvents() if message == "close-fails" else events()
+        )
         return CapabilityStreamOutput(
             iterator=iterator, output={"data": {"media_type": "text/event-stream"}},
         )
@@ -294,7 +308,32 @@ def test_gateway_owns_stream_lifecycle_until_completion() -> None:
             _ = [chunk async for chunk in failed_iterator]
         failed_replay = await gateway.invoke(failed)
         assert failed_replay.error.code == "provider_failed"
-        assert len(gateway.recent_metrics()) == 3
+        abandoned = envelope.model_copy(update={
+            "request_id": "stream-lifecycle-4", "trace_id": "stream-lifecycle-4",
+            "idempotency_key": "stream-lifecycle-4",
+        })
+        abandoned_result = await gateway.invoke(abandoned)
+        abandoned_iterator, _media = await gateway.claim_stream(
+            abandoned_result.data["data"]["stream_id"]
+        )
+        await abandoned_iterator.aclose()
+        abandoned_replay = await gateway.invoke(abandoned)
+        assert abandoned_replay.error.code == "cancelled"
+        assert gateway._admission.in_flight(f"{chat.spec.id}@2") == 0
+
+        retry_close = envelope.model_copy(update={
+            "payload": {"operation": "chat_stream", "body": {"message": "close-fails"}, "ai00_token": "token"},
+            "request_id": "stream-lifecycle-5", "trace_id": "stream-lifecycle-5",
+            "idempotency_key": "stream-lifecycle-5",
+        })
+        retry_result = await gateway.invoke(retry_close)
+        retry_iterator, _media = await gateway.claim_stream(
+            retry_result.data["data"]["stream_id"]
+        )
+        await retry_iterator.aclose()
+        assert close_attempts == 2
+        assert gateway._admission.in_flight(f"{chat.spec.id}@2") == 0
+        assert len(gateway.recent_metrics()) == 5
 
     asyncio.run(exercise())
 

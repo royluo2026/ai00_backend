@@ -3,8 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 
-from backend.capability_v2.provider_contracts import EvidenceRef
-from backend.capability_v2.reliability import TransactionalCapabilityOutput
+from backend.capability_v2.provider_contracts import CapabilityOutput, EvidenceRef
 from backend.capability_v2.contracts import AutomationLevel, CapabilityDescriptorV2, DomainErrorContract, ExecutionMode, ExposurePolicy, LifecycleStatus, SideEffectLevel
 from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec
 
@@ -48,17 +47,15 @@ def descriptor_for(spec) -> CapabilityDescriptorV2:
         "execution_mode": ExecutionMode.CLOUD_ASYNC if interaction else base.execution_mode,
         "operation_policy": "required" if interaction else ("optional" if write and spec.id not in _CANVAS_SYNC else "none"),
         "idempotency_policy": "required" if write else "none",
-        "consistency_policy": "strong",
+        "consistency_policy": "eventual" if write else "strong",
         "evidence_policy": "required" if write else "optional",
         "domain_errors": ERRORS, "domain_errors_complete": True,
     })
 
 
-def transactional_write_output(
-    capability_id: str, value, context, transaction,
-) -> TransactionalCapabilityOutput:
-    """Return an Agent write plus its still-open owning-domain transaction and evidence."""
-    if isinstance(value, TransactionalCapabilityOutput):
+def write_output(capability_id: str, value, context) -> CapabilityOutput:
+    """Return a committed Agent write with a durable owning-domain evidence pointer."""
+    if isinstance(value, CapabilityOutput):
         return value
     canonical = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     digest = "sha256:" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()
@@ -69,9 +66,8 @@ def transactional_write_output(
             "flow_gid", "interaction_id", "gid",
         ) if candidates.get(key)
     ), str(getattr(context, "request_id", "") or digest.removeprefix("sha256:")))
-    return TransactionalCapabilityOutput(
+    return CapabilityOutput(
         data=value,
-        transaction=transaction,
         evidence=(EvidenceRef(
             kind="agent.change",
             reference=f"agent://{capability_id}/{resource_id}",
@@ -80,4 +76,4 @@ def transactional_write_output(
         ),),
     )
 
-__all__ = ["descriptor_for", "transactional_write_output"]
+__all__ = ["descriptor_for", "write_output"]

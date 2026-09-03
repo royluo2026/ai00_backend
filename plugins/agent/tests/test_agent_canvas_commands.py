@@ -474,14 +474,19 @@ def test_default_provider_registers_canvas_worker_lifecycle_and_replays_terminal
             for name in reversed(self.lifecycle_names()):
                 await self.lifecycles[name][1]()
 
+    class Transaction:
+        def record_outbox(self, *_args): pass
+        def commit(self): pass
+        def rollback(self): pass
+        def close(self): pass
+
     registry = Registry()
-    capabilities.register_capabilities(registry)
+    capabilities.register_capabilities(registry, transaction_factory=Transaction)
     context = SimpleNamespace(user_gid="actor-1", team_gid="team-1", idempotency_key="start-key")
     payload = {"skill_gid": "skill-1", "expected_revision": 7, "input_values": []}
 
     accepted_output = asyncio.run(registry.get("agent.canvas.execution.start").handler(payload, context))
     accepted = accepted_output.data
-    accepted_output.transaction.rollback(); accepted_output.transaction.close()
 
     async def run():
         await registry.start_lifecycles()
@@ -494,7 +499,6 @@ def test_default_provider_registers_canvas_worker_lifecycle_and_replays_terminal
     asyncio.run(run())
     replay_output = asyncio.run(registry.get("agent.canvas.execution.start").handler(payload, context))
     replay = replay_output.data
-    replay_output.transaction.rollback(); replay_output.transaction.close()
 
     assert registry.lifecycle_names() == ("agent.canvas-execution-worker",)
     assert accepted["status"] == "accepted"

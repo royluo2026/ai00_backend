@@ -69,7 +69,46 @@ class _ManagedStream:
     expiry_task: asyncio.Task | None = None
     finalize_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
     iteration_started: bool = False
+    iterator_closed: bool = False
+    outcome_finalized: bool = False
+    admission_released: bool = False
+    metric_recorded: bool = False
     finalized: bool = False
+
+
+class _ClaimedStreamIterator:
+    """Async iterator whose close works even before the generator body starts."""
+
+    def __init__(self, iterator, close_unstarted):
+        self._iterator = iterator
+        self._close_unstarted = close_unstarted
+        self._lock = asyncio.Lock()
+        self._started = False
+        self._closed = False
+
+    def __aiter__(self):
+        return self
+
+    async def __anext__(self):
+        async with self._lock:
+            if self._closed:
+                raise StopAsyncIteration
+            self._started = True
+            try:
+                return await anext(self._iterator)
+            except (StopAsyncIteration, BaseException):
+                self._closed = True
+                raise
+
+    async def aclose(self):
+        async with self._lock:
+            if self._closed:
+                return
+            self._closed = True
+            if self._started:
+                await self._iterator.aclose()
+            else:
+                await self._close_unstarted()
 
 
 class CapabilityGatewayService:
@@ -298,7 +337,10 @@ class CapabilityGatewayService:
                 return result
 
         context = self._legacy_context(
-            envelope, operation_id=(async_operation.operation_id if async_operation else None)
+            envelope, operation_id=(
+                async_operation.operation_id if async_operation is not None else
+                lease.operation_id if lease is not None else None
+            )
         )
         capability_key = f"{descriptor.id}@{descriptor.major_version}"
         started = time.perf_counter()
@@ -649,7 +691,16 @@ class CapabilityGatewayService:
                     cancelled=cancelled, failure=failure,
                 )
 
-        return managed(), record.media_type
+        async def close_unstarted():
+            if record.expiry_task is not None:
+                record.expiry_task.cancel()
+                record.expiry_task = None
+            await self._finalize_stream(
+                record, output_bytes=self._json_size(record.output), completed=False,
+                cancelled=True, failure=None,
+            )
+
+        return _ClaimedStreamIterator(managed(), close_unstarted), record.media_type
 
     async def _expire_stream(
         self, stream_id: str, delay: float, *, deadline_expiry: bool,
@@ -700,8 +751,6 @@ class CapabilityGatewayService:
                 return
             if only_if_unstarted and record.iteration_started:
                 return
-            record.finalized = True
-            await self._close_stream_iterator(record.iterator)
             if completed:
                 result = CapabilityResultV2(
                     ok=True, status=CapabilityStatus.COMPLETED,
@@ -732,30 +781,62 @@ class CapabilityGatewayService:
                             status=OperationStatus.CANCELLED if cancelled else OperationStatus.FAILED,
                         ),
                     })
-            if record.lease is not None:
-                try:
-                    self._reliability.complete(record.lease, result)
-                except Exception:
+            for _attempt in range(2):
+                if not record.iterator_closed:
+                    record.iterator_closed = await self._close_stream_iterator(record.iterator)
+                if not record.outcome_finalized:
+                    if record.lease is None:
+                        record.outcome_finalized = True
+                    else:
+                        try:
+                            self._reliability.complete(record.lease, result)
+                            record.outcome_finalized = True
+                        except Exception:
+                            try:
+                                self._reliability.mark_unknown(record.lease, result.model_copy(update={
+                                    "status": CapabilityStatus.OUTCOME_UNKNOWN,
+                                }))
+                                record.outcome_finalized = True
+                            except Exception:
+                                pass
+                if not record.admission_released:
                     try:
-                        self._reliability.mark_unknown(record.lease, result.model_copy(update={
-                            "status": CapabilityStatus.OUTCOME_UNKNOWN,
-                        }))
+                        await record.admission_lease.release()
+                        record.admission_released = True
                     except Exception:
                         pass
-            await record.admission_lease.release()
-            self._record_metric(
-                record.descriptor, record.envelope, record.started, record.before,
-                output_bytes, result, record.capability_key, cancelled=cancelled,
+                if not record.metric_recorded:
+                    try:
+                        self._record_metric(
+                            record.descriptor, record.envelope, record.started, record.before,
+                            output_bytes, result, record.capability_key, cancelled=cancelled,
+                        )
+                        record.metric_recorded = True
+                    except Exception:
+                        pass
+                record.finalized = all((
+                    record.iterator_closed, record.outcome_finalized,
+                    record.admission_released, record.metric_recorded,
+                ))
+                if record.finalized:
+                    return
+                await asyncio.sleep(0)
+            _log.error(
+                "Capability stream cleanup remains incomplete: %s@%s request_id=%s",
+                record.envelope.capability_id, record.envelope.major_version,
+                record.envelope.request_id,
             )
 
     @staticmethod
-    async def _close_stream_iterator(iterator: Any) -> None:
+    async def _close_stream_iterator(iterator: Any) -> bool:
         closer = getattr(iterator, "aclose", None)
-        if closer is not None:
-            try:
-                await closer()
-            except Exception:
-                pass
+        if closer is None:
+            return True
+        try:
+            await closer()
+        except Exception:
+            return False
+        return True
 
     def _resolve_envelope(self, envelope: InvocationEnvelope):
         if self._catalog_release is None:

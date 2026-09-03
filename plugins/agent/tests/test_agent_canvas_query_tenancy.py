@@ -169,13 +169,18 @@ def test_default_registered_query_composes_runtime_and_uniformly_denies_cross_te
         user_gid = "actor-1"
         team_gid = "team-2"
 
+    class Transaction:
+        def record_outbox(self, *_args): pass
+        def commit(self): pass
+        def rollback(self): pass
+        def close(self): pass
+
     registry = Registry()
-    capabilities.register_capabilities(registry)
+    capabilities.register_capabilities(registry, transaction_factory=Transaction)
     payload = {"flow_gid": "flow-1", "node_id": "node-1", "input_values": []}
 
     output = asyncio.run(registry.handlers["agent.workflow.node.test.execute"](payload, SameTeam()))
     result = output.data
-    output.transaction.rollback(); output.transaction.close()
     assert result == {
         "status": "completed", "output_values": [], "summary": "ok",
     }

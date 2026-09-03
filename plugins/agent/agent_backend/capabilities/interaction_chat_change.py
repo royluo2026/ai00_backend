@@ -6,8 +6,9 @@ from typing import Any
 
 from backend.capability_v2.contracts import BusinessInvariantContract, CorrelationRef, ExposurePolicy, ResourceSelector
 from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilitySpec, CapabilityStreamOutput
-from backend.capability_v2.reliability import transactional_provider
-from ..data.connection import begin_agent_transaction
+from ..data.connection import (
+    begin_agent_transaction, close_agent_transaction, rollback_agent_transaction,
+)
 
 OPERATIONS = ("chat_stream", "chat_sync", "confirm", "confirm_sync")
 CHAT_OPERATIONS = ("chat_stream", "chat_sync")
@@ -120,7 +121,9 @@ async def apply_interaction_chat_change(
     return await _apply_interaction_chat_change(payload, context, version=2)
 
 
-def register_interaction_chat_change_capability(registry: Any) -> None:
+def register_interaction_chat_change_capability(
+    registry: Any, *, transaction_factory=begin_agent_transaction,
+) -> None:
     v1 = CapabilitySpec(
         id="agent.interaction.chat.change.apply", owner="agent",
         description="Execute governed Agent chat and confirmation interactions with bounded event projection.",
@@ -164,17 +167,21 @@ def register_interaction_chat_change_capability(registry: Any) -> None:
         }, "additionalProperties": False},
         tags=("agent", "interaction", "chat", "write"),
     )
-    from .provider import descriptor_for, transactional_write_output
+    from .provider import descriptor_for, write_output
 
-    @transactional_provider
     async def governed_v1(payload, context):
-        transaction = begin_agent_transaction()
+        transaction = transaction_factory()
         try:
             value = await apply_interaction_chat_change_v1(payload, context)
-            return transactional_write_output(v1.id, value, context, transaction)
+            output = write_output(v1.id, value, context)
+            transaction.record_outbox(v1.id, context, output)
+            transaction.commit()
+            return output
         except BaseException:
-            transaction.rollback(); transaction.close()
+            rollback_agent_transaction(transaction)
             raise
+        finally:
+            close_agent_transaction(transaction)
 
     v1_governed = v1.model_copy(update={"plugin_callable": True})
     registry.register(
@@ -182,6 +189,7 @@ def register_interaction_chat_change_capability(registry: Any) -> None:
         governed_v1,
         descriptor=descriptor_for(v1_governed).model_copy(update={
             "exposure": ExposurePolicy(web=True, api=True, plugin=True, agent=False, mcp=False),
+            "consistency_policy": "eventual",
         }),
     )
     v2_governed = v2.model_copy(update={"plugin_callable": True})

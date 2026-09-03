@@ -10,14 +10,15 @@ from ..application.service import (
 )
 from ..infrastructure import AgentCapabilityRepository
 from ..data.audit_repository import AuditRepository
-from ..data.connection import begin_agent_transaction
+from ..data.connection import (
+    begin_agent_transaction, close_agent_transaction, rollback_agent_transaction,
+)
 from ..data.session_repository import SessionRepository
 from .descriptors import specs
-from .provider import descriptor_for, transactional_write_output
+from .provider import descriptor_for, write_output
 from .interaction_chat_change import register_interaction_chat_change_capability
 from .catalog_tool_confirmation import register_catalog_tool_confirmation_capability
 from backend.domain_ports.resource_authorization import resource_authorizers
-from backend.capability_v2.reliability import transactional_provider
 
 
 _DEFAULT_RUNTIME = object()
@@ -44,7 +45,10 @@ def _validate_canvas_runtime(runtime) -> None:
         raise RuntimeError("Agent canvas runtime adapter must implement the finite async runtime port")
 
 
-def register_capabilities(registry, *, canvas_runtime=_DEFAULT_RUNTIME) -> None:
+def register_capabilities(
+    registry, *, canvas_runtime=_DEFAULT_RUNTIME, transaction_factory=None,
+) -> None:
+    transaction_factory = transaction_factory or begin_agent_transaction
     resource_authorizers.register("agent-session", _authorize_agent_session)
     repository = AgentCapabilityRepository()
     production_composition = canvas_runtime is _DEFAULT_RUNTIME
@@ -96,29 +100,39 @@ def register_capabilities(registry, *, canvas_runtime=_DEFAULT_RUNTIME) -> None:
             async def handler(payload, context, *, _capability_id=capability_id, _write=write):
                 if not _write:
                     return await provider.invoke(_capability_id, payload, context)
-                transaction = begin_agent_transaction()
+                transaction = transaction_factory()
                 try:
                     value = await provider.invoke(_capability_id, payload, context)
-                    return transactional_write_output(_capability_id, value, context, transaction)
+                    output = write_output(_capability_id, value, context)
+                    transaction.record_outbox(_capability_id, context, output)
+                    transaction.commit()
+                    return output
                 except BaseException:
-                    transaction.rollback(); transaction.close()
+                    rollback_agent_transaction(transaction)
                     raise
+                finally:
+                    close_agent_transaction(transaction)
         else:
             def handler(payload, context, *, _capability_id=capability_id, _write=write):
                 if not _write:
                     return provider.invoke(_capability_id, payload, context)
-                transaction = begin_agent_transaction()
+                transaction = transaction_factory()
                 try:
                     value = provider.invoke(_capability_id, payload, context)
-                    return transactional_write_output(_capability_id, value, context, transaction)
+                    output = write_output(_capability_id, value, context)
+                    transaction.record_outbox(_capability_id, context, output)
+                    transaction.commit()
+                    return output
                 except BaseException:
-                    transaction.rollback(); transaction.close()
+                    rollback_agent_transaction(transaction)
                     raise
-        if write:
-            handler = transactional_provider(handler)
+                finally:
+                    close_agent_transaction(transaction)
         governed = spec.model_copy(update={"plugin_callable": True})
         registry.register(governed, handler, descriptor=descriptor_for(governed))
-    register_interaction_chat_change_capability(registry)
+    register_interaction_chat_change_capability(
+        registry, transaction_factory=transaction_factory,
+    )
     register_catalog_tool_confirmation_capability(registry)
 
 __all__ = ["register_capabilities"]

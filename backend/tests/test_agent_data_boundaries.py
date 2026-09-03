@@ -5,6 +5,7 @@ from pathlib import Path
 from plugins.agent.agent_backend.data.audit_repository import AuditRepository
 from plugins.agent.agent_backend.data.memory_repository import MemoryRepository
 from plugins.agent.agent_backend.data import connection as agent_connection
+from backend.capability_v2.provider_contracts import CapabilityOutput, EvidenceRef
 
 
 class Cursor:
@@ -81,7 +82,7 @@ class AgentDataBoundaryTests(unittest.TestCase):
         self.assertIn("owner_gid=%s OR scope='team' OR (scope='global' AND status='active')", repository)
 
 
-def test_agent_transaction_reuses_domain_connection_and_enlists_base_outcome(monkeypatch):
+def test_agent_transaction_reuses_domain_connection_and_persists_owned_outbox(monkeypatch):
     cursor = Cursor()
 
     class TransactionConnection(Connection):
@@ -98,19 +99,22 @@ def test_agent_transaction_reuses_domain_connection_and_enlists_base_outcome(mon
     class Pool:
         def connection(self): return connection
 
-    monkeypatch.setenv("AI00_BASE_DB_URL", "mysql://user:password@localhost/ai00_base")
     monkeypatch.setattr(agent_connection, "_get_pool", lambda: Pool())
     transaction = agent_connection.begin_agent_transaction()
     with agent_connection.get_agent_conn() as owned:
         assert owned is connection
-    with transaction.cursor() as tx_cursor:
-        tx_cursor.execute(
-            "UPDATE workmanship_base_capability_outcomes SET status=%s",
-            ("completed",),
-        )
+    transaction.record_outbox(
+        "agent.run.change.apply",
+        type("Context", (), {"operation_id": "op-1", "request_id": "req-1"})(),
+        CapabilityOutput(
+            data={"resource_gid": "run-1"},
+            evidence=(EvidenceRef(kind="agent.change", reference="agent://run/run-1"),),
+        ),
+    )
     transaction.commit(); transaction.close()
 
-    assert "`ai00_base`.`workmanship_base_capability_outcomes`" in cursor.executed[0][0]
+    assert "INSERT INTO workmanship_agent_capability_outbox" in cursor.executed[0][0]
+    assert "workmanship_base_" not in cursor.executed[0][0]
     assert connection.committed is True
     assert connection.closed is True
 

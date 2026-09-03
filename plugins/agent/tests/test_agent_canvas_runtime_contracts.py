@@ -433,9 +433,17 @@ def test_registered_handlers_propagate_principal_and_serialize_schema_valid_resu
         user_gid = "actor-1"
         team_gid = "team-1"
 
+    class Transaction:
+        def record_outbox(self, *_args): pass
+        def commit(self): pass
+        def rollback(self): pass
+        def close(self): pass
+
     runtime = Runtime()
     registry = Registry()
-    register_capabilities(registry, canvas_runtime=runtime)
+    register_capabilities(
+        registry, canvas_runtime=runtime, transaction_factory=Transaction,
+    )
     results = {}
     for capability_id, payload in _payloads().items():
         handler, registered_descriptor = registry.items[capability_id]
@@ -447,7 +455,6 @@ def test_registered_handlers_propagate_principal_and_serialize_schema_valid_resu
         if registered_descriptor.side_effect_level.value != "read":
             output = result
             result = output.data
-            output.transaction.rollback(); output.transaction.close()
         validate(result, OUTPUT_SCHEMAS[capability_id])
         results[capability_id] = result
 
