@@ -256,6 +256,23 @@ def test_projection_rejects_exact_hash_nonlegacy_incomplete_business_definition(
         build_business_catalog_projection(catalog, legacy_baseline={})
 
 
+@pytest.mark.parametrize("kind", INCOMPLETE_DEFINITIONS)
+def test_analysis_mode_reports_exact_nonlegacy_definition_blockers(kind: str):
+    catalog = _incomplete_catalog(kind)
+    row = catalog["descriptors"][0]
+    key = f"{row['id']}@{row['major_version']}"
+
+    result = evaluate_catalog_business_governance(
+        catalog, {}, report_definition_blockers=True,
+    )
+
+    assert result.status == "blocked"
+    assert result.machine_passed is False
+    assert result.capabilities[0].capability_key == key
+    assert all(blocker.endswith(f":{key}") for blocker in result.capabilities[0].blockers)
+    assert f"business_definition_approval_missing:{key}" in result.capabilities[0].blockers
+
+
 def test_projection_normalizes_json_and_enum_lifecycle_values():
     json_catalog = _catalog(count=2)
     enum_catalog = deepcopy(json_catalog)

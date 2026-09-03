@@ -39,6 +39,39 @@ def test_evidence_rows_and_root_causes_are_counted_separately():
     assert report.shared_remediation_families == {"declare_business_rule": 2}
 
 
+def test_gate_definition_blockers_become_exact_audit_root_causes():
+    from backend.capability_v2.release_gate import (
+        BusinessGateCapability,
+        evaluate_business_governance_gate,
+    )
+
+    AuditCapability, _, audit, _, _ = _audit_types()
+    key = "project.task.read@1"
+    digest = "sha256:" + "a" * 64
+    gate = evaluate_business_governance_gate((BusinessGateCapability(
+        capability_key=key,
+        capability_version_gid="1",
+        definition_hash=digest,
+        change_kind="material_change",
+        deterministic_blockers=(f"business_effect_invalid:{key}",),
+    ),))
+    report = audit((), capabilities=(AuditCapability(
+        capability_id="project.task.read",
+        major_version=1,
+        domain="project_management",
+        maturity="L3",
+        capability_version_gid="1",
+        snapshot_capability_version_gid="1",
+        business_definition_hash=digest,
+    ),), snapshot_gid="snap-1", gate_result=gate)
+
+    assert report.finding_count == 1
+    assert report.root_cause_group_count == 1
+    assert report.root_causes[0].root_cause_key == f"business_effect_invalid:{key}"
+    assert report.root_causes[0].severity == "blocking"
+    assert report.review_queue[0].governance_status == "blocked"
+
+
 def test_cross_domain_conflict_is_one_group_with_all_capabilities_and_domains():
     _, AuditEvidence, audit, _, _ = _audit_types()
     keys = ("ergonomics.height.validate@1", "person.height.write@1")

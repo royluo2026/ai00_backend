@@ -216,6 +216,7 @@ def build_business_catalog_projection(
     business_catalog: Mapping[str, object],
     *,
     legacy_baseline: Mapping[str, str] | None = None,
+    validate_business_definitions: bool = True,
 ) -> BusinessCatalogProjection:
     """Return the complete governed projection of one content-addressed Catalog."""
     try:
@@ -251,7 +252,11 @@ def build_business_catalog_projection(
             is_legacy = (
                 legacy_baseline is not None and legacy_baseline.get(key) == digest
             )
-            if not is_legacy and substantive_business_definition_errors(descriptor):
+            if (
+                validate_business_definitions
+                and not is_legacy
+                and substantive_business_definition_errors(descriptor)
+            ):
                 raise BusinessGovernanceConfigurationError(
                     "business_catalog_definition_invalid"
                 )
@@ -603,13 +608,23 @@ def evaluate_catalog_business_governance(
     business_review_lookup: Mapping[tuple[str, str], object] | Callable[[str, str], object] | None = None,
     runtime_verification: Mapping[str, bool] | None = None,
     deterministic_blockers: Mapping[str, Iterable[str]] | None = None,
+    report_definition_blockers: bool = False,
 ) -> BusinessGateResult:
     previous = previous_hashes or {}
     runtime = runtime_verification or {}
     blocker_map = deterministic_blockers or {}
     projection = build_business_catalog_projection(
         business_catalog, legacy_baseline=legacy_baseline,
+        validate_business_definitions=not report_definition_blockers,
     )
+    if report_definition_blockers:
+        from .catalog import load_catalog_release
+        descriptors = {
+            f"{item.id}@{item.major_version}": item
+            for item in load_catalog_release(business_catalog).descriptors
+        }
+    else:
+        descriptors = {}
 
     def approved_hash(version_gid: str, definition_hash: str) -> str | None:
         value = (
@@ -631,15 +646,29 @@ def evaluate_catalog_business_governance(
         version_gid = item.capability_version_gid
         definition_hash = item.business_definition_hash
         approval = approved_hash(version_gid, definition_hash)
+        change_kind = classify_change(
+            key, definition_hash, previous.get(key), legacy_baseline,
+        )
+        blockers = set(str(value) for value in blocker_map.get(key, ()) if str(value))
+        descriptor = descriptors.get(key)
+        if (
+            descriptor is not None
+            and descriptor.lifecycle_status.value == "stable"
+            and change_kind != "unchanged_legacy"
+        ):
+            blockers.update(
+                f"{reason}:{key}"
+                for reason in substantive_business_definition_errors(descriptor)
+            )
         capabilities.append(BusinessGateCapability(
             capability_key=key,
             capability_version_gid=version_gid,
             definition_hash=definition_hash,
             approved_definition_hash=approval,
-            change_kind=classify_change(key, definition_hash, previous.get(key), legacy_baseline),
+            change_kind=change_kind,
             human_approved=approval == definition_hash,
             runtime_verified=bool(runtime.get(key, False)),
-            deterministic_blockers=tuple(blocker_map.get(key, ())),
+            deterministic_blockers=tuple(sorted(blockers)),
         ))
     return evaluate_business_governance_gate(
         capabilities, catalog_binding=projection.binding,

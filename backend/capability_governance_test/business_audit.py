@@ -443,7 +443,7 @@ def _build_report(
     relations: Iterable[AuditRelation] = (), unbound_entries: Iterable[UnboundPublicEntry] = (),
     gate_result: Any | None = None,
 ) -> BusinessAuditReport:
-    evidence_rows = tuple(findings)
+    evidence_rows = list(findings)
     relation_rows = tuple(sorted(relations, key=lambda item: (item.relation_type, item.capability_keys, item.candidate_hash)))
     gate_rows = {
         str(_value(item, "capability_key", "")): item
@@ -461,6 +461,38 @@ def _build_report(
             snapshot_capability_version_gid=item.snapshot_capability_version_gid,
         ) for item in capabilities
     ), key=lambda item: item.capability_key))
+
+    by_key = {item.capability_key: item for item in capability_rows}
+    for capability_key, gate_row in gate_rows.items():
+        capability = by_key.get(capability_key)
+        if capability is None:
+            continue
+        approval_blocker = f"business_definition_approval_missing:{capability_key}"
+        for blocker in tuple(_value(gate_row, "blockers", ()) or ()):
+            reason, separator, blocker_key = str(blocker).partition(":")
+            if (
+                not separator
+                or blocker_key != capability_key
+                or blocker == approval_blocker
+                or any(
+                    item.reason_code == reason and item.capability_key == capability_key
+                    for item in evidence_rows
+                )
+            ):
+                continue
+            evidence_rows.append(AuditEvidence(
+                reason_code=reason,
+                capability_id=capability.capability_id,
+                major_version=capability.major_version,
+                domain=capability.domain,
+                layer=_reason_layer(reason),
+                evidence_ref=f"catalog:{capability_key}",
+                remediation_family=_remediation_family(reason),
+                severity="blocking",
+                related_capability_keys=(capability_key,),
+                related_domains=(capability.domain,),
+            ))
+    evidence_rows = tuple(evidence_rows)
 
     maturity_evidence = {
         level: tuple(item.capability_key for item in capability_rows if item.maturity == level)

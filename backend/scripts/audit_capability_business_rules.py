@@ -17,7 +17,7 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 if str(REPOSITORY_ROOT) not in sys.path:
     sys.path.insert(0, str(REPOSITORY_ROOT))
 
-from backend.capability_governance_test.business_audit import collect_business_audit
+from backend.capability_governance_test.business_audit import audit, collect_business_audit
 from backend.capability_governance_test.business_relations import analyze_relationships
 from backend.capability_governance_test.config import GovernanceSettings
 from backend.capability_governance_test.scanner import GovernanceScanner
@@ -217,12 +217,18 @@ def build_local_report(*, web_root: Path = DEFAULT_WEB_ROOT, page_limit: int = 2
     gate = evaluate_catalog_business_governance(
         business_catalog, baseline.capabilities, business_review_lookup={}, runtime_verification={},
         deterministic_blockers=deterministic_blockers,
+        report_definition_blockers=True,
     )
-    report = collect_business_audit(
+    base = collect_business_audit(
         service, snapshot_gid=str(snapshot.snapshot_gid),
         source_revisions={"backend": backend_revision, "web": web_revision, "source": backend_revision},
-        gate_result=gate, page_limit=page_limit, business_catalog=business_catalog,
-        legacy_baseline=baseline.capabilities, business_review_lookup={},
+        page_limit=page_limit,
+    )
+    report = audit(
+        base.findings, capabilities=base.audit_capabilities,
+        snapshot_gid=base.snapshot_gid, source_revisions=base.source_revisions,
+        relations=base.relations, unbound_entries=base.unbound_entries,
+        gate_result=gate,
     )
     return report.to_dict()
 
