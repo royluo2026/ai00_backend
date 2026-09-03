@@ -1308,6 +1308,28 @@
         "plugins/agent/agent_backend/capabilities/provider.py"
       ]
     },
+    "capability:agent.catalog_tool.confirm.apply": {
+      "function_id": "capability:agent.catalog_tool.confirm.apply",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.catalog_tool.confirm.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/agent/agent_backend/capabilities/catalog_tool_confirmation.py"
+      ]
+    },
     "capability:agent.flow.change.apply": {
       "function_id": "capability:agent.flow.change.apply",
       "domain": "Agent",

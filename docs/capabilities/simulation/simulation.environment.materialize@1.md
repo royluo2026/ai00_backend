@@ -8,7 +8,7 @@ Queue exact Connector materialization for an immutable environment.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`simulation`
-- Catalog Release：`rel_2a6666b7b028b0ac07b3f5dd1b2108a3`
+- Catalog Release：`rel_a3992af99a15f984f89bae199051b70c`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -41,14 +41,14 @@ Queue exact Connector materialization for an immutable environment.
 ## 执行与可靠性
 
 - 副作用：`write`
-- 执行模式：`cloud_async`
+- 执行模式：`cloud_sync`
 - 超时：30 秒
 - 审批：`user`
 - 幂等：`required`
 - 并发：`none`
 - 无预期版本信封要求。
 - 一致性：`external`
-- Operation：`required`
+- Operation：`optional`
 - Artifact：`none`
 - 审计：`standard`
 - Evidence：`required`
@@ -96,7 +96,7 @@ Queue exact Connector materialization for an immutable environment.
 ```json
 {
   "capability_id": "simulation.environment.materialize",
-  "catalog_release": "rel_2a6666b7b028b0ac07b3f5dd1b2108a3",
+  "catalog_release": "rel_a3992af99a15f984f89bae199051b70c",
   "major_version": 1,
   "payload": {
     "device_id": "example",
@@ -108,7 +108,7 @@ Queue exact Connector materialization for an immutable environment.
 
 ## 输出 Schema
 
-首次调用返回 `status=accepted`、`data=null` 和持久化 `operation_ref`；下列输出 Schema 适用于 Operation 完成后的领域结果。
+领域数据必须符合下列 Schema，并封装在完整 `CapabilityResultV2` 中：
 
 ```json
 {

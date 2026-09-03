@@ -11,6 +11,7 @@
     "agent/agent.canvas.execution.resume@1.md",
     "agent/agent.canvas.execution.start@1.md",
     "agent/agent.canvas.options.resolve@1.md",
+    "agent/agent.catalog_tool.confirm.apply@1.md",
     "agent/agent.flow.change.apply@1.md",
     "agent/agent.flow.read@1.md",
     "agent/agent.interaction.cancel@1.md",

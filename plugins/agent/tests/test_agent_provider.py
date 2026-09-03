@@ -9,6 +9,7 @@ EXPECTED = {
     "agent.workflow.node.test.execute", "agent.canvas.options.resolve",
     "agent.canvas.execution.start", "agent.canvas.execution.resume",
     "agent.interaction.request", "agent.interaction.cancel", "agent.interaction.chat.change.apply",
+    "agent.catalog_tool.confirm.apply",
     "agent.memory.change.apply", "agent.memory.read", "agent.runtime.config.read", "agent.tool_catalog.read", "agent.script.generate",
     "agent.run.change.apply", "agent.run.read", "agent.session.change.apply", "agent.session.read",
     "agent.skill.change.apply", "agent.skill.read",
@@ -24,7 +25,13 @@ def test_agent_provider_matches_frozen_review_and_is_stable():
     assert {spec.id for spec, _ in registry.items} == EXPECTED
     assert {descriptor.owner_domain for _, descriptor in registry.items} == {"agent"}
     assert all(descriptor.lifecycle_status == "stable" for _, descriptor in registry.items)
-    assert all(descriptor.exposure.plugin and descriptor.exposure.agent and descriptor.exposure.mcp for _, descriptor in registry.items)
+    model_hidden = {"agent.interaction.chat.change.apply", "agent.catalog_tool.confirm.apply"}
+    assert all(descriptor.exposure.plugin for _, descriptor in registry.items)
+    assert all(
+        descriptor.exposure.agent == (spec.id not in model_hidden)
+        and descriptor.exposure.mcp == (spec.id not in model_hidden)
+        for spec, descriptor in registry.items
+    )
     chat_versions = {
         spec.version
         for spec, _descriptor in registry.items

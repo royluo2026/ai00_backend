@@ -1,13 +1,13 @@
-# plugin.storage.get@1
+# agent.catalog_tool.confirm.apply@1
 
-Read a value from the caller plugin namespace.
+Execute one previously proposed Catalog-generated Agent tool after explicit user confirmation.
 
 ## 使用判断
 
-- 适用：Read a value from the caller plugin namespace.
-- 不适用：Use the owning domain's governed Capability.
+- 适用：A user confirms the exact pending tool proposal in an owned Agent session.
+- 不适用：Starting or continuing chat, or invoking a tool without a bound confirmation token.
 - 生命周期：`stable`
-- 所属领域：`base`
+- 所属领域：`agent`
 - Catalog Release：`rel_a3992af99a15f984f89bae199051b70c`
 - Schema 精度：`typed`
 - 暂未开放原因：无
@@ -18,9 +18,9 @@ Read a value from the caller plugin namespace.
 |---|---|
 | web | 可用 |
 | plugin | 可用 |
-| agent | 可用 |
+| agent | 不可用 |
 | api | 可用 |
-| mcp | 可用 |
+| mcp | 不可用 |
 | worker | 不可用 |
 | local_runtime | 不可用 |
 
@@ -28,26 +28,26 @@ Read a value from the caller plugin namespace.
 
 ## 授权与数据边界
 
-- 授权策略：`base.v2:authenticated`
-- 自动化等级：`A2`
+- 授权策略：`agent.v2:agent.interact`
+- 自动化等级：`A1`
 - 数据分类：`confidential`
 - Delegation：`scoped`
 - 认证新鲜度：0 秒
 
 资源选择器：
-- `plugin-storage-key` ← `key`（必填）
+- `agent-session` ← `session_gid`（必填）
 
 ## 执行与可靠性
 
-- 副作用：`read`
+- 副作用：`write`
 - 执行模式：`cloud_sync`
 - 超时：30 秒
-- 审批：`none`
-- 幂等：`none`
+- 审批：`user`
+- 幂等：`required`
 - 并发：`none`
 - 无预期版本信封要求。
-- 一致性：`strong`
-- Operation：`none`
+- 一致性：`eventual`
+- Operation：`optional`
 - Artifact：`none`
 - 审计：`standard`
 - Evidence：`optional`
@@ -70,12 +70,30 @@ Read a value from the caller plugin namespace.
 {
   "additionalProperties": false,
   "properties": {
-    "key": {
+    "confirm_token": {
+      "maxLength": 128,
+      "minLength": 1,
+      "type": "string"
+    },
+    "session_gid": {
+      "maxLength": 128,
+      "minLength": 1,
+      "type": "string"
+    },
+    "tool_name": {
+      "maxLength": 128,
+      "minLength": 1,
+      "type": "string"
+    },
+    "tool_use_id": {
+      "maxLength": 256,
       "type": "string"
     }
   },
   "required": [
-    "key"
+    "confirm_token",
+    "tool_name",
+    "session_gid"
   ],
   "type": "object"
 }
@@ -85,11 +103,13 @@ Read a value from the caller plugin namespace.
 
 ```json
 {
-  "capability_id": "plugin.storage.get",
+  "capability_id": "agent.catalog_tool.confirm.apply",
   "catalog_release": "rel_a3992af99a15f984f89bae199051b70c",
   "major_version": 1,
   "payload": {
-    "key": "example"
+    "confirm_token": "example",
+    "session_gid": "example",
+    "tool_name": "example"
   }
 }
 ```
@@ -102,31 +122,30 @@ Read a value from the caller plugin namespace.
 {
   "additionalProperties": false,
   "properties": {
-    "key": {
-      "type": "string"
-    },
-    "updated_at": {
-      "type": "string"
-    },
-    "value": {
-      "type": [
-        "object",
-        "array",
-        "string",
-        "number",
-        "boolean",
-        "null"
-      ]
-    },
-    "version": {
-      "type": "integer"
+    "data": {
+      "additionalProperties": false,
+      "properties": {
+        "result_json": {
+          "maxLength": 1048576,
+          "type": "string"
+        },
+        "session_gid": {
+          "type": "string"
+        },
+        "tool_name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "session_gid",
+        "tool_name",
+        "result_json"
+      ],
+      "type": "object"
     }
   },
   "required": [
-    "key",
-    "value",
-    "version",
-    "updated_at"
+    "data"
   ],
   "type": "object"
 }
@@ -164,14 +183,17 @@ Read a value from the caller plugin namespace.
 
 领域错误：
 
-- `resource_not_found`：The requested Base resource does not exist or is not visible.（retryable=false）
-- `permission_denied`：The caller lacks a required Base Platform permission.（retryable=false）
-- `approval_required`：The governed operation requires a valid approval.（retryable=false）
-- `authentication_stale`：The caller must authenticate again before this high-risk operation.（retryable=false）
-- `idempotency_conflict`：The idempotency key is bound to a different request.（retryable=false）
-- `version_conflict`：The resource version differs from the expected version.（retryable=false）
-- `provider_unavailable`：A required domain provider is not registered.（retryable=true）
-- `plugin_state_conflict`：The plugin installation cannot perform this lifecycle transition.（retryable=false）
+- `invalid_input`：The Agent request is invalid.（retryable=false）
+- `permission_denied`：The caller cannot access the Agent resource.（retryable=false）
+- `resource_not_found`：The Agent resource does not exist.（retryable=false）
+- `version_conflict`：The Agent resource changed concurrently.（retryable=false）
+- `catalog_release_unavailable`：The pinned Catalog release is unavailable.（retryable=true）
+- `delegation_expired`：The Agent delegation is missing or expired.（retryable=false）
+- `approval_required`：The delegated operation requires Base approval.（retryable=false）
+- `provider_unavailable`：The Agent canvas runtime adapter is unavailable.（retryable=true）
+- `runtime_timeout`：The bounded Agent canvas runtime timed out.（retryable=true）
+- `idempotency_conflict`：The Agent canvas invocation conflicts with an earlier request.（retryable=false）
+- `outcome_unknown`：The Agent canvas outcome must be reconciled.（retryable=true）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

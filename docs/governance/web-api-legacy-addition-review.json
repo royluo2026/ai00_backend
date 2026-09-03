@@ -17,8 +17,8 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 942,
-          "end_line": 951,
+          "start_line": 986,
+          "end_line": 995,
           "sha256": "4ac274a86cc2272aca28a1fc343433594b21b61f45ac4ea1ca4607de27fa7048"
         },
         "expected_target_invocation": "invoke_agent_capability(\n        \"agent.session.change.apply\", {\"operation\": \"delete\", \"session_gid\": gid}, _user\n    )"
@@ -1668,8 +1668,8 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 932,
-          "end_line": 939,
+          "start_line": 976,
+          "end_line": 983,
           "sha256": "31aedd61b13e1a10361b9a8a51487eae80be1b0970ca473f1e24b759e49a97b9"
         },
         "expected_target_invocation": "invoke_agent_capability(\"agent.session.read\", {\"operation\": \"list\"}, _user)"
@@ -1889,8 +1889,8 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 954,
-          "end_line": 964,
+          "start_line": 998,
+          "end_line": 1008,
           "sha256": "438571906130a444a2539400b4f1b98cbd80530d3905641cdc8fccd897a7c195"
         },
         "expected_target_invocation": "invoke_agent_capability(\n        \"agent.session.read\", {\"operation\": \"get\", \"session_gid\": gid}, _user\n    )"
@@ -2196,19 +2196,19 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 559,
-          "end_line": 566,
+          "start_line": 607,
+          "end_line": 614,
           "sha256": "b8537ad102440ea968bb481c6dca485cf1edafc4b493347a6003f91564bd9e33"
         },
         "delegation_symbol": "_invoke_interaction_chat",
         "expected_delegation": "_invoke_interaction_chat(request, _user, principal, gateway, {\"operation\": \"chat_stream\", \"body\": body, \"ai00_token\": x_ai00_token})",
         "binding": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 51,
-          "end_line": 64,
-          "sha256": "7f274fafecff4dea69c1a166cc151d1cfa4eba894ed2b44d182c0ae83845a916"
+          "start_line": 52,
+          "end_line": 65,
+          "sha256": "01615772f61bb20d12ebf8bab8c40e959e200e7b81b19c4cecbbb4a4fe0b093d"
         },
-        "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"agent.interaction.chat.change.apply\", payload=_normalize_interaction_payload(payload),\n        current_user=user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        major_version=2,\n    )"
+        "expected_target_binding": "build_trusted_web_envelope(\n        gateway, capability_id=\"agent.interaction.chat.change.apply\", payload=_normalize_interaction_payload(payload),\n        current_user=user, principal=principal, consumer_id=\"ai00.web.agent\", request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        major_version=2,\n    )"
       }
     },
     {
@@ -2223,19 +2223,19 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 668,
-          "end_line": 675,
+          "start_line": 717,
+          "end_line": 724,
           "sha256": "25a447e0004f8ef2819d439c258ada28df866d9e8fac53ea77d981554ed78029"
         },
         "delegation_symbol": "_invoke_interaction_chat",
         "expected_delegation": "_invoke_interaction_chat(request, _user, principal, gateway, {\"operation\": \"chat_sync\", \"body\": body, \"ai00_token\": x_ai00_token})",
         "binding": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 51,
-          "end_line": 64,
-          "sha256": "7f274fafecff4dea69c1a166cc151d1cfa4eba894ed2b44d182c0ae83845a916"
+          "start_line": 52,
+          "end_line": 65,
+          "sha256": "01615772f61bb20d12ebf8bab8c40e959e200e7b81b19c4cecbbb4a4fe0b093d"
         },
-        "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"agent.interaction.chat.change.apply\", payload=_normalize_interaction_payload(payload),\n        current_user=user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        major_version=2,\n    )"
+        "expected_target_binding": "build_trusted_web_envelope(\n        gateway, capability_id=\"agent.interaction.chat.change.apply\", payload=_normalize_interaction_payload(payload),\n        current_user=user, principal=principal, consumer_id=\"ai00.web.agent\", request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        major_version=2,\n    )"
       }
     },
     {
@@ -2250,8 +2250,8 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 916,
-          "end_line": 927,
+          "start_line": 960,
+          "end_line": 971,
           "sha256": "6125ed56ff17deadf3af096a2f04d65f3f63860fc0f9e9e327c57a17319da062"
         },
         "expected_target_invocation": "invoke_agent_capability(\"agent.interaction.cancel\", {\"session_gid\": session_gid}, _user)"
