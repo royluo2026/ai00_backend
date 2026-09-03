@@ -19,7 +19,7 @@ async def test_catalog_agent_adapter_preserves_gateway_result_and_evidence():
         id="craft.bop.execution_structure.get", major_version=1, description="read bop",
         input_schema={}, output_schema={}, agent_output_schema=None,
         side_effect_level=SimpleNamespace(value="read"), automation_level=SimpleNamespace(value="A2"),
-        confirmation_policy="none", exposure=SimpleNamespace(agent=True),
+        confirmation_policy="none", resource_selectors=(), exposure=SimpleNamespace(agent=True),
     )
     registry = CatalogToolRegistry(SimpleNamespace(descriptors=(descriptor,)), client=Client())
     result = await registry.execute(
