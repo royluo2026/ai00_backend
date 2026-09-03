@@ -15,6 +15,8 @@ from .provider import NativeContractRegistry
 from .reviewed import register_reviewed_capabilities
 from backend.domain_ports.versioned_resources import versioned_resource_resolvers
 from backend.domain_ports.resource_authorization import resource_authorizers
+from backend.domain_ports.simulation_runtime import simulation_runtime_ports
+from ..public_ports import CraftExecutionPlanAdapter, CraftScreenshotAdapter
 from .bop_structure import resolve_execution_plan_reference
 from .library_read import register_craft_library_read_capability
 from .library_change import register_craft_library_change_capability
@@ -88,6 +90,8 @@ def _authorize_bop_version(resource_id, identity) -> bool:
 def register_capabilities(registry: Any) -> None:
     """Register Craft-owned handlers; never mount routers or start workers."""
     resource_authorizers.register("craft-bop-version", _authorize_bop_version)
+    simulation_runtime_ports.register("craft.execution_plan", CraftExecutionPlanAdapter())
+    simulation_runtime_ports.register("craft.screenshot", CraftScreenshotAdapter())
     native = NativeContractRegistry(registry)
     register_bop_version_capabilities(native)
     register_bop_structure_capabilities(native)

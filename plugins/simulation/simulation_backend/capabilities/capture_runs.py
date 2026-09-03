@@ -14,6 +14,7 @@ from backend.capability_v2.provider_contracts import (
 )
 
 from ..application.capture_worker import CaptureWorkflow, SimulationWorkflowError
+from ..application.runtime_ports import connector_port, craft_screenshot_port
 from ..data.connection import get_simulation_conn
 from ..data.environment_repository import repository as manifest_repository
 
@@ -207,7 +208,7 @@ class CaptureRunProvider:
 
 default_provider = CaptureRunProvider(CaptureWorkflow(
     repository=SqlCaptureWorkflowRepository(),
-    connector_port=_UnavailableConnectorPort(), craft_port=_UnavailableCraftPort(),
+    connector_port=connector_port, craft_port=craft_screenshot_port,
 ))
 
 

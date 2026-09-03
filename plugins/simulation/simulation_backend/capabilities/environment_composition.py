@@ -17,6 +17,9 @@ from backend.domain_ports.knowledge import ResourceModelMappingPort
 
 from ..data.environment_repository import EnvironmentManifestRepository, repository
 from ..domain.environment_manifest import REQUIRED_CONNECTOR_OPERATIONS, compose_manifest
+from ..application.runtime_ports import (
+    craft_execution_port, connector_port, knowledge_mapping_port,
+)
 
 
 class _UnavailableCraftPort:
@@ -171,9 +174,9 @@ class EnvironmentCompositionProvider:
 
 default_provider = EnvironmentCompositionProvider(
     repository=repository,
-    craft_port=_UnavailableCraftPort(),
-    knowledge_port=_UnavailableKnowledgePort(),
-    connector_port=_UnavailableConnectorPort(),
+    craft_port=craft_execution_port,
+    knowledge_port=knowledge_mapping_port,
+    connector_port=connector_port,
 )
 
 
