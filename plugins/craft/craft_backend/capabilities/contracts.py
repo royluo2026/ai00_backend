@@ -1001,6 +1001,27 @@ for _capability_id, (_input_schema, _output_schema) in _RESOURCE_REQUIREMENT_SCH
     INPUT_SCHEMAS[(_capability_id, 1)] = _input_schema
     OUTPUT_SCHEMAS[(_capability_id, 1)] = _output_schema
 
+_ARTIFACT_REF = _object({
+    "artifact_id": STRING,
+    "media_type": STRING,
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "byte_size": {"type": "integer", "minimum": 0},
+    "version": {"type": "integer", "minimum": 1},
+}, required=("artifact_id", "media_type", "sha256", "byte_size", "version"))
+INPUT_SCHEMAS[("craft.process_screenshot.attach", 1)] = _object({
+    "bop_version_gid": STRING,
+    "operation_id": STRING,
+    "capture_run_id": STRING,
+    "artifact_ref": _ARTIFACT_REF,
+}, required=("bop_version_gid", "operation_id", "capture_run_id", "artifact_ref"))
+OUTPUT_SCHEMAS[("craft.process_screenshot.attach", 1)] = _object({
+    "screenshot_gid": STRING,
+    "bop_version_gid": STRING,
+    "operation_id": STRING,
+    "capture_run_id": STRING,
+    "artifact_ref": _ARTIFACT_REF,
+}, required=("screenshot_gid", "bop_version_gid", "operation_id", "capture_run_id", "artifact_ref"))
+
 
 def input_schema_for(capability_id: str, major_version: int) -> dict[str, Any]:
     return INPUT_SCHEMAS.get((capability_id, major_version)) or INPUT_SCHEMAS[capability_id]

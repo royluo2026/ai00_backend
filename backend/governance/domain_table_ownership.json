@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "registry_version": 1,
-  "table_count": 249,
+  "table_count": 250,
   "tables": [
     {
       "table": "workmanship_agent_canvas_audit_events",
@@ -815,6 +815,12 @@
     },
     {
       "table": "workmanship_craft_pbom_change_previews",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_process_screenshots",
       "owner": "craft",
       "runtime_domain": "craft",
       "legacy_name": false
