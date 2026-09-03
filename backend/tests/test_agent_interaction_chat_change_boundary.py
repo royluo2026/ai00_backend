@@ -11,6 +11,7 @@ from backend.capabilities.registry_next import CapabilityRegistry
 from backend.capabilities.validation_next import validate_payload
 from backend.capability_v2.catalog import CatalogResolver, build_release
 from backend.capability_v2.catalog_store import InMemoryCatalogStore
+from backend.capability_v2.business_definition import substantive_business_definition_errors
 from backend.capability_v2.contracts import (
     ActorIdentity,
     ConsumerDescriptor,
@@ -64,6 +65,11 @@ def test_agent_chat_registers_frozen_v1_and_corrected_v2() -> None:
     assert v2.descriptor.consistency_policy == "eventual"
     assert v2.descriptor.evidence_policy == "optional"
     assert v2.descriptor.idempotency_policy == "required"
+    assert substantive_business_definition_errors(v2.descriptor) == ()
+    assert {rule.rule_id for rule in v2.descriptor.business_invariants} == {
+        "agent.interaction.chat.actor_bound",
+        "agent.interaction.chat.session_owned",
+    }
     assert v2.spec.input_schema["properties"]["body"]["additionalProperties"] is False
     assert v2.spec.output_schema["properties"]["data"]["additionalProperties"] is False
 
@@ -158,6 +164,20 @@ def test_agent_chat_v2_rejects_oversized_sync_response(monkeypatch) -> None:
             {"operation": "chat_sync", "body": {"message": "hi"}},
             SimpleNamespace(user_gid="user-1"),
         ))
+
+
+def test_agent_chat_rejects_a_foreign_session(monkeypatch) -> None:
+    monkeypatch.setattr(
+        ai_chat._store,
+        "list_sessions",
+        lambda *, user_gid: [{"gid": "owned-session", "user_gid": user_gid}],
+    )
+
+    ai_chat._require_legacy_session_owner("owned-session", "admin-1")
+    with pytest.raises(HTTPException) as exc_info:
+        ai_chat._require_legacy_session_owner("foreign-session", "admin-1")
+
+    assert exc_info.value.status_code == 404
 
 
 def test_web_chat_pins_v2_and_normalizes_trusted_payload() -> None:

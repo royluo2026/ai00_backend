@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from backend.capability_v2.contracts import BusinessInvariantContract
 from backend.capability_v2.provider_contracts import CapabilityContext, CapabilitySpec
 
 OPERATIONS = ("chat_stream", "chat_sync", "confirm", "confirm_sync")
@@ -142,6 +143,40 @@ def register_interaction_chat_change_capability(registry: Any) -> None:
     v2_descriptor = descriptor_for(v2_governed).model_copy(update={
         "consistency_policy": "eventual",
         "evidence_policy": "optional",
+        "business_effect": (
+            "Authenticated internal users can continue or confirm their own Xiaorou conversations "
+            "while downstream tool writes remain governed by their owning capabilities."
+        ),
+        "business_acceptance_criteria": (
+            "Each accepted request executes as the authenticated actor and never as a caller-supplied user identity.",
+            "A supplied chat session is used only when it belongs to the authenticated actor.",
+            "The caller receives a schema-valid bounded synchronous result or at most 500 serialized stream events.",
+        ),
+        "business_invariants": (
+            BusinessInvariantContract(
+                rule_id="agent.interaction.chat.actor_bound",
+                version=1,
+                statement="Every chat or confirmation interaction executes as the authenticated Gateway actor.",
+                applies_when="an Agent chat or confirmation request is accepted",
+                enforcement_ref="plugins/agent/agent_backend/routers/ai_chat.py:_normalize_interaction_payload",
+                error_code="permission_denied",
+                test_refs=(
+                    "backend/tests/test_agent_interaction_chat_change_boundary.py::test_web_chat_pins_v2_and_normalizes_trusted_payload",
+                ),
+            ),
+            BusinessInvariantContract(
+                rule_id="agent.interaction.chat.session_owned",
+                version=1,
+                statement="A supplied chat session can be continued or confirmed only by its authenticated owner.",
+                applies_when="the request supplies a session identifier",
+                enforcement_ref="plugins/agent/agent_backend/routers/ai_chat.py:_require_legacy_session_owner",
+                error_code="resource_not_found",
+                test_refs=(
+                    "backend/tests/test_agent_interaction_chat_change_boundary.py::test_agent_chat_rejects_a_foreign_session",
+                ),
+            ),
+        ),
+        "no_business_invariant_reason": None,
     })
     registry.register(v2_governed, apply_interaction_chat_change, descriptor=v2_descriptor)
 
