@@ -15,6 +15,7 @@ OLD_0005_BLOB_SHA1 = "4dcb5ebeff87ebc2671426079f73a9dbbbf1031c"
 
 
 def _git_blob_sha1(data: bytes) -> str:
+    data = data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
     return hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
 
 
