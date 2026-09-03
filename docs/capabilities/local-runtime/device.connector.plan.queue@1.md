@@ -8,7 +8,7 @@ Queue one immutable compatible ExecutionPlan for an owned AI00 Connector.
 - 不适用：Compatibility or user-session preflight has not passed.
 - 生命周期：`stable`
 - 所属领域：`device`
-- Catalog Release：`rel_a09dc46bd385dfe188e3236dd882f6b3`
+- Catalog Release：`rel_c18d458fc88a715e5ca39fddd0c765d3`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -46,7 +46,7 @@ Queue one immutable compatible ExecutionPlan for an owned AI00 Connector.
 - 幂等：`required`
 - 并发：`none`
 - 无预期版本信封要求。
-- 一致性：`external`
+- 一致性：`strong`
 - Operation：`optional`
 - Artifact：`none`
 - 审计：`standard`
@@ -229,7 +229,7 @@ Queue one immutable compatible ExecutionPlan for an owned AI00 Connector.
 ```json
 {
   "capability_id": "device.connector.plan.queue",
-  "catalog_release": "rel_a09dc46bd385dfe188e3236dd882f6b3",
+  "catalog_release": "rel_c18d458fc88a715e5ca39fddd0c765d3",
   "major_version": 1,
   "payload": {
     "plan": {

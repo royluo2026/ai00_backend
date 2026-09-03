@@ -8,7 +8,7 @@ Freeze an active BOP version with link snapshots or unfreeze a baseline version.
 - 不适用：The request creates a version snapshot/fork, promotes a snapshot, or publishes a version.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_a09dc46bd385dfe188e3236dd882f6b3`
+- Catalog Release：`rel_c18d458fc88a715e5ca39fddd0c765d3`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -95,7 +95,7 @@ Freeze an active BOP version with link snapshots or unfreeze a baseline version.
 ```json
 {
   "capability_id": "craft.bop.version.freeze.change.apply",
-  "catalog_release": "rel_a09dc46bd385dfe188e3236dd882f6b3",
+  "catalog_release": "rel_c18d458fc88a715e5ca39fddd0c765d3",
   "major_version": 1,
   "payload": {
     "operation": "freeze",

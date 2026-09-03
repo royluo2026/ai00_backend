@@ -8,7 +8,7 @@ Queue exact Connector materialization for an immutable environment.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`simulation`
-- Catalog Release：`rel_a09dc46bd385dfe188e3236dd882f6b3`
+- Catalog Release：`rel_c18d458fc88a715e5ca39fddd0c765d3`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -96,7 +96,7 @@ Queue exact Connector materialization for an immutable environment.
 ```json
 {
   "capability_id": "simulation.environment.materialize",
-  "catalog_release": "rel_a09dc46bd385dfe188e3236dd882f6b3",
+  "catalog_release": "rel_c18d458fc88a715e5ca39fddd0c765d3",
   "major_version": 1,
   "payload": {
     "device_id": "example",
@@ -230,6 +230,7 @@ Queue exact Connector materialization for an immutable environment.
 - `active_document_unavailable`：The Connector has no readable active document.（retryable=true）
 - `active_document_snapshot_required`：A confirmed asynchronous active-document snapshot is required.（retryable=false）
 - `document_snapshot_not_found`：The document snapshot request is unavailable or not visible.（retryable=false）
+- `document_snapshot_action_not_ready`：The prepared document snapshot action is not ready to dispatch.（retryable=false）
 - `bom_snapshot_invalid`：The Connector returned an invalid active BOM snapshot.（retryable=false）
 - `bom_identity_mismatch`：The active BOM identity does not match the requested source.（retryable=false）
 - `bom_snapshot_limit_exceeded`：The active BOM exceeds the governed snapshot limit.（retryable=false）
@@ -252,6 +253,11 @@ Queue exact Connector materialization for an immutable environment.
 - `artifact_upload_unconfirmed`：A captured Artifact upload has not been reconciled.（retryable=true）
 - `craft_screenshot_attach_failed`：Craft rejected or failed the screenshot association.（retryable=true）
 - `local_execution_outcome_unknown`：The local side effect outcome requires reconciliation.（retryable=false）
+- `downstream_confirmation_required`：The exact downstream action requires a separately issued user confirmation.（retryable=false）
+- `capture_action_not_ready`：No capture action is currently ready to dispatch.（retryable=false）
+- `materialization_run_not_found`：The materialization run is unavailable or not visible.（retryable=false）
+- `materialization_action_not_ready`：The materialization action is not ready to dispatch.（retryable=false）
+- `plan_outcome_invalid`：The Connector outcome does not match the immutable execution plan.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

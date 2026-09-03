@@ -8,7 +8,7 @@ Read VisMockup connection state.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`deprecated`
 - 所属领域：`device`
-- Catalog Release：`rel_a09dc46bd385dfe188e3236dd882f6b3`
+- Catalog Release：`rel_c18d458fc88a715e5ca39fddd0c765d3`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -87,7 +87,7 @@ Read VisMockup connection state.
 ```json
 {
   "capability_id": "vismockup.status",
-  "catalog_release": "rel_a09dc46bd385dfe188e3236dd882f6b3",
+  "catalog_release": "rel_c18d458fc88a715e5ca39fddd0c765d3",
   "major_version": 1,
   "payload": {
     "device_id": "example"
