@@ -25,7 +25,21 @@ def test_agent_provider_matches_frozen_review_and_is_stable():
     assert {descriptor.owner_domain for _, descriptor in registry.items} == {"agent"}
     assert all(descriptor.lifecycle_status == "stable" for _, descriptor in registry.items)
     assert all(descriptor.exposure.plugin and descriptor.exposure.agent and descriptor.exposure.mcp for _, descriptor in registry.items)
-    assert all(spec.confirmation == ("none" if spec.risk.value == "read" else "user") for spec, _ in registry.items)
+    chat_versions = {
+        spec.version
+        for spec, _descriptor in registry.items
+        if spec.id == "agent.interaction.chat.change.apply"
+    }
+    assert chat_versions == {1, 2}
+    assert all(
+        spec.confirmation == (
+            "none"
+            if spec.risk.value == "read"
+            or (spec.id == "agent.interaction.chat.change.apply" and spec.version == 2)
+            else "user"
+        )
+        for spec, _ in registry.items
+    )
 
 
 def test_agent_is_official_and_database_independent():

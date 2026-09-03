@@ -1,6 +1,7 @@
 """Governed Agent chat and confirmation interaction boundary."""
 from __future__ import annotations
 
+import json
 from typing import Any
 
 from backend.capability_v2.provider_contracts import CapabilityContext, CapabilitySpec
@@ -8,7 +9,7 @@ from backend.capability_v2.provider_contracts import CapabilityContext, Capabili
 OPERATIONS = ("chat_stream", "chat_sync", "confirm", "confirm_sync")
 
 
-async def _collect(value: Any) -> dict[str, Any]:
+async def _collect_v1(value: Any) -> dict[str, Any]:
     if isinstance(value, dict):
         return value
     iterator = getattr(value, "body_iterator", None)
@@ -20,7 +21,39 @@ async def _collect(value: Any) -> dict[str, Any]:
     return {"events": chunks, "media_type": getattr(value, "media_type", "text/event-stream")}
 
 
-async def apply_interaction_chat_change(payload: dict[str, Any], context: CapabilityContext) -> dict[str, Any]:
+async def _collect_v2(value: Any) -> dict[str, Any]:
+    if isinstance(value, dict):
+        encoded = json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+        if len(encoded) > 1_048_576:
+            raise ValueError("synchronous response exceeds 1048576 characters")
+        return {"response_json": encoded}
+    iterator = getattr(value, "body_iterator", None)
+    if iterator is None:
+        raise ValueError("unsupported Agent response type")
+    events: list[str] = []
+    async for chunk in iterator:
+        if len(events) == 500:
+            raise ValueError("stream response exceeds 500 events")
+        events.append(chunk.decode("utf-8", errors="replace") if isinstance(chunk, bytes) else str(chunk))
+    return {"events": events, "media_type": getattr(value, "media_type", "text/event-stream")}
+
+
+def _v2_body(raw_body: Any) -> dict[str, Any]:
+    if not isinstance(raw_body, dict):
+        raise ValueError("body must be an object")
+    body = dict(raw_body)
+    context_json = body.pop("context_json", "")
+    if context_json:
+        context = json.loads(context_json)
+        if not isinstance(context, dict):
+            raise ValueError("context_json must encode an object")
+        body["context"] = context
+    return body
+
+
+async def _apply_interaction_chat_change(
+    payload: dict[str, Any], context: CapabilityContext, *, version: int,
+) -> dict[str, Any]:
     operation = str(payload.get("operation") or "").strip()
     if operation not in OPERATIONS:
         raise ValueError(f"operation must be one of: {', '.join(OPERATIONS)}")
@@ -28,19 +61,34 @@ async def apply_interaction_chat_change(payload: dict[str, Any], context: Capabi
     body = payload.get("body")
     if not isinstance(body, dict):
         raise ValueError("body must be an object")
+    if version == 2:
+        body = _v2_body(body)
     user = {"gid": context.user_gid}
     token = str(payload.get("ai00_token") or "")
+    collector = _collect_v2 if version == 2 else _collect_v1
     if operation == "chat_stream":
-        return {"data": await _collect(legacy._legacy_chat_stream(body, user, token))}
+        return {"data": await collector(legacy._legacy_chat_stream(body, user, token))}
     if operation == "chat_sync":
-        return {"data": await _collect(legacy._legacy_chat_sync(body, user, token))}
+        return {"data": await collector(legacy._legacy_chat_sync(body, user, token))}
     if operation == "confirm":
-        return {"data": await _collect(legacy._legacy_confirm_tool(body, user))}
-    return {"data": await _collect(legacy._legacy_confirm_tool_sync(body, user))}
+        return {"data": await collector(legacy._legacy_confirm_tool(body, user))}
+    return {"data": await collector(legacy._legacy_confirm_tool_sync(body, user))}
+
+
+async def apply_interaction_chat_change_v1(
+    payload: dict[str, Any], context: CapabilityContext,
+) -> dict[str, Any]:
+    return await _apply_interaction_chat_change(payload, context, version=1)
+
+
+async def apply_interaction_chat_change(
+    payload: dict[str, Any], context: CapabilityContext,
+) -> dict[str, Any]:
+    return await _apply_interaction_chat_change(payload, context, version=2)
 
 
 def register_interaction_chat_change_capability(registry: Any) -> None:
-    spec = CapabilitySpec(
+    v1 = CapabilitySpec(
         id="agent.interaction.chat.change.apply", owner="agent",
         description="Execute governed Agent chat and confirmation interactions with bounded event projection.",
         use_when="A governed Agent consumer sends a chat turn or confirms a pending tool interaction.",
@@ -54,9 +102,53 @@ def register_interaction_chat_change_capability(registry: Any) -> None:
         output_schema={"type": "object", "required": ["data"], "properties": {"data": {"type": "object", "properties": {"events": {"type": "array", "maxItems": 500, "items": {"type": "string"}}, "media_type": {"type": "string"}, "answer": {"type": "string"}, "session_id": {"type": "string"}}, "additionalProperties": False}}, "additionalProperties": False},
         tags=("agent", "interaction", "chat", "write"),
     )
+    v2 = CapabilitySpec(
+        id="agent.interaction.chat.change.apply", version=2, owner="agent",
+        description="Execute governed Agent chat and confirmation interactions with bounded event projection.",
+        use_when="A governed Agent consumer sends a chat turn or confirms a pending tool interaction.",
+        do_not_use_when="The request only cancels an interaction or manages Agent sessions directly.",
+        risk="write", confirmation="none", idempotent=False, permissions=("agent.interact",),
+        input_schema={"type": "object", "required": ["operation", "body"], "properties": {
+            "operation": {"type": "string", "enum": list(OPERATIONS)},
+            "body": {"type": "object", "properties": {
+                "message": {"type": "string"},
+                "session_id": {"type": ["string", "null"]},
+                "session_gid": {"type": ["string", "null"]},
+                "confirm_token": {"type": "string"},
+                "tool_name": {"type": "string"},
+                "tool_use_id": {"type": "string"},
+                "auth_token": {"type": "string"},
+                "context_json": {"type": "string", "maxLength": 65_536},
+            }, "additionalProperties": False},
+            "ai00_token": {"type": "string"},
+        }, "additionalProperties": False},
+        output_schema={"type": "object", "required": ["data"], "properties": {
+            "data": {"type": "object", "properties": {
+                "events": {"type": "array", "maxItems": 500, "items": {"type": "string"}},
+                "media_type": {"type": "string"},
+                "response_json": {"type": "string", "maxLength": 1_048_576},
+            }, "additionalProperties": False},
+        }, "additionalProperties": False},
+        tags=("agent", "interaction", "chat", "write"),
+    )
     from .provider import descriptor_for
-    governed = spec.model_copy(update={"plugin_callable": True})
-    registry.register(governed, apply_interaction_chat_change, descriptor=descriptor_for(governed))
+    v1_governed = v1.model_copy(update={"plugin_callable": True})
+    registry.register(
+        v1_governed,
+        apply_interaction_chat_change_v1,
+        descriptor=descriptor_for(v1_governed),
+    )
+    v2_governed = v2.model_copy(update={"plugin_callable": True})
+    v2_descriptor = descriptor_for(v2_governed).model_copy(update={
+        "consistency_policy": "eventual",
+        "evidence_policy": "optional",
+    })
+    registry.register(v2_governed, apply_interaction_chat_change, descriptor=v2_descriptor)
 
 
-__all__ = ["OPERATIONS", "apply_interaction_chat_change", "register_interaction_chat_change_capability"]
+__all__ = [
+    "OPERATIONS",
+    "apply_interaction_chat_change",
+    "apply_interaction_chat_change_v1",
+    "register_interaction_chat_change_capability",
+]
