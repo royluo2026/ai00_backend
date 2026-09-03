@@ -2,12 +2,14 @@ import json
 from pathlib import Path
 
 from backend.capability_v2.schema_compiler import compile_expected_schema
+from backend.capability_v2.domain_manifest import load_domain_manifests
+from backend.capability_v2.domain_migrations import discover_domain_migrations
 from backend.governance import load_registry
 
 
 ROOT = Path(__file__).resolve().parents[2]
-MIGRATION = ROOT / "backend/db/migrations/domains/agent/202609030001_agent_orchestration_mvp.sql"
-RUNTIME_MIGRATION = ROOT / "backend/db/migrations/domains/agent/202609030002_agent_orchestration_runtime_metrics.sql"
+MIGRATION = ROOT / "backend/db/migrations/domains/agent/0004_agent_orchestration_mvp.sql"
+RUNTIME_MIGRATION = ROOT / "backend/db/migrations/domains/agent/0005_agent_orchestration_runtime_metrics.sql"
 TABLES = {
     "workmanship_agent_orch_panoramas",
     "workmanship_agent_orch_versions",
@@ -33,6 +35,16 @@ def test_authoritative_agent_schema_contains_all_orchestration_tables():
     names = {table.name for table in schema.tables}
 
     assert TABLES | RUNTIME_TABLES <= names
+
+
+def test_domain_runner_discovers_orchestration_migrations():
+    manifest = load_domain_manifests(
+        ROOT / "backend/capability_v2/official_domains.json"
+    ).require("agent")
+
+    migrations = discover_domain_migrations(ROOT, manifest)
+
+    assert [item.migration_id for item in migrations][-2:] == ["0004", "0005"]
 
 
 def test_orchestration_schema_is_agent_owned_and_replay_safe():
