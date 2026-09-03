@@ -92,6 +92,22 @@ class SqlCaptureWorkflowRepository:
         }
         return value
 
+    def has_completed_materialization(
+        self, environment_id, environment_version, device_id, context,
+    ):
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT 1 FROM workmanship_sim_materialization_runs "
+                "WHERE environment_id=%s AND environment_version=%s AND device_id=%s "
+                "AND status='completed' AND (owner_gid=%s OR (%s IS NOT NULL AND team_gid=%s)) "
+                "LIMIT 1",
+                (
+                    environment_id, environment_version, device_id,
+                    context.user_gid, context.team_gid, context.team_gid,
+                ),
+            )
+            return cursor.fetchone() is not None
+
     def create_capture_run(self, row):
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(

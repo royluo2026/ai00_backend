@@ -20,6 +20,9 @@ ARTIFACT_REF = obj({
     "byte_size": NONNEGATIVE_INTEGER, "version": POSITIVE_INTEGER,
 }, ("artifact_id", "media_type", "sha256", "byte_size", "version"))
 EXECUTION_PLAN_REF = obj({"version_gid": STRING, "revision": POSITIVE_INTEGER, "content_hash": HASH}, ("version_gid", "revision", "content_hash"))
+EXECUTION_SCOPE = obj({
+    "kind": {"type": "string", "enum": ["line"]}, "gid": STRING,
+}, ("kind", "gid"))
 MODEL_SNAPSHOT_REF = obj({
     "model_id": STRING, "version_id": STRING, "snapshot_hash": HASH, "artifact_ref": ARTIFACT_REF,
 }, ("model_id", "version_id", "snapshot_hash", "artifact_ref"))
@@ -191,6 +194,11 @@ INPUT_SCHEMAS = {
         "name": STRING, "device_id": STRING, "execution_plan_ref": EXECUTION_PLAN_REF,
         "snapshot_request_id": STRING, "capture_profile": CAPTURE_PROFILE,
     }, ("name", "device_id", "execution_plan_ref", "snapshot_request_id", "capture_profile")),
+    ("simulation.environment.compose", 2): obj({
+        "name": STRING, "device_id": STRING, "execution_plan_ref": EXECUTION_PLAN_REF,
+        "snapshot_request_id": STRING, "capture_profile": CAPTURE_PROFILE,
+        "scope": EXECUTION_SCOPE,
+    }, ("name", "device_id", "execution_plan_ref", "snapshot_request_id", "capture_profile")),
     "simulation.document_snapshot.request": obj({"device_id": STRING, "request_key": STRING}, ("device_id", "request_key")),
     "simulation.document_snapshot.get": obj({"snapshot_request_id": STRING}, ("snapshot_request_id",)),
     "simulation.document_snapshot.action.get": obj({"snapshot_request_id": STRING}, ("snapshot_request_id",)),
@@ -242,6 +250,7 @@ OUTPUT_SCHEMAS = {
     "simulation.result.get": RESULT,
     "simulation.result.compare": obj({"left_result_ref": RESULT_REF, "right_result_ref": RESULT_REF, "same_inputs": {"type": "boolean"}, "changes": {"type": "array", "items": RESULT_CHANGE}}, ("left_result_ref", "right_result_ref", "same_inputs", "changes")),
     "simulation.environment.compose": COMPOSE_OUTPUT,
+    ("simulation.environment.compose", 2): COMPOSE_OUTPUT,
     "simulation.environment.manifest.get": MANIFEST,
     "simulation.environment.manifest.search": obj({"items": {"type": "array", "items": MANIFEST, "maxItems": 200}, "total": NONNEGATIVE_INTEGER}, ("items", "total")),
     "simulation.environment.manifest.archive": obj({"environment_id": STRING, "status": {"type": "string", "enum": ["archived"]}}, ("environment_id", "status")),

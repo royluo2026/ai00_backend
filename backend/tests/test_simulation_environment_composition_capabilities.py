@@ -78,8 +78,12 @@ class Repository:
 
 
 class CraftPort:
-    def __init__(self, execution=None): self.execution = execution or _execution()
-    async def get_execution_plan(self, ref, context): return self.execution
+    def __init__(self, execution=None):
+        self.execution = execution or _execution()
+        self.references = []
+    async def get_execution_plan(self, ref, context):
+        self.references.append(dict(ref))
+        return self.execution
 
 
 class KnowledgePort:
@@ -173,6 +177,9 @@ def test_registration_adds_new_major_one_capabilities_without_changing_legacy_sc
     register_capabilities(registry, composition_provider=_provider()[0])
 
     assert registry.get("simulation.environment.compose", 1).descriptor.lifecycle_status == "stable"
+    assert registry.get("simulation.environment.compose", 2).descriptor.lifecycle_status == "experimental"
+    assert "scope" not in registry.get("simulation.environment.compose", 1).spec.input_schema["properties"]
+    assert "scope" in registry.get("simulation.environment.compose", 2).spec.input_schema["properties"]
     assert registry.get("simulation.environment.preflight", 1).descriptor.side_effect_level == "read"
     compose = registry.get("simulation.environment.compose", 1).descriptor
     assert {item.resource_type for item in compose.resource_selectors} == {
@@ -204,3 +211,26 @@ def test_compose_contract_validates_through_registry_boundary():
 
     assert result.data["status"] == "composed"
     assert result.evidence[0].digest == result.data["manifest_hash"]
+
+
+def test_compose_v2_forwards_one_exact_line_scope_to_the_craft_port():
+    provider, _ = _provider()
+    payload = {**_payload(), "scope": {"kind": "line", "gid": "line-1"}}
+    registry = CapabilityRegistry()
+    register_capabilities(registry, composition_provider=provider)
+    token = confirmation_manager.issue(
+        "simulation.environment.compose", 2, "user-1", payload,
+    )
+    context = CapabilityContext(
+        user_gid="user-1", team_gid="team-1", source="agent",
+        permissions=("simulation.use",), confirmation_token=token,
+    )
+
+    result = asyncio.run(registry.invoke(
+        "simulation.environment.compose", payload, context, version=2,
+    ))
+
+    assert result.data["status"] == "composed"
+    assert provider.craft_port.references == [{
+        **payload["execution_plan_ref"], "scope": payload["scope"],
+    }]

@@ -318,7 +318,9 @@ def _errors(*, connector_environment: bool) -> tuple[DomainErrorContract, ...]:
 
 
 def governed_spec(spec: Any) -> Any:
-    return spec.model_copy(update={"plugin_callable": True, "input_schema": INPUT_SCHEMAS[spec.id], "output_schema": OUTPUT_SCHEMAS[spec.id]})
+    input_schema = INPUT_SCHEMAS.get((spec.id, spec.version), INPUT_SCHEMAS[spec.id])
+    output_schema = OUTPUT_SCHEMAS.get((spec.id, spec.version), OUTPUT_SCHEMAS[spec.id])
+    return spec.model_copy(update={"plugin_callable": True, "input_schema": input_schema, "output_schema": output_schema})
 
 
 def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
@@ -331,6 +333,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             if governed.id in _TWO_PHASE_ENTRYPOINTS and governed.version == 1
             else LifecycleStatus.EXPERIMENTAL
             if governed.id in _TWO_PHASE_ENTRYPOINTS and governed.version >= 2
+            or governed.id == "simulation.environment.compose" and governed.version >= 2
             or governed.id.startswith("simulation.document_snapshot.")
             or governed.id in {
                 "simulation.capture_run.action.get", "simulation.capture_run.dispatch",

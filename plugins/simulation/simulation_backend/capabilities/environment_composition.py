@@ -76,6 +76,8 @@ class EnvironmentCompositionProvider:
 
     async def compose(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
         reference = dict(payload["execution_plan_ref"])
+        if payload.get("scope"):
+            reference["scope"] = dict(payload["scope"])
         execution = dict(await self.craft_port.get_execution_plan(reference, context))
         source = execution.get("source") or {}
         actual = (
@@ -200,7 +202,8 @@ def specs(provider: EnvironmentCompositionProvider = default_provider):
         "plugin_callable": True, "tags": ("simulation", "connector_environment"),
     }
     return (
-        (CapabilitySpec(id="simulation.environment.compose", description="Compose an immutable Connector environment from pinned owning-domain sources.", risk=CapabilityRisk.WRITE, confirmation="user", **common), provider.compose),
+        (CapabilitySpec(id="simulation.environment.compose", version=1, description="Compose an immutable Connector environment from pinned owning-domain sources.", risk=CapabilityRisk.WRITE, confirmation="user", **{key: value for key, value in common.items() if key != "version"}), provider.compose),
+        (CapabilitySpec(id="simulation.environment.compose", version=2, description="Compose an immutable Connector environment from a pinned whole BOP or one exact line scope.", risk=CapabilityRisk.WRITE, confirmation="user", **{key: value for key, value in common.items() if key != "version"}), provider.compose),
         (CapabilitySpec(id="simulation.environment.manifest.get", description="Read one immutable Connector environment manifest.", risk=CapabilityRisk.READ, confirmation="none", **common), provider.get_manifest),
         (CapabilitySpec(id="simulation.environment.manifest.search", description="Search visible Connector environment manifests.", risk=CapabilityRisk.READ, confirmation="none", **common), provider.search),
         (CapabilitySpec(id="simulation.environment.manifest.archive", description="Archive a Connector environment identity without mutating its manifests.", risk=CapabilityRisk.WRITE, confirmation="user", **common), provider.archive),

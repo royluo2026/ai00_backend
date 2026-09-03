@@ -77,10 +77,28 @@ class GovernedSimulationRuntimeClient:
         return result.data
 
     async def get_execution_plan(self, reference, context):
-        return await self._invoke(DomainInvocation(
+        execution = await self._invoke(DomainInvocation(
             "craft.bop.execution_structure.get", 1,
             {"version_gid": str(reference["version_gid"])},
         ), context)
+        scope = reference.get("scope")
+        if not scope:
+            return execution
+        work_package = await self._invoke(DomainInvocation(
+            "craft.bop.work_package.get", 1,
+            {"version_gid": str(reference["version_gid"]), "scope": dict(scope)},
+        ), context)
+        selected = {
+            str(item["operation_id"]) for item in work_package.get("work_items", ())
+        }
+        return {
+            **execution,
+            "scope": dict(work_package["scope"]),
+            "operations": [
+                item for item in execution.get("operations", ())
+                if str(item.get("operation_id")) in selected
+            ],
+        }
 
     async def resolve_resource_models(self, items, context):
         return await self._invoke(DomainInvocation(

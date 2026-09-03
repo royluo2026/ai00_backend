@@ -91,6 +91,8 @@ class Repository:
         step = next(item for item in self.runs[run_id]["steps"] if item["operation_id"] == operation_id)
         step.update(changes)
     def create_materialization_run(self, row): self.runs[row["run_id"]] = row
+    def has_completed_materialization(self, environment_id, environment_version, device_id, context):
+        return True
 
 
 class Connector:
@@ -150,6 +152,17 @@ def test_capture_prepares_then_dispatches_only_the_first_reverse_order_operation
         for plan, _approval in connector.plans for step in plan.steps
         if step.operation_id == "vismockup.view.capture@1"
     )
+
+
+def test_capture_cannot_start_before_exact_environment_materialization_completes():
+    workflow, repository, connector, _ = _workflow()
+    repository.has_completed_materialization = lambda *_args: False
+
+    with pytest.raises(SimulationWorkflowError, match="simulation_result_not_ready"):
+        asyncio.run(workflow.start_capture("env-1", 1, "device-1", _context()))
+
+    assert repository.runs == {}
+    assert connector.plans == []
 
 
 def test_materialization_plan_attaches_models_before_scene_verification():

@@ -69,6 +69,44 @@ def test_connector_queue_uses_gateway_with_exact_payload_identity_approval_and_i
     assert result["status"] == "accepted"
 
 
+def test_scoped_execution_plan_is_filtered_by_governed_craft_work_package():
+    class ExecutionClient(DomainClient):
+        async def invoke(self, invocation, identity, correlation):
+            self.calls.append((invocation, identity, correlation))
+            if invocation.capability_id == "craft.bop.execution_structure.get":
+                return SimpleNamespace(status=CapabilityStatus.COMPLETED, error=None, data={
+                    "source": {"bop_version_gid": "bop-1", "revision": 1},
+                    "content_hash": "sha256:" + "a" * 64,
+                    "operations": [
+                        {"operation_id": "op-line", "sequence": 1},
+                        {"operation_id": "op-other", "sequence": 2},
+                    ],
+                })
+            return SimpleNamespace(status=CapabilityStatus.COMPLETED, error=None, data={
+                "scope": {"kind": "line", "gid": "line-1"},
+                "work_items": [{"operation_id": "op-line"}],
+            })
+
+    adapter = GovernedSimulationRuntimeClient(Gateway())
+    adapter.client = ExecutionClient()
+    identity = ConsumerIdentity(
+        actor=ActorIdentity(user_id="user-1", authentication_method="test", authenticated_at=datetime(2026, 9, 3, tzinfo=UTC)),
+        tenant=TenantIdentity(tenant_id="team-1", membership="active"),
+        consumer=ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="simulation-web"),
+    )
+    context = SimpleNamespace(effective_identity=identity, request_id="request-scope-1")
+
+    result = asyncio.run(adapter.get_execution_plan({
+        "version_gid": "bop-1", "scope": {"kind": "line", "gid": "line-1"},
+    }, context))
+
+    assert [item[0].capability_id for item in adapter.client.calls] == [
+        "craft.bop.execution_structure.get", "craft.bop.work_package.get",
+    ]
+    assert [item["operation_id"] for item in result["operations"]] == ["op-line"]
+    assert result["scope"] == {"kind": "line", "gid": "line-1"}
+
+
 def test_connector_outcome_uses_local_runtime_identity_and_governed_simulation_projection():
     adapter = GovernedSimulationRuntimeClient(Gateway())
     adapter.client = DomainClient()

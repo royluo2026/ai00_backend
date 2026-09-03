@@ -111,6 +111,10 @@ class CaptureWorkflow:
         manifest = self.repository.get_manifest(environment_id, environment_version, context)
         if manifest is None:
             raise SimulationWorkflowError("simulation_environment_not_found")
+        if not self.repository.has_completed_materialization(
+            environment_id, environment_version, device_id, context,
+        ):
+            raise SimulationWorkflowError("simulation_result_not_ready")
         capture_run_id = self.id_factory("capture")
         ordered = sorted(
             manifest.operations, key=lambda item: (item.sequence, item.operation_id), reverse=True,
