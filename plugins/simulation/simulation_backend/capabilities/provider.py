@@ -25,6 +25,8 @@ _RESOURCES = {
         ("craft-bop-version", "execution_plan_ref.version_gid"),
         ("device", "device_id"),
     ),
+    "simulation.document_snapshot.request": (("device", "device_id"),),
+    "simulation.document_snapshot.get": (("simulation-document-snapshot", "snapshot_request_id"),),
     "simulation.environment.manifest.get": (("simulation-environment", "environment_id"),),
     "simulation.environment.manifest.archive": (("simulation-environment", "environment_id"),),
     "simulation.environment.preflight": (
@@ -56,6 +58,9 @@ _ERROR_PAIRS = (
     ("idempotency_conflict", "The idempotency key is bound to a different Simulation request."),
     ("execution_plan_unavailable", "The pinned Craft execution plan is unavailable."),
     ("active_document_unavailable", "The Connector has no readable active document."),
+    ("active_document_snapshot_required", "A confirmed asynchronous active-document snapshot is required."),
+    ("document_snapshot_not_found", "The document snapshot request is unavailable or not visible."),
+    ("bom_snapshot_invalid", "The Connector returned an invalid active BOM snapshot."),
     ("bom_identity_mismatch", "The active BOM identity does not match the requested source."),
     ("bom_snapshot_limit_exceeded", "The active BOM exceeds the governed snapshot limit."),
     ("product_binding_not_found", "A process product reference has no active BOM node."),
@@ -87,6 +92,8 @@ _RETRYABLE_ERROR_CODES = frozenset({
 })
 
 _CONNECTOR_BUSINESS_EFFECTS = {
+    "simulation.document_snapshot.request": "Queue one bounded immutable snapshot of the bound user's currently active VisMockup BOM for later environment composition.",
+    "simulation.document_snapshot.get": "Return authoritative status and the immutable confirmed BOM snapshot for one caller-visible request.",
     "simulation.environment.compose": "Create one immutable, reproducible simulation-environment manifest from the selected process version, active VisMockup BOM and governed resource-model mappings.",
     "simulation.environment.manifest.get": "Return one caller-visible immutable simulation-environment manifest with its exact source and Connector contract pins.",
     "simulation.environment.manifest.search": "Return a bounded caller-visible list of simulation-environment manifests for reuse and audit.",
@@ -104,6 +111,16 @@ _CONNECTOR_READ_REASON = (
 )
 
 _CONNECTOR_BUSINESS_INVARIANTS = {
+    "simulation.document_snapshot.request": (
+        BusinessInvariantContract(
+            rule_id="simulation.document_snapshot.confirmed_only", version=1,
+            statement="A document snapshot becomes completed only from a validated Connector outcome containing a bounded tree with product references.",
+            applies_when="an active VisMockup document snapshot is requested",
+            enforcement_ref="plugins/simulation/simulation_backend/application/document_snapshots.py:DocumentSnapshotWorkflow.apply_connector_outcome",
+            error_code="bom_snapshot_invalid",
+            test_refs=("backend/tests/test_simulation_document_snapshot_workflow.py::test_snapshot_request_is_idempotent_and_completes_only_from_connector_outcome",),
+        ),
+    ),
     "simulation.environment.compose": (
         BusinessInvariantContract(
             rule_id="simulation.environment.compose.atomic_manifest", version=1,
@@ -186,7 +203,11 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
     descriptor = descriptor_from_provider_spec(governed)
     is_write = descriptor.side_effect_level is not SideEffectLevel.READ
     updates = {
-        "lifecycle_status": LifecycleStatus.STABLE,
+        "lifecycle_status": (
+            LifecycleStatus.EXPERIMENTAL
+            if governed.id.startswith("simulation.document_snapshot.")
+            else LifecycleStatus.STABLE
+        ),
         "exposure": ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True),
         "exposure_policy_source": "provider_explicit",
         "automation_level": AutomationLevel.A1 if is_write else AutomationLevel.A2,
@@ -196,12 +217,12 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         "agent_output_schema": descriptor.output_schema,
         "execution_mode": ExecutionMode.CLOUD_ASYNC if governed.id in {
             "simulation.run.start", "simulation.environment.materialize", "simulation.capture_run.start",
-            "simulation.capture_step.retry",
+            "simulation.capture_step.retry", "simulation.document_snapshot.request",
         } else descriptor.execution_mode,
         "artifact_policy": "output" if governed.id == "simulation.result.get" else "none",
         "operation_policy": "required" if governed.id in {
             "simulation.run.start", "simulation.environment.materialize", "simulation.capture_run.start",
-            "simulation.capture_step.retry",
+            "simulation.capture_step.retry", "simulation.document_snapshot.request",
         } else ("optional" if is_write else "none"),
         "concurrency_policy": "none", "idempotency_policy": "required" if is_write else "none",
         "consistency_policy": "external" if is_write else "strong", "evidence_policy": "required",

@@ -50,6 +50,7 @@ def _document():
 def _payload():
     return {
         "name": "Line capture", "device_id": "device-1",
+        "snapshot_request_id": "snapshot-1",
         "execution_plan_ref": {
             "version_gid": "bop-1", "revision": 7, "content_hash": "sha256:" + "a" * 64,
         },
@@ -97,7 +98,6 @@ class KnowledgePort:
 
 
 class ConnectorPort:
-    def get_document_snapshot(self, device_id, context): return _document()
     def get_health(self, device_id, context):
         return {
             "protocol_versions": ["ai00.connector.execution-plan.v1"],
@@ -114,11 +114,18 @@ class ConnectorPort:
         }
 
 
+class SnapshotRepository:
+    def get_request(self, request_id, context):
+        if request_id != "snapshot-1": return None
+        return {"snapshot_request_id": request_id, "device_id": "device-1", "status": "completed", "snapshot": _document()}
+
+
 def _provider(*, unresolved=False):
     repository = Repository()
     provider = EnvironmentCompositionProvider(
         repository=repository, craft_port=CraftPort(),
         knowledge_port=KnowledgePort(unresolved=unresolved), connector_port=ConnectorPort(),
+        snapshot_repository=SnapshotRepository(),
     )
     return provider, repository
 

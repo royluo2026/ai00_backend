@@ -16,6 +16,7 @@ from backend.domain_ports.digital_model import ActiveDocumentSnapshotPort
 from backend.domain_ports.knowledge import ResourceModelMappingPort
 
 from ..data.environment_repository import EnvironmentManifestRepository, repository
+from ..data.document_snapshot_repository import repository as document_snapshot_repository
 from ..domain.environment_manifest import REQUIRED_CONNECTOR_OPERATIONS, compose_manifest
 from ..application.runtime_ports import (
     craft_execution_port, connector_port, knowledge_mapping_port,
@@ -65,11 +66,13 @@ class EnvironmentCompositionProvider:
         craft_port: CraftExecutionPlanPort,
         knowledge_port: ResourceModelMappingPort,
         connector_port: ActiveDocumentSnapshotPort,
+        snapshot_repository=document_snapshot_repository,
     ) -> None:
         self.repository = repository
         self.craft_port = craft_port
         self.knowledge_port = knowledge_port
         self.connector_port = connector_port
+        self.snapshot_repository = snapshot_repository
 
     def compose(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
         reference = dict(payload["execution_plan_ref"])
@@ -84,7 +87,17 @@ class EnvironmentCompositionProvider:
                 "environment_source_changed", "Craft execution plan no longer matches the pinned reference",
                 details={"expected": expected, "actual": actual},
             )
-        document = self.connector_port.get_document_snapshot(str(payload["device_id"]), context)
+        snapshot_request_id = str(payload.get("snapshot_request_id") or "")
+        snapshot_row = self.snapshot_repository.get_request(snapshot_request_id, context)
+        if not snapshot_row or snapshot_row.get("status") != "completed" or not snapshot_row.get("snapshot"):
+            raise CapabilityBusinessError(
+                "active_document_snapshot_required",
+                "A confirmed asynchronous VisMockup document snapshot is required",
+                retryable=True,
+            )
+        if snapshot_row.get("device_id") != str(payload["device_id"]):
+            raise CapabilityBusinessError("bom_identity_mismatch", "The snapshot belongs to another Connector")
+        document = snapshot_row["snapshot"]
         mappings = self.knowledge_port.resolve_resource_models(_resources(execution), context)
         result = compose_manifest(execution, document, mappings, payload["capture_profile"])
         problems = [item.model_dump(mode="json") for item in result.problems]
@@ -177,6 +190,7 @@ default_provider = EnvironmentCompositionProvider(
     craft_port=craft_execution_port,
     knowledge_port=knowledge_mapping_port,
     connector_port=connector_port,
+    snapshot_repository=document_snapshot_repository,
 )
 
 

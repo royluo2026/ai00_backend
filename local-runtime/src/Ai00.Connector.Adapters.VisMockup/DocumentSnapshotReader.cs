@@ -1,22 +1,23 @@
 using Ai00.Connector.Contracts;
+using System.Text.Json.Serialization;
 
 namespace Ai00.Connector.Adapters.VisMockup;
 
 public sealed record VisMockupSnapshotNode(
-    string NodeKey,
-    string? ParentNodeKey,
-    int ChildOrder,
-    int Depth,
-    string PrintableName,
-    string OccurrenceId,
-    string ModelId);
+    [property: JsonPropertyName("node_key")] string NodeKey,
+    [property: JsonPropertyName("parent_key")] string? ParentKey,
+    [property: JsonPropertyName("child_order")] int ChildOrder,
+    [property: JsonPropertyName("depth")] int Depth,
+    [property: JsonPropertyName("printable_name")] string PrintableName,
+    [property: JsonPropertyName("occurrence_id")] string OccurrenceId,
+    [property: JsonPropertyName("product_ref")] string ProductRef);
 
 public sealed record VisMockupDocumentSnapshot(
-    string DocumentId,
-    string SourceIdentity,
-    string RootNodeKey,
-    IReadOnlyList<VisMockupSnapshotNode> Nodes,
-    string SnapshotHash);
+    [property: JsonPropertyName("document_id")] string DocumentId,
+    [property: JsonPropertyName("source_identity")] string SourceIdentity,
+    [property: JsonPropertyName("root_node_key")] string RootNodeKey,
+    [property: JsonPropertyName("nodes")] IReadOnlyList<VisMockupSnapshotNode> Nodes,
+    [property: JsonPropertyName("snapshot_hash")] string SnapshotHash);
 
 public sealed class DocumentSnapshotReader
 {
@@ -46,10 +47,10 @@ public sealed class DocumentSnapshotReader
             ["root_node_key"] = document.RootNode.NodeKey,
             ["nodes"] = nodes.Select(node => new Dictionary<string, object?>
             {
-                ["node_key"] = node.NodeKey, ["parent_node_key"] = node.ParentNodeKey,
+                ["node_key"] = node.NodeKey, ["parent_key"] = node.ParentKey,
                 ["child_order"] = node.ChildOrder, ["depth"] = node.Depth,
                 ["printable_name"] = node.PrintableName, ["occurrence_id"] = node.OccurrenceId,
-                ["model_id"] = node.ModelId,
+                ["product_ref"] = node.ProductRef,
             }).ToArray(),
         };
         return new(document.DocumentId, document.SourceIdentity, document.RootNode.NodeKey, nodes, CanonicalJson.Hash(projection));

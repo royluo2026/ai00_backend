@@ -1,5 +1,6 @@
 using Ai00.Connector.Adapters.VisMockup;
 using Ai00.Connector.Contracts;
+using System.Text.Json;
 using Xunit;
 
 namespace Ai00.Connector.Tests;
@@ -48,5 +49,23 @@ public sealed class VisMockupSnapshotTests
         var error = await Assert.ThrowsAsync<ConnectorException>(() => adapter.SnapshotAsync(10_000, 64));
 
         Assert.Equal("bom_snapshot_invalid", error.Code);
+    }
+
+    [Fact]
+    public async Task SnapshotWireResultUsesSimulationSnakeCaseAndProductReferences()
+    {
+        var fake = new FakeVisMockupCom { ExistingApplication = FakeVisMockupCom.WithDocument("BOM-1") };
+        using var sta = new StaDispatcher();
+        var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([Path.GetTempPath()]), fake);
+
+        var snapshot = await adapter.SnapshotAsync(10_000, 64);
+        var json = JsonSerializer.SerializeToElement(snapshot);
+
+        Assert.True(json.TryGetProperty("document_id", out _));
+        var node = json.GetProperty("nodes")[0];
+        Assert.True(node.TryGetProperty("parent_key", out _));
+        Assert.True(node.TryGetProperty("product_ref", out var product));
+        Assert.False(string.IsNullOrWhiteSpace(product.GetString()));
+        Assert.False(node.TryGetProperty("ModelId", out _));
     }
 }

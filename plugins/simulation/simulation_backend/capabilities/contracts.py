@@ -134,6 +134,21 @@ CAPTURE_RUN = obj({
     "operation_ref": OPERATION_REF,
     "steps": {"type": "array", "items": CAPTURE_STEP, "maxItems": 3000},
 }, ("capture_run_id", "environment_id", "environment_version", "manifest_hash", "device_id", "plan_id", "status", "operation_ref", "steps"))
+DOCUMENT_SNAPSHOT_NODE = obj({
+    "node_key": STRING, "parent_key": {"type": ["string", "null"]},
+    "product_ref": STRING, "child_order": NONNEGATIVE_INTEGER,
+}, ("node_key", "parent_key", "product_ref", "child_order"))
+DOCUMENT_SNAPSHOT = obj({
+    "document_id": STRING, "root_node_key": STRING, "source_identity": STRING,
+    "snapshot_hash": HASH,
+    "nodes": {"type": "array", "items": DOCUMENT_SNAPSHOT_NODE, "maxItems": 10000},
+}, ("document_id", "root_node_key", "source_identity", "snapshot_hash", "nodes"))
+DOCUMENT_SNAPSHOT_REQUEST = obj({
+    "snapshot_request_id": STRING, "device_id": STRING, "plan_id": STRING,
+    "status": {"type": "string", "enum": ["queued", "completed", "failed", "outcome_unknown"]},
+    "snapshot": {"anyOf": [DOCUMENT_SNAPSHOT, {"type": "null"}]},
+    "failure_code": STRING, "operation_ref": OPERATION_REF,
+}, ("snapshot_request_id", "device_id", "plan_id", "status", "snapshot", "failure_code", "operation_ref"))
 
 
 INPUT_SCHEMAS = {
@@ -154,8 +169,10 @@ INPUT_SCHEMAS = {
     "simulation.result.compare": obj({"left_result_ref": RESULT_REF, "right_result_ref": RESULT_REF}, ("left_result_ref", "right_result_ref")),
     "simulation.environment.compose": obj({
         "name": STRING, "device_id": STRING, "execution_plan_ref": EXECUTION_PLAN_REF,
-        "capture_profile": CAPTURE_PROFILE,
-    }, ("name", "device_id", "execution_plan_ref", "capture_profile")),
+        "snapshot_request_id": STRING, "capture_profile": CAPTURE_PROFILE,
+    }, ("name", "device_id", "execution_plan_ref", "snapshot_request_id", "capture_profile")),
+    "simulation.document_snapshot.request": obj({"device_id": STRING, "request_key": STRING}, ("device_id", "request_key")),
+    "simulation.document_snapshot.get": obj({"snapshot_request_id": STRING}, ("snapshot_request_id",)),
     "simulation.environment.manifest.get": obj({"environment_id": STRING, "environment_version": POSITIVE_INTEGER}, ("environment_id", "environment_version")),
     "simulation.environment.manifest.search": obj({"limit": {"type": "integer", "minimum": 1, "maximum": 200}}),
     "simulation.environment.manifest.archive": obj({"environment_id": STRING}, ("environment_id",)),
@@ -168,6 +185,8 @@ INPUT_SCHEMAS = {
 }
 
 OUTPUT_SCHEMAS = {
+    "simulation.document_snapshot.request": DOCUMENT_SNAPSHOT_REQUEST,
+    "simulation.document_snapshot.get": DOCUMENT_SNAPSHOT_REQUEST,
     "simulation.parameter_set.create": PARAMETER_SET,
     "simulation.parameter_set.get": PARAMETER_SET,
     "simulation.parameter_set.search": obj({"items": {"type": "array", "items": PARAMETER_SET}, "total": INTEGER, "query": STRING}, ("items", "total", "query")),

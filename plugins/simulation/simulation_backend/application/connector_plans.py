@@ -12,6 +12,7 @@ from backend.contracts.connector_execution_plan_v1 import (
 )
 
 from ..domain.environment_manifest import SimulationEnvironmentManifestV1
+from ..domain.environment_manifest import REQUIRED_CONNECTOR_OPERATIONS
 
 
 def _step(
@@ -156,4 +157,35 @@ def build_capture_plan(
     )
 
 
-__all__ = ["build_capture_plan", "build_materialization_plan"]
+def build_document_snapshot_plan(
+    *, plan_id: str, device_id: str, tenant_id: str, user_id: str, issued_at: datetime,
+) -> ConnectorExecutionPlanV1:
+    operation_id = "vismockup.document.snapshot@1"
+    step = _step(
+        REQUIRED_CONNECTOR_OPERATIONS, 1, operation_id,
+        {"max_nodes": 10_000, "max_depth": 64}, (),
+    )
+    raw = {
+        "protocol": "ai00.connector.execution-plan.v1",
+        "plan_id": plan_id, "tenant_id": tenant_id, "user_id": user_id,
+        "device_id": device_id,
+        "capability_version_gid": "simulation.document_snapshot.request@1",
+        "business_definition_hash": canonical_hash({
+            "capability": "simulation.document_snapshot.request@1",
+            "device_id": device_id,
+        }),
+        "adapter_id": "ai00.vismockup", "adapter_major": 1,
+        "target_product": ConnectorTargetProductV1(
+            product_id="siemens.vismockup", minimum_version="14.0.0",
+            maximum_version_exclusive="15.0.0",
+        ),
+        "steps": (step,), "issued_at": issued_at,
+        "expires_at": issued_at + timedelta(minutes=5),
+    }
+    draft = ConnectorExecutionPlanV1.model_construct(
+        **raw, plan_hash="sha256:" + "0" * 64,
+    )
+    return ConnectorExecutionPlanV1(**raw, plan_hash=draft.compute_hash())
+
+
+__all__ = ["build_capture_plan", "build_document_snapshot_plan", "build_materialization_plan"]

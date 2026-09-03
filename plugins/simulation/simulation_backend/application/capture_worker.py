@@ -270,14 +270,19 @@ class CaptureWorkflow:
 
 
 class ConnectorOutcomeProjection:
-    def __init__(self, workflow: CaptureWorkflow) -> None:
+    def __init__(self, workflow: CaptureWorkflow, snapshot_workflow=None) -> None:
         self.workflow = workflow
+        self.snapshot_workflow = snapshot_workflow
 
     def apply(
         self, plan: ConnectorExecutionPlanV1, outcome: ConnectorPlanOutcomeV1,
     ) -> dict[str, Any] | None:
-        if plan.capability_version_gid != "simulation.capture_run.start@1":
+        if plan.capability_version_gid == "simulation.document_snapshot.request@1":
+            if self.snapshot_workflow is None:
+                raise SimulationWorkflowError("document_snapshot_projection_unavailable")
+            self.snapshot_workflow.apply_connector_outcome(plan, outcome)
             return None
+        if plan.capability_version_gid != "simulation.capture_run.start@1": return None
         context = CapabilityContext(
             user_gid=plan.user_id, team_gid=plan.tenant_id, source="connector",
         )

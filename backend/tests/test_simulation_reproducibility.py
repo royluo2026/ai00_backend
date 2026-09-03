@@ -36,6 +36,8 @@ CAPABILITY_IDS = {
     "simulation.result.get",
     "simulation.result.compare",
     "simulation.environment.compose",
+    "simulation.document_snapshot.request",
+    "simulation.document_snapshot.get",
     "simulation.environment.manifest.get",
     "simulation.environment.manifest.search",
     "simulation.environment.manifest.archive",
@@ -99,7 +101,8 @@ def test_provider_publishes_native_stable_plugin_agent_and_mcp_contracts():
     for capability_id, registration in registrations.items():
         descriptor = registration.descriptor
         assert descriptor.owner_domain == "simulation", capability_id
-        assert descriptor.lifecycle_status == "stable", capability_id
+        expected_lifecycle = "experimental" if capability_id.startswith("simulation.document_snapshot.") else "stable"
+        assert descriptor.lifecycle_status == expected_lifecycle, capability_id
         assert descriptor.exposure.plugin and descriptor.exposure.agent and descriptor.exposure.mcp
         assert descriptor.input_schema["additionalProperties"] is False
         assert descriptor.output_schema["additionalProperties"] is False
