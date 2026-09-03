@@ -44,7 +44,7 @@ def test_domain_runner_discovers_orchestration_migrations():
 
     migrations = discover_domain_migrations(ROOT, manifest)
 
-    assert [item.migration_id for item in migrations][-2:] == ["0004", "0005"]
+    assert [item.migration_id for item in migrations][-3:] == ["0004", "0005", "0006"]
 
 
 def test_orchestration_schema_is_agent_owned_and_replay_safe():
