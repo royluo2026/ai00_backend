@@ -3,7 +3,10 @@ from __future__ import annotations
 
 from typing import Any
 
+from fastapi.encoders import jsonable_encoder
+
 from backend.capability_v2.provider_contracts import CapabilityContext, CapabilityExecutionBudget, CapabilitySpec
+from .bop_entry_change import _user as _actor
 
 OPERATIONS = (
     "create", "purge", "import_tc", "copy", "copy_from_gbop",
@@ -18,8 +21,8 @@ def _required(payload: dict[str, Any], name: str) -> str:
     return value
 
 
-def _actor(context: CapabilityContext) -> dict[str, Any]:
-    return {"gid": context.user_gid, "name": context.user_gid, "org_role": "member"}
+def _result(data: Any) -> dict[str, Any]:
+    return jsonable_encoder({"data": data})
 
 
 def apply_bop_entry_bulk_change(payload: dict[str, Any], context: CapabilityContext) -> dict[str, Any]:
@@ -32,35 +35,35 @@ def apply_bop_entry_bulk_change(payload: dict[str, Any], context: CapabilityCont
             raise ValueError("version_gid is required")
         from ..routers._bop import entries as legacy
         body = legacy.CreateEntryBody(**{k: v for k, v in payload.items() if k not in {"operation"}})
-        return {"data": legacy._legacy_create_entry(body, _actor(context))}
+        return _result(legacy._legacy_create_entry(body, _actor(context)))
     if operation == "purge":
         version_gid = _required(payload, "version_gid")
         from ..routers._bop import entries as legacy
-        return {"data": legacy._legacy_purge_version_entries(version_gid, legacy.PurgeEntriesBody(mode=payload.get("mode", "soft")), _actor(context))}
+        return _result(legacy._legacy_purge_version_entries(version_gid, legacy.PurgeEntriesBody(mode=payload.get("mode", "soft")), _actor(context)))
     if operation == "import_tc":
         version_gid = _required(payload, "version_gid")
         rows = payload.get("rows")
         if not isinstance(rows, list):
             raise ValueError("rows must be an array")
         from ..routers._bop import entries as legacy
-        return {"data": legacy._legacy_import_tc_entries(version_gid, legacy.ImportTcBody(rows=rows), _actor(context))}
+        return _result(legacy._legacy_import_tc_entries(version_gid, legacy.ImportTcBody(rows=rows), _actor(context)))
     if operation in {"copy", "copy_from_gbop"}:
         version_gid = _required(payload, "version_gid")
         source_gid = _required(payload, "source_gid")
         from ..routers._bop import entries as legacy
         fn = legacy._legacy_copy_entries_from_gbop if operation == "copy_from_gbop" else legacy._legacy_copy_entries_from
-        return {"data": fn(version_gid, source_gid, _actor(context))}
+        return _result(fn(version_gid, source_gid, _actor(context)))
     if operation == "auto_link":
         version_gid = _required(payload, "version_gid")
         from ..routers._bop import entries as legacy
         body = legacy.AutoLinkBody(step=payload.get("step", "all"), mode=payload.get("mode", "incremental"))
-        return {"data": legacy._legacy_auto_link_entries(version_gid, body, _actor(context))}
+        return _result(legacy._legacy_auto_link_entries(version_gid, body, _actor(context)))
     if operation == "entity_detail.patch":
         from ..routers._bop import entries as legacy
         body = legacy.EntityPatchBody(link_type=_required(payload, "link_type"), ref_gid=_required(payload, "ref_gid"), fields=payload.get("fields") or {})
-        return {"data": legacy._legacy_patch_entity_detail(body, _actor(context))}
+        return _result(legacy._legacy_patch_entity_detail(body, _actor(context)))
     from ..routers._bop import entries as legacy
-    return {"data": legacy._legacy_rollback_entry_history(_required(payload, "gid"), _required(payload, "log_gid"), _actor(context))}
+    return _result(legacy._legacy_rollback_entry_history(_required(payload, "gid"), _required(payload, "log_gid"), _actor(context)))
 
 
 def register_bop_entry_bulk_change_capability(registry: Any) -> None:

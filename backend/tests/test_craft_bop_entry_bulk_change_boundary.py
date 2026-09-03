@@ -1,3 +1,5 @@
+import json
+from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -24,6 +26,25 @@ def test_entry_bulk_validates_operation_before_io() -> None:
 def test_entry_bulk_validates_required_fields_before_io() -> None:
     with pytest.raises(ValueError, match="version_gid is required"):
         apply_bop_entry_bulk_change({"operation": "import_tc"}, object())
+
+
+def test_entry_bulk_create_preserves_admin_role_and_returns_json_safe_data(monkeypatch) -> None:
+    from plugins.craft.craft_backend.routers._bop import entries
+
+    captured = {}
+
+    def create(_body, actor):
+        captured.update(actor)
+        return {"data": {"gid": "e1", "created_at": datetime(2026, 9, 3, 12, 0)}}
+
+    monkeypatch.setattr(entries, "_legacy_create_entry", create)
+    result = apply_bop_entry_bulk_change(
+        {"operation": "create", "version_gid": "v1", "title": "Process"},
+        CapabilityContext(user_gid="admin-1", active_roles=("super_admin",)),
+    )
+
+    assert captured["org_role"] == "super_admin"
+    assert json.loads(json.dumps(result))["data"]["data"]["created_at"] == "2026-09-03T12:00:00"
 
 
 class _ImportCursor:

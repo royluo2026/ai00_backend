@@ -6,6 +6,7 @@ import re
 from typing import Any
 
 from fastapi import HTTPException
+from fastapi.encoders import jsonable_encoder
 
 from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilitySpec
 from plugins.ontology.public import active_projection
@@ -328,7 +329,13 @@ def apply_bop_entry_change(payload: dict[str, Any], context: CapabilityContext) 
                 sets.append("updated_at=NOW()")
                 cur.execute(f"UPDATE workmanship_bop_bop_entries SET {', '.join(sets)} WHERE gid=%s AND is_deleted=FALSE", [*values, entry_gid])
                 if cur.rowcount == 0:
-                    raise CapabilityBusinessError("resource_not_found", f"BOP entry {entry_gid} does not exist")
+                    cur.execute(
+                        "SELECT 1 AS present FROM workmanship_bop_bop_entries "
+                        "WHERE gid=%s AND is_deleted=FALSE",
+                        (entry_gid,),
+                    )
+                    if not cur.fetchone():
+                        raise CapabilityBusinessError("resource_not_found", f"BOP entry {entry_gid} does not exist")
             if properties:
                 contracts = _validate_property_updates(str(entry["node_type"]), properties)
                 advisory = _validate_property_rules(
@@ -362,11 +369,11 @@ def apply_bop_entry_change(payload: dict[str, Any], context: CapabilityContext) 
                 _sync_child_vpps(cur, updates["parent_gid"], version_gid)
             _log_entry_op(cur, version_gid=version_gid, entry_gid=entry_gid, entry_title=str(updates.get("title") or entry.get("title") or ""), op_type="update_entry",
                           old_state=entry, new_state={**updates, "properties": properties} if properties else updates, user_gid=context.user_gid, user_name=context.user_gid)
-            conn.commit()
             cur.execute("SELECT * FROM workmanship_bop_bop_entries WHERE gid=%s", (entry_gid,))
-            result = {"data": dict(cur.fetchone() or {}), "version_gid": version_gid}
+            result = jsonable_encoder({"data": dict(cur.fetchone() or {}), "version_gid": version_gid})
             if properties and advisory:
-                result["warnings"] = advisory
+                result["warnings"] = jsonable_encoder(advisory)
+            conn.commit()
             return result
 
         cur.execute("SELECT parent_gid,title,node_type,vpps FROM workmanship_bop_bop_entries WHERE gid=%s", (entry_gid,))

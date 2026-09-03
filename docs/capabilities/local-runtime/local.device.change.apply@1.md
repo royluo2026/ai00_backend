@@ -8,7 +8,7 @@ Execute the reviewed local.device.change.apply device outcome.
 - 不适用：The request executes a VisMockup workstation action.
 - 生命周期：`deprecated`
 - 所属领域：`device`
-- Catalog Release：`rel_7738c9526ffdac55e54d5793dcb3a7c5`
+- Catalog Release：`rel_81acffa84ca2a65a2390a086d605e708`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -93,7 +93,7 @@ Execute the reviewed local.device.change.apply device outcome.
 ```json
 {
   "capability_id": "local.device.change.apply",
-  "catalog_release": "rel_7738c9526ffdac55e54d5793dcb3a7c5",
+  "catalog_release": "rel_81acffa84ca2a65a2390a086d605e708",
   "major_version": 1,
   "payload": {
     "arguments": {},

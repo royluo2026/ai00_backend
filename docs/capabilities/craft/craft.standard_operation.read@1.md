@@ -8,7 +8,7 @@ Read bounded Craft standard operation library records.
 - 不适用：The outcome is a GBOP release or BOP execution operation.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_7738c9526ffdac55e54d5793dcb3a7c5`
+- Catalog Release：`rel_81acffa84ca2a65a2390a086d605e708`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -98,7 +98,7 @@ Read bounded Craft standard operation library records.
 ```json
 {
   "capability_id": "craft.standard_operation.read",
-  "catalog_release": "rel_7738c9526ffdac55e54d5793dcb3a7c5",
+  "catalog_release": "rel_81acffa84ca2a65a2390a086d605e708",
   "major_version": 1,
   "payload": {
     "operation": "list"

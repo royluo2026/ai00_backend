@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_7738c9526ffdac55e54d5793dcb3a7c5",
-  "catalog_hash": "sha256:7738c9526ffdac55e54d5793dcb3a7c5495fd629325f5d412db2969958296104",
+  "release_id": "rel_81acffa84ca2a65a2390a086d605e708",
+  "catalog_hash": "sha256:81acffa84ca2a65a2390a086d605e7085318b221103866d2fc84be6489db14c7",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -249942,7 +249942,7 @@
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
       "version": "1.2.0",
-      "artifact_hash": "sha256:567aef3577e2a734eb890c69767b8018b25a1b55e3ff60e373103b5b497f4e61"
+      "artifact_hash": "sha256:0b0826b7499890dfaacbd3a7f610be53131d6dc361ec0046a7dd9d4e446f5657"
     },
     {
       "plugin_id": "official.device",
@@ -249993,5 +249993,5 @@
       "artifact_hash": "sha256:5c1fccaa2219f6833c24237667039685e322cefcffc7ca6f0287d28cfc0a2b39"
     }
   ],
-  "created_at": "2026-09-02T16:48:26.812685Z"
+  "created_at": "2026-09-03T01:36:23.528570Z"
 }

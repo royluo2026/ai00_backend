@@ -8,7 +8,7 @@ Execute exact Base outcome base.identity.role.assign.atomic.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_7738c9526ffdac55e54d5793dcb3a7c5`
+- Catalog Release：`rel_81acffa84ca2a65a2390a086d605e708`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -109,7 +109,7 @@ Execute exact Base outcome base.identity.role.assign.atomic.
 ```json
 {
   "capability_id": "base.identity.role.assign.atomic",
-  "catalog_release": "rel_7738c9526ffdac55e54d5793dcb3a7c5",
+  "catalog_release": "rel_81acffa84ca2a65a2390a086d605e708",
   "major_version": 1,
   "payload": {
     "external_subtype": "example",
