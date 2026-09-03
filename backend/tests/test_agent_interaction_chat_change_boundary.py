@@ -173,6 +173,22 @@ def test_agent_chat_v2_rejects_more_than_500_stream_events(monkeypatch) -> None:
         ))
 
 
+def test_agent_chat_v2_converts_stream_error_to_business_failure(monkeypatch) -> None:
+    async def chunks():
+        yield 'data: {"type":"error","message":"runtime down"}\n\n'
+
+    response = SimpleNamespace(body_iterator=chunks(), media_type="text/event-stream")
+    monkeypatch.setattr(ai_chat, "_legacy_chat_stream", lambda *_args: response)
+
+    with pytest.raises(CapabilityBusinessError) as exc_info:
+        asyncio.run(apply_interaction_chat_change(
+            {"operation": "chat_stream", "body": {"message": "hi"}},
+            SimpleNamespace(user_gid="user-1"),
+        ))
+
+    assert exc_info.value.code == "provider_unavailable"
+
+
 def test_agent_chat_v2_rejects_oversized_sync_response(monkeypatch) -> None:
     monkeypatch.setattr(
         ai_chat,
@@ -209,6 +225,19 @@ def test_agent_chat_rejects_a_foreign_session(monkeypatch) -> None:
 
     assert exc_info.value.code == "resource_not_found"
     assert checked == [("owned-session", "admin-1")]
+
+
+@pytest.mark.parametrize("method", ["_legacy_chat_stream", "_legacy_chat_sync"])
+def test_pi_runtime_checks_session_owner_before_proxy(monkeypatch, method) -> None:
+    monkeypatch.setattr(ai_chat._pi_proxy, "enabled", lambda: True)
+    monkeypatch.setattr(
+        ai_chat,
+        "_require_legacy_session_owner",
+        lambda *_args: (_ for _ in ()).throw(CapabilityBusinessError("resource_not_found", "missing")),
+    )
+
+    with pytest.raises(CapabilityBusinessError, match="missing"):
+        getattr(ai_chat, method)({"session_gid": "foreign"}, {"gid": "user-1"}, "token")
 
 
 def test_web_chat_pins_v2_and_normalizes_trusted_payload() -> None:
@@ -332,7 +361,10 @@ def test_confirm_route_uses_catalog_reverse_mapping_then_governed_chat(monkeypat
             return SimpleNamespace(ok=True, data=data, error=None)
 
     tool_name = "cap__project__task__change__apply__v1"
-    token = tool_executor.issue_confirm_token(tool_name, {"name": "x"}, "session-1", "admin-1")
+    token = tool_executor.issue_confirm_token(
+        tool_name, {"name": "x"}, "session-1", "admin-1",
+        catalog_release="release-1", capability_id="project.task.change.apply", major_version=1,
+    )
     response = asyncio.run(ai_chat._invoke_confirmed_catalog_tool(
         SimpleNamespace(headers={}),
         {"gid": "admin-1", "team_id": "team-1", "org_role": "super_admin"},

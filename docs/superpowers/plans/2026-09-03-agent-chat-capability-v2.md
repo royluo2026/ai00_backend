@@ -20,6 +20,9 @@ The first implementation review rejected the combined chat/confirmation contract
 - Replace the bounded session-list ownership check with an exact `(session_gid, user_gid)` repository lookup and raise `CapabilityBusinessError("resource_not_found", ...)`.
 - Build Agent Web envelopes in the Base compatibility adapter with consumer id `ai00.web.agent`, and publish verified consumer references.
 - Represent chat success and failure as distinct schema-valid outputs; never wrap legacy `{error: ...}` payloads as successful opaque JSON.
+- Generate the model-visible tool list from the same pinned Catalog used for execution; confirmation classification, token bindings, ordinary execution, and confirmed execution must resolve the same stored `cap__...__vN` record.
+- Reserve confirmation tokens as `inflight`, consume only after Gateway acceptance, release them after a failed invocation, and bind the canonical payload hash plus Catalog coordinates.
+- Enforce session ownership before both legacy and Pi runtime dispatch, and convert SSE error events into Capability business failures.
 - Project `agent.read` to authenticated internal users so the documented read-only AI settings route is usable, while keeping external identities denied.
 - Default the optional Pi proxy to legacy mode when no runtime mode is configured; an explicitly selected Pi mode remains fail-closed without a URL.
 

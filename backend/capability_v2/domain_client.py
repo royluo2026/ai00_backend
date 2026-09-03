@@ -33,6 +33,13 @@ class DomainCapabilityClient:
     def __init__(self, gateway: CapabilityGatewayService) -> None:
         self._gateway = gateway
 
+    @property
+    def catalog_release(self) -> str:
+        return self._gateway.catalog_release
+
+    def catalog(self):
+        return self._gateway.catalog(self.catalog_release)
+
     async def invoke(
         self,
         invocation: DomainInvocation,

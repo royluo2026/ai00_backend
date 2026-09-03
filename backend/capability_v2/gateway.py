@@ -612,8 +612,7 @@ class CapabilityGatewayService:
             )),
         ))
 
-    @staticmethod
-    def _legacy_context(envelope: InvocationEnvelope, *, operation_id: str | None = None) -> CapabilityContext:
+    def _legacy_context(self, envelope: InvocationEnvelope, *, operation_id: str | None = None) -> CapabilityContext:
         actor = envelope.identity.actor
         return CapabilityContext(
             user_gid=actor.user_id or actor.service_id or "",
@@ -634,6 +633,9 @@ class CapabilityGatewayService:
             # Governance business approvals consume this server-created object
             # rather than caller-provided roles on the legacy context.
             effective_identity=envelope.identity,
+            domain_client=__import__(
+                "backend.capability_v2.domain_client", fromlist=["DomainCapabilityClient"]
+            ).DomainCapabilityClient(self),
         )
 
     @staticmethod

@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from backend.capability_v2.contracts import BusinessInvariantContract, ResourceSelector
+from backend.capability_v2.contracts import BusinessInvariantContract, CorrelationRef, ResourceSelector
 from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilitySpec
 
 OPERATIONS = ("chat_stream", "chat_sync", "confirm", "confirm_sync")
@@ -40,7 +40,20 @@ async def _collect_v2(value: Any) -> dict[str, Any]:
     async for chunk in iterator:
         if len(events) == 500:
             raise ValueError("stream response exceeds 500 events")
-        events.append(chunk.decode("utf-8", errors="replace") if isinstance(chunk, bytes) else str(chunk))
+        event = chunk.decode("utf-8", errors="replace") if isinstance(chunk, bytes) else str(chunk)
+        for line in event.splitlines():
+            if not line.startswith("data: "):
+                continue
+            try:
+                payload = json.loads(line[6:])
+            except json.JSONDecodeError:
+                continue
+            if isinstance(payload, dict) and payload.get("type") == "error":
+                raise CapabilityBusinessError(
+                    "provider_unavailable", str(payload.get("message") or "Agent runtime failed"),
+                    retryable=True,
+                )
+        events.append(event)
     return {"events": events, "media_type": getattr(value, "media_type", "text/event-stream")}
 
 
@@ -70,7 +83,21 @@ async def _apply_interaction_chat_change(
         raise ValueError("body must be an object")
     if version == 2:
         body = _v2_body(body)
-    user = {"gid": context.user_gid}
+    domain_client = getattr(context, "domain_client", None)
+    identity = getattr(context, "effective_identity", None)
+    catalog_runtime = None
+    if domain_client is not None and identity is not None:
+        from ..ai_assistant.catalog_tools import CatalogToolRegistry
+        catalog_runtime = {
+            "registry": CatalogToolRegistry(domain_client.catalog(), client=domain_client),
+            "identity": identity,
+            "correlation": CorrelationRef(
+                request_id=context.request_id or f"agent_chat_{context.user_gid}",
+                trace_id=context.request_id or None,
+            ),
+            "catalog_release": domain_client.catalog_release,
+        }
+    user = {"gid": context.user_gid, "_catalog_runtime": catalog_runtime}
     token = str(payload.get("ai00_token") or "")
     collector = _collect_v2 if version == 2 else _collect_v1
     if operation == "chat_stream":

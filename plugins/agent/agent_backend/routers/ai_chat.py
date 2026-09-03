@@ -16,6 +16,7 @@ POST /api/ai/abort          — 中断流式对话
 """
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 import uuid
@@ -29,8 +30,7 @@ from ..ai_assistant.catalog_tools import CatalogToolRegistry
 from ..ai_assistant import system_prompt as _sp
 from . import agent_runtime_proxy_next as _pi_proxy
 from ..ai_assistant.tool_registry import (
-    get_all_tools_with_skills, WRITE_TOOLS_CONFIRM,
-    _READ_TOOLS, _WRITE_TOOLS_CONFIRM, _WRITE_TOOLS_NO_CONFIRM, _SYSTEM_TOOLS,
+    catalog_tools_openai,
 )
 from ..api.compatibility import invoke_agent_capability
 from ..application.interaction_state import consume_abort
@@ -69,14 +69,23 @@ async def _invoke_interaction_chat(request, user, principal, gateway, payload):
 async def _invoke_confirmed_catalog_tool(request, user, principal, gateway, body):
     session_gid = body.get("session_gid") or body.get("session_id", "")
     user_gid = str(user.get("gid") or "")
-    _require_legacy_session_owner(session_gid, user_gid)
+    try:
+        _require_legacy_session_owner(session_gid, user_gid)
+    except CapabilityBusinessError as exc:
+        raise HTTPException(
+            status_code=404 if exc.code == "resource_not_found" else 422,
+            detail={"code": exc.code, "message": exc.message, "retryable": exc.retryable, "details": exc.details},
+        ) from exc
     tool_name = str(body.get("tool_name") or "")
     try:
         tool = CatalogToolRegistry(gateway.catalog(gateway.catalog_release)).resolve(tool_name)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
-    valid, pending = _te.consume_confirm_token(
-        str(body.get("confirm_token") or ""), tool_name, session_gid, user_gid,
+    confirm_token = str(body.get("confirm_token") or "")
+    valid, pending = _te.begin_confirm_token(
+        confirm_token, tool_name, session_gid, user_gid,
+        catalog_release=gateway.catalog_release, capability_id=tool.capability_id,
+        major_version=tool.major_version,
     )
     if not valid:
         raise HTTPException(status_code=400, detail="确认令牌无效或已过期，请重新操作")
@@ -89,13 +98,19 @@ async def _invoke_confirmed_catalog_tool(request, user, principal, gateway, body
         trace_id=request.headers.get("X-Trace-ID") or request_id,
         idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
     )
-    result = await invoke_trusted_web_compatibility(gateway, envelope)
+    try:
+        result = await invoke_trusted_web_compatibility(gateway, envelope)
+    except Exception:
+        _te.finish_confirm_token(confirm_token, accepted=False)
+        raise
     if not result.ok:
+        _te.finish_confirm_token(confirm_token, accepted=False)
         code = result.error.code if result.error else "provider_error"
         raise HTTPException(
             status_code={"invalid_input": 400, "permission_denied": 403, "resource_not_found": 404}.get(code, 422),
             detail=result.error.model_dump(mode="json") if result.error else None,
         )
+    _te.finish_confirm_token(confirm_token, accepted=True)
     write_result = result.data.get("data", result.data) if isinstance(result.data, dict) else result.data
     _store.add_turn(session_gid, "tool_result", "", tool_calls=[{
         "name": tool_name, "input": pending["inputs"], "result": write_result,
@@ -274,6 +289,7 @@ def _chat_stream_gen(
     auth_token: str,
     context: dict | None,
     canvas_context: dict | None = None,
+    catalog_runtime: dict | None = None,
 ):
     """生成 SSE 事件的生成器函数。"""
     ai_cfg = _get_ai_config(user_gid)
@@ -353,7 +369,13 @@ def _chat_stream_gen(
     if task_cls and task_cls["complexity"] == "multi_step":
         system = system + "\n\n【任务规划提示】请按步骤逐一使用工具，每步完成后输出中间结论，最后综合输出最终答案。"
 
-    all_tools = get_all_tools_with_skills(owner_gid=user_gid, auth_mode=auth_mode)
+    if not catalog_runtime:
+        raise CapabilityBusinessError(
+            "catalog_release_unavailable", "Pinned Agent Catalog runtime is unavailable",
+            retryable=True,
+        )
+    catalog_registry = catalog_runtime["registry"]
+    all_tools = catalog_tools_openai(catalog_registry)
     msgs      = [{"role": "system", "content": system}] + list(messages)
 
     answer               = ""
@@ -490,11 +512,19 @@ def _chat_stream_gen(
             return
 
         # ── 写工具 → 暂停等待确认 ────────────────────────────────────────────
-        write_calls = [tc for tc in tool_calls if tc.function.name in WRITE_TOOLS_CONFIRM]
+        write_calls = [
+            tc for tc in tool_calls
+            if catalog_registry.resolve(tc.function.name).confirmation_policy != "none"
+        ]
         if write_calls:
             wtc     = write_calls[0]
             inputs  = json.loads(wtc.function.arguments or "{}")
-            token   = _te.issue_confirm_token(wtc.function.name, inputs, session_gid, user_gid)
+            tool = catalog_registry.resolve(wtc.function.name)
+            token = _te.issue_confirm_token(
+                tool.name, inputs, session_gid, user_gid,
+                catalog_release=catalog_runtime["catalog_release"],
+                capability_id=tool.capability_id, major_version=tool.major_version,
+            )
             preview = _te.build_preview(wtc.function.name, inputs)
             intent  = answer or f"即将执行：{preview}"
             _store.add_turn(session_gid, "assistant", intent)
@@ -526,10 +556,15 @@ def _chat_stream_gen(
         if to_exec:
             def _exec_one(item):
                 _tc, _name, _inputs, _call_key = item
-                _res = _te.execute_tool(
-                    _name, _inputs, auth_mode,
-                    auth_token=auth_token, user_gid=user_gid, session_gid=session_gid,
-                    canvas_context=canvas_context,
+                _result = asyncio.run(_te.execute_catalog_tool(
+                    catalog_registry, _name, _inputs,
+                    identity=catalog_runtime["identity"],
+                    correlation=catalog_runtime["correlation"],
+                    idempotency_key=f"{catalog_runtime['correlation'].request_id}:{_tc.id}",
+                ))
+                _res = (
+                    _result.data if _result.ok else
+                    {"error": _result.error.message, "code": _result.error.code}
                 )
                 return _tc.id, _name, _call_key, _res
 
@@ -613,15 +648,15 @@ def _legacy_chat_stream(
     x_ai00_token: str = Header(alias="X-AI00-Token"),
 ):
     """SSE 流式对话（主路径）；可灰度切换到 Pi Runtime。"""
+    session_gid = body.get("session_id") or body.get("session_gid") or None
+    user_gid = _user.get("gid", "")
+    _require_legacy_session_owner(session_gid, user_gid)
     if _pi_proxy.enabled():
         return StreamingResponse(
             _pi_proxy.stream_chat(body, x_ai00_token), media_type="text/event-stream",
             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
         )
     message     = body.get("message", "")
-    session_gid = body.get("session_id") or body.get("session_gid") or None
-    user_gid    = _user.get("gid", "")
-    _require_legacy_session_owner(session_gid, user_gid)
     auth_mode   = "feishu"
     auth_token  = body.get("auth_token", "")
     context_raw = body.get("context") or {}
@@ -646,6 +681,7 @@ def _legacy_chat_stream(
             auth_token=auth_token,
             context=context_raw or None,
             canvas_context=canvas_ctx or None,
+            catalog_runtime=_user.get("_catalog_runtime"),
         ),
         media_type="text/event-stream",
         headers={
@@ -722,11 +758,11 @@ def _legacy_chat_sync(
     x_ai00_token: str = Header(alias="X-AI00-Token"),
 ):
     """同步对话（降级路径，收集所有 SSE 事件后返回）。"""
-    if _pi_proxy.enabled():
-        return _pi_proxy.sync_chat(body, x_ai00_token)
     _require_legacy_session_owner(
         body.get("session_id") or body.get("session_gid"), _user.get("gid", ""),
     )
+    if _pi_proxy.enabled():
+        return _pi_proxy.sync_chat(body, x_ai00_token)
     try:
         chunks = list(_chat_stream_gen(
             message=body.get("message", ""),
@@ -735,6 +771,7 @@ def _legacy_chat_sync(
             auth_mode="feishu",
             auth_token=body.get("auth_token", ""),
             context=body.get("context") or None,
+            catalog_runtime=_user.get("_catalog_runtime"),
         ))
     except UnicodeDecodeError:
         # streaming 整体失败，直接用容错同步请求

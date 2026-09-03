@@ -413,9 +413,10 @@ class AgentCapabilityRepository:
 
     def runtime_config(self, data: dict) -> dict:
         import os
+        from ..runtime_mode import pi_enabled
 
         is_admin = "super_admin" in set(data.get("active_roles", ()))
-        if os.getenv("AI00_AGENT_RUNTIME_MODE", "pi").strip().lower() == "pi":
+        if pi_enabled():
             return {
                 "source": "pi_runtime",
                 "model": "由 Agent Runtime 管理",
