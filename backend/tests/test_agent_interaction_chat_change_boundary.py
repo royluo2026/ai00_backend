@@ -31,6 +31,10 @@ from plugins.agent.agent_backend.capabilities.interaction_chat_change import (
     apply_interaction_chat_change,
     register_interaction_chat_change_capability,
 )
+from plugins.agent.agent_backend.capabilities.catalog_tool_confirmation import (
+    apply_catalog_tool_confirmation,
+    register_catalog_tool_confirmation_capability,
+)
 from plugins.agent.agent_backend.routers import ai_chat
 from plugins.agent.agent_backend.ai_assistant import tool_executor
 
@@ -336,49 +340,96 @@ def test_web_sync_chat_restores_the_bounded_response() -> None:
     assert response == {"answer": "ok", "tool_calls": []}
 
 
-def test_confirm_route_uses_catalog_reverse_mapping_then_governed_chat(monkeypatch) -> None:
+def test_confirm_route_uses_fixed_governed_confirmation_capability(monkeypatch) -> None:
     calls = []
-    stored = []
-    monkeypatch.setattr(ai_chat, "_require_legacy_session_owner", lambda *_args: None)
-    monkeypatch.setattr(ai_chat._store, "add_turn", lambda *args, **kwargs: stored.append((args, kwargs)))
-    monkeypatch.setattr(
-        ai_chat,
-        "CatalogToolRegistry",
-        lambda _release: SimpleNamespace(resolve=lambda name: SimpleNamespace(
-            name=name, capability_id="project.task.change.apply", major_version=1,
-        )),
-    )
 
     class Gateway:
         catalog_release = "release-1"
 
-        def catalog(self, _release_id):
-            return object()
-
         async def invoke(self, envelope):
             calls.append(envelope)
-            data = {"data": {"gid": "task-1"}} if len(calls) == 1 else {"data": {"response_json": '{"answer":"continued"}'}}
+            data = {"data": {"session_gid": "session-1"}} if len(calls) == 1 else {"data": {"response_json": '{"answer":"continued"}'}}
             return SimpleNamespace(ok=True, data=data, error=None)
 
     tool_name = "cap__project__task__change__apply__v1"
-    token = tool_executor.issue_confirm_token(
-        tool_name, {"name": "x"}, "session-1", "admin-1",
-        catalog_release="release-1", capability_id="project.task.change.apply", major_version=1,
-    )
     response = asyncio.run(ai_chat._invoke_confirmed_catalog_tool(
         SimpleNamespace(headers={}),
         {"gid": "admin-1", "team_id": "team-1", "org_role": "super_admin"},
         ActorIdentity(user_id="admin-1", authentication_method="jwt", authenticated_at=datetime.now(UTC)),
         Gateway(),
-        {"confirm_token": token, "tool_name": tool_name, "session_gid": "session-1", "stream": False},
+        {"confirm_token": "token-1", "tool_name": tool_name, "session_gid": "session-1", "stream": False},
     ))
 
     assert [call.capability_id for call in calls] == [
-        "project.task.change.apply", "agent.interaction.chat.change.apply",
+        "agent.catalog_tool.confirm.apply", "agent.interaction.chat.change.apply",
     ]
     assert calls[0].identity.consumer.consumer_id == "ai00.web.agent"
+    assert calls[0].payload == {
+        "confirm_token": "token-1", "tool_name": tool_name,
+        "session_gid": "session-1", "tool_use_id": "",
+    }
     assert response == {"answer": "continued"}
+
+
+def test_catalog_tool_confirmation_is_user_confirmed_and_not_model_exposed() -> None:
+    registry = CapabilityRegistry()
+    register_catalog_tool_confirmation_capability(registry)
+    registered = registry.get("agent.catalog_tool.confirm.apply", 1)
+
+    assert registered.spec.confirmation == "user"
+    assert registered.descriptor.exposure.web is True
+    assert registered.descriptor.exposure.agent is False
+    assert registered.descriptor.exposure.mcp is False
+    assert substantive_business_definition_errors(registered.descriptor) == ()
+    assert [(item.resource_type, item.payload_path) for item in registered.descriptor.resource_selectors] == [
+        ("agent-session", "session_gid"),
+    ]
+
+
+def test_catalog_tool_confirmation_resolves_pinned_record_and_consumes_after_success(monkeypatch) -> None:
+    from backend.capability_v2.catalog import load_catalog_release
+    from plugins.agent.agent_backend.ai_assistant.catalog_tools import CatalogToolRegistry
+
+    release = load_catalog_release(
+        Path("docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
+    )
+    tool = next(item for item in CatalogToolRegistry(release).tools() if item.confirmation_policy != "none")
+    calls = []
+    stored = []
+
+    class Client:
+        catalog_release = release.release_id
+
+        def catalog(self):
+            return release
+
+        async def invoke_after_user_confirmation(self, invocation, identity, correlation):
+            calls.append((invocation, identity, correlation))
+            return SimpleNamespace(ok=True, data={"data": {"gid": "created-1"}}, error=None)
+
+    monkeypatch.setattr(ai_chat._store, "require_owned_session", lambda *_args: None)
+    monkeypatch.setattr(ai_chat._store, "add_turn", lambda *args, **kwargs: stored.append((args, kwargs)))
+    token = tool_executor.issue_confirm_token(
+        tool.name, {}, "session-1", "admin-1",
+        catalog_release=release.release_id,
+        capability_id=tool.capability_id,
+        major_version=tool.major_version,
+    )
+    context = SimpleNamespace(
+        user_gid="admin-1", request_id="request-1", idempotency_key="idem-1",
+        domain_client=Client(), effective_identity=SimpleNamespace(),
+    )
+
+    response = asyncio.run(apply_catalog_tool_confirmation({
+        "confirm_token": token, "tool_name": tool.name,
+        "session_gid": "session-1", "tool_use_id": "call-1",
+    }, context))
+
+    assert calls[0][0].capability_id == tool.capability_id
+    assert calls[0][0].major_version == tool.major_version
+    assert json.loads(response["data"]["result_json"]) == {"gid": "created-1"}
     assert stored
+    assert token not in tool_executor._CONFIRM_TOKENS
 
 
 def test_web_chat_rejects_non_object_context_before_gateway() -> None:

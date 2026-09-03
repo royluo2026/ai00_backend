@@ -498,7 +498,7 @@ def test_reviewed_ai_routes_match_exact_handler_invocations() -> None:
 
     assert targets[("POST", "/api/ai/chat")] == "agent.interaction.chat.change.apply"
     assert targets[("POST", "/api/ai/chat/stream")] == "agent.interaction.chat.change.apply"
-    assert targets[("POST", "/api/ai/confirm/sync")] == "agent.interaction.chat.change.apply"
+    assert targets[("POST", "/api/ai/confirm/sync")] == "agent.catalog_tool.confirm.apply"
     assert targets[("POST", "/api/ai/abort")] == "agent.interaction.cancel"
     assert ("GET", "/api/ai/balance") not in targets
 
@@ -524,7 +524,10 @@ def test_agent_chat_routes_target_major_v2() -> None:
         ("POST", "/api/ai/confirm"),
         ("POST", "/api/ai/confirm/sync"),
     }
-    assert {entry.migration_target_major_version for entry in routes.values()} == {2}
+    assert routes[("POST", "/api/ai/chat")].migration_target_major_version == 2
+    assert routes[("POST", "/api/ai/chat/stream")].migration_target_major_version == 2
+    assert routes[("POST", "/api/ai/confirm")].migration_target_major_version == 1
+    assert routes[("POST", "/api/ai/confirm/sync")].migration_target_major_version == 1
 
 
 def test_lark_business_routes_are_registered_not_operations_excluded() -> None:
@@ -600,7 +603,7 @@ def test_round4_exact_adapter_families_have_governed_targets() -> None:
         ("GET", "/api/rules"): "craft.rule.library.read",
         ("GET", "/api/import-export/templates"): "base.export_template.read",
         ("POST", "/api/import-export/export/excel"): "craft.data_exchange.export",
-        ("POST", "/api/ai/confirm"): "agent.interaction.chat.change.apply",
+        ("POST", "/api/ai/confirm"): "agent.catalog_tool.confirm.apply",
     }
 
     assert {key: targets.get(key) for key in expected} == expected

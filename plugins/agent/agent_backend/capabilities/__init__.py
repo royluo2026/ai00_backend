@@ -14,6 +14,7 @@ from ..data.session_repository import SessionRepository
 from .descriptors import specs
 from .provider import descriptor_for
 from .interaction_chat_change import register_interaction_chat_change_capability
+from .catalog_tool_confirmation import register_catalog_tool_confirmation_capability
 
 
 _DEFAULT_RUNTIME = object()
@@ -84,5 +85,6 @@ def register_capabilities(registry, *, canvas_runtime=_DEFAULT_RUNTIME) -> None:
         governed = spec.model_copy(update={"plugin_callable": True})
         registry.register(governed, handler, descriptor=descriptor_for(governed))
     register_interaction_chat_change_capability(registry)
+    register_catalog_tool_confirmation_capability(registry)
 
 __all__ = ["register_capabilities"]

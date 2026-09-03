@@ -26,7 +26,6 @@ from fastapi.responses import StreamingResponse
 from backend.platform_sdk.auth import get_current_user, require_role
 from ..ai_assistant.session_store import _store
 from ..ai_assistant import tool_executor as _te
-from ..ai_assistant.catalog_tools import CatalogToolRegistry
 from ..ai_assistant import system_prompt as _sp
 from . import agent_runtime_proxy_next as _pi_proxy
 from ..ai_assistant.tool_registry import (
@@ -67,55 +66,28 @@ async def _invoke_interaction_chat(request, user, principal, gateway, payload):
 
 
 async def _invoke_confirmed_catalog_tool(request, user, principal, gateway, body):
-    session_gid = body.get("session_gid") or body.get("session_id", "")
-    user_gid = str(user.get("gid") or "")
-    try:
-        _require_legacy_session_owner(session_gid, user_gid)
-    except CapabilityBusinessError as exc:
-        raise HTTPException(
-            status_code=404 if exc.code == "resource_not_found" else 422,
-            detail={"code": exc.code, "message": exc.message, "retryable": exc.retryable, "details": exc.details},
-        ) from exc
-    tool_name = str(body.get("tool_name") or "")
-    try:
-        tool = CatalogToolRegistry(gateway.catalog(gateway.catalog_release)).resolve(tool_name)
-    except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-    confirm_token = str(body.get("confirm_token") or "")
-    valid, pending = _te.begin_confirm_token(
-        confirm_token, tool_name, session_gid, user_gid,
-        catalog_release=gateway.catalog_release, capability_id=tool.capability_id,
-        major_version=tool.major_version,
-    )
-    if not valid:
-        raise HTTPException(status_code=400, detail="确认令牌无效或已过期，请重新操作")
-
+    session_gid = str(body.get("session_gid") or body.get("session_id") or "")
     request_id = request.headers.get("X-Request-ID") or f"agent_confirm_{uuid.uuid4().hex}"
     envelope = build_trusted_web_envelope(
-        gateway, capability_id=tool.capability_id, major_version=tool.major_version,
-        payload=dict(pending["inputs"]), current_user=user, principal=principal,
+        gateway, capability_id="agent.catalog_tool.confirm.apply", major_version=1,
+        payload={
+            "confirm_token": str(body.get("confirm_token") or ""),
+            "tool_name": str(body.get("tool_name") or ""),
+            "session_gid": session_gid,
+            "tool_use_id": str(body.get("tool_use_id") or ""),
+        }, current_user=user, principal=principal,
         consumer_id="ai00.web.agent", request_id=request_id,
         trace_id=request.headers.get("X-Trace-ID") or request_id,
         idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+        approval_reference=request.headers.get("X-Capability-Approval"),
     )
-    try:
-        result = await invoke_trusted_web_compatibility(gateway, envelope)
-    except Exception:
-        _te.finish_confirm_token(confirm_token, accepted=False)
-        raise
+    result = await invoke_trusted_web_compatibility(gateway, envelope)
     if not result.ok:
-        _te.finish_confirm_token(confirm_token, accepted=False)
         code = result.error.code if result.error else "provider_error"
         raise HTTPException(
             status_code={"invalid_input": 400, "permission_denied": 403, "resource_not_found": 404}.get(code, 422),
             detail=result.error.model_dump(mode="json") if result.error else None,
         )
-    _te.finish_confirm_token(confirm_token, accepted=True)
-    write_result = result.data.get("data", result.data) if isinstance(result.data, dict) else result.data
-    _store.add_turn(session_gid, "tool_result", "", tool_calls=[{
-        "name": tool_name, "input": pending["inputs"], "result": write_result,
-        "tool_use_id": body.get("tool_use_id", ""), "confirmed": True,
-    }])
     return await _invoke_interaction_chat(
         request, user, principal, gateway,
         {"operation": "chat_stream" if body.get("stream", True) else "chat_sync", "body": {"message": "", "session_gid": session_gid}},

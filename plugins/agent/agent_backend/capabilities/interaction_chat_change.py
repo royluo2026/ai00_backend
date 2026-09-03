@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from backend.capability_v2.contracts import BusinessInvariantContract, CorrelationRef, ResourceSelector
+from backend.capability_v2.contracts import BusinessInvariantContract, CorrelationRef, ExposurePolicy, ResourceSelector
 from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilitySpec
 
 OPERATIONS = ("chat_stream", "chat_sync", "confirm", "confirm_sync")
@@ -170,10 +170,13 @@ def register_interaction_chat_change_capability(registry: Any) -> None:
     registry.register(
         v1_governed,
         apply_interaction_chat_change_v1,
-        descriptor=descriptor_for(v1_governed),
+        descriptor=descriptor_for(v1_governed).model_copy(update={
+            "exposure": ExposurePolicy(web=True, api=True, plugin=True, agent=False, mcp=False),
+        }),
     )
     v2_governed = v2.model_copy(update={"plugin_callable": True})
     v2_descriptor = descriptor_for(v2_governed).model_copy(update={
+        "exposure": ExposurePolicy(web=True, api=True, plugin=True, agent=False, mcp=False),
         "consistency_policy": "eventual",
         "evidence_policy": "optional",
         "resource_selectors": (

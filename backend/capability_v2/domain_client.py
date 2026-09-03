@@ -79,6 +79,50 @@ class DomainCapabilityClient:
         )
         return await self._gateway.invoke(envelope)
 
+    async def invoke_after_user_confirmation(
+        self,
+        invocation: DomainInvocation,
+        identity: ConsumerIdentity,
+        correlation: CorrelationRef,
+        deadline: datetime | None = None,
+    ) -> CapabilityResultV2:
+        """Invoke a nested target from an already user-confirmed capability.
+
+        The Gateway still authorizes, validates, and issues the exact approval for
+        the target envelope.  This method is intentionally separate from
+        ``invoke`` so ordinary domain-to-domain calls cannot acquire approvals.
+        """
+        if invocation.approval_reference is not None:
+            raise DomainInvocationError("caller_approval_reference_forbidden")
+        result = await self.invoke(invocation, identity, correlation, deadline)
+        if result.ok or result.error is None or result.error.code != "confirmation_required":
+            return result
+
+        approved = DomainInvocation(
+            capability_id=invocation.capability_id,
+            major_version=invocation.major_version,
+            payload=invocation.payload,
+            idempotency_key=invocation.idempotency_key or correlation.request_id,
+            expected_resource_version=invocation.expected_resource_version,
+        )
+        release_id = self._gateway.catalog_release
+        envelope = InvocationEnvelope(
+            capability_id=approved.capability_id,
+            major_version=approved.major_version,
+            catalog_release=release_id,
+            payload=dict(approved.payload),
+            identity=identity,
+            idempotency_key=approved.idempotency_key,
+            expected_resource_version=approved.expected_resource_version,
+            request_id=correlation.request_id,
+            trace_id=correlation.trace_id or correlation.request_id,
+            deadline=deadline,
+        )
+        issued = await self._gateway.request_approval(envelope)
+        return await self._gateway.invoke(
+            envelope.model_copy(update={"approval_reference": issued.token})
+        )
+
 
 __all__ = [
     "DomainCapabilityClient",

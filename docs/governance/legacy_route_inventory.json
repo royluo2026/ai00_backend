@@ -2971,14 +2971,14 @@
       "route_path": "/api/ai/confirm/sync",
       "method": "POST",
       "owner": "agent",
-      "migration_target_capability": "agent.interaction.chat.change.apply",
+      "migration_target_capability": "agent.catalog_tool.confirm.apply",
       "migration_deadline": "2026-11-21",
       "source": "plugins/agent/agent_backend/routers/ai_chat.py",
       "allowed_consumers": [
         "web",
         "rest"
       ],
-      "migration_target_major_version": 2,
+      "migration_target_major_version": 1,
       "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
@@ -4609,14 +4609,14 @@
       "route_path": "/api/ai/confirm",
       "method": "POST",
       "owner": "agent",
-      "migration_target_capability": "agent.interaction.chat.change.apply",
+      "migration_target_capability": "agent.catalog_tool.confirm.apply",
       "source": "plugins/agent/agent_backend/routers/ai_chat.py",
       "migration_deadline": "2026-11-21",
       "allowed_consumers": [
         "web",
         "rest"
       ],
-      "migration_target_major_version": 2,
+      "migration_target_major_version": 1,
       "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {

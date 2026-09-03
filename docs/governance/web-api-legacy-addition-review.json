@@ -2162,26 +2162,26 @@
       "method": "POST",
       "route_path": "/api/ai/confirm/sync",
       "disposition": "retained",
-      "target_capability": "agent.interaction.chat.change.apply",
-      "reason": "Handler delegates to _invoke_interaction_chat, whose anchored binding invokes agent.interaction.chat.change.apply.",
-      "target_major_version": 2,
+      "target_capability": "agent.catalog_tool.confirm.apply",
+      "reason": "Handler delegates to the fixed governed Agent Catalog-tool confirmation boundary.",
+      "target_major_version": 1,
       "evidence": {
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 822,
-          "end_line": 828,
-          "sha256": "679c2ba88dee1d3c00bc853afe69e73caa20daf6f5826fc014661389a7b14679"
+          "start_line": 868,
+          "end_line": 874,
+          "sha256": "b0029f9a2df847fd0db5f68d9d1bca1a9b6965c03ee4ad50be7b9d8d3cc8328d"
         },
-        "delegation_symbol": "_invoke_interaction_chat",
-        "expected_delegation": "_invoke_interaction_chat(request, _user, principal, gateway, {\"operation\": \"confirm_sync\", \"body\": body})",
+        "delegation_symbol": "_invoke_confirmed_catalog_tool",
+        "expected_delegation": "_invoke_confirmed_catalog_tool(request, _user, principal, gateway, {**body, \"stream\": False})",
         "binding": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 51,
-          "end_line": 64,
-          "sha256": "7f274fafecff4dea69c1a166cc151d1cfa4eba894ed2b44d182c0ae83845a916"
+          "start_line": 68,
+          "end_line": 96,
+          "sha256": "9d714fd06da373f05bf0c229e12544ec9c0f1e1f057bec41df6538ad30ee8786"
         },
-        "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"agent.interaction.chat.change.apply\", payload=_normalize_interaction_payload(payload),\n        current_user=user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        major_version=2,\n    )"
+        "expected_target_binding": "build_trusted_web_envelope(\n        gateway, capability_id=\"agent.catalog_tool.confirm.apply\", major_version=1,\n        payload={\n            \"confirm_token\": str(body.get(\"confirm_token\") or \"\"),\n            \"tool_name\": str(body.get(\"tool_name\") or \"\"),\n            \"session_gid\": session_gid,\n            \"tool_use_id\": str(body.get(\"tool_use_id\") or \"\"),\n        }, current_user=user, principal=principal,\n        consumer_id=\"ai00.web.agent\", request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n    )"
       }
     },
     {
@@ -3667,26 +3667,26 @@
       "method": "POST",
       "route_path": "/api/ai/confirm",
       "disposition": "retained",
-      "target_capability": "agent.interaction.chat.change.apply",
-      "reason": "Handler delegates to _invoke_interaction_chat, whose anchored binding invokes agent.interaction.chat.change.apply.",
-      "target_major_version": 2,
+      "target_capability": "agent.catalog_tool.confirm.apply",
+      "reason": "Handler delegates to the fixed governed Agent Catalog-tool confirmation boundary.",
+      "target_major_version": 1,
       "evidence": {
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 746,
-          "end_line": 751,
-          "sha256": "107ba0026b78f91e88b96d680a0b9b34540f23b645673351fd45dd5b7bc349e9"
+          "start_line": 795,
+          "end_line": 801,
+          "sha256": "0a79b7b601d9d95b79bca87b5cd77a0bd6c1023e8ca510f15a6837fe1ac6deca"
         },
-        "delegation_symbol": "_invoke_interaction_chat",
-        "expected_delegation": "_invoke_interaction_chat(request, _user, principal, gateway, {\"operation\": \"confirm\", \"body\": body})",
+        "delegation_symbol": "_invoke_confirmed_catalog_tool",
+        "expected_delegation": "_invoke_confirmed_catalog_tool(request, _user, principal, gateway, {**body, \"stream\": True})",
         "binding": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 51,
-          "end_line": 64,
-          "sha256": "7f274fafecff4dea69c1a166cc151d1cfa4eba894ed2b44d182c0ae83845a916"
+          "start_line": 68,
+          "end_line": 96,
+          "sha256": "9d714fd06da373f05bf0c229e12544ec9c0f1e1f057bec41df6538ad30ee8786"
         },
-        "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"agent.interaction.chat.change.apply\", payload=_normalize_interaction_payload(payload),\n        current_user=user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        major_version=2,\n    )"
+        "expected_target_binding": "build_trusted_web_envelope(\n        gateway, capability_id=\"agent.catalog_tool.confirm.apply\", major_version=1,\n        payload={\n            \"confirm_token\": str(body.get(\"confirm_token\") or \"\"),\n            \"tool_name\": str(body.get(\"tool_name\") or \"\"),\n            \"session_gid\": session_gid,\n            \"tool_use_id\": str(body.get(\"tool_use_id\") or \"\"),\n        }, current_user=user, principal=principal,\n        consumer_id=\"ai00.web.agent\", request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n    )"
       },
       "round_4_change": "new"
     },

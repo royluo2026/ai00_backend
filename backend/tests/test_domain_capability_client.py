@@ -178,3 +178,43 @@ def test_internal_client_forwards_write_when_descriptor_requirements_are_met(ide
 
     assert gateway.envelopes[0].idempotency_key == "factory-asset-get-1"
     assert gateway.envelopes[0].trace_id == "req_1"
+
+
+def test_confirmed_internal_client_requests_exact_gateway_approval_then_retries(identity):
+    gateway = RecordingGateway(
+        descriptor=Descriptor(
+            side_effect_level=SideEffectLevel.WRITE,
+            idempotency_policy="required",
+        )
+    )
+    gateway.result = type("Result", (), {
+        "ok": False,
+        "error": type("Error", (), {"code": "confirmation_required"})(),
+    })()
+    approved = []
+
+    async def request_approval(envelope):
+        approved.append(envelope)
+        gateway.result = CapabilityResultV2(
+            ok=True, status=CapabilityStatus.COMPLETED,
+            capability_id="factory.asset.get", major_version=1,
+            data={"asset_id": "asset_1"},
+            correlation=CorrelationRef(request_id="req_1", trace_id="trace_1"),
+        )
+        return type("Approval", (), {"token": "approval_1"})()
+
+    gateway.request_approval = request_approval
+    client = DomainCapabilityClient(gateway)
+    result = asyncio.run(client.invoke_after_user_confirmation(
+        DomainInvocation(
+            "factory.asset.get", 1, {"asset_id": "asset_1"},
+            idempotency_key="idem_1",
+        ),
+        identity,
+        CorrelationRef(request_id="req_1", trace_id="trace_1"),
+    ))
+
+    assert result.ok is True
+    assert len(gateway.envelopes) == 2
+    assert approved[0].payload == gateway.envelopes[0].payload == gateway.envelopes[1].payload
+    assert gateway.envelopes[1].approval_reference == "approval_1"
