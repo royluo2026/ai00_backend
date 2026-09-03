@@ -118,6 +118,8 @@ def test_resolve_reports_unresolved_and_rejects_invalid_or_oversized_input(conte
 
 
 def test_contract_is_closed_and_registered_as_a_knowledge_read():
+    from backend.capability_v2.business_definition import substantive_business_definition_errors
+
     class Registry:
         def register(self, spec, handler, *, descriptor):
             self.spec = spec
@@ -135,6 +137,7 @@ def test_contract_is_closed_and_registered_as_a_knowledge_read():
     assert registry.spec.output_schema["additionalProperties"] is False
     assert registry.descriptor.evidence_policy == "required"
     assert registry.descriptor.consistency_policy == "strong"
+    assert substantive_business_definition_errors(registry.descriptor) == ()
     assert "mapping_candidate_limit_exceeded" in {
         item.code for item in registry.descriptor.domain_errors
     }

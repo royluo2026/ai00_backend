@@ -57,6 +57,9 @@
     </svg>
     新建仿真任务
   </button>
+  <button id="btnGovernedCapture" class="cs-btn primary" title="通过 AI00 Connector 搭建环境并按工艺倒序截图">
+    AI00 Connector 截图
+  </button>
   <div class="cs-toolbar-spacer"></div>
 
   <!-- 复位视角 -->
@@ -319,6 +322,32 @@
 </div>
 
 <!-- 新建仿真任务弹窗 -->
+<div id="connectorCaptureOverlay" class="cs-modal-overlay hidden">
+  <div class="cs-modal cs-connector-modal">
+    <div class="cs-modal-title">AI00 Connector · 环境搭建与倒序截图</div>
+    <div class="cs-connector-note">浏览器只提交受治理任务；VisMockup COM、场景控制和内部截图均在本机 Connector 中执行。</div>
+    <div class="cs-field">
+      <label>环境名称</label>
+      <input id="connectorEnvironmentName" value="工艺倒序截图环境" maxlength="255">
+    </div>
+    <div class="cs-field">
+      <label>Connector 设备 ID</label>
+      <input id="connectorDeviceId" placeholder="选择或输入已绑定设备 ID">
+    </div>
+    <div class="cs-connector-source" id="connectorSource">请先选择已发布的 BOP 版本</div>
+    <div id="connectorProblems" class="cs-connector-problems hidden"></div>
+    <div id="connectorProgress" class="cs-connector-progress">尚未预检</div>
+    <div class="cs-modal-actions">
+      <button class="cs-btn" id="connectorClose">关闭</button>
+      <button class="cs-btn" id="connectorCompose">搭建环境</button>
+      <button class="cs-btn" id="connectorPreflight" disabled>重新预检</button>
+      <button class="cs-btn primary" id="connectorStart" disabled>物化并截图</button>
+      <button class="cs-btn" id="connectorCancel" disabled>取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- 新建仿真任务弹窗 -->
 <div id="taskModalOverlay" class="cs-modal-overlay hidden">
   <div class="cs-modal">
     <div class="cs-modal-title">新建仿真任务</div>
@@ -350,6 +379,7 @@
 <script src="../assets/lib/occt/o3dv.min.js"></script>
 <script src="structure_tree.js"></script>
 <script src="viewer3d.js"></script>
+<script src="capture_workflow.js"></script>
 <script src="cad_sim.js"></script>
 <script>
   // 主题同步

@@ -179,6 +179,8 @@ def test_lease_requires_a_fresh_ready_bound_session():
 
 
 def test_connector_capabilities_are_registered_with_closed_contracts():
+    from backend.capability_v2.business_definition import substantive_business_definition_errors
+
     class Registry:
         def __init__(self):
             self.items = []
@@ -195,6 +197,7 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
         assert spec.input_schema["additionalProperties"] is False
         assert spec.output_schema["additionalProperties"] is False
         assert descriptor.evidence_policy == "required"
+        assert substantive_business_definition_errors(descriptor) == ()
 
 
 def test_connector_heartbeat_route_passes_authenticated_device_identity(monkeypatch):

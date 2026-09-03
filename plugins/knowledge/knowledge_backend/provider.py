@@ -147,6 +147,17 @@ def descriptor_for(spec):
             f"Use {spec.replaced_by}." if deprecated and spec.replaced_by else None
         ),
     }
+    if spec.id == "knowledge.resource_model_mapping.resolve":
+        updates.update({
+            "business_effect": "Resolve each typed process resource code to one exact governed tool, equipment or fixture model version, returning all missing or ambiguous mappings.",
+            "business_acceptance_criteria": (
+                "Resolution preserves the caller-provided resource type and normalized code identity.",
+                "Every resolved item contains one immutable model and model-version reference.",
+                "Missing, ambiguous and over-limit mappings return governed diagnostics without selecting a candidate implicitly.",
+            ),
+            "business_invariants": (),
+            "no_business_invariant_reason": "This read applies existing governed mappings and returns deterministic diagnostics; it does not create, choose or mutate a mapping.",
+        })
     return CapabilityDescriptorV2.model_validate({**descriptor.model_dump(), **updates})
 
 

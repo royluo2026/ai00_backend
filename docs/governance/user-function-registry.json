@@ -1889,6 +1889,30 @@
         "plugins/craft/craft_backend/capabilities/contracts.py"
       ]
     },
+    "capability:craft.bop.entry.relation.list": {
+      "function_id": "capability:craft.bop.entry.relation.list",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.entry.relation.list",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_entry_relations.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/provider.py"
+      ]
+    },
     "capability:craft.bop.entry.search": {
       "function_id": "capability:craft.bop.entry.search",
       "domain": "Craft",
@@ -2260,7 +2284,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/capabilities/bop_lifecycle_state_change.py",
-        "plugins/craft/craft_backend/capabilities/contracts.py"
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
     "capability:craft.bop.lifecycle.state.read": {
@@ -2283,7 +2308,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/capabilities/bop_lifecycle_state.py",
-        "plugins/craft/craft_backend/capabilities/contracts.py"
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
     "capability:craft.bop.lifecycle.stats.refresh.apply": {
@@ -2306,7 +2332,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/capabilities/bop_lifecycle_stats_refresh.py",
-        "plugins/craft/craft_backend/capabilities/contracts.py"
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
     "capability:craft.bop.lifecycle.step.rollback.apply": {
@@ -2353,6 +2380,30 @@
       "source_paths": [
         "plugins/craft/craft_backend/capabilities/bop_line_operation_catia.py",
         "plugins/craft/craft_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:craft.bop.linked_entity.detail.get": {
+      "function_id": "capability:craft.bop.linked_entity.detail.get",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.linked_entity.detail.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/bop_entry_relations.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
     "capability:craft.bop.linked_parts.get": {
@@ -3957,7 +4008,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/capabilities/contracts.py",
-        "plugins/craft/craft_backend/capabilities/library_read.py"
+        "plugins/craft/craft_backend/capabilities/library_read.py",
+        "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
     "capability:craft.manufacturing_resource.change.apply": {
@@ -4276,6 +4328,30 @@
         "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
         "plugins/craft/craft_backend/capabilities/pbom_descriptors.py",
+        "plugins/craft/craft_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:craft.process_screenshot.attach": {
+      "function_id": "capability:craft.process_screenshot.attach",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.process_screenshot.attach",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/process_screenshot.py",
         "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
@@ -5014,6 +5090,7 @@
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/provider.py",
         "plugins/craft/craft_backend/capabilities/vpps_audit.py"
       ]
     },
@@ -5037,6 +5114,7 @@
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/provider.py",
         "plugins/craft/craft_backend/capabilities/vpps_audit.py"
       ]
     },
@@ -6844,7 +6922,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "plugins/knowledge/knowledge_backend/capabilities/reference_data.py"
+        "plugins/knowledge/knowledge_backend/capabilities/reference_data.py",
+        "plugins/knowledge/knowledge_backend/capabilities/resource_model_mapping.py"
       ]
     },
     "capability:knowledge.reference_dataset.publish": {
@@ -6868,6 +6947,28 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/knowledge/knowledge_backend/capabilities/reference_data.py"
+      ]
+    },
+    "capability:knowledge.resource_model_mapping.resolve": {
+      "function_id": "capability:knowledge.resource_model_mapping.resolve",
+      "domain": "Knowledge",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "knowledge.resource_model_mapping.resolve",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/knowledge/knowledge_backend/capabilities/resource_model_mapping.py"
       ]
     },
     "capability:knowledge.search": {
@@ -8425,6 +8526,102 @@
         "backend/capabilities/system_shared_next.py"
       ]
     },
+    "capability:simulation.capture_run.cancel": {
+      "function_id": "capability:simulation.capture_run.cancel",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.capture_run.cancel",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/simulation/simulation_backend/capabilities/capture_runs.py",
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:simulation.capture_run.get": {
+      "function_id": "capability:simulation.capture_run.get",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.capture_run.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/simulation/simulation_backend/capabilities/capture_runs.py",
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:simulation.capture_run.start": {
+      "function_id": "capability:simulation.capture_run.start",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.capture_run.start",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/simulation/simulation_backend/capabilities/capture_runs.py",
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:simulation.capture_step.retry": {
+      "function_id": "capability:simulation.capture_step.retry",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.capture_step.retry",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/simulation/simulation_backend/capabilities/capture_runs.py",
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/provider.py"
+      ]
+    },
     "capability:simulation.environment.archive": {
       "function_id": "capability:simulation.environment.archive",
       "domain": "Simulation",
@@ -8447,6 +8644,30 @@
         "backend/capabilities/agreed_catalog.py",
         "plugins/simulation/simulation_backend/capabilities/contracts.py",
         "plugins/simulation/simulation_backend/capabilities/models.py",
+        "plugins/simulation/simulation_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:simulation.environment.compose": {
+      "function_id": "capability:simulation.environment.compose",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.environment.compose",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/environment_composition.py",
         "plugins/simulation/simulation_backend/capabilities/provider.py"
       ]
     },
@@ -8497,6 +8718,126 @@
         "backend/capabilities/agreed_catalog.py",
         "plugins/simulation/simulation_backend/capabilities/contracts.py",
         "plugins/simulation/simulation_backend/capabilities/models.py",
+        "plugins/simulation/simulation_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:simulation.environment.manifest.archive": {
+      "function_id": "capability:simulation.environment.manifest.archive",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.environment.manifest.archive",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/environment_composition.py",
+        "plugins/simulation/simulation_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:simulation.environment.manifest.get": {
+      "function_id": "capability:simulation.environment.manifest.get",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.environment.manifest.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/environment_composition.py",
+        "plugins/simulation/simulation_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:simulation.environment.manifest.search": {
+      "function_id": "capability:simulation.environment.manifest.search",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.environment.manifest.search",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/environment_composition.py",
+        "plugins/simulation/simulation_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:simulation.environment.materialize": {
+      "function_id": "capability:simulation.environment.materialize",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.environment.materialize",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/simulation/simulation_backend/capabilities/capture_runs.py",
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:simulation.environment.preflight": {
+      "function_id": "capability:simulation.environment.preflight",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.environment.preflight",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/environment_composition.py",
         "plugins/simulation/simulation_backend/capabilities/provider.py"
       ]
     },
@@ -14622,6 +14963,28 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/users.py"
+      ]
+    },
+    "rest:GET:/api/v1/connector/plans/{plan_id}/artifacts/{artifact_id}": {
+      "function_id": "rest:GET:/api/v1/connector/plans/{plan_id}/artifacts/{artifact_id}",
+      "domain": "Device",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Device",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/device_runtime.py"
       ]
     },
     "rest:GET:/api/v1/device-runtime/commands/{command_gid}/artifacts/{artifact_id}": {
@@ -21255,6 +21618,94 @@
         "backend/routers/uploads.py"
       ]
     },
+    "rest:POST:/api/v1/connector/activate": {
+      "function_id": "rest:POST:/api/v1/connector/activate",
+      "domain": "Device",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Device",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/device_runtime.py"
+      ]
+    },
+    "rest:POST:/api/v1/connector/heartbeat": {
+      "function_id": "rest:POST:/api/v1/connector/heartbeat",
+      "domain": "Device",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Device",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/device_runtime.py"
+      ]
+    },
+    "rest:POST:/api/v1/connector/plans/lease": {
+      "function_id": "rest:POST:/api/v1/connector/plans/lease",
+      "domain": "Device",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Device",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/device_runtime.py"
+      ]
+    },
+    "rest:POST:/api/v1/connector/plans/{plan_id}/complete": {
+      "function_id": "rest:POST:/api/v1/connector/plans/{plan_id}/complete",
+      "domain": "Device",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Device",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/device_runtime.py"
+      ]
+    },
     "rest:POST:/api/v1/device-runtime/activate": {
       "function_id": "rest:POST:/api/v1/device-runtime/activate",
       "domain": "Device",
@@ -22371,6 +22822,28 @@
       "exclusion_reason": "rest:PUT:/api/uploads/{filename} is a ArtifactRef or OperationRef transfer protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/uploads.py"
+      ]
+    },
+    "rest:PUT:/api/v1/connector/plans/{plan_id}/steps/{step_id}/result-artifact": {
+      "function_id": "rest:PUT:/api/v1/connector/plans/{plan_id}/steps/{step_id}/result-artifact",
+      "domain": "Device",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Device",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/device_runtime.py"
       ]
     },
     "rest:PUT:/api/v1/device-runtime/commands/{command_gid}/result-artifact": {

@@ -950,6 +950,25 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 [data-theme="light"] .cs-dp-resize:hover,
 [data-theme="light"] .cs-dp-resize.active { background: var(--accent); }
 
+/* AI00 Connector governed capture */
+.cs-connector-modal { width: 640px; max-width: 94vw; }
+.cs-connector-note,
+.cs-connector-source,
+.cs-connector-progress,
+.cs-connector-problems {
+  margin: 8px 0;
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.cs-connector-note { color: var(--text-muted); background: var(--surface2); }
+.cs-connector-source { color: var(--accent2); font-family: monospace; }
+.cs-connector-progress { max-height: 220px; overflow: auto; white-space: pre-wrap; }
+.cs-connector-problems { color: var(--red); background: color-mix(in srgb, var(--red) 8%, transparent); }
+.cs-connector-step { display: grid; grid-template-columns: 1fr 80px 60px; gap: 8px; padding: 3px 0; border-top: 1px solid var(--border); }
+
 /* ── 详情面板左侧树 ──────────────────────────────────────────── */
 .cs-dp-tree {
   width: 240px;

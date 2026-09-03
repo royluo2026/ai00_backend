@@ -83,6 +83,7 @@ async function init() {
   _bindModal();
   _bindBopPanel();
   _bindVisPanel();
+  _initGovernedCapture();
   _initDetailPanel();
   await _tryAutoConnect();
   await _loadBopVersions();
@@ -1273,13 +1274,12 @@ function _bindVisPanel() {
       _cmdShow(r?.error || '扫描失败', 'err');
     }
   });
-  $('btnCaptureOps')?.addEventListener('click', _captureOpSequence);
+  $('btnCaptureOps')?.addEventListener('click', _openGovernedCapture);
 
   // 跨面板入口：assoc_panel 通过 window.top._cadSimCapture(lineGid, progressCb) 触发
   // 注意：lineage_view 可能嵌套在 craft_hub 内，window.parent 不是 workspace，需用 window.top
   const _topWin = window.top || window.parent || window;
-  _topWin._cadSimCapture = (lineGid, progressCb) =>
-    _captureOpSequence(lineGid, progressCb);
+  _topWin._cadSimCapture = () => _openGovernedCapture();
 }
 
 async function _loadVisTree(force = false) {
@@ -1857,6 +1857,84 @@ window._loadNodeGeoInline = async (nodeKey, sectionId) => {
 
 function _esc(s) {
   return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── AI00 Connector 受治理环境与截图流程 ──────────────────────────────────────
+let _governedCapture = null;
+
+function _renderGovernedCapture(state) {
+  const progress = $('connectorProgress');
+  const problems = $('connectorProblems');
+  if (!progress || !problems) return;
+  const issues = state.preflight?.problems || [];
+  problems.classList.toggle('hidden', issues.length === 0 && !state.error);
+  problems.textContent = state.error
+    ? `${state.error.code}: ${state.error.message}`
+    : issues.map(item => `${item.code}（期望 ${item.expected ?? '—'}，实际 ${item.actual ?? '—'}）`).join('\n');
+  const run = state.captureRun;
+  if (!run) {
+    progress.textContent = state.preflight?.compatible ? 'Connector 预检通过，可以开始。' : '尚未通过 Connector 预检。';
+  } else {
+    const rows = (run.steps || []).map(step =>
+      `${step.operation_id}  ·  ${step.status}  ·  attempt ${step.attempt}`
+    );
+    progress.textContent = [`运行 ${run.capture_run_id}：${run.status}`, ...rows].join('\n');
+  }
+  $('connectorStart').disabled = !_governedCapture?.canStartCapture();
+  $('connectorPreflight').disabled = !state.environmentId;
+  $('connectorCancel').disabled = !run || ['completed', 'failed', 'cancelled', 'outcome_unknown'].includes(run.status);
+}
+
+function _openGovernedCapture() {
+  const version = _bopVersions.find(item => item.gid === _selectedBopGid);
+  $('connectorSource').textContent = version
+    ? `${version.gid} · revision ${version.revision ?? '未知'} · ${version.content_hash || version.structure_hash || '缺少 content hash'}`
+    : '请先选择已发布的 BOP 版本';
+  $('connectorCaptureOverlay').classList.remove('hidden');
+}
+
+function _initGovernedCapture() {
+  const library = window.SimulationCaptureWorkflow;
+  const cloudFetch = window.parent?._cloudFetch || window._cloudFetch;
+  if (!library || typeof cloudFetch !== 'function') return;
+  const api = library.createGatewayApi(cloudFetch, {
+    approve: async capabilityId => window.confirm(`确认执行受治理能力 ${capabilityId}@1？`),
+  });
+  _governedCapture = library.createCaptureWorkflow({
+    invoke: (id, payload, options) => api.invoke(id, payload, options),
+    onChange: _renderGovernedCapture,
+  });
+  $('btnGovernedCapture')?.addEventListener('click', _openGovernedCapture);
+  $('connectorClose')?.addEventListener('click', () => $('connectorCaptureOverlay').classList.add('hidden'));
+  $('connectorCompose')?.addEventListener('click', async () => {
+    const version = _bopVersions.find(item => item.gid === _selectedBopGid);
+    const contentHash = version?.content_hash || version?.structure_hash;
+    const deviceId = $('connectorDeviceId').value.trim();
+    const revision = Number(version?.revision);
+    if (!version || !Number.isInteger(revision) || revision < 1 || !contentHash || !deviceId) {
+      _showBanner('请选择带 revision/content hash 的已发布 BOP，并填写 Connector 设备 ID', 'error');
+      return;
+    }
+    try {
+      const result = await _governedCapture.compose({
+        name: $('connectorEnvironmentName').value.trim() || '工艺倒序截图环境',
+        device_id: deviceId,
+        execution_plan_ref: { version_gid: version.gid, revision, content_hash: contentHash },
+        capture_profile: { format: 'png', width: 1920, height: 1080, background: 'current' },
+      });
+      if (result.status === 'composed') await _governedCapture.selectConnector(deviceId);
+    } catch (_) { /* state renderer displays stable code */ }
+  });
+  $('connectorPreflight')?.addEventListener('click', async () => {
+    try { await _governedCapture.selectConnector($('connectorDeviceId').value.trim()); } catch (_) {}
+  });
+  $('connectorStart')?.addEventListener('click', async () => {
+    try { await _governedCapture.startCapture(); } catch (_) {}
+  });
+  $('connectorCancel')?.addEventListener('click', async () => {
+    try { await _governedCapture.cancel(); } catch (_) {}
+  });
+  _renderGovernedCapture(_governedCapture.state);
 }
 
 window.addEventListener('message', e => {

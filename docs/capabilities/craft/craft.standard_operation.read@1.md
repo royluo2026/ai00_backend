@@ -8,7 +8,7 @@ Read bounded Craft standard operation library records.
 - 不适用：The outcome is a GBOP release or BOP execution operation.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_81acffa84ca2a65a2390a086d605e708`
+- Catalog Release：`rel_900dacb56a1cab69166515ec5b15ed10`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -98,7 +98,7 @@ Read bounded Craft standard operation library records.
 ```json
 {
   "capability_id": "craft.standard_operation.read",
-  "catalog_release": "rel_81acffa84ca2a65a2390a086d605e708",
+  "catalog_release": "rel_900dacb56a1cab69166515ec5b15ed10",
   "major_version": 1,
   "payload": {
     "operation": "list"
@@ -317,6 +317,7 @@ Read bounded Craft standard operation library records.
 - `resource_staging_not_found`：The requested TC resource staging row does not exist.（retryable=false）
 - `resource_staging_conflict`：The staging row was already decided or changed.（retryable=false）
 - `resource_type_mismatch`：The selected standard does not match the staged resource type.（retryable=false）
+- `screenshot_artifact_invalid`：The supplied screenshot is not a valid finalized image ArtifactRef.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

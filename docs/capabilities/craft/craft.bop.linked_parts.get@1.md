@@ -8,7 +8,7 @@ Read PBOM parts explicitly linked to a BOP and their usage locations.
 - 不适用：The caller is searching PBOM candidate parts.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_81acffa84ca2a65a2390a086d605e708`
+- Catalog Release：`rel_900dacb56a1cab69166515ec5b15ed10`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -96,7 +96,7 @@ Read PBOM parts explicitly linked to a BOP and their usage locations.
 ```json
 {
   "capability_id": "craft.bop.linked_parts.get",
-  "catalog_release": "rel_81acffa84ca2a65a2390a086d605e708",
+  "catalog_release": "rel_900dacb56a1cab69166515ec5b15ed10",
   "major_version": 1,
   "payload": {
     "version_gid": "example"
@@ -307,6 +307,7 @@ Read PBOM parts explicitly linked to a BOP and their usage locations.
 - `resource_staging_not_found`：The requested TC resource staging row does not exist.（retryable=false）
 - `resource_staging_conflict`：The staging row was already decided or changed.（retryable=false）
 - `resource_type_mismatch`：The selected standard does not match the staged resource type.（retryable=false）
+- `screenshot_artifact_invalid`：The supplied screenshot is not a valid finalized image ArtifactRef.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

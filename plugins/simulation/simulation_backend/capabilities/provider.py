@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from backend.capability_v2.contracts import AutomationLevel, CapabilityDescriptorV2, DomainErrorContract, ExecutionMode, ExposurePolicy, LifecycleStatus, ResourceSelector, SideEffectLevel
+from backend.capability_v2.contracts import AutomationLevel, BusinessInvariantContract, CapabilityDescriptorV2, DomainErrorContract, ExecutionMode, ExposurePolicy, LifecycleStatus, ResourceSelector, SideEffectLevel
 from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec
 
 from .contracts import INPUT_SCHEMAS, OUTPUT_SCHEMAS
@@ -86,6 +86,86 @@ _RETRYABLE_ERROR_CODES = frozenset({
     "capture_failed", "artifact_upload_unconfirmed", "craft_screenshot_attach_failed",
 })
 
+_CONNECTOR_BUSINESS_EFFECTS = {
+    "simulation.environment.compose": "Create one immutable, reproducible simulation-environment manifest from the selected process version, active VisMockup BOM and governed resource-model mappings.",
+    "simulation.environment.manifest.get": "Return one caller-visible immutable simulation-environment manifest with its exact source and Connector contract pins.",
+    "simulation.environment.manifest.search": "Return a bounded caller-visible list of simulation-environment manifests for reuse and audit.",
+    "simulation.environment.manifest.archive": "Archive a simulation-environment identity while retaining every immutable manifest and execution record for audit.",
+    "simulation.environment.preflight": "Report every known incompatibility between an immutable environment manifest and the bound AI00 Connector session without starting local work.",
+    "simulation.environment.materialize": "Queue construction and verification of the exact immutable simulation environment in the bound user's VisMockup session.",
+    "simulation.capture_run.start": "Queue VisMockup-internal screenshots in reverse process order for an exact environment manifest and attach confirmed artifacts to their Craft operations.",
+    "simulation.capture_run.get": "Return authoritative capture-run, step and artifact-association progress for the caller-visible run.",
+    "simulation.capture_run.cancel": "Cancel only capture work that has not started while preserving active and completed outcomes for reconciliation.",
+    "simulation.capture_step.retry": "Create a new attempt for one proven-failed capture step without replaying successful or outcome-unknown local effects.",
+}
+
+_CONNECTOR_READ_REASON = (
+    "This capability returns a bounded projection or compatibility diagnosis and does not decide or mutate domain state."
+)
+
+_CONNECTOR_BUSINESS_INVARIANTS = {
+    "simulation.environment.compose": (
+        BusinessInvariantContract(
+            rule_id="simulation.environment.compose.atomic_manifest", version=1,
+            statement="Composition persists no environment manifest unless every product and resource binding resolves to an exact immutable source.",
+            applies_when="a Connector environment is composed",
+            enforcement_ref="plugins/simulation/simulation_backend/capabilities/environment_composition.py:EnvironmentCompositionProvider.compose",
+            error_code="environment_binding_invalid",
+            test_refs=("backend/tests/test_simulation_environment_composition_capabilities.py::test_compose_returns_every_problem_and_persists_nothing",),
+        ),
+    ),
+    "simulation.environment.manifest.archive": (
+        BusinessInvariantContract(
+            rule_id="simulation.environment.archive.preserve_manifests", version=1,
+            statement="Archiving changes only the environment identity lifecycle and never mutates an immutable manifest.",
+            applies_when="a Connector environment is archived",
+            enforcement_ref="plugins/simulation/simulation_backend/data/environment_repository.py:archive",
+            error_code="simulation_environment_not_found",
+            test_refs=("backend/tests/test_simulation_environment_manifest.py::test_manifest_is_independent_of_input_collection_order",),
+        ),
+    ),
+    "simulation.environment.materialize": (
+        BusinessInvariantContract(
+            rule_id="simulation.environment.materialize.exact_manifest", version=1,
+            statement="Local materialization uses the pinned manifest and verifies the resulting VisMockup scene before completion.",
+            applies_when="an immutable environment is materialized",
+            enforcement_ref="plugins/simulation/simulation_backend/application/connector_plans.py:build_materialization_plan",
+            error_code="scene_verification_failed",
+            test_refs=("backend/tests/test_simulation_capture_workflow.py::test_materialization_plan_attaches_models_before_scene_verification",),
+        ),
+    ),
+    "simulation.capture_run.start": (
+        BusinessInvariantContract(
+            rule_id="simulation.capture.reverse_process_order", version=1,
+            statement="Capture steps execute in descending process sequence and use VisMockup internal capture for the verified scene.",
+            applies_when="a process screenshot run is started",
+            enforcement_ref="plugins/simulation/simulation_backend/application/connector_plans.py:build_capture_plan",
+            error_code="capture_failed",
+            test_refs=("backend/tests/test_simulation_capture_workflow.py::test_capture_plan_orders_operations_descending",),
+        ),
+    ),
+    "simulation.capture_run.cancel": (
+        BusinessInvariantContract(
+            rule_id="simulation.capture.cancel.unstarted_only", version=1,
+            statement="Cancellation stops only queued steps and preserves active, completed and uncertain local outcomes.",
+            applies_when="a capture run is cancelled",
+            enforcement_ref="plugins/simulation/simulation_backend/application/capture_worker.py:cancel",
+            error_code="local_execution_outcome_unknown",
+            test_refs=("backend/tests/test_simulation_capture_workflow.py::test_cancel_stops_only_unstarted_steps",),
+        ),
+    ),
+    "simulation.capture_step.retry": (
+        BusinessInvariantContract(
+            rule_id="simulation.capture.retry.proven_failed_only", version=1,
+            statement="Retry creates a new attempt only after failure is proven and never replays an outcome-unknown step.",
+            applies_when="a capture step retry is requested",
+            enforcement_ref="plugins/simulation/simulation_backend/application/capture_worker.py:retry",
+            error_code="local_execution_outcome_unknown",
+            test_refs=("backend/tests/test_simulation_capture_workflow.py::test_outcome_unknown_requires_reconciliation_before_retry",),
+        ),
+    ),
+}
+
 
 def _errors(*, connector_environment: bool) -> tuple[DomainErrorContract, ...]:
     return tuple(
@@ -128,6 +208,18 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         "domain_errors": _errors(connector_environment="connector_environment" in governed.tags),
         "domain_errors_complete": True,
     }
+    if "connector_environment" in governed.tags:
+        invariants = _CONNECTOR_BUSINESS_INVARIANTS.get(governed.id, ())
+        updates.update({
+            "business_effect": _CONNECTOR_BUSINESS_EFFECTS[governed.id],
+            "business_acceptance_criteria": (
+                "The result is scoped to the caller-visible immutable environment or capture-run identity.",
+                "Inputs and outputs satisfy the closed published contract and retain exact source version pins.",
+                "Rejected or uncertain local outcomes return a governed error and durable reconciliation evidence.",
+            ),
+            "business_invariants": invariants,
+            "no_business_invariant_reason": None if invariants else _CONNECTOR_READ_REASON,
+        })
     return CapabilityDescriptorV2.model_validate({**descriptor.model_dump(), **updates})
 
 

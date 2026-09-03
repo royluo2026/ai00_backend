@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from backend.capability_v2.contracts import AutomationLevel, DomainErrorContract, ExecutionMode, ExposurePolicy, LifecycleStatus, ResourceSelector, SideEffectLevel
+from backend.capability_v2.contracts import AutomationLevel, BusinessInvariantContract, DomainErrorContract, ExecutionMode, ExposurePolicy, LifecycleStatus, ResourceSelector, SideEffectLevel
 from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec
 
 from .contracts import INPUT_SCHEMAS, OUTPUT_SCHEMAS
@@ -37,7 +37,7 @@ def descriptor_for(spec: Any):
         selectors.append(ResourceSelector(resource_type="device", payload_path="plan.device_id"))
     if governed.id == "vismockup.model.open":
         selectors.append(ResourceSelector(resource_type="artifact", payload_path="artifact_ref.artifact_id"))
-    return descriptor.model_copy(update={
+    updates = {
         "lifecycle_status": (
             LifecycleStatus.DEPRECATED
             if governed.id in DEPRECATED_LOCAL_DEVICE_CAPABILITIES
@@ -60,7 +60,39 @@ def descriptor_for(spec: Any):
         "concurrency_policy": "none", "idempotency_policy": "required" if is_write else ("optional" if is_local else "none"),
         "consistency_policy": "external" if is_local else "strong", "evidence_policy": "required",
         "domain_errors": _ERRORS, "domain_errors_complete": True,
-    })
+    }
+    if governed.id == "device.connector.health.get":
+        updates.update({
+            "business_effect": "Return the authenticated workstation's bounded AI00 Connector, user-session, adapter and target-application health projection.",
+            "business_acceptance_criteria": (
+                "Health is returned only for the caller-owned device identity.",
+                "The projection identifies the bound user, interactive session and advertised Adapter contracts.",
+                "Reading health does not queue or execute local application work.",
+            ),
+            "business_invariants": (),
+            "no_business_invariant_reason": "This read reports already-recorded, caller-scoped Connector health and does not decide or mutate domain state.",
+        })
+    elif governed.id == "device.connector.plan.queue":
+        updates.update({
+            "business_effect": "Authenticate, validate and durably queue one exact signed execution plan for the bound user's AI00 Connector.",
+            "business_acceptance_criteria": (
+                "The plan targets one caller-owned device and its bound user.",
+                "The queued payload retains the exact protocol, Adapter operation contracts and idempotency identity.",
+                "Rejected plans do not create executable local work.",
+            ),
+            "business_invariants": (
+                BusinessInvariantContract(
+                    rule_id="device.connector.plan.bound_identity", version=1,
+                    statement="A Connector plan is queued only for the authenticated device and its single bound AI00 user.",
+                    applies_when="a local Connector execution plan is queued",
+                    enforcement_ref="plugins/device/device_backend/capabilities/connector_runtime.py:ConnectorControlPlane.queue_plan",
+                    error_code="device_not_found",
+                    test_refs=("backend/tests/test_connector_runtime_control_plane.py::test_queue_checks_protocol_adapter_operation_and_contract_hash",),
+                ),
+            ),
+            "no_business_invariant_reason": None,
+        })
+    return descriptor.model_copy(update=updates)
 
 
 def register(registry: Any, spec: Any, handler: Any) -> None:

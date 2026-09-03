@@ -8,7 +8,7 @@ Execute Knowledge operation folders.update.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_81acffa84ca2a65a2390a086d605e708`
+- Catalog Release：`rel_900dacb56a1cab69166515ec5b15ed10`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -196,7 +196,7 @@ Execute Knowledge operation folders.update.
 ```json
 {
   "capability_id": "knowledge.hub.change.apply.atomic.folders_update",
-  "catalog_release": "rel_81acffa84ca2a65a2390a086d605e708",
+  "catalog_release": "rel_900dacb56a1cab69166515ec5b15ed10",
   "major_version": 1,
   "payload": {}
 }
@@ -265,6 +265,13 @@ Execute Knowledge operation folders.update.
 - `knowledge_storage_unavailable`：The immutable Knowledge object store is unavailable.（retryable=true）
 - `publication_in_progress`：Another worker owns the current publication lease.（retryable=true）
 - `self_review_forbidden`：Proposal creators cannot approve or reject their own proposal.（retryable=false）
+- `resource_type_invalid`：The supplied resource type is not tool, equipment, or fixture.（retryable=false）
+- `resource_code_invalid`：The supplied resource code is blank after normalization.（retryable=false）
+- `mapping_batch_limit_exceeded`：The resolver request contains more than 500 unique typed codes.（retryable=false）
+- `mapping_candidate_limit_exceeded`：One typed resource code has more than 100 active model mappings.（retryable=false）
+- `mapping_snapshot_changed`：The requested mapping snapshot is no longer current.（retryable=false）
+- `mapping_data_invalid`：A stored resource mapping is not a valid immutable Digital Model reference.（retryable=false）
+- `tenant_context_required`：Resource mappings cannot be resolved without an authenticated tenant scope.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

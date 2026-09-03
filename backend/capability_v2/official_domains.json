@@ -122,7 +122,7 @@
         "plugin_id": "official.device",
         "module": "device_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:85c7ee0aa82ed02b3c9a09e0121a7271966b471655e95421702db19ff0aeec2c"
+        "artifact_hash": "sha256:1648988930b801a625177f2cef8e6596e5d34121107c3b7a76d3222e53d30991"
       },
       "artifact_path": "plugins/device/device_backend",
       "allowed_owners": [
@@ -224,7 +224,7 @@
         "plugin_id": "official.knowledge",
         "module": "knowledge_backend.capabilities",
         "version": "2.0.0",
-        "artifact_hash": "sha256:997d1b8a5a2bdf77935c1b2a26bcd1268929d5708d386182b1786b8a1684d7dc"
+        "artifact_hash": "sha256:2704f2b18c7cfa4c7dd6bebda7fa00a4512c7ec409a3ddb9bf6298c637de42df"
       },
       "artifact_path": "plugins/knowledge/knowledge_backend",
       "allowed_owners": [
@@ -304,7 +304,7 @@
         "plugin_id": "official.simulation",
         "module": "simulation_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:7e74bc31cbf64e885cec5d933c0b2b4bbbb99ce73138b0515c2d210e9f124200"
+        "artifact_hash": "sha256:6e43df06f3c061d9e48be7edbd5c1c1d782d6f27d13bd47b65032b68a6869caf"
       },
       "artifact_path": "plugins/simulation/simulation_backend",
       "allowed_owners": [

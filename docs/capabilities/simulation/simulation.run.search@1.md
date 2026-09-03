@@ -8,7 +8,7 @@ Search Simulation runs.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`simulation`
-- Catalog Release：`rel_81acffa84ca2a65a2390a086d605e708`
+- Catalog Release：`rel_900dacb56a1cab69166515ec5b15ed10`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -88,7 +88,7 @@ Search Simulation runs.
 ```json
 {
   "capability_id": "simulation.run.search",
-  "catalog_release": "rel_81acffa84ca2a65a2390a086d605e708",
+  "catalog_release": "rel_900dacb56a1cab69166515ec5b15ed10",
   "major_version": 1,
   "payload": {}
 }

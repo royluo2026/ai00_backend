@@ -8,7 +8,7 @@ Read redacted runtime database configuration.
 - 不适用：A business domain needs to access its own governed database.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_81acffa84ca2a65a2390a086d605e708`
+- Catalog Release：`rel_900dacb56a1cab69166515ec5b15ed10`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -79,7 +79,7 @@ Read redacted runtime database configuration.
 ```json
 {
   "capability_id": "base.runtime.database_config.get",
-  "catalog_release": "rel_81acffa84ca2a65a2390a086d605e708",
+  "catalog_release": "rel_900dacb56a1cab69166515ec5b15ed10",
   "major_version": 1,
   "payload": {}
 }
