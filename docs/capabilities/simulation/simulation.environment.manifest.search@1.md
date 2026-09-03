@@ -8,7 +8,7 @@ Search visible Connector environment manifests.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`simulation`
-- Catalog Release：`rel_db5fec04f77dd6835b325ef80c4da522`
+- Catalog Release：`rel_f91a658427dcd1990d752a720f0a7493`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -85,7 +85,7 @@ Search visible Connector environment manifests.
 ```json
 {
   "capability_id": "simulation.environment.manifest.search",
-  "catalog_release": "rel_db5fec04f77dd6835b325ef80c4da522",
+  "catalog_release": "rel_f91a658427dcd1990d752a720f0a7493",
   "major_version": 1,
   "payload": {}
 }
@@ -611,6 +611,7 @@ Search visible Connector environment manifests.
 - `materialization_run_not_found`：The materialization run is unavailable or not visible.（retryable=false）
 - `materialization_action_not_ready`：The materialization action is not ready to dispatch.（retryable=false）
 - `plan_outcome_invalid`：The Connector outcome does not match the immutable execution plan.（retryable=false）
+- `capability_migration_required`：This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

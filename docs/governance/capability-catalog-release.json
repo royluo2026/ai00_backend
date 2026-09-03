@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_db5fec04f77dd6835b325ef80c4da522",
-  "catalog_hash": "sha256:db5fec04f77dd6835b325ef80c4da522ca8cf51fad6a0e3780d800b453193034",
+  "release_id": "rel_f91a658427dcd1990d752a720f0a7493",
+  "catalog_hash": "sha256:f91a658427dcd1990d752a720f0a749317e7d3d9e2d028757fde03bc1ed1c23e",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -134573,6 +134573,12 @@
           "meaning": "The Local Runtime application provider is unavailable.",
           "retryable": true,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated Connector queue version must migrate to @2.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -134612,6 +134618,12 @@
           "error_code": "provider_unavailable",
           "message_template": "The Local Runtime application provider is unavailable.",
           "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated Connector queue version must migrate to @2.",
+          "is_retryable": false,
           "is_caller_error": false
         }
       ],
@@ -134675,7 +134687,7 @@
       "id": "device.connector.plan.queue",
       "major_version": 1,
       "owner_domain": "device",
-      "lifecycle_status": "stable",
+      "lifecycle_status": "deprecated",
       "catalog_release": null,
       "title": "device.connector.plan.queue",
       "description": "Queue one immutable compatible ExecutionPlan for an owned AI00 Connector.",
@@ -134706,11 +134718,11 @@
       "side_effects": "Writes device domain state through its Provider and records a capability audit event.",
       "execution_mode": "cloud_sync",
       "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -134955,7 +134967,7 @@
       "confirmation_policy": "user",
       "evidence_policy": "required",
       "audit_policy": "standard",
-      "deprecation_message": null,
+      "deprecation_message": "Strong-consistency queue @1 is closed; migrate to device.connector.plan.queue@2.",
       "domain_errors": [
         {
           "code": "device_not_found",
@@ -134991,6 +135003,12 @@
           "code": "provider_unavailable",
           "meaning": "The Local Runtime application provider is unavailable.",
           "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated Connector queue version must migrate to @2.",
+          "retryable": false,
           "is_caller_error": false
         }
       ],
@@ -135031,6 +135049,12 @@
           "error_code": "provider_unavailable",
           "message_template": "The Local Runtime application provider is unavailable.",
           "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated Connector queue version must migrate to @2.",
+          "is_retryable": false,
           "is_caller_error": false
         }
       ],
@@ -135094,7 +135118,7 @@
       "id": "device.connector.plan.queue",
       "major_version": 2,
       "owner_domain": "device",
-      "lifecycle_status": "stable",
+      "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "device.connector.plan.queue",
       "description": "Queue one immutable compatible ExecutionPlan using external Connector consistency.",
@@ -135411,6 +135435,12 @@
           "meaning": "The Local Runtime application provider is unavailable.",
           "retryable": true,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated Connector queue version must migrate to @2.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -135450,6 +135480,12 @@
           "error_code": "provider_unavailable",
           "message_template": "The Local Runtime application provider is unavailable.",
           "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated Connector queue version must migrate to @2.",
+          "is_retryable": false,
           "is_caller_error": false
         }
       ],
@@ -181473,6 +181509,12 @@
           "meaning": "The Local Runtime application provider is unavailable.",
           "retryable": true,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated Connector queue version must migrate to @2.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -181512,6 +181554,12 @@
           "error_code": "provider_unavailable",
           "message_template": "The Local Runtime application provider is unavailable.",
           "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated Connector queue version must migrate to @2.",
+          "is_retryable": false,
           "is_caller_error": false
         }
       ],
@@ -181711,6 +181759,12 @@
           "meaning": "The Local Runtime application provider is unavailable.",
           "retryable": true,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated Connector queue version must migrate to @2.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -181750,6 +181804,12 @@
           "error_code": "provider_unavailable",
           "message_template": "The Local Runtime application provider is unavailable.",
           "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated Connector queue version must migrate to @2.",
+          "is_retryable": false,
           "is_caller_error": false
         }
       ],
@@ -181949,6 +182009,12 @@
           "meaning": "The Local Runtime application provider is unavailable.",
           "retryable": true,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated Connector queue version must migrate to @2.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -181988,6 +182054,12 @@
           "error_code": "provider_unavailable",
           "message_template": "The Local Runtime application provider is unavailable.",
           "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated Connector queue version must migrate to @2.",
+          "is_retryable": false,
           "is_caller_error": false
         }
       ],
@@ -249805,6 +249877,12 @@
           "meaning": "The Connector outcome does not match the immutable execution plan.",
           "retryable": false,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -250053,6 +250131,12 @@
         {
           "error_code": "plan_outcome_invalid",
           "message_template": "The Connector outcome does not match the immutable execution plan.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -250491,6 +250575,12 @@
           "meaning": "The Connector outcome does not match the immutable execution plan.",
           "retryable": false,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -250739,6 +250829,12 @@
         {
           "error_code": "plan_outcome_invalid",
           "message_template": "The Connector outcome does not match the immutable execution plan.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -251477,6 +251573,12 @@
           "meaning": "The Connector outcome does not match the immutable execution plan.",
           "retryable": false,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -251725,6 +251827,12 @@
         {
           "error_code": "plan_outcome_invalid",
           "message_template": "The Connector outcome does not match the immutable execution plan.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -252450,6 +252558,12 @@
           "meaning": "The Connector outcome does not match the immutable execution plan.",
           "retryable": false,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -252700,6 +252814,12 @@
           "message_template": "The Connector outcome does not match the immutable execution plan.",
           "is_retryable": false,
           "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "is_retryable": false,
+          "is_caller_error": false
         }
       ],
       "transaction_policy": {
@@ -252762,13 +252882,856 @@
       "id": "simulation.capture_run.start",
       "major_version": 1,
       "owner_domain": "simulation",
-      "lifecycle_status": "stable",
+      "lifecycle_status": "deprecated",
       "catalog_release": null,
       "title": "simulation.capture_run.start",
       "description": "Queue internal VisMockup captures in reverse process order.",
       "use_when": "Queue internal VisMockup captures in reverse process order.",
       "do_not_use_when": "Use the owning domain's governed Capability.",
       "business_effect": "Queue VisMockup-internal screenshots in reverse process order for an exact environment manifest and attach confirmed artifacts to their Craft operations.",
+      "business_acceptance_criteria": [
+        "The result is scoped to the caller-visible immutable environment or capture-run identity.",
+        "Inputs and outputs satisfy the closed published contract and retain exact source version pins.",
+        "Rejected or uncertain local outcomes return a governed error and durable reconciliation evidence."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "simulation.capture.reverse_process_order",
+          "version": 1,
+          "statement": "Capture steps execute in descending process sequence and use VisMockup internal capture for the verified scene.",
+          "applies_when": "a process screenshot run is started",
+          "enforcement_ref": "plugins/simulation/simulation_backend/application/connector_plans.py:build_capture_plan",
+          "error_code": "capture_failed",
+          "test_refs": [
+            "backend/tests/test_simulation_capture_workflow.py::test_capture_plan_orders_operations_descending"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Writes simulation domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-environment",
+          "payload_path": "environment_id",
+          "required": true
+        },
+        {
+          "resource_type": "device",
+          "payload_path": "device_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "environment_id": {
+            "type": "string"
+          },
+          "environment_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "device_id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "environment_id",
+          "environment_version",
+          "device_id"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "capture_run_id": {
+            "type": "string"
+          },
+          "environment_id": {
+            "type": "string"
+          },
+          "environment_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "manifest_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "device_id": {
+            "type": "string"
+          },
+          "plan_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "leased",
+              "running",
+              "cancelling",
+              "completed",
+              "partial",
+              "failed",
+              "cancelled",
+              "outcome_unknown"
+            ]
+          },
+          "operation_ref": {
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "running",
+                  "completed",
+                  "failed",
+                  "cancelled",
+                  "outcome_unknown"
+                ]
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ]
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "operation_id": {
+                  "type": "string"
+                },
+                "sequence": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "queued",
+                    "running",
+                    "completed",
+                    "failed",
+                    "skipped",
+                    "cancelled",
+                    "outcome_unknown"
+                  ]
+                },
+                "attempt": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "artifact_ref": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "artifact_id": {
+                          "type": "string"
+                        },
+                        "media_type": {
+                          "type": "string"
+                        },
+                        "sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$",
+                          "example": "0000000000000000000000000000000000000000000000000000000000000000"
+                        },
+                        "byte_size": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "artifact_id",
+                        "media_type",
+                        "sha256",
+                        "byte_size",
+                        "version"
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "artifact_attached": {
+                  "type": "boolean"
+                },
+                "expected_scene_hash": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$",
+                  "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "operation_id",
+                "sequence",
+                "status",
+                "attempt",
+                "artifact_ref",
+                "artifact_attached",
+                "expected_scene_hash"
+              ]
+            },
+            "maxItems": 3000
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "capture_run_id",
+          "environment_id",
+          "environment_version",
+          "manifest_hash",
+          "device_id",
+          "plan_id",
+          "status",
+          "operation_ref",
+          "steps"
+        ]
+      },
+      "agent_output_schema": null,
+      "schema_hash": "sha256:c9f37c5adbdcb00b63a9f2ec973b801f774824b64d7cf3accceed821b3d2e653",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": "Immediate dispatch is closed; migrate to simulation.capture_run.start@2 and its action/dispatch workflow.",
+      "domain_errors": [
+        {
+          "code": "source_resolver_unavailable",
+          "meaning": "A required owning-domain resolver is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "source_version_mismatch",
+          "meaning": "A referenced source no longer matches its immutable hash or version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "parameter_set_not_found",
+          "meaning": "The immutable parameter set is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_profile_not_found",
+          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_environment_not_found",
+          "meaning": "The Simulation environment is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_run_not_found",
+          "meaning": "The Simulation run is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_result_not_ready",
+          "meaning": "The Simulation run has no completed result artifacts.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different Simulation request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "execution_plan_unavailable",
+          "meaning": "The pinned Craft execution plan is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "active_document_unavailable",
+          "meaning": "The Connector has no readable active document.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "active_document_snapshot_required",
+          "meaning": "A confirmed asynchronous active-document snapshot is required.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "document_snapshot_not_found",
+          "meaning": "The document snapshot request is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "document_snapshot_action_not_ready",
+          "meaning": "The prepared document snapshot action is not ready to dispatch.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_snapshot_invalid",
+          "meaning": "The Connector returned an invalid active BOM snapshot.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_identity_mismatch",
+          "meaning": "The active BOM identity does not match the requested source.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_snapshot_limit_exceeded",
+          "meaning": "The active BOM exceeds the governed snapshot limit.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "product_binding_not_found",
+          "meaning": "A process product reference has no active BOM node.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "product_binding_ambiguous",
+          "meaning": "A process product reference resolves to multiple BOM nodes.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_model_not_found",
+          "meaning": "A typed resource code has no model mapping.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_model_ambiguous",
+          "meaning": "A typed resource code has multiple active model mappings.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "environment_source_changed",
+          "meaning": "A pinned environment source changed before composition.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "connector_offline",
+          "meaning": "The bound Connector is offline or stale.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "connector_version_incompatible",
+          "meaning": "The Connector protocol or target product version is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "adapter_unavailable",
+          "meaning": "The required Connector Adapter is unavailable.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "adapter_contract_mismatch",
+          "meaning": "An Adapter operation contract hash does not match.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "interactive_session_missing",
+          "meaning": "The bound user's interactive SessionHost is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "interactive_session_conflict",
+          "meaning": "More than one fresh SessionHost claims the bound user.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bound_user_mismatch",
+          "meaning": "The Connector is bound to a different AI00 user.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "vismockup_unavailable",
+          "meaning": "VisMockup is unavailable to the bound SessionHost.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "vismockup_document_changed",
+          "meaning": "The active VisMockup document changed during execution.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "scene_verification_failed",
+          "meaning": "The actual VisMockup scene does not match the manifest.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "capture_failed",
+          "meaning": "VisMockup internal view capture failed.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "artifact_upload_unconfirmed",
+          "meaning": "A captured Artifact upload has not been reconciled.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "craft_screenshot_attach_failed",
+          "meaning": "Craft rejected or failed the screenshot association.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "local_execution_outcome_unknown",
+          "meaning": "The local side effect outcome requires reconciliation.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "downstream_confirmation_required",
+          "meaning": "The exact downstream action requires a separately issued user confirmation.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "capture_action_not_ready",
+          "meaning": "No capture action is currently ready to dispatch.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "materialization_run_not_found",
+          "meaning": "The materialization run is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "materialization_action_not_ready",
+          "meaning": "The materialization action is not ready to dispatch.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "plan_outcome_invalid",
+          "meaning": "The Connector outcome does not match the immutable execution plan.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_f5a31692b1774e7457466cfb",
+      "error_schema": [
+        {
+          "error_code": "source_resolver_unavailable",
+          "message_template": "A required owning-domain resolver is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "source_version_mismatch",
+          "message_template": "A referenced source no longer matches its immutable hash or version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "parameter_set_not_found",
+          "message_template": "The immutable parameter set is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_profile_not_found",
+          "message_template": "The immutable Simulation profile is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "solver_not_allowed",
+          "message_template": "The requested solver coordinate is not in the governed allowlist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_environment_not_found",
+          "message_template": "The Simulation environment is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_run_not_found",
+          "message_template": "The Simulation run is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_result_not_ready",
+          "message_template": "The Simulation run has no completed result artifacts.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different Simulation request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "execution_plan_unavailable",
+          "message_template": "The pinned Craft execution plan is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "active_document_unavailable",
+          "message_template": "The Connector has no readable active document.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "active_document_snapshot_required",
+          "message_template": "A confirmed asynchronous active-document snapshot is required.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "document_snapshot_not_found",
+          "message_template": "The document snapshot request is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "document_snapshot_action_not_ready",
+          "message_template": "The prepared document snapshot action is not ready to dispatch.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_snapshot_invalid",
+          "message_template": "The Connector returned an invalid active BOM snapshot.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_identity_mismatch",
+          "message_template": "The active BOM identity does not match the requested source.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_snapshot_limit_exceeded",
+          "message_template": "The active BOM exceeds the governed snapshot limit.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "product_binding_not_found",
+          "message_template": "A process product reference has no active BOM node.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "product_binding_ambiguous",
+          "message_template": "A process product reference resolves to multiple BOM nodes.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_model_not_found",
+          "message_template": "A typed resource code has no model mapping.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_model_ambiguous",
+          "message_template": "A typed resource code has multiple active model mappings.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "environment_source_changed",
+          "message_template": "A pinned environment source changed before composition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "connector_offline",
+          "message_template": "The bound Connector is offline or stale.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "connector_version_incompatible",
+          "message_template": "The Connector protocol or target product version is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "adapter_unavailable",
+          "message_template": "The required Connector Adapter is unavailable.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "adapter_contract_mismatch",
+          "message_template": "An Adapter operation contract hash does not match.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "interactive_session_missing",
+          "message_template": "The bound user's interactive SessionHost is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "interactive_session_conflict",
+          "message_template": "More than one fresh SessionHost claims the bound user.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bound_user_mismatch",
+          "message_template": "The Connector is bound to a different AI00 user.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "vismockup_unavailable",
+          "message_template": "VisMockup is unavailable to the bound SessionHost.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "vismockup_document_changed",
+          "message_template": "The active VisMockup document changed during execution.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "scene_verification_failed",
+          "message_template": "The actual VisMockup scene does not match the manifest.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capture_failed",
+          "message_template": "VisMockup internal view capture failed.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "artifact_upload_unconfirmed",
+          "message_template": "A captured Artifact upload has not been reconciled.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "craft_screenshot_attach_failed",
+          "message_template": "Craft rejected or failed the screenshot association.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "local_execution_outcome_unknown",
+          "message_template": "The local side effect outcome requires reconciliation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "downstream_confirmation_required",
+          "message_template": "The exact downstream action requires a separately issued user confirmation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capture_action_not_ready",
+          "message_template": "No capture action is currently ready to dispatch.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "materialization_run_not_found",
+          "message_template": "The materialization run is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "materialization_action_not_ready",
+          "message_template": "The materialization action is not ready to dispatch.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plan_outcome_invalid",
+          "message_template": "The Connector outcome does not match the immutable execution plan.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "The unsafe immediate-dispatch contract is frozen with no verified runtime consumer and accepts no new traffic.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.capture_run.start:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.capture_run.start@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.capture_run.start@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.capture_run.start@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.capture_run.start@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.capture_run.start@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.capture_run.start@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.capture_run.start@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:d67456c0d656fc2064b92aad8526a6f6c1f14aa3a2e4a3cf19e154d4d20c6f19"
+    },
+    {
+      "id": "simulation.capture_run.start",
+      "major_version": 2,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.capture_run.start",
+      "description": "Prepare reverse-order internal VisMockup captures for separately confirmed dispatch.",
+      "use_when": "Prepare reverse-order internal VisMockup captures for separately confirmed dispatch.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Prepare reverse-order VisMockup-internal screenshot steps; each Device or Craft action is dispatched only after separate exact confirmation.",
       "business_acceptance_criteria": [
         "The result is scoped to the caller-visible immutable environment or capture-run identity.",
         "Inputs and outputs satisfy the closed published contract and retain exact source version pins.",
@@ -253450,10 +254413,16 @@
           "meaning": "The Connector outcome does not match the immutable execution plan.",
           "retryable": false,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
-      "capability_version_gid": "cv2_f5a31692b1774e7457466cfb",
+      "capability_version_gid": "cv2_7691c436a7b73bbdba95083c",
       "error_schema": [
         {
           "error_code": "source_resolver_unavailable",
@@ -253700,6 +254669,12 @@
           "message_template": "The Connector outcome does not match the immutable execution plan.",
           "is_retryable": false,
           "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "is_retryable": false,
+          "is_caller_error": false
         }
       ],
       "transaction_policy": {
@@ -253715,48 +254690,48 @@
       "test_refs": [
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.capture_run.start@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.capture_run.start@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.capture_run.start@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.capture_run.start@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.capture_run.start@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.capture_run.start@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.capture_run.start@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.capture_run.start@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.capture_run.start@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.capture_run.start@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.capture_run.start@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.capture_run.start@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.capture_run.start@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.capture_run.start@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:d67456c0d656fc2064b92aad8526a6f6c1f14aa3a2e4a3cf19e154d4d20c6f19"
+      "business_definition_hash": "sha256:2cce92ce983c8f57628871b11fad65383f8c59e6f37b1c9116741e3ef190c637"
     },
     {
       "id": "simulation.capture_step.retry",
@@ -254164,6 +255139,12 @@
           "meaning": "The Connector outcome does not match the immutable execution plan.",
           "retryable": false,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -254412,6 +255393,12 @@
         {
           "error_code": "plan_outcome_invalid",
           "message_template": "The Connector outcome does not match the immutable execution plan.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -254856,6 +255843,12 @@
           "meaning": "The Connector outcome does not match the immutable execution plan.",
           "retryable": false,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -255106,6 +256099,12 @@
           "message_template": "The Connector outcome does not match the immutable execution plan.",
           "is_retryable": false,
           "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "is_retryable": false,
+          "is_caller_error": false
         }
       ],
       "transaction_policy": {
@@ -255180,8 +256179,21 @@
         "Inputs and outputs satisfy the closed published contract and retain exact source version pins.",
         "Rejected or uncertain local outcomes return a governed error and durable reconciliation evidence."
       ],
-      "business_invariants": [],
-      "no_business_invariant_reason": "This capability returns a bounded projection or compatibility diagnosis and does not decide or mutate domain state.",
+      "business_invariants": [
+        {
+          "rule_id": "simulation.connector_outcome.document_snapshot_identity",
+          "version": 1,
+          "statement": "A document snapshot outcome is accepted only for the exact persisted plan and projects an empty uncertain reconciliation without inventing step data.",
+          "applies_when": "an authenticated document snapshot outcome is projected",
+          "enforcement_ref": "plugins/simulation/simulation_backend/application/document_snapshots.py:DocumentSnapshotWorkflow.apply_connector_outcome",
+          "error_code": "plan_outcome_invalid",
+          "test_refs": [
+            "backend/tests/test_simulation_document_snapshot_workflow.py::test_snapshot_request_is_idempotent_and_completes_only_from_connector_outcome"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
       "side_effect_level": "write",
       "side_effects": "Writes simulation domain state through its Provider and records a capability audit event.",
       "execution_mode": "cloud_sync",
@@ -255535,6 +256547,12 @@
           "meaning": "The Connector outcome does not match the immutable execution plan.",
           "retryable": false,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -255785,6 +256803,12 @@
           "message_template": "The Connector outcome does not match the immutable execution plan.",
           "is_retryable": false,
           "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "is_retryable": false,
+          "is_caller_error": false
         }
       ],
       "transaction_policy": {
@@ -255841,7 +256865,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:373a7803cd4d4b424ddef776820162c7e6479bc1280fe24b0daaff6e4476a10c"
+      "business_definition_hash": "sha256:644dbf3a671c495de475efd80446c0f91eb0b702da1a27604063e19b2e130435"
     },
     {
       "id": "simulation.connector_materialization_outcome.apply",
@@ -255859,8 +256883,21 @@
         "Inputs and outputs satisfy the closed published contract and retain exact source version pins.",
         "Rejected or uncertain local outcomes return a governed error and durable reconciliation evidence."
       ],
-      "business_invariants": [],
-      "no_business_invariant_reason": "This capability returns a bounded projection or compatibility diagnosis and does not decide or mutate domain state.",
+      "business_invariants": [
+        {
+          "rule_id": "simulation.connector_outcome.materialization_identity",
+          "version": 1,
+          "statement": "A materialization outcome is accepted only for the exact persisted plan id and plan hash of its caller-visible run.",
+          "applies_when": "an authenticated materialization outcome is projected",
+          "enforcement_ref": "plugins/simulation/simulation_backend/application/capture_worker.py:CaptureWorkflow.apply_materialization_outcome",
+          "error_code": "plan_outcome_invalid",
+          "test_refs": [
+            "backend/tests/test_simulation_capture_workflow.py::test_materialization_outcome_projects_terminal_status_to_domain_run"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
       "side_effect_level": "write",
       "side_effects": "Writes simulation domain state through its Provider and records a capability audit event.",
       "execution_mode": "cloud_sync",
@@ -256214,6 +257251,12 @@
           "meaning": "The Connector outcome does not match the immutable execution plan.",
           "retryable": false,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -256464,6 +257507,12 @@
           "message_template": "The Connector outcome does not match the immutable execution plan.",
           "is_retryable": false,
           "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "is_retryable": false,
+          "is_caller_error": false
         }
       ],
       "transaction_policy": {
@@ -256520,7 +257569,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:98c37e473b1b9ccc649ca127071a6a1cbbbcb82e8e095d3f6277845b049dad9f"
+      "business_definition_hash": "sha256:43a9c7d49c8c06def0d3f8b1e679fc5d6dea6fd6f58d56f6b1102797e84414f4"
     },
     {
       "id": "simulation.document_snapshot.action.get",
@@ -256949,6 +257998,12 @@
           "meaning": "The Connector outcome does not match the immutable execution plan.",
           "retryable": false,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -257197,6 +258252,12 @@
         {
           "error_code": "plan_outcome_invalid",
           "message_template": "The Connector outcome does not match the immutable execution plan.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -257857,6 +258918,12 @@
           "meaning": "The Connector outcome does not match the immutable execution plan.",
           "retryable": false,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -258105,6 +259172,12 @@
         {
           "error_code": "plan_outcome_invalid",
           "message_template": "The Connector outcome does not match the immutable execution plan.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -258752,6 +259825,12 @@
           "meaning": "The Connector outcome does not match the immutable execution plan.",
           "retryable": false,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -259002,6 +260081,12 @@
           "message_template": "The Connector outcome does not match the immutable execution plan.",
           "is_retryable": false,
           "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "is_retryable": false,
+          "is_caller_error": false
         }
       ],
       "transaction_policy": {
@@ -259064,13 +260149,807 @@
       "id": "simulation.document_snapshot.request",
       "major_version": 1,
       "owner_domain": "simulation",
+      "lifecycle_status": "deprecated",
+      "catalog_release": null,
+      "title": "simulation.document_snapshot.request",
+      "description": "Request and queue an immutable snapshot of the bound user's active VisMockup BOM.",
+      "use_when": "Request and queue an immutable snapshot of the bound user's active VisMockup BOM.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Queue one bounded immutable snapshot of the bound user's currently active VisMockup BOM for later environment composition.",
+      "business_acceptance_criteria": [
+        "The result is scoped to the caller-visible immutable environment or capture-run identity.",
+        "Inputs and outputs satisfy the closed published contract and retain exact source version pins.",
+        "Rejected or uncertain local outcomes return a governed error and durable reconciliation evidence."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "simulation.document_snapshot.confirmed_only",
+          "version": 1,
+          "statement": "A document snapshot becomes completed only from a validated Connector outcome containing a bounded tree with product references.",
+          "applies_when": "an active VisMockup document snapshot is requested",
+          "enforcement_ref": "plugins/simulation/simulation_backend/application/document_snapshots.py:DocumentSnapshotWorkflow.apply_connector_outcome",
+          "error_code": "bom_snapshot_invalid",
+          "test_refs": [
+            "backend/tests/test_simulation_document_snapshot_workflow.py::test_snapshot_request_is_idempotent_and_completes_only_from_connector_outcome"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Writes simulation domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "device",
+          "payload_path": "device_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "device_id": {
+            "type": "string"
+          },
+          "request_key": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "device_id",
+          "request_key"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "snapshot_request_id": {
+            "type": "string"
+          },
+          "device_id": {
+            "type": "string"
+          },
+          "plan_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "completed",
+              "failed",
+              "outcome_unknown"
+            ]
+          },
+          "snapshot": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "document_id": {
+                    "type": "string"
+                  },
+                  "root_node_key": {
+                    "type": "string"
+                  },
+                  "source_identity": {
+                    "type": "string"
+                  },
+                  "snapshot_hash": {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$",
+                    "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                  },
+                  "nodes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "node_key": {
+                          "type": "string"
+                        },
+                        "parent_key": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "product_ref": {
+                          "type": "string"
+                        },
+                        "child_order": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "node_key",
+                        "parent_key",
+                        "product_ref",
+                        "child_order"
+                      ]
+                    },
+                    "maxItems": 10000
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "document_id",
+                  "root_node_key",
+                  "source_identity",
+                  "snapshot_hash",
+                  "nodes"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "failure_code": {
+            "type": "string"
+          },
+          "operation_ref": {
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "running",
+                  "completed",
+                  "failed",
+                  "cancelled",
+                  "outcome_unknown"
+                ]
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "snapshot_request_id",
+          "device_id",
+          "plan_id",
+          "status",
+          "snapshot",
+          "failure_code",
+          "operation_ref"
+        ]
+      },
+      "agent_output_schema": null,
+      "schema_hash": "sha256:6b2a2648b32b52390cb7bd8388ed59c41b562c8522099cd907267d2ad132a3a5",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": "Immediate dispatch is closed; migrate to simulation.document_snapshot.request@2 and its action/dispatch workflow.",
+      "domain_errors": [
+        {
+          "code": "source_resolver_unavailable",
+          "meaning": "A required owning-domain resolver is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "source_version_mismatch",
+          "meaning": "A referenced source no longer matches its immutable hash or version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "parameter_set_not_found",
+          "meaning": "The immutable parameter set is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_profile_not_found",
+          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_environment_not_found",
+          "meaning": "The Simulation environment is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_run_not_found",
+          "meaning": "The Simulation run is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_result_not_ready",
+          "meaning": "The Simulation run has no completed result artifacts.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different Simulation request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "execution_plan_unavailable",
+          "meaning": "The pinned Craft execution plan is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "active_document_unavailable",
+          "meaning": "The Connector has no readable active document.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "active_document_snapshot_required",
+          "meaning": "A confirmed asynchronous active-document snapshot is required.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "document_snapshot_not_found",
+          "meaning": "The document snapshot request is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "document_snapshot_action_not_ready",
+          "meaning": "The prepared document snapshot action is not ready to dispatch.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_snapshot_invalid",
+          "meaning": "The Connector returned an invalid active BOM snapshot.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_identity_mismatch",
+          "meaning": "The active BOM identity does not match the requested source.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_snapshot_limit_exceeded",
+          "meaning": "The active BOM exceeds the governed snapshot limit.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "product_binding_not_found",
+          "meaning": "A process product reference has no active BOM node.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "product_binding_ambiguous",
+          "meaning": "A process product reference resolves to multiple BOM nodes.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_model_not_found",
+          "meaning": "A typed resource code has no model mapping.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_model_ambiguous",
+          "meaning": "A typed resource code has multiple active model mappings.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "environment_source_changed",
+          "meaning": "A pinned environment source changed before composition.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "connector_offline",
+          "meaning": "The bound Connector is offline or stale.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "connector_version_incompatible",
+          "meaning": "The Connector protocol or target product version is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "adapter_unavailable",
+          "meaning": "The required Connector Adapter is unavailable.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "adapter_contract_mismatch",
+          "meaning": "An Adapter operation contract hash does not match.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "interactive_session_missing",
+          "meaning": "The bound user's interactive SessionHost is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "interactive_session_conflict",
+          "meaning": "More than one fresh SessionHost claims the bound user.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bound_user_mismatch",
+          "meaning": "The Connector is bound to a different AI00 user.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "vismockup_unavailable",
+          "meaning": "VisMockup is unavailable to the bound SessionHost.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "vismockup_document_changed",
+          "meaning": "The active VisMockup document changed during execution.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "scene_verification_failed",
+          "meaning": "The actual VisMockup scene does not match the manifest.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "capture_failed",
+          "meaning": "VisMockup internal view capture failed.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "artifact_upload_unconfirmed",
+          "meaning": "A captured Artifact upload has not been reconciled.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "craft_screenshot_attach_failed",
+          "meaning": "Craft rejected or failed the screenshot association.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "local_execution_outcome_unknown",
+          "meaning": "The local side effect outcome requires reconciliation.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "downstream_confirmation_required",
+          "meaning": "The exact downstream action requires a separately issued user confirmation.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "capture_action_not_ready",
+          "meaning": "No capture action is currently ready to dispatch.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "materialization_run_not_found",
+          "meaning": "The materialization run is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "materialization_action_not_ready",
+          "meaning": "The materialization action is not ready to dispatch.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "plan_outcome_invalid",
+          "meaning": "The Connector outcome does not match the immutable execution plan.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_fed7bec1b267b79371bd918d",
+      "error_schema": [
+        {
+          "error_code": "source_resolver_unavailable",
+          "message_template": "A required owning-domain resolver is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "source_version_mismatch",
+          "message_template": "A referenced source no longer matches its immutable hash or version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "parameter_set_not_found",
+          "message_template": "The immutable parameter set is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_profile_not_found",
+          "message_template": "The immutable Simulation profile is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "solver_not_allowed",
+          "message_template": "The requested solver coordinate is not in the governed allowlist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_environment_not_found",
+          "message_template": "The Simulation environment is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_run_not_found",
+          "message_template": "The Simulation run is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_result_not_ready",
+          "message_template": "The Simulation run has no completed result artifacts.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different Simulation request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "execution_plan_unavailable",
+          "message_template": "The pinned Craft execution plan is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "active_document_unavailable",
+          "message_template": "The Connector has no readable active document.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "active_document_snapshot_required",
+          "message_template": "A confirmed asynchronous active-document snapshot is required.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "document_snapshot_not_found",
+          "message_template": "The document snapshot request is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "document_snapshot_action_not_ready",
+          "message_template": "The prepared document snapshot action is not ready to dispatch.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_snapshot_invalid",
+          "message_template": "The Connector returned an invalid active BOM snapshot.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_identity_mismatch",
+          "message_template": "The active BOM identity does not match the requested source.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_snapshot_limit_exceeded",
+          "message_template": "The active BOM exceeds the governed snapshot limit.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "product_binding_not_found",
+          "message_template": "A process product reference has no active BOM node.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "product_binding_ambiguous",
+          "message_template": "A process product reference resolves to multiple BOM nodes.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_model_not_found",
+          "message_template": "A typed resource code has no model mapping.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_model_ambiguous",
+          "message_template": "A typed resource code has multiple active model mappings.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "environment_source_changed",
+          "message_template": "A pinned environment source changed before composition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "connector_offline",
+          "message_template": "The bound Connector is offline or stale.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "connector_version_incompatible",
+          "message_template": "The Connector protocol or target product version is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "adapter_unavailable",
+          "message_template": "The required Connector Adapter is unavailable.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "adapter_contract_mismatch",
+          "message_template": "An Adapter operation contract hash does not match.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "interactive_session_missing",
+          "message_template": "The bound user's interactive SessionHost is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "interactive_session_conflict",
+          "message_template": "More than one fresh SessionHost claims the bound user.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bound_user_mismatch",
+          "message_template": "The Connector is bound to a different AI00 user.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "vismockup_unavailable",
+          "message_template": "VisMockup is unavailable to the bound SessionHost.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "vismockup_document_changed",
+          "message_template": "The active VisMockup document changed during execution.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "scene_verification_failed",
+          "message_template": "The actual VisMockup scene does not match the manifest.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capture_failed",
+          "message_template": "VisMockup internal view capture failed.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "artifact_upload_unconfirmed",
+          "message_template": "A captured Artifact upload has not been reconciled.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "craft_screenshot_attach_failed",
+          "message_template": "Craft rejected or failed the screenshot association.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "local_execution_outcome_unknown",
+          "message_template": "The local side effect outcome requires reconciliation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "downstream_confirmation_required",
+          "message_template": "The exact downstream action requires a separately issued user confirmation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capture_action_not_ready",
+          "message_template": "No capture action is currently ready to dispatch.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "materialization_run_not_found",
+          "message_template": "The materialization run is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "materialization_action_not_ready",
+          "message_template": "The materialization action is not ready to dispatch.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plan_outcome_invalid",
+          "message_template": "The Connector outcome does not match the immutable execution plan.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "The unsafe immediate-dispatch contract is frozen with no verified runtime consumer and accepts no new traffic.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.document_snapshot.request:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.document_snapshot.request@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.document_snapshot.request@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.document_snapshot.request@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.document_snapshot.request@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.document_snapshot.request@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.document_snapshot.request@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.document_snapshot.request@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:ed3424d7fba01ed8c2a2b572e42e2917b7d2bd3f1efe30c1b519b125fd12efae"
+    },
+    {
+      "id": "simulation.document_snapshot.request",
+      "major_version": 2,
+      "owner_domain": "simulation",
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "simulation.document_snapshot.request",
-      "description": "Request an immutable snapshot of the bound user's active VisMockup BOM.",
-      "use_when": "Request an immutable snapshot of the bound user's active VisMockup BOM.",
+      "description": "Prepare an immutable active VisMockup BOM snapshot for separately confirmed dispatch.",
+      "use_when": "Prepare an immutable active VisMockup BOM snapshot for separately confirmed dispatch.",
       "do_not_use_when": "Use the owning domain's governed Capability.",
-      "business_effect": "Queue one bounded immutable snapshot of the bound user's currently active VisMockup BOM for later environment composition.",
+      "business_effect": "Prepare one bounded immutable snapshot request for later user-confirmed Device dispatch.",
       "business_acceptance_criteria": [
         "The result is scoped to the caller-visible immutable environment or capture-run identity.",
         "Inputs and outputs satisfy the closed published contract and retain exact source version pins.",
@@ -259664,10 +261543,16 @@
           "meaning": "The Connector outcome does not match the immutable execution plan.",
           "retryable": false,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
-      "capability_version_gid": "cv2_fed7bec1b267b79371bd918d",
+      "capability_version_gid": "cv2_da2fcd57c296a397587ecfe7",
       "error_schema": [
         {
           "error_code": "source_resolver_unavailable",
@@ -259914,6 +261799,12 @@
           "message_template": "The Connector outcome does not match the immutable execution plan.",
           "is_retryable": false,
           "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "is_retryable": false,
+          "is_caller_error": false
         }
       ],
       "transaction_policy": {
@@ -259929,48 +261820,48 @@
       "test_refs": [
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.document_snapshot.request@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.document_snapshot.request@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.document_snapshot.request@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.document_snapshot.request@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.document_snapshot.request@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.document_snapshot.request@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.document_snapshot.request@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.document_snapshot.request@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.document_snapshot.request@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.document_snapshot.request@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.document_snapshot.request@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.document_snapshot.request@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.document_snapshot.request@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.document_snapshot.request@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:ed3424d7fba01ed8c2a2b572e42e2917b7d2bd3f1efe30c1b519b125fd12efae"
+      "business_definition_hash": "sha256:da2c155f855c05e2a78837e3cd33d0df2063b6467102b36bd3eda53924741e2f"
     },
     {
       "id": "simulation.environment.archive",
@@ -262009,6 +263900,12 @@
           "meaning": "The Connector outcome does not match the immutable execution plan.",
           "retryable": false,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -262257,6 +264154,12 @@
         {
           "error_code": "plan_outcome_invalid",
           "message_template": "The Connector outcome does not match the immutable execution plan.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -264243,6 +266146,12 @@
           "meaning": "The Connector outcome does not match the immutable execution plan.",
           "retryable": false,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -264491,6 +266400,12 @@
         {
           "error_code": "plan_outcome_invalid",
           "message_template": "The Connector outcome does not match the immutable execution plan.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -265725,6 +267640,12 @@
           "meaning": "The Connector outcome does not match the immutable execution plan.",
           "retryable": false,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -265973,6 +267894,12 @@
         {
           "error_code": "plan_outcome_invalid",
           "message_template": "The Connector outcome does not match the immutable execution plan.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -267231,6 +269158,12 @@
           "meaning": "The Connector outcome does not match the immutable execution plan.",
           "retryable": false,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -267481,6 +269414,12 @@
           "message_template": "The Connector outcome does not match the immutable execution plan.",
           "is_retryable": false,
           "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "is_retryable": false,
+          "is_caller_error": false
         }
       ],
       "transaction_policy": {
@@ -267543,13 +269482,758 @@
       "id": "simulation.environment.materialize",
       "major_version": 1,
       "owner_domain": "simulation",
-      "lifecycle_status": "stable",
+      "lifecycle_status": "deprecated",
       "catalog_release": null,
       "title": "simulation.environment.materialize",
       "description": "Queue exact Connector materialization for an immutable environment.",
       "use_when": "Queue exact Connector materialization for an immutable environment.",
       "do_not_use_when": "Use the owning domain's governed Capability.",
       "business_effect": "Queue construction and verification of the exact immutable simulation environment in the bound user's VisMockup session.",
+      "business_acceptance_criteria": [
+        "The result is scoped to the caller-visible immutable environment or capture-run identity.",
+        "Inputs and outputs satisfy the closed published contract and retain exact source version pins.",
+        "Rejected or uncertain local outcomes return a governed error and durable reconciliation evidence."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "simulation.environment.materialize.exact_manifest",
+          "version": 1,
+          "statement": "Local materialization uses the pinned manifest and verifies the resulting VisMockup scene before completion.",
+          "applies_when": "an immutable environment is materialized",
+          "enforcement_ref": "plugins/simulation/simulation_backend/application/connector_plans.py:build_materialization_plan",
+          "error_code": "scene_verification_failed",
+          "test_refs": [
+            "backend/tests/test_simulation_capture_workflow.py::test_materialization_plan_attaches_models_before_scene_verification"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Writes simulation domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-environment",
+          "payload_path": "environment_id",
+          "required": true
+        },
+        {
+          "resource_type": "device",
+          "payload_path": "device_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "environment_id": {
+            "type": "string"
+          },
+          "environment_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "device_id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "environment_id",
+          "environment_version",
+          "device_id"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "run_id": {
+            "type": "string"
+          },
+          "environment_id": {
+            "type": "string"
+          },
+          "environment_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "manifest_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "device_id": {
+            "type": "string"
+          },
+          "plan_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued"
+            ]
+          },
+          "operation_ref": {
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "running",
+                  "completed",
+                  "failed",
+                  "cancelled",
+                  "outcome_unknown"
+                ]
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "run_id",
+          "environment_id",
+          "environment_version",
+          "manifest_hash",
+          "device_id",
+          "plan_id",
+          "status",
+          "operation_ref"
+        ]
+      },
+      "agent_output_schema": null,
+      "schema_hash": "sha256:668ee1df04d3191799edd28f8d4ca5d87861baafcb4ec9e2362469b3de6fcefd",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": "Immediate dispatch is closed; migrate to simulation.environment.materialize@2 and its action/dispatch workflow.",
+      "domain_errors": [
+        {
+          "code": "source_resolver_unavailable",
+          "meaning": "A required owning-domain resolver is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "source_version_mismatch",
+          "meaning": "A referenced source no longer matches its immutable hash or version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "parameter_set_not_found",
+          "meaning": "The immutable parameter set is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_profile_not_found",
+          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_environment_not_found",
+          "meaning": "The Simulation environment is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_run_not_found",
+          "meaning": "The Simulation run is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_result_not_ready",
+          "meaning": "The Simulation run has no completed result artifacts.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different Simulation request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "execution_plan_unavailable",
+          "meaning": "The pinned Craft execution plan is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "active_document_unavailable",
+          "meaning": "The Connector has no readable active document.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "active_document_snapshot_required",
+          "meaning": "A confirmed asynchronous active-document snapshot is required.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "document_snapshot_not_found",
+          "meaning": "The document snapshot request is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "document_snapshot_action_not_ready",
+          "meaning": "The prepared document snapshot action is not ready to dispatch.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_snapshot_invalid",
+          "meaning": "The Connector returned an invalid active BOM snapshot.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_identity_mismatch",
+          "meaning": "The active BOM identity does not match the requested source.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_snapshot_limit_exceeded",
+          "meaning": "The active BOM exceeds the governed snapshot limit.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "product_binding_not_found",
+          "meaning": "A process product reference has no active BOM node.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "product_binding_ambiguous",
+          "meaning": "A process product reference resolves to multiple BOM nodes.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_model_not_found",
+          "meaning": "A typed resource code has no model mapping.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_model_ambiguous",
+          "meaning": "A typed resource code has multiple active model mappings.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "environment_source_changed",
+          "meaning": "A pinned environment source changed before composition.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "connector_offline",
+          "meaning": "The bound Connector is offline or stale.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "connector_version_incompatible",
+          "meaning": "The Connector protocol or target product version is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "adapter_unavailable",
+          "meaning": "The required Connector Adapter is unavailable.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "adapter_contract_mismatch",
+          "meaning": "An Adapter operation contract hash does not match.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "interactive_session_missing",
+          "meaning": "The bound user's interactive SessionHost is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "interactive_session_conflict",
+          "meaning": "More than one fresh SessionHost claims the bound user.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bound_user_mismatch",
+          "meaning": "The Connector is bound to a different AI00 user.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "vismockup_unavailable",
+          "meaning": "VisMockup is unavailable to the bound SessionHost.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "vismockup_document_changed",
+          "meaning": "The active VisMockup document changed during execution.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "scene_verification_failed",
+          "meaning": "The actual VisMockup scene does not match the manifest.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "capture_failed",
+          "meaning": "VisMockup internal view capture failed.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "artifact_upload_unconfirmed",
+          "meaning": "A captured Artifact upload has not been reconciled.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "craft_screenshot_attach_failed",
+          "meaning": "Craft rejected or failed the screenshot association.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "local_execution_outcome_unknown",
+          "meaning": "The local side effect outcome requires reconciliation.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "downstream_confirmation_required",
+          "meaning": "The exact downstream action requires a separately issued user confirmation.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "capture_action_not_ready",
+          "meaning": "No capture action is currently ready to dispatch.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "materialization_run_not_found",
+          "meaning": "The materialization run is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "materialization_action_not_ready",
+          "meaning": "The materialization action is not ready to dispatch.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "plan_outcome_invalid",
+          "meaning": "The Connector outcome does not match the immutable execution plan.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_182249e94a64354fc67c9ae2",
+      "error_schema": [
+        {
+          "error_code": "source_resolver_unavailable",
+          "message_template": "A required owning-domain resolver is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "source_version_mismatch",
+          "message_template": "A referenced source no longer matches its immutable hash or version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "parameter_set_not_found",
+          "message_template": "The immutable parameter set is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_profile_not_found",
+          "message_template": "The immutable Simulation profile is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "solver_not_allowed",
+          "message_template": "The requested solver coordinate is not in the governed allowlist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_environment_not_found",
+          "message_template": "The Simulation environment is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_run_not_found",
+          "message_template": "The Simulation run is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_result_not_ready",
+          "message_template": "The Simulation run has no completed result artifacts.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different Simulation request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "execution_plan_unavailable",
+          "message_template": "The pinned Craft execution plan is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "active_document_unavailable",
+          "message_template": "The Connector has no readable active document.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "active_document_snapshot_required",
+          "message_template": "A confirmed asynchronous active-document snapshot is required.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "document_snapshot_not_found",
+          "message_template": "The document snapshot request is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "document_snapshot_action_not_ready",
+          "message_template": "The prepared document snapshot action is not ready to dispatch.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_snapshot_invalid",
+          "message_template": "The Connector returned an invalid active BOM snapshot.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_identity_mismatch",
+          "message_template": "The active BOM identity does not match the requested source.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_snapshot_limit_exceeded",
+          "message_template": "The active BOM exceeds the governed snapshot limit.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "product_binding_not_found",
+          "message_template": "A process product reference has no active BOM node.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "product_binding_ambiguous",
+          "message_template": "A process product reference resolves to multiple BOM nodes.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_model_not_found",
+          "message_template": "A typed resource code has no model mapping.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_model_ambiguous",
+          "message_template": "A typed resource code has multiple active model mappings.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "environment_source_changed",
+          "message_template": "A pinned environment source changed before composition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "connector_offline",
+          "message_template": "The bound Connector is offline or stale.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "connector_version_incompatible",
+          "message_template": "The Connector protocol or target product version is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "adapter_unavailable",
+          "message_template": "The required Connector Adapter is unavailable.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "adapter_contract_mismatch",
+          "message_template": "An Adapter operation contract hash does not match.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "interactive_session_missing",
+          "message_template": "The bound user's interactive SessionHost is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "interactive_session_conflict",
+          "message_template": "More than one fresh SessionHost claims the bound user.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bound_user_mismatch",
+          "message_template": "The Connector is bound to a different AI00 user.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "vismockup_unavailable",
+          "message_template": "VisMockup is unavailable to the bound SessionHost.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "vismockup_document_changed",
+          "message_template": "The active VisMockup document changed during execution.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "scene_verification_failed",
+          "message_template": "The actual VisMockup scene does not match the manifest.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capture_failed",
+          "message_template": "VisMockup internal view capture failed.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "artifact_upload_unconfirmed",
+          "message_template": "A captured Artifact upload has not been reconciled.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "craft_screenshot_attach_failed",
+          "message_template": "Craft rejected or failed the screenshot association.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "local_execution_outcome_unknown",
+          "message_template": "The local side effect outcome requires reconciliation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "downstream_confirmation_required",
+          "message_template": "The exact downstream action requires a separately issued user confirmation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capture_action_not_ready",
+          "message_template": "No capture action is currently ready to dispatch.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "materialization_run_not_found",
+          "message_template": "The materialization run is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "materialization_action_not_ready",
+          "message_template": "The materialization action is not ready to dispatch.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "plan_outcome_invalid",
+          "message_template": "The Connector outcome does not match the immutable execution plan.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "The unsafe immediate-dispatch contract is frozen with no verified runtime consumer and accepts no new traffic.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.environment.materialize:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.environment.materialize@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.environment.materialize@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.environment.materialize@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.environment.materialize@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.environment.materialize@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.environment.materialize@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.environment.materialize@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:13c8704e0d5099dedc5f36565202eb5432e47a4283a8626d57973d9c72cc8d68"
+    },
+    {
+      "id": "simulation.environment.materialize",
+      "major_version": 2,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.environment.materialize",
+      "description": "Prepare exact Connector materialization for separately confirmed dispatch.",
+      "use_when": "Prepare exact Connector materialization for separately confirmed dispatch.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Prepare construction and verification of the exact immutable simulation environment for later user-confirmed Device dispatch.",
       "business_acceptance_criteria": [
         "The result is scoped to the caller-visible immutable environment or capture-run identity.",
         "Inputs and outputs satisfy the closed published contract and retain exact source version pins.",
@@ -268035,10 +270719,16 @@
           "meaning": "The Connector outcome does not match the immutable execution plan.",
           "retryable": false,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
-      "capability_version_gid": "cv2_182249e94a64354fc67c9ae2",
+      "capability_version_gid": "cv2_bfd161d0af053081b391bb2b",
       "error_schema": [
         {
           "error_code": "source_resolver_unavailable",
@@ -268285,6 +270975,12 @@
           "message_template": "The Connector outcome does not match the immutable execution plan.",
           "is_retryable": false,
           "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "is_retryable": false,
+          "is_caller_error": false
         }
       ],
       "transaction_policy": {
@@ -268300,48 +270996,48 @@
       "test_refs": [
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.environment.materialize@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.environment.materialize@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.environment.materialize@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.environment.materialize@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.environment.materialize@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.environment.materialize@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.environment.materialize@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.environment.materialize@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.environment.materialize@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.environment.materialize@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.environment.materialize@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.environment.materialize@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.environment.materialize@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.environment.materialize@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:13c8704e0d5099dedc5f36565202eb5432e47a4283a8626d57973d9c72cc8d68"
+      "business_definition_hash": "sha256:f4894dced8caea4170acdea6fcb40c8fe34274d7b2128c28786c0852f10924b4"
     },
     {
       "id": "simulation.environment.preflight",
@@ -268768,6 +271464,12 @@
           "meaning": "The Connector outcome does not match the immutable execution plan.",
           "retryable": false,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -269016,6 +271718,12 @@
         {
           "error_code": "plan_outcome_invalid",
           "message_template": "The Connector outcome does not match the immutable execution plan.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -270229,6 +272937,12 @@
           "meaning": "The Connector outcome does not match the immutable execution plan.",
           "retryable": false,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -270477,6 +273191,12 @@
         {
           "error_code": "plan_outcome_invalid",
           "message_template": "The Connector outcome does not match the immutable execution plan.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -271031,6 +273751,12 @@
           "meaning": "The Connector outcome does not match the immutable execution plan.",
           "retryable": false,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -271279,6 +274005,12 @@
         {
           "error_code": "plan_outcome_invalid",
           "message_template": "The Connector outcome does not match the immutable execution plan.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.",
           "is_retryable": false,
           "is_caller_error": false
         }
@@ -277860,6 +280592,12 @@
           "meaning": "The Local Runtime application provider is unavailable.",
           "retryable": true,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated Connector queue version must migrate to @2.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -277899,6 +280637,12 @@
           "error_code": "provider_unavailable",
           "message_template": "The Local Runtime application provider is unavailable.",
           "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated Connector queue version must migrate to @2.",
+          "is_retryable": false,
           "is_caller_error": false
         }
       ],
@@ -278140,6 +280884,12 @@
           "meaning": "The Local Runtime application provider is unavailable.",
           "retryable": true,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated Connector queue version must migrate to @2.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -278179,6 +280929,12 @@
           "error_code": "provider_unavailable",
           "message_template": "The Local Runtime application provider is unavailable.",
           "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated Connector queue version must migrate to @2.",
+          "is_retryable": false,
           "is_caller_error": false
         }
       ],
@@ -278410,6 +281166,12 @@
           "meaning": "The Local Runtime application provider is unavailable.",
           "retryable": true,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated Connector queue version must migrate to @2.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -278449,6 +281211,12 @@
           "error_code": "provider_unavailable",
           "message_template": "The Local Runtime application provider is unavailable.",
           "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated Connector queue version must migrate to @2.",
+          "is_retryable": false,
           "is_caller_error": false
         }
       ],
@@ -278725,6 +281493,12 @@
           "meaning": "The Local Runtime application provider is unavailable.",
           "retryable": true,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated Connector queue version must migrate to @2.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -278764,6 +281538,12 @@
           "error_code": "provider_unavailable",
           "message_template": "The Local Runtime application provider is unavailable.",
           "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated Connector queue version must migrate to @2.",
+          "is_retryable": false,
           "is_caller_error": false
         }
       ],
@@ -278995,6 +281775,12 @@
           "meaning": "The Local Runtime application provider is unavailable.",
           "retryable": true,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated Connector queue version must migrate to @2.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -279034,6 +281820,12 @@
           "error_code": "provider_unavailable",
           "message_template": "The Local Runtime application provider is unavailable.",
           "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated Connector queue version must migrate to @2.",
+          "is_retryable": false,
           "is_caller_error": false
         }
       ],
@@ -279273,6 +282065,12 @@
           "meaning": "The Local Runtime application provider is unavailable.",
           "retryable": true,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated Connector queue version must migrate to @2.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -279312,6 +282110,12 @@
           "error_code": "provider_unavailable",
           "message_template": "The Local Runtime application provider is unavailable.",
           "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated Connector queue version must migrate to @2.",
+          "is_retryable": false,
           "is_caller_error": false
         }
       ],
@@ -279552,6 +282356,12 @@
           "meaning": "The Local Runtime application provider is unavailable.",
           "retryable": true,
           "is_caller_error": false
+        },
+        {
+          "code": "capability_migration_required",
+          "meaning": "This deprecated Connector queue version must migrate to @2.",
+          "retryable": false,
+          "is_caller_error": false
         }
       ],
       "domain_errors_complete": true,
@@ -279591,6 +282401,12 @@
           "error_code": "provider_unavailable",
           "message_template": "The Local Runtime application provider is unavailable.",
           "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capability_migration_required",
+          "message_template": "This deprecated Connector queue version must migrate to @2.",
+          "is_retryable": false,
           "is_caller_error": false
         }
       ],
@@ -279674,7 +282490,7 @@
       "plugin_id": "official.device",
       "module": "device_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:ff5363e9ac4ad183b06a2e6567a43c22bde7b1693b601ab80e4aebc2d0c5a91f"
+      "artifact_hash": "sha256:4ca01afd255c6b14ae4b6f63f04f2232d45d837a5dd1906e8a16a1a1ca1c41d6"
     },
     {
       "plugin_id": "official.digital-model",
@@ -279716,8 +282532,8 @@
       "plugin_id": "official.simulation",
       "module": "simulation_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:49a19525c7291140c1a5b088adf5c7cb79eb0b1c4290a9a3c188fe76456abc5b"
+      "artifact_hash": "sha256:204cb4a33dbcd47647382c4953ed6a633503809b14451a192f12c98f2424def2"
     }
   ],
-  "created_at": "2026-09-03T10:06:51.456559Z"
+  "created_at": "2026-09-03T10:10:42.665580Z"
 }

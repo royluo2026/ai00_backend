@@ -6,9 +6,9 @@ Queue one immutable compatible ExecutionPlan for an owned AI00 Connector.
 
 - 适用：A governed workflow is ready to execute a version-pinned local plan.
 - 不适用：Compatibility or user-session preflight has not passed.
-- 生命周期：`stable`
+- 生命周期：`deprecated`
 - 所属领域：`device`
-- Catalog Release：`rel_db5fec04f77dd6835b325ef80c4da522`
+- Catalog Release：`rel_f91a658427dcd1990d752a720f0a7493`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -16,11 +16,11 @@ Queue one immutable compatible ExecutionPlan for an owned AI00 Connector.
 
 | 消费者 | 状态 |
 |---|---|
-| web | 可用 |
-| plugin | 可用 |
-| agent | 可用 |
-| api | 可用 |
-| mcp | 可用 |
+| web | 不可用 |
+| plugin | 不可用 |
+| agent | 不可用 |
+| api | 不可用 |
+| mcp | 不可用 |
 | worker | 不可用 |
 | local_runtime | 不可用 |
 
@@ -229,7 +229,7 @@ Queue one immutable compatible ExecutionPlan for an owned AI00 Connector.
 ```json
 {
   "capability_id": "device.connector.plan.queue",
-  "catalog_release": "rel_db5fec04f77dd6835b325ef80c4da522",
+  "catalog_release": "rel_f91a658427dcd1990d752a720f0a7493",
   "major_version": 1,
   "payload": {
     "plan": {
@@ -336,6 +336,7 @@ Queue one immutable compatible ExecutionPlan for an owned AI00 Connector.
 - `local_operation_failed`：The workstation returned a sanitized local execution error.（retryable=false）
 - `local_operation_outcome_unknown`：Execution may have occurred and must be reconciled before retry.（retryable=true）
 - `provider_unavailable`：The Local Runtime application provider is unavailable.（retryable=true）
+- `capability_migration_required`：This deprecated Connector queue version must migrate to @2.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

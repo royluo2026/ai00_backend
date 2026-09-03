@@ -8,7 +8,7 @@ Launch or connect to VisMockup.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`deprecated`
 - 所属领域：`device`
-- Catalog Release：`rel_db5fec04f77dd6835b325ef80c4da522`
+- Catalog Release：`rel_f91a658427dcd1990d752a720f0a7493`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -87,7 +87,7 @@ Launch or connect to VisMockup.
 ```json
 {
   "capability_id": "vismockup.launch",
-  "catalog_release": "rel_db5fec04f77dd6835b325ef80c4da522",
+  "catalog_release": "rel_f91a658427dcd1990d752a720f0a7493",
   "major_version": 1,
   "payload": {
     "device_id": "example"
@@ -170,6 +170,7 @@ Launch or connect to VisMockup.
 - `local_operation_failed`：The workstation returned a sanitized local execution error.（retryable=false）
 - `local_operation_outcome_unknown`：Execution may have occurred and must be reconciled before retry.（retryable=true）
 - `provider_unavailable`：The Local Runtime application provider is unavailable.（retryable=true）
+- `capability_migration_required`：This deprecated Connector queue version must migrate to @2.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

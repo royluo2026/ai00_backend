@@ -1,26 +1,26 @@
 # simulation.document_snapshot.request@1
 
-Request an immutable snapshot of the bound user's active VisMockup BOM.
+Request and queue an immutable snapshot of the bound user's active VisMockup BOM.
 
 ## 使用判断
 
-- 适用：Request an immutable snapshot of the bound user's active VisMockup BOM.
+- 适用：Request and queue an immutable snapshot of the bound user's active VisMockup BOM.
 - 不适用：Use the owning domain's governed Capability.
-- 生命周期：`experimental`
+- 生命周期：`deprecated`
 - 所属领域：`simulation`
-- Catalog Release：`rel_db5fec04f77dd6835b325ef80c4da522`
+- Catalog Release：`rel_f91a658427dcd1990d752a720f0a7493`
 - Schema 精度：`typed`
-- 暂未开放原因：`experimental_lifecycle`
+- 暂未开放原因：无
 
 ## 消费者可用性
 
 | 消费者 | 状态 |
 |---|---|
-| web | 可用 |
-| plugin | 可用 |
-| agent | 可用 |
-| api | 可用 |
-| mcp | 可用 |
+| web | 不可用 |
+| plugin | 不可用 |
+| agent | 不可用 |
+| api | 不可用 |
+| mcp | 不可用 |
 | worker | 不可用 |
 | local_runtime | 不可用 |
 
@@ -90,7 +90,7 @@ Request an immutable snapshot of the bound user's active VisMockup BOM.
 ```json
 {
   "capability_id": "simulation.document_snapshot.request",
-  "catalog_release": "rel_db5fec04f77dd6835b325ef80c4da522",
+  "catalog_release": "rel_f91a658427dcd1990d752a720f0a7493",
   "major_version": 1,
   "payload": {
     "device_id": "example",
@@ -310,6 +310,7 @@ Request an immutable snapshot of the bound user's active VisMockup BOM.
 - `materialization_run_not_found`：The materialization run is unavailable or not visible.（retryable=false）
 - `materialization_action_not_ready`：The materialization action is not ready to dispatch.（retryable=false）
 - `plan_outcome_invalid`：The Connector outcome does not match the immutable execution plan.（retryable=false）
+- `capability_migration_required`：This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 
