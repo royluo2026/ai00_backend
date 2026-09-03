@@ -213,11 +213,43 @@ class OrchestrationRepository:
     def get_graph_for_user(self, version_gid: str, actor_gid: str) -> GraphDraft:
         return self.get_graph(version_gid, actor_gid=actor_gid)
 
-    def publish_version(self, version_gid: str, *, expected_revision: int, actor_gid: str) -> dict[str, Any]:
+    def publish_version(
+        self,
+        version_gid: str,
+        *,
+        expected_revision: int,
+        actor_gid: str,
+        resolved_bindings: list[dict[str, Any]] | None = None,
+    ) -> dict[str, Any]:
         with self._connection_factory() as conn, conn.cursor() as cur:
             version = self._owned_version_for_update(cur, version_gid, actor_gid)
             if version["status"] != "draft" or int(version["revision"]) != expected_revision:
                 raise RevisionConflict("orchestration version is published or stale")
+            for binding in resolved_bindings or []:
+                execution_policy = {
+                    "gateway_ref": binding["gateway_ref"],
+                    "provider_ref": binding["provider_ref"],
+                    "catalog_release_gid": binding["catalog_release_gid"],
+                    "artifact_hash": binding["artifact_hash"],
+                    "timeout_seconds": binding["timeout_seconds"],
+                    "retry": binding["retry_policy"],
+                    "fallback": binding["fallback_policy"],
+                }
+                cur.execute(
+                    """UPDATE workmanship_agent_orch_capability_bindings
+                       SET capability_id=%s,version_constraint=%s,execution_policy_json=%s,updated_at=NOW(6)
+                       WHERE gid=%s AND version_gid=%s AND capability_version_gid=%s""",
+                    (
+                        binding["capability_id"],
+                        f"={binding['major_version']}",
+                        _json(execution_policy),
+                        binding["binding_gid"],
+                        version_gid,
+                        binding["capability_version_gid"],
+                    ),
+                )
+                if cur.rowcount != 1:
+                    raise ResourceNotAccessible("orchestration Capability binding is not accessible")
             cur.execute(
                 """UPDATE workmanship_agent_orch_versions
                    SET status='published', revision=revision+1, published_at=NOW(6),
