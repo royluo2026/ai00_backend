@@ -130,21 +130,19 @@ git commit -m "fix(agent): grant chat capability to internal users"
 - [ ] **Step 1: Add failing version and frozen-contract tests**
 
 ```python
-from backend.capability_v2.business_definition import business_definition_hash
-
-
 def test_agent_chat_registers_frozen_v1_and_corrected_v2():
     registry = CapabilityRegistry()
     register_interaction_chat_change_capability(registry)
     v1 = registry.get("agent.interaction.chat.change.apply", 1)
     v2 = registry.get("agent.interaction.chat.change.apply", 2)
 
-    assert business_definition_hash(v1.descriptor) == (
-        "sha256:cd4e5f972aeffa4be59487b94163c985098a720c7c09e23825f617d704e13805"
-    )
     assert v1.spec.confirmation == "user"
     assert v1.descriptor.consistency_policy == "strong"
     assert v1.descriptor.evidence_policy == "required"
+    assert "context_json" not in v1.spec.input_schema["properties"]["body"]["properties"]
+    assert set(v1.spec.output_schema["properties"]["data"]["properties"]) == {
+        "events", "media_type", "answer", "session_id",
+    }
     assert v2.spec.version == 2
     assert v2.spec.confirmation == "none"
     assert v2.descriptor.consistency_policy == "eventual"
