@@ -8,8 +8,8 @@ from backend.governance import load_registry
 
 
 ROOT = Path(__file__).resolve().parents[2]
-MIGRATION = ROOT / "backend/db/migrations/domains/agent/0004_agent_orchestration_mvp.sql"
-RUNTIME_MIGRATION = ROOT / "backend/db/migrations/domains/agent/0005_agent_orchestration_runtime_metrics.sql"
+MIGRATION = ROOT / "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+RUNTIME_MIGRATION = ROOT / "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
 TABLES = {
     "workmanship_agent_orch_panoramas",
     "workmanship_agent_orch_versions",
