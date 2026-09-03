@@ -122,7 +122,7 @@
         "plugin_id": "official.device",
         "module": "device_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:ff5363e9ac4ad183b06a2e6567a43c22bde7b1693b601ab80e4aebc2d0c5a91f"
+        "artifact_hash": "sha256:4ca01afd255c6b14ae4b6f63f04f2232d45d837a5dd1906e8a16a1a1ca1c41d6"
       },
       "artifact_path": "plugins/device/device_backend",
       "allowed_owners": [
@@ -304,7 +304,7 @@
         "plugin_id": "official.simulation",
         "module": "simulation_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:49a19525c7291140c1a5b088adf5c7cb79eb0b1c4290a9a3c188fe76456abc5b"
+        "artifact_hash": "sha256:204cb4a33dbcd47647382c4953ed6a633503809b14451a192f12c98f2424def2"
       },
       "artifact_path": "plugins/simulation/simulation_backend",
       "allowed_owners": [
