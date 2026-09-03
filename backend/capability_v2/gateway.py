@@ -8,11 +8,14 @@ import json
 import logging
 import os
 import time
+import uuid
+from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
 from backend.capabilities.models_next import CapabilityBusinessError, CapabilityContext, CapabilityOutput
+from .provider_contracts import CapabilityStreamOutput
 from backend.capabilities.validation_next import validate_payload
 
 from .catalog import CatalogRelease, CatalogResolutionError, CatalogResolver, build_release, load_catalog_release
@@ -48,13 +51,33 @@ from .resource_budget import (
 _log = logging.getLogger(__name__)
 
 
+@dataclass
+class _ManagedStream:
+    iterator: Any
+    media_type: str
+    descriptor: Any
+    envelope: InvocationEnvelope
+    authorization: Any
+    lease: InvocationLease | None
+    admission_lease: AdmissionLease
+    started: float
+    before: Any
+    capability_key: str
+    output: dict[str, Any]
+    deadline_at: float
+    max_events: int
+    expiry_task: asyncio.Task | None = None
+
+
 class CapabilityGatewayService:
     def __init__(self, resolver: CatalogResolver, policy: GatewayPolicy | None = None,
                  *, reliability: ReliabilityCoordinator | None = None,
                  operations: OperationService | None = None,
                  admission: ResourceAdmissionController | None = None,
                  metrics: InMemoryCapabilityMetrics | None = None,
-                 admission_timeout_seconds: float = 0.25) -> None:
+                 admission_timeout_seconds: float = 0.25,
+                 stream_claim_ttl_seconds: float = 15.0,
+                 max_pending_streams: int = 128) -> None:
         self._resolver = resolver
         self._policy = policy or FailClosedGatewayPolicy()
         self._reliability = reliability
@@ -63,6 +86,9 @@ class CapabilityGatewayService:
         self._metrics = metrics or InMemoryCapabilityMetrics()
         self._admission_timeout_seconds = max(0.0, admission_timeout_seconds)
         self._catalog_release: str | None = None
+        self._streams: dict[str, _ManagedStream] = {}
+        self._stream_claim_ttl_seconds = max(0.1, stream_claim_ttl_seconds)
+        self._max_pending_streams = max(1, max_pending_streams)
 
     @property
     def catalog_release(self) -> str:
@@ -298,6 +324,9 @@ class CapabilityGatewayService:
             )
         transaction = None
         cancelled = False
+        stream_output: CapabilityStreamOutput | None = None
+        stream_id: str | None = None
+        defer_stream = False
         try:
             try:
                 value = provider.handler(dict(envelope.payload), context)
@@ -322,7 +351,18 @@ class CapabilityGatewayService:
                     "invalid_input", "The provider rejected the supplied input."
                 ) from exc
             evidence = ()
-            if isinstance(value, TransactionalCapabilityOutput):
+            if isinstance(value, CapabilityStreamOutput):
+                stream_output = value
+                if len(self._streams) >= self._max_pending_streams:
+                    raise CapabilityBusinessError(
+                        "stream_capacity_exceeded",
+                        "Gateway pending stream capacity is exhausted.",
+                        retryable=True,
+                    )
+                stream_id = f"capability-stream-{uuid.uuid4().hex}"
+                value = json.loads(json.dumps(value.output))
+                value.setdefault("data", {})["stream_id"] = stream_id
+            elif isinstance(value, TransactionalCapabilityOutput):
                 transaction = value.transaction
                 evidence = tuple(EvidenceRefV2(
                     kind=item.kind,
@@ -357,6 +397,7 @@ class CapabilityGatewayService:
                     "Capability provider exceeded its declared output byte limit.",
                 )
             projected = self._policy.project(descriptor, envelope.identity, value)
+            defer_stream = stream_output is not None
         except asyncio.CancelledError:
             cancelled = True
             if transaction is not None:
@@ -402,13 +443,39 @@ class CapabilityGatewayService:
                     correlation=CorrelationRef(request_id=envelope.request_id, trace_id=envelope.trace_id),
                 )
         finally:
-            if admission_lease is not None:
+            if admission_lease is not None and not defer_stream:
                 await admission_lease.release()
+            if stream_output is not None and not defer_stream:
+                await self._close_stream_iterator(stream_output.iterator)
             if cancelled:
                 self._record_metric(
                     descriptor, envelope, started, before, output_bytes, None, capability_key,
                     cancelled=True,
                 )
+        if defer_stream and result.ok and stream_output is not None and stream_id is not None:
+            result = result.model_copy(update={
+                "status": CapabilityStatus.ACCEPTED,
+                "operation_ref": (
+                    OperationRef(operation_id=lease.operation_id, status=OperationStatus.RUNNING)
+                    if lease is not None else None
+                ),
+            })
+            projected_result = project_result(
+                result, descriptor, envelope.identity,
+                data_scopes=authorization.data_scopes if authorization is not None else (),
+            )
+            record = _ManagedStream(
+                iterator=stream_output.iterator, media_type=stream_output.media_type,
+                descriptor=descriptor, envelope=envelope, authorization=authorization,
+                lease=lease, admission_lease=admission_lease, started=started,
+                before=before, capability_key=capability_key, output=value,
+                deadline_at=started + self._provider_timeout_seconds(descriptor, envelope),
+                max_events=max(1, stream_output.max_events),
+            )
+            self._streams[stream_id] = record
+            record.expiry_task = asyncio.create_task(self._expire_stream(stream_id))
+            return projected_result
+
         if async_operation is not None and not result.ok:
             try:
                 failed_ref = self._operations.transition(
@@ -514,6 +581,129 @@ class CapabilityGatewayService:
             descriptor, envelope, started, before, output_bytes, projected_result, capability_key,
         )
         return projected_result
+
+    async def claim_stream(self, stream_id: str):
+        """Claim one Gateway-owned stream while retaining invocation leases."""
+        record = self._streams.pop(stream_id, None)
+        if record is None:
+            raise ValueError("Capability stream is missing, expired, or already claimed")
+        if record.expiry_task is not None:
+            record.expiry_task.cancel()
+
+        async def managed():
+            output_bytes = self._json_size(record.output)
+            event_count = 0
+            completed = False
+            cancelled = False
+            failure: Exception | None = None
+            try:
+                remaining = max(0.0, record.deadline_at - time.perf_counter())
+                async with asyncio.timeout(remaining):
+                    async for chunk in record.iterator:
+                        event_count += 1
+                        if event_count > record.max_events:
+                            raise CapabilityBusinessError(
+                                "capability_output_limit_exceeded",
+                                "Capability stream exceeded its declared event limit.",
+                            )
+                        output_bytes += len(chunk) if isinstance(chunk, bytes) else len(str(chunk).encode("utf-8"))
+                        if output_bytes > record.descriptor.execution_budget.max_output_bytes:
+                            raise CapabilityBusinessError(
+                                "capability_output_limit_exceeded",
+                                "Capability stream exceeded its declared output byte limit.",
+                            )
+                        yield chunk
+                completed = True
+            except asyncio.CancelledError:
+                cancelled = True
+                raise
+            except GeneratorExit:
+                cancelled = True
+                raise
+            except Exception as exc:
+                failure = exc
+                raise
+            finally:
+                await self._close_stream_iterator(record.iterator)
+                await self._finalize_stream(
+                    record, output_bytes=output_bytes, completed=completed,
+                    cancelled=cancelled, failure=failure,
+                )
+
+        return managed(), record.media_type
+
+    async def _expire_stream(self, stream_id: str) -> None:
+        try:
+            await asyncio.sleep(self._stream_claim_ttl_seconds)
+        except asyncio.CancelledError:
+            return
+        record = self._streams.pop(stream_id, None)
+        if record is None:
+            return
+        await self._close_stream_iterator(record.iterator)
+        await self._finalize_stream(
+            record, output_bytes=self._json_size(record.output), completed=False,
+            cancelled=True, failure=TimeoutError("stream claim expired"),
+        )
+
+    async def _finalize_stream(
+        self, record: _ManagedStream, *, output_bytes: int, completed: bool,
+        cancelled: bool, failure: Exception | None,
+    ) -> None:
+        if completed:
+            result = CapabilityResultV2(
+                ok=True, status=CapabilityStatus.COMPLETED,
+                capability_id=record.envelope.capability_id,
+                major_version=record.envelope.major_version,
+                data=record.output,
+                correlation=CorrelationRef(
+                    request_id=record.envelope.request_id,
+                    trace_id=record.envelope.trace_id,
+                ),
+                operation_ref=(
+                    OperationRef(operation_id=record.lease.operation_id, status=OperationStatus.COMPLETED)
+                    if record.lease is not None else None
+                ),
+            )
+        else:
+            code = "cancelled" if cancelled else (
+                failure.code if isinstance(failure, CapabilityBusinessError) else
+                "runtime_timeout" if isinstance(failure, TimeoutError) else "provider_failed"
+            )
+            result = self._failed(
+                record.envelope, code, "Capability stream did not complete."
+            )
+            if record.lease is not None:
+                result = result.model_copy(update={
+                    "operation_ref": OperationRef(
+                        operation_id=record.lease.operation_id,
+                        status=OperationStatus.CANCELLED if cancelled else OperationStatus.FAILED,
+                    ),
+                })
+        if record.lease is not None:
+            try:
+                self._reliability.complete(record.lease, result)
+            except Exception:
+                try:
+                    self._reliability.mark_unknown(record.lease, result.model_copy(update={
+                        "status": CapabilityStatus.OUTCOME_UNKNOWN,
+                    }))
+                except Exception:
+                    pass
+        await record.admission_lease.release()
+        self._record_metric(
+            record.descriptor, record.envelope, record.started, record.before,
+            output_bytes, result, record.capability_key, cancelled=cancelled,
+        )
+
+    @staticmethod
+    async def _close_stream_iterator(iterator: Any) -> None:
+        closer = getattr(iterator, "aclose", None)
+        if closer is not None:
+            try:
+                await closer()
+            except Exception:
+                pass
 
     def _resolve_envelope(self, envelope: InvocationEnvelope):
         if self._catalog_release is None:

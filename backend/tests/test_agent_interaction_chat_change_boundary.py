@@ -6,7 +6,7 @@ from types import SimpleNamespace
 
 import pytest
 from fastapi import HTTPException
-from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilitySpec
+from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilitySpec, CapabilityStreamOutput
 from backend.capability_v2.domain_client import DomainCapabilityClient
 
 from backend.capabilities.registry_next import CapabilityRegistry
@@ -44,7 +44,6 @@ from plugins.agent.agent_backend.capabilities import _authorize_agent_session
 from plugins.agent.agent_backend.routers import ai_chat
 from plugins.agent.agent_backend.ai_assistant import tool_executor
 from plugins.agent.agent_backend.data.confirmation_repository import InMemoryConfirmationRepository
-from plugins.agent.agent_backend.application import stream_channel
 from plugins.agent.agent_backend.capabilities.provider import descriptor_for as agent_descriptor_for
 from plugins.agent.agent_backend.ai_assistant.catalog_tools import CatalogToolRegistry, tool_name_for
 
@@ -54,7 +53,6 @@ ROUTER = Path("plugins/agent/agent_backend/routers/ai_chat.py")
 
 def setup_function() -> None:
     tool_executor.configure_confirmation_store(InMemoryConfirmationRepository())
-    stream_channel.reset_channels()
 
 
 def test_agent_chat_routes_use_gateway_capability() -> None:
@@ -129,8 +127,7 @@ def test_agent_chat_v2_runs_without_a_transaction_participant() -> None:
     registry.register(
         chat.spec,
         lambda _payload, _context: {"data": {
-            "stream_id": "agent-stream-" + "a" * 32,
-            "media_type": "text/event-stream",
+            "response_json": "{}",
         }},
         descriptor=chat.descriptor,
     )
@@ -157,7 +154,7 @@ def test_agent_chat_v2_runs_without_a_transaction_participant() -> None:
         capability_id=chat.spec.id,
         major_version=2,
         catalog_release=release.release_id,
-        payload={"operation": "chat_stream", "body": {"message": "hello"}, "ai00_token": "token"},
+        payload={"operation": "chat_sync", "body": {"message": "hello"}, "ai00_token": "token"},
         identity=ConsumerIdentity(
             actor=ActorIdentity(
                 user_id="admin-1", authentication_method="jwt", authenticated_at=datetime.now(UTC)
@@ -187,14 +184,13 @@ def test_agent_chat_v2_rejects_non_object_context_json(monkeypatch) -> None:
         ))
 
 
-def test_agent_chat_v2_stream_channel_is_immediate_single_use_and_bounded(monkeypatch) -> None:
+def test_agent_chat_v2_returns_unconsumed_gateway_stream(monkeypatch) -> None:
     iterated = False
 
     async def chunks():
         nonlocal iterated
         iterated = True
-        for _ in range(501):
-            yield "data: {}\n\n"
+        yield "data: {}\n\n"
 
     response = SimpleNamespace(body_iterator=chunks(), media_type="text/event-stream")
     monkeypatch.setattr(ai_chat, "_legacy_chat_stream", lambda *_args: response)
@@ -205,13 +201,159 @@ def test_agent_chat_v2_stream_channel_is_immediate_single_use_and_bounded(monkey
             SimpleNamespace(user_gid="user-1"),
         )
         assert iterated is False
-        stream_id = result["data"]["stream_id"]
-        iterator, media_type = await stream_channel.claim_channel(stream_id)
-        assert media_type == "text/event-stream"
-        with pytest.raises(ValueError, match="stream response exceeds 500 events"):
-            _ = [chunk async for chunk in iterator]
-        with pytest.raises(ValueError, match="missing or already claimed"):
-            await stream_channel.claim_channel(stream_id)
+        assert isinstance(result, CapabilityStreamOutput)
+        assert result.media_type == "text/event-stream"
+        assert [chunk async for chunk in result.iterator] == ["data: {}\n\n"]
+
+    asyncio.run(exercise())
+
+
+def test_gateway_owns_stream_lifecycle_until_completion() -> None:
+    registered = CapabilityRegistry(); register_interaction_chat_change_capability(registered)
+    chat = registered.get("agent.interaction.chat.change.apply", 2)
+    release_tail = asyncio.Event()
+
+    async def events():
+        yield "data: first\n\n"
+        await release_tail.wait()
+        yield "data: done\n\n"
+
+    async def broken_events():
+        yield "data: first\n\n"
+        raise RuntimeError("provider stream failed")
+
+    def stream_output(payload, *_args):
+        iterator = broken_events() if payload["body"]["message"] == "explode" else events()
+        return CapabilityStreamOutput(
+            iterator=iterator, output={"data": {"media_type": "text/event-stream"}},
+        )
+
+    registry = CapabilityRegistry()
+    registry.register(
+        chat.spec,
+        stream_output,
+        descriptor=chat.descriptor,
+    )
+    release = build_release([chat.descriptor]); store = InMemoryCatalogStore(); store.publish(release)
+    class Policy:
+        def authorize(self, *_args): return None
+        def approve(self, *_args): return None
+        def project(self, _descriptor, _identity, data): return data
+    gateway = CapabilityGatewayService(
+        CatalogResolver(store, registry), Policy(),
+        reliability=ReliabilityCoordinator(InMemoryOutcomeStore(), InMemoryRateLimiter(limit=10)),
+    ).bind_release(release.release_id)
+    envelope = InvocationEnvelope(
+        capability_id=chat.spec.id, major_version=2, catalog_release=release.release_id,
+        payload={"operation": "chat_stream", "body": {"message": "hello"}, "ai00_token": "token"},
+        identity=ConsumerIdentity(
+            actor=ActorIdentity(user_id="admin-1", authentication_method="jwt", authenticated_at=datetime.now(UTC)),
+            tenant=TenantIdentity(tenant_id="team-1", membership="member"),
+            consumer=ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="ai00.web.agent"),
+        ), request_id="stream-lifecycle-1", trace_id="stream-lifecycle-1",
+        idempotency_key="stream-lifecycle-1",
+    )
+
+    async def exercise():
+        result = await gateway.invoke(envelope)
+        assert result.status.value == "accepted"
+        assert gateway.recent_metrics() == ()
+        stream_id = result.data["data"]["stream_id"]
+        iterator, _media = await gateway.claim_stream(stream_id)
+        assert await anext(iterator) == "data: first\n\n"
+        assert gateway.recent_metrics() == ()
+        release_tail.set()
+        assert [chunk async for chunk in iterator] == ["data: done\n\n"]
+        assert len(gateway.recent_metrics()) == 1
+        replay = await gateway.invoke(envelope)
+        assert replay.status.value == "completed"
+        with pytest.raises(ValueError, match="already claimed"):
+            await gateway.claim_stream(stream_id)
+
+        disconnected = envelope.model_copy(update={
+            "request_id": "stream-lifecycle-2", "trace_id": "stream-lifecycle-2",
+            "idempotency_key": "stream-lifecycle-2",
+        })
+        disconnected_result = await gateway.invoke(disconnected)
+        disconnected_iterator, _media = await gateway.claim_stream(
+            disconnected_result.data["data"]["stream_id"]
+        )
+        assert await anext(disconnected_iterator) == "data: first\n\n"
+        await disconnected_iterator.aclose()
+        disconnected_replay = await gateway.invoke(disconnected)
+        assert disconnected_replay.error.code == "cancelled"
+
+        failed = envelope.model_copy(update={
+            "payload": {"operation": "chat_stream", "body": {"message": "explode"}, "ai00_token": "token"},
+            "request_id": "stream-lifecycle-3", "trace_id": "stream-lifecycle-3",
+            "idempotency_key": "stream-lifecycle-3",
+        })
+        failed_result = await gateway.invoke(failed)
+        failed_iterator, _media = await gateway.claim_stream(failed_result.data["data"]["stream_id"])
+        with pytest.raises(RuntimeError, match="provider stream failed"):
+            _ = [chunk async for chunk in failed_iterator]
+        failed_replay = await gateway.invoke(failed)
+        assert failed_replay.error.code == "provider_failed"
+        assert len(gateway.recent_metrics()) == 3
+
+    asyncio.run(exercise())
+
+
+def test_gateway_expires_unclaimed_stream_and_closes_iterator() -> None:
+    registered = CapabilityRegistry(); register_interaction_chat_change_capability(registered)
+    chat = registered.get("agent.interaction.chat.change.apply", 2)
+    closed = 0
+
+    class Events:
+        def __aiter__(self): return self
+        async def __anext__(self): return "data: never-claimed\n\n"
+        async def aclose(self):
+            nonlocal closed
+            closed += 1
+
+    registry = CapabilityRegistry()
+    registry.register(
+        chat.spec,
+        lambda *_args: CapabilityStreamOutput(
+            iterator=Events(), output={"data": {"media_type": "text/event-stream"}},
+        ), descriptor=chat.descriptor,
+    )
+    release = build_release([chat.descriptor]); store = InMemoryCatalogStore(); store.publish(release)
+    class Policy:
+        def authorize(self, *_args): return None
+        def approve(self, *_args): return None
+        def project(self, _descriptor, _identity, data): return data
+    gateway = CapabilityGatewayService(
+        CatalogResolver(store, registry), Policy(),
+        reliability=ReliabilityCoordinator(InMemoryOutcomeStore(), InMemoryRateLimiter(limit=10)),
+        stream_claim_ttl_seconds=0.01, max_pending_streams=1,
+    ).bind_release(release.release_id)
+    identity = ConsumerIdentity(
+        actor=ActorIdentity(user_id="admin-1", authentication_method="jwt", authenticated_at=datetime.now(UTC)),
+        tenant=TenantIdentity(tenant_id="team-1", membership="member"),
+        consumer=ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="ai00.web.agent"),
+    )
+    envelope = InvocationEnvelope(
+        capability_id=chat.spec.id, major_version=2, catalog_release=release.release_id,
+        payload={"operation": "chat_stream", "body": {"message": "hello"}, "ai00_token": "token"},
+        identity=identity, request_id="stream-expiry-1", trace_id="stream-expiry-1",
+        idempotency_key="stream-expiry-1",
+    )
+
+    async def exercise():
+        result = await gateway.invoke(envelope)
+        stream_id = result.data["data"]["stream_id"]
+        overflow = await gateway.invoke(envelope.model_copy(update={
+            "request_id": "stream-expiry-2", "trace_id": "stream-expiry-2",
+            "idempotency_key": "stream-expiry-2",
+        }))
+        assert overflow.error.code == "stream_capacity_exceeded"
+        assert closed == 1
+        await asyncio.sleep(0.13)
+        assert closed == 2
+        assert len(gateway.recent_metrics()) == 2
+        with pytest.raises(ValueError, match="expired"):
+            await gateway.claim_stream(stream_id)
 
     asyncio.run(exercise())
 
@@ -228,8 +370,8 @@ def test_agent_chat_v2_preserves_runtime_error_as_sse_without_gateway_buffering(
             {"operation": "chat_stream", "body": {"message": "hi"}},
             SimpleNamespace(user_gid="user-1"),
         )
-        iterator, _media_type = await stream_channel.claim_channel(result["data"]["stream_id"])
-        return "".join([chunk async for chunk in iterator])
+        assert isinstance(result, CapabilityStreamOutput)
+        return "".join([chunk async for chunk in result.iterator])
 
     assert asyncio.run(exercise()) == 'data: {"type":"error","message":"runtime down"}\n\n'
 
@@ -335,10 +477,11 @@ def test_web_stream_chat_restores_the_sse_response() -> None:
         async def events():
             yield 'data: {"type":"done"}\n\n'
 
-        stream_id = await stream_channel.open_channel(events(), "text/event-stream")
+        stream_id = "capability-stream-" + "a" * 32
 
         class Gateway:
             catalog_release = "release-1"
+            claimed = False
 
             async def invoke(self, _envelope):
                 return SimpleNamespace(
@@ -346,6 +489,10 @@ def test_web_stream_chat_restores_the_sse_response() -> None:
                     data={"data": {"stream_id": stream_id, "media_type": "text/event-stream"}},
                     error=None,
                 )
+            async def claim_stream(self, claimed_id):
+                assert claimed_id == stream_id and not self.claimed
+                self.claimed = True
+                return events(), "text/event-stream"
 
         response = await ai_chat._invoke_interaction_chat(
             SimpleNamespace(headers={}),
@@ -376,10 +523,15 @@ def test_asgi_stream_emits_first_body_before_agent_finishes() -> None:
             await release_tail.wait()
             yield 'data: {"type":"done"}\n\n'
 
-        stream_id = await stream_channel.open_channel(events(), "text/event-stream")
+        stream_id = "capability-stream-" + "b" * 32
+        class Gateway:
+            async def claim_stream(self, claimed_id):
+                assert claimed_id == stream_id
+                return events(), "text/event-stream"
         response = await ai_chat._project_interaction_response(
             {"operation": "chat_stream"},
             {"stream_id": stream_id, "media_type": "text/event-stream"},
+            gateway=Gateway(),
         )
         received_request = False
 

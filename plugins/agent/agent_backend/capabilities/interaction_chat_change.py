@@ -5,7 +5,7 @@ import json
 from typing import Any
 
 from backend.capability_v2.contracts import BusinessInvariantContract, CorrelationRef, ExposurePolicy, ResourceSelector
-from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilitySpec
+from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilitySpec, CapabilityStreamOutput
 
 OPERATIONS = ("chat_stream", "chat_sync", "confirm", "confirm_sync")
 CHAT_OPERATIONS = ("chat_stream", "chat_sync")
@@ -36,12 +36,12 @@ async def _collect_v2(value: Any) -> dict[str, Any]:
     iterator = getattr(value, "body_iterator", None)
     if iterator is None:
         raise ValueError("unsupported Agent response type")
-    from ..application.stream_channel import open_channel
     media_type = getattr(value, "media_type", "text/event-stream")
-    return {
-        "stream_id": await open_channel(iterator, media_type),
-        "media_type": media_type,
-    }
+    return CapabilityStreamOutput(
+        iterator=iterator,
+        output={"data": {"media_type": media_type}},
+        media_type=media_type,
+    )
 
 
 def _v2_body(raw_body: Any) -> dict[str, Any]:
@@ -97,7 +97,8 @@ async def _apply_interaction_chat_change(
     token = str(payload.get("ai00_token") or "")
     collector = _collect_v2 if version == 2 else _collect_v1
     if operation == "chat_stream":
-        return {"data": await collector(legacy._legacy_chat_stream(body, user, token))}
+        collected = await collector(legacy._legacy_chat_stream(body, user, token))
+        return collected if isinstance(collected, CapabilityStreamOutput) else {"data": collected}
     if operation == "chat_sync":
         return {"data": await collector(legacy._legacy_chat_sync(body, user, token))}
     if operation == "confirm":
@@ -154,7 +155,7 @@ def register_interaction_chat_change_capability(registry: Any) -> None:
         }, "additionalProperties": False},
         output_schema={"type": "object", "required": ["data"], "properties": {
             "data": {"type": "object", "properties": {
-                "stream_id": {"type": "string", "pattern": "^agent-stream-[0-9a-f]{32}$"},
+                "stream_id": {"type": "string", "pattern": "^capability-stream-[0-9a-f]{32}$"},
                 "media_type": {"type": "string"},
                 "response_json": {"type": "string", "maxLength": 1_048_576},
             }, "additionalProperties": False},

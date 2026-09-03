@@ -20,10 +20,12 @@ class InMemoryConfirmationRepository:
 
     def save(self, token_hash: str, record: dict[str, Any]) -> None:
         with self._lock:
+            self._purge_expired_locked()
             self.records[token_hash] = dict(record)
 
     def begin(self, token_hash: str, expected: dict[str, Any]) -> dict[str, Any] | None:
         with self._lock:
+            self._purge_expired_locked()
             record = self.records.get(token_hash)
             if not record or record.get("state") != "pending" or record["expires_at"] <= datetime.now(UTC):
                 return None
@@ -45,6 +47,14 @@ class InMemoryConfirmationRepository:
             else:
                 record["state"] = "pending"
 
+    def _purge_expired_locked(self) -> None:
+        now = datetime.now(UTC)
+        for key in [
+            key for key, value in self.records.items()
+            if value.get("expires_at") and value["expires_at"] <= now
+        ][:100]:
+            self.records.pop(key, None)
+
 
 class SqlConfirmationRepository:
     TABLE = "workmanship_agent_confirmation_tokens"
@@ -58,6 +68,7 @@ class SqlConfirmationRepository:
 
     def save(self, token_hash: str, record: dict[str, Any]) -> None:
         with self._connection_factory() as conn, conn.cursor() as cur:
+            self._purge_expired(cur)
             cur.execute(
                 f"INSERT INTO {self.TABLE} "
                 "(token_hash,tool_name,inputs_json,session_gid,user_gid,catalog_release,capability_id,"
@@ -84,6 +95,7 @@ class SqlConfirmationRepository:
             optional_sql += " AND capability_id=%s"
             optional_values.append(capability_id)
         with self._connection_factory() as conn, conn.cursor() as cur:
+            self._purge_expired(cur)
             cur.execute(
                 f"UPDATE {self.TABLE} SET state='inflight' WHERE token_hash=%s AND state='pending' "
                 "AND expires_at>UTC_TIMESTAMP(6) AND tool_name=%s AND session_gid=%s AND user_gid=%s "
@@ -123,6 +135,12 @@ class SqlConfirmationRepository:
                     f"UPDATE {self.TABLE} SET state='pending' WHERE token_hash=%s AND state='inflight'",
                     (token_hash,),
                 )
+
+    def _purge_expired(self, cursor, *, limit: int = 100) -> None:
+        cursor.execute(
+            f"DELETE FROM {self.TABLE} WHERE expires_at<=UTC_TIMESTAMP(6) LIMIT %s",
+            (max(1, min(int(limit), 1000)),),
+        )
 
 
 def _json(value):

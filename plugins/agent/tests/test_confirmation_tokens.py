@@ -101,8 +101,16 @@ def test_sql_confirmation_token_survives_repository_restart_and_uses_cas() -> No
                 row = rows.get(params[0])
                 if row and row["state"] == "inflight": row["state"] = "pending"; self.rowcount = 1
             elif sql.startswith("DELETE"):
-                row = rows.get(params[0])
-                if row and row["state"] == "inflight": rows.pop(params[0]); self.rowcount = 1
+                if "expires_at<=UTC_TIMESTAMP" in sql:
+                    expired = [
+                        key for key, row in rows.items()
+                        if row["expires_at"] <= datetime.now(UTC).replace(tzinfo=None)
+                    ][:params[0]]
+                    for key in expired: rows.pop(key)
+                    self.rowcount = len(expired)
+                else:
+                    row = rows.get(params[0])
+                    if row and row["state"] == "inflight": rows.pop(params[0]); self.rowcount = 1
         def fetchone(self): return self.row
 
     class Connection:
@@ -128,7 +136,12 @@ def test_sql_confirmation_token_survives_repository_restart_and_uses_cas() -> No
         "catalog_release": "rel-1", "capability_id": "project.task.change.apply", "major_version": 1,
     }
     worker_one = SqlConfirmationRepository(connect)
+    rows["expired"] = {
+        **record, "token_hash": "expired", "state": "pending",
+        "expires_at": datetime.now(UTC).replace(tzinfo=None) - timedelta(seconds=1),
+    }
     worker_one.save(token_hash, record)
+    assert "expired" not in rows
     worker_two_after_restart = SqlConfirmationRepository(connect)
 
     assert worker_two_after_restart.begin(token_hash, expected)["idempotency_key"] == "stable-idem-1"

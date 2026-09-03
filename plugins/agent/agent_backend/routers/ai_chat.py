@@ -62,7 +62,9 @@ async def _invoke_interaction_chat(request, user, principal, gateway, payload):
     if not result.ok:
         code = result.error.code if result.error else "provider_error"
         raise HTTPException(status_code={"invalid_input": 400, "permission_denied": 403, "resource_not_found": 404}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
-    return await _project_interaction_response(payload, result.data.get("data", result.data))
+    return await _project_interaction_response(
+        payload, result.data.get("data", result.data), gateway=gateway,
+    )
 
 
 async def _invoke_confirmed_catalog_tool(request, user, principal, gateway, body):
@@ -1187,12 +1189,13 @@ def _normalize_interaction_payload(payload: dict) -> dict:
     return {**payload, "body": body}
 
 
-async def _project_interaction_response(payload: dict, data):
+async def _project_interaction_response(payload: dict, data, *, gateway=None):
     if isinstance(data, dict) and "response_json" in data:
         return json.loads(data["response_json"])
     if payload.get("operation") == "chat_stream" and isinstance(data, dict) and data.get("stream_id"):
-        from ..application.stream_channel import claim_channel
-        iterator, media_type = await claim_channel(str(data["stream_id"]))
+        if gateway is None:
+            raise ValueError("Gateway-managed Agent stream is unavailable")
+        iterator, media_type = await gateway.claim_stream(str(data["stream_id"]))
         return StreamingResponse(
             iterator,
             media_type=media_type,
