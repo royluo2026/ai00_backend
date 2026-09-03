@@ -65,7 +65,7 @@ class ConnectorOutcomeProvider:
         if plan.plan_id != payload["run_id"]:
             raise CapabilityBusinessError("plan_outcome_invalid", "plan_outcome_invalid")
         try:
-            self.workflow.apply_materialization_outcome(plan, outcome)
+            self.workflow.apply_materialization_outcome(plan, outcome, context)
         except SimulationWorkflowError as exc:
             raise CapabilityBusinessError(str(exc), str(exc)) from exc
         return self._result(payload["run_id"], "materialization-outcome")
@@ -75,7 +75,7 @@ class ConnectorOutcomeProvider:
         if self.snapshot_workflow is None or plan.plan_id != payload["snapshot_request_id"]:
             raise CapabilityBusinessError("plan_outcome_invalid", "plan_outcome_invalid")
         try:
-            self.snapshot_workflow.apply_connector_outcome(plan, outcome)
+            self.snapshot_workflow.apply_connector_outcome(plan, outcome, context)
         except SimulationWorkflowError as exc:
             raise CapabilityBusinessError(str(exc), str(exc)) from exc
         return self._result(payload["snapshot_request_id"], "document-snapshot-outcome")

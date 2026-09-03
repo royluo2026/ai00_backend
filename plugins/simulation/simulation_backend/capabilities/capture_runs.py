@@ -260,6 +260,13 @@ class CaptureRunProvider:
         return CapabilityOutput(data=data, evidence=(EvidenceRef(kind="simulation.materialization", reference=f"simulation://materialization/{row['run_id']}", digest=row["manifest_hash"]),))
 
     @staticmethod
+    def migration_required(payload, context):
+        raise CapabilityBusinessError(
+            "capability_migration_required",
+            "This immediate-dispatch version is closed; migrate to the @2 prepare/action/dispatch workflow.",
+        )
+
+    @staticmethod
     def _project_action(action):
         if action is None:
             return None
@@ -322,17 +329,19 @@ default_provider = CaptureRunProvider(CaptureWorkflow(
 
 
 def specs(provider: CaptureRunProvider = default_provider):
-    common = {"owner": "simulation", "version": 1, "permissions": ("simulation.use",), "plugin_callable": True, "tags": ("simulation", "connector_environment")}
+    common = {"owner": "simulation", "permissions": ("simulation.use",), "plugin_callable": True, "tags": ("simulation", "connector_environment")}
     return (
-        (CapabilitySpec(id="simulation.environment.materialize", description="Queue exact Connector materialization for an immutable environment.", risk=CapabilityRisk.WRITE, confirmation="user", **common), provider.materialize),
-        (CapabilitySpec(id="simulation.materialization_run.action.get", description="Read the exact materialization action awaiting user confirmation.", risk=CapabilityRisk.READ, confirmation="none", **common), provider.materialization_action),
-        (CapabilitySpec(id="simulation.materialization_run.dispatch", description="Dispatch one prepared materialization action using its separate user confirmation.", risk=CapabilityRisk.WRITE, confirmation="none", **common), provider.dispatch_materialization),
-        (CapabilitySpec(id="simulation.capture_run.start", description="Queue internal VisMockup captures in reverse process order.", risk=CapabilityRisk.WRITE, confirmation="user", **common), provider.start),
-        (CapabilitySpec(id="simulation.capture_run.get", description="Read authoritative reverse-capture progress.", risk=CapabilityRisk.READ, confirmation="none", **common), provider.get),
-        (CapabilitySpec(id="simulation.capture_run.action.get", description="Read the exact next downstream action awaiting user confirmation.", risk=CapabilityRisk.READ, confirmation="none", **common), provider.action),
-        (CapabilitySpec(id="simulation.capture_run.dispatch", description="Dispatch exactly one downstream action using its separately issued user confirmation.", risk=CapabilityRisk.WRITE, confirmation="none", **common), provider.dispatch),
-        (CapabilitySpec(id="simulation.capture_run.cancel", description="Cancel unstarted capture steps and reconcile active work.", risk=CapabilityRisk.WRITE, confirmation="user", **common), provider.cancel),
-        (CapabilitySpec(id="simulation.capture_step.retry", description="Retry one proven-failed capture step with a new attempt.", risk=CapabilityRisk.WRITE, confirmation="user", **common), provider.retry),
+        (CapabilitySpec(id="simulation.environment.materialize", version=1, description="Queue exact Connector materialization for an immutable environment.", risk=CapabilityRisk.WRITE, confirmation="user", **common), provider.migration_required),
+        (CapabilitySpec(id="simulation.environment.materialize", version=2, description="Prepare exact Connector materialization for separately confirmed dispatch.", risk=CapabilityRisk.WRITE, confirmation="user", **common), provider.materialize),
+        (CapabilitySpec(id="simulation.materialization_run.action.get", version=1, description="Read the exact materialization action awaiting user confirmation.", risk=CapabilityRisk.READ, confirmation="none", **common), provider.materialization_action),
+        (CapabilitySpec(id="simulation.materialization_run.dispatch", version=1, description="Dispatch one prepared materialization action using its separate user confirmation.", risk=CapabilityRisk.WRITE, confirmation="none", **common), provider.dispatch_materialization),
+        (CapabilitySpec(id="simulation.capture_run.start", version=1, description="Queue internal VisMockup captures in reverse process order.", risk=CapabilityRisk.WRITE, confirmation="user", **common), provider.migration_required),
+        (CapabilitySpec(id="simulation.capture_run.start", version=2, description="Prepare reverse-order internal VisMockup captures for separately confirmed dispatch.", risk=CapabilityRisk.WRITE, confirmation="user", **common), provider.start),
+        (CapabilitySpec(id="simulation.capture_run.get", version=1, description="Read authoritative reverse-capture progress.", risk=CapabilityRisk.READ, confirmation="none", **common), provider.get),
+        (CapabilitySpec(id="simulation.capture_run.action.get", version=1, description="Read the exact next downstream action awaiting user confirmation.", risk=CapabilityRisk.READ, confirmation="none", **common), provider.action),
+        (CapabilitySpec(id="simulation.capture_run.dispatch", version=1, description="Dispatch exactly one downstream action using its separately issued user confirmation.", risk=CapabilityRisk.WRITE, confirmation="none", **common), provider.dispatch),
+        (CapabilitySpec(id="simulation.capture_run.cancel", version=1, description="Cancel unstarted capture steps and reconcile active work.", risk=CapabilityRisk.WRITE, confirmation="user", **common), provider.cancel),
+        (CapabilitySpec(id="simulation.capture_step.retry", version=1, description="Retry one proven-failed capture step with a new attempt.", risk=CapabilityRisk.WRITE, confirmation="user", **common), provider.retry),
     )
 
 

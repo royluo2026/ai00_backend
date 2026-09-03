@@ -11,7 +11,7 @@ from pydantic import Field, model_validator
 
 from backend.capability_v2.contracts import FrozenModel, OperationRef, OperationStatus
 from backend.capability_v2.provider_contracts import (
-    CapabilityContext, CapabilityOutput, CapabilityRisk, CapabilitySpec, EvidenceRef,
+    CapabilityBusinessError, CapabilityContext, CapabilityOutput, CapabilityRisk, CapabilitySpec, EvidenceRef,
 )
 from backend.contracts.connector_execution_plan_v1 import (
     ConnectorExecutionPlanV1, ConnectorPlanOutcomeV1, canonical_hash,
@@ -214,10 +214,76 @@ class ConnectorControlPlane:
                 raise ConnectorError("plan_outcome_invalid")
         self.repository.complete_plan(device_id, plan_id, lease_id, outcome)
         if self.outcome_port is not None:
-            await self.outcome_port.apply(plan, outcome)
+            target = self.outcome_port.target(plan) if hasattr(self.outcome_port, "target") else "simulation.connector_outcome.apply"
+            attempt = 1
+            if hasattr(self.repository, "begin_projection"):
+                attempt = self.repository.begin_projection(
+                    plan_id, canonical_hash(outcome.model_dump(mode="json")), target,
+                )
+                if attempt is None:
+                    return
+            try:
+                await self.outcome_port.apply(plan, outcome, attempt=attempt)
+            except Exception as exc:
+                if hasattr(self.repository, "fail_projection"):
+                    self.repository.fail_projection(
+                        plan_id, attempt,
+                        retryable=bool(getattr(exc, "retryable", True)),
+                        error_code=str(exc)[:128],
+                    )
+                raise
+            if hasattr(self.repository, "complete_projection"):
+                self.repository.complete_projection(plan_id, attempt)
 
 
 class SqlConnectorRepository:
+    def begin_projection(self, plan_id: str, outcome_hash: str, target_capability: str) -> int | None:
+        with get_device_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT attempt,status,outcome_hash,target_capability,(next_retry_at IS NULL OR next_retry_at<=NOW(6)) AS retry_ready "
+                "FROM workmanship_device_connector_projection_outbox "
+                "WHERE plan_id=%s ORDER BY attempt DESC LIMIT 1 FOR UPDATE",
+                (plan_id,),
+            )
+            current = cursor.fetchone()
+            if current:
+                if current["outcome_hash"] != outcome_hash or current["target_capability"] != target_capability:
+                    raise ConnectorError("idempotency_conflict")
+                if current["status"] in {"projected", "reconciliation_required"}:
+                    return None
+                if current["status"] == "projecting":
+                    raise ConnectorError("projection_in_progress")
+                if not current["retry_ready"]:
+                    raise ConnectorError("projection_retry_later")
+                attempt = int(current["attempt"]) + 1
+            else:
+                attempt = 1
+            cursor.execute(
+                "INSERT INTO workmanship_device_connector_projection_outbox "
+                "(plan_id,outcome_hash,target_capability,attempt,status,next_retry_at) "
+                "VALUES (%s,%s,%s,%s,'projecting',NOW(6))",
+                (plan_id, outcome_hash, target_capability, attempt),
+            )
+        return attempt
+
+    def complete_projection(self, plan_id: str, attempt: int) -> None:
+        with get_device_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "UPDATE workmanship_device_connector_projection_outbox SET status='projected',projected_at=NOW(6),updated_at=NOW(6) "
+                "WHERE plan_id=%s AND attempt=%s AND status='projecting'",
+                (plan_id, attempt),
+            )
+
+    def fail_projection(self, plan_id: str, attempt: int, *, retryable: bool, error_code: str) -> None:
+        status = "retryable_failed" if retryable else "reconciliation_required"
+        with get_device_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "UPDATE workmanship_device_connector_projection_outbox SET status=%s,error_code=%s,"
+                "next_retry_at=IF(%s,DATE_ADD(NOW(6),INTERVAL 5 SECOND),NULL),updated_at=NOW(6) "
+                "WHERE plan_id=%s AND attempt=%s AND status='projecting'",
+                (status, error_code, retryable, plan_id, attempt),
+            )
+
     def get_health(self, device_id: str) -> ConnectorHealth | None:
         with get_device_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
@@ -441,6 +507,12 @@ def register_connector_runtime_capabilities(registry, control_plane: ConnectorCo
             digest=plan.plan_hash,
         ),))
 
+    def queue_plan_v1_closed(payload, context):
+        raise CapabilityBusinessError(
+            "capability_migration_required",
+            "device.connector.plan.queue@1 is closed; migrate to externally consistent @2.",
+        )
+
     register(registry, CapabilitySpec(
         id="device.connector.health.get", owner="device", version=1,
         description="Read the latest authenticated AI00 Connector health advertisement.",
@@ -456,7 +528,7 @@ def register_connector_runtime_capabilities(registry, control_plane: ConnectorCo
         do_not_use_when="Compatibility or user-session preflight has not passed.",
         risk=CapabilityRisk.WRITE, confirmation="user", permissions=("agent.run",),
         input_schema={}, output_schema={}, tags=("device", "connector", "plan"),
-    ), queue_plan)
+    ), queue_plan_v1_closed)
     register(registry, CapabilitySpec(
         id="device.connector.plan.queue", owner="device", version=2,
         description="Queue one immutable compatible ExecutionPlan using external Connector consistency.",

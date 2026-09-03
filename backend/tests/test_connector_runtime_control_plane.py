@@ -104,6 +104,7 @@ def test_completion_can_retry_domain_projection_after_device_outcome_is_stored()
         def __init__(self):
             super().__init__()
             self.saved_outcome = None
+            self.projection_attempts = []
 
         def get_plan(self, plan_id, *, device_id, lease_id):
             return plan()
@@ -113,12 +114,24 @@ def test_completion_can_retry_domain_projection_after_device_outcome_is_stored()
                 raise ConnectorError("idempotency_conflict")
             self.saved_outcome = outcome
 
+        def begin_projection(self, plan_id, outcome_hash, target):
+            attempt = len(self.projection_attempts) + 1
+            self.projection_attempts.append([attempt, "projecting"])
+            return attempt
+
+        def fail_projection(self, plan_id, attempt, **failure):
+            self.projection_attempts[-1][1] = "retryable_failed"
+
+        def complete_projection(self, plan_id, attempt):
+            self.projection_attempts[-1][1] = "projected"
+
     class Projection:
         def __init__(self):
             self.calls = 0
 
-        async def apply(self, current_plan, outcome):
+        async def apply(self, current_plan, outcome, *, attempt=1):
             self.calls += 1
+            assert attempt == self.calls
             if self.calls == 1:
                 raise RuntimeError("projection_temporarily_unavailable")
 
@@ -131,6 +144,9 @@ def test_completion_can_retry_domain_projection_after_device_outcome_is_stored()
 
     assert repository.saved_outcome == completed_outcome()
     assert projection.calls == 2
+    assert repository.projection_attempts == [
+        [1, "retryable_failed"], [2, "projected"],
+    ]
 
 
 def test_failed_plan_outcome_requires_a_failed_step():
@@ -318,6 +334,9 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
         assert substantive_business_definition_errors(descriptor) == ()
     assert by_id[("device.connector.plan.queue", 1)][1].consistency_policy == "strong"
     assert by_id[("device.connector.plan.queue", 2)][1].consistency_policy == "external"
+    assert by_id[("device.connector.plan.queue", 1)][1].lifecycle_status == "deprecated"
+    assert not any(by_id[("device.connector.plan.queue", 1)][1].exposure.model_dump().values())
+    assert by_id[("device.connector.plan.queue", 2)][1].lifecycle_status == "experimental"
 
 
 def test_connector_heartbeat_route_passes_authenticated_device_identity(monkeypatch):

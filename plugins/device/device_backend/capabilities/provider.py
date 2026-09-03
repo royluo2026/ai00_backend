@@ -25,6 +25,7 @@ _ERRORS = tuple(DomainErrorContract(code=code, meaning=meaning, retryable=retrya
     ("local_operation_failed", "The workstation returned a sanitized local execution error.", False),
     ("local_operation_outcome_unknown", "Execution may have occurred and must be reconciled before retry.", True),
     ("provider_unavailable", "The Local Runtime application provider is unavailable.", True),
+    ("capability_migration_required", "This deprecated Connector queue version must migrate to @2.", False),
 ))
 
 
@@ -49,6 +50,9 @@ def descriptor_for(spec: Any):
         "lifecycle_status": (
             LifecycleStatus.DEPRECATED
             if governed.id in DEPRECATED_LOCAL_DEVICE_CAPABILITIES | DEPRECATED_DIRECT_VISMOCKUP_CAPABILITIES
+            or (governed.id == "device.connector.plan.queue" and governed.version == 1)
+            else LifecycleStatus.EXPERIMENTAL
+            if governed.id == "device.connector.plan.queue" and governed.version >= 2
             else LifecycleStatus.STABLE
         ),
         "deprecation_message": (
@@ -58,11 +62,17 @@ def descriptor_for(spec: Any):
                 "Use simulation.capture_run.start; direct VisMockup commands remain an internal AI00 Connector compatibility path only."
                 if governed.id == "vismockup.capture" else (
                     "Use simulation.environment.materialize; direct VisMockup commands remain an internal AI00 Connector compatibility path only."
-                    if governed.id in DEPRECATED_DIRECT_VISMOCKUP_CAPABILITIES else None
+                    if governed.id in DEPRECATED_DIRECT_VISMOCKUP_CAPABILITIES else (
+                        "Strong-consistency queue @1 is closed; migrate to device.connector.plan.queue@2."
+                        if governed.id == "device.connector.plan.queue" and governed.version == 1 else None
+                    )
                 )
             )
         ),
         "exposure": (
+            ExposurePolicy()
+            if governed.id == "device.connector.plan.queue" and governed.version == 1
+            else
             ExposurePolicy(web=False, api=False, plugin=False, agent=False, mcp=False, local_runtime=True)
             if governed.id in DEPRECATED_DIRECT_VISMOCKUP_CAPABILITIES
             else ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True, local_runtime=is_local)

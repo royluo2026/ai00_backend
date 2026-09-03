@@ -106,7 +106,8 @@ class GovernedSimulationRuntimeClient:
             approval_reference=approval_reference,
         ), context)
 
-    async def apply_connector_outcome(self, plan, outcome):
+    @staticmethod
+    def connector_outcome_target(plan):
         operations = {step.operation_id for step in plan.steps}
         if operations == {"vismockup.document.snapshot@1"}:
             capability_id = "simulation.connector_document_snapshot_outcome.apply"
@@ -121,6 +122,10 @@ class GovernedSimulationRuntimeClient:
         else:
             capability_id = "simulation.connector_materialization_outcome.apply"
             resource_payload = {"run_id": plan.plan_id}
+        return capability_id, resource_payload
+
+    async def apply_connector_outcome(self, plan, outcome, *, attempt=1):
+        capability_id, resource_payload = self.connector_outcome_target(plan)
         outcome_value = outcome.model_dump(mode="json")
         payload = {
             **resource_payload,
@@ -134,7 +139,7 @@ class GovernedSimulationRuntimeClient:
             actor=ActorIdentity(
                 user_id=plan.user_id,
                 authentication_method="connector_plan_lease",
-                authenticated_at=datetime.now(UTC),
+                authenticated_at=plan.issued_at,
             ),
             tenant=TenantIdentity(tenant_id=plan.tenant_id, membership="member"),
             consumer=ConsumerDescriptor(
@@ -149,7 +154,7 @@ class GovernedSimulationRuntimeClient:
         )
         result = await self.client.invoke(DomainInvocation(
             capability_id, 1, payload,
-            idempotency_key=f"{plan.plan_id}:{digest}",
+            idempotency_key=f"{plan.plan_id}:{digest}:{attempt}",
         ), identity, correlation)
         if result.status is not CapabilityStatus.COMPLETED or result.error is not None:
             error = result.error
@@ -188,8 +193,13 @@ class ConnectorPortProxy:
 
 
 class ConnectorOutcomePortProxy:
-    async def apply(self, plan, outcome):
-        return await simulation_runtime_ports.require("simulation.connector_outcome").apply_connector_outcome(plan, outcome)
+    def target(self, plan):
+        return GovernedSimulationRuntimeClient.connector_outcome_target(plan)[0]
+
+    async def apply(self, plan, outcome, *, attempt=1):
+        return await simulation_runtime_ports.require("simulation.connector_outcome").apply_connector_outcome(
+            plan, outcome, attempt=attempt,
+        )
 
 
 class KnowledgeMappingPortProxy:

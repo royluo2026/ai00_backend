@@ -36,6 +36,13 @@ class DocumentSnapshotProvider:
             reference=f"simulation://document-snapshot/{row['snapshot_request_id']}",
         ),))
 
+    @staticmethod
+    def migration_required(payload, context):
+        raise CapabilityBusinessError(
+            "capability_migration_required",
+            "This immediate-dispatch version is closed; migrate to the @2 prepare/action/dispatch workflow.",
+        )
+
     def get(self, payload, context):
         row = self._call(self.workflow.get, payload["snapshot_request_id"], context)
         digest = row["snapshot"].get("snapshot_hash") if row.get("snapshot") else None
@@ -80,13 +87,14 @@ default_provider = DocumentSnapshotProvider(default_workflow)
 
 
 def specs(provider=default_provider):
-    common = {"owner": "simulation", "version": 1, "permissions": ("simulation.use",),
+    common = {"owner": "simulation", "permissions": ("simulation.use",),
               "plugin_callable": True, "tags": ("simulation", "connector_environment")}
     return (
-        (CapabilitySpec(id="simulation.document_snapshot.request", description="Request an immutable snapshot of the bound user's active VisMockup BOM.", risk=CapabilityRisk.WRITE, confirmation="user", **common), provider.request),
-        (CapabilitySpec(id="simulation.document_snapshot.get", description="Read authoritative progress and the confirmed active VisMockup BOM snapshot.", risk=CapabilityRisk.READ, confirmation="none", **common), provider.get),
-        (CapabilitySpec(id="simulation.document_snapshot.action.get", description="Read the exact snapshot action awaiting user confirmation.", risk=CapabilityRisk.READ, confirmation="none", **common), provider.action),
-        (CapabilitySpec(id="simulation.document_snapshot.dispatch", description="Dispatch the prepared snapshot action using its separate user confirmation.", risk=CapabilityRisk.WRITE, confirmation="none", **common), provider.dispatch),
+        (CapabilitySpec(id="simulation.document_snapshot.request", version=1, description="Request and queue an immutable snapshot of the bound user's active VisMockup BOM.", risk=CapabilityRisk.WRITE, confirmation="user", **common), provider.migration_required),
+        (CapabilitySpec(id="simulation.document_snapshot.request", version=2, description="Prepare an immutable active VisMockup BOM snapshot for separately confirmed dispatch.", risk=CapabilityRisk.WRITE, confirmation="user", **common), provider.request),
+        (CapabilitySpec(id="simulation.document_snapshot.get", version=1, description="Read authoritative progress and the confirmed active VisMockup BOM snapshot.", risk=CapabilityRisk.READ, confirmation="none", **common), provider.get),
+        (CapabilitySpec(id="simulation.document_snapshot.action.get", version=1, description="Read the exact snapshot action awaiting user confirmation.", risk=CapabilityRisk.READ, confirmation="none", **common), provider.action),
+        (CapabilitySpec(id="simulation.document_snapshot.dispatch", version=1, description="Dispatch the prepared snapshot action using its separate user confirmation.", risk=CapabilityRisk.WRITE, confirmation="none", **common), provider.dispatch),
     )
 
 

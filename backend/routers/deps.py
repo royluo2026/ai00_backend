@@ -419,7 +419,8 @@ def build_capability_authorization_grants(
             resource_scopes.add(f"team:{scope_gid}")
     data_scopes = {"internal"}
     if set(profile.get("permissions", ())) & {
-        "craft.view", "craft.write_direct", "knowledge.view", "knowledge.manage"
+        "craft.view", "craft.write_direct", "knowledge.view", "knowledge.manage",
+        "simulation.use",
     }:
         data_scopes.add("confidential")
     if "system.plugin.manage" in set(profile.get("permissions", ())):
@@ -429,6 +430,21 @@ def build_capability_authorization_grants(
         data_scopes.add("*")
     capability_scopes = ("*",) if consumer_type in {"web", "api"} else ()
     policy_version = "legacy-rbac-to-abac-v1"
+    if consumer_type == "local_runtime":
+        if (
+            identity is None
+            or identity.consumer.consumer_id != "ai00.connector"
+            or not identity.consumer.installation_id
+            or identity.actor.user_id != str(user.get("gid"))
+            or identity.actor.authentication_method != "connector_plan_lease"
+        ):
+            raise PermissionError("connector local-runtime identity binding mismatch")
+        capability_scopes = (
+            "simulation.connector_capture_outcome.apply",
+            "simulation.connector_document_snapshot_outcome.apply",
+            "simulation.connector_materialization_outcome.apply",
+        )
+        policy_version = f"connector-plan-lease-v1:{identity.consumer.installation_id}"
     if consumer_type in {"agent", "mcp"}:
         if identity is None or identity.delegation is None:
             raise PermissionError("delegation identity is required")

@@ -91,7 +91,7 @@ def test_snapshot_request_is_idempotent_and_completes_only_from_connector_outcom
         protocol=plan.protocol, plan_id=plan.plan_id, status="completed",
         steps=(result,), reported_at=NOW,
     )
-    workflow.apply_connector_outcome(plan, outcome)
+    workflow.apply_connector_outcome(plan, outcome, context())
 
     completed = workflow.get("snapshot-1", context())
     assert completed["snapshot"] == SNAPSHOT

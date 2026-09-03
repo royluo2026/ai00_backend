@@ -187,7 +187,7 @@ def test_materialization_outcome_projects_terminal_status_to_domain_run():
         steps=results, reported_at=now,
     )
 
-    workflow.apply_materialization_outcome(plan, outcome)
+    workflow.apply_materialization_outcome(plan, outcome, _context())
 
     assert repository.runs["run-1"]["status"] == "completed"
 
@@ -211,6 +211,9 @@ def test_outcome_unknown_requires_reconciliation_before_retry():
     workflow, _, _, _ = _workflow()
     asyncio.run(workflow.start_capture("env-1", 1, "device-1", _context()))
     workflow.record_step_result("run-1", "op-30", status="outcome_unknown")
+    workflow.repository.update_capture_run("run-1", status="outcome_unknown")
+
+    assert workflow.next_action("run-1", _context()) is None
 
     with pytest.raises(SimulationWorkflowError, match="local_execution_outcome_unknown"):
         asyncio.run(workflow.retry_step("run-1", "op-30", _context()))
@@ -294,15 +297,15 @@ def test_gateway_bound_capture_plan_uses_exact_descriptor_provenance():
     registry = CapabilityRegistry()
     register_capabilities(registry, capture_provider=CaptureRunProvider(workflow))
     payload = {"environment_id": "env-1", "environment_version": 1, "device_id": "device-1"}
-    token = confirmation_manager.issue("simulation.capture_run.start", 1, "user-1", payload)
+    token = confirmation_manager.issue("simulation.capture_run.start", 2, "user-1", payload)
     context = CapabilityContext(
         user_gid="user-1", team_gid="team-1", permissions=("simulation.use",),
         confirmation_token=token,
     )
 
-    asyncio.run(registry.invoke("simulation.capture_run.start", payload, context, version=1))
+    asyncio.run(registry.invoke("simulation.capture_run.start", payload, context, version=2))
 
-    descriptor = registry.get("simulation.capture_run.start", 1).descriptor
+    descriptor = registry.get("simulation.capture_run.start", 2).descriptor
     prepared = repository.runs["run-1"]["steps"][0]["plan"]
     assert prepared["capability_version_gid"] == descriptor.capability_version_gid
     assert prepared["business_definition_hash"] == business_definition_hash(descriptor)

@@ -190,3 +190,33 @@ def test_team_plugin_manager_receives_restricted_data_scope_without_global_scope
     assert grants.data_scopes == ("internal", "restricted")
     assert "*" not in grants.resource_scopes
     assert "*" not in grants.data_scopes
+
+
+def test_connector_local_runtime_receives_only_outcome_projection_scopes(monkeypatch):
+    from backend.routers import deps
+
+    monkeypatch.setattr(deps, "build_profile", lambda _user: {
+        "permissions": ["simulation.use"], "org_role": "member", "grants": [],
+    })
+    identity = _identity(ConsumerType.LOCAL_RUNTIME)
+    identity = identity.model_copy(update={
+        "consumer": ConsumerDescriptor(
+            type=ConsumerType.LOCAL_RUNTIME,
+            consumer_id="ai00.connector",
+            installation_id="device_1",
+        ),
+        "actor": identity.actor.model_copy(update={
+            "authentication_method": "connector_plan_lease",
+        }),
+    })
+
+    grants = deps.build_capability_authorization_grants(
+        {"gid": "user_1"}, "tenant_1", "local_runtime", identity,
+    )
+
+    assert set(grants.capability_scopes) == {
+        "simulation.connector_capture_outcome.apply",
+        "simulation.connector_materialization_outcome.apply",
+        "simulation.connector_document_snapshot_outcome.apply",
+    }
+    assert grants.data_scopes == ("confidential", "internal")

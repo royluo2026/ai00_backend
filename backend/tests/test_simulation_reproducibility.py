@@ -68,6 +68,8 @@ EXPERIMENTAL_IDS = {
     "simulation.connector_capture_outcome.apply",
     "simulation.connector_materialization_outcome.apply",
     "simulation.connector_document_snapshot_outcome.apply",
+    "simulation.environment.materialize",
+    "simulation.capture_run.start",
 }
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -145,6 +147,23 @@ def test_provider_publishes_native_stable_plugin_agent_and_mcp_contracts():
         if error.retryable
     }
     assert retryable_errors == {"source_resolver_unavailable", "simulation_result_not_ready"}
+
+
+def test_two_phase_entrypoints_use_new_major_and_fail_closed_legacy_versions():
+    registry = CapabilityRegistry()
+    register_capabilities(registry)
+
+    for capability_id in (
+        "simulation.document_snapshot.request",
+        "simulation.environment.materialize",
+        "simulation.capture_run.start",
+    ):
+        legacy = registry.get(capability_id, 1)
+        current = registry.get(capability_id, 2)
+        assert legacy is not None and legacy.descriptor.lifecycle_status == "deprecated"
+        assert not any(legacy.descriptor.exposure.model_dump().values())
+        assert legacy.descriptor.deprecation_message and "@2" in legacy.descriptor.deprecation_message
+        assert current is not None and current.descriptor.lifecycle_status == "experimental"
 
 
 def test_connector_environment_capabilities_have_author_controlled_business_definitions():

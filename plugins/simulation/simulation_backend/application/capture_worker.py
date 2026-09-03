@@ -142,6 +142,10 @@ class CaptureWorkflow:
         run = self.repository.get_capture_run(capture_run_id, context)
         if run is None:
             raise SimulationWorkflowError("capture_run_not_found")
+        if run["status"] in {
+            "cancelling", "cancelled", "failed", "partial", "outcome_unknown",
+        }:
+            return None
         manifest = self.repository.get_manifest(
             run["environment_id"], run["environment_version"], context,
         )
@@ -238,6 +242,7 @@ class CaptureWorkflow:
 
     def apply_materialization_outcome(
         self, plan: ConnectorExecutionPlanV1, outcome: ConnectorPlanOutcomeV1,
+        context: CapabilityContext,
     ) -> None:
         if outcome.plan_id != plan.plan_id or outcome.protocol != plan.protocol:
             raise SimulationWorkflowError("plan_outcome_invalid")
@@ -248,6 +253,12 @@ class CaptureWorkflow:
         if not plan.steps or any(
             step.operation_id not in materialization_operations for step in plan.steps
         ):
+            raise SimulationWorkflowError("plan_outcome_invalid")
+        persisted = self.repository.get_materialization_run(plan.plan_id, context)
+        if persisted is None:
+            raise SimulationWorkflowError("materialization_run_not_found")
+        expected_plan = ConnectorExecutionPlanV1.model_validate(persisted.get("plan"))
+        if expected_plan.plan_hash != plan.plan_hash or expected_plan != plan:
             raise SimulationWorkflowError("plan_outcome_invalid")
         status = {
             "completed": "completed", "failed": "failed",
@@ -280,6 +291,19 @@ class CaptureWorkflow:
             raise SimulationWorkflowError("plan_outcome_invalid")
 
         current = {item["operation_id"]: item for item in run["steps"]}
+        capture_operation_id = str(capture_steps[0].payload.get("operation_id") or "")
+        persisted_step = current.get(capture_operation_id)
+        if persisted_step is None:
+            raise SimulationWorkflowError("capture_step_not_found")
+        expected_plan = ConnectorExecutionPlanV1.model_validate(persisted_step.get("plan"))
+        if expected_plan.plan_hash != plan.plan_hash or expected_plan != plan:
+            raise SimulationWorkflowError("plan_outcome_invalid")
+        if outcome.status == "outcome_unknown" and not outcome.steps:
+            self.record_step_result(
+                capture_run_id, capture_operation_id, status="outcome_unknown",
+            )
+            self.repository.update_capture_run(capture_run_id, status="outcome_unknown")
+            return self.repository.get_capture_run(capture_run_id, context)
         projected = 0
         for step in plan.steps:
             if step.operation_id != "vismockup.view.capture@1":

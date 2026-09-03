@@ -10,6 +10,12 @@ from backend.capability_v2.business_definition import business_definition_hash
 from .contracts import INPUT_SCHEMAS, OUTPUT_SCHEMAS
 
 
+_TWO_PHASE_ENTRYPOINTS = {
+    "simulation.document_snapshot.request",
+    "simulation.environment.materialize",
+    "simulation.capture_run.start",
+}
+
 _RESOURCES = {
     "simulation.parameter_set.get": (("simulation-parameter-set", "parameter_set_ref.parameter_set_id"),),
     "simulation.solver_profile.get": (("simulation-profile", "simulation_profile_ref.profile_id"),),
@@ -98,6 +104,7 @@ _ERROR_PAIRS = (
     ("materialization_run_not_found", "The materialization run is unavailable or not visible."),
     ("materialization_action_not_ready", "The materialization action is not ready to dispatch."),
     ("plan_outcome_invalid", "The Connector outcome does not match the immutable execution plan."),
+    ("capability_migration_required", "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow."),
 )
 _LEGACY_ERROR_CODES = frozenset(code for code, _ in _ERROR_PAIRS[:9])
 _RETRYABLE_ERROR_CODES = frozenset({
@@ -129,6 +136,11 @@ _CONNECTOR_BUSINESS_EFFECTS = {
     "simulation.connector_capture_outcome.apply": "Project one authenticated Device-owned Connector outcome into the exact caller-visible capture run without dispatching later work.",
     "simulation.connector_materialization_outcome.apply": "Project one authenticated Device-owned Connector outcome into the exact caller-visible materialization run.",
     "simulation.connector_document_snapshot_outcome.apply": "Project one authenticated Device-owned Connector outcome into the exact caller-visible document snapshot request.",
+}
+_TWO_PHASE_BUSINESS_EFFECTS = {
+    "simulation.document_snapshot.request": "Prepare one bounded immutable snapshot request for later user-confirmed Device dispatch.",
+    "simulation.environment.materialize": "Prepare construction and verification of the exact immutable simulation environment for later user-confirmed Device dispatch.",
+    "simulation.capture_run.start": "Prepare reverse-order VisMockup-internal screenshot steps; each Device or Craft action is dispatched only after separate exact confirmation.",
 }
 
 _CONNECTOR_READ_REASON = (
@@ -246,6 +258,26 @@ _CONNECTOR_BUSINESS_INVARIANTS = {
             test_refs=("backend/tests/test_simulation_connector_outcome_capabilities.py::test_capture_outcome_is_projected_only_through_its_exact_simulation_resource",),
         ),
     ),
+    "simulation.connector_materialization_outcome.apply": (
+        BusinessInvariantContract(
+            rule_id="simulation.connector_outcome.materialization_identity", version=1,
+            statement="A materialization outcome is accepted only for the exact persisted plan id and plan hash of its caller-visible run.",
+            applies_when="an authenticated materialization outcome is projected",
+            enforcement_ref="plugins/simulation/simulation_backend/application/capture_worker.py:CaptureWorkflow.apply_materialization_outcome",
+            error_code="plan_outcome_invalid",
+            test_refs=("backend/tests/test_simulation_capture_workflow.py::test_materialization_outcome_projects_terminal_status_to_domain_run",),
+        ),
+    ),
+    "simulation.connector_document_snapshot_outcome.apply": (
+        BusinessInvariantContract(
+            rule_id="simulation.connector_outcome.document_snapshot_identity", version=1,
+            statement="A document snapshot outcome is accepted only for the exact persisted plan and projects an empty uncertain reconciliation without inventing step data.",
+            applies_when="an authenticated document snapshot outcome is projected",
+            enforcement_ref="plugins/simulation/simulation_backend/application/document_snapshots.py:DocumentSnapshotWorkflow.apply_connector_outcome",
+            error_code="plan_outcome_invalid",
+            test_refs=("backend/tests/test_simulation_document_snapshot_workflow.py::test_snapshot_request_is_idempotent_and_completes_only_from_connector_outcome",),
+        ),
+    ),
 }
 
 
@@ -269,8 +301,11 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
     is_write = descriptor.side_effect_level is not SideEffectLevel.READ
     updates = {
         "lifecycle_status": (
-            LifecycleStatus.EXPERIMENTAL
-            if governed.id.startswith("simulation.document_snapshot.")
+            LifecycleStatus.DEPRECATED
+            if governed.id in _TWO_PHASE_ENTRYPOINTS and governed.version == 1
+            else LifecycleStatus.EXPERIMENTAL
+            if governed.id in _TWO_PHASE_ENTRYPOINTS and governed.version >= 2
+            or governed.id.startswith("simulation.document_snapshot.")
             or governed.id in {
                 "simulation.capture_run.action.get", "simulation.capture_run.dispatch",
                 "simulation.materialization_run.action.get", "simulation.materialization_run.dispatch",
@@ -293,6 +328,13 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         "domain_errors": _errors(connector_environment="connector_environment" in governed.tags),
         "domain_errors_complete": True,
     }
+    if governed.id in _TWO_PHASE_ENTRYPOINTS and governed.version == 1:
+        updates.update({
+            "exposure": ExposurePolicy(),
+            "agent_output_schema": None,
+            "deprecation_message": f"Immediate dispatch is closed; migrate to {governed.id}@2 and its action/dispatch workflow.",
+            "no_consumer_reason": "The unsafe immediate-dispatch contract is frozen with no verified runtime consumer and accepts no new traffic.",
+        })
     if governed.id.startswith("simulation.connector_") and governed.id.endswith("_outcome.apply"):
         updates.update({
             "exposure": ExposurePolicy(local_runtime=True),
@@ -301,7 +343,11 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
     if "connector_environment" in governed.tags:
         invariants = _CONNECTOR_BUSINESS_INVARIANTS.get(governed.id, ())
         updates.update({
-            "business_effect": _CONNECTOR_BUSINESS_EFFECTS[governed.id],
+            "business_effect": (
+                _TWO_PHASE_BUSINESS_EFFECTS[governed.id]
+                if governed.id in _TWO_PHASE_ENTRYPOINTS and governed.version >= 2
+                else _CONNECTOR_BUSINESS_EFFECTS[governed.id]
+            ),
             "business_acceptance_criteria": (
                 "The result is scoped to the caller-visible immutable environment or capture-run identity.",
                 "Inputs and outputs satisfy the closed published contract and retain exact source version pins.",

@@ -106,8 +106,23 @@ class DocumentSnapshotWorkflow:
 
     def apply_connector_outcome(
         self, plan: ConnectorExecutionPlanV1, outcome: ConnectorPlanOutcomeV1,
+        context: CapabilityContext,
     ) -> None:
-        if outcome.plan_id != plan.plan_id or not outcome.steps:
+        persisted = self.repository.get_request(plan.plan_id, context)
+        if persisted is None:
+            raise SimulationWorkflowError("document_snapshot_not_found")
+        expected_plan = ConnectorExecutionPlanV1.model_validate(persisted.get("plan"))
+        if expected_plan.plan_hash != plan.plan_hash or expected_plan != plan:
+            raise SimulationWorkflowError("plan_outcome_invalid")
+        if outcome.plan_id != plan.plan_id:
+            raise SimulationWorkflowError("plan_outcome_invalid")
+        if outcome.status == "outcome_unknown" and not outcome.steps:
+            self.repository.complete_request(
+                plan.plan_id, status="outcome_unknown",
+                failure_code="local_execution_outcome_unknown",
+            )
+            return
+        if not outcome.steps:
             raise SimulationWorkflowError("plan_outcome_invalid")
         result = outcome.steps[0]
         if result.step_id != plan.steps[0].step_id:
