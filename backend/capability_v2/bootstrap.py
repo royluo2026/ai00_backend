@@ -21,6 +21,15 @@ _test_governance_store_factory: Callable[[], Any] | None = None
 _test_governance_service_factory: Callable[[Any], Any] | None = None
 
 
+def _plain_catalog_value(value: Any) -> Any:
+    """Copy an immutable snapshot value into a Catalog-loader-safe tree."""
+    if isinstance(value, Mapping):
+        return {str(key): _plain_catalog_value(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_plain_catalog_value(item) for item in value]
+    return value
+
+
 def build_capability_registry(
     root: Path | None = None,
     manifest_path: Path | None = None,
@@ -114,24 +123,32 @@ def _install_default_test_governance_runtime() -> None:
     """Install bounded scanner/worker ports for the explicit test profile."""
     from backend.capability_governance_test.analysis import AnalysisRequest, run_deterministic_analysis
     from backend.capability_governance_test.audit import AuditSink
+    from backend.capability_governance_test.business_audit import audit
     from backend.capability_governance_test.scanner import GovernanceScanner
     from backend.capability_governance_test.service import CapabilityGovernanceService
     from backend.capability_governance_test.store import MemoryGovernanceStore, SqlGovernanceStore
     from backend.capability_governance_test.worker import InMemoryRunLeaseStore, LeasedGovernanceWorker, SqlRunLeaseStore
     from backend.domain_ports.capability_governance_config import GovernanceSettings
     from backend.capability_v2.catalog import load_catalog_release
+    from backend.capability_v2.catalog_store import SqlCatalogStore
+    from backend.capability_v2.release_gate import evaluate_catalog_business_governance, load_legacy_baseline
     from backend.utils.gid import next_gid
 
     repository_root = Path(__file__).resolve().parents[2]
-    product = load_catalog_release(
+    product_document = json.loads(
         (repository_root / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
     )
+    product = load_catalog_release(product_document)
     extension = load_catalog_release(
         (repository_root / "docs/governance/test-extension/capability-governance-catalog-release.json").read_text(encoding="utf-8")
     )
     manifests = load_domain_manifests(repository_root / "backend/capability_v2/official_domains.json")
     acceptance_manifest = json.loads(
         (repository_root / "backend/tests/acceptance/fixtures/case-manifest.json").read_text(encoding="utf-8")
+    )
+    legacy_baseline = load_legacy_baseline(
+        repository_root / "docs/governance/capability-business-governance-legacy-baseline.json",
+        repository_root=repository_root,
     )
 
     def store_factory() -> Any:
@@ -144,7 +161,7 @@ def _install_default_test_governance_runtime() -> None:
     def service_factory(store: Any) -> Any:
         scanner = GovernanceScanner(
             GovernanceSettings("test-governance", repository_root),
-            product_catalog=product,
+            product_catalog=product_document,
             extension_catalog=extension,
             domain_manifests=manifests,
             acceptance_manifest=acceptance_manifest,
@@ -152,23 +169,91 @@ def _install_default_test_governance_runtime() -> None:
         if getattr(store, "persistent", False):
             from backend.db.connection import acquire_connection
             leases = SqlRunLeaseStore(acquire_connection)
+            catalog_store = SqlCatalogStore(acquire_connection)
         else:
             leases = InMemoryRunLeaseStore()
+            catalog_store = None
         worker = LeasedGovernanceWorker(leases, worker_id="capability-governance")
         audit_sink = AuditSink(next_gid=next_gid)
+
+        def web_revision_provider() -> str | None:
+            value = os.environ.get("AI00_TEST_GOVERNANCE_WEB_REVISION", "").strip()
+            return value if len(value) == 40 and all(character in "0123456789abcdef" for character in value) else None
+
+        def business_review_lookup(version_gid: str, definition_hash: str) -> str | None:
+            lookup = getattr(store, "current_business_review", None)
+            review = lookup(int(version_gid), definition_hash) if callable(lookup) else None
+            return definition_hash if review is not None else None
+
+        def business_gate_provider(snapshot: Any) -> Any:
+            document = getattr(snapshot, "document", snapshot)
+            release_id = str(getattr(document, "product_release_id", ""))
+            release = product if product.release_id == release_id else (
+                catalog_store.get(release_id) if catalog_store is not None else None
+            )
+            if release is None or release.catalog_hash != str(getattr(document, "catalog_hash", "")):
+                raise ValueError("snapshot_catalog_release_unavailable")
+            catalog = _plain_catalog_value(
+                product_document if release is product else release.model_dump(mode="json")
+            )
+            list_reviews = getattr(store, "list_current_business_reviews", None)
+            if callable(list_reviews):
+                approved = {
+                    (str(getattr(review, "capability_version_gid")), str(getattr(review, "definition_hash")))
+                    for review in list_reviews()
+                }
+                review_lookup = lambda version_gid, definition_hash: (
+                    definition_hash if (str(version_gid), str(definition_hash)) in approved else None
+                )
+            else:
+                review_lookup = business_review_lookup
+            return evaluate_catalog_business_governance(
+                catalog,
+                legacy_baseline.capabilities,
+                business_review_lookup=review_lookup,
+                runtime_verification={},
+                report_definition_blockers=True,
+            )
+
+        service_holder: dict[str, Any] = {}
+
+        def analysis_runner(snapshot_record: Any, request: Any) -> Any:
+            document = getattr(snapshot_record, "document", snapshot_record)
+            source_revision = str(getattr(document, "code_revision", ""))
+            web_revision = web_revision_provider() or source_revision
+            revisions = {"backend": source_revision, "web": web_revision, "source": source_revision}
+            service = service_holder["service"]
+            base = service.collect_business_audit_base(
+                snapshot_gid=str(getattr(snapshot_record, "snapshot_gid", "")),
+                source_revisions=revisions,
+            )
+            return audit(
+                base.findings,
+                capabilities=base.audit_capabilities,
+                snapshot_gid=base.snapshot_gid,
+                source_revisions=base.source_revisions,
+                relations=base.relations,
+                unbound_entries=base.unbound_entries,
+                gate_result=business_gate_provider(snapshot_record),
+            )
 
         def test_runner(snapshot: Any, payload: Mapping[str, Any] | None = None) -> Mapping[str, Any]:
             result = run_deterministic_analysis(snapshot, AnalysisRequest())
             return {"status": "passed" if result.status == "ok" else "failed", "findings": result.findings}
 
-        return CapabilityGovernanceService(
+        service = CapabilityGovernanceService(
             store=store,
             scanner=scanner,
-            analysis_runner=run_deterministic_analysis,
+            analysis_runner=analysis_runner,
             test_runner=test_runner,
             worker=worker,
             audit_sink=audit_sink,
+            web_revision_provider=web_revision_provider,
+            business_gate_provider=business_gate_provider,
+            next_ids=next_gid,
         )
+        service_holder["service"] = service
+        return service
 
     global _test_governance_store_factory, _test_governance_service_factory
     _test_governance_store_factory = store_factory

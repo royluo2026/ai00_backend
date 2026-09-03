@@ -846,6 +846,7 @@ class GovernanceScanner:
         capabilities: list[ScannedCapability] = []
         for raw_descriptor in catalog.get("descriptors", ()):
             descriptor = dict(_json_document(raw_descriptor))
+            catalog_definition_hash = str(descriptor.get("business_definition_hash") or "").strip()
             capability_id = str(descriptor.get("id", ""))
             major = int(descriptor.get("major_version", 0))
             owner = str(descriptor.get("owner_domain", ""))
@@ -893,7 +894,12 @@ class GovernanceScanner:
             for field_name in ("read_scope", "write_scope", "api_refs", "business_acceptance_criteria"):
                 if field_name in descriptor:
                     descriptor[field_name] = _strings(descriptor[field_name])
-            descriptor["business_definition_hash"] = business_definition_hash(descriptor)
+            # The Catalog hash identifies the author-controlled business
+            # definition.  Scanner normalization may add defaults or reorder
+            # rule evidence, but must not create a second semantic identity.
+            descriptor["business_definition_hash"] = (
+                catalog_definition_hash or business_definition_hash(descriptor)
+            )
             input_hash = _digest(descriptor.get("input_schema", {}))
             output_hash = _digest(descriptor.get("output_schema", {}))
             read_scope, write_scope = _scopes(descriptor)

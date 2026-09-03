@@ -226,7 +226,60 @@ _BOUNDED_COLLECTION_SCHEMA = {
     "type": "array", "maxItems": 500, "items": _BOUNDED_OBJECT_SCHEMA,
 }
 INPUT_SCHEMAS = {capability_id: _input_schema(capability_id) for capability_id in ALL_IDS}
-_CONTRACT_SCHEMA = {"type": "object", "maxProperties": 50, "additionalProperties": _BOUNDED_VALUE_SCHEMA}
+_BUSINESS_RULE_SCHEMA = _closed({
+    "rule_id": _SMALL_STRING_SCHEMA,
+    "version": {"type": "integer", "minimum": 1},
+    "statement": {"type": "string", "maxLength": 4000},
+    "applies_when": {"type": "string", "maxLength": 4000},
+    "enforcement_ref": {"type": "string", "maxLength": 1000},
+    "error_code": _SMALL_STRING_SCHEMA,
+    "test_refs": {"type": "array", "items": {"type": "string", "maxLength": 1000}, "maxItems": 50},
+    "machine_constraints": {
+        **_closed({
+            "field": _SMALL_STRING_SCHEMA,
+            "unit": _SMALL_STRING_SCHEMA,
+            "minimum": {"type": ["integer", "number", "null"]},
+            "maximum": {"type": ["integer", "number", "null"]},
+            "minimum_inclusive": _BOOLEAN_SCHEMA,
+            "maximum_inclusive": _BOOLEAN_SCHEMA,
+        }),
+        "type": ["object", "null"],
+    },
+})
+_FINGERPRINT_SCHEMA = {
+    **_closed({
+        "owner_domain": _SMALL_STRING_SCHEMA,
+        "business_object": _SMALL_STRING_SCHEMA,
+        "action": _SMALL_STRING_SCHEMA,
+        "business_effect": STRING_SCHEMA,
+        "input_schema_hash": _SHA256_SCHEMA,
+        "output_schema_hash": _SHA256_SCHEMA,
+        "provider_ref": STRING_SCHEMA,
+        "read_scope": {"type": "array", "items": STRING_SCHEMA, "maxItems": 200},
+        "write_scope": {"type": "array", "items": STRING_SCHEMA, "maxItems": 200},
+        "rule_ids": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 50},
+    }),
+    "type": ["object", "null"],
+}
+_BUSINESS_LAYER_EVIDENCE_SCHEMA = _closed({
+    layer: {"type": "array", "items": {"type": "string", "maxLength": 4000}, "maxItems": 200}
+    for layer in "ABCDEFG"
+})
+_BUSINESS_MATURITY_SCHEMA = _closed({
+    "level": {"type": "string", "enum": [f"L{index}" for index in range(7)]},
+    "reason_codes": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 50},
+})
+_CONTRACT_SCHEMA = _closed({
+    "business_rules": {"type": "array", "items": _BUSINESS_RULE_SCHEMA, "maxItems": 50},
+    "fingerprint": _FINGERPRINT_SCHEMA,
+    "business_layer_evidence": _BUSINESS_LAYER_EVIDENCE_SCHEMA,
+    "business_maturity": _BUSINESS_MATURITY_SCHEMA,
+    "business_definition_hash": _SHA256_SCHEMA,
+    "catalog_capability_version_gid": _VERSION_SCHEMA,
+}, (
+    "business_rules", "fingerprint", "business_layer_evidence", "business_maturity",
+    "business_definition_hash", "catalog_capability_version_gid",
+))
 _ITEM_SCHEMA = _closed({
     "capability_id": STRING_SCHEMA, "capability_version_gid": GID_SCHEMA,
     "capability_gid": GID_SCHEMA, "major_version": {"type": "integer", "minimum": 1},

@@ -99,6 +99,7 @@ def test_snapshot_catalog_hash_uses_the_next_unique_resumable_migration():
     assert len(ids) == len(set(ids))
     assert migration.path.name == "0009_snapshot_catalog_hash.sql"
     assert "-- AI00: RESUMABLE BACKFILL" in migration.sql
+    assert "ON BINARY catalog.release_id = BINARY snapshot.catalog_release_id" in migration.sql
     assert "WHERE snapshot.catalog_hash IS NULL" in migration.sql
     assert "MODIFY COLUMN catalog_hash VARCHAR(71) NOT NULL" in migration.sql
 

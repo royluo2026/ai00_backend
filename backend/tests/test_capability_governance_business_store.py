@@ -342,6 +342,7 @@ def test_business_reviews_are_append_only_and_latest_exact_hash_is_current():
     store.save_business_review(second)
 
     assert store.current_business_review(202, HASH_1) == second
+    assert store.list_current_business_reviews() == (second,)
     with pytest.raises(ImmutableRecordError, match="business_review_gid_already_exists"):
         store.save_business_review(first)
 
@@ -360,6 +361,7 @@ def test_current_business_review_does_not_resurrect_a_superseded_approval(decisi
     ))
 
     assert store.current_business_review(202, HASH_1) is None
+    assert store.list_current_business_reviews() == ()
 
 
 def test_current_business_review_uses_append_order_not_client_timestamp():

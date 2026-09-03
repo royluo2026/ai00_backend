@@ -5,6 +5,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 import inspect
+import logging
 import math
 from types import MappingProxyType
 from typing import Any
@@ -24,6 +25,7 @@ from .business_audit import (
     validate_business_audit_report,
 )
 from .business_relations import analyze_relationships
+from .fingerprint import canonical_fingerprint
 from .prompting import PromptAuthorizationError, RedactedPrompt, _render_repair_prompt
 from .redaction import redact
 from .release_gate import ReleaseCandidate, ReleaseGate, ReleaseGateError
@@ -39,6 +41,7 @@ _DEFAULT_PORT = object()
 _MAX_OFFSET = 100000
 _MAX_ANALYSIS_COLLECTION_ITEMS = 5000
 _ANALYSIS_COLLECTIONS = ("review_queue", "root_causes", "unbound_entries", "relations")
+_log = logging.getLogger(__name__)
 
 
 # Finding codes are the machine-stable NOK categories.  Keep their explanations
@@ -626,6 +629,7 @@ class CapabilityGovernanceService:
         workflow_port: Any | None = None,
         web_revision_provider: Callable[[], str | None] | None = None,
         business_gate_provider: Callable[[Any], BusinessGateResult | None] | None = None,
+        next_ids: Callable[[], int] | None = None,
     ) -> None:
         self._store = store
         self._scanner = scanner
@@ -636,10 +640,16 @@ class CapabilityGovernanceService:
         self._audit_sink = audit_sink
         self._web_revision_provider = web_revision_provider
         self._business_gate_provider = business_gate_provider
+        self._next_ids = next_ids
         self._runs: dict[tuple[str, str, str], GovernedRun] = {}
         self._prompt_records: dict[str, dict[str, str]] = {}
         self._prompt_texts: dict[str, str] = {}
         self._finding_gids: dict[str, int] = {}
+        # Governance snapshots are immutable.  Reusing the decoded record is
+        # essential for paginated analysis because a SQL load reconstructs the
+        # complete graph and descriptor set, not merely the requested page.
+        self._snapshot_cache: dict[int, Any] = {}
+        self._business_audit_base_cache: dict[tuple[str, str, str, str], BusinessAuditReport] = {}
         self._next_run_gid = 1
         self._next_governance_gid_value = 1
         self._proposals = proposal_service or ProposalService(
@@ -755,6 +765,7 @@ class CapabilityGovernanceService:
             projected.append(record)
         return self._completed(
             "base.capability_registry.search", limit=limit, offset=offset, items=tuple(projected),
+            snapshot_gid=str(getattr(snapshot, "snapshot_gid")) if snapshot is not None else None,
             total=len(matches),
             product_capability_total=len(matches) - len(extension_matches),
             governance_extension_capability_total=len(extension_matches),
@@ -796,6 +807,25 @@ class CapabilityGovernanceService:
                 "evidence": _business_contract_value(redact(getattr(item, "evidence", {}))),
             } for item in candidates),
         }
+
+    def collect_business_audit_base(
+        self, *, snapshot_gid: str, source_revisions: Mapping[str, str],
+    ) -> BusinessAuditReport:
+        """Build immutable snapshot evidence once and reuse it for trust comparison."""
+        key = (
+            str(snapshot_gid),
+            str(source_revisions.get("backend", "")),
+            str(source_revisions.get("web", "")),
+            str(source_revisions.get("source", "")),
+        )
+        cached = self._business_audit_base_cache.get(key)
+        if cached is None:
+            cached = collect_business_audit(
+                self, snapshot_gid=str(snapshot_gid), source_revisions=source_revisions,
+                finding_search=self.business_audit_persisted_finding_search,
+            )
+            self._business_audit_base_cache[key] = cached
+        return cached
 
     def base_capability_governance_snapshot_summary_get(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
         """Return a bounded, agent-friendly summary of one verified snapshot.
@@ -1670,10 +1700,9 @@ class CapabilityGovernanceService:
         if client_web_revision is not None and web_revision is not None and client_web_revision != web_revision:
             raise _business_error("invalid_input")
         run = GovernedRun(
-            str(self._next_run_gid), snapshot_gid, kind, _context_user(context), key,
+            str(self._new_run_gid()), snapshot_gid, kind, _context_user(context), key,
             web_revision=web_revision,
         )
-        self._next_run_gid += 1
         self._runs[run_key] = run
         self._persist_governed_run(run)
 
@@ -1704,6 +1733,7 @@ class CapabilityGovernanceService:
             failed = replace(self._runs.get(run_key, run), status="failed", result=None)
             self._runs[run_key] = failed
             self._persist_governed_run(failed)
+            _log.exception("Governance %s run %s failed", kind, run.run_gid)
             raise _business_error("governance_dependency_unavailable") from exc
         if completed is False:
             failed = replace(self._runs.get(run_key, run), status="failed", result=None)
@@ -1753,6 +1783,71 @@ class CapabilityGovernanceService:
                 canonical, snapshot, expected_web_revision=expected_web_revision,
             )
         except (AttributeError, KeyError, TypeError, ValueError) as exc:
+            gate_rows = tuple(getattr(report, "governance_capabilities", ()))
+            audit_rows = tuple(getattr(report, "audit_capabilities", ()))
+            gate_by_key = {str(getattr(item, "capability_key", "")): item for item in gate_rows}
+            mismatch_fields: dict[str, int] = {
+                "missing": 0, "version_gid": 0, "definition_hash": 0,
+                "governance_status": 0, "change_kind": 0,
+            }
+            mismatch_keys: list[str] = []
+            for item in audit_rows:
+                item_key = str(getattr(item, "capability_key", ""))
+                row = gate_by_key.get(item_key)
+                item_mismatch = row is None
+                if row is None:
+                    mismatch_fields["missing"] += 1
+                else:
+                    version_mismatch = (
+                        str(getattr(row, "capability_version_gid", ""))
+                        != str(getattr(item, "capability_version_gid", ""))
+                    )
+                    hash_mismatch = (
+                        str(getattr(row, "definition_hash", ""))
+                        != str(getattr(item, "business_definition_hash", ""))
+                    )
+                    status_mismatch = (
+                        str(getattr(row, "governance_status", ""))
+                        != str(getattr(item, "governance_status", ""))
+                    )
+                    change_mismatch = (
+                        str(getattr(row, "change_kind", "")) != str(getattr(item, "change_kind", ""))
+                    )
+                    mismatch_fields["version_gid"] += version_mismatch
+                    mismatch_fields["definition_hash"] += hash_mismatch
+                    mismatch_fields["governance_status"] += status_mismatch
+                    mismatch_fields["change_kind"] += change_mismatch
+                    item_mismatch = version_mismatch or hash_mismatch or status_mismatch or change_mismatch
+                if item_mismatch and len(mismatch_keys) < 5:
+                    mismatch_keys.append(item_key)
+            binding_mismatches = sum(
+                1 for item in audit_rows
+                if (
+                    (row := gate_by_key.get(str(getattr(item, "capability_key", "")))) is None
+                    or str(getattr(row, "capability_version_gid", "")) != str(getattr(item, "capability_version_gid", ""))
+                    or str(getattr(row, "definition_hash", "")) != str(getattr(item, "business_definition_hash", ""))
+                    or str(getattr(row, "governance_status", "")) != str(getattr(item, "governance_status", ""))
+                    or str(getattr(row, "change_kind", "")) != str(getattr(item, "change_kind", ""))
+                )
+            )
+            expected = (
+                bool(gate_rows) and all(bool(getattr(item, "machine_passed", False)) for item in gate_rows),
+                bool(gate_rows) and all(bool(getattr(item, "human_approved", False)) for item in gate_rows),
+                bool(gate_rows) and all(bool(getattr(item, "runtime_verified", False)) for item in gate_rows),
+                sum(str(getattr(item, "governance_status", "")) == "legacy_pending_review" for item in gate_rows),
+            )
+            _log.error(
+                "Business audit gate diagnostics gate=%d audit=%d queue=%d binding_mismatches=%d "
+                "fields=%s sample=%s actual=%s expected=%s",
+                len(gate_rows), len(audit_rows), len(getattr(report, "review_queue", ())),
+                binding_mismatches, mismatch_fields, mismatch_keys,
+                (
+                    getattr(report, "machine_passed", None), getattr(report, "human_approved", None),
+                    getattr(report, "runtime_verified", None), getattr(report, "legacy_pending_review_count", None),
+                ),
+                expected,
+            )
+            _log.exception("Governance business audit result validation failed")
             raise _business_error("governance_result_invalid") from exc
         return MappingProxyType({"business_audit": audit_result})
 
@@ -1793,10 +1888,9 @@ class CapabilityGovernanceService:
         ).serialized() != gate.serialized():
             raise ValueError("business_audit_gate_invalid")
         source_revisions = dict(report.source_revisions)
-        base = collect_business_audit(
-            self, snapshot_gid=str(getattr(snapshot, "snapshot_gid", "")),
+        base = self.collect_business_audit_base(
+            snapshot_gid=str(getattr(snapshot, "snapshot_gid", "")),
             source_revisions=source_revisions,
-            finding_search=self.business_audit_persisted_finding_search,
         )
         canonical = audit(
             base.findings, capabilities=base.audit_capabilities,
@@ -1903,6 +1997,7 @@ class CapabilityGovernanceService:
                 snapshot = persist(document)
                 if snapshot is None:
                     raise _business_error("governance_dependency_unavailable")
+                self._cache_snapshot(snapshot)
                 return snapshot
         raise _business_error("governance_dependency_unavailable")
 
@@ -1928,22 +2023,39 @@ class CapabilityGovernanceService:
         run_key = (kind, snapshot_gid, key)
         run = self._runs.get(run_key)
         if run is None:
-            run = GovernedRun(str(self._next_run_gid), snapshot_gid, kind, _context_user(context), key)
-            self._next_run_gid += 1
+            run = GovernedRun(str(self._new_run_gid()), snapshot_gid, kind, _context_user(context), key)
             self._runs[run_key] = run
         return self._accepted(capability_id, run_gid=run.run_gid, snapshot_gid=run.snapshot_gid)
 
     def _next_governance_gid(self) -> int:
+        if self._next_ids is not None:
+            return int(self._next_ids())
         gid = self._next_governance_gid_value
         self._next_governance_gid_value += 1
+        return gid
+
+    def _new_run_gid(self) -> int:
+        if self._next_ids is not None:
+            return int(self._next_ids())
+        gid = self._next_run_gid
+        self._next_run_gid += 1
         return gid
 
     def _snapshot(self, payload: Mapping[str, Any]) -> Any:
         if self._store is None or not hasattr(self._store, "get_snapshot"):
             raise _business_error("resource_not_found")
-        snapshot = self._store.get_snapshot(_gid(payload.get("target_gid")))
+        snapshot_gid = _gid(payload.get("target_gid"))
+        snapshot = self._snapshot_cache.get(snapshot_gid)
+        if snapshot is None:
+            snapshot = self._store.get_snapshot(snapshot_gid)
         if snapshot is None:
             raise _business_error("resource_not_found")
+        self._cache_snapshot(snapshot)
+        return snapshot
+
+    def _cache_snapshot(self, snapshot: Any) -> Any:
+        snapshot_gid = int(getattr(snapshot, "snapshot_gid"))
+        self._snapshot_cache[snapshot_gid] = snapshot
         return snapshot
 
     def _entries(self) -> tuple[Any, ...]:
@@ -1969,7 +2081,8 @@ class CapabilityGovernanceService:
         loader = getattr(self._store, "latest_snapshot", None)
         if callable(loader):
             try:
-                return loader()
+                snapshot = loader()
+                return self._cache_snapshot(snapshot) if snapshot is not None else None
             except Exception:
                 return None
         # Compatibility for legacy unit-test doubles; never used by the
@@ -2096,9 +2209,12 @@ class CapabilityGovernanceService:
 
     def _snapshot_by_gid(self, snapshot_gid: int) -> Any:
         getter = getattr(self._store, "get_snapshot", None) if self._store is not None else None
-        snapshot = getter(snapshot_gid) if callable(getter) else None
+        snapshot = self._snapshot_cache.get(snapshot_gid)
+        if snapshot is None:
+            snapshot = getter(snapshot_gid) if callable(getter) else None
         if snapshot is None:
             raise WorkflowError("review_subject_hash_mismatch")
+        self._cache_snapshot(snapshot)
         return snapshot
 
     @staticmethod
@@ -2322,6 +2438,43 @@ class CapabilityGovernanceService:
         for candidate in tuple(findings or ())[:limit]:
             code = str(getattr(candidate, "code", ""))
             fingerprint = str(getattr(candidate, "fingerprint", ""))
+            if not code and getattr(candidate, "reason_code", None):
+                code = str(candidate.reason_code)
+                related_keys = tuple(dict.fromkeys(
+                    str(value) for value in getattr(candidate, "related_capability_keys", ())
+                    if str(value)
+                )) or (f"{candidate.capability_id}@{candidate.major_version}",)
+                evidence = (str(getattr(candidate, "evidence_ref", "unresolved")),)
+                root_key = str(getattr(candidate, "group_key", "")) or f"{code}:{related_keys[0]}"
+                fingerprint = canonical_fingerprint({
+                    "root_cause_key": root_key, "evidence": evidence,
+                    "severity": str(getattr(candidate, "severity", "warning")),
+                })
+                finding_gid = self._finding_gids.get(fingerprint)
+                if finding_gid is None:
+                    finding_gid = self._next_governance_gid()
+                    self._finding_gids[fingerprint] = finding_gid
+                subject_gids = tuple(
+                    entries[(capability_id, int(major))]
+                    for key in related_keys
+                    for capability_id, separator, major in (key.rpartition("@"),)
+                    if separator and major.isdigit() and (capability_id, int(major)) in entries
+                )
+                finding_domains = tuple(sorted(set(
+                    (*getattr(candidate, "related_domains", ()), getattr(candidate, "domain", ""))
+                ) - {""}))
+                records.append({
+                    "finding_gid": str(finding_gid), "code": code,
+                    "severity": str(getattr(candidate, "severity", "warning")), "status": "open",
+                    "fingerprint": fingerprint,
+                    "remediation_boundary": str(getattr(candidate, "remediation_family", "")),
+                    "subject_version_gids": subject_gids, "domains": finding_domains,
+                    "evidence": evidence, "reason_code": code, "reason": _finding_reason(code),
+                    "root_cause_key": root_key,
+                    "root_cause_label": f"{_finding_reason(code)} · {'|'.join(related_keys)}"[:512],
+                    "subject_summary": "、".join(f"Capability：{key}" for key in related_keys)[:255],
+                })
+                continue
             if not code or not fingerprint:
                 continue
             finding_gid = self._finding_gids.get(fingerprint)

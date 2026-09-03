@@ -11,6 +11,7 @@ from backend.capability_governance_test.models import ScanFinding, SnapshotDocum
 from backend.capability_governance_test.provider import register_governance_capabilities
 from backend.capability_governance_test.release_gate import ReleaseGate
 from backend.capability_governance_test.service import CapabilityGovernanceService
+from backend.capability_governance_test import service as governance_service_module
 from backend.capability_governance_test.store import MemoryGovernanceStore
 from backend.scripts.build_capability_governance_catalog import current_release
 
@@ -48,6 +49,45 @@ def test_search_caps_collection_to_200_items():
     assert result["limit"] == 200
     assert len(result["items"]) == 200
     assert len(result["items"]) == 200
+
+
+def test_reuses_immutable_snapshot_across_paginated_reads():
+    class CountingStore(_Store):
+        def __init__(self):
+            super().__init__()
+            self.get_snapshot_calls = 0
+
+        def get_snapshot(self, snapshot_gid: int):
+            self.get_snapshot_calls += 1
+            return super().get_snapshot(snapshot_gid)
+
+    store = CountingStore()
+    service = CapabilityGovernanceService(store)
+
+    service.base_capability_registry_search({"snapshot_gid": "100", "limit": 200, "offset": 0}, _context())
+    service.base_capability_registry_search({"snapshot_gid": "100", "limit": 200, "offset": 200}, _context())
+
+    assert store.get_snapshot_calls == 1
+
+
+def test_reuses_immutable_business_audit_base_for_trust_comparison(monkeypatch):
+    calls = []
+    report = SimpleNamespace(snapshot_gid="100")
+
+    def collect(*_args, **kwargs):
+        calls.append(kwargs)
+        return report
+
+    monkeypatch.setattr(governance_service_module, "collect_business_audit", collect)
+    service = CapabilityGovernanceService(_Store())
+    revisions = {"backend": "a" * 40, "web": "b" * 40, "source": "a" * 40}
+
+    first = service.collect_business_audit_base(snapshot_gid="100", source_revisions=revisions)
+    second = service.collect_business_audit_base(snapshot_gid="100", source_revisions=revisions)
+
+    assert first is second is report
+    assert len(calls) == 1
+    assert calls[0]["finding_search"] == service.business_audit_persisted_finding_search
 
 
 def test_graph_requires_explicit_bounded_depth_and_nodes():
@@ -258,7 +298,8 @@ def test_provider_projects_workflow_mutation_and_release_records():
         "release": {
             "report_gid": "1", "conclusion": "fail",
             "blockers": [
-                "governance_dependency_unavailable", "required_test_unavailable", "stale_evidence",
+                "business_governance_missing", "governance_dependency_unavailable",
+                "required_test_unavailable", "stale_evidence", "static_gate_not_passed",
             ],
         },
     }
@@ -304,6 +345,43 @@ def test_health_counts_blocking_exposure_findings_by_node_domain() -> None:
         "checked_at": result["items"][0]["checked_at"], "entry_count": 1,
         "finding_count": 1, "severities": ["blocking"], "reason": "blocking_findings",
     },)
+
+
+def test_health_counts_business_audit_evidence_for_the_same_snapshot() -> None:
+    """V2.5 business blockers must not disappear from the health rollup."""
+    entry = SimpleNamespace(
+        capability_id="craft.example.publish", major_version=1,
+        capability_version_gid=101, owner_domain="craft",
+    )
+    snapshot = SimpleNamespace(
+        snapshot_gid=100, entries=(entry,),
+        document=SimpleNamespace(nodes=(), relations=(), bindings=(), capabilities=()),
+    )
+
+    class Store:
+        def get_snapshot(self, snapshot_gid: int):
+            return snapshot if snapshot_gid == 100 else None
+
+        def latest_snapshot(self):
+            return snapshot
+
+    evidence = SimpleNamespace(
+        reason_code="business_definition_missing",
+        capability_id="craft.example.publish", major_version=1,
+        domain="craft", layer="B", evidence_ref="catalog:craft.example.publish@1",
+        remediation_family="complete_business_definition", severity="blocking",
+        related_capability_keys=("craft.example.publish@1",), related_domains=("craft",),
+        group_key="business_definition_missing:craft.example.publish@1",
+    )
+    service = CapabilityGovernanceService(
+        Store(), analysis_runner=lambda snapshot, request: SimpleNamespace(findings=(evidence,)),
+    )
+
+    result = service.base_capability_health_get({"domains": ["craft"]}, _context())
+
+    assert result["items"][0]["status"] == "blocked"
+    assert result["items"][0]["finding_count"] == 1
+    assert result["items"][0]["severities"] == ["blocking"]
 
 
 def test_finding_records_explain_nok_reason_and_subject() -> None:
@@ -601,10 +679,18 @@ def test_registry_search_projects_scanned_business_evidence_in_contract():
     )
     scanned = SimpleNamespace(
         capability_id=entry.capability_id, major_version=entry.major_version,
-        business_rules=({"rule_id": "person.height.valid_range"},),
+        business_rules=({
+            "rule_id": "person.height.valid_range",
+            "test_refs": ("backend/tests/test_person_height.py::test_valid_range",),
+            "machine_constraints": None,
+        },),
         fingerprint=SimpleNamespace(business_object="height", action="write"),
         business_layer_evidence={"A": (entry.business_effect,), "B": ("height", "write")},
         business_maturity=SimpleNamespace(level="L3", reason_codes=("rule_evidence_present",)),
+        descriptor={
+            "business_definition_hash": "sha256:" + "a" * 64,
+            "capability_version_gid": "17",
+        },
     )
     snapshot = SimpleNamespace(
         snapshot_gid=100, entries=(entry,),
@@ -632,6 +718,17 @@ def test_registry_search_projects_scanned_business_evidence_in_contract():
         "business_object": "height", "action": "write",
     }
     assert result["items"][0]["contract"]["business_maturity"]["level"] == "L3"
+    assert result["snapshot_gid"] == "100"
+    assert result["items"][0]["contract"]["business_rules"][0]["machine_constraints"] is None
+    assert result["items"][0]["contract"]["business_rules"][0]["test_refs"] == [
+        "backend/tests/test_person_height.py::test_valid_range",
+    ]
+    descriptors = {item.id: item for item in current_release().descriptors}
+    validate_payload(
+        dict(descriptors["base.capability_registry.search"].output_schema),
+        result,
+        label="base.capability_registry.search.output",
+    )
 
 
 def test_blocked_scan_is_persisted_and_reachable_through_finding_provider():

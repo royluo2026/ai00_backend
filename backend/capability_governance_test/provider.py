@@ -57,7 +57,12 @@ def _projection(record: Any, fields: tuple[str, ...]) -> dict[str, Any]:
 
 def _transport_value(value: Any, *, depth: int, max_items: int = 50) -> Any:
     """Keep nested catalog evidence bounded without flattening its meaning."""
-    if depth >= 3:
+    if isinstance(value, (str, int, float, bool)) or value is None:
+        return value
+    # Business contracts contain bounded arrays and constraint objects below
+    # the rule record; preserve that declared shape before falling back to a
+    # string for unknown deeper containers.
+    if depth >= 5:
         return str(value)[:512]
     if isinstance(value, Mapping):
         return {
@@ -67,8 +72,6 @@ def _transport_value(value: Any, *, depth: int, max_items: int = 50) -> Any:
         }
     if isinstance(value, (list, tuple)):
         return [_transport_value(item, depth=depth + 1) for item in value[:max_items]]
-    if isinstance(value, (str, int, float, bool)) or value is None:
-        return value
     return str(value)[:512]
 
 
@@ -255,10 +258,18 @@ def _business_audit_projection(value: Any) -> dict[str, Any]:
             "evidence_refs": _string_list(_value(item, "evidence_refs"), maximum=50),
         } for item in tuple(value.get("root_causes", ()))[:200]]
     if "unbound_entries" in value:
-        result["unbound_entries"] = [_projection(item, (
-            "entry_type", "canonical_key", "domain", "location", "source_path", "source_symbol",
-            "http_method", "route_path",
-        )) for item in tuple(value.get("unbound_entries", ()))[:200]]
+        result["unbound_entries"] = []
+        for item in tuple(value.get("unbound_entries", ()))[:200]:
+            projected = _projection(item, (
+                "entry_type", "canonical_key", "domain", "location", "source_path", "source_symbol",
+                "http_method", "route_path",
+            ))
+            # These nullable fields are part of the closed UI contract.  A
+            # Provider/file entry has no HTTP route, but omission would make
+            # its shape indistinguishable from a truncated projection.
+            projected.setdefault("http_method", None)
+            projected.setdefault("route_path", None)
+            result["unbound_entries"].append(projected)
     if "relations" in value:
         result["relations"] = [
             _business_relation_projection(item) for item in tuple(value.get("relations", ()))[:200]

@@ -1,6 +1,6 @@
 {
   "registry_version": 1,
-  "table_count": 244,
+  "table_count": 255,
   "tables": [
     {
       "table": "workmanship_agent_canvas_audit_events",
@@ -233,6 +233,26 @@
       "runtime_domain": "base"
     },
     {
+      "table": "workmanship_base_capability_business_purposes",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_business_review_requests",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_business_reviews",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_business_rules",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
       "table": "workmanship_base_capability_catalog_releases",
       "owner": "base",
       "runtime_domain": "base"
@@ -298,12 +318,22 @@
       "runtime_domain": "base"
     },
     {
+      "table": "workmanship_base_capability_relation_candidates",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
       "table": "workmanship_base_capability_release_reports",
       "owner": "base",
       "runtime_domain": "base"
     },
     {
       "table": "workmanship_base_capability_reviews",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_rule_effectiveness",
       "owner": "base",
       "runtime_domain": "base"
     },
@@ -319,6 +349,11 @@
     },
     {
       "table": "workmanship_base_capability_snapshots",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_standard_review_requests",
       "owner": "base",
       "runtime_domain": "base"
     },
@@ -683,7 +718,27 @@
       "runtime_domain": "craft"
     },
     {
+      "table": "workmanship_craft_resource_aliases",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_craft_resource_requirements",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
       "table": "workmanship_craft_schema_migrations",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_craft_standard_operations",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_craft_tc_resource_staging",
       "owner": "craft",
       "runtime_domain": "craft"
     },

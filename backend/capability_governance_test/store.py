@@ -524,6 +524,13 @@ class MemoryGovernanceStore(GovernanceStore):
             latest = max(matching, key=lambda item: item.review_gid, default=None)
             return latest if latest is not None and latest.decision == "approved" else None
 
+    def list_current_business_reviews(self) -> tuple[CapabilityBusinessReview, ...]:
+        with self._lock:
+            current: dict[tuple[int, str], CapabilityBusinessReview] = {}
+            for review in sorted(self._business_reviews.values(), key=lambda item: item.review_gid, reverse=True):
+                current.setdefault((review.capability_version_gid, review.definition_hash), review)
+            return tuple(review for review in current.values() if review.decision == "approved")
+
     def save_rule_effectiveness(self, record: RuleEffectivenessRecord) -> None:
         with self._lock:
             if record.effectiveness_gid in self._rule_effectiveness:
@@ -1402,6 +1409,35 @@ class SqlGovernanceStore(GovernanceStore):
                 evidence_snapshot_gid=int(_row_value(row, "evidence_snapshot_gid", 9)),
             )
             return review if review.decision == "approved" else None
+        finally:
+            close = getattr(cursor, "close", None)
+            if callable(close):
+                close()
+
+    def list_current_business_reviews(self) -> tuple[CapabilityBusinessReview, ...]:
+        cursor = self._connection.cursor()
+        try:
+            cursor.execute(
+                "SELECT business_review_gid, capability_version_gid, definition_hash, decision, "
+                "decision_reason, reviewer_gid, reviewer_role, decided_at, proposal_gid, evidence_snapshot_gid "
+                "FROM workmanship_base_capability_business_reviews ORDER BY business_review_gid DESC"
+            )
+            current: dict[tuple[int, str], CapabilityBusinessReview] = {}
+            for row in cursor.fetchall():
+                review = CapabilityBusinessReview(
+                    review_gid=int(_row_value(row, "business_review_gid", 0)),
+                    capability_version_gid=int(_row_value(row, "capability_version_gid", 1)),
+                    definition_hash=_text_value(_row_value(row, "definition_hash", 2)),
+                    decision=str(_row_value(row, "decision", 3)),
+                    decision_reason=str(_row_value(row, "decision_reason", 4)),
+                    reviewer_gid=str(_row_value(row, "reviewer_gid", 5)),
+                    reviewer_role=str(_row_value(row, "reviewer_role", 6)),
+                    decided_at=_row_value(row, "decided_at", 7),
+                    proposal_gid=int(_row_value(row, "proposal_gid", 8)),
+                    evidence_snapshot_gid=int(_row_value(row, "evidence_snapshot_gid", 9)),
+                )
+                current.setdefault((review.capability_version_gid, review.definition_hash), review)
+            return tuple(review for review in current.values() if review.decision == "approved")
         finally:
             close = getattr(cursor, "close", None)
             if callable(close):

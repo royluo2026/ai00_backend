@@ -4,7 +4,7 @@ ALTER TABLE workmanship_base_capability_snapshots
 -- AI00: RESUMABLE BACKFILL
 UPDATE workmanship_base_capability_snapshots AS snapshot
 JOIN workmanship_base_capability_catalog_releases AS catalog
-  ON catalog.release_id = snapshot.catalog_release_id
+  ON BINARY catalog.release_id = BINARY snapshot.catalog_release_id
 SET snapshot.catalog_hash = catalog.catalog_hash
 WHERE snapshot.catalog_hash IS NULL;
 

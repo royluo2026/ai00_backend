@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from pathlib import Path
+from types import MappingProxyType
 
 from backend.base import provider as base_provider
 from backend.capability_v2.bootstrap import (
+    _plain_catalog_value,
     build_capability_registry,
     build_test_governance_capability_registry,
     get_capability_registry,
@@ -17,6 +19,20 @@ from backend.scripts.build_capability_governance_catalog import current_release
 
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def test_catalog_runtime_projection_recursively_thaws_immutable_descriptors():
+    source = MappingProxyType({
+        "input_schema": MappingProxyType({"required": ("name",)}),
+        "business_rules": (MappingProxyType({"rule_id": "rule-1"}),),
+    })
+
+    projected = _plain_catalog_value(source)
+
+    assert projected == {
+        "input_schema": {"required": ["name"]},
+        "business_rules": [{"rule_id": "rule-1"}],
+    }
 
 
 def test_product_registry_is_unchanged_without_test_extension():
