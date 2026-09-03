@@ -4,10 +4,28 @@ using Ai00.Connector.Contracts;
 
 namespace Ai00.Connector.Adapters.VisMockup;
 
-public sealed class VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, string executable) : IConnectorAdapter
+public sealed class VisMockupAdapter : IConnectorAdapter
 {
     private const string ProgId = "VFFrame.Application";
+    private readonly StaDispatcher _sta;
+    private readonly AllowedPathPolicy _paths;
+    private readonly string _executable;
+    private readonly VisMockupConnection _connection;
     private object? _application;
+
+    public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, string executable)
+        : this(sta, paths, new WindowsVisMockupCom(executable), executable) { }
+
+    public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com)
+        : this(sta, paths, com, "") { }
+
+    private VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com, string executable)
+    {
+        _sta = sta;
+        _paths = paths;
+        _executable = executable;
+        _connection = new VisMockupConnection(com);
+    }
     public AdapterManifest Manifest { get; } = new(
         "ai00.vismockup", 1, "siemens.vismockup", "14.0.0",
         [
@@ -20,19 +38,39 @@ public sealed class VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths,
         ]);
 
     public async Task<AdapterHealth> ProbeAsync(CancellationToken cancellationToken)
+        => await ProbeAsync(false, cancellationToken);
+
+    public async Task<AdapterHealth> ProbeAsync(bool allowLaunch, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var status = await StatusAsync();
-        var ready = (bool)(status.GetType().GetProperty("connected")?.GetValue(status) ?? false);
-        return new AdapterHealth(ready, ready ? "ready" : "unavailable");
+        return await _sta.InvokeAsync(() =>
+        {
+            try
+            {
+                var application = _connection.RequireActiveApplication(allowLaunch);
+                var documentReady = application.ActiveDocument is not null;
+                return new AdapterHealth(true, documentReady ? "ready" : "document_missing", true, documentReady, application.ProductVersion);
+            }
+            catch (ConnectorException)
+            {
+                return new AdapterHealth(false, "unavailable");
+            }
+        });
     }
+
+    public Task<VisMockupDocumentSnapshot> SnapshotAsync(int maxNodes, int maxDepth) =>
+        _sta.InvokeAsync(() => new DocumentSnapshotReader().Read(_connection.RequireActiveDocument(), maxNodes, maxDepth));
 
     public async Task<AdapterResult> ExecuteAsync(AdapterOperation operation, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         object result = operation.OperationId switch
         {
-            "vismockup.application.probe@1" => await StatusAsync(),
+            "vismockup.application.probe@1" => await ProbeAsync(
+                operation.Payload.TryGetProperty("allow_launch", out var allowLaunch) && allowLaunch.GetBoolean(), cancellationToken),
+            "vismockup.document.snapshot@1" => await SnapshotAsync(
+                operation.Payload.GetProperty("max_nodes").GetInt32(),
+                operation.Payload.GetProperty("max_depth").GetInt32()),
             "vismockup.status" => await StatusAsync(),
             "vismockup.launch" => await LaunchAsync(),
             "vismockup.model.open" => await OpenFileAsync(operation.Payload.GetProperty("file_path").GetString() ?? ""),
@@ -50,7 +88,7 @@ public sealed class VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths,
         _application ??= Activator.CreateInstance(type) ?? throw new COMException("Unable to create VisMockup COM application");
         return _application;
     }
-    public Task<object> StatusAsync() => sta.InvokeAsync<object>(() =>
+    public Task<object> StatusAsync() => _sta.InvokeAsync<object>(() =>
     {
         try { dynamic app = Connect(); _ = app.Documents; return new { connected = true, platform = "windows" }; }
         catch { _application = null; return new { connected = false, platform = "windows" }; }
@@ -59,16 +97,16 @@ public sealed class VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths,
     {
         var status = await StatusAsync();
         if ((bool)(status.GetType().GetProperty("connected")?.GetValue(status) ?? false)) return new { status = "already_running" };
-        var fullExe = Path.GetFullPath(executable);
+        var fullExe = Path.GetFullPath(_executable);
         if (!File.Exists(fullExe)) throw new FileNotFoundException("VisMockup executable not found", fullExe);
         Process.Start(new ProcessStartInfo(fullExe) { UseShellExecute = true });
         return new { status = "starting" };
     }
-    public Task<object> OpenFileAsync(string filePath) => sta.InvokeAsync<object>(() =>
+    public Task<object> OpenFileAsync(string filePath) => _sta.InvokeAsync<object>(() =>
     {
-        var safePath = paths.ValidateModelPath(filePath); dynamic app = Connect(); app.Documents.Open(safePath); return new { opened = true };
+        var safePath = _paths.ValidateModelPath(filePath); dynamic app = Connect(); app.Documents.Open(safePath); return new { opened = true };
     });
-    public Task<object> VisibilityAsync(string action) => sta.InvokeAsync<object>(() =>
+    public Task<object> VisibilityAsync(string action) => _sta.InvokeAsync<object>(() =>
     {
         dynamic app = Connect(); dynamic documents = app.Documents;
         if ((int)documents.Count <= 0) throw new InvalidOperationException("No active VisMockup document");
@@ -76,7 +114,7 @@ public sealed class VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths,
         switch (action) { case "all_on": view.AllNodesOn(); break; case "all_off": view.AllNodesOff(); break; case "deselect": view.DeSelectAllNodes(); break; default: throw new InvalidOperationException("Unsupported visibility action"); }
         return new { action };
     });
-    public Task<object> TreeAsync(int maxDepth) => sta.InvokeAsync<object>(() =>
+    public Task<object> TreeAsync(int maxDepth) => _sta.InvokeAsync<object>(() =>
     {
         dynamic app = Connect(); dynamic documents = app.Documents;
         if ((int)documents.Count <= 0) throw new InvalidOperationException("No active VisMockup document");
@@ -102,7 +140,7 @@ public sealed class VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths,
         }
         return new { nodes, max_depth = maxDepth };
     });
-    public Task<object> HighlightAsync(IReadOnlySet<string> catiaNames) => sta.InvokeAsync<object>(() =>
+    public Task<object> HighlightAsync(IReadOnlySet<string> catiaNames) => _sta.InvokeAsync<object>(() =>
     {
         dynamic app = Connect(); dynamic documents = app.Documents;
         if ((int)documents.Count <= 0) throw new InvalidOperationException("No active VisMockup document");
@@ -129,7 +167,7 @@ public sealed class VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths,
         var missing = catiaNames.Where(name => !found.Contains(name)).OrderBy(name => name, StringComparer.Ordinal).ToArray();
         return new { matched = found.Count, not_found = missing };
     });
-    public Task<object> CaptureAsync() => sta.InvokeAsync<object>(() =>
+    public Task<object> CaptureAsync() => _sta.InvokeAsync<object>(() =>
     {
         dynamic app = Connect(); dynamic documents = app.Documents;
         if ((int)documents.Count <= 0) throw new InvalidOperationException("No active VisMockup document");

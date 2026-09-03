@@ -24,7 +24,12 @@ public sealed record AdapterManifest(
             string.Equals(item.ContractHash, contractHash, StringComparison.Ordinal));
 }
 
-public sealed record AdapterHealth(bool Ready, string Status);
+public sealed record AdapterHealth(
+    bool Ready,
+    string Status,
+    bool ProcessReady = false,
+    bool DocumentReady = false,
+    string ProductVersion = "");
 
 public sealed record AdapterOperation(string OperationId, JsonElement Payload);
 
