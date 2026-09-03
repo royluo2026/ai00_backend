@@ -25,11 +25,13 @@ public sealed class AdapterDispatcher(IEnumerable<IConnectorAdapter> adapters)
             foreach (var step in plan.Steps)
             {
                 var startedAt = WholeSecond(DateTimeOffset.UtcNow);
+                using var stepTimeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                stepTimeout.CancelAfter(TimeSpan.FromSeconds(step.TimeoutSeconds));
                 try
                 {
                     var payload = MaterializePayload(step, materializedArtifacts ?? []);
                     var result = await adapter.ExecuteAsync(
-                        new AdapterOperation(step.OperationId, payload, step.StepId, step.ContractHash), cancellationToken);
+                        new AdapterOperation(step.OperationId, payload, step.StepId, step.ContractHash), stepTimeout.Token);
                     var completedAt = WholeSecond(DateTimeOffset.UtcNow);
                     if (!result.Ok)
                     {
@@ -39,6 +41,13 @@ public sealed class AdapterDispatcher(IEnumerable<IConnectorAdapter> adapters)
                     results.Add(new(
                         step.StepId, "completed", result.Data, CanonicalJson.Hash(result.Data), "",
                         startedAt, completedAt));
+                }
+                catch (OperationCanceledException) when (
+                    !cancellationToken.IsCancellationRequested && stepTimeout.IsCancellationRequested)
+                {
+                    var completedAt = WholeSecond(DateTimeOffset.UtcNow);
+                    results.Add(new(step.StepId, "outcome_unknown", null, null, "step_timeout_outcome_unknown", startedAt, completedAt));
+                    return new(plan.Protocol, plan.PlanId, "outcome_unknown", results, completedAt);
                 }
                 catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
                 {

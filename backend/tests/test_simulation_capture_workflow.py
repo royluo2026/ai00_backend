@@ -125,11 +125,10 @@ def test_capture_plan_orders_operations_descending():
 
     workflow.start_capture("env-1", 1, "device-1", _context())
 
-    captures = [
-        step.payload["operation_id"] for step in connector.last_plan.steps
-        if step.operation_id == "vismockup.view.capture@1"
-    ]
+    captures = [step.payload["operation_id"] for plan in connector.plans for step in plan.steps
+                if step.operation_id == "vismockup.view.capture@1"]
     assert captures == ["op-30", "op-20", "op-10"]
+    assert all(len(plan.steps) == 3 for plan in connector.plans)
 
 
 def test_materialization_plan_attaches_models_before_scene_verification():
@@ -213,21 +212,22 @@ def test_queue_failure_is_persisted_as_failed_before_error_returns():
 def test_signed_connector_outcome_advances_capture_and_attaches_artifact_once():
     workflow, _, connector, craft = _workflow()
     workflow.start_capture("env-1", 1, "device-1", _context())
-    plan = connector.last_plan
+    plans = tuple(connector.plans)
     now = datetime(2026, 9, 3, tzinfo=UTC)
     results = []
-    for step in plan.steps:
-        value = {"artifact": ARTIFACT} if step.operation_id == "vismockup.view.capture@1" else {}
-        results.append(ConnectorStepResultV1(
-            step_id=step.step_id, status="completed", result=value,
-            result_hash=canonical_hash(value), started_at=now, completed_at=now,
-        ))
-    outcome = ConnectorPlanOutcomeV1(
-        protocol=plan.protocol, plan_id=plan.plan_id, status="completed",
-        steps=tuple(results), reported_at=now,
-    )
-
-    workflow.apply_connector_outcome(plan, outcome, _context())
-    workflow.apply_connector_outcome(plan, outcome, _context())
+    for plan in plans:
+        results = []
+        for step in plan.steps:
+            value = {"artifact": ARTIFACT} if step.operation_id == "vismockup.view.capture@1" else {}
+            results.append(ConnectorStepResultV1(
+                step_id=step.step_id, status="completed", result=value,
+                result_hash=canonical_hash(value), started_at=now, completed_at=now,
+            ))
+        outcome = ConnectorPlanOutcomeV1(
+            protocol=plan.protocol, plan_id=plan.plan_id, status="completed",
+            steps=tuple(results), reported_at=now,
+        )
+        workflow.apply_connector_outcome(plan, outcome, _context())
+        workflow.apply_connector_outcome(plan, outcome, _context())
 
     assert [call[1] for call in craft.calls] == ["op-30", "op-20", "op-10"]

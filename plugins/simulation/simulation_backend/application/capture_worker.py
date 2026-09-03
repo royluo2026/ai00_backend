@@ -80,16 +80,18 @@ class CaptureWorkflow:
         ordered = sorted(
             manifest.operations, key=lambda item: (item.sequence, item.operation_id), reverse=True,
         )
-        plan = build_capture_plan(
-            manifest, plan_id=capture_run_id, device_id=device_id, tenant_id=tenant_id,
-            user_id=user_id, issued_at=self.clock(),
-        )
+        plans = tuple(build_capture_plan(
+            manifest,
+            plan_id=capture_run_id if index == 1 else f"{capture_run_id}-op-{index:05d}",
+            capture_run_id=capture_run_id, device_id=device_id, tenant_id=tenant_id,
+            user_id=user_id, issued_at=self.clock(), operations=(item.operation_id,),
+        ) for index, item in enumerate(ordered, start=1))
         row = {
             "capture_run_id": capture_run_id, "environment_id": environment_id,
             "environment_version": environment_version, "manifest_hash": manifest.manifest_hash,
-            "device_id": device_id, "plan_id": plan.plan_id, "status": "queued",
+            "device_id": device_id, "plan_id": plans[0].plan_id, "status": "queued",
             "owner_gid": user_id, "team_gid": tenant_id,
-            "operation_ref": {"operation_id": plan.plan_id, "status": "accepted", "version": 1},
+            "operation_ref": {"operation_id": plans[0].plan_id, "status": "accepted", "version": 1},
             "steps": [{
                 "operation_id": item.operation_id, "sequence": item.sequence,
                 "status": "queued", "attempt": 1, "artifact_ref": None,
@@ -98,7 +100,8 @@ class CaptureWorkflow:
         }
         self.repository.create_capture_run(row)
         try:
-            self.connector_port.queue_plan(plan, context)
+            for plan in plans:
+                self.connector_port.queue_plan(plan, context)
         except Exception as exc:
             self.repository.update_capture_run(capture_run_id, status="failed")
             if isinstance(exc, SimulationWorkflowError):
@@ -175,7 +178,11 @@ class CaptureWorkflow:
         """Project a verified Device-domain outcome into the capture aggregate."""
         if outcome.plan_id != plan.plan_id or outcome.protocol != plan.protocol:
             raise SimulationWorkflowError("plan_outcome_invalid")
-        run = self.repository.get_capture_run(plan.plan_id, context)
+        capture_steps = [step for step in plan.steps if step.operation_id == "vismockup.view.capture@1"]
+        if len(capture_steps) != 1:
+            raise SimulationWorkflowError("plan_outcome_invalid")
+        capture_run_id = str(capture_steps[0].payload.get("capture_run_id") or "")
+        run = self.repository.get_capture_run(capture_run_id, context)
         if run is None:
             raise SimulationWorkflowError("capture_run_not_found")
 
@@ -204,25 +211,25 @@ class CaptureWorkflow:
                 if not isinstance(artifact, Mapping):
                     raise SimulationWorkflowError("artifact_upload_unconfirmed")
                 self.record_step_result(
-                    plan.plan_id, operation_id, status="completed", artifact_ref=dict(artifact),
+                    capture_run_id, operation_id, status="completed", artifact_ref=dict(artifact),
                 )
             else:
-                self.record_step_result(plan.plan_id, operation_id, status=result.status)
+                self.record_step_result(capture_run_id, operation_id, status=result.status)
             projected += 1
 
         refreshed = run
         for _ in range(projected):
-            refreshed = self.advance(plan.plan_id, context)
+            refreshed = self.advance(capture_run_id, context)
         statuses = {item["status"] for item in refreshed["steps"]}
         if "outcome_unknown" in statuses:
-            self.repository.update_capture_run(plan.plan_id, status="outcome_unknown")
+            self.repository.update_capture_run(capture_run_id, status="outcome_unknown")
         elif "failed" in statuses:
             terminal = statuses <= {"completed", "failed", "cancelled"}
             self.repository.update_capture_run(
-                plan.plan_id,
+                capture_run_id,
                 status="partial" if terminal and "completed" in statuses else "failed",
             )
-        return self.repository.get_capture_run(plan.plan_id, context)
+        return self.repository.get_capture_run(capture_run_id, context)
 
     def retry_step(
         self, capture_run_id: str, operation_id: str, context: CapabilityContext,
@@ -246,6 +253,7 @@ class CaptureWorkflow:
         plan = build_capture_plan(
             manifest, plan_id=retry_plan_id, device_id=run["device_id"], tenant_id=tenant_id,
             user_id=user_id, issued_at=self.clock(), operations=(operation_id,), attempt=attempt,
+            capture_run_id=capture_run_id,
         )
         self.repository.update_capture_step(
             capture_run_id, operation_id, status="queued", attempt=attempt,

@@ -26,7 +26,7 @@ public sealed class ConnectorGatewayClient(
 
     public async Task<LeasedConnectorPlan?> LeaseAsync(CancellationToken cancellationToken)
     {
-        using var request = Request(HttpMethod.Post, "/api/v1/connector/plans/lease", new { lease_seconds = 120 });
+        using var request = Request(HttpMethod.Post, "/api/v1/connector/plans/lease", new { lease_seconds = 300 });
         using var response = await http.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
         var envelope = await response.Content.ReadFromJsonAsync<ApiEnvelope<LeaseBody?>>(cancellationToken: cancellationToken);

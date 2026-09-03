@@ -113,6 +113,7 @@ def build_capture_plan(
     manifest: SimulationEnvironmentManifestV1,
     *, plan_id: str, device_id: str, tenant_id: str, user_id: str, issued_at: datetime,
     operations: Iterable[str] | None = None, attempt: int = 1,
+    capture_run_id: str | None = None,
 ) -> ConnectorExecutionPlanV1:
     requirements = {
         item.operation_id: item.contract_hash for item in manifest.connector_requirement.operations
@@ -126,8 +127,8 @@ def build_capture_plan(
     ]
     if not ordered:
         raise ValueError("capture_plan_empty")
-    if len(ordered) > 3000:
-        raise ValueError("capture_plan_limit_exceeded")
+    if len(ordered) != 1:
+        raise ValueError("capture_plan_requires_one_operation")
     steps: list[ConnectorStepV1] = []
 
     def add(operation_id: str, payload: dict) -> None:
@@ -147,7 +148,8 @@ def build_capture_plan(
             "expected_scene_hash": scene.scene_hash,
         })
         add("vismockup.view.capture@1", {
-            "operation_id": operation.operation_id, "capture_run_id": plan_id, "attempt": attempt,
+            "operation_id": operation.operation_id,
+            "capture_run_id": capture_run_id or plan_id, "attempt": attempt,
             **manifest.capture_profile.model_dump(mode="json"),
         })
     return _plan(
