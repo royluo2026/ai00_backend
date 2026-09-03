@@ -13,4 +13,14 @@ public sealed class AllowedPathPolicy
         if (!File.Exists(full)) throw new FileNotFoundException("Model file not found", full);
         return full;
     }
+
+    public string RequireVerifiedArtifact(string candidate, string expectedSha256)
+    {
+        var full = ValidateModelPath(candidate);
+        using var stream = File.OpenRead(full);
+        var actual = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(stream)).ToLowerInvariant();
+        if (!string.Equals(actual, expectedSha256, StringComparison.Ordinal))
+            throw new Ai00.Connector.Contracts.ConnectorException("artifact_integrity_failed", full);
+        return full;
+    }
 }

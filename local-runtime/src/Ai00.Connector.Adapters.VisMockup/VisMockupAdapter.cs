@@ -11,20 +11,31 @@ public sealed class VisMockupAdapter : IConnectorAdapter
     private readonly AllowedPathPolicy _paths;
     private readonly string _executable;
     private readonly VisMockupConnection _connection;
+    private readonly VisMockupSessionState _state = new();
+    private readonly SceneController _scene;
+    private readonly ModelAttacher _attacher;
+    private readonly InternalCapture _capture;
     private object? _application;
 
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, string executable)
-        : this(sta, paths, new WindowsVisMockupCom(executable), executable) { }
+        : this(sta, paths, new WindowsVisMockupCom(executable), executable,
+            Path.Combine(Path.GetTempPath(), "AI00", "captures")) { }
 
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com)
-        : this(sta, paths, com, "") { }
+        : this(sta, paths, com, "", Path.Combine(Path.GetTempPath(), "AI00", "captures")) { }
 
-    private VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com, string executable)
+    public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com, string captureRoot)
+        : this(sta, paths, com, "", captureRoot) { }
+
+    private VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com, string executable, string captureRoot)
     {
         _sta = sta;
         _paths = paths;
         _executable = executable;
         _connection = new VisMockupConnection(com);
+        _scene = new SceneController(_state);
+        _attacher = new ModelAttacher(paths, _state);
+        _capture = new InternalCapture(captureRoot);
     }
     public AdapterManifest Manifest { get; } = new(
         "ai00.vismockup", 1, "siemens.vismockup", "14.0.0",
@@ -61,6 +72,29 @@ public sealed class VisMockupAdapter : IConnectorAdapter
     public Task<VisMockupDocumentSnapshot> SnapshotAsync(int maxNodes, int maxDepth) =>
         _sta.InvokeAsync(() => new DocumentSnapshotReader().Read(_connection.RequireActiveDocument(), maxNodes, maxDepth));
 
+    public Task<NodeBinding> AttachModelAsync(string documentId, string baselineSnapshotHash, System.Text.Json.JsonElement binding) =>
+        _sta.InvokeAsync(() => _attacher.Attach(_connection.RequireActiveDocument(), documentId, baselineSnapshotHash, binding));
+
+    public Task<string> ApplySceneAsync(string documentId, SceneState scene, string? baselineSnapshotHash = null) =>
+        _sta.InvokeAsync(() =>
+        {
+            var document = _connection.RequireActiveDocument();
+            if (document.DocumentId != documentId) throw new ConnectorException("vismockup_document_changed");
+            if (baselineSnapshotHash is not null) _state.RequireBaseline(document, baselineSnapshotHash);
+            return _scene.Apply(document, scene);
+        });
+
+    public Task<SceneVerification> VerifySceneAsync(string documentId, string operationId, string expectedHash) =>
+        _sta.InvokeAsync(() =>
+        {
+            var document = _connection.RequireActiveDocument();
+            if (document.DocumentId != documentId) throw new ConnectorException("vismockup_document_changed");
+            return _scene.Verify(document, operationId, expectedHash);
+        });
+
+    public Task<LocalCaptureArtifact> CaptureAsync(CaptureRequest request) =>
+        _sta.InvokeAsync(() => _capture.Capture(_connection.RequireActiveDocument(), request));
+
     public async Task<AdapterResult> ExecuteAsync(AdapterOperation operation, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -71,6 +105,19 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             "vismockup.document.snapshot@1" => await SnapshotAsync(
                 operation.Payload.GetProperty("max_nodes").GetInt32(),
                 operation.Payload.GetProperty("max_depth").GetInt32()),
+            "vismockup.model.attach@1" => await AttachModelAsync(
+                operation.Payload.GetProperty("document_id").GetString() ?? "",
+                operation.Payload.GetProperty("baseline_snapshot_hash").GetString() ?? "",
+                operation.Payload.GetProperty("binding")),
+            "vismockup.scene.apply@1" => await ApplySceneAsync(
+                operation.Payload.GetProperty("document_id").GetString() ?? "",
+                ReadScene(operation.Payload.GetProperty("scene")),
+                operation.Payload.GetProperty("baseline_snapshot_hash").GetString() ?? ""),
+            "vismockup.scene.verify@1" => await VerifySceneAsync(
+                operation.Payload.GetProperty("document_id").GetString() ?? "",
+                operation.Payload.GetProperty("operation_id").GetString() ?? "",
+                operation.Payload.GetProperty("expected_scene_hash").GetString() ?? ""),
+            "vismockup.view.capture@1" => await CaptureAsync(ReadCaptureRequest(operation.Payload, operation.StepId)),
             "vismockup.status" => await StatusAsync(),
             "vismockup.launch" => await LaunchAsync(),
             "vismockup.model.open" => await OpenFileAsync(operation.Payload.GetProperty("file_path").GetString() ?? ""),
@@ -82,6 +129,24 @@ public sealed class VisMockupAdapter : IConnectorAdapter
         };
         return new AdapterResult(true, result);
     }
+
+    private static SceneState ReadScene(System.Text.Json.JsonElement value)
+    {
+        var profile = value.GetProperty("capture_profile");
+        return new(
+            value.GetProperty("operation_id").GetString() ?? "",
+            value.GetProperty("visible_products").EnumerateArray().Select(item => item.GetString() ?? "").ToArray(),
+            value.GetProperty("visible_resources").EnumerateArray().Select(item => item.GetString() ?? "").ToArray(),
+            new(profile.GetProperty("format").GetString() ?? "", profile.GetProperty("width").GetInt32(), profile.GetProperty("height").GetInt32(), profile.GetProperty("background").GetString() ?? ""),
+            value.GetProperty("scene_hash").GetString() ?? "");
+    }
+
+    private static CaptureRequest ReadCaptureRequest(System.Text.Json.JsonElement value, string stepId) => new(
+        value.GetProperty("capture_run_id").GetString() ?? "",
+        string.IsNullOrWhiteSpace(stepId) ? "capture-" + (value.GetProperty("operation_id").GetString() ?? "operation") : stepId,
+        value.GetProperty("operation_id").GetString() ?? "",
+        value.GetProperty("attempt").GetInt32(),
+        new(value.GetProperty("format").GetString() ?? "", value.GetProperty("width").GetInt32(), value.GetProperty("height").GetInt32(), value.GetProperty("background").GetString() ?? ""));
     private dynamic Connect()
     {
         var type = Type.GetTypeFromProgID(ProgId, throwOnError: true)!;

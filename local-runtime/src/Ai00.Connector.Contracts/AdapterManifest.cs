@@ -31,7 +31,7 @@ public sealed record AdapterHealth(
     bool DocumentReady = false,
     string ProductVersion = "");
 
-public sealed record AdapterOperation(string OperationId, JsonElement Payload);
+public sealed record AdapterOperation(string OperationId, JsonElement Payload, string StepId = "");
 
 public sealed record AdapterResult(bool Ok, object? Data = null, string ErrorCode = "");
 
