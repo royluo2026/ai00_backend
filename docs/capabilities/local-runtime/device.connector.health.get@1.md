@@ -8,7 +8,7 @@ Read the latest authenticated AI00 Connector health advertisement.
 - 不适用：The caller needs to queue local work.
 - 生命周期：`stable`
 - 所属领域：`device`
-- Catalog Release：`rel_c18d458fc88a715e5ca39fddd0c765d3`
+- Catalog Release：`rel_4ab5c48fcf65f8480df2bdb28e0bcc8a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -87,7 +87,7 @@ Read the latest authenticated AI00 Connector health advertisement.
 ```json
 {
   "capability_id": "device.connector.health.get",
-  "catalog_release": "rel_c18d458fc88a715e5ca39fddd0c765d3",
+  "catalog_release": "rel_4ab5c48fcf65f8480df2bdb28e0bcc8a",
   "major_version": 1,
   "payload": {
     "device_id": "example"

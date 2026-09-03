@@ -8,7 +8,7 @@ Compose an immutable Connector environment from pinned owning-domain sources.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`simulation`
-- Catalog Release：`rel_c18d458fc88a715e5ca39fddd0c765d3`
+- Catalog Release：`rel_4ab5c48fcf65f8480df2bdb28e0bcc8a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -156,7 +156,7 @@ Compose an immutable Connector environment from pinned owning-domain sources.
 ```json
 {
   "capability_id": "simulation.environment.compose",
-  "catalog_release": "rel_c18d458fc88a715e5ca39fddd0c765d3",
+  "catalog_release": "rel_4ab5c48fcf65f8480df2bdb28e0bcc8a",
   "major_version": 1,
   "payload": {
     "capture_profile": {

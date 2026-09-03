@@ -8,7 +8,7 @@ Queue one immutable compatible ExecutionPlan using external Connector consistenc
 - 不适用：Compatibility or user-session preflight has not passed.
 - 生命周期：`stable`
 - 所属领域：`device`
-- Catalog Release：`rel_c18d458fc88a715e5ca39fddd0c765d3`
+- Catalog Release：`rel_4ab5c48fcf65f8480df2bdb28e0bcc8a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -229,7 +229,7 @@ Queue one immutable compatible ExecutionPlan using external Connector consistenc
 ```json
 {
   "capability_id": "device.connector.plan.queue",
-  "catalog_release": "rel_c18d458fc88a715e5ca39fddd0c765d3",
+  "catalog_release": "rel_4ab5c48fcf65f8480df2bdb28e0bcc8a",
   "major_version": 2,
   "payload": {
     "plan": {
