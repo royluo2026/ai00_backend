@@ -20,3 +20,46 @@ public sealed class UpdateStateMachine
         State = next;
     }
 }
+
+public interface IUpdateSlots
+{
+    Task DrainAsync(CancellationToken cancellationToken);
+    Task SwitchAsync(UpdatePackage package, CancellationToken cancellationToken);
+    Task RollbackAsync(CancellationToken cancellationToken);
+}
+
+public sealed class UpdateCoordinator(IUpdatePackageVerifier verifier, IUpdateSlots slots)
+{
+    public async Task<UpdateState> ApplyAsync(
+        UpdatePackage package,
+        Func<CancellationToken, Task<bool>> healthCheck,
+        CancellationToken cancellationToken)
+    {
+        var machine = new UpdateStateMachine();
+        machine.MoveTo(UpdateState.Downloading);
+        try
+        {
+            machine.MoveTo(UpdateState.Verifying);
+            verifier.RequireTrusted(package);
+            machine.MoveTo(UpdateState.Draining);
+            await slots.DrainAsync(cancellationToken);
+            machine.MoveTo(UpdateState.Switching);
+            await slots.SwitchAsync(package, cancellationToken);
+            machine.MoveTo(UpdateState.HealthChecking);
+            if (await healthCheck(cancellationToken))
+            {
+                machine.MoveTo(UpdateState.Completed);
+                return machine.State;
+            }
+        }
+        catch when (machine.State is UpdateState.Downloading or UpdateState.Verifying or UpdateState.Draining or UpdateState.Switching or UpdateState.HealthChecking)
+        {
+            await slots.RollbackAsync(CancellationToken.None);
+            machine.MoveTo(UpdateState.RolledBack);
+            return machine.State;
+        }
+        await slots.RollbackAsync(CancellationToken.None);
+        machine.MoveTo(UpdateState.RolledBack);
+        return machine.State;
+    }
+}

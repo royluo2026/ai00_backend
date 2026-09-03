@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ai00.Connector.Adapters.Vis
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ai00.Connector.Adapters.Mcp", "src\Ai00.Connector.Adapters.Mcp\Ai00.Connector.Adapters.Mcp.csproj", "{F1AA1880-35EB-4BCE-A62E-DB7C8C6EF006}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ai00.Connector.Tray", "src\Ai00.Connector.Tray\Ai00.Connector.Tray.csproj", "{F1AA1880-35EB-4BCE-A62E-DB7C8C6EF007}"
+EndProject
 Global
   GlobalSection(SolutionConfigurationPlatforms) = preSolution
     Debug|Any CPU = Debug|Any CPU
@@ -44,5 +46,9 @@ Global
     {F1AA1880-35EB-4BCE-A62E-DB7C8C6EF006}.Debug|Any CPU.Build.0 = Debug|Any CPU
     {F1AA1880-35EB-4BCE-A62E-DB7C8C6EF006}.Release|Any CPU.ActiveCfg = Release|Any CPU
     {F1AA1880-35EB-4BCE-A62E-DB7C8C6EF006}.Release|Any CPU.Build.0 = Release|Any CPU
+    {F1AA1880-35EB-4BCE-A62E-DB7C8C6EF007}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {F1AA1880-35EB-4BCE-A62E-DB7C8C6EF007}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {F1AA1880-35EB-4BCE-A62E-DB7C8C6EF007}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {F1AA1880-35EB-4BCE-A62E-DB7C8C6EF007}.Release|Any CPU.Build.0 = Release|Any CPU
   EndGlobalSection
 EndGlobal
