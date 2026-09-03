@@ -1,11 +1,14 @@
 import asyncio
+import json
 from datetime import UTC, datetime
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+from fastapi import HTTPException
 
 from backend.capabilities.registry_next import CapabilityRegistry
+from backend.capabilities.validation_next import validate_payload
 from backend.capability_v2.catalog import CatalogResolver, build_release
 from backend.capability_v2.catalog_store import InMemoryCatalogStore
 from backend.capability_v2.contracts import (
@@ -155,6 +158,112 @@ def test_agent_chat_v2_rejects_oversized_sync_response(monkeypatch) -> None:
             {"operation": "chat_sync", "body": {"message": "hi"}},
             SimpleNamespace(user_gid="user-1"),
         ))
+
+
+def test_web_chat_pins_v2_and_normalizes_trusted_payload() -> None:
+    registered = CapabilityRegistry()
+    register_interaction_chat_change_capability(registered)
+    descriptor = registered.get("agent.interaction.chat.change.apply", 2).descriptor
+    captured = []
+
+    class Gateway:
+        catalog_release = "release-1"
+
+        async def invoke(self, envelope):
+            captured.append(envelope)
+            return SimpleNamespace(
+                ok=True,
+                data={"data": {"response_json": '{"answer":"ok"}'}},
+                error=None,
+            )
+
+    response = asyncio.run(ai_chat._invoke_interaction_chat(
+        SimpleNamespace(headers={}),
+        {"gid": "admin-1", "team_id": "team-1", "org_role": "super_admin"},
+        ActorIdentity(user_id="admin-1", authentication_method="jwt", authenticated_at=datetime.now(UTC)),
+        Gateway(),
+        {
+            "operation": "chat_sync",
+            "body": {
+                "message": "hello",
+                "user_gid": "untrusted-user",
+                "context": {"current_page": "workbench"},
+            },
+            "ai00_token": "token",
+        },
+    ))
+
+    envelope = captured[0]
+    validate_payload(dict(descriptor.input_schema), dict(envelope.payload))
+    assert envelope.major_version == 2
+    assert envelope.identity.actor.user_id == "admin-1"
+    assert "user_gid" not in envelope.payload["body"]
+    assert json.loads(envelope.payload["body"]["context_json"]) == {
+        "current_page": "workbench"
+    }
+    assert response == {"answer": "ok"}
+
+
+def test_web_stream_chat_restores_the_sse_response() -> None:
+    class Gateway:
+        catalog_release = "release-1"
+
+        async def invoke(self, _envelope):
+            return SimpleNamespace(
+                ok=True,
+                data={"data": {"events": ['data: {"type":"done"}\n\n'], "media_type": "text/event-stream"}},
+                error=None,
+            )
+
+    response = asyncio.run(ai_chat._invoke_interaction_chat(
+        SimpleNamespace(headers={}),
+        {"gid": "admin-1", "team_id": "team-1", "org_role": "super_admin"},
+        ActorIdentity(user_id="admin-1", authentication_method="jwt", authenticated_at=datetime.now(UTC)),
+        Gateway(),
+        {"operation": "chat_stream", "body": {"message": "hello"}, "ai00_token": "token"},
+    ))
+
+    async def collect() -> str:
+        return "".join([
+            chunk.decode() if isinstance(chunk, bytes) else chunk
+            async for chunk in response.body_iterator
+        ])
+
+    assert response.media_type == "text/event-stream"
+    assert asyncio.run(collect()) == 'data: {"type":"done"}\n\n'
+
+
+def test_web_sync_chat_restores_the_bounded_response() -> None:
+    class Gateway:
+        catalog_release = "release-1"
+
+        async def invoke(self, _envelope):
+            return SimpleNamespace(
+                ok=True,
+                data={"data": {"response_json": '{"answer":"ok","tool_calls":[]}'}},
+                error=None,
+            )
+
+    response = asyncio.run(ai_chat._invoke_interaction_chat(
+        SimpleNamespace(headers={}),
+        {"gid": "admin-1", "team_id": "team-1", "org_role": "super_admin"},
+        ActorIdentity(user_id="admin-1", authentication_method="jwt", authenticated_at=datetime.now(UTC)),
+        Gateway(),
+        {"operation": "chat_sync", "body": {"message": "hello"}, "ai00_token": "token"},
+    ))
+
+    assert response == {"answer": "ok", "tool_calls": []}
+
+
+def test_web_chat_rejects_non_object_context_before_gateway() -> None:
+    with pytest.raises(HTTPException) as raised:
+        ai_chat._normalize_interaction_payload({
+            "operation": "chat_sync",
+            "body": {"message": "hello", "context": []},
+        })
+
+    assert raised.value.status_code == 400
+    assert raised.value.detail == "context must be an object"
 
 
 @pytest.mark.parametrize(

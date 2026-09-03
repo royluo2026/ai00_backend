@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from datetime import UTC, datetime
+from types import SimpleNamespace
 
 from backend.capability_v2.contracts import (
     ActorIdentity,
@@ -14,6 +15,7 @@ from backend.capability_v2.contracts import (
 from backend.capability_v2.identity import AuthenticatedPrincipal
 from plugins.craft.craft_backend.routers import ontology
 from plugins.factory.factory_backend.api.compatibility import (
+    build_web_compatibility_envelope,
     invoke_compatibility as invoke_factory_compatibility,
 )
 from plugins.project_management.project_management_backend.api.compatibility import (
@@ -86,6 +88,22 @@ def _principal() -> AuthenticatedPrincipal:
         authentication_method="jwt",
         authenticated_at=datetime(2026, 8, 14, tzinfo=UTC),
     )
+
+
+def test_factory_web_envelope_defaults_to_v1_and_accepts_explicit_major():
+    gateway = SimpleNamespace(catalog_release="rel_adapter_test")
+    common = dict(
+        gateway=gateway,
+        capability_id="agent.interaction.chat.change.apply",
+        payload={"operation": "chat_sync", "body": {"message": "hi"}},
+        current_user={"gid": "user-1", "team_id": "team-1", "org_role": "member"},
+        principal=_principal(),
+        request_id="request-1",
+        trace_id="trace-1",
+    )
+
+    assert build_web_compatibility_envelope(**common).major_version == 1
+    assert build_web_compatibility_envelope(**common, major_version=2).major_version == 2
 
 
 def test_project_legacy_adapter_completes_unapproved_governed_write():

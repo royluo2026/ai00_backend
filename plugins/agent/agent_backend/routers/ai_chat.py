@@ -51,16 +51,17 @@ _TOOL_MAX_CALLS   = 3
 async def _invoke_interaction_chat(request, user, principal, gateway, payload):
     request_id = request.headers.get("X-Request-ID") or f"agent_interaction_chat_{uuid.uuid4().hex}"
     result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
-        gateway, capability_id="agent.interaction.chat.change.apply", payload=payload,
+        gateway, capability_id="agent.interaction.chat.change.apply", payload=_normalize_interaction_payload(payload),
         current_user=user, principal=principal, request_id=request_id,
         trace_id=request.headers.get("X-Trace-ID") or request_id,
         idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
         approval_reference=request.headers.get("X-Capability-Approval"),
+        major_version=2,
     ))
     if not result.ok:
         code = result.error.code if result.error else "provider_error"
         raise HTTPException(status_code={"invalid_input": 400, "permission_denied": 403, "resource_not_found": 404}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
-    return result.data.get("data", result.data)
+    return _project_interaction_response(payload, result.data.get("data", result.data))
 _TOOL_RESULT_MAX  = 12_000
 
 _CHJ_GATEWAY_HOST     = "api-hub.inner.chj.cloud"
@@ -1114,3 +1115,28 @@ chat_stream_legacy = chat_stream = _legacy_chat_stream
 chat_sync_legacy = chat_sync = _legacy_chat_sync
 confirm_tool_legacy = confirm_tool = _legacy_confirm_tool
 confirm_tool_sync_legacy = confirm_tool_sync = _legacy_confirm_tool_sync
+
+
+def _normalize_interaction_payload(payload: dict) -> dict:
+    body = dict(payload.get("body") or {})
+    context = body.pop("context", None)
+    body.pop("user_gid", None)
+    if context is not None:
+        if not isinstance(context, dict):
+            raise HTTPException(status_code=400, detail="context must be an object")
+        body["context_json"] = json.dumps(
+            context, ensure_ascii=False, separators=(",", ":"),
+        )
+    return {**payload, "body": body}
+
+
+def _project_interaction_response(payload: dict, data):
+    if isinstance(data, dict) and "response_json" in data:
+        return json.loads(data["response_json"])
+    if payload.get("operation") in {"chat_stream", "confirm"} and isinstance(data, dict):
+        return StreamingResponse(
+            iter(data.get("events") or ()),
+            media_type=data.get("media_type") or "text/event-stream",
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+        )
+    return data
