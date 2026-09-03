@@ -5,7 +5,7 @@ namespace Ai00.Connector.Contracts;
 
 public static class CanonicalJson
 {
-    public static byte[] Serialize(object value)
+    public static byte[] Serialize(object? value)
     {
         var element = value is JsonElement json ? json : JsonSerializer.SerializeToElement(value);
         using var stream = new MemoryStream();
@@ -14,7 +14,7 @@ public static class CanonicalJson
         return stream.ToArray();
     }
 
-    public static string Hash(object value) =>
+    public static string Hash(object? value) =>
         "sha256:" + Convert.ToHexString(SHA256.HashData(Serialize(value))).ToLowerInvariant();
 
     public static string UtcTimestamp(DateTimeOffset value) =>

@@ -181,3 +181,54 @@ public static class PlanValidator
         return 0;
     }
 }
+
+public sealed record ConnectorStepResult(
+    [property: JsonPropertyName("step_id")] string StepId,
+    [property: JsonPropertyName("status")] string Status,
+    [property: JsonPropertyName("result")] object? Result,
+    [property: JsonPropertyName("result_hash")] string? ResultHash,
+    [property: JsonPropertyName("error_code")] string ErrorCode,
+    [property: JsonPropertyName("started_at")] DateTimeOffset StartedAt,
+    [property: JsonPropertyName("completed_at")] DateTimeOffset CompletedAt);
+
+public sealed record ConnectorPlanOutcome(
+    [property: JsonPropertyName("protocol")] string Protocol,
+    [property: JsonPropertyName("plan_id")] string PlanId,
+    [property: JsonPropertyName("status")] string Status,
+    [property: JsonPropertyName("steps")] IReadOnlyList<ConnectorStepResult> Steps,
+    [property: JsonPropertyName("reported_at")] DateTimeOffset ReportedAt)
+{
+    public object CanonicalDocument() => new Dictionary<string, object?>
+    {
+        ["protocol"] = Protocol,
+        ["plan_id"] = PlanId,
+        ["status"] = Status,
+        ["steps"] = Steps.Select(step => new Dictionary<string, object?>
+        {
+            ["step_id"] = step.StepId,
+            ["status"] = step.Status,
+            ["result"] = step.Result,
+            ["result_hash"] = step.ResultHash,
+            ["error_code"] = step.ErrorCode,
+            ["started_at"] = CanonicalJson.UtcTimestamp(step.StartedAt),
+            ["completed_at"] = CanonicalJson.UtcTimestamp(step.CompletedAt),
+        }).ToArray(),
+        ["reported_at"] = CanonicalJson.UtcTimestamp(ReportedAt),
+    };
+}
+
+public sealed record SignedConnectorPlanOutcome(
+    ConnectorPlanOutcome Outcome,
+    string Signature,
+    string LeaseId);
+
+public static class ConnectorOutcomeSecurity
+{
+    public static string Sign(ConnectorPlanOutcome outcome, string deviceSecret)
+    {
+        if (Encoding.UTF8.GetByteCount(deviceSecret) < 32)
+            throw new InvalidOperationException("Device secret must contain at least 32 UTF-8 bytes");
+        using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(deviceSecret));
+        return "hmac-sha256:" + Convert.ToHexString(hmac.ComputeHash(CanonicalJson.Serialize(outcome.CanonicalDocument()))).ToLowerInvariant();
+    }
+}
