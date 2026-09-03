@@ -39,6 +39,11 @@ CAPABILITY_IDS = {
     "simulation.environment.manifest.search",
     "simulation.environment.manifest.archive",
     "simulation.environment.preflight",
+    "simulation.environment.materialize",
+    "simulation.capture_run.start",
+    "simulation.capture_run.get",
+    "simulation.capture_run.cancel",
+    "simulation.capture_step.retry",
 }
 ROOT = Path(__file__).resolve().parents[2]
 

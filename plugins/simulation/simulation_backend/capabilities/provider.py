@@ -30,6 +30,15 @@ _RESOURCES = {
     "simulation.environment.preflight": (
         ("simulation-environment", "environment_id"), ("device", "device_id"),
     ),
+    "simulation.environment.materialize": (
+        ("simulation-environment", "environment_id"), ("device", "device_id"),
+    ),
+    "simulation.capture_run.start": (
+        ("simulation-environment", "environment_id"), ("device", "device_id"),
+    ),
+    "simulation.capture_run.get": (("simulation-capture-run", "capture_run_id"),),
+    "simulation.capture_run.cancel": (("simulation-capture-run", "capture_run_id"),),
+    "simulation.capture_step.retry": (("simulation-capture-run", "capture_run_id"),),
     "simulation.run.start": (("simulation-environment", "environment_id"),),
     "simulation.run.get": (("simulation-run", "run_id"),),
     "simulation.result.get": (("simulation-run", "run_id"),),
@@ -105,9 +114,15 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         "resource_selectors": tuple(ResourceSelector(resource_type=t, payload_path=p) for t, p in _RESOURCES.get(governed.id, ())),
         "data_classification": "confidential", "delegation_policy": "scoped",
         "agent_output_schema": descriptor.output_schema,
-        "execution_mode": ExecutionMode.CLOUD_ASYNC if governed.id == "simulation.run.start" else descriptor.execution_mode,
+        "execution_mode": ExecutionMode.CLOUD_ASYNC if governed.id in {
+            "simulation.run.start", "simulation.environment.materialize", "simulation.capture_run.start",
+            "simulation.capture_step.retry",
+        } else descriptor.execution_mode,
         "artifact_policy": "output" if governed.id == "simulation.result.get" else "none",
-        "operation_policy": "required" if governed.id == "simulation.run.start" else ("optional" if is_write else "none"),
+        "operation_policy": "required" if governed.id in {
+            "simulation.run.start", "simulation.environment.materialize", "simulation.capture_run.start",
+            "simulation.capture_step.retry",
+        } else ("optional" if is_write else "none"),
         "concurrency_policy": "none", "idempotency_policy": "required" if is_write else "none",
         "consistency_policy": "external" if is_write else "strong", "evidence_policy": "required",
         "domain_errors": _errors(connector_environment="connector_environment" in governed.tags),

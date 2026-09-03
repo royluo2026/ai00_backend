@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS `workmanship_sim_capture_runs` (
   `updated_at` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`capture_run_id`),
   UNIQUE KEY `uq_sim_capture_plan` (`plan_id`),
-  CHECK (`status` IN ('queued','leased','running','completed','partial','failed','cancelled','outcome_unknown'))
+  CHECK (`status` IN ('queued','leased','running','cancelling','completed','partial','failed','cancelled','outcome_unknown'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `workmanship_sim_capture_steps` (
@@ -81,8 +81,11 @@ CREATE TABLE IF NOT EXISTS `workmanship_sim_capture_steps` (
   `operation_id` VARCHAR(128) NOT NULL,
   `sequence` BIGINT NOT NULL,
   `status` VARCHAR(32) NOT NULL,
+  `attempt` INT NOT NULL DEFAULT 1,
   `expected_scene_hash` VARCHAR(71) NOT NULL,
   `actual_scene_hash` VARCHAR(71) NULL,
+  `artifact_ref_json` JSON NULL,
+  `artifact_attached` BOOLEAN NOT NULL DEFAULT FALSE,
   `failure_code` VARCHAR(128) NULL,
   `owner_gid` VARCHAR(128) NOT NULL,
   `team_gid` VARCHAR(128) NULL,
@@ -90,7 +93,7 @@ CREATE TABLE IF NOT EXISTS `workmanship_sim_capture_steps` (
   `updated_at` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`capture_run_id`, `step_id`),
   UNIQUE KEY `uq_sim_capture_operation` (`capture_run_id`, `operation_id`),
-  CHECK (`status` IN ('queued','running','completed','failed','skipped','outcome_unknown'))
+  CHECK (`status` IN ('queued','running','completed','failed','skipped','cancelled','outcome_unknown'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `workmanship_sim_capture_artifact_refs` (

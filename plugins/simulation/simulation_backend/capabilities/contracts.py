@@ -120,6 +120,20 @@ PREFLIGHT_PROBLEM = obj({
     "code": STRING, "expected": {"type": ["string", "null"]},
     "actual": {"type": ["string", "null"]},
 }, ("code", "expected", "actual"))
+CAPTURE_STEP = obj({
+    "operation_id": STRING, "sequence": NONNEGATIVE_INTEGER,
+    "status": {"type": "string", "enum": ["queued", "running", "completed", "failed", "skipped", "cancelled", "outcome_unknown"]},
+    "attempt": POSITIVE_INTEGER,
+    "artifact_ref": {"anyOf": [ARTIFACT_REF, {"type": "null"}]},
+    "artifact_attached": {"type": "boolean"}, "expected_scene_hash": HASH,
+}, ("operation_id", "sequence", "status", "attempt", "artifact_ref", "artifact_attached", "expected_scene_hash"))
+CAPTURE_RUN = obj({
+    "capture_run_id": STRING, "environment_id": STRING, "environment_version": POSITIVE_INTEGER,
+    "manifest_hash": HASH, "device_id": STRING, "plan_id": STRING,
+    "status": {"type": "string", "enum": ["queued", "leased", "running", "cancelling", "completed", "partial", "failed", "cancelled", "outcome_unknown"]},
+    "operation_ref": OPERATION_REF,
+    "steps": {"type": "array", "items": CAPTURE_STEP, "maxItems": 3000},
+}, ("capture_run_id", "environment_id", "environment_version", "manifest_hash", "device_id", "plan_id", "status", "operation_ref", "steps"))
 
 
 INPUT_SCHEMAS = {
@@ -146,6 +160,11 @@ INPUT_SCHEMAS = {
     "simulation.environment.manifest.search": obj({"limit": {"type": "integer", "minimum": 1, "maximum": 200}}),
     "simulation.environment.manifest.archive": obj({"environment_id": STRING}, ("environment_id",)),
     "simulation.environment.preflight": obj({"environment_id": STRING, "environment_version": POSITIVE_INTEGER, "device_id": STRING}, ("environment_id", "environment_version", "device_id")),
+    "simulation.environment.materialize": obj({"environment_id": STRING, "environment_version": POSITIVE_INTEGER, "device_id": STRING}, ("environment_id", "environment_version", "device_id")),
+    "simulation.capture_run.start": obj({"environment_id": STRING, "environment_version": POSITIVE_INTEGER, "device_id": STRING}, ("environment_id", "environment_version", "device_id")),
+    "simulation.capture_run.get": obj({"capture_run_id": STRING}, ("capture_run_id",)),
+    "simulation.capture_run.cancel": obj({"capture_run_id": STRING}, ("capture_run_id",)),
+    "simulation.capture_step.retry": obj({"capture_run_id": STRING, "operation_id": STRING}, ("capture_run_id", "operation_id")),
 }
 
 OUTPUT_SCHEMAS = {
@@ -169,6 +188,18 @@ OUTPUT_SCHEMAS = {
     "simulation.environment.manifest.search": obj({"items": {"type": "array", "items": MANIFEST, "maxItems": 200}, "total": NONNEGATIVE_INTEGER}, ("items", "total")),
     "simulation.environment.manifest.archive": obj({"environment_id": STRING, "status": {"type": "string", "enum": ["archived"]}}, ("environment_id", "status")),
     "simulation.environment.preflight": obj({"compatible": {"type": "boolean"}, "problems": {"type": "array", "items": PREFLIGHT_PROBLEM, "maxItems": 128}}, ("compatible", "problems")),
+    "simulation.environment.materialize": obj({
+        "run_id": STRING, "environment_id": STRING, "environment_version": POSITIVE_INTEGER,
+        "manifest_hash": HASH, "device_id": STRING, "plan_id": STRING,
+        "status": {"type": "string", "enum": ["queued"]}, "operation_ref": OPERATION_REF,
+    }, ("run_id", "environment_id", "environment_version", "manifest_hash", "device_id", "plan_id", "status", "operation_ref")),
+    "simulation.capture_run.start": CAPTURE_RUN,
+    "simulation.capture_run.get": CAPTURE_RUN,
+    "simulation.capture_run.cancel": obj({"capture_run_id": STRING, "status": {"type": "string", "enum": ["cancelling", "cancelled"]}}, ("capture_run_id", "status")),
+    "simulation.capture_step.retry": obj({
+        "capture_run_id": STRING, "operation_id": STRING, "attempt": POSITIVE_INTEGER,
+        "plan_id": STRING, "status": {"type": "string", "enum": ["queued"]},
+    }, ("capture_run_id", "operation_id", "attempt", "plan_id", "status")),
 }
 
 __all__ = ["INPUT_SCHEMAS", "OUTPUT_SCHEMAS"]
