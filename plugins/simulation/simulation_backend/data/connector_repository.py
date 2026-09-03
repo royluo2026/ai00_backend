@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import secrets
 import uuid
 from dataclasses import dataclass
@@ -14,6 +15,7 @@ from backend.contracts.connector_execution_plan_v1 import (
 )
 
 from ..capabilities.connector_contracts import ConnectorHealth
+from ..domain.connector_pairing import PairingError, PairingRecord
 from .connection import get_simulation_conn
 
 
@@ -347,7 +349,113 @@ class SimulationConnectorRepository:
                 return int(cursor.rowcount)
 
 
+class SqlPairingRepository:
+    @staticmethod
+    def _record(row) -> PairingRecord | None:
+        if not row:
+            return None
+        envelope = row.get("credential_envelope_json")
+        if isinstance(envelope, str):
+            envelope = json.loads(envelope)
+        return PairingRecord(
+            pairing_id=row["pairing_id"], user_code=row["user_code_display"],
+            installation_id=row["installation_id"],
+            verifier_hash=row["verifier_hash"], device_name=row["device_name"],
+            runtime_version=row["runtime_version"],
+            windows_sid_hash=row["windows_sid_hash"],
+            masked_windows_user=row["masked_windows_user"],
+            ephemeral_public_key=row["ephemeral_public_key"], status=row["status"],
+            expires_at=row["expires_at"].replace(tzinfo=UTC) if row["expires_at"].tzinfo is None else row["expires_at"],
+            resource_version=int(row["resource_version"]),
+            approved_user_gid=row.get("approved_user_gid"), team_gid=row.get("team_gid"),
+            connector_id=row.get("connector_id"),
+            encrypted_envelope=(envelope or {}).get("ciphertext"),
+            envelope_hash=row.get("credential_envelope_hash"),
+        )
+
+    def create_pairing(self, record: PairingRecord) -> None:
+        nonce_hash = hashlib.sha256(
+            f"{record.installation_id}:{record.pairing_id}".encode("utf-8")
+        ).hexdigest()
+        user_code_hash = hashlib.sha256(record.user_code.encode("utf-8")).hexdigest()
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "INSERT INTO workmanship_sim_connector_pairings "
+                "(pairing_id,installation_id,nonce_hash,verifier_hash,user_code_hash,user_code_display,"
+                "device_name,runtime_version,windows_sid_hash,masked_windows_user,ephemeral_public_key,"
+                "status,resource_version,expires_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                (
+                    record.pairing_id, record.installation_id, nonce_hash,
+                    record.verifier_hash, user_code_hash, record.user_code,
+                    record.device_name, record.runtime_version, record.windows_sid_hash,
+                    record.masked_windows_user, record.ephemeral_public_key,
+                    record.status, record.resource_version, record.expires_at,
+                ),
+            )
+
+    def by_code(self, user_code: str) -> PairingRecord | None:
+        digest = hashlib.sha256(user_code.encode("utf-8")).hexdigest()
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT * FROM workmanship_sim_connector_pairings WHERE user_code_hash=%s LIMIT 1",
+                (digest,),
+            )
+            return self._record(cursor.fetchone())
+
+    def by_id(self, pairing_id: str) -> PairingRecord | None:
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT * FROM workmanship_sim_connector_pairings WHERE pairing_id=%s LIMIT 1",
+                (pairing_id,),
+            )
+            return self._record(cursor.fetchone())
+
+    def binding_for_user(self, user_gid: str) -> dict | None:
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT connector_id,installation_id FROM workmanship_sim_connector_bindings "
+                "WHERE owner_user_gid=%s LIMIT 1",
+                (user_gid,),
+            )
+            return cursor.fetchone()
+
+    def save_pairing(self, record: PairingRecord) -> None:
+        envelope_json = (
+            json.dumps({"ciphertext": record.encrypted_envelope}, separators=(",", ":"))
+            if record.encrypted_envelope else None
+        )
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "UPDATE workmanship_sim_connector_pairings SET status=%s,resource_version=%s,"
+                "approved_user_gid=%s,team_gid=%s,connector_id=%s,credential_envelope_json=%s,"
+                "credential_envelope_hash=%s,approved_at=IF(%s='approved',NOW(6),approved_at),"
+                "completed_at=IF(%s='completed',NOW(6),completed_at),updated_at=NOW(6) "
+                "WHERE pairing_id=%s",
+                (
+                    record.status, record.resource_version, record.approved_user_gid,
+                    record.team_gid, record.connector_id, envelope_json,
+                    record.envelope_hash, record.status, record.status, record.pairing_id,
+                ),
+            )
+            if cursor.rowcount != 1:
+                raise PairingError("pairing_not_found")
+
+    def create_binding(self, user_gid: str, binding: dict) -> None:
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "INSERT INTO workmanship_sim_connector_bindings "
+                "(connector_id,owner_user_gid,team_gid,installation_id,windows_sid_hash,display_name,"
+                "platform,runtime_version,token_hash,capabilities,status) "
+                "VALUES (%s,%s,%s,%s,%s,%s,'windows',%s,%s,JSON_ARRAY('ai00.vismockup@1'),'offline')",
+                (
+                    binding["connector_id"], user_gid, binding.get("team_gid"),
+                    binding["installation_id"], binding["windows_sid_hash"],
+                    binding["display_name"], binding["runtime_version"], binding["token_hash"],
+                ),
+            )
+
+
 __all__ = [
     "ConnectorRepositoryError", "ProjectionIntent", "ProjectionLease",
-    "SimulationConnectorRepository",
+    "SimulationConnectorRepository", "SqlPairingRepository",
 ]

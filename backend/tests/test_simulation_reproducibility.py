@@ -65,6 +65,11 @@ CAPABILITY_IDS = {
     "simulation.vismockup.selection.highlight",
     "simulation.vismockup.visibility.change.apply",
     "simulation.vismockup.capture.create",
+    "simulation.connector.pairing.request",
+    "simulation.connector.pairing.summary.get",
+    "simulation.connector.pairing.approve",
+    "simulation.connector.pairing.complete",
+    "simulation.connector.binding.get",
 }
 EXPERIMENTAL_IDS = {
     capability_id for capability_id in CAPABILITY_IDS
@@ -88,6 +93,11 @@ EXPERIMENTAL_IDS = {
     "simulation.vismockup.selection.highlight",
     "simulation.vismockup.visibility.change.apply",
     "simulation.vismockup.capture.create",
+    "simulation.connector.pairing.request",
+    "simulation.connector.pairing.summary.get",
+    "simulation.connector.pairing.approve",
+    "simulation.connector.pairing.complete",
+    "simulation.connector.binding.get",
 }
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -146,7 +156,10 @@ def test_provider_publishes_native_stable_plugin_agent_and_mcp_contracts():
         assert descriptor.lifecycle_status == expected_lifecycle, capability_id
         if (
             capability_id.startswith("simulation.connector_") and capability_id.endswith("_outcome.apply")
-        ) or capability_id.startswith("simulation.vismockup."):
+        ) or capability_id.startswith("simulation.vismockup.") or capability_id in {
+            "simulation.connector.pairing.request",
+            "simulation.connector.pairing.complete",
+        }:
             assert descriptor.exposure.local_runtime
             assert not descriptor.exposure.web and not descriptor.exposure.plugin
             assert not descriptor.exposure.agent and not descriptor.exposure.mcp

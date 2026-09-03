@@ -17,6 +17,7 @@ from .connector_runtime import (
     connector_control_plane,
     register_connector_runtime_capabilities,
 )
+from .connector_pairing import specs as connector_pairing_specs
 from .provider import register
 
 
@@ -107,6 +108,8 @@ def register_capabilities(
     for spec, handler in connector_outcome_specs(outcome_provider):
         register(registry, spec, handler)
     register_connector_runtime_capabilities(registry, connector_control_plane)
+    for spec, handler in connector_pairing_specs():
+        register(registry, spec, handler)
 
 
 __all__ = ["register_capabilities"]

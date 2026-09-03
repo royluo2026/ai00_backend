@@ -19,6 +19,11 @@ SIMULATION_CONNECTOR_IDS = {
     "simulation.vismockup.selection.highlight",
     "simulation.vismockup.visibility.change.apply",
     "simulation.vismockup.capture.create",
+    "simulation.connector.pairing.request",
+    "simulation.connector.pairing.summary.get",
+    "simulation.connector.pairing.approve",
+    "simulation.connector.pairing.complete",
+    "simulation.connector.binding.get",
 }
 
 LEGACY_IDS = {

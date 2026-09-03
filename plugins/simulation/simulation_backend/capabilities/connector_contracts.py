@@ -128,6 +128,20 @@ INPUT_SCHEMAS = {
     "simulation.vismockup.selection.highlight": obj({**CONNECTOR, "catia_names": {"type": "array", "items": STRING, "minItems": 1, "maxItems": 1000}}, ("connector_id", "catia_names")),
     "simulation.vismockup.visibility.change.apply": obj({**CONNECTOR, "action": {"type": "string", "enum": ["all_on", "all_off", "deselect"]}}, ("connector_id", "action")),
     "simulation.vismockup.capture.create": obj(CONNECTOR, ("connector_id",)),
+    "simulation.connector.pairing.request": obj({
+        "installation_id": STRING, "verifier_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "device_name": STRING, "runtime_version": STRING,
+        "windows_sid_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "masked_windows_user": STRING, "ephemeral_public_key": STRING,
+    }, ("installation_id", "verifier_hash", "device_name", "runtime_version", "windows_sid_hash", "masked_windows_user", "ephemeral_public_key")),
+    "simulation.connector.pairing.summary.get": obj({"user_code": STRING}, ("user_code",)),
+    "simulation.connector.pairing.approve": obj({
+        "user_code": STRING, "expected_version": {"type": "integer", "minimum": 1},
+    }, ("user_code", "expected_version")),
+    "simulation.connector.pairing.complete": obj({
+        "pairing_id": STRING, "installation_id": STRING, "verifier": STRING,
+    }, ("pairing_id", "installation_id", "verifier")),
+    "simulation.connector.binding.get": obj({}, ()),
 }
 
 OPERATION_REF = obj({
@@ -147,6 +161,12 @@ TREE_RESULT = obj({"nodes": {"type": "array", "items": TREE_NODE}, "max_depth": 
 HIGHLIGHT_RESULT = obj({"matched": {"type": "integer", "minimum": 0}, "not_found": {"type": "array", "items": STRING}}, ("matched", "not_found"))
 VISIBILITY_RESULT = obj({"action": {"type": "string", "enum": ["all_on", "all_off", "deselect"]}}, ("action",))
 CAPTURE_RESULT = obj({"artifact_ref": ARTIFACT_REF}, ("artifact_ref",))
+PAIRING_SUMMARY = obj({
+    "pairing_id": STRING, "user_code": STRING, "device_name": STRING,
+    "runtime_version": STRING, "masked_windows_user": STRING,
+    "status": STRING, "expires_at": {"type": "string", "format": "date-time"},
+    "resource_version": {"type": "integer", "minimum": 1},
+}, ("pairing_id", "user_code", "device_name", "runtime_version", "masked_windows_user", "status", "expires_at", "resource_version"))
 
 OUTPUT_SCHEMAS = {
     "simulation.connector.health.get": CONNECTOR_HEALTH,
@@ -158,6 +178,21 @@ OUTPUT_SCHEMAS = {
     "simulation.vismockup.selection.highlight": HIGHLIGHT_RESULT,
     "simulation.vismockup.visibility.change.apply": VISIBILITY_RESULT,
     "simulation.vismockup.capture.create": CAPTURE_RESULT,
+    "simulation.connector.pairing.request": obj({
+        "pairing_id": STRING, "user_code": STRING, "verification_uri": STRING,
+        "status": STRING, "expires_at": {"type": "string", "format": "date-time"},
+        "resource_version": {"type": "integer", "minimum": 1},
+    }, ("pairing_id", "user_code", "verification_uri", "status", "expires_at", "resource_version")),
+    "simulation.connector.pairing.summary.get": PAIRING_SUMMARY,
+    "simulation.connector.pairing.approve": PAIRING_SUMMARY,
+    "simulation.connector.pairing.complete": obj({
+        "connector_id": STRING, "encrypted_credential_envelope": STRING,
+        "envelope_hash": HASH,
+    }, ("connector_id", "encrypted_credential_envelope", "envelope_hash")),
+    "simulation.connector.binding.get": obj({
+        "connector_id": {"type": ["string", "null"]},
+        "installation_id": {"type": ["string", "null"]},
+    }, ("connector_id", "installation_id")),
 }
 
 

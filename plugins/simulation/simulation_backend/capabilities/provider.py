@@ -124,6 +124,13 @@ _ERROR_PAIRS = (
     ("materialization_action_not_ready", "The materialization action is not ready to dispatch."),
     ("plan_outcome_invalid", "The Connector outcome does not match the immutable execution plan."),
     ("capability_migration_required", "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow."),
+    ("pairing_not_found", "The Connector pairing request does not exist."),
+    ("pairing_expired", "The five-minute Connector pairing request expired."),
+    ("pairing_proof_invalid", "The Connector did not prove the original verifier and installation identity."),
+    ("pairing_not_approved", "The signed-in AI00 user has not approved this pairing."),
+    ("pairing_version_conflict", "The pairing changed after it was displayed."),
+    ("connector_binding_conflict", "The AI00 user already has a different Connector binding."),
+    ("feishu_login_required", "Pairing approval requires an AI00 Web session established through Feishu login."),
 )
 _LEGACY_ERROR_CODES = frozenset(code for code, _ in _ERROR_PAIRS[:9])
 _RETRYABLE_ERROR_CODES = frozenset({
@@ -336,6 +343,10 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         "exposure": (
             ExposurePolicy(local_runtime=True)
             if governed.id.startswith("simulation.vismockup.")
+            or governed.id in {
+                "simulation.connector.pairing.request",
+                "simulation.connector.pairing.complete",
+            }
             else ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True)
         ),
         "exposure_policy_source": "provider_explicit",
@@ -347,6 +358,10 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         "execution_mode": (
             ExecutionMode.LOCAL
             if governed.id.startswith("simulation.vismockup.")
+            or governed.id in {
+                "simulation.connector.pairing.request",
+                "simulation.connector.pairing.complete",
+            }
             else ExecutionMode.CLOUD_ASYNC
             if governed.id == "simulation.run.start"
             else descriptor.execution_mode
