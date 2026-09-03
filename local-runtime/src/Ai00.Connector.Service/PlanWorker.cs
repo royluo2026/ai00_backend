@@ -15,6 +15,19 @@ public interface IConnectorPlanExecutor
     Task<SignedConnectorPlanOutcome> ExecuteAsync(LeasedConnectorPlan plan, CancellationToken cancellationToken);
 }
 
+public sealed class PowerGuardedPlanExecutor(
+    IConnectorPlanExecutor inner,
+    ISystemPowerGuard power) : IConnectorPlanExecutor
+{
+    public async Task<SignedConnectorPlanOutcome> ExecuteAsync(
+        LeasedConnectorPlan plan,
+        CancellationToken cancellationToken)
+    {
+        using var lease = power.Acquire(plan.Plan.PlanId);
+        return await inner.ExecuteAsync(plan, cancellationToken);
+    }
+}
+
 public sealed class PlanWorker(
     PlanJournal journal,
     IConnectorPlanGateway gateway,

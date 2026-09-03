@@ -42,9 +42,10 @@ public interface IAdapterSignatureVerifier
     void RequireTrusted(AdapterManifest manifest, string assemblyPath);
 }
 
-public sealed class ConnectorException(string code) : Exception(code)
+public sealed class ConnectorException(string code, string? localPath = null) : Exception(code)
 {
     public string Code { get; } = code;
+    public string? LocalPath { get; } = localPath;
 }
 
 public sealed class AdapterManifestLoader(
