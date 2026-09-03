@@ -503,6 +503,30 @@ def test_reviewed_ai_routes_match_exact_handler_invocations() -> None:
     assert ("GET", "/api/ai/balance") not in targets
 
 
+def test_agent_chat_routes_target_major_v2() -> None:
+    inventory = load_route_inventory(
+        ROOT / "docs/governance/legacy_route_inventory.json"
+    )
+    routes = {
+        (entry.method, entry.route_path): entry
+        for entry in inventory.entries
+        if entry.route_path in {
+            "/api/ai/chat",
+            "/api/ai/chat/stream",
+            "/api/ai/confirm",
+            "/api/ai/confirm/sync",
+        }
+    }
+
+    assert set(routes) == {
+        ("POST", "/api/ai/chat"),
+        ("POST", "/api/ai/chat/stream"),
+        ("POST", "/api/ai/confirm"),
+        ("POST", "/api/ai/confirm/sync"),
+    }
+    assert {entry.migration_target_major_version for entry in routes.values()} == {2}
+
+
 def test_lark_business_routes_are_registered_not_operations_excluded() -> None:
     root = Path(__file__).resolve().parents[2]
     inventory = load_route_inventory(root / "docs/governance/legacy_route_inventory.json")

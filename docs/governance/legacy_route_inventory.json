@@ -2950,7 +2950,7 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1,
+      "migration_target_major_version": 2,
       "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
@@ -2964,7 +2964,7 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1,
+      "migration_target_major_version": 2,
       "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
@@ -2978,7 +2978,7 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1,
+      "migration_target_major_version": 2,
       "evidence_provenance": "web-api-legacy-addition-review/original_109"
     },
     {
@@ -4616,7 +4616,7 @@
         "web",
         "rest"
       ],
-      "migration_target_major_version": 1,
+      "migration_target_major_version": 2,
       "evidence_provenance": "web-api-legacy-addition-review/fix_round_4"
     },
     {

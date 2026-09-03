@@ -17,8 +17,8 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 941,
-          "end_line": 950,
+          "start_line": 942,
+          "end_line": 951,
           "sha256": "4ac274a86cc2272aca28a1fc343433594b21b61f45ac4ea1ca4607de27fa7048"
         },
         "expected_target_invocation": "invoke_agent_capability(\n        \"agent.session.change.apply\", {\"operation\": \"delete\", \"session_gid\": gid}, _user\n    )"
@@ -1668,8 +1668,8 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 931,
-          "end_line": 938,
+          "start_line": 932,
+          "end_line": 939,
           "sha256": "31aedd61b13e1a10361b9a8a51487eae80be1b0970ca473f1e24b759e49a97b9"
         },
         "expected_target_invocation": "invoke_agent_capability(\"agent.session.read\", {\"operation\": \"list\"}, _user)"
@@ -1889,8 +1889,8 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 953,
-          "end_line": 963,
+          "start_line": 954,
+          "end_line": 964,
           "sha256": "438571906130a444a2539400b4f1b98cbd80530d3905641cdc8fccd897a7c195"
         },
         "expected_target_invocation": "invoke_agent_capability(\n        \"agent.session.read\", {\"operation\": \"get\", \"session_gid\": gid}, _user\n    )"
@@ -2164,13 +2164,13 @@
       "disposition": "retained",
       "target_capability": "agent.interaction.chat.change.apply",
       "reason": "Handler delegates to _invoke_interaction_chat, whose anchored binding invokes agent.interaction.chat.change.apply.",
-      "target_major_version": 1,
+      "target_major_version": 2,
       "evidence": {
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 821,
-          "end_line": 827,
+          "start_line": 822,
+          "end_line": 828,
           "sha256": "679c2ba88dee1d3c00bc853afe69e73caa20daf6f5826fc014661389a7b14679"
         },
         "delegation_symbol": "_invoke_interaction_chat",
@@ -2178,10 +2178,10 @@
         "binding": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
           "start_line": 51,
-          "end_line": 63,
-          "sha256": "1f16e8a374b9cb8e8b588629a73bcc9d327b0877ef2ada653e6089571e67f5f3"
+          "end_line": 64,
+          "sha256": "7f274fafecff4dea69c1a166cc151d1cfa4eba894ed2b44d182c0ae83845a916"
         },
-        "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"agent.interaction.chat.change.apply\", payload=payload,\n        current_user=user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n    )"
+        "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"agent.interaction.chat.change.apply\", payload=_normalize_interaction_payload(payload),\n        current_user=user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        major_version=2,\n    )"
       }
     },
     {
@@ -2191,13 +2191,13 @@
       "disposition": "retained",
       "target_capability": "agent.interaction.chat.change.apply",
       "reason": "Handler delegates to _invoke_interaction_chat, whose anchored binding invokes agent.interaction.chat.change.apply.",
-      "target_major_version": 1,
+      "target_major_version": 2,
       "evidence": {
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 558,
-          "end_line": 565,
+          "start_line": 559,
+          "end_line": 566,
           "sha256": "b8537ad102440ea968bb481c6dca485cf1edafc4b493347a6003f91564bd9e33"
         },
         "delegation_symbol": "_invoke_interaction_chat",
@@ -2205,10 +2205,10 @@
         "binding": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
           "start_line": 51,
-          "end_line": 63,
-          "sha256": "1f16e8a374b9cb8e8b588629a73bcc9d327b0877ef2ada653e6089571e67f5f3"
+          "end_line": 64,
+          "sha256": "7f274fafecff4dea69c1a166cc151d1cfa4eba894ed2b44d182c0ae83845a916"
         },
-        "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"agent.interaction.chat.change.apply\", payload=payload,\n        current_user=user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n    )"
+        "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"agent.interaction.chat.change.apply\", payload=_normalize_interaction_payload(payload),\n        current_user=user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        major_version=2,\n    )"
       }
     },
     {
@@ -2218,13 +2218,13 @@
       "disposition": "retained",
       "target_capability": "agent.interaction.chat.change.apply",
       "reason": "Handler delegates to _invoke_interaction_chat, whose anchored binding invokes agent.interaction.chat.change.apply.",
-      "target_major_version": 1,
+      "target_major_version": 2,
       "evidence": {
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 667,
-          "end_line": 674,
+          "start_line": 668,
+          "end_line": 675,
           "sha256": "25a447e0004f8ef2819d439c258ada28df866d9e8fac53ea77d981554ed78029"
         },
         "delegation_symbol": "_invoke_interaction_chat",
@@ -2232,10 +2232,10 @@
         "binding": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
           "start_line": 51,
-          "end_line": 63,
-          "sha256": "1f16e8a374b9cb8e8b588629a73bcc9d327b0877ef2ada653e6089571e67f5f3"
+          "end_line": 64,
+          "sha256": "7f274fafecff4dea69c1a166cc151d1cfa4eba894ed2b44d182c0ae83845a916"
         },
-        "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"agent.interaction.chat.change.apply\", payload=payload,\n        current_user=user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n    )"
+        "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"agent.interaction.chat.change.apply\", payload=_normalize_interaction_payload(payload),\n        current_user=user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        major_version=2,\n    )"
       }
     },
     {
@@ -2250,8 +2250,8 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 915,
-          "end_line": 926,
+          "start_line": 916,
+          "end_line": 927,
           "sha256": "6125ed56ff17deadf3af096a2f04d65f3f63860fc0f9e9e327c57a17319da062"
         },
         "expected_target_invocation": "invoke_agent_capability(\"agent.interaction.cancel\", {\"session_gid\": session_gid}, _user)"
@@ -3669,13 +3669,13 @@
       "disposition": "retained",
       "target_capability": "agent.interaction.chat.change.apply",
       "reason": "Handler delegates to _invoke_interaction_chat, whose anchored binding invokes agent.interaction.chat.change.apply.",
-      "target_major_version": 1,
+      "target_major_version": 2,
       "evidence": {
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 745,
-          "end_line": 750,
+          "start_line": 746,
+          "end_line": 751,
           "sha256": "107ba0026b78f91e88b96d680a0b9b34540f23b645673351fd45dd5b7bc349e9"
         },
         "delegation_symbol": "_invoke_interaction_chat",
@@ -3683,10 +3683,10 @@
         "binding": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
           "start_line": 51,
-          "end_line": 63,
-          "sha256": "1f16e8a374b9cb8e8b588629a73bcc9d327b0877ef2ada653e6089571e67f5f3"
+          "end_line": 64,
+          "sha256": "7f274fafecff4dea69c1a166cc151d1cfa4eba894ed2b44d182c0ae83845a916"
         },
-        "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"agent.interaction.chat.change.apply\", payload=payload,\n        current_user=user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n    )"
+        "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"agent.interaction.chat.change.apply\", payload=_normalize_interaction_payload(payload),\n        current_user=user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        major_version=2,\n    )"
       },
       "round_4_change": "new"
     },
