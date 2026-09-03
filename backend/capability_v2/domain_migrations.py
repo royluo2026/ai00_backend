@@ -21,6 +21,7 @@ from .domain_manifest import DomainManifest
 
 MIGRATION_FILE_RE = re.compile(r"^(?P<id>\d{4})_(?P<name>[a-z][a-z0-9_]*)\.sql$")
 LEDGER_TABLE = "ai00_schema_migrations"
+_HISTORICAL_SIMULATION_0004 = "be3e9cefefa42b1fc196ffdf275d4740d30d8acffff0e80dc0408008e03ada04"
 _QUALIFIED_IDENTIFIER_RE = re.compile(
     r"(?i)(?:`?[a-z_][a-z0-9_]*`?)\s*\.\s*(?:`?[a-z_][a-z0-9_]*`?)"
 )
@@ -102,14 +103,25 @@ def discover_domain_migrations(
             canonical_sql = canonicalize_migration_sql(raw.decode("utf-8"))
         except UnicodeDecodeError as exc:
             raise MigrationError(f"migration must be UTF-8: {path.name}") from exc
+        checksum = hashlib.sha256(canonical_sql.encode("utf-8")).hexdigest()
         sql = normalize_oceanbase_sql(canonical_sql)
+        # 0004 was released before resumable ADD COLUMN syntax became mandatory.
+        # Preserve its ledger checksum byte-for-byte while normalizing only the
+        # executable form; 0006 carries the forward compatibility DDL.
+        if (
+            manifest.domain_id == "simulation"
+            and migration_id == "0004"
+            and checksum == _HISTORICAL_SIMULATION_0004
+        ):
+            sql = re.sub(r"\bADD\s+COLUMN\s+(?!IF\s+NOT\s+EXISTS)",
+                         "ADD COLUMN IF NOT EXISTS ", sql, flags=re.I)
         _validate_domain_sql(path, sql)
         migrations.append(DomainMigration(
             migration_id=migration_id,
             name=match.group("name"),
             path=path,
             sql=sql,
-            checksum=hashlib.sha256(canonical_sql.encode("utf-8")).hexdigest(),
+            checksum=checksum,
             artifact_version=manifest.artifact.version,
         ))
     return tuple(migrations)

@@ -36,5 +36,6 @@ builder.Services.AddSingleton<IConnectorPlanExecutor>(service =>
         service.GetRequiredService<ISystemPowerGuard>()));
 builder.Services.AddSingleton<PlanWorker>();
 builder.Services.AddHostedService<RuntimeWorker>();
+builder.Services.AddHostedService<ConnectorPlanBackgroundWorker>();
 builder.Services.AddHostedService<ConnectorHeartbeatWorker>();
 await builder.Build().RunAsync();

@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import base64
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime, timedelta
 import hashlib
 import json
@@ -123,6 +123,14 @@ class InMemoryPairingRepository:
     def save_pairing(self, record: PairingRecord) -> None:
         self.pairings[record.pairing_id] = record
 
+    def approve_pairing(self, record: PairingRecord, *, expected_version: int) -> None:
+        current = self.pairings.get(record.pairing_id)
+        if current is None:
+            raise PairingError("pairing_not_found")
+        if current.status != "pending" or current.resource_version != expected_version:
+            raise PairingError("pairing_version_conflict")
+        self.pairings[record.pairing_id] = record
+
     def complete_pairing(self, record: PairingRecord, user_gid: str, binding: dict) -> None:
         existing = self.bindings.get(user_gid)
         if existing and existing["connector_id"] != binding["connector_id"]:
@@ -197,11 +205,11 @@ class PairingService:
         existing = self.repository.binding_for_user(actor_user_gid)
         if existing and existing["installation_id"] != record.installation_id:
             raise PairingError("connector_binding_conflict")
-        record.approved_user_gid = actor_user_gid
-        record.team_gid = team_gid
-        record.status = "approved"
-        record.resource_version += 1
-        self.repository.save_pairing(record)
+        approved = replace(
+            record, approved_user_gid=actor_user_gid, team_gid=team_gid,
+            status="approved", resource_version=record.resource_version + 1,
+        )
+        self.repository.approve_pairing(approved, expected_version=expected_version)
         return self.get_summary(user_code, actor_user_gid)
 
     def complete(

@@ -96,6 +96,29 @@ def test_one_user_cannot_silently_replace_binding():
         service.approve(second.user_code, "user-1", "team-1", expected_version=1)
 
 
+def test_concurrent_pairing_approval_cannot_overwrite_first_feishu_user():
+    class RacingRepository(InMemoryPairingRepository):
+        def approve_pairing(self, record, *, expected_version):
+            current = self.pairings[record.pairing_id]
+            if current.status == "pending":
+                self.pairings[record.pairing_id] = type(current)(
+                    **{**current.__dict__, "status": "approved", "resource_version": 2,
+                       "approved_user_gid": "user-winner", "team_gid": "team-winner"}
+                )
+            super().approve_pairing(record, expected_version=expected_version)
+
+    repository = RacingRepository()
+    service = PairingService(repository, clock=lambda: NOW)
+    created = service.request(_request())
+
+    with pytest.raises(PairingError, match="pairing_version_conflict"):
+        service.approve(created.user_code, "user-loser", "team-loser", expected_version=1)
+
+    stored = repository.by_id(created.pairing_id)
+    assert stored.approved_user_gid == "user-winner"
+    assert stored.team_gid == "team-winner"
+
+
 def test_completion_retry_returns_same_encrypted_envelope():
     service = _service()
     created = service.request(_request())

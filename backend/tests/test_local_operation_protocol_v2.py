@@ -59,6 +59,9 @@ def test_dotnet_contract_declares_canonical_json_key_rotation_and_crash_recovery
     contracts = (ROOT / "local-runtime/src/Ai00.Connector.Contracts/Contracts.cs").read_text(encoding="utf-8")
     ledger = (ROOT / "local-runtime/src/Ai00.Connector.SessionHost/CommandLedger.cs").read_text(encoding="utf-8")
     worker = (ROOT / "local-runtime/src/Ai00.Connector.Service/RuntimeWorker.cs").read_text(encoding="utf-8")
+    plan_worker = (ROOT / "local-runtime/src/Ai00.Connector.Service/PlanWorker.cs").read_text(encoding="utf-8")
+    service_program = (ROOT / "local-runtime/src/Ai00.Connector.Service/Program.cs").read_text(encoding="utf-8")
+    session_program = (ROOT / "local-runtime/src/Ai00.Connector.SessionHost/Program.cs").read_text(encoding="utf-8")
     pipe_host = (ROOT / "local-runtime/src/Ai00.Connector.SessionHost/CommandPipeHost.cs").read_text(encoding="utf-8")
     gateway = (ROOT / "local-runtime/src/Ai00.Connector.Service/DeviceGatewayClient.cs").read_text(encoding="utf-8")
     dispatcher = (ROOT / "local-runtime/src/Ai00.Connector.SessionHost/CommandDispatcher.cs").read_text(encoding="utf-8")
@@ -68,6 +71,12 @@ def test_dotnet_contract_declares_canonical_json_key_rotation_and_crash_recovery
     assert "outcome_unknown" in ledger
     assert "started" in ledger
     assert "outcome_unknown" in worker
+    assert "PlanWorker planWorker" not in worker
+    assert "ConnectorPlanBackgroundWorker" in plan_worker
+    assert "AddHostedService<ConnectorPlanBackgroundWorker>" in service_program
+    assert "AI00_CONNECTOR_DEVICE_ID" not in session_program
+    assert "ConnectorIdentityStore.Load" in session_program
+    assert "connector_windows_session_mismatch" in session_program
     assert "PipeOptions.CurrentUserOnly" in pipe_host
     assert "IncrementalHash" in gateway and "artifact_integrity_failed" in gateway
     assert "Path.GetFullPath(artifactCacheRoot)" in dispatcher

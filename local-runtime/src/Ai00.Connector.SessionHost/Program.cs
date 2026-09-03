@@ -6,21 +6,26 @@ using System.Diagnostics;
 using System.Text.Json;
 
 var options = SessionHostOptions.FromEnvironment();
-var deviceId = Environment.GetEnvironmentVariable("AI00_CONNECTOR_DEVICE_ID")
-    ?? throw new InvalidOperationException("AI00_CONNECTOR_DEVICE_ID is required");
 var windowsSid = WindowsIdentity.GetCurrent().User?.Value
     ?? throw new InvalidOperationException("Current Windows SID is unavailable");
-using var instance = SingleInstanceGuard.Acquire(deviceId, windowsSid);
+var credentialPath = Path.Combine(
+    Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+    "AI00", "Connector", "device.credential");
+var credential = ConnectorIdentityStore.Load(credentialPath);
+if (!string.Equals(credential.WindowsSid, windowsSid, StringComparison.Ordinal))
+    throw new InvalidOperationException("connector_windows_session_mismatch");
+var connectorId = credential.DeviceId;
+using var instance = SingleInstanceGuard.Acquire(connectorId, windowsSid);
 using var sta = new StaDispatcher();
 var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy(options.AllowedRoots.Append(options.ArtifactCacheRoot)), options.VisMockupExe);
 var ledgerPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AI00", "command-ledger.jsonl");
 var host = new CommandPipeHost(
     new CommandDispatcher(adapter, new CommandLedger(ledgerPath), options.ArtifactCacheRoot),
     options.OperationSigningKeys,
-    ConnectorPipeName.For(deviceId, windowsSid));
+    ConnectorPipeName.For(connectorId, windowsSid));
 var planHost = new PlanPipeHost(
     new ValidatedPlanDispatcher([adapter], options.OperationSigningKeys),
-    ConnectorPipeName.PlanFor(deviceId, windowsSid));
+    ConnectorPipeName.PlanFor(connectorId, windowsSid));
 using var presenceCancellation = new CancellationTokenSource();
 var presence = PublishPresenceAsync(adapter, windowsSid, presenceCancellation.Token);
 try

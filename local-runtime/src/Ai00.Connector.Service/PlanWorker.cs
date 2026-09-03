@@ -77,3 +77,25 @@ public sealed class PlanWorker(
         return outcome;
     }
 }
+
+public sealed class ConnectorPlanBackgroundWorker(
+    PlanWorker worker,
+    Microsoft.Extensions.Options.IOptions<RuntimeOptions> options,
+    ILogger<ConnectorPlanBackgroundWorker> logger) : BackgroundService
+{
+    private readonly RuntimeOptions _options = options.Value;
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            try
+            {
+                await worker.StartOnceAsync(stoppingToken);
+            }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested) { break; }
+            catch (Exception ex) { logger.LogWarning(ex, "Simulation Connector Plan loop failed"); }
+            await Task.Delay(TimeSpan.FromSeconds(Math.Clamp(_options.PollSeconds, 1, 60)), stoppingToken);
+        }
+    }
+}

@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 
 namespace Ai00.Connector.Service;
 
-public sealed class RuntimeWorker(DeviceGatewayClient gateway, SessionHostClient sessionHost, PlanWorker planWorker, IOptions<RuntimeOptions> options, ILogger<RuntimeWorker> logger) : BackgroundService
+public sealed class RuntimeWorker(DeviceGatewayClient gateway, SessionHostClient sessionHost, IOptions<RuntimeOptions> options, ILogger<RuntimeWorker> logger) : BackgroundService
 {
     private readonly RuntimeOptions _options = options.Value;
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -31,7 +31,6 @@ public sealed class RuntimeWorker(DeviceGatewayClient gateway, SessionHostClient
                     catch (Exception) { completion = new(command.Operation.OperationId, "outcome_unknown", ErrorCode: "session_host_unavailable"); }
                     await gateway.CompleteAsync(command.Operation.OperationId, command.LeaseId, completion, stoppingToken);
                 }
-                await planWorker.StartOnceAsync(stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested) { break; }
             catch (Exception ex) { logger.LogWarning(ex, "Local Runtime loop failed"); }

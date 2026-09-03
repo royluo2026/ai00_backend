@@ -467,6 +467,21 @@ class SqlPairingRepository:
             if cursor.rowcount != 1:
                 raise PairingError("pairing_not_found")
 
+    def approve_pairing(self, record: PairingRecord, *, expected_version: int) -> None:
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "UPDATE workmanship_sim_connector_pairings SET status='approved',"
+                "resource_version=%s,approved_user_gid=%s,team_gid=%s,approved_at=NOW(6),"
+                "updated_at=NOW(6) WHERE pairing_id=%s AND status='pending' "
+                "AND resource_version=%s",
+                (
+                    record.resource_version, record.approved_user_gid,
+                    record.team_gid, record.pairing_id, expected_version,
+                ),
+            )
+            if cursor.rowcount != 1:
+                raise PairingError("pairing_version_conflict")
+
     def complete_pairing(self, record: PairingRecord, user_gid: str, binding: dict) -> None:
         envelope_json = json.dumps(
             {"ciphertext": record.encrypted_envelope}, separators=(",", ":"),

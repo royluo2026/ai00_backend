@@ -25,6 +25,13 @@ def craft_manifest():
     ).require("craft")
 
 
+@pytest.fixture
+def simulation_manifest():
+    return load_domain_manifests(
+        ROOT / "backend/capability_v2/official_domains.json"
+    ).require("simulation")
+
+
 def _migration_root(tmp_path: Path, craft_manifest) -> Path:
     path = tmp_path / craft_manifest.database.migration_path
     path.mkdir(parents=True)
@@ -136,6 +143,8 @@ class RecordingCursor:
             self._all = list(self.connection.ledger_rows)
         elif "information_schema.TABLE_CONSTRAINTS" in normalized:
             self._one = (0,)
+        elif "information_schema.COLUMNS" in normalized:
+            self._one = (0,)
 
     def fetchone(self):
         return self._one
@@ -159,6 +168,23 @@ class RecordingConnection:
 
     def rollback(self):
         self.rollbacks += 1
+
+
+def test_simulation_historical_0004_checksum_upgrades_forward_to_0006(simulation_manifest):
+    migrations = discover_domain_migrations(ROOT, simulation_manifest)
+    old = next(item for item in migrations if item.migration_id == "0004")
+    assert old.checksum == "be3e9cefefa42b1fc196ffdf275d4740d30d8acffff0e80dc0408008e03ada04"
+    assert "ADD COLUMN IF NOT EXISTS" in old.sql
+    ledger = tuple(
+        {"migration_id": item.migration_id, "checksum": item.checksum,
+         "artifact_version": item.artifact_version}
+        for item in migrations if item.migration_id <= "0004"
+    )
+    connection = RecordingConnection(ledger_rows=ledger)
+
+    applied = apply_domain_migrations(connection, simulation_manifest, migrations)
+
+    assert applied == ("0005", "0006")
 
 
 def test_apply_uses_domain_lock_ledger_and_artifact_version(craft_manifest):
