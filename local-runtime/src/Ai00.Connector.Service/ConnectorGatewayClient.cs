@@ -16,7 +16,7 @@ public sealed class ConnectorGatewayClient(
 
     public async Task HeartbeatAsync(object health, CancellationToken cancellationToken)
     {
-        using var request = Request(HttpMethod.Post, "/api/v1/connector/heartbeat", health);
+        using var request = Request(HttpMethod.Post, "/api/v1/simulation/connectors/heartbeat", health);
         using var response = await http.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
     }
@@ -26,7 +26,7 @@ public sealed class ConnectorGatewayClient(
 
     public async Task<LeasedConnectorPlan?> LeaseAsync(CancellationToken cancellationToken)
     {
-        using var request = Request(HttpMethod.Post, "/api/v1/connector/plans/lease", new { lease_seconds = 300 });
+        using var request = Request(HttpMethod.Post, "/api/v1/simulation/connectors/plans/lease", new { lease_seconds = 300 });
         using var response = await http.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
         var envelope = await response.Content.ReadFromJsonAsync<ApiEnvelope<LeaseBody?>>(cancellationToken: cancellationToken);
@@ -40,7 +40,7 @@ public sealed class ConnectorGatewayClient(
         var signed = reconciliation.Outcome ?? OutcomeUnknown(reconciliation.PlanId);
         using var request = Request(
             HttpMethod.Post,
-            $"/api/v1/connector/plans/{Uri.EscapeDataString(reconciliation.PlanId)}/complete",
+            $"/api/v1/simulation/connectors/plans/{Uri.EscapeDataString(reconciliation.PlanId)}/complete",
             new { lease_id = signed.LeaseId, outcome = signed.Outcome, signature = signed.Signature });
         using var response = await http.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
@@ -58,7 +58,7 @@ public sealed class ConnectorGatewayClient(
                 artifact.GetProperty("media_type").GetString() ?? "",
                 artifact.GetProperty("sha256").GetString() ?? "",
                 artifact.GetProperty("byte_size").GetInt64(), artifact.GetProperty("version").GetInt32());
-            var path = $"/api/v1/connector/plans/{Uri.EscapeDataString(lease.Plan.PlanId)}/artifacts/" +
+            var path = $"/api/v1/simulation/connectors/plans/{Uri.EscapeDataString(lease.Plan.PlanId)}/artifacts/" +
                 $"{Uri.EscapeDataString(reference.ArtifactId)}?lease_id={Uri.EscapeDataString(lease.LeaseId)}";
             using var request = Request(HttpMethod.Get, path);
             using var response = await http.SendAsync(request, cancellationToken);
@@ -108,7 +108,7 @@ public sealed class ConnectorGatewayClient(
             await using var content = info.OpenRead();
             using var request = Request(
                 HttpMethod.Put,
-                $"/api/v1/connector/plans/{Uri.EscapeDataString(lease.Plan.PlanId)}/steps/{Uri.EscapeDataString(step.StepId)}/result-artifact" +
+                $"/api/v1/simulation/connectors/plans/{Uri.EscapeDataString(lease.Plan.PlanId)}/steps/{Uri.EscapeDataString(step.StepId)}/result-artifact" +
                 $"?lease_id={Uri.EscapeDataString(lease.LeaseId)}");
             request.Headers.Add("X-AI00-Content-SHA256", sha256);
             request.Headers.Add("X-AI00-Content-Length", info.Length.ToString(System.Globalization.CultureInfo.InvariantCulture));
@@ -139,8 +139,8 @@ public sealed class ConnectorGatewayClient(
     {
         var credential = credentialStore.Load();
         var request = new HttpRequestMessage(method, new Uri(new Uri(_options.GatewayUrl.TrimEnd('/') + "/"), path.TrimStart('/')));
-        request.Headers.Add("X-AI00-Device-ID", credential.DeviceId);
-        request.Headers.Add("X-AI00-Device-Token", credential.DeviceToken);
+        request.Headers.Add("X-AI00-Connector-ID", credential.DeviceId);
+        request.Headers.Add("X-AI00-Connector-Token", credential.DeviceToken);
         if (body is not null) request.Content = JsonContent.Create(body);
         return request;
     }

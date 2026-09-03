@@ -12,9 +12,17 @@ from backend.contracts.connector_execution_plan_v1 import canonical_hash
 
 from ..data.connector_repository import SqlPairingRepository
 from ..domain.connector_pairing import PairingError, PairingRequest, PairingService
+from .connector_runtime import connector_plan_signing_material
 
 
-default_service = PairingService(SqlPairingRepository())
+def _plan_credentials(connector_id: str) -> dict:
+    key_id, secret = connector_plan_signing_material(connector_id)
+    return {"plan_signing_key_id": key_id, "plan_signing_secret": secret}
+
+
+default_service = PairingService(
+    SqlPairingRepository(), extra_credential_factory=_plan_credentials,
+)
 
 
 def _translate(call):

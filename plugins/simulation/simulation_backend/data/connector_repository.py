@@ -41,6 +41,22 @@ class ProjectionLease:
 
 
 class SimulationConnectorRepository:
+    def authenticate_connector(self, connector_id: str, token: str) -> dict:
+        digest = hashlib.sha256(token.encode("utf-8")).hexdigest()
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT connector_id,owner_user_gid,team_gid,installation_id,token_hash,status "
+                "FROM workmanship_sim_connector_bindings WHERE connector_id=%s LIMIT 1",
+                (connector_id,),
+            )
+            row = cursor.fetchone()
+        if (
+            not row or row["status"] == "revoked"
+            or not secrets.compare_digest(str(row["token_hash"]), digest)
+        ):
+            raise PermissionError("invalid_connector_credentials")
+        return row
+
     def can_use_connector(
         self, connector_id: str, *, user_gid: str, team_gid: str,
     ) -> bool:
@@ -88,6 +104,17 @@ class SimulationConnectorRepository:
                     "(gid,connector_id,health_hash,health_json,reported_at) VALUES (%s,%s,%s,%s,%s)",
                     ("connector-heartbeat-" + uuid.uuid4().hex, connector_id, digest, encoded, health.reported_at),
                 )
+                cursor.execute(
+                    "UPDATE workmanship_sim_connector_bindings SET status='online',"
+                    "runtime_version=%s,last_seen_at=%s,updated_at=NOW(6) "
+                    "WHERE connector_id=%s AND owner_user_gid=%s AND status<>'revoked'",
+                    (
+                        health.connector_version, health.reported_at,
+                        connector_id, health.bound_user_id,
+                    ),
+                )
+                if cursor.rowcount != 1:
+                    raise ConnectorRepositoryError("connector_binding_not_found")
 
     def insert_plan(self, plan: ConnectorExecutionPlanV1) -> None:
         encoded = json.dumps(
@@ -440,7 +467,10 @@ class SqlPairingRepository:
             if cursor.rowcount != 1:
                 raise PairingError("pairing_not_found")
 
-    def create_binding(self, user_gid: str, binding: dict) -> None:
+    def complete_pairing(self, record: PairingRecord, user_gid: str, binding: dict) -> None:
+        envelope_json = json.dumps(
+            {"ciphertext": record.encrypted_envelope}, separators=(",", ":"),
+        )
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
                 "INSERT INTO workmanship_sim_connector_bindings "
@@ -453,6 +483,20 @@ class SqlPairingRepository:
                     binding["display_name"], binding["runtime_version"], binding["token_hash"],
                 ),
             )
+            cursor.execute(
+                "UPDATE workmanship_sim_connector_pairings SET status='completed',resource_version=%s,"
+                "connector_id=%s,credential_envelope_json=%s,credential_envelope_hash=%s,"
+                "completed_at=NOW(6),updated_at=NOW(6) "
+                "WHERE pairing_id=%s AND status='approved' AND approved_user_gid=%s "
+                "AND resource_version=%s",
+                (
+                    record.resource_version, record.connector_id, envelope_json,
+                    record.envelope_hash, record.pairing_id, user_gid,
+                    record.resource_version - 1,
+                ),
+            )
+            if cursor.rowcount != 1:
+                raise PairingError("pairing_version_conflict")
 
 
 __all__ = [

@@ -3,36 +3,15 @@
  * VisMockup 作为独立窗口运行，此页面负责：连接控制、BOP 结构树、文件打开、节点高亮
  */
 
-// ── VisMockup Bridge（127.0.0.1:7654，由 Electron 在 Windows 启动时 spawn）──────
-const _VM_BRIDGE_PORT = 7654;
-
-/**
- * 调用本地 VisMockup Bridge HTTP 服务。
- * 支持两种模式：
- *   kwargs: _bridge('vis_mockup', 'highlight_nodes_by_catia', { catia_names: [...] })
- *   positional: _bridge('vis_mockup', 'color_and_screenshot_op', gid, names)
- */
-async function _bridge(ns, method, ...args) {
-  let payload;
-  if (args.length === 0) {
-    payload = {};
-  } else if (args.length === 1 && args[0] !== null && args[0] !== undefined
-             && typeof args[0] === 'object' && !Array.isArray(args[0])) {
-    payload = args[0];
-  } else {
-    payload = { _args: args };
-  }
-  try {
-    const res = await fetch(`http://127.0.0.1:${_VM_BRIDGE_PORT}/bridge/${ns}/${method}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) return { success: false, error: `HTTP ${res.status}`, data: {} };
-    return res.json();
-  } catch (e) {
-    return { success: false, error: `VisMockup Bridge 未运行 (127.0.0.1:${_VM_BRIDGE_PORT}): ${e.message}`, data: {} };
-  }
+// Production Web must never call a workstation loopback service. Legacy handlers
+// remain fail-closed until each operation is routed through a governed Simulation
+// Capability and AI00 Connector execution plan.
+async function _bridge(_ns, _method, ..._args) {
+  return {
+    success: false,
+    error: 'local_bridge_disabled: 请使用 AI00 Connector 受治理流程',
+    data: {},
+  };
 }
 
 const _eAPI = () => window.electronAPI || window.parent?.electronAPI;
@@ -102,7 +81,7 @@ async function init() {
   _bindVisPanel();
   _initGovernedCapture();
   _initDetailPanel();
-  await _tryAutoConnect();
+  _setVmStatus('disconnected', '请通过 AI00 Connector 连接');
   await _loadBopVersions();
   await _loadTasks();
 }

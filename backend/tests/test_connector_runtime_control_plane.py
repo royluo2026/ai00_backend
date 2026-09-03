@@ -338,65 +338,56 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
             assert not descriptor.exposure.web
 
 
-def test_connector_heartbeat_route_passes_authenticated_device_identity(monkeypatch):
-    from backend.routers import device_runtime
+def test_connector_heartbeat_route_passes_authenticated_connector_identity(monkeypatch):
+    from backend.routers import simulation_connector
 
     calls = []
     monkeypatch.setattr(
-        device_runtime,
+        simulation_connector,
         "record_connector_heartbeat",
         lambda device_id, owner_user_id, health: calls.append(
             (device_id, owner_user_id, health.session_id)
         ),
     )
-    body = device_runtime.ConnectorHeartbeatBody.model_validate(
+    body = simulation_connector.ConnectorHeartbeatBody.model_validate(
         healthy().model_dump(mode="json")
     )
 
-    response = device_runtime.connector_heartbeat(
-        body, {"gid": "device-001", "owner_user_gid": "user-001"}
+    response = simulation_connector.connector_heartbeat(
+        body, {"gid": "connector-001", "owner_user_gid": "user-001"}
     )
 
     assert response == {"success": True}
-    assert calls == [("device-001", "user-001", "session-1")]
+    assert calls == [("connector-001", "user-001", "session-1")]
 
 
-def test_connector_v1_transport_routes_are_separate_from_legacy_runtime_routes():
-    from backend.routers.device_runtime import router
+def test_connector_transport_is_owned_only_by_simulation_router():
+    from backend.routers.device_runtime import router as device_router
+    from backend.routers.simulation_connector import router as simulation_router
 
-    paths = {route.path for route in router.routes}
+    simulation_paths = {route.path for route in simulation_router.routes}
     assert {
-        "/api/v1/connector/activate",
-        "/api/v1/connector/heartbeat",
-        "/api/v1/connector/plans/lease",
-        "/api/v1/connector/plans/{plan_id}/complete",
-        "/api/v1/connector/plans/{plan_id}/artifacts/{artifact_id}",
-        "/api/v1/connector/plans/{plan_id}/steps/{step_id}/result-artifact",
-    } <= paths
-    assert "/api/v1/device-runtime/commands/lease" in paths
+        "/api/v1/simulation/connectors/heartbeat",
+        "/api/v1/simulation/connectors/plans/lease",
+        "/api/v1/simulation/connectors/plans/{plan_id}/complete",
+        "/api/v1/simulation/connectors/plans/{plan_id}/artifacts/{artifact_id}",
+        "/api/v1/simulation/connectors/plans/{plan_id}/steps/{step_id}/result-artifact",
+    } <= simulation_paths
+    device_paths = {route.path for route in device_router.routes}
+    assert not any(path.startswith("/api/v1/simulation/connectors/") for path in device_paths)
+    assert not any(path.startswith("/api/v1/connector/plans/") for path in device_paths)
+    assert "/api/v1/connector/activate" in device_paths
+    assert "/api/v1/device-runtime/commands/lease" in device_paths
 
 
-def test_connector_activation_provisions_the_plan_verification_key_before_consuming_token(monkeypatch):
+def test_legacy_connector_activation_is_closed_in_favour_of_browser_pairing(monkeypatch):
     from backend.routers import device_runtime
 
     body = device_runtime.ActivateBody(enrollment_token="x" * 32, runtime_version="1.0.0")
-    consumed = []
-    monkeypatch.delenv("AI00_CONNECTOR_PLAN_SIGNING_KEY_ID", raising=False)
-    monkeypatch.delenv("AI00_CONNECTOR_PLAN_SIGNING_SECRET", raising=False)
     with pytest.raises(Exception) as missing:
         device_runtime.connector_activate(body)
-    assert getattr(missing.value, "status_code", None) == 503
-    assert consumed == []
-
-    monkeypatch.setenv("AI00_CONNECTOR_PLAN_SIGNING_KEY_ID", "plan-key-1")
-    monkeypatch.setenv("AI00_CONNECTOR_PLAN_SIGNING_SECRET", "s" * 32)
-    monkeypatch.setattr(device_runtime, "activate", lambda value: consumed.append(value) or {
-        "success": True,
-        "data": {"device_gid": "device-1", "device_token": "token", "owner_user_gid": "user-1"},
-    })
-    response = device_runtime.connector_activate(body)
-
-    assert len(consumed) == 1
-    assert response["data"]["plan_signing_key_id"].startswith("plan-key-1.device.")
-    assert response["data"]["plan_signing_secret"] != "s" * 32
-    assert len(response["data"]["plan_signing_secret"]) == 64
+    assert getattr(missing.value, "status_code", None) == 410
+    assert missing.value.detail == {
+        "code": "connector_browser_pairing_required",
+        "replacement": "/api/v1/simulation/connectors/pairings",
+    }

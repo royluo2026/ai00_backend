@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>绑定 AI00 Connector</title>
+  <link rel="stylesheet" href="./pair.css">
+</head>
+<body>
+  <main>
+    <h1>绑定 AI00 Connector</h1>
+    <p id="status">正在读取配对请求…</p>
+    <dl id="summary" hidden>
+      <dt>配对码</dt><dd id="code"></dd>
+      <dt>电脑</dt><dd id="device"></dd>
+      <dt>Windows 用户</dt><dd id="windows-user"></dd>
+      <dt>Connector 版本</dt><dd id="version"></dd>
+    </dl>
+    <button id="approve" type="button" disabled>确认绑定</button>
+  </main>
+  <script src="./pair.js" defer></script>
+</body>
+</html>

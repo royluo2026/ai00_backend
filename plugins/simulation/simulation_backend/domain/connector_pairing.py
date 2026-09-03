@@ -10,8 +10,9 @@ import secrets
 from typing import Callable
 
 from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import padding
-from pydantic import Field
+from cryptography.hazmat.primitives.asymmetric import padding, rsa
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from pydantic import Field, field_validator
 
 from backend.capability_v2.contracts import FrozenModel
 from backend.contracts.connector_execution_plan_v1 import canonical_hash
@@ -33,6 +34,17 @@ class PairingRequest(FrozenModel):
     windows_sid_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     masked_windows_user: str = Field(min_length=1, max_length=255)
     ephemeral_public_key: str = Field(min_length=64, max_length=8192)
+
+    @field_validator("ephemeral_public_key")
+    @classmethod
+    def validate_ephemeral_public_key(cls, value: str) -> str:
+        try:
+            key = serialization.load_pem_public_key(value.encode("ascii"))
+        except (UnicodeEncodeError, ValueError, TypeError) as exc:
+            raise ValueError("ephemeral_public_key_invalid") from exc
+        if not isinstance(key, rsa.RSAPublicKey) or key.key_size < 2048:
+            raise ValueError("ephemeral_public_key_invalid")
+        return value
 
     @classmethod
     def from_verifier(cls, *, verifier: str, **values):
@@ -111,21 +123,25 @@ class InMemoryPairingRepository:
     def save_pairing(self, record: PairingRecord) -> None:
         self.pairings[record.pairing_id] = record
 
-    def create_binding(self, user_gid: str, binding: dict) -> None:
-        if user_gid in self.bindings and self.bindings[user_gid]["connector_id"] != binding["connector_id"]:
+    def complete_pairing(self, record: PairingRecord, user_gid: str, binding: dict) -> None:
+        existing = self.bindings.get(user_gid)
+        if existing and existing["connector_id"] != binding["connector_id"]:
             raise PairingError("connector_binding_conflict")
         self.bindings[user_gid] = binding
+        self.pairings[record.pairing_id] = record
 
 
 class PairingService:
     def __init__(
         self, repository, *, clock: Callable[[], datetime] = lambda: datetime.now(UTC),
         id_factory: Callable[[str], str] | None = None,
-        verification_uri: str = "/simulation/connectors/pair",
+        extra_credential_factory: Callable[[str], dict] | None = None,
+        verification_uri: str = "/web/simulation_connector/pair.html",
     ):
         self.repository = repository
         self.clock = clock
         self.id_factory = id_factory or self._random_id
+        self.extra_credential_factory = extra_credential_factory or (lambda _connector_id: {})
         self.verification_uri = verification_uri
 
     @staticmethod
@@ -214,27 +230,39 @@ class PairingService:
             "connector_token": connector_token,
             "bound_user_id": record.approved_user_gid,
             "team_id": record.team_gid,
+            **self.extra_credential_factory(connector_id),
         }, sort_keys=True, separators=(",", ":")).encode("utf-8")
         public_key = serialization.load_pem_public_key(record.ephemeral_public_key.encode("ascii"))
-        encrypted = public_key.encrypt(
-            plaintext,
+        envelope_key = AESGCM.generate_key(bit_length=256)
+        nonce = secrets.token_bytes(12)
+        encrypted_payload = AESGCM(envelope_key).encrypt(nonce, plaintext, None)
+        encrypted_key = public_key.encrypt(
+            envelope_key,
             padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()), algorithm=hashes.SHA256(), label=None),
         )
-        envelope = base64.b64encode(encrypted).decode("ascii")
+        envelope_value = {
+            "encrypted_key": base64.b64encode(encrypted_key).decode("ascii"),
+            "nonce": base64.b64encode(nonce).decode("ascii"),
+            "ciphertext": base64.b64encode(encrypted_payload[:-16]).decode("ascii"),
+            "tag": base64.b64encode(encrypted_payload[-16:]).decode("ascii"),
+        }
+        envelope = base64.b64encode(json.dumps(
+            envelope_value, sort_keys=True, separators=(",", ":"),
+        ).encode("utf-8")).decode("ascii")
         envelope_hash = canonical_hash({"ciphertext": envelope})
-        self.repository.create_binding(record.approved_user_gid, {
+        binding = {
             "connector_id": connector_id, "installation_id": installation_id,
             "team_gid": record.team_gid, "token_hash": _hash(connector_token),
             "windows_sid_hash": record.windows_sid_hash,
             "display_name": record.device_name,
             "runtime_version": record.runtime_version,
-        })
+        }
         record.connector_id = connector_id
         record.encrypted_envelope = envelope
         record.envelope_hash = envelope_hash
         record.status = "completed"
         record.resource_version += 1
-        self.repository.save_pairing(record)
+        self.repository.complete_pairing(record, record.approved_user_gid, binding)
         return PairingCompletion(
             connector_id=connector_id, encrypted_credential_envelope=envelope,
             envelope_hash=envelope_hash,
