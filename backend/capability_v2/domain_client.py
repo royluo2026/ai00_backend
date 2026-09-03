@@ -2,13 +2,18 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
+import uuid
 from typing import Any, Mapping
 
 from .contracts import (
     CapabilityResultV2,
     ConsumerIdentity,
+    ConsumerDescriptor,
+    ConsumerType,
     CorrelationRef,
+    DelegationContext,
+    AutomationLevel,
     InvocationEnvelope,
     SideEffectLevel,
 )
@@ -30,8 +35,9 @@ class DomainInvocation:
 
 
 class DomainCapabilityClient:
-    def __init__(self, gateway: CapabilityGatewayService) -> None:
+    def __init__(self, gateway: CapabilityGatewayService, *, parent_envelope: InvocationEnvelope | None = None) -> None:
         self._gateway = gateway
+        self._parent_envelope = parent_envelope
 
     @property
     def catalog_release(self) -> str:
@@ -79,21 +85,55 @@ class DomainCapabilityClient:
         )
         return await self._gateway.invoke(envelope)
 
-    async def invoke_after_user_confirmation(
+    def issue_agent_run_identity(
+        self, parent: ConsumerIdentity, *, agent_run_id: str, session_gid: str,
+        capability_scopes: tuple[str, ...], resource_scopes: tuple[str, ...] = (),
+        lifetime_seconds: int = 600,
+    ) -> ConsumerIdentity:
+        """Create a server-owned Agent delegation bound to one run and session."""
+        if parent.consumer.type is not ConsumerType.WEB or not parent.actor.user_id:
+            raise DomainInvocationError("agent_delegation_parent_invalid")
+        now = datetime.now(UTC)
+        return parent.model_copy(update={
+            "consumer": ConsumerDescriptor(
+                type=ConsumerType.AGENT, consumer_id="agent.xiaorou",
+                agent_run_id=agent_run_id,
+            ),
+            "delegation": DelegationContext(
+                delegation_id=f"agent-delegation-{uuid.uuid4().hex}",
+                delegated_by=parent.actor.user_id,
+                capability_scopes=capability_scopes,
+                resource_scopes=tuple(dict.fromkeys((
+                    f"agent-session:{session_gid}", *resource_scopes,
+                ))),
+                data_scopes=("confidential",),
+                catalog_release=self.catalog_release,
+                maximum_automation_level=AutomationLevel.A2,
+                expires_at=now + timedelta(seconds=lifetime_seconds),
+            ),
+        })
+
+    async def _invoke_from_confirmed_parent(
         self,
         invocation: DomainInvocation,
         identity: ConsumerIdentity,
         correlation: CorrelationRef,
         deadline: datetime | None = None,
     ) -> CapabilityResultV2:
-        """Invoke a nested target from an already user-confirmed capability.
+        """Invoke a nested target from the Gateway-confirmed parent envelope.
 
         The Gateway still authorizes, validates, and issues the exact approval for
         the target envelope.  This method is intentionally separate from
         ``invoke`` so ordinary domain-to-domain calls cannot acquire approvals.
         """
+        parent = self._parent_envelope
         if invocation.approval_reference is not None:
             raise DomainInvocationError("caller_approval_reference_forbidden")
+        if parent is None or not parent.approval_reference:
+            raise DomainInvocationError("confirmed_parent_required")
+        parent_descriptor = self.catalog().descriptor(parent.capability_id, parent.major_version)
+        if parent_descriptor is None or parent_descriptor.confirmation_policy == "none":
+            raise DomainInvocationError("confirmed_parent_required")
         result = await self.invoke(invocation, identity, correlation, deadline)
         if result.ok or result.error is None or result.error.code != "confirmation_required":
             return result

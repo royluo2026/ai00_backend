@@ -635,7 +635,7 @@ class CapabilityGatewayService:
             effective_identity=envelope.identity,
             domain_client=__import__(
                 "backend.capability_v2.domain_client", fromlist=["DomainCapabilityClient"]
-            ).DomainCapabilityClient(self),
+            ).DomainCapabilityClient(self, parent_envelope=envelope),
         )
 
     @staticmethod

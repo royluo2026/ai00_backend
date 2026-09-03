@@ -6,7 +6,8 @@ from types import SimpleNamespace
 
 import pytest
 from fastapi import HTTPException
-from backend.capability_v2.provider_contracts import CapabilityBusinessError
+from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilitySpec
+from backend.capability_v2.domain_client import DomainCapabilityClient
 
 from backend.capabilities.registry_next import CapabilityRegistry
 from backend.capabilities.validation_next import validate_payload
@@ -19,11 +20,15 @@ from backend.capability_v2.contracts import (
     ConsumerIdentity,
     ConsumerType,
     InvocationEnvelope,
+    ResourceSelector,
     TenantIdentity,
 )
 from backend.capability_v2.gateway import CapabilityGatewayService
 from backend.capability_v2.outcomes import InMemoryOutcomeStore
 from backend.capability_v2.reliability import InMemoryRateLimiter, ReliabilityCoordinator
+from backend.capability_v2.reliability import ApprovalService, InMemoryApprovalStore
+from backend.capability_v2.authorization import AuthorizationGrants
+from backend.capability_v2.policies import LegacyServerGatewayPolicy
 from backend.platform_sdk.effective_identity import build_effective_profile
 from backend.routers import deps
 from backend.scripts.build_capability_catalog import _verified_consumer_refs
@@ -35,11 +40,21 @@ from plugins.agent.agent_backend.capabilities.catalog_tool_confirmation import (
     apply_catalog_tool_confirmation,
     register_catalog_tool_confirmation_capability,
 )
+from plugins.agent.agent_backend.capabilities import _authorize_agent_session
 from plugins.agent.agent_backend.routers import ai_chat
 from plugins.agent.agent_backend.ai_assistant import tool_executor
+from plugins.agent.agent_backend.data.confirmation_repository import InMemoryConfirmationRepository
+from plugins.agent.agent_backend.application import stream_channel
+from plugins.agent.agent_backend.capabilities.provider import descriptor_for as agent_descriptor_for
+from plugins.agent.agent_backend.ai_assistant.catalog_tools import CatalogToolRegistry, tool_name_for
 
 
 ROUTER = Path("plugins/agent/agent_backend/routers/ai_chat.py")
+
+
+def setup_function() -> None:
+    tool_executor.configure_confirmation_store(InMemoryConfirmationRepository())
+    stream_channel.reset_channels()
 
 
 def test_agent_chat_routes_use_gateway_capability() -> None:
@@ -57,6 +72,10 @@ def test_agent_chat_v2_has_verified_web_consumers() -> None:
         "dist/packages/agent-plugin/web/automation_hub/ai_assistant.js",
     }
     assert _verified_consumer_refs("agent.interaction.chat.change.apply", 1) == ()
+    assert {item["consumer_id"] for item in _verified_consumer_refs("agent.catalog_tool.confirm.apply", 1)} == {
+        "dist/packages/agent-plugin/web/wfc_window/wfc_window.js",
+        "dist/packages/agent-plugin/web/automation_hub/ai_assistant.js",
+    }
 
 
 def test_agent_chat_validates_operation_before_io() -> None:
@@ -97,6 +116,9 @@ def test_agent_chat_registers_frozen_v1_and_corrected_v2() -> None:
     }
     assert v2.spec.input_schema["properties"]["body"]["additionalProperties"] is False
     assert v2.spec.output_schema["properties"]["data"]["additionalProperties"] is False
+    assert set(v2.spec.output_schema["properties"]["data"]["properties"]) == {
+        "stream_id", "media_type", "response_json",
+    }
 
 
 def test_agent_chat_v2_runs_without_a_transaction_participant() -> None:
@@ -106,7 +128,10 @@ def test_agent_chat_v2_runs_without_a_transaction_participant() -> None:
     registry = CapabilityRegistry()
     registry.register(
         chat.spec,
-        lambda _payload, _context: {"data": {"events": [], "media_type": "text/event-stream"}},
+        lambda _payload, _context: {"data": {
+            "stream_id": "agent-stream-" + "a" * 32,
+            "media_type": "text/event-stream",
+        }},
         descriptor=chat.descriptor,
     )
     release = build_release([chat.descriptor])
@@ -162,35 +187,51 @@ def test_agent_chat_v2_rejects_non_object_context_json(monkeypatch) -> None:
         ))
 
 
-def test_agent_chat_v2_rejects_more_than_500_stream_events(monkeypatch) -> None:
+def test_agent_chat_v2_stream_channel_is_immediate_single_use_and_bounded(monkeypatch) -> None:
+    iterated = False
+
     async def chunks():
+        nonlocal iterated
+        iterated = True
         for _ in range(501):
             yield "data: {}\n\n"
 
     response = SimpleNamespace(body_iterator=chunks(), media_type="text/event-stream")
     monkeypatch.setattr(ai_chat, "_legacy_chat_stream", lambda *_args: response)
 
-    with pytest.raises(ValueError, match="stream response exceeds 500 events"):
-        asyncio.run(apply_interaction_chat_change(
+    async def exercise():
+        result = await apply_interaction_chat_change(
             {"operation": "chat_stream", "body": {"message": "hi"}},
             SimpleNamespace(user_gid="user-1"),
-        ))
+        )
+        assert iterated is False
+        stream_id = result["data"]["stream_id"]
+        iterator, media_type = await stream_channel.claim_channel(stream_id)
+        assert media_type == "text/event-stream"
+        with pytest.raises(ValueError, match="stream response exceeds 500 events"):
+            _ = [chunk async for chunk in iterator]
+        with pytest.raises(ValueError, match="missing or already claimed"):
+            await stream_channel.claim_channel(stream_id)
+
+    asyncio.run(exercise())
 
 
-def test_agent_chat_v2_converts_stream_error_to_business_failure(monkeypatch) -> None:
+def test_agent_chat_v2_preserves_runtime_error_as_sse_without_gateway_buffering(monkeypatch) -> None:
     async def chunks():
         yield 'data: {"type":"error","message":"runtime down"}\n\n'
 
     response = SimpleNamespace(body_iterator=chunks(), media_type="text/event-stream")
     monkeypatch.setattr(ai_chat, "_legacy_chat_stream", lambda *_args: response)
 
-    with pytest.raises(CapabilityBusinessError) as exc_info:
-        asyncio.run(apply_interaction_chat_change(
+    async def exercise():
+        result = await apply_interaction_chat_change(
             {"operation": "chat_stream", "body": {"message": "hi"}},
             SimpleNamespace(user_gid="user-1"),
-        ))
+        )
+        iterator, _media_type = await stream_channel.claim_channel(result["data"]["stream_id"])
+        return "".join([chunk async for chunk in iterator])
 
-    assert exc_info.value.code == "provider_unavailable"
+    assert asyncio.run(exercise()) == 'data: {"type":"error","message":"runtime down"}\n\n'
 
 
 def test_agent_chat_v2_rejects_oversized_sync_response(monkeypatch) -> None:
@@ -290,32 +331,85 @@ def test_web_chat_pins_v2_and_normalizes_trusted_payload() -> None:
 
 
 def test_web_stream_chat_restores_the_sse_response() -> None:
-    class Gateway:
-        catalog_release = "release-1"
+    async def exercise() -> tuple[object, str]:
+        async def events():
+            yield 'data: {"type":"done"}\n\n'
 
-        async def invoke(self, _envelope):
-            return SimpleNamespace(
-                ok=True,
-                data={"data": {"events": ['data: {"type":"done"}\n\n'], "media_type": "text/event-stream"}},
-                error=None,
-            )
+        stream_id = await stream_channel.open_channel(events(), "text/event-stream")
 
-    response = asyncio.run(ai_chat._invoke_interaction_chat(
-        SimpleNamespace(headers={}),
-        {"gid": "admin-1", "team_id": "team-1", "org_role": "super_admin"},
-        ActorIdentity(user_id="admin-1", authentication_method="jwt", authenticated_at=datetime.now(UTC)),
-        Gateway(),
-        {"operation": "chat_stream", "body": {"message": "hello"}, "ai00_token": "token"},
-    ))
+        class Gateway:
+            catalog_release = "release-1"
 
-    async def collect() -> str:
-        return "".join([
+            async def invoke(self, _envelope):
+                return SimpleNamespace(
+                    ok=True,
+                    data={"data": {"stream_id": stream_id, "media_type": "text/event-stream"}},
+                    error=None,
+                )
+
+        response = await ai_chat._invoke_interaction_chat(
+            SimpleNamespace(headers={}),
+            {"gid": "admin-1", "team_id": "team-1", "org_role": "super_admin"},
+            ActorIdentity(user_id="admin-1", authentication_method="jwt", authenticated_at=datetime.now(UTC)),
+            Gateway(),
+            {"operation": "chat_stream", "body": {"message": "hello"}, "ai00_token": "token"},
+        )
+        body = "".join([
             chunk.decode() if isinstance(chunk, bytes) else chunk
             async for chunk in response.body_iterator
         ])
+        return response, body
 
+    response, body = asyncio.run(exercise())
     assert response.media_type == "text/event-stream"
-    assert asyncio.run(collect()) == 'data: {"type":"done"}\n\n'
+    assert body == 'data: {"type":"done"}\n\n'
+
+
+def test_asgi_stream_emits_first_body_before_agent_finishes() -> None:
+    async def exercise() -> None:
+        release_tail = asyncio.Event()
+        first_body = asyncio.Event()
+        sent = []
+
+        async def events():
+            yield 'data: {"type":"token","content":"a"}\n\n'
+            await release_tail.wait()
+            yield 'data: {"type":"done"}\n\n'
+
+        stream_id = await stream_channel.open_channel(events(), "text/event-stream")
+        response = await ai_chat._project_interaction_response(
+            {"operation": "chat_stream"},
+            {"stream_id": stream_id, "media_type": "text/event-stream"},
+        )
+        received_request = False
+
+        async def receive():
+            nonlocal received_request
+            if not received_request:
+                received_request = True
+                return {"type": "http.request", "body": b"", "more_body": False}
+            await asyncio.Event().wait()
+
+        async def send(message):
+            sent.append(message)
+            if message["type"] == "http.response.body" and message.get("body"):
+                first_body.set()
+
+        scope = {
+            "type": "http", "asgi": {"version": "3.0"}, "http_version": "1.1",
+            "method": "POST", "scheme": "http", "path": "/api/ai/chat/stream",
+            "raw_path": b"/api/ai/chat/stream", "query_string": b"",
+            "headers": [], "client": ("test", 1), "server": ("test", 80),
+        }
+        task = asyncio.create_task(response(scope, receive, send))
+        await asyncio.wait_for(first_body.wait(), timeout=0.5)
+        assert task.done() is False
+        assert sent[0]["type"] == "http.response.start"
+        assert sent[1]["body"].startswith(b"data: ")
+        release_tail.set()
+        await asyncio.wait_for(task, timeout=0.5)
+
+    asyncio.run(exercise())
 
 
 def test_web_sync_chat_restores_the_bounded_response() -> None:
@@ -378,12 +472,171 @@ def test_catalog_tool_confirmation_is_user_confirmed_and_not_model_exposed() -> 
 
     assert registered.spec.confirmation == "user"
     assert registered.descriptor.exposure.web is True
+    assert registered.descriptor.exposure.api is False
+    assert registered.descriptor.exposure.plugin is False
     assert registered.descriptor.exposure.agent is False
     assert registered.descriptor.exposure.mcp is False
     assert substantive_business_definition_errors(registered.descriptor) == ()
     assert [(item.resource_type, item.payload_path) for item in registered.descriptor.resource_selectors] == [
         ("agent-session", "session_gid"),
     ]
+
+
+def test_member_confirmation_passes_real_gateway_resource_authorization(monkeypatch) -> None:
+    registered = CapabilityRegistry()
+    register_catalog_tool_confirmation_capability(registered)
+    confirmation = registered.get("agent.catalog_tool.confirm.apply", 1)
+    registry = CapabilityRegistry()
+    registry.register(
+        confirmation.spec,
+        lambda payload, _context: {"data": {
+            "session_gid": payload["session_gid"], "tool_name": payload["tool_name"],
+            "result_json": "{}",
+        }},
+        descriptor=confirmation.descriptor,
+    )
+    release = build_release([confirmation.descriptor])
+    store = InMemoryCatalogStore(); store.publish(release)
+    monkeypatch.setattr(
+        "plugins.agent.agent_backend.capabilities.SessionRepository.require_owned_session",
+        lambda _self, session_gid, user_gid: None if (session_gid, user_gid) == ("owned", "member-1")
+        else (_ for _ in ()).throw(CapabilityBusinessError("resource_not_found", "missing")),
+    )
+    policy = LegacyServerGatewayPolicy(
+        user_loader=lambda _gid: {"gid": "member-1", "is_active": True},
+        grants_resolver=lambda _identity, _user: AuthorizationGrants(
+            permissions=("agent.interact",), capability_scopes=("*",),
+            resource_scopes=(), data_scopes=("confidential",), policy_version="test-1",
+        ),
+        approval_service=ApprovalService(InMemoryApprovalStore()),
+        resource_authorizer=lambda ref, identity, _user: (
+            ref.startswith("agent-session:")
+            and _authorize_agent_session(ref.split(":", 1)[1], identity)
+        ),
+    )
+    gateway = CapabilityGatewayService(
+        CatalogResolver(store, registry), policy,
+        reliability=ReliabilityCoordinator(InMemoryOutcomeStore(), InMemoryRateLimiter(limit=20)),
+    ).bind_release(release.release_id)
+    identity = ConsumerIdentity(
+        actor=ActorIdentity(user_id="member-1", authentication_method="jwt", authenticated_at=datetime.now(UTC)),
+        tenant=TenantIdentity(tenant_id="team-1", membership="member", active_roles=("member",)),
+        consumer=ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="ai00.web.agent"),
+    )
+    def envelope(session_gid, request_id):
+        return InvocationEnvelope(
+            capability_id=confirmation.spec.id, major_version=1,
+            catalog_release=release.release_id,
+            payload={"confirm_token": "token", "tool_name": "cap__x__v1", "session_gid": session_gid, "tool_use_id": "call"},
+            identity=identity, request_id=request_id, trace_id=request_id,
+            idempotency_key=request_id,
+        )
+
+    owned = envelope("owned", "owned-request")
+    challenge = asyncio.run(gateway.invoke(owned))
+    assert challenge.error.code == "confirmation_required"
+    approval = asyncio.run(gateway.request_approval(owned))
+    accepted = asyncio.run(gateway.invoke(owned.model_copy(update={"approval_reference": approval.token})))
+    assert accepted.ok is True
+    foreign = asyncio.run(gateway.invoke(envelope("foreign", "foreign-request")))
+    assert foreign.error.code == "resource_scope_denied"
+
+
+def test_confirmed_catalog_tool_reaches_target_as_session_bound_agent_identity(monkeypatch) -> None:
+    registry = CapabilityRegistry()
+    register_catalog_tool_confirmation_capability(registry)
+    target_spec = CapabilitySpec(
+        id="agent.test.change.apply", owner="agent",
+        description="Test one delegated Agent target envelope.",
+        use_when="Testing delegated target identity.", do_not_use_when="Outside tests.",
+        risk="write", confirmation="user", idempotent=False,
+        permissions=("agent.interact",),
+        input_schema={"type": "object", "required": ["task_gid", "value"], "properties": {"task_gid": {"type": "string"}, "value": {"type": "integer"}}, "additionalProperties": False},
+        output_schema={"type": "object", "required": ["data"], "properties": {"data": {"type": "object", "required": ["value"], "properties": {"value": {"type": "integer"}}, "additionalProperties": False}}, "additionalProperties": False},
+        plugin_callable=True,
+    )
+    captured = []
+    registry.register(
+        target_spec,
+        lambda payload, context: captured.append(context.effective_identity) or {"data": {"value": payload["value"]}},
+        descriptor=agent_descriptor_for(target_spec).model_copy(update={
+            "consistency_policy": "eventual",
+            "evidence_policy": "optional",
+            "resource_selectors": (
+                ResourceSelector(
+                    resource_type="project-task", payload_path="task_gid", required=True,
+                ),
+            ),
+        }),
+    )
+    release = build_release([item.descriptor for item in registry.snapshot()])
+    store = InMemoryCatalogStore(); store.publish(release)
+    monkeypatch.setattr(ai_chat._store, "require_owned_session", lambda *_args: None)
+    monkeypatch.setattr(ai_chat._store, "add_turn", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(
+        "plugins.agent.agent_backend.capabilities.SessionRepository.require_owned_session",
+        lambda *_args: None,
+    )
+    policy = LegacyServerGatewayPolicy(
+        user_loader=lambda _gid: {"gid": "member-1", "is_active": True},
+        grants_resolver=lambda _identity, _user: AuthorizationGrants(
+            permissions=("agent.interact",), capability_scopes=("*",),
+            resource_scopes=(), data_scopes=("confidential",), policy_version="test-1",
+        ),
+        approval_service=ApprovalService(InMemoryApprovalStore()),
+        resource_authorizer=lambda ref, identity, _user: (
+            ref == "project-task:task-7"
+            or (
+                ref.startswith("agent-session:")
+                and _authorize_agent_session(ref.split(":", 1)[1], identity)
+            )
+        ),
+    )
+    gateway = CapabilityGatewayService(
+        CatalogResolver(store, registry), policy,
+        reliability=ReliabilityCoordinator(InMemoryOutcomeStore(), InMemoryRateLimiter(limit=30)),
+    ).bind_release(release.release_id)
+    web_identity = ConsumerIdentity(
+        actor=ActorIdentity(user_id="member-1", authentication_method="jwt", authenticated_at=datetime.now(UTC)),
+        tenant=TenantIdentity(tenant_id="team-1", membership="member", active_roles=("member",)),
+        consumer=ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="ai00.web.agent"),
+    )
+    tool_name = tool_name_for(target_spec.id, 1)
+    tool = CatalogToolRegistry(release).resolve(tool_name)
+    tool_inputs = {"task_gid": "task-7", "value": 7}
+    delegated = DomainCapabilityClient(gateway).issue_agent_run_identity(
+        web_identity, agent_run_id="run-real-1", session_gid="session-1",
+        capability_scopes=(target_spec.id,),
+        resource_scopes=tool.resource_scopes(tool_inputs),
+    )
+    token = tool_executor.issue_confirm_token(
+        tool_name, tool_inputs, "session-1", "member-1",
+        catalog_release=release.release_id, capability_id=target_spec.id,
+        major_version=1, idempotency_key="stable-target-1", agent_identity=delegated,
+    )
+    parent = InvocationEnvelope(
+        capability_id="agent.catalog_tool.confirm.apply", major_version=1,
+        catalog_release=release.release_id,
+        payload={"confirm_token": token, "tool_name": tool_name, "session_gid": "session-1", "tool_use_id": "call-1"},
+        identity=web_identity, request_id="confirm-real-1", trace_id="trace-real-1",
+        idempotency_key="confirm-real-1",
+    )
+
+    challenge = asyncio.run(gateway.invoke(parent))
+    assert challenge.error.code == "confirmation_required"
+    approval = asyncio.run(gateway.request_approval(parent))
+    result = asyncio.run(gateway.invoke(parent.model_copy(update={"approval_reference": approval.token})))
+
+    assert result.ok is True, result.error
+    assert len(captured) == 1
+    target_identity = captured[0]
+    assert target_identity.consumer.type is ConsumerType.AGENT
+    assert target_identity.consumer.agent_run_id == "run-real-1"
+    assert target_identity.delegation.catalog_release == release.release_id
+    assert target_identity.delegation.resource_scopes == (
+        "agent-session:session-1", "project-task:task-7",
+    )
+    assert target_identity.delegation.capability_scopes == (target_spec.id,)
 
 
 def test_catalog_tool_confirmation_resolves_pinned_record_and_consumes_after_success(monkeypatch) -> None:
@@ -403,7 +656,7 @@ def test_catalog_tool_confirmation_resolves_pinned_record_and_consumes_after_suc
         def catalog(self):
             return release
 
-        async def invoke_after_user_confirmation(self, invocation, identity, correlation):
+        async def _invoke_from_confirmed_parent(self, invocation, identity, correlation):
             calls.append((invocation, identity, correlation))
             return SimpleNamespace(ok=True, data={"data": {"gid": "created-1"}}, error=None)
 
@@ -414,6 +667,11 @@ def test_catalog_tool_confirmation_resolves_pinned_record_and_consumes_after_suc
         catalog_release=release.release_id,
         capability_id=tool.capability_id,
         major_version=tool.major_version,
+        agent_identity=ConsumerIdentity(
+            actor=ActorIdentity(user_id="admin-1", authentication_method="jwt", authenticated_at=datetime.now(UTC)),
+            tenant=TenantIdentity(tenant_id="team-1", membership="member"),
+            consumer=ConsumerDescriptor(type=ConsumerType.AGENT, consumer_id="agent.xiaorou", agent_run_id="run-1"),
+        ),
     )
     context = SimpleNamespace(
         user_gid="admin-1", request_id="request-1", idempotency_key="idem-1",
@@ -429,7 +687,110 @@ def test_catalog_tool_confirmation_resolves_pinned_record_and_consumes_after_suc
     assert calls[0][0].major_version == tool.major_version
     assert json.loads(response["data"]["result_json"]) == {"gid": "created-1"}
     assert stored
-    assert token not in tool_executor._CONFIRM_TOKENS
+    assert tool_executor._token_hash(token) not in tool_executor._CONFIRM_STORE.records
+
+
+def test_catalog_tool_confirmation_releases_token_when_cancelled(monkeypatch) -> None:
+    from backend.capability_v2.catalog import load_catalog_release
+    from plugins.agent.agent_backend.ai_assistant.catalog_tools import CatalogToolRegistry
+
+    release = load_catalog_release(
+        Path("docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
+    )
+    tool = next(item for item in CatalogToolRegistry(release).tools() if item.confirmation_policy != "none")
+
+    class Client:
+        catalog_release = release.release_id
+        def catalog(self): return release
+        async def _invoke_from_confirmed_parent(self, *_args):
+            raise asyncio.CancelledError()
+
+    monkeypatch.setattr(ai_chat._store, "require_owned_session", lambda *_args: None)
+    identity = ConsumerIdentity(
+        actor=ActorIdentity(user_id="admin-1", authentication_method="jwt", authenticated_at=datetime.now(UTC)),
+        tenant=TenantIdentity(tenant_id="team-1", membership="member"),
+        consumer=ConsumerDescriptor(type=ConsumerType.AGENT, consumer_id="agent.xiaorou", agent_run_id="run-1"),
+    )
+    token = tool_executor.issue_confirm_token(
+        tool.name, {}, "session-1", "admin-1",
+        catalog_release=release.release_id, capability_id=tool.capability_id,
+        major_version=tool.major_version, agent_identity=identity,
+    )
+    context = SimpleNamespace(
+        user_gid="admin-1", request_id="request-1", idempotency_key="idem-1",
+        domain_client=Client(), effective_identity=SimpleNamespace(),
+    )
+
+    with pytest.raises(asyncio.CancelledError):
+        asyncio.run(apply_catalog_tool_confirmation({
+            "confirm_token": token, "tool_name": tool.name,
+            "session_gid": "session-1", "tool_use_id": "call-1",
+        }, context))
+
+    valid, _ = tool_executor.begin_confirm_token(
+        token, tool.name, "session-1", "admin-1",
+        catalog_release=release.release_id, capability_id=tool.capability_id,
+        major_version=tool.major_version,
+    )
+    assert valid is True
+
+
+def test_catalog_tool_confirmation_reuses_stable_idempotency_after_unknown_outcome(monkeypatch) -> None:
+    from backend.capability_v2.catalog import load_catalog_release
+    from plugins.agent.agent_backend.ai_assistant.catalog_tools import CatalogToolRegistry
+
+    release = load_catalog_release(
+        Path("docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
+    )
+    tool = next(item for item in CatalogToolRegistry(release).tools() if item.confirmation_policy != "none")
+    calls = []
+
+    class Client:
+        catalog_release = release.release_id
+        def catalog(self): return release
+        async def _invoke_from_confirmed_parent(self, invocation, *_args):
+            calls.append(invocation)
+            if len(calls) == 1:
+                return SimpleNamespace(
+                    ok=False, data={},
+                    error=SimpleNamespace(
+                        code="outcome_unknown", message="reconcile and retry",
+                        retryable=True, details={},
+                    ),
+                )
+            return SimpleNamespace(ok=True, data={"data": {"gid": "created-1"}}, error=None)
+
+    monkeypatch.setattr(ai_chat._store, "require_owned_session", lambda *_args: None)
+    monkeypatch.setattr(ai_chat._store, "add_turn", lambda *_args, **_kwargs: None)
+    identity = ConsumerIdentity(
+        actor=ActorIdentity(user_id="admin-1", authentication_method="jwt", authenticated_at=datetime.now(UTC)),
+        tenant=TenantIdentity(tenant_id="team-1", membership="member"),
+        consumer=ConsumerDescriptor(type=ConsumerType.AGENT, consumer_id="agent.xiaorou", agent_run_id="run-1"),
+    )
+    token = tool_executor.issue_confirm_token(
+        tool.name, {}, "session-1", "admin-1",
+        catalog_release=release.release_id, capability_id=tool.capability_id,
+        major_version=tool.major_version, agent_identity=identity,
+        idempotency_key="stable-confirmed-write-1",
+    )
+    context = SimpleNamespace(
+        user_gid="admin-1", request_id="request-1", idempotency_key="outer-idem",
+        domain_client=Client(), effective_identity=SimpleNamespace(),
+    )
+    payload = {
+        "confirm_token": token, "tool_name": tool.name,
+        "session_gid": "session-1", "tool_use_id": "call-1",
+    }
+
+    with pytest.raises(CapabilityBusinessError) as raised:
+        asyncio.run(apply_catalog_tool_confirmation(payload, context))
+    assert raised.value.code == "outcome_unknown"
+    response = asyncio.run(apply_catalog_tool_confirmation(payload, context))
+
+    assert json.loads(response["data"]["result_json"]) == {"gid": "created-1"}
+    assert [call.idempotency_key for call in calls] == [
+        "stable-confirmed-write-1", "stable-confirmed-write-1",
+    ]
 
 
 def test_web_chat_rejects_non_object_context_before_gateway() -> None:

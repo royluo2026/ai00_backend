@@ -13,6 +13,7 @@ from backend.capability_v2.contracts import (
     ConsumerIdentity,
     ConsumerType,
     CorrelationRef,
+    InvocationEnvelope,
     SideEffectLevel,
     TenantIdentity,
 )
@@ -41,9 +42,10 @@ def identity():
 
 
 class Descriptor:
-    def __init__(self, *, side_effect_level=SideEffectLevel.READ, idempotency_policy="none"):
+    def __init__(self, *, side_effect_level=SideEffectLevel.READ, idempotency_policy="none", confirmation_policy="none"):
         self.side_effect_level = side_effect_level
         self.idempotency_policy = idempotency_policy
+        self.confirmation_policy = confirmation_policy
 
 
 class Catalog:
@@ -138,6 +140,7 @@ def test_internal_client_requires_idempotency_from_write_descriptor(identity):
         descriptor=Descriptor(
             side_effect_level=SideEffectLevel.WRITE,
             idempotency_policy="required",
+            confirmation_policy="user",
         )
     )
     client = DomainCapabilityClient(gateway)
@@ -185,6 +188,7 @@ def test_confirmed_internal_client_requests_exact_gateway_approval_then_retries(
         descriptor=Descriptor(
             side_effect_level=SideEffectLevel.WRITE,
             idempotency_policy="required",
+            confirmation_policy="user",
         )
     )
     gateway.result = type("Result", (), {
@@ -204,8 +208,14 @@ def test_confirmed_internal_client_requests_exact_gateway_approval_then_retries(
         return type("Approval", (), {"token": "approval_1"})()
 
     gateway.request_approval = request_approval
-    client = DomainCapabilityClient(gateway)
-    result = asyncio.run(client.invoke_after_user_confirmation(
+    parent = InvocationEnvelope(
+        capability_id="factory.asset.get", major_version=1,
+        catalog_release=gateway.catalog_release, payload={"asset_id": "asset_1"},
+        identity=identity, request_id="parent_1", trace_id="trace_1",
+        idempotency_key="parent_1", approval_reference="parent_approval_1",
+    )
+    client = DomainCapabilityClient(gateway, parent_envelope=parent)
+    result = asyncio.run(client._invoke_from_confirmed_parent(
         DomainInvocation(
             "factory.asset.get", 1, {"asset_id": "asset_1"},
             idempotency_key="idem_1",
@@ -218,3 +228,38 @@ def test_confirmed_internal_client_requests_exact_gateway_approval_then_retries(
     assert len(gateway.envelopes) == 2
     assert approved[0].payload == gateway.envelopes[0].payload == gateway.envelopes[1].payload
     assert gateway.envelopes[1].approval_reference == "approval_1"
+
+
+def test_internal_client_issues_session_bound_agent_run_identity(identity):
+    web_identity = identity.model_copy(update={
+        "consumer": ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="ai00.web.agent"),
+    })
+    client = DomainCapabilityClient(RecordingGateway())
+
+    delegated = client.issue_agent_run_identity(
+        web_identity, agent_run_id="run-1", session_gid="session-1",
+        capability_scopes=("project.task.read", "project.task.change.apply"),
+        resource_scopes=("project-task:task-1",),
+    )
+
+    assert delegated.consumer.type is ConsumerType.AGENT
+    assert delegated.consumer.agent_run_id == "run-1"
+    assert delegated.delegation.delegated_by == "user_1"
+    assert delegated.delegation.resource_scopes == (
+        "agent-session:session-1", "project-task:task-1",
+    )
+    assert delegated.delegation.capability_scopes == (
+        "project.task.read", "project.task.change.apply",
+    )
+    assert delegated.delegation.catalog_release == client.catalog_release
+
+
+def test_confirmed_internal_client_rejects_missing_verified_parent(identity):
+    client = DomainCapabilityClient(RecordingGateway())
+
+    with pytest.raises(DomainInvocationError, match="confirmed_parent_required"):
+        asyncio.run(client._invoke_from_confirmed_parent(
+            DomainInvocation("factory.asset.get", 1, {"asset_id": "asset_1"}),
+            identity,
+            CorrelationRef(request_id="req_1", trace_id="trace_1"),
+        ))

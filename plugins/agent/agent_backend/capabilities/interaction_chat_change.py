@@ -36,25 +36,12 @@ async def _collect_v2(value: Any) -> dict[str, Any]:
     iterator = getattr(value, "body_iterator", None)
     if iterator is None:
         raise ValueError("unsupported Agent response type")
-    events: list[str] = []
-    async for chunk in iterator:
-        if len(events) == 500:
-            raise ValueError("stream response exceeds 500 events")
-        event = chunk.decode("utf-8", errors="replace") if isinstance(chunk, bytes) else str(chunk)
-        for line in event.splitlines():
-            if not line.startswith("data: "):
-                continue
-            try:
-                payload = json.loads(line[6:])
-            except json.JSONDecodeError:
-                continue
-            if isinstance(payload, dict) and payload.get("type") == "error":
-                raise CapabilityBusinessError(
-                    "provider_unavailable", str(payload.get("message") or "Agent runtime failed"),
-                    retryable=True,
-                )
-        events.append(event)
-    return {"events": events, "media_type": getattr(value, "media_type", "text/event-stream")}
+    from ..application.stream_channel import open_channel
+    media_type = getattr(value, "media_type", "text/event-stream")
+    return {
+        "stream_id": await open_channel(iterator, media_type),
+        "media_type": media_type,
+    }
 
 
 def _v2_body(raw_body: Any) -> dict[str, Any]:
@@ -88,9 +75,18 @@ async def _apply_interaction_chat_change(
     catalog_runtime = None
     if domain_client is not None and identity is not None:
         from ..ai_assistant.catalog_tools import CatalogToolRegistry
+        import uuid
+        tool_registry = CatalogToolRegistry(domain_client.catalog(), client=domain_client)
+        agent_run_id = f"xiaorou-{uuid.uuid4().hex}"
         catalog_runtime = {
-            "registry": CatalogToolRegistry(domain_client.catalog(), client=domain_client),
-            "identity": identity,
+            "registry": tool_registry,
+            "identity_factory": lambda session_gid, tool, inputs: domain_client.issue_agent_run_identity(
+                identity,
+                agent_run_id=agent_run_id,
+                session_gid=session_gid,
+                capability_scopes=(tool.capability_id,),
+                resource_scopes=tool.resource_scopes(inputs),
+            ),
             "correlation": CorrelationRef(
                 request_id=context.request_id or f"agent_chat_{context.user_gid}",
                 trace_id=context.request_id or None,
@@ -158,7 +154,7 @@ def register_interaction_chat_change_capability(registry: Any) -> None:
         }, "additionalProperties": False},
         output_schema={"type": "object", "required": ["data"], "properties": {
             "data": {"type": "object", "properties": {
-                "events": {"type": "array", "maxItems": 500, "items": {"type": "string"}},
+                "stream_id": {"type": "string", "pattern": "^agent-stream-[0-9a-f]{32}$"},
                 "media_type": {"type": "string"},
                 "response_json": {"type": "string", "maxLength": 1_048_576},
             }, "additionalProperties": False},
@@ -194,7 +190,7 @@ def register_interaction_chat_change_capability(registry: Any) -> None:
         "business_acceptance_criteria": (
             "Each accepted request executes as the authenticated actor and never as a caller-supplied user identity.",
             "A supplied chat session is used only when it belongs to the authenticated actor.",
-            "The caller receives a schema-valid bounded synchronous result or at most 500 serialized stream events.",
+            "The caller receives a schema-valid bounded synchronous result or a single-use stream channel capped at 500 events.",
         ),
         "business_invariants": (
             BusinessInvariantContract(

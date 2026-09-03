@@ -62,7 +62,7 @@ async def _invoke_interaction_chat(request, user, principal, gateway, payload):
     if not result.ok:
         code = result.error.code if result.error else "provider_error"
         raise HTTPException(status_code={"invalid_input": 400, "permission_denied": 403, "resource_not_found": 404}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
-    return _project_interaction_response(payload, result.data.get("data", result.data))
+    return await _project_interaction_response(payload, result.data.get("data", result.data))
 
 
 async def _invoke_confirmed_catalog_tool(request, user, principal, gateway, body):
@@ -347,6 +347,17 @@ def _chat_stream_gen(
             retryable=True,
         )
     catalog_registry = catalog_runtime["registry"]
+    identity_factory = catalog_runtime.get("identity_factory")
+    def identity_for(tool, inputs):
+        identity = (
+            identity_factory(session_gid, tool, inputs)
+            if identity_factory else catalog_runtime.get("identity")
+        )
+        if identity is None:
+            raise CapabilityBusinessError(
+                "delegation_expired", "Agent run identity is unavailable",
+            )
+        return identity
     all_tools = catalog_tools_openai(catalog_registry)
     msgs      = [{"role": "system", "content": system}] + list(messages)
 
@@ -496,6 +507,8 @@ def _chat_stream_gen(
                 tool.name, inputs, session_gid, user_gid,
                 catalog_release=catalog_runtime["catalog_release"],
                 capability_id=tool.capability_id, major_version=tool.major_version,
+                idempotency_key=f"{catalog_runtime['correlation'].request_id}:{wtc.id}",
+                agent_identity=identity_for(tool, inputs),
             )
             preview = _te.build_preview(wtc.function.name, inputs)
             intent  = answer or f"即将执行：{preview}"
@@ -530,7 +543,7 @@ def _chat_stream_gen(
                 _tc, _name, _inputs, _call_key = item
                 _result = asyncio.run(_te.execute_catalog_tool(
                     catalog_registry, _name, _inputs,
-                    identity=catalog_runtime["identity"],
+                    identity=identity_for(catalog_registry.resolve(_name), _inputs),
                     correlation=catalog_runtime["correlation"],
                     idempotency_key=f"{catalog_runtime['correlation'].request_id}:{_tc.id}",
                 ))
@@ -1174,9 +1187,17 @@ def _normalize_interaction_payload(payload: dict) -> dict:
     return {**payload, "body": body}
 
 
-def _project_interaction_response(payload: dict, data):
+async def _project_interaction_response(payload: dict, data):
     if isinstance(data, dict) and "response_json" in data:
         return json.loads(data["response_json"])
+    if payload.get("operation") == "chat_stream" and isinstance(data, dict) and data.get("stream_id"):
+        from ..application.stream_channel import claim_channel
+        iterator, media_type = await claim_channel(str(data["stream_id"]))
+        return StreamingResponse(
+            iterator,
+            media_type=media_type,
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+        )
     if payload.get("operation") in {"chat_stream", "confirm"} and isinstance(data, dict):
         return StreamingResponse(
             iter(data.get("events") or ()),

@@ -14,7 +14,11 @@ def descriptor_for(spec):
     base = descriptor_from_provider_spec(spec); write = base.side_effect_level is not SideEffectLevel.READ
     return CapabilityDescriptorV2.model_validate({
         **base.model_dump(), "owner_domain": "ontology", "lifecycle_status": LifecycleStatus.STABLE,
-        "exposure": ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True),
+        "exposure": ExposurePolicy(
+            web=True, api=True, plugin=True,
+            agent=spec.id != "ontology.release.activate",
+            mcp=spec.id != "ontology.release.activate",
+        ),
         "exposure_policy_source": "provider_explicit",
         "automation_level": AutomationLevel.A0 if spec.id == "ontology.release.activate" else (AutomationLevel.A1 if write else AutomationLevel.A2),
         "authorization_policy": "ontology.v2:" + (",".join(spec.permissions) or "authenticated"),

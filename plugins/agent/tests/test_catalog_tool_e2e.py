@@ -11,6 +11,11 @@ from backend.capability_v2.contracts import ActorIdentity, ConsumerDescriptor, C
 from plugins.agent.agent_backend.ai_assistant.catalog_tools import CatalogToolRegistry, tool_name_for
 from plugins.agent.agent_backend.ai_assistant import tool_executor, tool_registry
 from plugins.agent.agent_backend.routers import ai_chat
+from plugins.agent.agent_backend.data.confirmation_repository import InMemoryConfirmationRepository
+
+
+def setup_function() -> None:
+    tool_executor.configure_confirmation_store(InMemoryConfirmationRepository())
 
 
 def test_tool_name_is_deterministic_and_bounded():
@@ -93,7 +98,11 @@ def test_real_chat_loop_issues_bound_token_from_pinned_catalog(monkeypatch):
     monkeypatch.setattr(ai_chat, "_chj_completion", completion)
     runtime = {
         "registry": registry,
-        "identity": SimpleNamespace(),
+        "identity_factory": lambda _session_gid, _tool, _inputs: ConsumerIdentity(
+            actor=ActorIdentity(user_id="user-1", authentication_method="jwt", authenticated_at=datetime.now(UTC)),
+            tenant=TenantIdentity(tenant_id="tenant-1", membership="member"),
+            consumer=ConsumerDescriptor(type=ConsumerType.AGENT, consumer_id="agent.xiaorou", agent_run_id="run-1"),
+        ),
         "correlation": SimpleNamespace(request_id="request-1"),
         "catalog_release": release.release_id,
     }
@@ -107,7 +116,9 @@ def test_real_chat_loop_issues_bound_token_from_pinned_catalog(monkeypatch):
         json.loads(chunk[6:]) for chunk in chunks
         if json.loads(chunk[6:]).get("type") == "confirm_required"
     )
-    pending = tool_executor._CONFIRM_TOKENS[event["confirm_token"]]
+    pending = tool_executor._CONFIRM_STORE.records[
+        tool_executor._token_hash(event["confirm_token"])
+    ]
 
     assert captured_tools
     assert all(item["function"]["name"].startswith("cap__") for item in captured_tools)
@@ -115,3 +126,6 @@ def test_real_chat_loop_issues_bound_token_from_pinned_catalog(monkeypatch):
     assert pending["catalog_release"] == release.release_id
     assert pending["capability_id"] == tool.capability_id
     assert pending["major_version"] == tool.major_version
+    assert pending["agent_identity"]["consumer"]["type"] == "agent"
+    assert pending["agent_identity"]["consumer"]["agent_run_id"] == "run-1"
+    assert pending["idempotency_key"] == "request-1:call-1"

@@ -15,6 +15,7 @@ from .descriptors import specs
 from .provider import descriptor_for
 from .interaction_chat_change import register_interaction_chat_change_capability
 from .catalog_tool_confirmation import register_catalog_tool_confirmation_capability
+from backend.domain_ports.resource_authorization import resource_authorizers
 
 
 _DEFAULT_RUNTIME = object()
@@ -24,6 +25,17 @@ _CANVAS_CAPABILITIES = {
 }
 
 
+def _authorize_agent_session(resource_id, identity) -> bool:
+    actor_id = identity.actor.user_id or ""
+    if not actor_id:
+        return False
+    try:
+        SessionRepository().require_owned_session(resource_id, actor_id)
+    except Exception:
+        return False
+    return True
+
+
 def _validate_canvas_runtime(runtime) -> None:
     methods = ("test_node", "resolve_options", "start", "resume")
     if any(not inspect.iscoroutinefunction(getattr(runtime, name, None)) for name in methods):
@@ -31,6 +43,7 @@ def _validate_canvas_runtime(runtime) -> None:
 
 
 def register_capabilities(registry, *, canvas_runtime=_DEFAULT_RUNTIME) -> None:
+    resource_authorizers.register("agent-session", _authorize_agent_session)
     repository = AgentCapabilityRepository()
     production_composition = canvas_runtime is _DEFAULT_RUNTIME
     runtime = (

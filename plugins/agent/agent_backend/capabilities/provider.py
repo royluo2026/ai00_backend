@@ -20,6 +20,9 @@ ERRORS = tuple(DomainErrorContract(code=code, meaning=meaning, retryable=retryab
 
 _CANVAS_COMMANDS = {"agent.canvas.execution.start", "agent.canvas.execution.resume"}
 _CANVAS_SYNC = {"agent.workflow.node.test.execute", "agent.canvas.options.resolve"}
+_MODEL_HIDDEN = {
+    "agent.runtime.config.read",
+}
 
 
 def descriptor_for(spec) -> CapabilityDescriptorV2:
@@ -27,7 +30,11 @@ def descriptor_for(spec) -> CapabilityDescriptorV2:
     interaction = spec.id in {"agent.interaction.request", "agent.script.generate", *_CANVAS_COMMANDS}
     return CapabilityDescriptorV2.model_validate({
         **base.model_dump(), "owner_domain": "agent", "lifecycle_status": LifecycleStatus.STABLE,
-        "exposure": ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True),
+        "exposure": ExposurePolicy(
+            web=True, api=True, plugin=True,
+            agent=spec.id not in _MODEL_HIDDEN,
+            mcp=spec.id not in _MODEL_HIDDEN,
+        ),
         "exposure_policy_source": "provider_explicit",
         "automation_level": AutomationLevel.A1 if write else AutomationLevel.A2,
         "authorization_policy": "agent.v2:" + ",".join(spec.permissions),

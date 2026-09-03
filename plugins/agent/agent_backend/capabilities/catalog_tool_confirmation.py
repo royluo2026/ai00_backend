@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import asyncio
 from typing import Any
 
 from backend.capability_v2.contracts import (
@@ -46,10 +47,18 @@ async def apply_catalog_tool_confirmation(
         capability_id=tool.capability_id,
         major_version=tool.major_version,
         payload=dict(pending["inputs"]),
-        idempotency_key=context.idempotency_key or correlation.request_id,
+        idempotency_key=pending["idempotency_key"],
     )
     try:
-        result = await client.invoke_after_user_confirmation(invocation, identity, correlation)
+        agent_identity_json = pending.get("agent_identity") or {}
+        if not agent_identity_json:
+            raise CapabilityBusinessError("invalid_input", "Agent run identity is missing")
+        from backend.capability_v2.contracts import ConsumerIdentity
+        identity = ConsumerIdentity.model_validate(agent_identity_json)
+        result = await client._invoke_from_confirmed_parent(invocation, identity, correlation)
+    except asyncio.CancelledError:
+        tool_executor.finish_confirm_token(token, accepted=False)
+        raise
     except Exception:
         tool_executor.finish_confirm_token(token, accepted=False)
         raise
@@ -118,11 +127,11 @@ def register_catalog_tool_confirmation_capability(registry: Any) -> None:
             "additionalProperties": False,
         },
         tags=("agent", "catalog", "tool", "confirmation", "write"),
-        plugin_callable=True,
+        plugin_callable=False,
     )
     from .provider import descriptor_for
     descriptor = descriptor_for(spec).model_copy(update={
-        "exposure": ExposurePolicy(web=True, api=True, plugin=True, agent=False, mcp=False),
+        "exposure": ExposurePolicy(web=True, api=False, plugin=False, agent=False, mcp=False),
         "consistency_policy": "eventual",
         "evidence_policy": "optional",
         "resource_selectors": (

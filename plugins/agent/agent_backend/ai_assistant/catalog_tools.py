@@ -25,6 +25,21 @@ class CatalogTool:
     side_effect_level: str
     automation_level: str
     confirmation_policy: str
+    resource_selectors: tuple[tuple[str, str, bool], ...]
+
+    def resource_scopes(self, payload: dict[str, Any]) -> tuple[str, ...]:
+        scopes = []
+        for resource_type, path, _required in self.resource_selectors:
+            current: Any = payload
+            found = True
+            for part in path.split("."):
+                if not part or not isinstance(current, dict) or part not in current:
+                    found = False
+                    break
+                current = current[part]
+            if found and current not in (None, "") and not isinstance(current, (dict, list, tuple, set, bool)):
+                scopes.append(f"{resource_type}:{current}")
+        return tuple(scopes)
 
 
 class CatalogToolRegistry:
@@ -38,6 +53,10 @@ class CatalogToolRegistry:
                 input_schema=dict(item.input_schema), output_schema=dict(item.agent_output_schema or item.output_schema),
                 side_effect_level=str(item.side_effect_level.value), automation_level=str(item.automation_level.value),
                 confirmation_policy=item.confirmation_policy,
+                resource_selectors=tuple(
+                    (selector.resource_type, selector.payload_path, selector.required)
+                    for selector in item.resource_selectors
+                ),
             )
             for item in release.descriptors if item.exposure.agent
         }

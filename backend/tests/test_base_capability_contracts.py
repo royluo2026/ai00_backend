@@ -23,6 +23,13 @@ from backend.tests.capability_completion_support import (
 
 ROOT = Path(__file__).resolve().parents[2]
 STABLE_CAPABILITIES = FrozenCoverageReview(ROOT).capability_ids("base")
+MODEL_HIDDEN = {
+    "plugin.disable", "plugin.enable", "plugin.install", "plugin.revoke",
+    "plugin.rollback", "plugin.uninstall", "plugin.upgrade", "plugin.upgrade.finish",
+    "base.plugin.installation.request.create", "base.plugin.installation.transition.uninstall",
+    "base.authorization.grant.create", "base.authorization.grant.revoke",
+    "base.authorization.grant.change.apply",
+}
 
 
 def test_base_provider_matches_corrected_frozen_review():
@@ -69,8 +76,8 @@ def test_all_stable_base_capabilities_have_native_open_contracts():
         assert descriptor.domain_errors
         if item.spec.plugin_callable:
             assert descriptor.exposure.plugin is True
-            assert descriptor.exposure.agent is True
-            assert descriptor.exposure.mcp is True
+            assert descriptor.exposure.agent == (capability_id not in MODEL_HIDDEN)
+            assert descriptor.exposure.mcp == (capability_id not in MODEL_HIDDEN)
             assert descriptor.agent_output_schema == descriptor.output_schema
         else:
             assert descriptor.exposure.plugin is False
@@ -88,6 +95,8 @@ def test_plugin_lifecycle_is_exposed_but_remains_admin_governed():
         assert descriptor.confirmation_policy == "admin"
         assert descriptor.authorization_policy == "base.v2:system.plugin.manage"
         assert descriptor.idempotency_policy == "required"
+        assert descriptor.exposure.agent is False
+        assert descriptor.exposure.mcp is False
         assert descriptor.audit_policy == "high_risk"
         assert descriptor.required_auth_freshness_seconds > 0
 
@@ -154,7 +163,7 @@ def test_gateway_derives_agent_storage_namespace_from_trusted_identity():
             ),
         ),
     )
-    context = CapabilityGatewayService._legacy_context(envelope)
+    context = CapabilityGatewayService._legacy_context(object(), envelope)
     assert context.plugin_id == "agent.planner"
     assert _identity(context) == ("t1", "agent.planner")
 

@@ -110,6 +110,11 @@ def _verified_consumer_refs(capability_id: str, major_version: int = 1) -> tuple
             {"consumer_id": "dist/packages/agent-plugin/web/wfc_window/wfc_window.js", "consumer_type": "web", "version_constraint": "==2"},
             {"consumer_id": "dist/packages/agent-plugin/web/automation_hub/ai_assistant.js", "consumer_type": "web", "version_constraint": "==2"},
         ))
+    if capability_id == "agent.catalog_tool.confirm.apply":
+        consumers.extend((
+            {"consumer_id": "dist/packages/agent-plugin/web/wfc_window/wfc_window.js", "consumer_type": "web", "version_constraint": "==1"},
+            {"consumer_id": "dist/packages/agent-plugin/web/automation_hub/ai_assistant.js", "consumer_type": "web", "version_constraint": "==1"},
+        ))
     if capability_id == "agent.runtime.config.read":
         consumers.extend((
             {"consumer_id": "dist/packages/agent-plugin/web/automation_hub/ai_settings.html", "consumer_type": "web", "version_constraint": ">=1"},

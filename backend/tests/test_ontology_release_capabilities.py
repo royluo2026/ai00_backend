@@ -177,6 +177,9 @@ def test_release_capabilities_separate_publish_and_activation_authority():
     assert activate.permissions == ("ontology.activate",)
     assert publish.confirmation == "admin"
     assert activate.confirmation == "admin"
+    from plugins.ontology.ontology_backend.provider import descriptor_for
+    assert descriptor_for(activate).exposure.agent is False
+    assert descriptor_for(activate).exposure.mcp is False
 
     for capability_id in ("ontology.release.get", "ontology.release.search", "ontology.release.diff"):
         descriptor = adapt_v1_spec(registry.get(capability_id).spec)

@@ -25,8 +25,15 @@ def test_agent_provider_matches_frozen_review_and_is_stable():
     assert {spec.id for spec, _ in registry.items} == EXPECTED
     assert {descriptor.owner_domain for _, descriptor in registry.items} == {"agent"}
     assert all(descriptor.lifecycle_status == "stable" for _, descriptor in registry.items)
-    model_hidden = {"agent.interaction.chat.change.apply", "agent.catalog_tool.confirm.apply"}
-    assert all(descriptor.exposure.plugin for _, descriptor in registry.items)
+    model_hidden = {
+        "agent.interaction.chat.change.apply",
+        "agent.catalog_tool.confirm.apply",
+        "agent.runtime.config.read",
+    }
+    assert all(
+        descriptor.exposure.plugin == (spec.id != "agent.catalog_tool.confirm.apply")
+        for spec, descriptor in registry.items
+    )
     assert all(
         descriptor.exposure.agent == (spec.id not in model_hidden)
         and descriptor.exposure.mcp == (spec.id not in model_hidden)
@@ -57,3 +64,7 @@ def test_agent_is_official_and_database_independent():
     sql = (ROOT / "backend/db/migrations/domains/agent/0001_agent.sql").read_text(encoding="utf-8")
     assert "workmanship_agent_runs" in sql
     assert "workmanship_bop_" not in sql
+    confirmation_sql = (ROOT / "backend/db/migrations/domains/agent/0004_confirmation_tokens.sql").read_text(encoding="utf-8")
+    assert "workmanship_agent_confirmation_tokens" in confirmation_sql
+    assert "token_hash" in confirmation_sql
+    assert "state VARCHAR(16) NOT NULL" in confirmation_sql

@@ -19,6 +19,11 @@ _LIFECYCLE = {
 }
 _STORAGE_WRITES = {"plugin.storage.delete", "plugin.storage.put"}
 _WRITES = _LIFECYCLE | _STORAGE_WRITES | {"system.job.cancel"}
+_MODEL_HIDDEN = _LIFECYCLE | {
+    "base.authorization.grant.create",
+    "base.authorization.grant.revoke",
+    "base.authorization.grant.change.apply",
+}
 _ATOMIC_WEB_EFFECTS = {
     "base.file_store.public_config.get": "Reads a secret-filtered file-store configuration projection without mutation.",
     "base.authorization.grant.list": "Reads active authorization grants from the Base grant store without mutation.",
@@ -109,7 +114,11 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
     resource = _RESOURCE_FIELDS.get(capability_id)
     updates = {
         "lifecycle_status": LifecycleStatus.STABLE,
-        "exposure": ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True),
+        "exposure": ExposurePolicy(
+            web=True, api=True, plugin=True,
+            agent=capability_id not in _MODEL_HIDDEN,
+            mcp=capability_id not in _MODEL_HIDDEN,
+        ),
         "exposure_policy_source": "provider_explicit",
         "automation_level": AutomationLevel.A0 if capability_id in _LIFECYCLE else (AutomationLevel.A1 if is_write else AutomationLevel.A2),
         "authorization_policy": "base.v2:system.plugin.manage" if capability_id in _LIFECYCLE else "base.v2:" + (",".join(governed.permissions) or "authenticated"),
