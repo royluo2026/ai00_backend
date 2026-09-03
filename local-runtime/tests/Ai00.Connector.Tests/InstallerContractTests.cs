@@ -13,7 +13,19 @@ public sealed class InstallerContractTests
         Assert.Contains("Ai00ConnectorSessionHost", wix, StringComparison.Ordinal);
         Assert.Contains("LocalService", wix, StringComparison.Ordinal);
         Assert.Contains("AI00\\Connector", wix, StringComparison.Ordinal);
+        Assert.Contains("ComponentGroupRef Id=\"Ai00ConnectorServicePayload\"", wix, StringComparison.Ordinal);
+        Assert.Contains("$(var.ServicePublishDir)\\**", wix, StringComparison.Ordinal);
+        Assert.Contains("CurrentVersion\\Run", wix, StringComparison.Ordinal);
+        Assert.Contains("AI00 Connector SessionHost", wix, StringComparison.Ordinal);
         Assert.DoesNotContain("FirewallException", wix, StringComparison.Ordinal);
+
+        var settings = File.ReadAllText(SourceFile("appsettings.example.json"));
+        Assert.Contains("\"Connector\"", settings, StringComparison.Ordinal);
+        Assert.DoesNotContain("\"LocalRuntime\"", settings, StringComparison.Ordinal);
+
+        var planPipe = File.ReadAllText(SourceFile("src", "Ai00.Connector.SessionHost", "PlanPipeHost.cs"));
+        Assert.DoesNotContain("PipeOptions.CurrentUserOnly", planPipe, StringComparison.Ordinal);
+        Assert.Contains("LocalServiceSid", planPipe, StringComparison.Ordinal);
     }
 
     private static string SourceFile(params string[] parts)

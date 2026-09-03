@@ -3,5 +3,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Ai00.Connector.Contracts\Ai00.Connector.Contracts.csproj" />
     <ProjectReference Include="..\Ai00.Connector.Adapters.VisMockup\Ai00.Connector.Adapters.VisMockup.csproj" />
+    <PackageReference Include="System.IO.Pipes.AccessControl" Version="5.0.0" />
   </ItemGroup>
 </Project>

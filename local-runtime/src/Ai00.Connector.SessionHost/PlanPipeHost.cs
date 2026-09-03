@@ -1,5 +1,7 @@
 using System.IO.Pipes;
 using System.Text.Json;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using Ai00.Connector.Contracts;
 
 namespace Ai00.Connector.SessionHost;
@@ -45,9 +47,15 @@ public sealed class PlanPipeHost(
     {
         while (!cancellationToken.IsCancellationRequested)
         {
-            await using var pipe = new NamedPipeServerStream(
+            var security = new System.IO.Pipes.PipeSecurity();
+            security.AddAccessRule(new PipeAccessRule(
+                WindowsIdentity.GetCurrent().User!, PipeAccessRights.ReadWrite, AccessControlType.Allow));
+            security.AddAccessRule(new PipeAccessRule(
+                new SecurityIdentifier(WellKnownSidType.LocalServiceSid, null),
+                PipeAccessRights.ReadWrite, AccessControlType.Allow));
+            await using var pipe = NamedPipeServerStreamAcl.Create(
                 pipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte,
-                PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly, 64 * 1024, 64 * 1024);
+                PipeOptions.Asynchronous, 64 * 1024, 64 * 1024, security);
             await pipe.WaitForConnectionAsync(cancellationToken);
             var request = await JsonSerializer.DeserializeAsync<ConnectorPlanExecutionRequest>(
                 pipe, cancellationToken: cancellationToken);

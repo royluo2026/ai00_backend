@@ -11,9 +11,11 @@
         </Component>
         <Component Id="Ai00ConnectorSessionHost" Guid="*">
           <File Id="Ai00ConnectorSessionHostExe" Source="$(var.SessionHostPublishDir)\Ai00.Connector.SessionHost.exe" KeyPath="yes" />
+          <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Run" Name="AI00 Connector SessionHost" Value="&quot;[INSTALLFOLDER]Ai00.Connector.SessionHost.exe&quot;" Type="string" />
         </Component>
         <Component Id="Ai00ConnectorTray" Guid="*">
           <File Id="Ai00ConnectorTrayExe" Source="$(var.TrayPublishDir)\Ai00.Connector.Tray.exe" KeyPath="yes" />
+          <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Run" Name="AI00 Connector Tray" Value="&quot;[INSTALLFOLDER]Ai00.Connector.Tray.exe&quot;" Type="string" />
         </Component>
       </Directory>
     </StandardDirectory>
@@ -32,6 +34,31 @@
       <ComponentRef Id="Ai00ConnectorSessionHost" />
       <ComponentRef Id="Ai00ConnectorTray" />
       <ComponentRef Id="Ai00ConnectorProgramDataAcl" />
+      <ComponentGroupRef Id="Ai00ConnectorServicePayload" />
+      <ComponentGroupRef Id="Ai00ConnectorSessionHostPayload" />
+      <ComponentGroupRef Id="Ai00ConnectorTrayPayload" />
     </Feature>
   </Package>
+
+  <Fragment>
+    <ComponentGroup Id="Ai00ConnectorServicePayload" Directory="INSTALLFOLDER">
+      <Files Include="$(var.ServicePublishDir)\**">
+        <Exclude Files="$(var.ServicePublishDir)\Ai00.Connector.Service.exe" />
+      </Files>
+    </ComponentGroup>
+    <ComponentGroup Id="Ai00ConnectorSessionHostPayload" Directory="INSTALLFOLDER">
+      <Files Include="$(var.SessionHostPublishDir)\**">
+        <Exclude Files="$(var.SessionHostPublishDir)\Ai00.Connector.SessionHost.exe" />
+        <Exclude Files="$(var.SessionHostPublishDir)\Ai00.Connector.Contracts.dll" />
+        <Exclude Files="$(var.SessionHostPublishDir)\Ai00.Connector.Contracts.pdb" />
+      </Files>
+    </ComponentGroup>
+    <ComponentGroup Id="Ai00ConnectorTrayPayload" Directory="INSTALLFOLDER">
+      <Files Include="$(var.TrayPublishDir)\**">
+        <Exclude Files="$(var.TrayPublishDir)\Ai00.Connector.Tray.exe" />
+        <Exclude Files="$(var.TrayPublishDir)\Ai00.Connector.Contracts.dll" />
+        <Exclude Files="$(var.TrayPublishDir)\Ai00.Connector.Contracts.pdb" />
+      </Files>
+    </ComponentGroup>
+  </Fragment>
 </Wix>
