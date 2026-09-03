@@ -8,7 +8,7 @@ Search immutable Simulation parameter sets.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`simulation`
-- Catalog Release：`rel_6aa108ced57d29b4cb35d05266369c04`
+- Catalog Release：`rel_909b49765f221187a4e1ecc5e367e56f`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -88,7 +88,7 @@ Search immutable Simulation parameter sets.
 ```json
 {
   "capability_id": "simulation.parameter_set.search",
-  "catalog_release": "rel_6aa108ced57d29b4cb35d05266369c04",
+  "catalog_release": "rel_909b49765f221187a4e1ecc5e367e56f",
   "major_version": 1,
   "payload": {}
 }

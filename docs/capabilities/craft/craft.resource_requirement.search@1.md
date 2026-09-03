@@ -8,7 +8,7 @@ Governed Craft resource requirement search outcome.
 - 不适用：The object is a physical Factory asset or a legacy VPPS template row.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_6aa108ced57d29b4cb35d05266369c04`
+- Catalog Release：`rel_909b49765f221187a4e1ecc5e367e56f`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -109,7 +109,7 @@ Governed Craft resource requirement search outcome.
 ```json
 {
   "capability_id": "craft.resource_requirement.search",
-  "catalog_release": "rel_6aa108ced57d29b4cb35d05266369c04",
+  "catalog_release": "rel_909b49765f221187a4e1ecc5e367e56f",
   "major_version": 1,
   "payload": {}
 }

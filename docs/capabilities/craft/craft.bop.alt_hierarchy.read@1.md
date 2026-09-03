@@ -8,7 +8,7 @@ Read a bounded BOP hierarchy enriched with linked PBOM CATIA occurrences.
 - 不适用：The consumer needs to mutate entries or read revision-pinned navigation contracts.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_6aa108ced57d29b4cb35d05266369c04`
+- Catalog Release：`rel_909b49765f221187a4e1ecc5e367e56f`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -86,7 +86,7 @@ Read a bounded BOP hierarchy enriched with linked PBOM CATIA occurrences.
 ```json
 {
   "capability_id": "craft.bop.alt_hierarchy.read",
-  "catalog_release": "rel_6aa108ced57d29b4cb35d05266369c04",
+  "catalog_release": "rel_909b49765f221187a4e1ecc5e367e56f",
   "major_version": 1,
   "payload": {
     "version_gid": "example"
