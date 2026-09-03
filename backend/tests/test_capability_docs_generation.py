@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from backend.capabilities.models_next import CapabilitySpec
 from backend.capabilities.validation_next import validate_payload
 from backend.capability_v2.catalog import CatalogRelease, load_catalog_release
@@ -47,13 +49,20 @@ def test_v1_adapter_preserves_explicit_typed_any_json_schema():
     validate_payload(dict(descriptor.input_schema), {"value": {"items": [1, 2]}})
 
 
-def test_minimal_example_satisfies_sha256_string_patterns():
+@pytest.mark.parametrize(
+    ("pattern", "expected"),
+    (
+        ("^sha256:[0-9a-f]{64}$", "sha256:" + "0" * 64),
+        ("^[0-9a-f]{64}$", "0" * 64),
+    ),
+)
+def test_minimal_example_satisfies_sha256_string_patterns(pattern, expected):
     """Breaks if generated machine examples use a generic string for a digest field."""
-    schema = {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+    schema = {"type": "string", "pattern": pattern}
 
     example = example_for_schema(schema)
 
-    assert example == "sha256:" + "0" * 64
+    assert example == expected
     validate_payload(schema, example)
 
 

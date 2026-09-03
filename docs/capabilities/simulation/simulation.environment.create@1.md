@@ -8,7 +8,7 @@ Create a reproducible environment from four immutable references.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`simulation`
-- Catalog Release：`rel_94ba4f715fc3e8b6c9f617c4a5b05fe5`
+- Catalog Release：`rel_38f8bdbb827c5ff822916b1242deb40a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -218,7 +218,7 @@ Create a reproducible environment from four immutable references.
 ```json
 {
   "capability_id": "simulation.environment.create",
-  "catalog_release": "rel_94ba4f715fc3e8b6c9f617c4a5b05fe5",
+  "catalog_release": "rel_38f8bdbb827c5ff822916b1242deb40a",
   "major_version": 1,
   "payload": {
     "execution_plan_ref": {

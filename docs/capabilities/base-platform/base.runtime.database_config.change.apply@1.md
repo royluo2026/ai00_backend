@@ -8,7 +8,7 @@ Save runtime database configuration without exposing stored credentials.
 - 不适用：A business domain needs to access its own governed database.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_94ba4f715fc3e8b6c9f617c4a5b05fe5`
+- Catalog Release：`rel_38f8bdbb827c5ff822916b1242deb40a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -106,7 +106,7 @@ Save runtime database configuration without exposing stored credentials.
 ```json
 {
   "capability_id": "base.runtime.database_config.change.apply",
-  "catalog_release": "rel_94ba4f715fc3e8b6c9f617c4a5b05fe5",
+  "catalog_release": "rel_38f8bdbb827c5ff822916b1242deb40a",
   "major_version": 1,
   "payload": {
     "collab_db": "example",

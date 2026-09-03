@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Mapping, Protocol, Sequence
+from typing import Any, Mapping, Protocol, Sequence
 
 
 @dataclass(frozen=True)
@@ -43,7 +43,16 @@ class KnowledgeOperationsPort(Protocol):
     def health(self, context: object) -> Mapping[str, object]: ...
 
 
+class ResourceModelMappingPort(Protocol):
+    """Typed resource-code resolution without exposing Knowledge storage."""
+
+    def resolve_resource_models(
+        self, items: Sequence[Mapping[str, Any]], context: Any,
+    ) -> Mapping[str, Any]: ...
+
+
 __all__ = [
     "KnowledgeCommandPort", "KnowledgeContextRef", "KnowledgeDocumentRef",
     "KnowledgeOperationsPort", "KnowledgeProposalRef", "KnowledgeQueryPort",
+    "ResourceModelMappingPort",
 ]

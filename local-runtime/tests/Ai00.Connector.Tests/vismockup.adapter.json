@@ -1,0 +1,12 @@
+{
+  "adapter_id": "ai00.vismockup",
+  "adapter_major": 1,
+  "product_id": "siemens.vismockup",
+  "product_version": "14.2.0",
+  "operations": [
+    {
+      "operation_id": "vismockup.application.probe@1",
+      "contract_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  ]
+}

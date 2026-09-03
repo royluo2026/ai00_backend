@@ -11,6 +11,7 @@ from backend.capabilities.validation_next import validate_payload
 from backend.capability_v2.descriptor_adapter import (
     descriptor_from_provider_spec as adapt_v1_spec,
 )
+from backend.capability_v2.business_definition import substantive_business_definition_errors
 from plugins.project_management.project_management_backend.capabilities import (
     register_capabilities,
 )
@@ -83,6 +84,7 @@ def test_all_project_capabilities_have_native_stable_contracts():
         assert descriptor.exposure.plugin is True
         assert descriptor.domain_errors_complete is True
         assert descriptor.domain_errors
+        assert substantive_business_definition_errors(descriptor) == (), spec.id
 
 
 def test_project_capability_version_gid_changes_with_contract_schema():

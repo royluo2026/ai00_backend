@@ -90,7 +90,7 @@
         "plugin_id": "official.craft",
         "module": "craft_backend.capabilities",
         "version": "1.2.0",
-        "artifact_hash": "sha256:166be8e8efe814bc9b67b122c2e8d4d1d60045fabd5f8ac4f2d9fd9208437b64"
+        "artifact_hash": "sha256:449f3feeeedeb279fd92c2d156a678cb01ea3a6e1db680bd0ba82c90862dd5fa"
       },
       "artifact_path": "plugins/craft/craft_backend",
       "allowed_owners": [
@@ -122,7 +122,7 @@
         "plugin_id": "official.device",
         "module": "device_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:34e21eb2cddd975d511c2ed55a2add066c9315ca10d44f7b2929bcaf8ae4d233"
+        "artifact_hash": "sha256:f27bf588918afe5714e8c89559ab39f0f000b93d93272e3f8cdcc87b8fa47d5d"
       },
       "artifact_path": "plugins/device/device_backend",
       "allowed_owners": [
@@ -224,7 +224,7 @@
         "plugin_id": "official.knowledge",
         "module": "knowledge_backend.capabilities",
         "version": "2.0.0",
-        "artifact_hash": "sha256:e373ffa7314fc0c6d7bbd7a828f48c083d76e3702c537cb9edfae9a63feac64f"
+        "artifact_hash": "sha256:0c4694d3f8798be480e644083076ab1481f0fe3cf0e783d5a85d5e6aa2aaf0fa"
       },
       "artifact_path": "plugins/knowledge/knowledge_backend",
       "allowed_owners": [
@@ -278,7 +278,7 @@
         "plugin_id": "official.project-management",
         "module": "project_management_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:5807ab5a2945b4ff1f6e7b8ccd6ba8f5b32417a500edc016f311cce3c0e319f3"
+        "artifact_hash": "sha256:93c59efc1599cdd70d4dd62c1163adb18bb3f77879db5a3d9446643c184870a9"
       },
       "artifact_path": "plugins/project_management/project_management_backend",
       "allowed_owners": [
@@ -304,7 +304,7 @@
         "plugin_id": "official.simulation",
         "module": "simulation_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:5c1fccaa2219f6833c24237667039685e322cefcffc7ca6f0287d28cfc0a2b39"
+        "artifact_hash": "sha256:6e43df06f3c061d9e48be7edbd5c1c1d782d6f27d13bd47b65032b68a6869caf"
       },
       "artifact_path": "plugins/simulation/simulation_backend",
       "allowed_owners": [

@@ -44,3 +44,18 @@ be advertised as the plugin or Agent contract.
 3. The Web legacy-route checker must report zero direct Capability REST calls.
 4. A rollback must restore route, modules and tests as one atomic deployment;
    partial rollback is unsupported because it creates two public contracts.
+
+## Direct VisMockup capability retirement
+
+The direct `vismockup.*@1` capability family is deprecated from the AI00 Web,
+API, plugin, Agent and MCP surfaces. New workflows use
+`simulation.environment.materialize@1` for active-document/BOM validation,
+model attachment and scene construction, and `simulation.capture_run.start@1`
+for reverse-process internal screenshots and Craft screenshot association.
+
+The old operation IDs remain available only inside the AI00 Connector local
+runtime as a bounded compatibility path. They are not an authorization surface
+for arbitrary COM, scripts or MCP calls. Removal requires production usage
+telemetry, a published sunset date, completed fake integration evidence and
+real-workstation VisMockup evidence; until then rollback consists of restoring
+only the prior exposure descriptor, never bypassing signed Connector plans.

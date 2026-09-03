@@ -111,10 +111,16 @@ class ExecutionStructureRepository:
                     "p.quantity, p.unit, p.snapshot_gid, p.material, p.meta, p.created_at, "
                     "p.created_at AS updated_at, p.vpps, p.parent_gid AS parent_part_gid, "
                     "p.component_type AS node_type, p.bom_row AS bom_row_id, "
-                    "p.level AS seq_no, p.part_no AS part_number "
+                    "p.level AS seq_no, p.part_no AS part_number, "
+                    "r.code AS resource_code, r.resource_type AS standard_resource_type "
                     "FROM workmanship_bop_bop_entry_links l "
                     "LEFT JOIN workmanship_bop_pbom p "
                     "ON l.link_type = 'pbom_part' AND p.gid = l.entity_gid "
+                    "LEFT JOIN workmanship_craft_resource_requirements r "
+                    "ON l.link_type IN ('project_tools','physical_tool','tool',"
+                    "'project_tooling','physical_fixture','fixture',"
+                    "'project_equipment','physical_equipment','equipment') "
+                    "AND r.gid = l.entity_gid "
                     "WHERE l.version_gid = %s AND l.is_deleted = 0",
                     (version_gid,),
                 )
@@ -142,6 +148,9 @@ class ExecutionStructureRepository:
                             entity_data["created_at"] = _transport(entity_data["created_at"])
                         if "updated_at" in entity_data:
                             entity_data["updated_at"] = _transport(entity_data["updated_at"])
+                    elif link.get("resource_code") is not None:
+                        entity_data["code"] = link.pop("resource_code")
+                        entity_data["resource_type"] = link.pop("standard_resource_type", None)
                     link["entity_data"] = entity_data
                     links.append(link)
 
@@ -283,6 +292,26 @@ def _normalize(aggregate: BopAggregate) -> dict[str, Any]:
         resource_refs = sorted(
             refs["tool_refs"] + refs["fixture_refs"] + refs["equipment_refs"]
         )
+        products = []
+        resources = []
+        for link in node_links:
+            link_type = str(link.get("link_type") or "")
+            data = _json_object(link.get("entity_data"))
+            if link_type == "pbom_part":
+                products.append({
+                    "product_ref": str(data.get("part_no") or link.get("entity_gid")),
+                    "action": str(data.get("action") or "use"),
+                })
+            resource_type = {
+                "project_tools": "tool", "physical_tool": "tool", "tool": "tool",
+                "project_tooling": "fixture", "physical_fixture": "fixture", "fixture": "fixture",
+                "project_equipment": "equipment", "physical_equipment": "equipment", "equipment": "equipment",
+            }.get(link_type)
+            if resource_type:
+                resources.append({
+                    "resource_type": resource_type,
+                    "code": str(data.get("code") or data.get("resource_code") or link.get("entity_gid")),
+                })
         operations.append(
             {
                 "operation_id": gid,
@@ -293,6 +322,8 @@ def _normalize(aggregate: BopAggregate) -> dict[str, Any]:
                 "resource_refs": resource_refs,
                 "model_refs": [],
                 "part_refs": refs["part_refs"],
+                "products": sorted(products, key=lambda item: (item["product_ref"], item["action"])),
+                "resources": sorted(resources, key=lambda item: (item["resource_type"], item["code"])),
                 "knowledge_refs": refs["knowledge_refs"],
                 "rule_refs": refs["rule_refs"],
                 "parameters": {"parent_node_id": parent_gid, "vpps": entry.get("vpps")},

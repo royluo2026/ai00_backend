@@ -22,13 +22,14 @@ def test_agent_and_mcp_views_are_exact_release_bound_projections():
         assert actual == expected
 
 
-def test_openapi_uses_the_only_public_capability_url_for_every_descriptor():
+def test_openapi_uses_the_only_public_capability_url_for_every_api_descriptor():
     catalog = document("docs/capabilities/catalog.v2.json")
     paths = document("docs/capabilities/openapi-fragment.v2.json")["paths"]
 
     assert set(paths) == {
         f'/api/v1/capabilities/{item["id"]}:invoke'
         for item in catalog["capabilities"]
+        if item["exposure"]["api"]
     }
     assert not any(path.startswith("/api/v2/capabilities") for path in paths)
 

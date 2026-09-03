@@ -60,7 +60,65 @@ _DOMAIN_ERRORS = (
         code="self_review_forbidden",
         meaning="Proposal creators cannot approve or reject their own proposal.",
     ),
+    DomainErrorContract(
+        code="resource_type_invalid",
+        meaning="The supplied resource type is not tool, equipment, or fixture.",
+    ),
+    DomainErrorContract(
+        code="resource_code_invalid",
+        meaning="The supplied resource code is blank after normalization.",
+    ),
+    DomainErrorContract(
+        code="mapping_batch_limit_exceeded",
+        meaning="The resolver request contains more than 500 unique typed codes.",
+    ),
+    DomainErrorContract(
+        code="mapping_candidate_limit_exceeded",
+        meaning="One typed resource code has more than 100 active model mappings.",
+    ),
+    DomainErrorContract(
+        code="mapping_snapshot_changed",
+        meaning="The requested mapping snapshot is no longer current.",
+    ),
+    DomainErrorContract(
+        code="mapping_data_invalid",
+        meaning="A stored resource mapping is not a valid immutable Digital Model reference.",
+    ),
+    DomainErrorContract(
+        code="tenant_context_required",
+        meaning="Resource mappings cannot be resolved without an authenticated tenant scope.",
+    ),
 )
+
+
+def _business_definition(spec, *, is_write: bool) -> dict[str, object]:
+    operation = (
+        spec.id.split(".atomic.", 1)[1].replace("_", " ")
+        if ".atomic." in spec.id else spec.id.removeprefix("knowledge.").replace(".", " ")
+    )
+    return {
+        "business_effect": (
+            f"Authorized knowledge contributors can apply the requested {operation} change "
+            "within their active tenant and receive its governed outcome."
+            if is_write else
+            f"Authorized users can inspect the requested {operation} knowledge result "
+            "within their active tenant."
+        ),
+        "business_acceptance_criteria": (
+            "The Provider evaluates the request only within the authenticated active tenant.",
+            "The returned data conforms to the Capability's closed output contract.",
+            (
+                "The requested change is committed once, or the Provider returns a governed error without reporting success."
+                if is_write else
+                "The read does not mutate Knowledge business state."
+            ),
+        ),
+        "business_invariants": (),
+        "no_business_invariant_reason": (
+            "This Capability introduces no additional business invariant beyond the Knowledge "
+            "Provider's tenant authorization, closed schema, and transaction policies."
+        ),
+    }
 
 
 def descriptor_for(spec):
@@ -83,6 +141,7 @@ def descriptor_for(spec):
             mcp=not deprecated,
             worker=spec.id in {
                 "knowledge.proposal.outbox.retry", "knowledge.reference_dataset.publish",
+                "knowledge.resource_model_mapping.resolve",
             },
         ),
         "exposure_policy_source": "provider_explicit",
@@ -108,13 +167,28 @@ def descriptor_for(spec):
         # Reliability therefore records an externally consistent outcome and never
         # pretends to enlist that commit in the Base outcome transaction.
         "consistency_policy": "external" if is_write else "strong",
-        "evidence_policy": "required" if spec.id.startswith("knowledge.document.") else "optional",
+        "evidence_policy": "required" if (
+            spec.id.startswith("knowledge.document.")
+            or spec.id == "knowledge.resource_model_mapping.resolve"
+        ) else "optional",
         "domain_errors": _DOMAIN_ERRORS,
         "domain_errors_complete": True,
         "deprecation_message": (
             f"Use {spec.replaced_by}." if deprecated and spec.replaced_by else None
         ),
+        **_business_definition(spec, is_write=is_write),
     }
+    if spec.id == "knowledge.resource_model_mapping.resolve":
+        updates.update({
+            "business_effect": "Resolve each typed process resource code to one exact governed tool, equipment or fixture model version, returning all missing or ambiguous mappings.",
+            "business_acceptance_criteria": (
+                "Resolution preserves the caller-provided resource type and normalized code identity.",
+                "Every resolved item contains one immutable model and model-version reference.",
+                "Missing, ambiguous and over-limit mappings return governed diagnostics without selecting a candidate implicitly.",
+            ),
+            "business_invariants": (),
+            "no_business_invariant_reason": "This read applies existing governed mappings and returns deterministic diagnostics; it does not create, choose or mutate a mapping.",
+        })
     return CapabilityDescriptorV2.model_validate({**descriptor.model_dump(), **updates})
 
 

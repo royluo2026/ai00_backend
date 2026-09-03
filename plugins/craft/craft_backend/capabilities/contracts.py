@@ -839,7 +839,7 @@ _BOP_ENTRY_UPDATES = _object({
     name: {"description": "Provider-validated entry field value."}
     for name in (
         "parent_gid", "node_type", "sort_order", "title", "vpps", "vpps_desc",
-        "parent_bop_title", "process_flow_pic", "cad_sim_pics", "meta",
+        "parent_bop_title", "process_flow_pic", "process_chart_pic", "cad_sim_pics", "meta",
     )
 })
 _BOP_PROPERTY_UPDATE = _object({
@@ -858,7 +858,7 @@ OUTPUT_SCHEMAS[("craft.bop.entry.change.apply", 1)] = _object({
             "gid", "version_gid", "parent_gid", "node_type", "sort_order", "level",
             "ai00_level", "title", "vpps", "vpps_desc", "parent_bop_title",
             "child_vpps", "owner_gid", "created_by", "meta", "created_at",
-            "updated_at", "process_flow_pic", "link_gid", "link_type",
+            "updated_at", "process_flow_pic", "process_chart_pic", "link_gid", "link_type",
             "entity_gid", "entity_data",
         ),
         "deleted": BOOLEAN,
@@ -867,7 +867,13 @@ OUTPUT_SCHEMAS[("craft.bop.entry.change.apply", 1)] = _object({
     "warnings": {"type": "array", "maxItems": 200, "items": {"description": "Advisory rule violation."}},
 }, required=("data",))
 INPUT_SCHEMAS[("craft.bop.picture.upload", 1)] = _object({"filename": STRING, "mime": STRING, "data_b64": STRING}, required=("filename", "mime", "data_b64"))
-OUTPUT_SCHEMAS[("craft.bop.picture.upload", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
+OUTPUT_SCHEMAS[("craft.bop.picture.upload", 1)] = _object({
+    "data": _object({
+        "url": STRING,
+        "object_key": STRING,
+        "storage": STRING,
+    }, required=("url",)),
+}, required=("data",))
 INPUT_SCHEMAS[("craft.bop.lifecycle.state.change.apply", 1)] = _object({"operation": {"type": "string", "enum": ["init.update", "phase.confirm"]}, "version_gid": STRING, "route": {"type": ["string", "null"]}, "checklist": LIFECYCLE_CHECKLIST, "note": {"type": ["string", "null"]}}, required=("operation", "version_gid"))
 OUTPUT_SCHEMAS[("craft.bop.lifecycle.state.change.apply", 1)] = _object({"data": _object({"lifecycle_state": LIFECYCLE_STATE, "lifecycle_phase": {"type": "string"}})}, required=("data",))
 INPUT_SCHEMAS[("craft.bop.lifecycle.checkpoint.change.apply", 1)] = _object({"operation": {"type": "string", "enum": ["create"]}, "version_gid": STRING, "line_gid": STRING, "label": {"type": ["string", "null"]}}, required=("operation", "version_gid", "line_gid"))
@@ -1009,6 +1015,27 @@ from .resource_requirements import SCHEMAS as _RESOURCE_REQUIREMENT_SCHEMAS
 for _capability_id, (_input_schema, _output_schema) in _RESOURCE_REQUIREMENT_SCHEMAS.items():
     INPUT_SCHEMAS[(_capability_id, 1)] = _input_schema
     OUTPUT_SCHEMAS[(_capability_id, 1)] = _output_schema
+
+_ARTIFACT_REF = _object({
+    "artifact_id": STRING,
+    "media_type": STRING,
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "byte_size": {"type": "integer", "minimum": 0},
+    "version": {"type": "integer", "minimum": 1},
+}, required=("artifact_id", "media_type", "sha256", "byte_size", "version"))
+INPUT_SCHEMAS[("craft.process_screenshot.attach", 1)] = _object({
+    "bop_version_gid": STRING,
+    "operation_id": STRING,
+    "capture_run_id": STRING,
+    "artifact_ref": _ARTIFACT_REF,
+}, required=("bop_version_gid", "operation_id", "capture_run_id", "artifact_ref"))
+OUTPUT_SCHEMAS[("craft.process_screenshot.attach", 1)] = _object({
+    "screenshot_gid": STRING,
+    "bop_version_gid": STRING,
+    "operation_id": STRING,
+    "capture_run_id": STRING,
+    "artifact_ref": _ARTIFACT_REF,
+}, required=("screenshot_gid", "bop_version_gid", "operation_id", "capture_run_id", "artifact_ref"))
 
 
 def input_schema_for(capability_id: str, major_version: int) -> dict[str, Any]:

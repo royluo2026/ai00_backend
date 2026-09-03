@@ -8,7 +8,7 @@ Execute the reviewed project.notification.change.apply project outcome.
 - 不适用：The operation belongs to another domain.
 - 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_94ba4f715fc3e8b6c9f617c4a5b05fe5`
+- Catalog Release：`rel_38f8bdbb827c5ff822916b1242deb40a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -340,7 +340,7 @@ Execute the reviewed project.notification.change.apply project outcome.
 ```json
 {
   "capability_id": "project.notification.change.apply",
-  "catalog_release": "rel_94ba4f715fc3e8b6c9f617c4a5b05fe5",
+  "catalog_release": "rel_38f8bdbb827c5ff822916b1242deb40a",
   "major_version": 1,
   "payload": {
     "arguments": {},

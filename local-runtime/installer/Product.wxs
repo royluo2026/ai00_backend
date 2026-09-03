@@ -1,0 +1,37 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="AI00 Connector" Manufacturer="AI00" Version="1.0.0" UpgradeCode="0E32A2D0-CDEA-43E9-9EAA-1A418F590EB4" Scope="perMachine">
+    <MajorUpgrade DowngradeErrorMessage="A newer AI00 Connector is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="AI00 Connector">
+        <Component Id="Ai00ConnectorServiceComponent" Guid="*">
+          <File Id="Ai00ConnectorServiceExe" Source="$(var.ServicePublishDir)\Ai00.Connector.Service.exe" KeyPath="yes" />
+          <ServiceInstall Id="Ai00ConnectorService" Name="AI00Connector" DisplayName="AI00 Connector" Start="auto" Type="ownProcess" ErrorControl="normal" Account="NT AUTHORITY\LocalService" />
+          <ServiceControl Id="StartAi00Connector" Name="AI00Connector" Start="install" Stop="both" Remove="uninstall" Wait="yes" />
+        </Component>
+        <Component Id="Ai00ConnectorSessionHost" Guid="*">
+          <File Id="Ai00ConnectorSessionHostExe" Source="$(var.SessionHostPublishDir)\Ai00.Connector.SessionHost.exe" KeyPath="yes" />
+        </Component>
+        <Component Id="Ai00ConnectorTray" Guid="*">
+          <File Id="Ai00ConnectorTrayExe" Source="$(var.TrayPublishDir)\Ai00.Connector.Tray.exe" KeyPath="yes" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+    <StandardDirectory Id="CommonAppDataFolder">
+      <Directory Id="Ai00ProgramData" Name="AI00">
+        <Directory Id="Ai00ConnectorProgramData" Name="Connector">
+          <Component Id="Ai00ConnectorProgramDataAcl" Guid="*">
+            <CreateFolder />
+            <RegistryValue Root="HKLM" Key="Software\AI00\Connector" Name="BoundUserStartupTask" Value="AI00 Connector SessionHost" Type="string" KeyPath="yes" />
+          </Component>
+        </Directory>
+      </Directory>
+    </StandardDirectory>
+    <Feature Id="Complete" Title="AI00 Connector" Level="1">
+      <ComponentRef Id="Ai00ConnectorServiceComponent" />
+      <ComponentRef Id="Ai00ConnectorSessionHost" />
+      <ComponentRef Id="Ai00ConnectorTray" />
+      <ComponentRef Id="Ai00ConnectorProgramDataAcl" />
+    </Feature>
+  </Package>
+</Wix>

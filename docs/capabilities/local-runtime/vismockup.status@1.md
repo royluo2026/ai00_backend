@@ -6,9 +6,9 @@ Read VisMockup connection state.
 
 - 适用：Read VisMockup connection state.
 - 不适用：Use the owning domain's governed Capability.
-- 生命周期：`stable`
+- 生命周期：`deprecated`
 - 所属领域：`device`
-- Catalog Release：`rel_94ba4f715fc3e8b6c9f617c4a5b05fe5`
+- Catalog Release：`rel_38f8bdbb827c5ff822916b1242deb40a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -16,11 +16,11 @@ Read VisMockup connection state.
 
 | 消费者 | 状态 |
 |---|---|
-| web | 可用 |
-| plugin | 可用 |
-| agent | 可用 |
-| api | 可用 |
-| mcp | 可用 |
+| web | 不可用 |
+| plugin | 不可用 |
+| agent | 不可用 |
+| api | 不可用 |
+| mcp | 不可用 |
 | worker | 不可用 |
 | local_runtime | 可用 |
 
@@ -87,7 +87,7 @@ Read VisMockup connection state.
 ```json
 {
   "capability_id": "vismockup.status",
-  "catalog_release": "rel_94ba4f715fc3e8b6c9f617c4a5b05fe5",
+  "catalog_release": "rel_38f8bdbb827c5ff822916b1242deb40a",
   "major_version": 1,
   "payload": {
     "device_id": "example"

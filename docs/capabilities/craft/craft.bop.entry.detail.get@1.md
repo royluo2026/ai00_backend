@@ -8,7 +8,7 @@ Read the full governed detail of one BOP entry at an exact revision.
 - 不适用：A consumer is rendering a BOP list or outline.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_94ba4f715fc3e8b6c9f617c4a5b05fe5`
+- Catalog Release：`rel_38f8bdbb827c5ff822916b1242deb40a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -97,7 +97,7 @@ Read the full governed detail of one BOP entry at an exact revision.
 ```json
 {
   "capability_id": "craft.bop.entry.detail.get",
-  "catalog_release": "rel_94ba4f715fc3e8b6c9f617c4a5b05fe5",
+  "catalog_release": "rel_38f8bdbb827c5ff822916b1242deb40a",
   "major_version": 1,
   "payload": {
     "entry_gid": "example",
@@ -785,6 +785,7 @@ Read the full governed detail of one BOP entry at an exact revision.
 - `resource_staging_not_found`：The requested TC resource staging row does not exist.（retryable=false）
 - `resource_staging_conflict`：The staging row was already decided or changed.（retryable=false）
 - `resource_type_mismatch`：The selected standard does not match the staged resource type.（retryable=false）
+- `screenshot_artifact_invalid`：The supplied screenshot is not a valid finalized image ArtifactRef.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

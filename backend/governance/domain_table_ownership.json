@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "registry_version": 1,
-  "table_count": 255,
+  "table_count": 267,
   "tables": [
     {
       "table": "workmanship_agent_canvas_audit_events",
@@ -862,6 +862,12 @@
       "legacy_name": false
     },
     {
+      "table": "workmanship_craft_process_screenshots",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
       "table": "workmanship_craft_resource_aliases",
       "owner": "craft",
       "runtime_domain": "craft",
@@ -908,6 +914,24 @@
       "owner": "base",
       "runtime_domain": "base",
       "legacy_name": true
+    },
+    {
+      "table": "workmanship_device_connector_health",
+      "owner": "device",
+      "runtime_domain": "device",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_device_connector_heartbeat_audit",
+      "owner": "device",
+      "runtime_domain": "device",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_device_connector_plans",
+      "owner": "device",
+      "runtime_domain": "device",
+      "legacy_name": false
     },
     {
       "table": "workmanship_factory_assets",
@@ -1144,6 +1168,12 @@
       "legacy_name": true
     },
     {
+      "table": "workmanship_knowledge_resource_model_mappings",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "legacy_name": false
+    },
+    {
       "table": "workmanship_knowledge_schema_migrations",
       "owner": "knowledge",
       "runtime_domain": "knowledge",
@@ -1348,7 +1378,49 @@
       "legacy_name": true
     },
     {
+      "table": "workmanship_sim_capture_artifact_refs",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_capture_runs",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_capture_steps",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_connector_environments",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_environment_bindings",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_environment_manifests",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
       "table": "workmanship_sim_environments",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_materialization_runs",
       "owner": "simulation",
       "runtime_domain": "simulation",
       "legacy_name": false

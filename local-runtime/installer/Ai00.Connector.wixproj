@@ -1,0 +1,11 @@
+<Project Sdk="WixToolset.Sdk/5.0.2">
+  <PropertyGroup>
+    <OutputName>AI00.Connector</OutputName>
+    <InstallerPlatform>x64</InstallerPlatform>
+    <ServicePublishDir Condition="'$(ServicePublishDir)' == ''">$(MSBuildThisFileDirectory)..\src\Ai00.Connector.Service\bin\$(Configuration)\net8.0-windows</ServicePublishDir>
+    <SessionHostPublishDir Condition="'$(SessionHostPublishDir)' == ''">$(MSBuildThisFileDirectory)..\src\Ai00.Connector.SessionHost\bin\$(Configuration)\net8.0-windows</SessionHostPublishDir>
+    <TrayPublishDir Condition="'$(TrayPublishDir)' == ''">$(MSBuildThisFileDirectory)..\src\Ai00.Connector.Tray\bin\$(Configuration)\net8.0-windows</TrayPublishDir>
+    <DefineConstants>ServicePublishDir=$(ServicePublishDir);SessionHostPublishDir=$(SessionHostPublishDir);TrayPublishDir=$(TrayPublishDir)</DefineConstants>
+    <SuppressValidation Condition="'$(CI)' != 'true'">true</SuppressValidation>
+  </PropertyGroup>
+</Project>

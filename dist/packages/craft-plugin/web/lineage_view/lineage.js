@@ -2722,7 +2722,7 @@ async function _uploadBopPic(file) {
       const b64     = dataUrl.slice(comma + 1);
       try {
         const res = await _invokeCapability('craft.bop.picture.upload', 1, {
-          filename: file.name,
+          filename: file.name || `clipboard-${Date.now()}.png`,
           mime,
           data_b64: b64,
         });

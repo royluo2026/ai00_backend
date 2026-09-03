@@ -10,6 +10,7 @@ from backend.capabilities.models_next import CapabilityContext
 from backend.capabilities.registry_next import CapabilityRegistry
 from backend.capabilities.validation_next import validate_payload
 from backend.capability_v2.revision.simulation_adapter import SimulationRevisionAdapter
+from backend.capability_v2.business_definition import substantive_business_definition_errors
 from backend.domain_ports.simulation import SimulationEnvironmentRef
 from plugins.simulation.simulation_backend.capabilities import register_capabilities
 from plugins.simulation.simulation_backend.capabilities import models as simulation_capabilities
@@ -34,6 +35,16 @@ CAPABILITY_IDS = {
     "simulation.run.search",
     "simulation.result.get",
     "simulation.result.compare",
+    "simulation.environment.compose",
+    "simulation.environment.manifest.get",
+    "simulation.environment.manifest.search",
+    "simulation.environment.manifest.archive",
+    "simulation.environment.preflight",
+    "simulation.environment.materialize",
+    "simulation.capture_run.start",
+    "simulation.capture_run.get",
+    "simulation.capture_run.cancel",
+    "simulation.capture_step.retry",
 }
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -105,6 +116,14 @@ def test_provider_publishes_native_stable_plugin_agent_and_mcp_contracts():
         if error.retryable
     }
     assert retryable_errors == {"source_resolver_unavailable", "simulation_result_not_ready"}
+
+
+def test_connector_environment_capabilities_have_author_controlled_business_definitions():
+    registry = CapabilityRegistry()
+    register_capabilities(registry)
+    for registration in registry.snapshot():
+        if "connector_environment" in registration.spec.tags:
+            assert substantive_business_definition_errors(registration.descriptor) == (), registration.spec.id
 
 
 @pytest.mark.parametrize("value", [1, 1.5, "fixed", True])

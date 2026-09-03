@@ -298,16 +298,17 @@ def prepare_resumable_statement(conn, statement: str) -> str | None:
             flags=re.I,
         )
 
-    if re.search(
-        r"\bUPDATE\s+workmanship_know_craft_rules\s+SET\s+owner_user_gid\s*=\s*creator_gid\b",
-        strip_sql_comments(statement),
-        re.I,
-    ):
+    legacy_column_backfill = re.search(
+        r"\bUPDATE\s+`?([A-Za-z0-9_]+)`?\s+SET\s+owner_user_gid\s*=\s*creator_gid\b",
+        strip_sql_comments(statement), re.I,
+    )
+    if legacy_column_backfill:
+        table = legacy_column_backfill.group(1)
         with conn.cursor() as cur:
             cur.execute(
                 "SELECT COUNT(*) FROM information_schema.COLUMNS "
                 "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s AND COLUMN_NAME=%s",
-                ("workmanship_know_craft_rules", "creator_gid"),
+                (table, "creator_gid"),
             )
             creator_exists = int(_scalar(cur.fetchone())) > 0
         if not creator_exists:
@@ -423,17 +424,6 @@ def prepare_resumable_statement(conn, statement: str) -> str | None:
             )
             exists = int(_scalar(cur.fetchone())) > 0
         return statement if exists else None
-
-    normalized = strip_sql_comments(statement)
-    if re.match(r"^UPDATE\s+workmanship_know_craft_rules\b", normalized, re.I) and re.search(r"\bcreator_gid\b", normalized, re.I):
-        with conn.cursor() as cur:
-            cur.execute(
-                "SELECT COUNT(*) FROM information_schema.COLUMNS "
-                "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s AND COLUMN_NAME=%s",
-                ("workmanship_know_craft_rules", "creator_gid"),
-            )
-            if int(_scalar(cur.fetchone())) == 0:
-                return None
 
     return statement
 

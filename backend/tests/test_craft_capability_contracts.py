@@ -48,6 +48,7 @@ STABLE_CAPABILITIES = {
     "craft.pbom.version.publish",
     "craft.pbom.version.search",
     "craft.pbom.version.submit",
+    "craft.process_screenshot.attach",
     "craft.library.read",
     "craft.library.change.apply",
     "craft.standard_operation.read",
@@ -177,6 +178,7 @@ def test_all_stable_craft_capabilities_have_native_open_contracts():
 def test_changed_craft_provider_descriptors_have_substantive_business_definitions():
     registrations = _registrations()
     changed = {
+        "craft.process_screenshot.attach",
         "craft.bop.entry.detail.get",
         "craft.bop.entry.relation.list",
         "craft.bop.lifecycle.state.change.apply",

@@ -1,14 +1,14 @@
 {
   "counts": {
-    "columns": 2580,
-    "constraints": 6,
-    "indexes": 592,
-    "source_files": 70,
-    "tables": 226
+    "columns": 2701,
+    "constraints": 13,
+    "indexes": 616,
+    "source_files": 74,
+    "tables": 238
   },
   "database_name": "ai00_test",
   "isolation_profile": "single_database_domain_tables",
-  "schema_sha256": "sha256:bf66b26303b7a31d648951ce251ac1d5bb9778b32bdb4d366dd67d4efb407c01",
+  "schema_sha256": "sha256:45951d1659de6115240d2e9f7d463a637014467bfd5c595e810166af389c371e",
   "schema_version": 1,
   "status": "complete",
   "unsupported_statements": 0

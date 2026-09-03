@@ -1748,6 +1748,30 @@
         }
       }
     },
+    "knowledge.resource_model_mapping.resolve": {
+      "kind": "new",
+      "function_dispositions": {
+        "capability:knowledge.resource_model_mapping.resolve": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/knowledge/knowledge_backend/capabilities/resource_model_mapping.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "Knowledge resolves typed process-resource codes to immutable governed Digital Model references without selecting ambiguous candidates.",
+          "reviewer": "simulation-capability-integration",
+          "reviewed_at": "2026-09-03"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {"enabled": true, "reason": "Reviewed simulation workflows require governed resource-model resolution.", "policy_ref": "knowledge.resource_model_mapping.resolve"},
+        "rest": {"enabled": true, "reason": "Reviewed HTTP consumers use the shared Capability Gateway.", "policy_ref": "knowledge.resource_model_mapping.resolve"},
+        "plugin": {"enabled": true, "reason": "Simulation composes this Knowledge-owned read through the Gateway.", "policy_ref": "knowledge.resource_model_mapping.resolve"},
+        "agent": {"enabled": true, "reason": "Governed agents may resolve explicitly typed resource codes.", "policy_ref": "knowledge.resource_model_mapping.resolve"},
+        "mcp": {"enabled": true, "reason": "Governed MCP consumers use the same closed contract.", "policy_ref": "knowledge.resource_model_mapping.resolve"},
+        "local_runtime": {"enabled": false, "reason": "The Connector receives resolved immutable references in its execution plan.", "policy_ref": "knowledge.resource_model_mapping.resolve"}
+      }
+    },
     "knowledge.space.search": {
       "kind": "existing",
       "function_dispositions": {

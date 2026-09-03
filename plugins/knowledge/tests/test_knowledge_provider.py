@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from backend.capability_v2.schema_validation import validate_payload
+from backend.capability_v2.business_definition import substantive_business_definition_errors
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -24,6 +25,9 @@ def test_knowledge_provider_is_complete_against_frozen_review():
         if ".atomic." not in descriptor.id
     } == set(review["capabilities"])
     assert {descriptor.owner_domain for _, descriptor in registry.items} == {"knowledge"}
+    for spec, descriptor in registry.items:
+        if descriptor.lifecycle_status.value == "stable":
+            assert substantive_business_definition_errors(descriptor) == (), spec.id
 
 
 def test_knowledge_official_artifact_is_independent_plugin():

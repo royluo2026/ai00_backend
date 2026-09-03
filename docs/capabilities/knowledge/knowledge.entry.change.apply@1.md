@@ -8,7 +8,7 @@ Execute knowledge.entry.change.apply.
 - 不适用：The resource belongs to another domain.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_94ba4f715fc3e8b6c9f617c4a5b05fe5`
+- Catalog Release：`rel_38f8bdbb827c5ff822916b1242deb40a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -255,7 +255,7 @@ Execute knowledge.entry.change.apply.
 ```json
 {
   "capability_id": "knowledge.entry.change.apply",
-  "catalog_release": "rel_94ba4f715fc3e8b6c9f617c4a5b05fe5",
+  "catalog_release": "rel_38f8bdbb827c5ff822916b1242deb40a",
   "major_version": 1,
   "payload": {
     "arguments": {},
@@ -352,6 +352,13 @@ Execute knowledge.entry.change.apply.
 - `knowledge_storage_unavailable`：The immutable Knowledge object store is unavailable.（retryable=true）
 - `publication_in_progress`：Another worker owns the current publication lease.（retryable=true）
 - `self_review_forbidden`：Proposal creators cannot approve or reject their own proposal.（retryable=false）
+- `resource_type_invalid`：The supplied resource type is not tool, equipment, or fixture.（retryable=false）
+- `resource_code_invalid`：The supplied resource code is blank after normalization.（retryable=false）
+- `mapping_batch_limit_exceeded`：The resolver request contains more than 500 unique typed codes.（retryable=false）
+- `mapping_candidate_limit_exceeded`：One typed resource code has more than 100 active model mappings.（retryable=false）
+- `mapping_snapshot_changed`：The requested mapping snapshot is no longer current.（retryable=false）
+- `mapping_data_invalid`：A stored resource mapping is not a valid immutable Digital Model reference.（retryable=false）
+- `tenant_context_required`：Resource mappings cannot be resolved without an authenticated tenant scope.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

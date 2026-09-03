@@ -2064,14 +2064,14 @@ class LayoutMode {
       <div id="_picDlgAreaFlow"></div>
       <div style="font-size:11px;color:var(--overlay0,#6c7086);margin-top:8px;padding:6px 8px;
            background:var(--base,#1e1e2e);border-radius:4px;border:1px dashed var(--surface2,#585b70);
-           text-align:center;cursor:pointer" id="_picDlgPasteHintFlow">
+           text-align:center;cursor:pointer" id="_picDlgPasteHintFlow" tabindex="0">
         📋 点击此处后按 Ctrl+V 粘贴到工艺流程图
       </div>
       <div style="font-size:11px;font-weight:600;color:var(--subtext0,#a6adc8);margin:14px 0 4px">工艺卡图片</div>
       <div id="_picDlgAreaChart"></div>
       <div style="font-size:11px;color:var(--overlay0,#6c7086);margin-top:8px;padding:6px 8px;
            background:var(--base,#1e1e2e);border-radius:4px;border:1px dashed var(--surface2,#585b70);
-           text-align:center;cursor:pointer" id="_picDlgPasteHintChart">
+           text-align:center;cursor:pointer" id="_picDlgPasteHintChart" tabindex="0">
         📋 点击此处后按 Ctrl+V 粘贴到工艺卡图片
       </div>
       <div class="lv-modal-actions">
@@ -2110,6 +2110,7 @@ class LayoutMode {
       const activeTarget = dlg.dataset.pasteTarget === 'chart' ? 'chart' : 'flow';
       for (const item of items) {
         if (item.type.startsWith('image/')) {
+          e.preventDefault();
           const file = item.getAsFile();
           const targetList = activeTarget === 'chart' ? pendingChartPics : pendingFlowPics;
           const hintId = activeTarget === 'chart' ? '#_picDlgPasteHintChart' : '#_picDlgPasteHintFlow';
@@ -2124,7 +2125,9 @@ class LayoutMode {
               else pendingFlowPics = targetList;
               refresh();
             }
-          } catch (err) { /* ignore */ }
+          } catch (err) {
+            this._data?.toast?.('图片上传失败: ' + (err?.message || String(err)), 'error');
+          }
           if (hint) hint.textContent = activeTarget === 'chart'
             ? '📋 点击此处后按 Ctrl+V 粘贴到工艺卡图片'
             : '📋 点击此处后按 Ctrl+V 粘贴到工艺流程图';

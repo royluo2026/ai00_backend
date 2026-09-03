@@ -18,7 +18,7 @@ from ..routers._bop._helpers import _check_line_editable, _log_entry_op, _sync_c
 
 
 OPERATIONS = ("update", "delete")
-_UPDATE_FIELDS = frozenset({"parent_gid", "node_type", "sort_order", "title", "vpps", "vpps_desc", "parent_bop_title", "process_flow_pic", "cad_sim_pics", "meta"})
+_UPDATE_FIELDS = frozenset({"parent_gid", "node_type", "sort_order", "title", "vpps", "vpps_desc", "parent_bop_title", "process_flow_pic", "process_chart_pic", "cad_sim_pics", "meta"})
 _OWNED_ENTITY_TYPES = frozenset({"bop_line", "bop_station", "bop_process", "bop_steps", "bop_operator"})
 _ENTITY_TITLE_SYNC = {
     "bop_line": ("workmanship_bop_bop_line", "title"),
@@ -293,7 +293,8 @@ def apply_bop_entry_change(payload: dict[str, Any], context: CapabilityContext) 
 
     with get_craft_conn() as conn, conn.cursor() as cur:
         cur.execute(
-            "SELECT e.gid,e.version_gid,e.parent_gid,e.node_type,e.title,e.vpps,e.vpps_desc,e.parent_bop_title,e.meta "
+            "SELECT e.gid,e.version_gid,e.parent_gid,e.node_type,e.title,e.vpps,e.vpps_desc,e.parent_bop_title,"
+            "e.process_flow_pic,e.process_chart_pic,e.meta "
             "FROM workmanship_bop_bop_entries e WHERE e.gid=%s AND e.is_deleted=FALSE",
             (entry_gid,),
         )
@@ -319,6 +320,9 @@ def apply_bop_entry_change(payload: dict[str, Any], context: CapabilityContext) 
             if "process_flow_pic" in updates:
                 sets.append("process_flow_pic=%s")
                 values.append(_json(updates["process_flow_pic"]))
+            if "process_chart_pic" in updates:
+                sets.append("process_chart_pic=%s")
+                values.append(_json(updates["process_chart_pic"]))
             if "cad_sim_pics" in updates:
                 sets.append("meta=JSON_SET(IFNULL(meta,'{}'),'$.cad_sim_pics',CAST(%s AS JSON))")
                 values.append(_json(updates["cad_sim_pics"]))
@@ -388,8 +392,17 @@ def apply_bop_entry_change(payload: dict[str, Any], context: CapabilityContext) 
                 continue
             table_info = _LINK_TARGET_TABLES.get(link["link_type"])
             if table_info:
-                cur.execute(f"UPDATE {table_info[0]} SET deleted_at=NOW() WHERE {table_info[1]}=%s AND deleted_at IS NULL", (link["entity_gid"],))
-        cur.execute("UPDATE workmanship_bop_bop_entry_links SET deleted_at=NOW() WHERE entry_gid=%s AND deleted_at IS NULL", (entry_gid,))
+                cur.execute(
+                    f"UPDATE {table_info[0]} SET is_deleted=TRUE, deleted_at=NOW() "
+                    f"WHERE {table_info[1]}=%s AND is_deleted=FALSE AND deleted_at IS NULL",
+                    (link["entity_gid"],),
+                )
+        cur.execute(
+            "UPDATE workmanship_bop_bop_entry_links "
+            "SET is_deleted=TRUE, deleted_at=NOW() "
+            "WHERE entry_gid=%s AND is_deleted=FALSE AND deleted_at IS NULL",
+            (entry_gid,),
+        )
         if current.get("parent_gid"):
             _sync_child_vpps(cur, current["parent_gid"], version_gid)
         _log_entry_op(cur, version_gid=version_gid, entry_gid=entry_gid, entry_title=current.get("title") or "", op_type="delete_entry",

@@ -55,6 +55,7 @@ _RESOURCE_FIELDS: dict[str, tuple[tuple[str, str], ...]] = {
     "craft.bop.draft.change.preview": (("craft-bop-version", "version_gid"),),
     "craft.bop.draft.change.apply": (("craft-bop-preview", "preview_gid"),),
     "craft.bop.version.archive": (("craft-bop-version", "version_gid"),),
+    "craft.process_screenshot.attach": (("craft-bop-version", "bop_version_gid"),),
 }
 
 _EXPECTED_REVISION = {
@@ -77,6 +78,33 @@ _BOP_IMPORT_PREVIEW_ID = "craft.bop.import.preview"
 _BOP_ENTRY_BULK_CHANGE_ID = "craft.bop.entry.bulk.change.apply"
 _LIBRARY_CHANGE_ID = "craft.library.change.apply"
 _CRAFT_BUSINESS_DEFINITIONS = {
+    "craft.bop.picture.upload": (
+        "Store one bounded image and return its governed URL for later attachment to a BOP entry or process view.",
+        (
+            "The accepted payload is an image MIME type whose decoded content does not exceed five megabytes.",
+            "A successful result contains one URL conforming to the closed upload-result contract.",
+            "Invalid filenames, MIME types or base64 content return a governed error without reporting an uploaded asset.",
+        ),
+        "This capability stores an image asset but does not itself attach or mutate any BOP business entity.",
+    ),
+    "craft.bop.entry.change.apply": (
+        "Create, update or delete one governed BOP entry together with its entry-owned relationship projection.",
+        (
+            "The target entry belongs to the requested BOP version and caller-visible scope.",
+            "Create and update return the persisted entry projection at the resulting BOP revision.",
+            "Delete retires the entry and its active entry links in one Craft transaction without leaving visible dangling relationships.",
+        ),
+        "BOP entry identity, revision and relationship consistency are enforced by the Craft entry-change Provider transaction.",
+    ),
+    "craft.process_screenshot.attach": (
+        "Idempotently associate one finalized screenshot ArtifactRef with one exact BOP operation and update its current screenshot projection.",
+        (
+            "The BOP version and operation exist and match the requested identity.",
+            "The ArtifactRef is finalized, immutable, image-typed and authorized for the target BOP version.",
+            "The same capture run and operation return the same association; a different artifact is rejected.",
+        ),
+        "The write preserves screenshot history and updates the operation projection in one Craft transaction.",
+    ),
     "craft.bop.entry.detail.get": (
         "Return the governed BOP entry, its bounded links and allowlisted linked-entity projection at one exact revision.",
         (
@@ -376,6 +404,7 @@ _DOMAIN_ERRORS = tuple(
         ("resource_staging_not_found", "The requested TC resource staging row does not exist."),
         ("resource_staging_conflict", "The staging row was already decided or changed."),
         ("resource_type_mismatch", "The selected standard does not match the staged resource type."),
+        ("screenshot_artifact_invalid", "The supplied screenshot is not a valid finalized image ArtifactRef."),
     )
 )
 _DOMAIN_ERROR_BY_CODE = {item.code: item for item in _DOMAIN_ERRORS}
@@ -438,7 +467,9 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         "expected_version_payload_path": _EXPECTED_VERSION_PATHS.get(spec.id, "expected_revision" if spec.id in _EXPECTED_REVISION else None),
         "idempotency_policy": "required" if is_write else "none",
         "consistency_policy": "external" if is_write else "strong",
-        "evidence_policy": "optional",
+        "evidence_policy": (
+            "required" if spec.id == "craft.process_screenshot.attach" else "optional"
+        ),
         "domain_errors": _DOMAIN_ERRORS,
         "domain_errors_complete": True,
     }

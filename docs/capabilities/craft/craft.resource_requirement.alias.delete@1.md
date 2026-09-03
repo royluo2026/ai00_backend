@@ -8,7 +8,7 @@ Governed Craft resource requirement alias.delete outcome.
 - 不适用：The object is a physical Factory asset or a legacy VPPS template row.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_94ba4f715fc3e8b6c9f617c4a5b05fe5`
+- Catalog Release：`rel_38f8bdbb827c5ff822916b1242deb40a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -92,7 +92,7 @@ Governed Craft resource requirement alias.delete outcome.
 ```json
 {
   "capability_id": "craft.resource_requirement.alias.delete",
-  "catalog_release": "rel_94ba4f715fc3e8b6c9f617c4a5b05fe5",
+  "catalog_release": "rel_38f8bdbb827c5ff822916b1242deb40a",
   "major_version": 1,
   "payload": {
     "alias_gid": "example",

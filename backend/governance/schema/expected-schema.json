@@ -1,7 +1,7 @@
 {
   "database_name": "ai00_test",
   "isolation_profile": "single_database_domain_tables",
-  "schema_sha256": "sha256:bf66b26303b7a31d648951ce251ac1d5bb9778b32bdb4d366dd67d4efb407c01",
+  "schema_sha256": "sha256:45951d1659de6115240d2e9f7d463a637014467bfd5c595e810166af389c371e",
   "schema_version": 1,
   "tables": [
     {
@@ -18072,6 +18072,137 @@
     {
       "columns": [
         {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0007_process_screenshots.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "bop_version_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0007_process_screenshots.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "operation_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0007_process_screenshots.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "capture_run_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0007_process_screenshots.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "artifact_ref_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0007_process_screenshots.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "artifact_sha256",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0007_process_screenshots.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "created_by_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0007_process_screenshots.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0007_process_screenshots.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0007_process_screenshots.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "bop_version_gid",
+            "operation_id",
+            "created_at"
+          ],
+          "name": "idx_craft_process_screenshot_operation",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0007_process_screenshots.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "bop_version_gid",
+            "operation_id",
+            "capture_run_id"
+          ],
+          "name": "uq_craft_process_capture",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0007_process_screenshots.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_craft_process_screenshots",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "sources": [
+        "backend/db/migrations/domains/craft/0007_process_screenshots.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
           "data_type": "CHAR(36)",
           "default": null,
           "extra": "",
@@ -19199,6 +19330,399 @@
       "runtime_domain": "craft",
       "sources": [
         "backend/db/migrations/202608060004_craft_validation_policies.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "device_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "bound_user_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "session_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "health_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "health_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "reported_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "device_gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "bound_user_id",
+            "reported_at"
+          ],
+          "name": "idx_device_connector_health_user",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_device_connector_health",
+      "owner": "device",
+      "runtime_domain": "device",
+      "sources": [
+        "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "device_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "health_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "health_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "reported_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "device_gid",
+            "created_at"
+          ],
+          "name": "idx_device_connector_heartbeat_audit",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_device_connector_heartbeat_audit",
+      "owner": "device",
+      "runtime_domain": "device",
+      "sources": [
+        "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "plan_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "device_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "user_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "plan_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "plan_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": "'queued'",
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": "0",
+          "extra": "",
+          "name": "attempts",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "lease_id",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "lease_until",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "outcome_json",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "outcome_hash",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "expires_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "plan_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "device_gid",
+            "status",
+            "expires_at",
+            "created_at"
+          ],
+          "name": "idx_device_connector_plan_lease",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_device_connector_plans",
+      "owner": "device",
+      "runtime_domain": "device",
+      "sources": [
+        "backend/db/migrations/domains/device/0002_connector_control_plane.sql"
       ]
     },
     {
@@ -25146,6 +25670,170 @@
     {
       "columns": [
         {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0004_resource_model_mappings.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0004_resource_model_mappings.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "resource_type",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0004_resource_model_mappings.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "normalized_code",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0004_resource_model_mappings.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "model_ref_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0004_resource_model_mappings.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": null,
+          "extra": "",
+          "name": "mapping_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0004_resource_model_mappings.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "valid_from",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0004_resource_model_mappings.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "valid_to",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0004_resource_model_mappings.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "content_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0004_resource_model_mappings.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "created_by_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0004_resource_model_mappings.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0004_resource_model_mappings.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0004_resource_model_mappings.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "resource_type",
+            "normalized_code",
+            "valid_from",
+            "valid_to"
+          ],
+          "name": "idx_know_resource_model_mapping_active",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0004_resource_model_mappings.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "resource_type",
+            "normalized_code",
+            "mapping_version"
+          ],
+          "name": "uq_know_resource_model_mapping",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/knowledge/0004_resource_model_mappings.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_knowledge_resource_model_mappings",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "sources": [
+        "backend/db/migrations/domains/knowledge/0004_resource_model_mappings.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
           "data_type": "VARCHAR(128)",
           "default": null,
           "extra": "",
@@ -30589,6 +31277,904 @@
           "data_type": "VARCHAR(128)",
           "default": null,
           "extra": "",
+          "name": "capture_run_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "step_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "operation_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "artifact_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": null,
+          "extra": "",
+          "name": "artifact_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "artifact_sha256",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "artifact_ref_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": "'pending'",
+          "extra": "",
+          "name": "craft_attachment_status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "owner_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [],
+          "expression": "`craft_attachment_status` IN ('pending','attached','failed')",
+          "kind": "check",
+          "name": "check_workmanship_sim_capture_artifact_refs_1",
+          "referenced_columns": [],
+          "referenced_table": null,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "capture_run_id",
+            "step_id",
+            "artifact_id",
+            "artifact_version"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "capture_run_id",
+            "step_id",
+            "artifact_sha256"
+          ],
+          "name": "uq_sim_capture_artifact_hash",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_capture_artifact_refs",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "capture_run_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "environment_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": null,
+          "extra": "",
+          "name": "environment_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "manifest_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "device_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "plan_id",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "failure_code",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "owner_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [],
+          "expression": "`status` IN ('queued','leased','running','cancelling','completed','partial','failed','cancelled','outcome_unknown')",
+          "kind": "check",
+          "name": "check_workmanship_sim_capture_runs_1",
+          "referenced_columns": [],
+          "referenced_table": null,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "capture_run_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "plan_id"
+          ],
+          "name": "uq_sim_capture_plan",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_capture_runs",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "capture_run_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "step_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "operation_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": null,
+          "extra": "",
+          "name": "sequence",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": "1",
+          "extra": "",
+          "name": "attempt",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "expected_scene_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "actual_scene_hash",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "artifact_ref_json",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "BOOLEAN",
+          "default": "FALSE",
+          "extra": "",
+          "name": "artifact_attached",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "failure_code",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "owner_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [],
+          "expression": "`status` IN ('queued','running','completed','failed','skipped','cancelled','outcome_unknown')",
+          "kind": "check",
+          "name": "check_workmanship_sim_capture_steps_1",
+          "referenced_columns": [],
+          "referenced_table": null,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "capture_run_id",
+            "step_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "capture_run_id",
+            "operation_id"
+          ],
+          "name": "uq_sim_capture_operation",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_capture_steps",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "environment_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "name",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": "'active'",
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "owner_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [],
+          "expression": "`status` IN ('active','archived')",
+          "kind": "check",
+          "name": "check_workmanship_sim_connector_environments_1",
+          "referenced_columns": [],
+          "referenced_table": null,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "environment_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_connector_environments",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "environment_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": null,
+          "extra": "",
+          "name": "environment_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "binding_kind",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "source_type",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "source_code",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "node_key",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "binding_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "owner_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [],
+          "expression": "`binding_kind` IN ('product','resource')",
+          "kind": "check",
+          "name": "check_workmanship_sim_environment_bindings_1",
+          "referenced_columns": [],
+          "referenced_table": null,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "columns": [],
+          "expression": "`source_type` IN ('product','tool','equipment','fixture')",
+          "kind": "check",
+          "name": "check_workmanship_sim_environment_bindings_2",
+          "referenced_columns": [],
+          "referenced_table": null,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "environment_id",
+            "environment_version",
+            "binding_kind",
+            "source_type",
+            "source_code"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_environment_bindings",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "environment_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": null,
+          "extra": "",
+          "name": "environment_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "manifest_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "manifest_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "owner_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "environment_id",
+            "environment_version"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "environment_id",
+            "manifest_hash"
+          ],
+          "name": "uq_sim_manifest_hash",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_environment_manifests",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
           "name": "gid",
           "nullable": false,
           "sources": [
@@ -30785,6 +32371,174 @@
         "backend/db/migrations/202608030009_simulation_environments.sql",
         "backend/db/migrations/202608100010_simulation_reproducibility.sql",
         "backend/db/migrations/domains/simulation/0001_simulation.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "run_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "environment_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": null,
+          "extra": "",
+          "name": "environment_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "manifest_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "device_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "plan_id",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "failure_code",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "owner_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [],
+          "expression": "`status` IN ('queued','leased','running','completed','failed','cancelled','outcome_unknown')",
+          "kind": "check",
+          "name": "check_workmanship_sim_materialization_runs_1",
+          "referenced_columns": [],
+          "referenced_table": null,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "run_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "plan_id"
+          ],
+          "name": "uq_sim_materialization_plan",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_materialization_runs",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
       ]
     },
     {

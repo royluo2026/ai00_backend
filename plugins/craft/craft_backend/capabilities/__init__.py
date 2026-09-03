@@ -76,6 +76,7 @@ from .ebom_part_change import register_ebom_part_change_capabilities
 from .data_exchange import register_data_exchange_capability
 from .lark_exchange import register_lark_exchange_capabilities
 from .resource_requirements import register_resource_requirement_capabilities
+from .process_screenshot import register_process_screenshot_capability
 
 
 def _authorize_bop_version(resource_id, identity) -> bool:
@@ -100,6 +101,7 @@ def register_capabilities(registry: Any) -> None:
     register_craft_library_read_capability(native)
     register_craft_library_change_capability(native)
     register_resource_requirement_capabilities(native)
+    register_process_screenshot_capability(registry)
     register_canvas_capabilities(native)
     register_standard_operation_capabilities(native)
     register_vpps_audit_capabilities(native)

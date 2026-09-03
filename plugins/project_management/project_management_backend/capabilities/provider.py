@@ -37,6 +37,37 @@ DEPRECATED_CAPABILITY_IDS = frozenset({
 })
 
 
+def _business_definition(spec: Any, *, is_write: bool) -> dict[str, object]:
+    operation = (
+        spec.id.split(".atomic.", 1)[1].replace("_", " ")
+        if ".atomic." in spec.id else spec.id.removeprefix("project.").replace(".", " ")
+    )
+    effect = (
+        f"Authorized project participants can apply the requested {operation} change "
+        "within their active tenant and receive its governed outcome."
+        if is_write else
+        f"Authorized project participants can inspect the requested {operation} result "
+        "within their active tenant."
+    )
+    return {
+        "business_effect": effect,
+        "business_acceptance_criteria": (
+            "The Provider evaluates the request only within the authenticated active tenant.",
+            "The returned data conforms to the Capability's closed output contract.",
+            (
+                "The requested change is committed once, or the Provider returns a governed error without reporting success."
+                if is_write else
+                "The read does not mutate Project Management business state."
+            ),
+        ),
+        "business_invariants": (),
+        "no_business_invariant_reason": (
+            "This Capability introduces no additional business invariant beyond the Project "
+            "Management Provider's tenant authorization, closed schema, and transaction policies."
+        ),
+    }
+
+
 def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
     descriptor = descriptor_from_provider_spec(spec)
     capability_version_gid = "cv2_" + hashlib.sha256(
@@ -80,6 +111,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             "expected_version_payload_path": "expected_revision" if is_approval_rejection else None,
             "domain_errors": DOMAIN_ERRORS,
             "domain_errors_complete": True,
+            **_business_definition(spec, is_write=is_write),
         }
     )
 
