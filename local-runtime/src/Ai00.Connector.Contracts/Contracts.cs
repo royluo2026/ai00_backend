@@ -5,23 +5,6 @@ using System.Text.Json.Serialization;
 
 namespace Ai00.Connector.Contracts;
 
-public sealed record ConnectorExecutionPlan(string PlanId);
-
-public sealed record AdapterManifest(string AdapterId, int MajorVersion);
-
-public sealed record AdapterHealth(bool Ready, string Status);
-
-public sealed record AdapterOperation(string OperationId, JsonElement Payload);
-
-public sealed record AdapterResult(bool Ok, object? Data = null, string ErrorCode = "");
-
-public interface IConnectorAdapter
-{
-    AdapterManifest Manifest { get; }
-    Task<AdapterHealth> ProbeAsync(CancellationToken cancellationToken);
-    Task<AdapterResult> ExecuteAsync(AdapterOperation operation, CancellationToken cancellationToken);
-}
-
 public sealed record OperationEnvelope(
     [property: JsonPropertyName("protocol")] string Protocol,
     [property: JsonPropertyName("operation_id")] string OperationId,
@@ -85,45 +68,6 @@ public sealed record MaterializedArtifact(
 public sealed record LocalExecutionRequest(
     [property: JsonPropertyName("lease")] SignedOperationEnvelope Lease,
     [property: JsonPropertyName("materialized_artifacts")] IReadOnlyList<MaterializedArtifact> MaterializedArtifacts);
-
-public static class CanonicalJson
-{
-    public static byte[] Serialize(object value)
-    {
-        var element = value is JsonElement json ? json : JsonSerializer.SerializeToElement(value);
-        using var stream = new MemoryStream();
-        using (var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = false }))
-            Write(writer, element);
-        return stream.ToArray();
-    }
-
-    private static void Write(Utf8JsonWriter writer, JsonElement element)
-    {
-        switch (element.ValueKind)
-        {
-            case JsonValueKind.Object:
-                writer.WriteStartObject();
-                foreach (var property in element.EnumerateObject().OrderBy(item => item.Name, StringComparer.Ordinal))
-                {
-                    writer.WritePropertyName(property.Name);
-                    Write(writer, property.Value);
-                }
-                writer.WriteEndObject();
-                break;
-            case JsonValueKind.Array:
-                writer.WriteStartArray();
-                foreach (var item in element.EnumerateArray()) Write(writer, item);
-                writer.WriteEndArray();
-                break;
-            case JsonValueKind.String: writer.WriteStringValue(element.GetString()); break;
-            case JsonValueKind.Number: writer.WriteRawValue(element.GetRawText()); break;
-            case JsonValueKind.True: writer.WriteBooleanValue(true); break;
-            case JsonValueKind.False: writer.WriteBooleanValue(false); break;
-            case JsonValueKind.Null: writer.WriteNullValue(); break;
-            default: throw new InvalidOperationException("Unsupported JSON token in canonical document");
-        }
-    }
-}
 
 public static class PipeSecurity
 {

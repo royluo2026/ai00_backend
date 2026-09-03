@@ -8,7 +8,16 @@ public sealed class VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths,
 {
     private const string ProgId = "VFFrame.Application";
     private object? _application;
-    public AdapterManifest Manifest { get; } = new("ai00.vismockup", 1);
+    public AdapterManifest Manifest { get; } = new(
+        "ai00.vismockup", 1, "siemens.vismockup", "14.0.0",
+        [
+            new("vismockup.application.probe@1", "sha256:197cfad8bc3453030fdc288ea78c3abc21699274dd48d4482444af4f62380a37"),
+            new("vismockup.document.snapshot@1", "sha256:aa7c11c2501026c470a9cc7bfcbbecc7339879c18bf2b6b86f68ed7fc2e1861b"),
+            new("vismockup.model.attach@1", "sha256:444b6b8a963b5a7e04d6b607cfe53699a5c93196a5bf78c98843d12d073fe844"),
+            new("vismockup.scene.apply@1", "sha256:fce8ff3a33d996a26c3121d015839e2d68bc3c631a8c8c1091201e95d0bcabd3"),
+            new("vismockup.scene.verify@1", "sha256:e99bf5896c3f655afc7470fc140d261225d6f37a1d8224b7e9438a2e7b7a211a"),
+            new("vismockup.view.capture@1", "sha256:9c37c00be78afd4590be9fa128b1cddd2d84536d07f24bb690d0a176468c14e5"),
+        ]);
 
     public async Task<AdapterHealth> ProbeAsync(CancellationToken cancellationToken)
     {
@@ -23,6 +32,7 @@ public sealed class VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths,
         cancellationToken.ThrowIfCancellationRequested();
         object result = operation.OperationId switch
         {
+            "vismockup.application.probe@1" => await StatusAsync(),
             "vismockup.status" => await StatusAsync(),
             "vismockup.launch" => await LaunchAsync(),
             "vismockup.model.open" => await OpenFileAsync(operation.Payload.GetProperty("file_path").GetString() ?? ""),
