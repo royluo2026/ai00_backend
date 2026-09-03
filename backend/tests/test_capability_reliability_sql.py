@@ -97,6 +97,34 @@ def test_sql_outcome_completion_updates_outcome_and_enqueues_audit_in_one_transa
     assert len(entries) == 1
 
 
+def test_sql_outcome_reconciliation_promotes_unknown_and_upserts_audit():
+    envelope = _envelope()
+    unknown = OutcomeRecord(
+        operation_id="op_reconcile", request_id=envelope.request_id,
+        idempotency_scope="idem:reconcile", payload_hash="sha256:" + "b" * 64,
+        capability_id=envelope.capability_id, major_version=1,
+        tenant_id="tenant_1", consumer_scope="consumer:scope",
+        actor_id="user_1", consumer_type="agent", consumer_id="agent.runtime",
+        consumer_instance_id="run_a", policy_version="policy-7",
+        status="outcome_unknown", result=None,
+        started_at=datetime.now(UTC), completed_at=datetime.now(UTC),
+    )
+    row = unknown.model_dump(mode="python")
+    row["result_json"] = None
+    row["started_at"] = datetime.now()
+    row["completed_at"] = datetime.now()
+    cursor = Cursor([row])
+
+    completed = SqlOutcomeStore(connections(cursor, [])).reconcile_completed(
+        "op_reconcile", _result(envelope),
+    )
+
+    statements = [sql for sql, _params in cursor.statements]
+    assert "status IN ('started','outcome_unknown')" in statements[1]
+    assert "ON DUPLICATE KEY UPDATE" in statements[2]
+    assert completed.status == "completed"
+
+
 def test_reliability_migration_has_hash_only_approval_and_atomic_outcome_tables():
     root = Path(__file__).resolve().parents[2]
     sql = (root / "backend/db/migrations/202608100003_base_capability_outcomes_and_approvals.sql").read_text(

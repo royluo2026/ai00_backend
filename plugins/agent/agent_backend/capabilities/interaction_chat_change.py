@@ -174,7 +174,7 @@ def register_interaction_chat_change_capability(
         try:
             value = await apply_interaction_chat_change_v1(payload, context)
             output = write_output(v1.id, value, context)
-            transaction.record_outbox(v1.id, context, output)
+            transaction.record_outbox(v1.id, v1.version, context, output)
             transaction.commit()
             return output
         except BaseException:

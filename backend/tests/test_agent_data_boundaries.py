@@ -105,7 +105,12 @@ def test_agent_transaction_reuses_domain_connection_and_persists_owned_outbox(mo
         assert owned is connection
     transaction.record_outbox(
         "agent.run.change.apply",
-        type("Context", (), {"operation_id": "op-1", "request_id": "req-1"})(),
+        1,
+        type("Context", (), {
+            "outcome_operation_id": "outcome-op-1",
+            "async_operation_id": "async-op-1",
+            "request_id": "req-1",
+        })(),
         CapabilityOutput(
             data={"resource_gid": "run-1"},
             evidence=(EvidenceRef(kind="agent.change", reference="agent://run/run-1"),),
@@ -114,6 +119,8 @@ def test_agent_transaction_reuses_domain_connection_and_persists_owned_outbox(mo
     transaction.commit(); transaction.close()
 
     assert "INSERT INTO workmanship_agent_capability_outbox" in cursor.executed[0][0]
+    assert "outcome_operation_id" in cursor.executed[0][0]
+    assert cursor.executed[0][1][1:3] == ("outcome-op-1", "async-op-1")
     assert "workmanship_base_" not in cursor.executed[0][0]
     assert connection.committed is True
     assert connection.closed is True

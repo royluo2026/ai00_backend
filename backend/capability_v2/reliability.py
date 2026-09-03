@@ -361,6 +361,22 @@ class ReliabilityCoordinator:
         except OutcomeConflict as exc:
             raise ReliabilityError(str(exc)) from exc
 
+    def reconcile_committed(
+        self, operation_id: str, result: CapabilityResultV2,
+    ) -> OutcomeRecord:
+        """Idempotently converge a provider-committed eventual write."""
+        try:
+            record = self._store.get(operation_id)
+            if (
+                record.capability_id != result.capability_id
+                or record.major_version != result.major_version
+                or record.request_id != result.correlation.request_id
+            ):
+                raise ReliabilityError("outcome_identity_mismatch")
+            return self._store.reconcile_completed(operation_id, result)
+        except OutcomeConflict as exc:
+            raise ReliabilityError(str(exc)) from exc
+
 
 def normalized_payload_hash(payload) -> str:
     encoded = json.dumps(

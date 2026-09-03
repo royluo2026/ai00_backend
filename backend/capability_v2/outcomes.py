@@ -50,6 +50,7 @@ class OutcomeStore(Protocol):
     def get(self, operation_id: str) -> OutcomeRecord: ...
     def find_by_idempotency(self, scope: str) -> OutcomeRecord | None: ...
     def mark_unknown(self, operation_id: str, result: CapabilityResultV2) -> OutcomeRecord: ...
+    def reconcile_completed(self, operation_id: str, result: CapabilityResultV2) -> OutcomeRecord: ...
 
 
 class InMemoryOutcomeStore:
@@ -159,6 +160,27 @@ class InMemoryOutcomeStore:
             )
             self._outbox[event.event_id] = event
             return unknown
+
+    def reconcile_completed(self, operation_id: str, result: CapabilityResultV2) -> OutcomeRecord:
+        with self._lock:
+            record = self._records.get(operation_id)
+            if record is None:
+                raise OutcomeConflict("outcome_not_found")
+            durable = durable_result(result)
+            if record.status == "completed" and record.result == durable:
+                return record
+            if record.status not in {"started", "outcome_unknown"}:
+                raise OutcomeConflict("outcome_already_final")
+            completed_at = self._clock()
+            completed = record.model_copy(update={
+                "status": "completed", "result": durable, "completed_at": completed_at,
+            })
+            self._records[operation_id] = completed
+            self._outbox[f"audit_{operation_id}"] = AuditOutboxEvent(
+                event_id=f"audit_{operation_id}", operation_id=operation_id,
+                payload=_audit_payload(record, "completed"), created_at=completed_at,
+            )
+            return completed
 
     def pending_audit_events(self) -> tuple[AuditOutboxEvent, ...]:
         with self._lock:
@@ -353,6 +375,49 @@ class SqlOutcomeStore:
                 )
         return self.get(operation_id)
 
+    def reconcile_completed(self, operation_id: str, result: CapabilityResultV2) -> OutcomeRecord:
+        """Promote started/outcome_unknown to the provider-committed final result."""
+        with self._connections() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    f"SELECT * FROM {self.OUTCOME_TABLE} WHERE operation_id=%s FOR UPDATE",
+                    (operation_id,),
+                )
+                row = cursor.fetchone()
+                if not row:
+                    raise OutcomeConflict("outcome_not_found")
+                record = _record_from_row(row)
+                durable = durable_result(result)
+                if record.status == "completed" and record.result == durable:
+                    return record
+                if record.status not in {"started", "outcome_unknown"}:
+                    raise OutcomeConflict("outcome_already_final")
+                completed_at = self._clock()
+                cursor.execute(
+                    f"UPDATE {self.OUTCOME_TABLE} SET status='completed',result_json=%s,"
+                    "completed_at=%s WHERE operation_id=%s AND status IN ('started','outcome_unknown')",
+                    (
+                        json.dumps(durable.model_dump(mode="json"), ensure_ascii=False),
+                        completed_at, operation_id,
+                    ),
+                )
+                if cursor.rowcount != 1:
+                    raise OutcomeConflict("outcome_completion_race")
+                cursor.execute(
+                    f"INSERT INTO {self.OUTBOX_TABLE} "
+                    "(event_id,operation_id,event_type,payload_json,created_at) "
+                    "VALUES (%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE "
+                    "payload_json=VALUES(payload_json),delivered_at=NULL",
+                    (
+                        f"audit_{operation_id}", operation_id, "capability.outcome",
+                        json.dumps(_audit_payload(record, "completed"), ensure_ascii=False),
+                        completed_at,
+                    ),
+                )
+                return record.model_copy(update={
+                    "status": "completed", "result": durable, "completed_at": completed_at,
+                })
+
     def pending_audit_events(self, limit: int = 100) -> tuple[AuditOutboxEvent, ...]:
         with self._connections() as conn:
             with conn.cursor() as cursor:
@@ -390,6 +455,23 @@ class SqlOutcomeStore:
                     )
                     delivered += int(cursor.rowcount == 1)
         return delivered
+
+
+def _audit_payload(record: OutcomeRecord, status: str) -> dict[str, Any]:
+    return {
+        "capability_id": record.capability_id,
+        "major_version": record.major_version,
+        "request_id": record.request_id,
+        "tenant_id": record.tenant_id,
+        "consumer_scope": record.consumer_scope,
+        "actor_id": record.actor_id,
+        "consumer_type": record.consumer_type,
+        "consumer_id": record.consumer_id,
+        "consumer_instance_id": record.consumer_instance_id,
+        "policy_version": record.policy_version,
+        "payload_hash": record.payload_hash,
+        "status": status,
+    }
 
 
 def _record_from_row(row: Mapping[str, Any]) -> OutcomeRecord:

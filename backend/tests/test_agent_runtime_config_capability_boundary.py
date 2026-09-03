@@ -19,9 +19,11 @@ from backend.capability_v2.contracts import (
 )
 from backend.capability_v2.gateway import CapabilityGatewayService
 from backend.capability_v2.outcomes import InMemoryOutcomeStore
+from backend.capability_v2.operations import InMemoryOperationStore, OperationService
 from backend.capability_v2.reliability import InMemoryRateLimiter, ReliabilityCoordinator
 from plugins.agent.agent_backend.application.service import AgentApplication
 from plugins.agent.agent_backend.capabilities import register_capabilities
+from plugins.agent.agent_backend.infrastructure.capability_outbox import AgentCapabilityOutboxDispatcher
 from plugins.agent.agent_backend.capabilities.descriptors import specs
 from plugins.agent.agent_backend.capabilities.provider import descriptor_for
 
@@ -188,3 +190,102 @@ def test_write_cleanup_preserves_provider_error_when_rollback_also_fails(monkeyp
         )
     assert raised.value is original
     assert transaction.closed is True
+
+
+def test_committed_agent_outbox_reconciles_failed_base_complete_once(monkeypatch):
+    monkeypatch.setattr(
+        "plugins.agent.agent_backend.capabilities.AgentCapabilityRepository.request_interaction",
+        lambda _self, _payload: {"interaction_id": "interaction-1"},
+    )
+    captured = {}
+
+    class Transaction:
+        committed = False
+        def record_outbox(self, capability_id, major_version, context, output):
+            captured.update({
+                "event_id": "event-1",
+                "outcome_operation_id": context.outcome_operation_id,
+                "async_operation_id": context.async_operation_id,
+                "request_id": context.request_id,
+                "capability_id": capability_id,
+                "major_version": major_version,
+                "payload": {
+                    "data": output.data,
+                    "evidence": [item.model_dump(mode="json") for item in output.evidence],
+                },
+            })
+        def commit(self): self.committed = True
+        def rollback(self): pass
+        def close(self): pass
+
+    transaction = Transaction()
+    registry = CapabilityRegistry()
+    register_capabilities(
+        registry, canvas_runtime=None, transaction_factory=lambda: transaction,
+    )
+    provider = registry.get("agent.interaction.request", 1)
+    descriptor = provider.descriptor.model_copy(update={"confirmation_policy": "none"})
+    governed = CapabilityRegistry()
+    governed.register(provider.spec, provider.handler, descriptor=descriptor)
+    release = build_release([descriptor])
+    catalog = InMemoryCatalogStore(); catalog.publish(release)
+
+    class FailFirstComplete(InMemoryOutcomeStore):
+        fail = True
+        def complete(self, operation_id, result, *, preserve_projected_data=False):
+            if self.fail:
+                self.fail = False
+                raise RuntimeError("Base complete unavailable")
+            return super().complete(
+                operation_id, result, preserve_projected_data=preserve_projected_data,
+            )
+
+    outcomes = FailFirstComplete()
+
+    class Policy:
+        def authorize(self, *_args): return None
+        def approve(self, *_args): return None
+        def project(self, _descriptor, _identity, data): return data
+
+    gateway = CapabilityGatewayService(
+        CatalogResolver(catalog, governed), Policy(),
+        reliability=ReliabilityCoordinator(outcomes, InMemoryRateLimiter(limit=10)),
+        operations=OperationService(InMemoryOperationStore()),
+    ).bind_release(release.release_id)
+    envelope = InvocationEnvelope(
+        capability_id=provider.spec.id, major_version=1,
+        catalog_release=release.release_id, payload={},
+        identity=ConsumerIdentity(
+            actor=ActorIdentity(user_id="u1", authentication_method="jwt", authenticated_at=datetime.now(UTC)),
+            tenant=TenantIdentity(tenant_id="t1", membership="member"),
+            consumer=ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="ai00.web.agent"),
+        ),
+        request_id="req-reconcile-1", trace_id="req-reconcile-1",
+        idempotency_key="req-reconcile-1",
+    )
+
+    first = asyncio.run(gateway.invoke(envelope))
+    assert first.status.value == "outcome_unknown"
+    assert transaction.committed is True
+    assert captured["outcome_operation_id"].startswith("op_")
+    assert captured["async_operation_id"].startswith("operation_")
+    assert captured["outcome_operation_id"] != captured["async_operation_id"]
+
+    class Repository:
+        delivered = 0
+        def claim_next(self, _worker_id):
+            if self.delivered: return None
+            return {**captured, "lease_token": "lease-1", "attempt_count": 1}
+        def mark_delivered(self, _event_id, _lease_token):
+            self.delivered += 1; return True
+        def retry(self, *_args, **_kwargs): raise AssertionError("delivery should succeed")
+
+    repository = Repository()
+    dispatcher = AgentCapabilityOutboxDispatcher(
+        repository, gateway.reconcile_committed_agent_outcome,
+    )
+    assert asyncio.run(dispatcher.run_once()) is True
+    assert outcomes.get(captured["outcome_operation_id"]).status == "completed"
+    # Crash-after-Base-complete replay is harmless and does not duplicate outcome state.
+    gateway.reconcile_committed_agent_outcome(captured)
+    assert outcomes.get(captured["outcome_operation_id"]).status == "completed"

@@ -73,16 +73,25 @@ class AgentTransaction:
             self._connection = _get_pool().connection()
         return self._connection
 
-    def record_outbox(self, capability_id, context, output):
+    def record_outbox(self, capability_id, major_version, context, output):
+        outcome_operation_id = str(
+            getattr(context, "outcome_operation_id", "") or ""
+        )
+        if not outcome_operation_id:
+            raise RuntimeError("Gateway outcome_operation_id is required for Agent writes")
         evidence = [item.model_dump(mode="json") for item in output.evidence]
         with self.connection().cursor() as cursor:
             cursor.execute(
                 "INSERT INTO workmanship_agent_capability_outbox "
-                "(event_id,operation_id,request_id,capability_id,payload_json,state) "
-                "VALUES (%s,%s,%s,%s,%s,'pending')",
+                "(event_id,outcome_operation_id,async_operation_id,request_id,"
+                "capability_id,major_version,payload_json,state) "
+                "VALUES (%s,%s,%s,%s,%s,%s,%s,'pending')",
                 (
-                    str(uuid.uuid4()), str(getattr(context, "operation_id", "") or ""),
+                    str(uuid.uuid4()),
+                    outcome_operation_id,
+                    str(getattr(context, "async_operation_id", "") or "") or None,
                     str(getattr(context, "request_id", "") or ""), capability_id,
+                    int(major_version),
                     json.dumps({"data": output.data, "evidence": evidence}, ensure_ascii=False),
                 ),
             )

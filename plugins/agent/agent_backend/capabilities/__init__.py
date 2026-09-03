@@ -8,7 +8,10 @@ from ..application.canvas_runtime import ProductionAgentCanvasRuntime
 from ..application.service import (
     CanvasExecutionCoordinator, CanvasExecutionDispatcher, CanvasExecutionWorker,
 )
-from ..infrastructure import AgentCapabilityRepository
+from ..infrastructure import (
+    AgentCapabilityRepository, AgentCapabilityOutboxDispatcher,
+    AgentCapabilityOutboxRepository, default_agent_outcome_delivery,
+)
 from ..data.audit_repository import AuditRepository
 from ..data.connection import (
     begin_agent_transaction, close_agent_transaction, rollback_agent_transaction,
@@ -50,6 +53,14 @@ def register_capabilities(
 ) -> None:
     transaction_factory = transaction_factory or begin_agent_transaction
     resource_authorizers.register("agent-session", _authorize_agent_session)
+    if hasattr(registry, "register_lifecycle"):
+        outbox_dispatcher = AgentCapabilityOutboxDispatcher(
+            AgentCapabilityOutboxRepository(), default_agent_outcome_delivery,
+        )
+        registry.register_lifecycle(
+            "agent.capability-outbox", outbox_dispatcher.start, outbox_dispatcher.stop,
+            health=lambda: outbox_dispatcher.health,
+        )
     repository = AgentCapabilityRepository()
     production_composition = canvas_runtime is _DEFAULT_RUNTIME
     runtime = (
@@ -97,14 +108,17 @@ def register_capabilities(
         capability_id = spec.id
         write = spec.risk.value != "read"
         if capability_id in _CANVAS_CAPABILITIES:
-            async def handler(payload, context, *, _capability_id=capability_id, _write=write):
+            async def handler(
+                payload, context, *, _capability_id=capability_id,
+                _major_version=spec.version, _write=write,
+            ):
                 if not _write:
                     return await provider.invoke(_capability_id, payload, context)
                 transaction = transaction_factory()
                 try:
                     value = await provider.invoke(_capability_id, payload, context)
                     output = write_output(_capability_id, value, context)
-                    transaction.record_outbox(_capability_id, context, output)
+                    transaction.record_outbox(_capability_id, _major_version, context, output)
                     transaction.commit()
                     return output
                 except BaseException:
@@ -113,14 +127,17 @@ def register_capabilities(
                 finally:
                     close_agent_transaction(transaction)
         else:
-            def handler(payload, context, *, _capability_id=capability_id, _write=write):
+            def handler(
+                payload, context, *, _capability_id=capability_id,
+                _major_version=spec.version, _write=write,
+            ):
                 if not _write:
                     return provider.invoke(_capability_id, payload, context)
                 transaction = transaction_factory()
                 try:
                     value = provider.invoke(_capability_id, payload, context)
                     output = write_output(_capability_id, value, context)
-                    transaction.record_outbox(_capability_id, context, output)
+                    transaction.record_outbox(_capability_id, _major_version, context, output)
                     transaction.commit()
                     return output
                 except BaseException:

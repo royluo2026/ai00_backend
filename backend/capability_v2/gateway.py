@@ -12,7 +12,7 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 from backend.capabilities.models_next import CapabilityBusinessError, CapabilityContext, CapabilityOutput
 from .provider_contracts import CapabilityStreamOutput
@@ -340,7 +340,11 @@ class CapabilityGatewayService:
             envelope, operation_id=(
                 async_operation.operation_id if async_operation is not None else
                 lease.operation_id if lease is not None else None
-            )
+            ),
+            outcome_operation_id=lease.operation_id if lease is not None else None,
+            async_operation_id=(
+                async_operation.operation_id if async_operation is not None else None
+            ),
         )
         capability_key = f"{descriptor.id}@{descriptor.major_version}"
         started = time.perf_counter()
@@ -935,7 +939,42 @@ class CapabilityGatewayService:
             )),
         ))
 
-    def _legacy_context(self, envelope: InvocationEnvelope, *, operation_id: str | None = None) -> CapabilityContext:
+    def reconcile_committed_agent_outcome(self, event: Mapping[str, Any]):
+        """Converge a committed Agent write onto its durable Base outcome."""
+        outcome_operation_id = str(event["outcome_operation_id"])
+        capability_id = str(event["capability_id"])
+        major_version = int(event["major_version"])
+        request_id = str(event["request_id"])
+        payload = dict(event["payload"])
+        evidence = tuple(EvidenceRefV2(
+            kind=item["kind"], reference=item["reference"],
+            digest=item.get("digest"), summary=item.get("summary", ""),
+        ) for item in payload.get("evidence", ()))
+        async_operation_id = str(event.get("async_operation_id") or "")
+        if async_operation_id:
+            result = CapabilityResultV2.accepted(
+                capability_id, major_version, request_id,
+                OperationRef(
+                    operation_id=async_operation_id, status=OperationStatus.RUNNING,
+                ),
+            ).model_copy(update={"evidence": evidence})
+        else:
+            result = CapabilityResultV2(
+                ok=True, status=CapabilityStatus.COMPLETED,
+                capability_id=capability_id, major_version=major_version,
+                data=payload.get("data"), evidence=evidence,
+                operation_ref=OperationRef(
+                    operation_id=outcome_operation_id, status=OperationStatus.COMPLETED,
+                ),
+                correlation=CorrelationRef(request_id=request_id),
+            )
+        return self._reliability.reconcile_committed(outcome_operation_id, result)
+
+    def _legacy_context(
+        self, envelope: InvocationEnvelope, *, operation_id: str | None = None,
+        outcome_operation_id: str | None = None,
+        async_operation_id: str | None = None,
+    ) -> CapabilityContext:
         actor = envelope.identity.actor
         return CapabilityContext(
             user_gid=actor.user_id or actor.service_id or "",
@@ -946,6 +985,8 @@ class CapabilityGatewayService:
             confirmation_token=envelope.approval_reference,
             idempotency_key=envelope.idempotency_key,
             operation_id=operation_id,
+            outcome_operation_id=outcome_operation_id,
+            async_operation_id=async_operation_id,
             agent_run_id=envelope.identity.consumer.agent_run_id,
             # Plugin storage uses a server-derived consumer namespace. Agents receive
             # their own delegated consumer namespace; they cannot select another
