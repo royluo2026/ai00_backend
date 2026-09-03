@@ -22,6 +22,10 @@ class InvalidTransition(RuntimeError):
     pass
 
 
+class UntrustedBindingEvidence(RuntimeError):
+    pass
+
+
 _RUN_TRANSITIONS = {
     "pending": {"running", "failed"},
     "running": {"waiting_human", "succeeded", "failed"},
@@ -219,13 +223,36 @@ class OrchestrationRepository:
         *,
         expected_revision: int,
         actor_gid: str,
-        resolved_bindings: list[dict[str, Any]] | None = None,
+        resolved_bindings: list[dict[str, Any]],
     ) -> dict[str, Any]:
         with self._connection_factory() as conn, conn.cursor() as cur:
             version = self._owned_version_for_update(cur, version_gid, actor_gid)
             if version["status"] != "draft" or int(version["revision"]) != expected_revision:
                 raise RevisionConflict("orchestration version is published or stale")
-            for binding in resolved_bindings or []:
+            cur.execute(
+                """SELECT gid,capability_version_gid
+                   FROM workmanship_agent_orch_capability_bindings
+                   WHERE version_gid=%s ORDER BY gid FOR UPDATE""",
+                (version_gid,),
+            )
+            stored_bindings = list(cur.fetchall())
+            resolved_by_gid = {
+                binding["binding_gid"]: binding for binding in resolved_bindings
+            }
+            stored_by_gid = {binding["gid"]: binding for binding in stored_bindings}
+            if (
+                len(resolved_by_gid) != len(resolved_bindings)
+                or set(resolved_by_gid) != set(stored_by_gid)
+                or any(
+                    resolved_by_gid[gid]["capability_version_gid"]
+                    != stored_by_gid[gid]["capability_version_gid"]
+                    for gid in stored_by_gid
+                )
+            ):
+                raise UntrustedBindingEvidence(
+                    "stored Capability bindings do not match trusted resolution evidence"
+                )
+            for binding in resolved_bindings:
                 execution_policy = {
                     "gateway_ref": binding["gateway_ref"],
                     "provider_ref": binding["provider_ref"],
@@ -324,21 +351,20 @@ class OrchestrationRepository:
         run_gid: str,
         *,
         target_status: str,
+        authorized_principal_gid: str,
         actor_type: str,
-        actor_gid: str | None,
+        event_actor_gid: str,
         payload: dict[str, Any],
         item_gid: str | None = None,
         capability_call_id: str | None = None,
         evidence_id: str | None = None,
     ) -> dict[str, Any]:
-        if actor_gid is None:
-            raise ResourceNotAccessible("orchestration actor is required")
         with self._connection_factory() as conn, conn.cursor() as cur:
             cur.execute(
                 """SELECT r.status FROM workmanship_agent_orch_runs r
                    JOIN workmanship_agent_orch_panoramas p ON p.gid=r.panorama_gid
                    WHERE r.gid=%s AND p.owner_user_gid=%s FOR UPDATE""",
-                (run_gid, actor_gid),
+                (run_gid, authorized_principal_gid),
             )
             run = cur.fetchone()
             if not run:
@@ -368,7 +394,7 @@ class OrchestrationRepository:
                 sequence_no=sequence_no,
                 event_type="status_changed",
                 actor_type=actor_type,
-                actor_gid=actor_gid,
+                actor_gid=event_actor_gid,
                 payload=event_payload,
                 item_gid=item_gid,
                 capability_call_id=capability_call_id,

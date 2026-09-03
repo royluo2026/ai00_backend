@@ -29,6 +29,7 @@ class OrchestrationRuntime:
         run_gid: str,
         target_status: str,
         *,
+        authorized_principal_gid: str,
         actor_type: str,
         actor_gid: str,
         payload: dict[str, Any] | None = None,
@@ -36,7 +37,8 @@ class OrchestrationRuntime:
         return self.repository.transition_run_with_event(
             run_gid,
             target_status=target_status,
+            authorized_principal_gid=authorized_principal_gid,
             actor_type=actor_type,
-            actor_gid=actor_gid,
+            event_actor_gid=actor_gid,
             payload=payload or {},
         )

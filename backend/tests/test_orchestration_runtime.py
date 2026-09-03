@@ -32,15 +32,17 @@ def test_runtime_delegates_transition_and_event_to_one_atomic_repository_call():
     runtime = OrchestrationRuntime(repo)
 
     result = runtime.advance(
-        "run-1", "waiting_human", actor_type="human", actor_gid="u1", payload={"reason": "review"}
+        "run-1", "waiting_human", authorized_principal_gid="owner-1",
+        actor_type="agent", actor_gid="agent-1", payload={"reason": "review"}
     )
 
     assert result == {"status": "waiting_human", "sequence_no": 2}
     repo.transition_run_with_event.assert_called_once_with(
         "run-1",
         target_status="waiting_human",
-        actor_type="human",
-        actor_gid="u1",
+        authorized_principal_gid="owner-1",
+        actor_type="agent",
+        event_actor_gid="agent-1",
         payload={"reason": "review"},
     )
 
@@ -51,5 +53,6 @@ def test_runtime_preserves_repository_transition_failure():
 
     with pytest.raises(InvalidTransition):
         OrchestrationRuntime(repo).advance(
-            "run-1", "running", actor_type="human", actor_gid="u1"
+            "run-1", "running", authorized_principal_gid="owner-1",
+            actor_type="human", actor_gid="approver-1"
         )

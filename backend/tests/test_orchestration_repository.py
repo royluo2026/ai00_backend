@@ -8,6 +8,7 @@ from plugins.agent.agent_backend.orchestration.repository import (
     OrchestrationRepository,
     ResourceNotAccessible,
     RevisionConflict,
+    UntrustedBindingEvidence,
 )
 
 
@@ -123,7 +124,9 @@ def test_publish_and_delete_binding_require_owner_inside_transaction():
     })
     repo = OrchestrationRepository(connection_factory(cursor))
 
-    result = repo.publish_version("version-1", expected_revision=8, actor_gid="user-1")
+    result = repo.publish_version(
+        "version-1", expected_revision=8, actor_gid="user-1", resolved_bindings=[]
+    )
     repo.delete_binding("binding-1", actor_gid="user-1")
 
     assert result == {"version_gid": "version-1", "revision": 9, "status": "published"}
@@ -135,7 +138,9 @@ def test_publish_and_delete_binding_require_owner_inside_transaction():
 def test_publish_and_delete_hide_foreign_resources():
     repo = OrchestrationRepository(connection_factory(RecordingCursor()))
     with pytest.raises(ResourceNotAccessible):
-        repo.publish_version("version-1", expected_revision=8, actor_gid="user-2")
+        repo.publish_version(
+            "version-1", expected_revision=8, actor_gid="user-2", resolved_bindings=[]
+        )
     with pytest.raises(ResourceNotAccessible):
         repo.delete_binding("binding-1", actor_gid="user-2")
 
@@ -155,6 +160,21 @@ def test_create_run_requires_owned_matching_published_version_and_writes_started
     assert any("INSERT INTO workmanship_agent_orch_runs" in sql for sql, _ in cursor.executions)
     assert any("INSERT INTO workmanship_agent_orch_run_events" in sql for sql, _ in cursor.executions)
     assert run_gid
+
+
+def test_publish_requires_exact_catalog_evidence_for_every_stored_binding():
+    cursor = RecordingCursor({
+        "FROM workmanship_agent_orch_versions v": owned_version(revision=8),
+        "SELECT gid,capability_version_gid": [
+            {"gid": "binding-1", "capability_version_gid": "cv2_1"}
+        ],
+    })
+    repo = OrchestrationRepository(connection_factory(cursor))
+
+    with pytest.raises(UntrustedBindingEvidence):
+        repo.publish_version(
+            "version-1", expected_revision=8, actor_gid="user-1", resolved_bindings=[]
+        )
 
 
 def test_create_run_rejects_foreign_or_mismatched_version():
@@ -190,13 +210,15 @@ def test_transition_locks_owned_run_allocates_sequence_and_appends_event():
     repo = OrchestrationRepository(connection_factory(cursor))
 
     result = repo.transition_run_with_event(
-        "run-1", target_status="succeeded", actor_type="human", actor_gid="user-1", payload={"accepted": True}
+        "run-1", target_status="succeeded", authorized_principal_gid="user-1",
+        actor_type="agent", event_actor_gid="agent-1", payload={"accepted": True}
     )
 
     assert "FOR UPDATE" in cursor.executions[0][0]
     assert "p.owner_user_gid=%s" in cursor.executions[0][0]
     assert result["sequence_no"] == 8 and result["status"] == "succeeded"
     event_params = next(params for sql, params in cursor.executions if "INSERT INTO workmanship_agent_orch_run_events" in sql)
+    assert event_params[6] == "agent-1"
     assert '"from":"running"' in event_params[7]
     assert '"to":"succeeded"' in event_params[7]
 
@@ -205,12 +227,14 @@ def test_transition_rejects_foreign_and_terminal_runs():
     foreign = OrchestrationRepository(connection_factory(RecordingCursor()))
     with pytest.raises(ResourceNotAccessible):
         foreign.transition_run_with_event(
-            "run-1", target_status="failed", actor_type="human", actor_gid="user-2", payload={}
+            "run-1", target_status="failed", authorized_principal_gid="user-2",
+            actor_type="agent", event_actor_gid="agent-1", payload={}
         )
 
     terminal_cursor = RecordingCursor({"SELECT r.status FROM workmanship_agent_orch_runs r": [{"status": "succeeded"}]})
     terminal = OrchestrationRepository(connection_factory(terminal_cursor))
     with pytest.raises(InvalidTransition):
         terminal.transition_run_with_event(
-            "run-1", target_status="running", actor_type="human", actor_gid="user-1", payload={}
+            "run-1", target_status="running", authorized_principal_gid="user-1",
+            actor_type="human", event_actor_gid="approver-1", payload={}
         )
