@@ -21,15 +21,21 @@ _RESOURCES = {
     ),
     "simulation.environment.get": (("simulation-environment", "environment_id"),),
     "simulation.environment.archive": (("simulation-environment", "environment_id"),),
+    "simulation.environment.compose": (
+        ("craft-bop-version", "execution_plan_ref.version_gid"),
+        ("device", "device_id"),
+    ),
+    "simulation.environment.manifest.get": (("simulation-environment", "environment_id"),),
+    "simulation.environment.manifest.archive": (("simulation-environment", "environment_id"),),
+    "simulation.environment.preflight": (
+        ("simulation-environment", "environment_id"), ("device", "device_id"),
+    ),
     "simulation.run.start": (("simulation-environment", "environment_id"),),
     "simulation.run.get": (("simulation-run", "run_id"),),
     "simulation.result.get": (("simulation-run", "run_id"),),
     "simulation.result.compare": (("simulation-run", "left_result_ref.run_id"), ("simulation-run", "right_result_ref.run_id")),
 }
-_ERRORS = tuple(DomainErrorContract(
-    code=code, meaning=meaning,
-    retryable=code in {"source_resolver_unavailable", "simulation_result_not_ready"},
-) for code, meaning in (
+_ERROR_PAIRS = (
     ("source_resolver_unavailable", "A required owning-domain resolver is unavailable."),
     ("source_version_mismatch", "A referenced source no longer matches its immutable hash or version."),
     ("parameter_set_not_found", "The immutable parameter set is unavailable or not visible."),
@@ -39,7 +45,47 @@ _ERRORS = tuple(DomainErrorContract(
     ("simulation_run_not_found", "The Simulation run is unavailable or not visible."),
     ("simulation_result_not_ready", "The Simulation run has no completed result artifacts."),
     ("idempotency_conflict", "The idempotency key is bound to a different Simulation request."),
-))
+    ("execution_plan_unavailable", "The pinned Craft execution plan is unavailable."),
+    ("active_document_unavailable", "The Connector has no readable active document."),
+    ("bom_identity_mismatch", "The active BOM identity does not match the requested source."),
+    ("bom_snapshot_limit_exceeded", "The active BOM exceeds the governed snapshot limit."),
+    ("product_binding_not_found", "A process product reference has no active BOM node."),
+    ("product_binding_ambiguous", "A process product reference resolves to multiple BOM nodes."),
+    ("resource_model_not_found", "A typed resource code has no model mapping."),
+    ("resource_model_ambiguous", "A typed resource code has multiple active model mappings."),
+    ("environment_source_changed", "A pinned environment source changed before composition."),
+    ("connector_offline", "The bound Connector is offline or stale."),
+    ("connector_version_incompatible", "The Connector protocol or target product version is incompatible."),
+    ("adapter_unavailable", "The required Connector Adapter is unavailable."),
+    ("adapter_contract_mismatch", "An Adapter operation contract hash does not match."),
+    ("interactive_session_missing", "The bound user's interactive SessionHost is unavailable."),
+    ("interactive_session_conflict", "More than one fresh SessionHost claims the bound user."),
+    ("bound_user_mismatch", "The Connector is bound to a different AI00 user."),
+    ("vismockup_unavailable", "VisMockup is unavailable to the bound SessionHost."),
+    ("vismockup_document_changed", "The active VisMockup document changed during execution."),
+    ("scene_verification_failed", "The actual VisMockup scene does not match the manifest."),
+    ("capture_failed", "VisMockup internal view capture failed."),
+    ("artifact_upload_unconfirmed", "A captured Artifact upload has not been reconciled."),
+    ("craft_screenshot_attach_failed", "Craft rejected or failed the screenshot association."),
+    ("local_execution_outcome_unknown", "The local side effect outcome requires reconciliation."),
+)
+_LEGACY_ERROR_CODES = frozenset(code for code, _ in _ERROR_PAIRS[:9])
+_RETRYABLE_ERROR_CODES = frozenset({
+    "source_resolver_unavailable", "simulation_result_not_ready",
+    "execution_plan_unavailable", "active_document_unavailable",
+    "connector_offline", "interactive_session_missing", "vismockup_unavailable",
+    "capture_failed", "artifact_upload_unconfirmed", "craft_screenshot_attach_failed",
+})
+
+
+def _errors(*, connector_environment: bool) -> tuple[DomainErrorContract, ...]:
+    return tuple(
+        DomainErrorContract(
+            code=code, meaning=meaning, retryable=code in _RETRYABLE_ERROR_CODES,
+        )
+        for code, meaning in _ERROR_PAIRS
+        if connector_environment or code in _LEGACY_ERROR_CODES
+    )
 
 
 def governed_spec(spec: Any) -> Any:
@@ -64,7 +110,8 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         "operation_policy": "required" if governed.id == "simulation.run.start" else ("optional" if is_write else "none"),
         "concurrency_policy": "none", "idempotency_policy": "required" if is_write else "none",
         "consistency_policy": "external" if is_write else "strong", "evidence_policy": "required",
-        "domain_errors": _ERRORS, "domain_errors_complete": True,
+        "domain_errors": _errors(connector_environment="connector_environment" in governed.tags),
+        "domain_errors_complete": True,
     }
     return CapabilityDescriptorV2.model_validate({**descriptor.model_dump(), **updates})
 

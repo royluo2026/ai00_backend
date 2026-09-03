@@ -73,6 +73,10 @@ _DOMAIN_ERRORS = (
         meaning="The resolver request contains more than 500 unique typed codes.",
     ),
     DomainErrorContract(
+        code="mapping_candidate_limit_exceeded",
+        meaning="One typed resource code has more than 100 active model mappings.",
+    ),
+    DomainErrorContract(
         code="mapping_snapshot_changed",
         meaning="The requested mapping snapshot is no longer current.",
     ),

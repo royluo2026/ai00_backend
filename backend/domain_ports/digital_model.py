@@ -1,7 +1,7 @@
 """Public references and application port owned by Digital Model."""
 from __future__ import annotations
 
-from typing import Mapping, Protocol, Sequence
+from typing import Any, Mapping, Protocol, Sequence
 
 from pydantic import Field
 
@@ -40,7 +40,17 @@ class DigitalModelQueryPort(Protocol):
     def search_components(self, model_id: str, version_id: str, query: str, *, limit: int, tenant_id: str, actor_id: str) -> Sequence[ComponentRef]: ...
 
 
+class ActiveDocumentSnapshotPort(Protocol):
+    """Connector-backed active digital-model document snapshot boundary."""
+
+    def get_document_snapshot(
+        self, device_id: str, context: Any,
+    ) -> Mapping[str, Any]: ...
+
+    def get_health(self, device_id: str, context: Any) -> Mapping[str, Any]: ...
+
+
 __all__ = [
-    "ComponentRef", "DigitalModelQueryPort", "ModelRef", "ModelSnapshotRef",
+    "ActiveDocumentSnapshotPort", "ComponentRef", "DigitalModelQueryPort", "ModelRef", "ModelSnapshotRef",
     "ModelVersionRef",
 ]

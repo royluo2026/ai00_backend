@@ -79,7 +79,7 @@ AMBIGUOUS_SCHEMA = {
     "required": ["resource_type", "code", "normalized_code", "candidates"],
     "properties": {
         **UNRESOLVED_SCHEMA["properties"],
-        "candidates": {"type": "array", "items": MODEL_REF_SCHEMA, "minItems": 2},
+        "candidates": {"type": "array", "items": MODEL_REF_SCHEMA, "minItems": 2, "maxItems": 100},
     },
     "additionalProperties": False,
 }
@@ -96,9 +96,9 @@ OUTPUT_SCHEMA = {
     "type": "object",
     "required": ["resolved", "unresolved", "ambiguous", "mapping_snapshot_hash"],
     "properties": {
-        "resolved": {"type": "array", "items": RESOLVED_SCHEMA},
-        "unresolved": {"type": "array", "items": UNRESOLVED_SCHEMA},
-        "ambiguous": {"type": "array", "items": AMBIGUOUS_SCHEMA},
+        "resolved": {"type": "array", "items": RESOLVED_SCHEMA, "maxItems": 500},
+        "unresolved": {"type": "array", "items": UNRESOLVED_SCHEMA, "maxItems": 500},
+        "ambiguous": {"type": "array", "items": AMBIGUOUS_SCHEMA, "maxItems": 500},
         "mapping_snapshot_hash": HASH_SCHEMA,
     },
     "additionalProperties": False,
@@ -194,6 +194,11 @@ class ResourceModelMappingProvider:
                 ) from exc
             if model_ref not in candidates[key]:
                 candidates[key].append(model_ref)
+                if len(candidates[key]) > 100:
+                    raise CapabilityBusinessError(
+                        "mapping_candidate_limit_exceeded",
+                        "mapping_candidate_limit_exceeded: one typed code has more than 100 active model mappings",
+                    )
             snapshot_rows.append({
                 "resource_type": key[0],
                 "normalized_code": key[1],

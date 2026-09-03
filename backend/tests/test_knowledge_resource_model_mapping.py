@@ -135,6 +135,9 @@ def test_contract_is_closed_and_registered_as_a_knowledge_read():
     assert registry.spec.output_schema["additionalProperties"] is False
     assert registry.descriptor.evidence_policy == "required"
     assert registry.descriptor.consistency_policy == "strong"
+    assert "mapping_candidate_limit_exceeded" in {
+        item.code for item in registry.descriptor.domain_errors
+    }
 
 
 def test_normalize_code_rejects_blank_values():
@@ -170,3 +173,21 @@ def test_resolve_requires_tenant_scope_and_rejects_invalid_stored_model_refs():
             {"items": [{"resource_type": "tool", "code": "T-01"}]}, context=CapabilityContext(user_gid="user-1", team_gid="team-1")
         )
     assert invalid_mapping.value.code == "mapping_data_invalid"
+
+
+def test_resolve_rejects_unbounded_active_candidates_for_one_code(context):
+    rows = [
+        row(
+            "tool", "t-01",
+            {**MODEL_T01, "model_id": f"tool-{index}", "version_id": f"v-{index}"},
+            index + 1,
+        )
+        for index in range(101)
+    ]
+
+    with pytest.raises(CapabilityBusinessError) as too_many:
+        ResourceModelMappingProvider(StubRepository(rows)).resolve(
+            {"items": [{"resource_type": "tool", "code": "T-01"}]}, context,
+        )
+
+    assert too_many.value.code == "mapping_candidate_limit_exceeded"

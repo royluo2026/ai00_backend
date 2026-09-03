@@ -34,6 +34,11 @@ CAPABILITY_IDS = {
     "simulation.run.search",
     "simulation.result.get",
     "simulation.result.compare",
+    "simulation.environment.compose",
+    "simulation.environment.manifest.get",
+    "simulation.environment.manifest.search",
+    "simulation.environment.manifest.archive",
+    "simulation.environment.preflight",
 }
 ROOT = Path(__file__).resolve().parents[2]
 

@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Mapping, Protocol, Sequence
+from typing import Any, Mapping, Protocol, Sequence
 
 
 @dataclass(frozen=True)
@@ -32,6 +32,14 @@ class CraftQueryPort(Protocol):
     def get_pbom_snapshot(self, object_ref: str, *, actor_id: str) -> PbomSnapshotRef: ...
 
 
+class CraftExecutionPlanPort(Protocol):
+    """Version-pinned execution structure used by cross-domain orchestrators."""
+
+    def get_execution_plan(
+        self, reference: Mapping[str, Any], context: Any,
+    ) -> Mapping[str, Any]: ...
+
+
 class CraftCommandPort(Protocol):
     def preview_change(
         self,
@@ -44,6 +52,6 @@ class CraftCommandPort(Protocol):
 
 
 __all__ = [
-    "BopVersionRef", "CraftChangeRef", "CraftCommandPort", "CraftQueryPort",
+    "BopVersionRef", "CraftChangeRef", "CraftCommandPort", "CraftExecutionPlanPort", "CraftQueryPort",
     "PbomSnapshotRef",
 ]

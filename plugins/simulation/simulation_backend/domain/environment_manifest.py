@@ -48,6 +48,40 @@ class CaptureProfileV1(FrozenModel):
     background: Literal["current", "transparent", "white", "black"] = "current"
 
 
+_OPERATION_FIELDS = {
+    "vismockup.application.probe@1": (("allow_launch",), ("process_ready", "document_ready", "product_version")),
+    "vismockup.document.snapshot@1": (("max_nodes", "max_depth"), ("document_id", "root_node_key", "source_identity", "snapshot_hash", "nodes")),
+    "vismockup.model.attach@1": (("document_id", "baseline_snapshot_hash", "binding",), ("node_key", "binding_id")),
+    "vismockup.scene.apply@1": (("document_id", "baseline_snapshot_hash", "scene"), ("actual_scene_hash",)),
+    "vismockup.scene.verify@1": (("document_id", "expected_scene_hash"), ("actual_scene_hash", "matches")),
+    "vismockup.view.capture@1": (("format", "width", "height", "background"), ("artifact",)),
+}
+REQUIRED_CONNECTOR_OPERATIONS = {
+    operation_id: _canonical_hash({
+        "operation_id": operation_id,
+        "input_fields": input_fields,
+        "output_fields": output_fields,
+        "contract_version": 1,
+    })
+    for operation_id, (input_fields, output_fields) in _OPERATION_FIELDS.items()
+}
+
+
+class ConnectorOperationRequirementV1(FrozenModel):
+    operation_id: str
+    contract_hash: str = Field(pattern=HASH_PATTERN)
+
+
+class ConnectorRequirementV1(FrozenModel):
+    protocol: Literal["ai00.connector.execution-plan.v1"]
+    adapter_id: Literal["ai00.vismockup"]
+    adapter_major: Literal[1]
+    product_id: Literal["siemens.vismockup"]
+    minimum_product_version: str
+    maximum_product_version_exclusive: str
+    operations: tuple[ConnectorOperationRequirementV1, ...]
+
+
 class ExecutionSourceV1(FrozenModel):
     bop_version_gid: str
     revision: int = Field(ge=1)
@@ -103,6 +137,7 @@ class SimulationEnvironmentManifestV1(FrozenModel):
     resource_bindings: tuple[ResourceBindingV1, ...]
     operations: tuple[ManifestOperationV1, ...]
     capture_profile: CaptureProfileV1
+    connector_requirement: ConnectorRequirementV1
     manifest_hash: str = Field(pattern=HASH_PATTERN)
 
     def scene_for(self, operation_id: str) -> SceneStateV1:
@@ -280,6 +315,18 @@ def compose_manifest(
         "resource_bindings": [item.model_dump(mode="json") for item in resource_bindings],
         "operations": [item.model_dump(mode="json") for item in manifest_operations],
         "capture_profile": profile.model_dump(mode="json"),
+        "connector_requirement": ConnectorRequirementV1(
+            protocol="ai00.connector.execution-plan.v1",
+            adapter_id="ai00.vismockup",
+            adapter_major=1,
+            product_id="siemens.vismockup",
+            minimum_product_version="1.0.0",
+            maximum_product_version_exclusive="2.0.0",
+            operations=tuple(
+                ConnectorOperationRequirementV1(operation_id=operation_id, contract_hash=contract_hash)
+                for operation_id, contract_hash in sorted(REQUIRED_CONNECTOR_OPERATIONS.items())
+            ),
+        ).model_dump(mode="json"),
     }
     content_hash = _canonical_hash(body)
     environment_id = "senv_" + re.sub(r"[^0-9a-f]", "", content_hash)[0:32]
@@ -292,5 +339,6 @@ def compose_manifest(
 
 __all__ = [
     "BindingProblem", "CaptureProfileV1", "CompositionResult", "ManifestOperationV1",
-    "SceneStateV1", "SimulationEnvironmentManifestV1", "compose_manifest",
+    "REQUIRED_CONNECTOR_OPERATIONS", "SceneStateV1", "SimulationEnvironmentManifestV1",
+    "compose_manifest",
 ]
