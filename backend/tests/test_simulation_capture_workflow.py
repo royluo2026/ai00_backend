@@ -154,6 +154,28 @@ def test_materialization_plan_attaches_models_before_scene_verification():
     assert connector.last_plan.steps[-1].depends_on == (connector.last_plan.steps[-2].step_id,)
 
 
+def test_materialization_outcome_projects_terminal_status_to_domain_run():
+    workflow, repository, connector, _ = _workflow()
+    asyncio.run(workflow.start_materialization("env-1", 1, "device-1", _context()))
+    plan = connector.last_plan
+    now = datetime(2026, 9, 3, tzinfo=UTC)
+    results = tuple(
+        ConnectorStepResultV1(
+            step_id=step.step_id, status="completed", result={},
+            result_hash=canonical_hash({}), started_at=now, completed_at=now,
+        )
+        for step in plan.steps
+    )
+    outcome = ConnectorPlanOutcomeV1(
+        protocol=plan.protocol, plan_id=plan.plan_id, status="completed",
+        steps=results, reported_at=now,
+    )
+
+    workflow.apply_materialization_outcome(plan, outcome)
+
+    assert repository.runs["run-1"]["status"] == "completed"
+
+
 def test_completed_artifact_is_attached_once_before_later_completed_step():
     workflow, _, _, craft = _workflow()
     asyncio.run(workflow.start_capture("env-1", 1, "device-1", _context()))

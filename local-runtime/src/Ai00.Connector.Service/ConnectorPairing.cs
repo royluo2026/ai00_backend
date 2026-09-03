@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using System.Security.Principal;
 using System.Text.Json.Serialization;
+using Ai00.Connector.Contracts;
 
 namespace Ai00.Connector.Service;
 
@@ -13,9 +14,12 @@ public static class ConnectorPairing
             .Where(item => item.value.StartsWith("--", StringComparison.Ordinal) && item.index + 1 < arguments.Length)
             .ToDictionary(item => item.value, item => arguments[item.index + 1], StringComparer.Ordinal);
         if (!values.TryGetValue("--gateway", out var gateway) ||
-            !values.TryGetValue("--token", out var token) ||
+            !arguments.Contains("--token-stdin", StringComparer.Ordinal) ||
             !Uri.TryCreate(gateway, UriKind.Absolute, out var gatewayUri) || gatewayUri.Scheme != Uri.UriSchemeHttps)
-            throw new InvalidOperationException("Usage: AI00.Connector.Service.exe pair --gateway https://server --token <pairing-code>");
+            throw new InvalidOperationException("Usage: AI00.Connector.Service.exe pair --gateway https://server --token-stdin");
+        var token = (await Console.In.ReadLineAsync(cancellationToken))?.Trim();
+        if (string.IsNullOrWhiteSpace(token))
+            throw new InvalidOperationException("pairing_token_required");
 
         using var http = new HttpClient { BaseAddress = new Uri(gateway.TrimEnd('/') + "/") };
         using var response = await http.PostAsJsonAsync("api/v1/connector/activate", new
@@ -35,10 +39,11 @@ public static class ConnectorPairing
             envelope.Data.DeviceId, envelope.Data.OwnerUserId, sid, envelope.Data.DeviceToken));
 
         Environment.SetEnvironmentVariable("AI00_CONNECTOR_DEVICE_ID", envelope.Data.DeviceId, EnvironmentVariableTarget.Machine);
-        Environment.SetEnvironmentVariable(
-            "AI00_LOCAL_OPERATION_KEYS",
-            $"{envelope.Data.PlanSigningKeyId}={envelope.Data.PlanSigningSecret}",
-            EnvironmentVariableTarget.Machine);
+        ProtectedSecretStore.Save(
+            Path.Combine(Path.GetDirectoryName(credentialPath)!, "operation.keys"),
+            new Dictionary<string, string> {
+                [envelope.Data.PlanSigningKeyId] = envelope.Data.PlanSigningSecret,
+            });
         Environment.SetEnvironmentVariable("Connector__GatewayUrl", gateway.TrimEnd('/'), EnvironmentVariableTarget.Machine);
         Console.WriteLine("AI00 Connector pairing completed. Sign out and sign in once to start SessionHost.");
     }

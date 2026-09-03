@@ -53,6 +53,17 @@ class RegisteredSourceResolver:
 
 
 class SimulationRepository:
+    def can_read_environment(self, environment_id: str, *, user_gid: str, team_gid: str) -> bool:
+        if not environment_id or not user_gid or not team_gid:
+            return False
+        with get_simulation_conn() as conn, conn.cursor() as cur:
+            cur.execute(
+                "SELECT 1 FROM workmanship_sim_environments "
+                "WHERE gid=%s AND (owner_gid=%s OR team_gid=%s) LIMIT 1",
+                (environment_id, user_gid, team_gid),
+            )
+            return cur.fetchone() is not None
+
     def create_parameter_set(self, row: Mapping[str, Any]) -> None:
         with get_simulation_conn() as conn:
             with conn.cursor() as cur:

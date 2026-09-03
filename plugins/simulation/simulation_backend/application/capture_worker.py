@@ -146,6 +146,27 @@ class CaptureWorkflow:
         self.repository.update_capture_step(capture_run_id, operation_id, **changes)
         self.repository.update_capture_run(capture_run_id, status="running")
 
+    def apply_materialization_outcome(
+        self, plan: ConnectorExecutionPlanV1, outcome: ConnectorPlanOutcomeV1,
+    ) -> None:
+        if outcome.plan_id != plan.plan_id or outcome.protocol != plan.protocol:
+            raise SimulationWorkflowError("plan_outcome_invalid")
+        materialization_operations = {
+            "vismockup.application.probe@1", "vismockup.model.attach@1",
+            "vismockup.scene.apply@1", "vismockup.scene.verify@1",
+        }
+        if not plan.steps or any(
+            step.operation_id not in materialization_operations for step in plan.steps
+        ):
+            raise SimulationWorkflowError("plan_outcome_invalid")
+        status = {
+            "completed": "completed", "failed": "failed",
+            "outcome_unknown": "outcome_unknown", "cancelled": "failed",
+        }.get(outcome.status)
+        if status is None:
+            raise SimulationWorkflowError("plan_outcome_invalid")
+        self.repository.update_materialization_run(plan.plan_id, status=status)
+
     async def advance(self, capture_run_id: str, context: CapabilityContext) -> dict[str, Any]:
         run = self.repository.get_capture_run(capture_run_id, context)
         if run is None:
@@ -304,6 +325,13 @@ class ConnectorOutcomeProjection:
             if self.snapshot_workflow is None:
                 raise SimulationWorkflowError("document_snapshot_projection_unavailable")
             self.snapshot_workflow.apply_connector_outcome(plan, outcome)
+            return None
+        materialization_operations = {
+            "vismockup.application.probe@1", "vismockup.model.attach@1",
+            "vismockup.scene.apply@1", "vismockup.scene.verify@1",
+        }
+        if operations and operations <= materialization_operations:
+            self.workflow.apply_materialization_outcome(plan, outcome)
             return None
         if "vismockup.view.capture@1" not in operations: return None
         context = CapabilityContext(

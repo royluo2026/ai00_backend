@@ -259,7 +259,7 @@ def test_lease_requires_a_fresh_ready_bound_session_and_returns_signed_plan(monk
     repository.save_health("device-001", healthy())
     lease = control_plane.lease_plan("device-001", 60)
     assert lease["lease_id"] == "lease-1"
-    assert lease["key_id"] == "connector-plan-key-1"
+    assert lease["key_id"].startswith("connector-plan-key-1.device.")
     assert lease["signature"].startswith("hmac-sha256:")
     assert lease["signature"] == sign_connector_plan_lease(plan(), lease["key_id"])["signature"]
 
@@ -284,6 +284,7 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
         assert spec.output_schema["additionalProperties"] is False
         assert descriptor.evidence_policy == "required"
         assert substantive_business_definition_errors(descriptor) == ()
+    assert by_id["device.connector.plan.queue"][1].consistency_policy == "external"
 
 
 def test_connector_heartbeat_route_passes_authenticated_device_identity(monkeypatch):
@@ -345,5 +346,6 @@ def test_connector_activation_provisions_the_plan_verification_key_before_consum
     response = device_runtime.connector_activate(body)
 
     assert len(consumed) == 1
-    assert response["data"]["plan_signing_key_id"] == "plan-key-1"
-    assert response["data"]["plan_signing_secret"] == "s" * 32
+    assert response["data"]["plan_signing_key_id"].startswith("plan-key-1.device.")
+    assert response["data"]["plan_signing_secret"] != "s" * 32
+    assert len(response["data"]["plan_signing_secret"]) == 64

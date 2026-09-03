@@ -27,13 +27,24 @@ class ConnectorError(RuntimeError):
     pass
 
 
+def connector_plan_signing_material(device_id: str) -> tuple[str, str]:
+    configured_key_id = os.environ.get("AI00_CONNECTOR_PLAN_SIGNING_KEY_ID", "")
+    master_secret = os.environ.get("AI00_CONNECTOR_PLAN_SIGNING_SECRET", "")
+    if not configured_key_id or len(master_secret.encode("utf-8")) < 32 or not device_id:
+        raise ConnectorError("connector_plan_signing_key_unavailable")
+    device_tag = hashlib.sha256(device_id.encode("utf-8")).hexdigest()[:16]
+    derived = hmac.new(
+        master_secret.encode("utf-8"),
+        f"ai00.connector.plan.v1:{device_id}".encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+    return f"{configured_key_id}.device.{device_tag}", derived
+
+
 def sign_connector_plan_lease(
     plan: ConnectorExecutionPlanV1, key_id: str | None = None,
 ) -> dict[str, str]:
-    configured_key_id = os.environ.get("AI00_CONNECTOR_PLAN_SIGNING_KEY_ID", "")
-    secret = os.environ.get("AI00_CONNECTOR_PLAN_SIGNING_SECRET", "")
-    if not configured_key_id or len(secret.encode("utf-8")) < 32:
-        raise ConnectorError("connector_plan_signing_key_unavailable")
+    configured_key_id, secret = connector_plan_signing_material(plan.device_id)
     if key_id is not None and key_id != configured_key_id:
         raise ConnectorError("connector_plan_signing_key_mismatch")
     digest = hmac.new(
@@ -193,12 +204,11 @@ class ConnectorControlPlane:
             actual != expected or any(step.status != "completed" for step in outcome.steps)
         ):
             raise ConnectorError("plan_outcome_invalid")
-        if outcome.status == "failed" and not any(step.status == "failed" for step in outcome.steps):
-            raise ConnectorError("plan_outcome_invalid")
-        if outcome.status == "outcome_unknown" and outcome.steps and not any(
-            step.status == "outcome_unknown" for step in outcome.steps
-        ):
-            raise ConnectorError("plan_outcome_invalid")
+        if outcome.status in {"failed", "outcome_unknown", "cancelled"}:
+            if not outcome.steps or outcome.steps[-1].status != outcome.status:
+                raise ConnectorError("plan_outcome_invalid")
+            if any(step.status != "completed" for step in outcome.steps[:-1]):
+                raise ConnectorError("plan_outcome_invalid")
         self.repository.complete_plan(device_id, plan_id, lease_id, outcome)
         if self.outcome_port is not None:
             await self.outcome_port.apply(plan, outcome)
@@ -450,7 +460,7 @@ __all__ = [
     "AdapterAdvertisement", "AdapterOperation", "ConnectorControlPlane",
     "ConnectorError", "ConnectorHealth", "register_connector_runtime_capabilities",
     "SqlConnectorRepository", "complete_connector_plan", "connector_control_plane",
-    "get_leased_connector_plan", "lease_connector_plan", "queue_connector_plan",
+    "connector_plan_signing_material", "get_leased_connector_plan", "lease_connector_plan", "queue_connector_plan",
     "sign_connector_plan_lease",
     "record_connector_heartbeat", "require_compatible",
 ]

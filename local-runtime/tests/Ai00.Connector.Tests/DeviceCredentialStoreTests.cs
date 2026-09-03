@@ -1,4 +1,5 @@
 using Ai00.Connector.Service;
+using Ai00.Connector.Contracts;
 using Xunit;
 
 namespace Ai00.Connector.Tests;
@@ -18,6 +19,20 @@ public sealed class DeviceCredentialStoreTests : IDisposable
 
         Assert.DoesNotContain("secret-token", File.ReadAllText(store.StoragePath));
         Assert.Equal(credential, store.Load());
+    }
+
+    [Fact]
+    public void OperationSigningKeyIsProtectedAtRestAndRoundTrips()
+    {
+        var path = Path.Combine(_directory, "operation.keys");
+        var values = new Dictionary<string, string> {
+            ["key.device.1"] = new string('s', 64),
+        };
+
+        ProtectedSecretStore.Save(path, values);
+
+        Assert.DoesNotContain(new string('s', 64), File.ReadAllText(path));
+        Assert.Equal(values["key.device.1"], ProtectedSecretStore.Load(path)["key.device.1"]);
     }
 
     public void Dispose()

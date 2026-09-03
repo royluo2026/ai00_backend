@@ -11,6 +11,8 @@ from .environment_composition import EnvironmentCompositionProvider, specs as co
 from .capture_runs import CaptureRunProvider, specs as capture_specs
 from ..application.capture_worker import ConnectorOutcomeProjection
 from .capture_runs import default_provider as default_capture_provider
+from .models import repository as legacy_repository
+from .environment_composition import repository as environment_repository
 from .document_snapshots import default_workflow as default_snapshot_workflow
 from .document_snapshots import specs as document_snapshot_specs
 from .provider import register
@@ -25,11 +27,35 @@ def _authorize_document_snapshot(resource_id, identity) -> bool:
     )
 
 
+def _identity_scope(identity):
+    return {
+        "user_gid": identity.actor.user_id or "",
+        "team_gid": identity.tenant.tenant_id,
+    }
+
+
+def _authorize_environment(resource_id, identity) -> bool:
+    scope = _identity_scope(identity)
+    return bool(scope["user_gid"]) and (
+        environment_repository.can_read_environment(resource_id, **scope)
+        or legacy_repository.can_read_environment(resource_id, **scope)
+    )
+
+
+def _authorize_capture_run(resource_id, identity) -> bool:
+    scope = _identity_scope(identity)
+    return bool(scope["user_gid"]) and default_capture_provider.workflow.repository.can_read_capture_run(
+        resource_id, **scope,
+    )
+
+
 def register_capabilities(
     registry: Any, *, composition_provider: EnvironmentCompositionProvider | None = None,
     capture_provider: CaptureRunProvider | None = None,
 ) -> None:
     resource_authorizers.register("simulation-document-snapshot", _authorize_document_snapshot)
+    resource_authorizers.register("simulation-environment", _authorize_environment)
+    resource_authorizers.register("simulation-capture-run", _authorize_capture_run)
     selected_capture_provider = capture_provider or default_capture_provider
     simulation_runtime_ports.register(
         "simulation.connector_outcome",

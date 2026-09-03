@@ -12,7 +12,7 @@ from plugins.device.device_backend.public import (
     activate_device, authorize_active_lease, authorize_command_artifact, authenticate_device, complete_command, create_enrollment,
     heartbeat, lease_command, list_devices, mark_command_reconciled, pending_reconciliations, revoke_device,
     ConnectorHealth, record_connector_heartbeat,
-    complete_connector_plan, get_leased_connector_plan, lease_connector_plan,
+    complete_connector_plan, connector_plan_signing_material, get_leased_connector_plan, lease_connector_plan,
 )
 from backend.platform_sdk.auth import build_profile, get_current_user
 from backend.capability_v2.contracts import ActorIdentity, ConsumerDescriptor, ConsumerIdentity, ConsumerType, OperationStatus, TenantIdentity
@@ -118,11 +118,12 @@ def connector_heartbeat(body: ConnectorHeartbeatBody, device: dict = Depends(_de
 
 @router.post("/connector/activate")
 def connector_activate(body: ActivateBody):
-    key_id = os.environ.get("AI00_CONNECTOR_PLAN_SIGNING_KEY_ID", "")
-    secret = os.environ.get("AI00_CONNECTOR_PLAN_SIGNING_SECRET", "")
-    if not key_id or len(secret.encode("utf-8")) < 32:
+    if not os.environ.get("AI00_CONNECTOR_PLAN_SIGNING_KEY_ID", "") or len(
+        os.environ.get("AI00_CONNECTOR_PLAN_SIGNING_SECRET", "").encode("utf-8")
+    ) < 32:
         raise HTTPException(status_code=503, detail={"code": "connector_plan_signing_key_unavailable"})
     response = activate(body)
+    key_id, secret = connector_plan_signing_material(response["data"]["device_gid"])
     response["data"].update({"plan_signing_key_id": key_id, "plan_signing_secret": secret})
     return response
 

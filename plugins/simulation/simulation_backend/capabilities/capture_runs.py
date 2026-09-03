@@ -26,6 +26,17 @@ def _loads(value, default):
 
 
 class SqlCaptureWorkflowRepository:
+    def can_read_capture_run(self, capture_run_id, *, user_gid, team_gid):
+        if not capture_run_id or not user_gid or not team_gid:
+            return False
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT 1 FROM workmanship_sim_capture_runs "
+                "WHERE capture_run_id=%s AND (owner_gid=%s OR team_gid=%s) LIMIT 1",
+                (capture_run_id, user_gid, team_gid),
+            )
+            return cursor.fetchone() is not None
+
     def get_manifest(self, environment_id, environment_version, context):
         return manifest_repository.get_manifest(environment_id, environment_version, context)
 

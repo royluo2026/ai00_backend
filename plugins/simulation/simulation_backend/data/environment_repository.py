@@ -16,6 +16,17 @@ def _visible_clause(alias: str = "") -> str:
 
 
 class EnvironmentManifestRepository:
+    def can_read_environment(self, environment_id: str, *, user_gid: str, team_gid: str) -> bool:
+        if not environment_id or not user_gid or not team_gid:
+            return False
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT 1 FROM workmanship_sim_connector_environments "
+                "WHERE environment_id=%s AND (owner_gid=%s OR team_gid=%s) LIMIT 1",
+                (environment_id, user_gid, team_gid),
+            )
+            return cursor.fetchone() is not None
+
     def insert_manifest(
         self,
         manifest: SimulationEnvironmentManifestV1,

@@ -76,7 +76,9 @@ def descriptor_for(spec: Any):
         "artifact_policy": "input" if governed.id == "vismockup.model.open" else ("output" if governed.id == "vismockup.capture" else "none"),
         "operation_policy": "required" if is_local else ("optional" if is_write else "none"),
         "concurrency_policy": "none", "idempotency_policy": "required" if is_write else ("optional" if is_local else "none"),
-        "consistency_policy": "external" if is_local else "strong", "evidence_policy": "required",
+        "consistency_policy": (
+            "external" if is_local or governed.id == "device.connector.plan.queue" else "strong"
+        ), "evidence_policy": "required",
         "domain_errors": _ERRORS, "domain_errors_complete": True,
     }
     if governed.id == "device.connector.health.get":
