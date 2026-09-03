@@ -21,6 +21,7 @@ public sealed class TemporaryFileStore
         {
             "model/jt" => ".jt",
             "model/plmxml" or "application/vnd.siemens.plmxml+xml" => ".plmxml",
+            "model/step" => ".stp",
             "image/png" => ".png",
             _ => throw new ConnectorException("artifact_media_type_unsupported"),
         };

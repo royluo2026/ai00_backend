@@ -1,4 +1,6 @@
 using Ai00.Connector.Contracts;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace Ai00.Connector.SessionHost;
 
@@ -9,8 +11,8 @@ public sealed class AdapterDispatcher(IEnumerable<IConnectorAdapter> adapters)
     private readonly SemaphoreSlim _serial = new(1, 1);
 
     public async Task<ConnectorPlanOutcome> ExecuteAsync(
-        ConnectorExecutionPlan plan,
-        CancellationToken cancellationToken)
+        ConnectorExecutionPlan plan, CancellationToken cancellationToken,
+        IReadOnlyList<MaterializedArtifact>? materializedArtifacts = null)
     {
         if (!_adapters.TryGetValue(plan.AdapterId, out var adapter) ||
             adapter.Manifest.AdapterMajor != plan.AdapterMajor)
@@ -25,8 +27,9 @@ public sealed class AdapterDispatcher(IEnumerable<IConnectorAdapter> adapters)
                 var startedAt = WholeSecond(DateTimeOffset.UtcNow);
                 try
                 {
+                    var payload = MaterializePayload(step, materializedArtifacts ?? []);
                     var result = await adapter.ExecuteAsync(
-                        new AdapterOperation(step.OperationId, step.Payload, step.StepId, step.ContractHash), cancellationToken);
+                        new AdapterOperation(step.OperationId, payload, step.StepId, step.ContractHash), cancellationToken);
                     var completedAt = WholeSecond(DateTimeOffset.UtcNow);
                     if (!result.Ok)
                     {
@@ -60,4 +63,19 @@ public sealed class AdapterDispatcher(IEnumerable<IConnectorAdapter> adapters)
 
     private static DateTimeOffset WholeSecond(DateTimeOffset value) =>
         value.AddTicks(-(value.Ticks % TimeSpan.TicksPerSecond));
+
+    private static JsonElement MaterializePayload(
+        ConnectorStep step, IReadOnlyList<MaterializedArtifact> artifacts)
+    {
+        if (step.OperationId != "vismockup.model.attach@1") return step.Payload;
+        var root = JsonNode.Parse(step.Payload.GetRawText())?.AsObject()
+            ?? throw new ConnectorException("artifact_materialization_required");
+        var binding = root["binding"]?.AsObject()
+            ?? throw new ConnectorException("resource_binding_invalid");
+        var artifactId = binding["model_ref"]?["artifact_ref"]?["artifact_id"]?.GetValue<string>() ?? "";
+        var materialized = artifacts.SingleOrDefault(item => item.ArtifactId == artifactId)
+            ?? throw new ConnectorException("artifact_materialization_required");
+        binding["local_artifact_path"] = materialized.CachePath;
+        return JsonSerializer.SerializeToElement(root);
+    }
 }

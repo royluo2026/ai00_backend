@@ -93,7 +93,8 @@ public sealed record ConnectorPlanExecutionRequest(
     [property: JsonPropertyName("key_id")] string KeyId,
     [property: JsonPropertyName("signature")] string Signature,
     [property: JsonPropertyName("device_id")] string DeviceId,
-    [property: JsonPropertyName("user_id")] string UserId);
+    [property: JsonPropertyName("user_id")] string UserId,
+    [property: JsonPropertyName("materialized_artifacts")] IReadOnlyList<MaterializedArtifact>? MaterializedArtifacts = null);
 
 public sealed record PlanValidationResult(bool IsValid, string ErrorCode)
 {

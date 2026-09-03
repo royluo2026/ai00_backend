@@ -25,7 +25,8 @@ public sealed class ValidatedPlanDispatcher(
                 request.KeyId, request.Signature, signingKeys));
         if (!validation.IsValid)
             return Rejected(request.Plan, validation.ErrorCode);
-        return await _dispatcher.ExecuteAsync(request.Plan, cancellationToken);
+        return await _dispatcher.ExecuteAsync(
+            request.Plan, cancellationToken, request.MaterializedArtifacts ?? []);
     }
 
     private static ConnectorPlanOutcome Rejected(ConnectorExecutionPlan plan, string code)

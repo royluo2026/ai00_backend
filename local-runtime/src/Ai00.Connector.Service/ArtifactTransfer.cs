@@ -1,14 +1,15 @@
 using System.Security.Cryptography;
 using Ai00.Connector.Contracts;
+using System.Text.Json.Serialization;
 
 namespace Ai00.Connector.Service;
 
 public sealed record ConnectorArtifactRef(
-    string ArtifactId,
-    string MediaType,
-    string Sha256,
-    long ByteSize,
-    int Version);
+    [property: JsonPropertyName("artifact_id")] string ArtifactId,
+    [property: JsonPropertyName("media_type")] string MediaType,
+    [property: JsonPropertyName("sha256")] string Sha256,
+    [property: JsonPropertyName("byte_size")] long ByteSize,
+    [property: JsonPropertyName("version")] int Version);
 
 public sealed record UploadGrant(string UploadSessionId, Uri UploadUrl, long MaximumBytes);
 public sealed record ArtifactUploadReceipt(string UploadSessionId, ConnectorArtifactRef Artifact);

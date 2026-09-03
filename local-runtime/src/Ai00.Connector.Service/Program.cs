@@ -7,6 +7,10 @@ builder.Services.AddSingleton<IDeviceCredentialStore>(_ => new DeviceCredentialS
     Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "AI00", "Connector", "device.credential")));
 builder.Services.AddHttpClient<DeviceGatewayClient>();
 builder.Services.AddHttpClient<ConnectorGatewayClient>();
+builder.Services.AddHttpClient<IArtifactTransport, HttpArtifactTransport>();
+builder.Services.AddSingleton<TemporaryFileStore>(service => new TemporaryFileStore(
+    service.GetRequiredService<Microsoft.Extensions.Options.IOptions<RuntimeOptions>>().Value.ArtifactCacheRoot));
+builder.Services.AddSingleton<ArtifactTransfer>();
 builder.Services.AddSingleton<IConnectorHeartbeatSink>(service =>
     service.GetRequiredService<ConnectorGatewayClient>());
 builder.Services.AddSingleton<IConnectorHealthSource, FileConnectorHealthSource>();

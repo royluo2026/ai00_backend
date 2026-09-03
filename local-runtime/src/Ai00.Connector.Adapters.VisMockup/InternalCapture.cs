@@ -2,6 +2,7 @@ using System.Buffers.Binary;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using Ai00.Connector.Contracts;
+using System.Text.Json.Serialization;
 
 namespace Ai00.Connector.Adapters.VisMockup;
 
@@ -13,13 +14,13 @@ public sealed record CaptureRequest(
     CaptureProfile Profile);
 
 public sealed record LocalCaptureArtifact(
-    string Path,
-    string MediaType,
-    string Sha256,
-    long ByteSize,
-    int Width,
-    int Height,
-    int Attempt);
+    [property: JsonPropertyName("path")] string Path,
+    [property: JsonPropertyName("media_type")] string MediaType,
+    [property: JsonPropertyName("sha256")] string Sha256,
+    [property: JsonPropertyName("byte_size")] long ByteSize,
+    [property: JsonPropertyName("width")] int Width,
+    [property: JsonPropertyName("height")] int Height,
+    [property: JsonPropertyName("attempt")] int Attempt);
 
 public sealed class InternalCapture(string root)
 {
