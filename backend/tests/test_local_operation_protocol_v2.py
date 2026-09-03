@@ -115,10 +115,10 @@ def test_native_local_provider_deprecates_direct_vismockup_exposure():
             assert descriptor.input_schema["properties"]["operation"]["enum"] == []
         elif capability_id.startswith("vismockup."):
             assert descriptor.lifecycle_status.value == "deprecated"
-            assert descriptor.exposure.local_runtime
-            assert not descriptor.exposure.plugin
-            assert not descriptor.exposure.agent
-            assert not descriptor.exposure.mcp
+            assert not any(descriptor.exposure.model_dump().values())
+        elif capability_id.startswith("device.connector."):
+            assert descriptor.lifecycle_status.value == "deprecated"
+            assert not any(descriptor.exposure.model_dump().values())
         else:
             assert descriptor.lifecycle_status.value == "stable"
             assert descriptor.exposure.plugin and descriptor.exposure.agent and descriptor.exposure.mcp
@@ -188,7 +188,7 @@ def test_device_outcome_is_closed_signed_and_requires_explicit_unknown_error():
         )
 
 
-def test_gateway_can_resolve_exact_owned_device_and_artifact_without_global_wildcards():
+def test_legacy_vismockup_tombstone_has_no_device_resource_selector():
     registry = CapabilityRegistry()
     register_capabilities(registry)
     provider = next(item for item in registry.snapshot() if item.spec.id == "vismockup.model.open")
@@ -212,10 +212,11 @@ def test_gateway_can_resolve_exact_owned_device_and_artifact_without_global_wild
     )
     decision = policy.authorize(provider.descriptor, envelope, provider)
     assert decision.allowed
-    assert set(decision.resource_refs) == {"device:device_1", "artifact:artifact_model_1"}
+    assert decision.resource_refs == ()
+    assert not any(provider.descriptor.exposure.model_dump().values())
 
 
-def test_gateway_denies_when_any_exact_resource_ownership_is_unproven():
+def test_legacy_vismockup_tombstone_cannot_retain_device_ownership_policy():
     registry = CapabilityRegistry()
     register_capabilities(registry)
     provider = next(item for item in registry.snapshot() if item.spec.id == "vismockup.model.open")
@@ -237,8 +238,9 @@ def test_gateway_denies_when_any_exact_resource_ownership_is_unproven():
         ),
         resource_authorizer=lambda ref, _identity, _user: ref == "device:device_1",
     )
-    with pytest.raises(PermissionError):
-        policy.authorize(provider.descriptor, envelope, provider)
+    decision = policy.authorize(provider.descriptor, envelope, provider)
+    assert decision.resource_refs == ()
+    assert provider.descriptor.resource_selectors == ()
 
 
 def test_resource_authorizer_registration_is_idempotent_but_cannot_be_overwritten():

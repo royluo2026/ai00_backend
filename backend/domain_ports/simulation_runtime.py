@@ -89,12 +89,12 @@ class GovernedSimulationRuntimeClient:
 
     async def get_health(self, device_id, context):
         return await self._invoke(DomainInvocation(
-            "device.connector.health.get", 1, {"device_id": device_id},
+            "simulation.connector.health.get", 1, {"connector_id": device_id},
         ), context)
 
     async def queue_plan(self, plan, context, *, approval_reference):
         return await self._invoke(DomainInvocation(
-            "device.connector.plan.queue", 2,
+            "simulation.connector.plan.queue", 1,
             {"plan": plan.model_dump(mode="json")}, idempotency_key=plan.plan_id,
             approval_reference=approval_reference,
         ), context)

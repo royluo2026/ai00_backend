@@ -175,7 +175,9 @@ def test_registration_adds_new_major_one_capabilities_without_changing_legacy_sc
     assert registry.get("simulation.environment.compose", 1).descriptor.lifecycle_status == "stable"
     assert registry.get("simulation.environment.preflight", 1).descriptor.side_effect_level == "read"
     compose = registry.get("simulation.environment.compose", 1).descriptor
-    assert {item.resource_type for item in compose.resource_selectors} == {"craft-bop-version", "device"}
+    assert {item.resource_type for item in compose.resource_selectors} == {
+        "craft-bop-version", "simulation-connector",
+    }
     retryability = {item.code: item.retryable for item in compose.domain_errors}
     assert retryability["connector_offline"] is True
     assert retryability["adapter_contract_mismatch"] is False

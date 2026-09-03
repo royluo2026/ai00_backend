@@ -58,8 +58,8 @@ def test_connector_queue_uses_gateway_with_exact_payload_identity_approval_and_i
     result = asyncio.run(adapter.queue_plan(plan, context, approval_reference="approval_exact_1"))
 
     invocation, invoked_identity, correlation = adapter.client.calls[0]
-    assert invocation.capability_id == "device.connector.plan.queue"
-    assert invocation.major_version == 2
+    assert invocation.capability_id == "simulation.connector.plan.queue"
+    assert invocation.major_version == 1
     assert invocation.payload == {"plan": plan.model_dump(mode="json")}
     assert invocation.idempotency_key == plan.plan_id
     assert invocation.approval_reference == "approval_exact_1"

@@ -3,7 +3,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from backend.capability_v2.provider_contracts import CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
+from backend.capability_v2.provider_contracts import (
+    CapabilityBusinessError, CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef,
+)
 
 from .. import public as control_plane
 
@@ -21,15 +23,10 @@ LOCAL_CAPABILITIES = (
 
 def _enqueue(capability_id: str):
     def invoke(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
-        result = control_plane.enqueue_command(
-            capability_id, 1, payload, context.user_gid,
-            operation_id=getattr(context, "operation_id", None),
-            team_gid=context.team_gid,
+        raise CapabilityBusinessError(
+            "capability_migration_required",
+            "Connector and VisMockup moved to the Simulation domain.",
         )
-        return CapabilityOutput(data={
-            "command_id": result["command_gid"], "device_id": result["device_gid"],
-            "status": result["status"], "expires_in": result["expires_in"],
-        }, evidence=(EvidenceRef(kind="local.operation", reference=f"local-operation:{result['command_gid']}"),))
     return invoke
 
 

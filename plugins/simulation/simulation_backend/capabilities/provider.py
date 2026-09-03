@@ -7,7 +7,14 @@ from backend.capability_v2.contracts import AutomationLevel, BusinessInvariantCo
 from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec
 from backend.capability_v2.business_definition import business_definition_hash
 
-from .contracts import INPUT_SCHEMAS, OUTPUT_SCHEMAS
+from .contracts import INPUT_SCHEMAS as DOMAIN_INPUT_SCHEMAS, OUTPUT_SCHEMAS as DOMAIN_OUTPUT_SCHEMAS
+from .connector_contracts import (
+    INPUT_SCHEMAS as CONNECTOR_INPUT_SCHEMAS,
+    OUTPUT_SCHEMAS as CONNECTOR_OUTPUT_SCHEMAS,
+)
+
+INPUT_SCHEMAS = {**DOMAIN_INPUT_SCHEMAS, **CONNECTOR_INPUT_SCHEMAS}
+OUTPUT_SCHEMAS = {**DOMAIN_OUTPUT_SCHEMAS, **CONNECTOR_OUTPUT_SCHEMAS}
 
 
 _TWO_PHASE_ENTRYPOINTS = {
@@ -17,6 +24,18 @@ _TWO_PHASE_ENTRYPOINTS = {
 }
 
 _RESOURCES = {
+    "simulation.connector.health.get": (("simulation-connector", "connector_id"),),
+    "simulation.connector.plan.queue": (("simulation-connector", "plan.device_id"),),
+    "simulation.vismockup.status.get": (("simulation-connector", "connector_id"),),
+    "simulation.vismockup.application.launch": (("simulation-connector", "connector_id"),),
+    "simulation.vismockup.model.open": (
+        ("simulation-connector", "connector_id"),
+        ("artifact", "artifact_ref.artifact_id"),
+    ),
+    "simulation.vismockup.tree.get": (("simulation-connector", "connector_id"),),
+    "simulation.vismockup.selection.highlight": (("simulation-connector", "connector_id"),),
+    "simulation.vismockup.visibility.change.apply": (("simulation-connector", "connector_id"),),
+    "simulation.vismockup.capture.create": (("simulation-connector", "connector_id"),),
     "simulation.parameter_set.get": (("simulation-parameter-set", "parameter_set_ref.parameter_set_id"),),
     "simulation.solver_profile.get": (("simulation-profile", "simulation_profile_ref.profile_id"),),
     "simulation.environment.create": (
@@ -30,24 +49,24 @@ _RESOURCES = {
     "simulation.environment.archive": (("simulation-environment", "environment_id"),),
     "simulation.environment.compose": (
         ("craft-bop-version", "execution_plan_ref.version_gid"),
-        ("device", "device_id"),
+        ("simulation-connector", "device_id"),
     ),
-    "simulation.document_snapshot.request": (("device", "device_id"),),
+    "simulation.document_snapshot.request": (("simulation-connector", "device_id"),),
     "simulation.document_snapshot.get": (("simulation-document-snapshot", "snapshot_request_id"),),
     "simulation.document_snapshot.action.get": (("simulation-document-snapshot", "snapshot_request_id"),),
     "simulation.document_snapshot.dispatch": (("simulation-document-snapshot", "snapshot_request_id"),),
     "simulation.environment.manifest.get": (("simulation-environment", "environment_id"),),
     "simulation.environment.manifest.archive": (("simulation-environment", "environment_id"),),
     "simulation.environment.preflight": (
-        ("simulation-environment", "environment_id"), ("device", "device_id"),
+        ("simulation-environment", "environment_id"), ("simulation-connector", "device_id"),
     ),
     "simulation.environment.materialize": (
-        ("simulation-environment", "environment_id"), ("device", "device_id"),
+        ("simulation-environment", "environment_id"), ("simulation-connector", "device_id"),
     ),
     "simulation.materialization_run.action.get": (("simulation-materialization-run", "run_id"),),
     "simulation.materialization_run.dispatch": (("simulation-materialization-run", "run_id"),),
     "simulation.capture_run.start": (
-        ("simulation-environment", "environment_id"), ("device", "device_id"),
+        ("simulation-environment", "environment_id"), ("simulation-connector", "device_id"),
     ),
     "simulation.capture_run.get": (("simulation-capture-run", "capture_run_id"),),
     "simulation.capture_run.action.get": (("simulation-capture-run", "capture_run_id"),),
@@ -117,30 +136,30 @@ _RETRYABLE_ERROR_CODES = frozenset({
 _CONNECTOR_BUSINESS_EFFECTS = {
     "simulation.document_snapshot.request": "Queue one bounded immutable snapshot of the bound user's currently active VisMockup BOM for later environment composition.",
     "simulation.document_snapshot.get": "Return authoritative status and the immutable confirmed BOM snapshot for one caller-visible request.",
-    "simulation.document_snapshot.action.get": "Return the exact Device action that must be confirmed before the active VisMockup BOM is read.",
-    "simulation.document_snapshot.dispatch": "Consume the separately issued Device confirmation and dispatch the prepared active-document snapshot once.",
+    "simulation.document_snapshot.action.get": "Return the exact Connector action that must be confirmed before the active VisMockup BOM is read.",
+    "simulation.document_snapshot.dispatch": "Consume the separately issued Connector confirmation and dispatch the prepared active-document snapshot once.",
     "simulation.environment.compose": "Create one immutable, reproducible simulation-environment manifest from the selected process version, active VisMockup BOM and governed resource-model mappings.",
     "simulation.environment.manifest.get": "Return one caller-visible immutable simulation-environment manifest with its exact source and Connector contract pins.",
     "simulation.environment.manifest.search": "Return a bounded caller-visible list of simulation-environment manifests for reuse and audit.",
     "simulation.environment.manifest.archive": "Archive a simulation-environment identity while retaining every immutable manifest and execution record for audit.",
     "simulation.environment.preflight": "Report every known incompatibility between an immutable environment manifest and the bound AI00 Connector session without starting local work.",
     "simulation.environment.materialize": "Queue construction and verification of the exact immutable simulation environment in the bound user's VisMockup session.",
-    "simulation.materialization_run.action.get": "Return the exact Device action that must be confirmed before the prepared VisMockup environment is materialized.",
-    "simulation.materialization_run.dispatch": "Consume the separately issued Device confirmation and dispatch the prepared environment materialization once.",
+    "simulation.materialization_run.action.get": "Return the exact Connector action that must be confirmed before the prepared VisMockup environment is materialized.",
+    "simulation.materialization_run.dispatch": "Consume the separately issued Connector confirmation and dispatch the prepared environment materialization once.",
     "simulation.capture_run.start": "Queue VisMockup-internal screenshots in reverse process order for an exact environment manifest and attach confirmed artifacts to their Craft operations.",
     "simulation.capture_run.get": "Return authoritative capture-run, step and artifact-association progress for the caller-visible run.",
-    "simulation.capture_run.action.get": "Return the exact next Device or Craft action that must be confirmed before one serialized capture transition.",
+    "simulation.capture_run.action.get": "Return the exact next Connector or Craft action that must be confirmed before one serialized capture transition.",
     "simulation.capture_run.dispatch": "Consume the separately issued confirmation for the exact next downstream action and dispatch only that action.",
     "simulation.capture_run.cancel": "Cancel only capture work that has not started while preserving active and completed outcomes for reconciliation.",
     "simulation.capture_step.retry": "Create a new attempt for one proven-failed capture step without replaying successful or outcome-unknown local effects.",
-    "simulation.connector_capture_outcome.apply": "Project one authenticated Device-owned Connector outcome into the exact caller-visible capture run without dispatching later work.",
-    "simulation.connector_materialization_outcome.apply": "Project one authenticated Device-owned Connector outcome into the exact caller-visible materialization run.",
-    "simulation.connector_document_snapshot_outcome.apply": "Project one authenticated Device-owned Connector outcome into the exact caller-visible document snapshot request.",
+    "simulation.connector_capture_outcome.apply": "Project one authenticated Simulation-owned Connector outcome into the exact caller-visible capture run without dispatching later work.",
+    "simulation.connector_materialization_outcome.apply": "Project one authenticated Simulation-owned Connector outcome into the exact caller-visible materialization run.",
+    "simulation.connector_document_snapshot_outcome.apply": "Project one authenticated Simulation-owned Connector outcome into the exact caller-visible document snapshot request.",
 }
 _TWO_PHASE_BUSINESS_EFFECTS = {
-    "simulation.document_snapshot.request": "Prepare one bounded immutable snapshot request for later user-confirmed Device dispatch.",
-    "simulation.environment.materialize": "Prepare construction and verification of the exact immutable simulation environment for later user-confirmed Device dispatch.",
-    "simulation.capture_run.start": "Prepare reverse-order VisMockup-internal screenshot steps; each Device or Craft action is dispatched only after separate exact confirmation.",
+    "simulation.document_snapshot.request": "Prepare one bounded immutable snapshot request for later user-confirmed Connector dispatch.",
+    "simulation.environment.materialize": "Prepare construction and verification of the exact immutable simulation environment for later user-confirmed Connector dispatch.",
+    "simulation.capture_run.start": "Prepare reverse-order VisMockup-internal screenshot steps; each Connector or Craft action is dispatched only after separate exact confirmation.",
 }
 
 _CONNECTOR_READ_REASON = (
@@ -161,7 +180,7 @@ _CONNECTOR_BUSINESS_INVARIANTS = {
     "simulation.document_snapshot.dispatch": (
         BusinessInvariantContract(
             rule_id="simulation.document_snapshot.dispatch_once", version=1,
-            statement="The immutable snapshot plan is dispatched only after separate confirmation of the exact Device action and is not offered again after dispatch.",
+            statement="The immutable snapshot plan is dispatched only after separate confirmation of the exact Connector action and is not offered again after dispatch.",
             applies_when="a prepared active-document snapshot is dispatched",
             enforcement_ref="plugins/simulation/simulation_backend/application/document_snapshots.py:DocumentSnapshotWorkflow.dispatch",
             error_code="document_snapshot_action_not_ready",
@@ -310,22 +329,44 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
                 "simulation.capture_run.action.get", "simulation.capture_run.dispatch",
                 "simulation.materialization_run.action.get", "simulation.materialization_run.dispatch",
             }
-            or governed.id.startswith("simulation.connector_")
+            or governed.id.startswith("simulation.connector")
+            or governed.id.startswith("simulation.vismockup.")
             else LifecycleStatus.STABLE
         ),
-        "exposure": ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True),
+        "exposure": (
+            ExposurePolicy(local_runtime=True)
+            if governed.id.startswith("simulation.vismockup.")
+            else ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True)
+        ),
         "exposure_policy_source": "provider_explicit",
         "automation_level": AutomationLevel.A1 if is_write else AutomationLevel.A2,
         "authorization_policy": "simulation.v2:" + ",".join(governed.permissions),
         "resource_selectors": tuple(ResourceSelector(resource_type=t, payload_path=p) for t, p in _RESOURCES.get(governed.id, ())),
         "data_classification": "confidential", "delegation_policy": "scoped",
         "agent_output_schema": descriptor.output_schema,
-        "execution_mode": ExecutionMode.CLOUD_ASYNC if governed.id == "simulation.run.start" else descriptor.execution_mode,
-        "artifact_policy": "output" if governed.id == "simulation.result.get" else "none",
-        "operation_policy": "required" if governed.id == "simulation.run.start" else ("optional" if is_write else "none"),
+        "execution_mode": (
+            ExecutionMode.LOCAL
+            if governed.id.startswith("simulation.vismockup.")
+            else ExecutionMode.CLOUD_ASYNC
+            if governed.id == "simulation.run.start"
+            else descriptor.execution_mode
+        ),
+        "artifact_policy": (
+            "input" if governed.id == "simulation.vismockup.model.open"
+            else "output" if governed.id in {"simulation.result.get", "simulation.vismockup.capture.create"}
+            else "none"
+        ),
+        "operation_policy": (
+            "required" if governed.id.startswith("simulation.vismockup.") or governed.id == "simulation.run.start"
+            else "optional" if is_write else "none"
+        ),
         "concurrency_policy": "none", "idempotency_policy": "required" if is_write else "none",
         "consistency_policy": "external" if is_write else "strong", "evidence_policy": "required",
-        "domain_errors": _errors(connector_environment="connector_environment" in governed.tags),
+        "domain_errors": _errors(connector_environment=(
+            "connector_environment" in governed.tags
+            or governed.id.startswith("simulation.connector")
+            or governed.id.startswith("simulation.vismockup.")
+        )),
         "domain_errors_complete": True,
     }
     if governed.id in _TWO_PHASE_ENTRYPOINTS and governed.version == 1:
@@ -355,6 +396,26 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             ),
             "business_invariants": invariants,
             "no_business_invariant_reason": None if invariants else _CONNECTOR_READ_REASON,
+        })
+    if (
+        governed.id.startswith("simulation.connector.")
+        or governed.id.startswith("simulation.vismockup.")
+    ):
+        updates.update({
+            "business_effect": (
+                "Validate and persist one exact Connector control-plane operation for the caller-bound Simulation runtime."
+                if governed.id.startswith("simulation.connector.")
+                else "Expose one exact VisMockup adapter atom exclusively to a signed Simulation Connector execution plan."
+            ),
+            "business_acceptance_criteria": (
+                "The operation is scoped to the caller's single bound Simulation Connector.",
+                "The closed request and response contracts preserve exact Connector and Adapter identity.",
+                "Rejected operations do not create ungoverned VisMockup side effects.",
+            ),
+            "business_invariants": (),
+            "no_business_invariant_reason": (
+                "Identity, contract and execution-plan validation fully determine this atomic boundary; no additional business-state rule is decided here."
+            ),
         })
     return CapabilityDescriptorV2.model_validate({**descriptor.model_dump(), **updates})
 

@@ -78,7 +78,7 @@ class DocumentSnapshotWorkflow:
             return None
         plan = ConnectorExecutionPlanV1.model_validate(row.get("plan"))
         return {
-            "capability_id": "device.connector.plan.queue", "major_version": 2,
+            "capability_id": "simulation.connector.plan.queue", "major_version": 1,
             "payload": {"plan": plan.model_dump(mode="json")},
             "idempotency_key": plan.plan_id,
         }

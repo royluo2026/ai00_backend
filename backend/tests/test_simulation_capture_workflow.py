@@ -136,8 +136,8 @@ def test_capture_prepares_then_dispatches_only_the_first_reverse_order_operation
     asyncio.run(workflow.start_capture("env-1", 1, "device-1", _context()))
     assert connector.plans == []
     action = workflow.next_action("run-1", _context())
-    assert action["capability_id"] == "device.connector.plan.queue"
-    assert action["major_version"] == 2
+    assert action["capability_id"] == "simulation.connector.plan.queue"
+    assert action["major_version"] == 1
     asyncio.run(workflow.dispatch_next("run-1", "approval-device-1", _context()))
 
     captures = [step.payload["operation_id"] for plan, _approval in connector.plans for step in plan.steps
@@ -158,8 +158,8 @@ def test_materialization_plan_attaches_models_before_scene_verification():
     asyncio.run(workflow.start_materialization("env-1", 1, "device-1", _context()))
     assert connector.plans == []
     action = workflow.next_materialization_action("run-1", _context())
-    assert action["capability_id"] == "device.connector.plan.queue"
-    assert action["major_version"] == 2
+    assert action["capability_id"] == "simulation.connector.plan.queue"
+    assert action["major_version"] == 1
     asyncio.run(workflow.dispatch_materialization("run-1", "approval-materialize", _context()))
 
     operation_ids = [step.operation_id for step in connector.last_plan.steps]
@@ -267,8 +267,8 @@ def test_capture_dispatch_consumes_the_user_approved_exact_downstream_action():
     asyncio.run(workflow.start_capture("env-1", 1, "device-1", _context()))
 
     action = provider.action({"capture_run_id": "run-1"}, _context()).data["action"]
-    assert action["capability_id"] == "device.connector.plan.queue"
-    assert action["major_version"] == 2
+    assert action["capability_id"] == "simulation.connector.plan.queue"
+    assert action["major_version"] == 1
     assert action["payload_hash"] == canonical_hash(json.loads(action["payload_json"]))
 
     approved_context = _context().model_copy(update={"confirmation_token": "approved-exact-action"})

@@ -19,21 +19,15 @@ def _registrations():
     return {item.spec.id: item for item in registry.snapshot()}
 
 
-def test_direct_vismockup_capabilities_are_local_runtime_compatibility_only():
+def test_direct_vismockup_capabilities_are_fail_closed_after_simulation_migration():
     registrations = _registrations()
     for capability_id in DIRECT_VISMOCKUP_IDS:
         descriptor = registrations[capability_id].descriptor
         assert descriptor.lifecycle_status.value == "deprecated"
-        assert descriptor.exposure.local_runtime is True
-        assert descriptor.exposure.web is False
-        assert descriptor.exposure.api is False
-        assert descriptor.exposure.plugin is False
-        assert descriptor.exposure.agent is False
-        assert descriptor.exposure.mcp is False
+        assert not any(descriptor.exposure.model_dump().values())
 
 
 def test_deprecation_names_governed_simulation_replacement():
     registrations = _registrations()
-    assert "simulation.capture_run.start" in registrations["vismockup.capture"].descriptor.deprecation_message
-    for capability_id in DIRECT_VISMOCKUP_IDS - {"vismockup.capture"}:
-        assert "simulation.environment.materialize" in registrations[capability_id].descriptor.deprecation_message
+    for capability_id in DIRECT_VISMOCKUP_IDS:
+        assert "simulation" in registrations[capability_id].descriptor.deprecation_message.lower()

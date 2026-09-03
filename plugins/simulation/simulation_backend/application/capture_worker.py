@@ -82,7 +82,7 @@ class CaptureWorkflow:
             return None
         plan = ConnectorExecutionPlanV1.model_validate(run["plan"])
         return {
-            "capability_id": "device.connector.plan.queue", "major_version": 2,
+            "capability_id": "simulation.connector.plan.queue", "major_version": 1,
             "payload": {"plan": plan.model_dump(mode="json")},
             "idempotency_key": plan.plan_id,
         }
@@ -173,7 +173,7 @@ class CaptureWorkflow:
             return None
         plan = ConnectorExecutionPlanV1.model_validate(step["plan"])
         return {
-            "capability_id": "device.connector.plan.queue", "major_version": 2,
+            "capability_id": "simulation.connector.plan.queue", "major_version": 1,
             "payload": {"plan": plan.model_dump(mode="json")},
             "idempotency_key": plan.plan_id,
         }
@@ -187,7 +187,7 @@ class CaptureWorkflow:
         if action is None:
             raise SimulationWorkflowError("capture_action_not_ready")
         payload = action["payload"]
-        if action["capability_id"] == "device.connector.plan.queue":
+        if action["capability_id"] == "simulation.connector.plan.queue":
             plan = ConnectorExecutionPlanV1.model_validate(payload["plan"])
             await self.connector_port.queue_plan(
                 plan, context, approval_reference=approval_reference,

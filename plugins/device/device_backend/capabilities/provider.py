@@ -16,6 +16,9 @@ DEPRECATED_DIRECT_VISMOCKUP_CAPABILITIES = frozenset({
     "vismockup.tree", "vismockup.highlight", "vismockup.visibility",
     "vismockup.capture",
 })
+DEPRECATED_CONNECTOR_CAPABILITIES = frozenset({
+    "device.connector.health.get", "device.connector.plan.queue",
+})
 
 
 _ERRORS = tuple(DomainErrorContract(code=code, meaning=meaning, retryable=retryable) for code, meaning, retryable in (
@@ -46,13 +49,16 @@ def descriptor_for(spec: Any):
         selectors.append(ResourceSelector(resource_type="device", payload_path="plan.device_id"))
     if governed.id == "vismockup.model.open":
         selectors.append(ResourceSelector(resource_type="artifact", payload_path="artifact_ref.artifact_id"))
+    if governed.id in DEPRECATED_CONNECTOR_CAPABILITIES | DEPRECATED_DIRECT_VISMOCKUP_CAPABILITIES:
+        selectors = []
     updates = {
         "lifecycle_status": (
             LifecycleStatus.DEPRECATED
-            if governed.id in DEPRECATED_LOCAL_DEVICE_CAPABILITIES | DEPRECATED_DIRECT_VISMOCKUP_CAPABILITIES
-            or (governed.id == "device.connector.plan.queue" and governed.version == 1)
-            else LifecycleStatus.EXPERIMENTAL
-            if governed.id == "device.connector.plan.queue" and governed.version >= 2
+            if governed.id in (
+                DEPRECATED_LOCAL_DEVICE_CAPABILITIES
+                | DEPRECATED_DIRECT_VISMOCKUP_CAPABILITIES
+                | DEPRECATED_CONNECTOR_CAPABILITIES
+            )
             else LifecycleStatus.STABLE
         ),
         "deprecation_message": (
@@ -63,17 +69,17 @@ def descriptor_for(spec: Any):
                 if governed.id == "vismockup.capture" else (
                     "Use simulation.environment.materialize; direct VisMockup commands remain an internal AI00 Connector compatibility path only."
                     if governed.id in DEPRECATED_DIRECT_VISMOCKUP_CAPABILITIES else (
-                        "Strong-consistency queue @1 is closed; migrate to device.connector.plan.queue@2."
-                        if governed.id == "device.connector.plan.queue" and governed.version == 1 else None
+                        "Connector control moved to the Simulation domain; migrate to simulation.connector capabilities."
+                        if governed.id in DEPRECATED_CONNECTOR_CAPABILITIES else None
                     )
                 )
             )
         ),
         "exposure": (
             ExposurePolicy()
-            if governed.id == "device.connector.plan.queue" and governed.version == 1
+            if governed.id in DEPRECATED_CONNECTOR_CAPABILITIES
             else
-            ExposurePolicy(web=False, api=False, plugin=False, agent=False, mcp=False, local_runtime=True)
+            ExposurePolicy()
             if governed.id in DEPRECATED_DIRECT_VISMOCKUP_CAPABILITIES
             else ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True, local_runtime=is_local)
         ),
@@ -117,7 +123,7 @@ def descriptor_for(spec: Any):
                     rule_id="device.connector.plan.bound_identity", version=1,
                     statement="A Connector plan is queued only for the authenticated device and its single bound AI00 user.",
                     applies_when="a local Connector execution plan is queued",
-                    enforcement_ref="plugins/device/device_backend/capabilities/connector_runtime.py:ConnectorControlPlane.queue_plan",
+                    enforcement_ref="plugins/simulation/simulation_backend/capabilities/connector_runtime.py:ConnectorControlPlane.queue_plan",
                     error_code="device_not_found",
                     test_refs=("backend/tests/test_connector_runtime_control_plane.py::test_queue_checks_protocol_adapter_operation_and_contract_hash",),
                 ),
@@ -132,4 +138,7 @@ def register(registry: Any, spec: Any, handler: Any) -> None:
     registry.register(governed, handler, descriptor=descriptor_for(governed))
 
 
-__all__ = ["DEPRECATED_DIRECT_VISMOCKUP_CAPABILITIES", "DEPRECATED_LOCAL_DEVICE_CAPABILITIES", "descriptor_for", "register"]
+__all__ = [
+    "DEPRECATED_CONNECTOR_CAPABILITIES", "DEPRECATED_DIRECT_VISMOCKUP_CAPABILITIES",
+    "DEPRECATED_LOCAL_DEVICE_CAPABILITIES", "descriptor_for", "register",
+]

@@ -56,6 +56,15 @@ CAPABILITY_IDS = {
     "simulation.connector_capture_outcome.apply",
     "simulation.connector_materialization_outcome.apply",
     "simulation.connector_document_snapshot_outcome.apply",
+    "simulation.connector.health.get",
+    "simulation.connector.plan.queue",
+    "simulation.vismockup.status.get",
+    "simulation.vismockup.application.launch",
+    "simulation.vismockup.model.open",
+    "simulation.vismockup.tree.get",
+    "simulation.vismockup.selection.highlight",
+    "simulation.vismockup.visibility.change.apply",
+    "simulation.vismockup.capture.create",
 }
 EXPERIMENTAL_IDS = {
     capability_id for capability_id in CAPABILITY_IDS
@@ -70,6 +79,15 @@ EXPERIMENTAL_IDS = {
     "simulation.connector_document_snapshot_outcome.apply",
     "simulation.environment.materialize",
     "simulation.capture_run.start",
+    "simulation.connector.health.get",
+    "simulation.connector.plan.queue",
+    "simulation.vismockup.status.get",
+    "simulation.vismockup.application.launch",
+    "simulation.vismockup.model.open",
+    "simulation.vismockup.tree.get",
+    "simulation.vismockup.selection.highlight",
+    "simulation.vismockup.visibility.change.apply",
+    "simulation.vismockup.capture.create",
 }
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -126,7 +144,9 @@ def test_provider_publishes_native_stable_plugin_agent_and_mcp_contracts():
         assert descriptor.owner_domain == "simulation", capability_id
         expected_lifecycle = "experimental" if capability_id in EXPERIMENTAL_IDS else "stable"
         assert descriptor.lifecycle_status == expected_lifecycle, capability_id
-        if capability_id.startswith("simulation.connector_") and capability_id.endswith("_outcome.apply"):
+        if (
+            capability_id.startswith("simulation.connector_") and capability_id.endswith("_outcome.apply")
+        ) or capability_id.startswith("simulation.vismockup."):
             assert descriptor.exposure.local_runtime
             assert not descriptor.exposure.web and not descriptor.exposure.plugin
             assert not descriptor.exposure.agent and not descriptor.exposure.mcp

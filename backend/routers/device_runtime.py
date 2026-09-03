@@ -11,8 +11,10 @@ from pydantic import BaseModel, ConfigDict, Field
 from plugins.device.device_backend.public import (
     activate_device, authorize_active_lease, authorize_command_artifact, authenticate_device, complete_command, create_enrollment,
     heartbeat, lease_command, list_devices, mark_command_reconciled, pending_reconciliations, revoke_device,
-    ConnectorHealth, record_connector_heartbeat,
-    complete_connector_plan, connector_plan_signing_material, get_leased_connector_plan, lease_connector_plan,
+)
+from plugins.simulation.simulation_backend.capabilities.connector_runtime import (
+    ConnectorHealth, complete_connector_plan, connector_plan_signing_material,
+    get_leased_connector_plan, lease_connector_plan, record_connector_heartbeat,
 )
 from backend.platform_sdk.auth import build_profile, get_current_user
 from backend.capability_v2.contracts import ActorIdentity, ConsumerDescriptor, ConsumerIdentity, ConsumerType, OperationStatus, TenantIdentity

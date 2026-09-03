@@ -76,8 +76,8 @@ def test_snapshot_request_is_idempotent_and_completes_only_from_connector_outcom
     assert first["status"] == second["status"] == "queued"
     assert connector.plans == []
     action = workflow.next_action("snapshot-1", context())
-    assert action["capability_id"] == "device.connector.plan.queue"
-    assert action["major_version"] == 2
+    assert action["capability_id"] == "simulation.connector.plan.queue"
+    assert action["major_version"] == 1
     asyncio.run(workflow.dispatch("snapshot-1", "approval-snapshot", context()))
     assert len(connector.plans) == 1
     assert connector.plans[0][1] == "approval-snapshot"

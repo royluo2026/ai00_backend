@@ -13,6 +13,10 @@ from .environment_composition import repository as environment_repository
 from .document_snapshots import default_workflow as default_snapshot_workflow
 from .document_snapshots import specs as document_snapshot_specs
 from .connector_outcomes import ConnectorOutcomeProvider, specs as connector_outcome_specs
+from .connector_runtime import (
+    connector_control_plane,
+    register_connector_runtime_capabilities,
+)
 from .provider import register
 
 
@@ -69,6 +73,13 @@ def _authorize_run(resource_id, identity) -> bool:
     return bool(scope["user_gid"]) and legacy_repository.can_read_run(resource_id, **scope)
 
 
+def _authorize_connector(resource_id, identity) -> bool:
+    scope = _identity_scope(identity)
+    return bool(scope["user_gid"]) and connector_control_plane.repository.can_use_connector(
+        resource_id, **scope,
+    )
+
+
 def register_capabilities(
     registry: Any, *, composition_provider: EnvironmentCompositionProvider | None = None,
     capture_provider: CaptureRunProvider | None = None,
@@ -80,6 +91,7 @@ def register_capabilities(
     resource_authorizers.register("simulation-parameter-set", _authorize_parameter_set)
     resource_authorizers.register("simulation-profile", _authorize_profile)
     resource_authorizers.register("simulation-run", _authorize_run)
+    resource_authorizers.register("simulation-connector", _authorize_connector)
     selected_capture_provider = capture_provider or default_capture_provider
     for spec, handler in specs():
         register(registry, spec, handler)
@@ -94,6 +106,7 @@ def register_capabilities(
     )
     for spec, handler in connector_outcome_specs(outcome_provider):
         register(registry, spec, handler)
+    register_connector_runtime_capabilities(registry, connector_control_plane)
 
 
 __all__ = ["register_capabilities"]

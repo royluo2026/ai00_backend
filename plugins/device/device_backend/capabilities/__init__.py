@@ -8,7 +8,7 @@ from .runtime import specs
 from .reviewed import register_reviewed_capabilities
 from backend.domain_ports.resource_authorization import resource_authorizers
 from .. import control_plane
-from .connector_runtime import connector_control_plane, register_connector_runtime_capabilities
+from .legacy_connector import register_legacy_connector_capabilities
 
 
 def _authorize_owned_device(device_id, identity) -> bool:
@@ -22,7 +22,7 @@ def register_capabilities(registry: Any) -> None:
     for spec, handler in specs():
         register(registry, spec, handler)
     register_reviewed_capabilities(registry)
-    register_connector_runtime_capabilities(registry, connector_control_plane)
+    register_legacy_connector_capabilities(registry)
 
 
 __all__ = ["register_capabilities"]

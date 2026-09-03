@@ -1,11 +1,13 @@
 """Native Local Integration provider acceptance tests."""
-from backend.capabilities.models_next import CapabilityContext
+import pytest
+
+from backend.capabilities.models_next import CapabilityBusinessError, CapabilityContext
 from backend.capabilities.registry_next import CapabilityRegistry
 from plugins.device.device_backend.capabilities import register_capabilities
 from plugins.device.device_backend.capabilities import runtime
 
 
-def test_local_handlers_bind_command_identity_to_gateway_operation(monkeypatch):
+def test_legacy_vismockup_handler_fails_closed_without_enqueuing(monkeypatch):
     captured = {}
 
     def enqueue(capability_id, version, payload, user_gid, ttl_seconds=300, operation_id=None, team_gid=None):
@@ -16,15 +18,15 @@ def test_local_handlers_bind_command_identity_to_gateway_operation(monkeypatch):
     registry = CapabilityRegistry()
     register_capabilities(registry)
     registration = next(item for item in registry.snapshot() if item.spec.id == "vismockup.visibility")
-    output = registration.handler(
-        {"device_id": "device-1", "action": "all_on"},
-        CapabilityContext(user_gid="user-1", team_gid="tenant-a", operation_id="operation-1"),
-    )
-    assert output.data["command_id"] == "operation-1"
-    assert captured == {"capability_id": "vismockup.visibility", "payload": {"device_id": "device-1", "action": "all_on"}, "operation_id": "operation-1", "team_gid": "tenant-a"}
+    with pytest.raises(CapabilityBusinessError, match="Simulation domain"):
+        registration.handler(
+            {"device_id": "device-1", "action": "all_on"},
+            CapabilityContext(user_gid="user-1", team_gid="tenant-a", operation_id="operation-1"),
+        )
+    assert captured == {}
 
 
-def test_every_local_action_uses_durable_operation_and_device_resource_selector():
+def test_legacy_vismockup_descriptors_retain_no_device_resource_selector():
     registry = CapabilityRegistry()
     register_capabilities(registry)
     for registration in registry.snapshot():
@@ -33,7 +35,8 @@ def test_every_local_action_uses_durable_operation_and_device_resource_selector(
             continue
         assert descriptor.operation_policy == "required"
         assert descriptor.execution_mode.value == "local"
-        assert any(selector.resource_type == "device" and selector.payload_path == "device_id" for selector in descriptor.resource_selectors)
+        assert descriptor.resource_selectors == ()
+        assert not any(descriptor.exposure.model_dump().values())
 
 
 def test_device_lifecycle_outcomes_execute_in_the_cloud_control_plane():

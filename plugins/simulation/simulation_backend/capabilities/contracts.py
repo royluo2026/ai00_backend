@@ -144,7 +144,7 @@ MATERIALIZATION_RUN = obj({
 }, ("run_id", "environment_id", "environment_version", "manifest_hash", "device_id", "plan_id", "status", "operation_ref"))
 DOWNSTREAM_ACTION = obj({
     "capability_id": {"type": "string", "enum": [
-        "device.connector.plan.queue", "craft.process_screenshot.attach",
+        "simulation.connector.plan.queue", "craft.process_screenshot.attach",
     ]},
     "major_version": POSITIVE_INTEGER,
     "payload_json": STRING,

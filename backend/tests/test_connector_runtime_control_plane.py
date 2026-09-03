@@ -15,7 +15,7 @@ from backend.contracts.connector_execution_plan_v1 import (
     ConnectorStepResultV1,
     canonical_hash,
 )
-from plugins.device.device_backend.capabilities.connector_runtime import (
+from plugins.simulation.simulation_backend.capabilities.connector_runtime import (
     ConnectorControlPlane,
     ConnectorError,
     ConnectorHealth,
@@ -106,10 +106,10 @@ def test_completion_can_retry_domain_projection_after_device_outcome_is_stored()
             self.saved_outcome = None
             self.projection_attempts = []
 
-        def get_plan(self, plan_id, *, device_id, lease_id):
+        def get_plan(self, plan_id, *, connector_id, lease_id):
             return plan()
 
-        def complete_plan(self, device_id, plan_id, lease_id, outcome):
+        def complete_plan(self, connector_id, plan_id, lease_id, outcome):
             if self.saved_outcome is not None and self.saved_outcome != outcome:
                 raise ConnectorError("idempotency_conflict")
             self.saved_outcome = outcome
@@ -151,10 +151,10 @@ def test_completion_can_retry_domain_projection_after_device_outcome_is_stored()
 
 def test_failed_plan_outcome_requires_a_failed_step():
     class Repository(MemoryRepository):
-        def get_plan(self, plan_id, *, device_id, lease_id):
+        def get_plan(self, plan_id, *, connector_id, lease_id):
             return plan()
 
-        def complete_plan(self, device_id, plan_id, lease_id, outcome):
+        def complete_plan(self, connector_id, plan_id, lease_id, outcome):
             raise AssertionError("invalid outcome must not be persisted")
 
     completed = completed_outcome()
@@ -171,10 +171,10 @@ def test_reconciliation_can_report_unknown_outcome_without_fabricating_step_resu
             super().__init__()
             self.saved = None
 
-        def get_plan(self, plan_id, *, device_id, lease_id):
+        def get_plan(self, plan_id, *, connector_id, lease_id):
             return plan()
 
-        def complete_plan(self, device_id, plan_id, lease_id, outcome):
+        def complete_plan(self, connector_id, plan_id, lease_id, outcome):
             self.saved = outcome
 
     outcome = ConnectorPlanOutcomeV1(
@@ -323,20 +323,27 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
 
     by_id = {(spec.id, spec.version): (spec, descriptor) for spec, descriptor in registry.items}
     assert set(by_id) == {
-        ("device.connector.health.get", 1),
-        ("device.connector.plan.queue", 1),
-        ("device.connector.plan.queue", 2),
+        ("simulation.connector.health.get", 1),
+        ("simulation.connector.plan.queue", 1),
+        ("simulation.vismockup.status.get", 1),
+        ("simulation.vismockup.application.launch", 1),
+        ("simulation.vismockup.model.open", 1),
+        ("simulation.vismockup.tree.get", 1),
+        ("simulation.vismockup.selection.highlight", 1),
+        ("simulation.vismockup.visibility.change.apply", 1),
+        ("simulation.vismockup.capture.create", 1),
     }
     for spec, descriptor in by_id.values():
         assert spec.input_schema["additionalProperties"] is False
         assert spec.output_schema["additionalProperties"] is False
         assert descriptor.evidence_policy == "required"
         assert substantive_business_definition_errors(descriptor) == ()
-    assert by_id[("device.connector.plan.queue", 1)][1].consistency_policy == "strong"
-    assert by_id[("device.connector.plan.queue", 2)][1].consistency_policy == "external"
-    assert by_id[("device.connector.plan.queue", 1)][1].lifecycle_status == "deprecated"
-    assert not any(by_id[("device.connector.plan.queue", 1)][1].exposure.model_dump().values())
-    assert by_id[("device.connector.plan.queue", 2)][1].lifecycle_status == "experimental"
+    assert by_id[("simulation.connector.plan.queue", 1)][1].consistency_policy == "external"
+    assert by_id[("simulation.connector.plan.queue", 1)][1].lifecycle_status == "experimental"
+    for capability_id, (_spec, descriptor) in by_id.items():
+        if capability_id[0].startswith("simulation.vismockup."):
+            assert descriptor.exposure.local_runtime
+            assert not descriptor.exposure.web
 
 
 def test_connector_heartbeat_route_passes_authenticated_device_identity(monkeypatch):
