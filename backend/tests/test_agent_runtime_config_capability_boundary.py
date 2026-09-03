@@ -5,6 +5,8 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from plugins.agent.agent_backend.application.service import AgentApplication
+from plugins.agent.agent_backend.capabilities.descriptors import specs
+from plugins.agent.agent_backend.capabilities.provider import descriptor_for
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -34,3 +36,8 @@ def test_runtime_config_application_delegates_to_repository():
     context = SimpleNamespace(user_gid="u1", team_gid="t1", active_roles=("super_admin",))
     assert app.invoke("agent.runtime.config.read", {}, context)["source"] == "pi_runtime"
     assert calls[0]["owner_gid"] == "u1"
+
+
+def test_runtime_config_read_does_not_require_write_evidence():
+    spec = next(item for item in specs() if item.id == "agent.runtime.config.read")
+    assert descriptor_for(spec).evidence_policy == "optional"

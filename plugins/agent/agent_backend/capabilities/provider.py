@@ -44,7 +44,8 @@ def descriptor_for(spec) -> CapabilityDescriptorV2:
         "operation_policy": "required" if interaction else ("optional" if write and spec.id not in _CANVAS_SYNC else "none"),
         "idempotency_policy": "required" if write else "none",
         "consistency_policy": "strong",
-        "evidence_policy": "required", "domain_errors": ERRORS, "domain_errors_complete": True,
+        "evidence_policy": "required" if write else "optional",
+        "domain_errors": ERRORS, "domain_errors_complete": True,
     })
 
 __all__ = ["descriptor_for"]
