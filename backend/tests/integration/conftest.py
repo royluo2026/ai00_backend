@@ -245,6 +245,18 @@ def base_db():
 
 
 @pytest.fixture
+def agent_db():
+    """Factory: context manager yielding an Agent-domain DB connection."""
+    return _db_factory("AI00_AGENT_DB_URL")
+
+
+@pytest.fixture
+def simulation_db():
+    """Factory: context manager yielding a Simulation-domain DB connection."""
+    return _db_factory("AI00_SIMULATION_TEST_DB_URL")
+
+
+@pytest.fixture
 def factory_db():
     """Factory: context manager yielding a Factory-domain DB connection."""
     return _db_factory("AI00_FACTORY_DB_URL")

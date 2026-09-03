@@ -7,6 +7,7 @@ from backend.tests.test_connector_runtime_control_plane import completed_outcome
 from plugins.simulation.simulation_backend.application.connector_projection_worker import (
     ConnectorProjectionWorker,
 )
+from backend.domain_ports.simulation_runtime import GovernedSimulationRuntimeClient
 
 
 class Repository:
@@ -52,6 +53,14 @@ class Projector:
         self.calls.append((current_plan.plan_id, outcome.plan_id, attempt))
         if self.failure:
             raise self.failure
+
+
+def test_production_projector_implements_worker_port():
+    """The exact projector composed by the CLI must satisfy the worker port."""
+    assert callable(getattr(GovernedSimulationRuntimeClient, "target", None))
+    assert asyncio.iscoroutinefunction(
+        getattr(GovernedSimulationRuntimeClient, "apply", None)
+    )
 
 
 def test_worker_reclaims_claims_projects_and_finishes_by_lease_owner():

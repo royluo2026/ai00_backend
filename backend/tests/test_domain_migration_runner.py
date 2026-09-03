@@ -269,7 +269,7 @@ def test_apply_rejects_changed_checksum_for_applied_migration(craft_manifest):
 
 def test_check_mode_validates_empty_domain_without_connecting(capsys):
     assert main(["--domain", "craft", "--check"], root=ROOT, environ={}) == 0
-    assert capsys.readouterr().out.strip() == "domain=craft migrations=6 mode=check"
+    assert capsys.readouterr().out.strip() == "domain=craft migrations=7 mode=check"
 
 
 def test_apply_requires_only_the_selected_domains_ddl_credential(monkeypatch, capsys):
@@ -309,4 +309,4 @@ def test_apply_requires_only_the_selected_domains_ddl_credential(monkeypatch, ca
     assert result == 0
     assert captured[0].username == "craft_ddl"
     assert connection.closed is True
-    assert "domain=craft migrations=6 applied=0" in capsys.readouterr().out
+    assert "domain=craft migrations=7 applied=0" in capsys.readouterr().out

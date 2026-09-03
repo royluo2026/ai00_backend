@@ -124,6 +124,11 @@ class GovernedSimulationRuntimeClient:
             resource_payload = {"run_id": plan.plan_id}
         return capability_id, resource_payload
 
+    @staticmethod
+    def target(plan):
+        """Adapter required by ``ConnectorProjectionWorker``."""
+        return GovernedSimulationRuntimeClient.connector_outcome_target(plan)[0]
+
     async def apply_connector_outcome(self, plan, outcome, *, attempt=1):
         capability_id, resource_payload = self.connector_outcome_target(plan)
         outcome_value = outcome.model_dump(mode="json")
@@ -163,6 +168,10 @@ class GovernedSimulationRuntimeClient:
                 retryable=bool(error and error.retryable),
             )
         return result.data
+
+    async def apply(self, plan, outcome, *, attempt=1):
+        """Project one durable Connector outcome through the Capability Gateway."""
+        return await self.apply_connector_outcome(plan, outcome, attempt=attempt)
 
 
 def configure_simulation_runtime_gateway(gateway) -> None:
