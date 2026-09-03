@@ -8,7 +8,7 @@ Execute exact Base outcome base.identity.user.search.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_4ab5c48fcf65f8480df2bdb28e0bcc8a`
+- Catalog Release：`rel_db5fec04f77dd6835b325ef80c4da522`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -93,7 +93,7 @@ Execute exact Base outcome base.identity.user.search.
 ```json
 {
   "capability_id": "base.identity.user.search",
-  "catalog_release": "rel_4ab5c48fcf65f8480df2bdb28e0bcc8a",
+  "catalog_release": "rel_db5fec04f77dd6835b325ef80c4da522",
   "major_version": 1,
   "payload": {
     "limit": 1,

@@ -8,7 +8,7 @@ Request an immutable snapshot of the bound user's active VisMockup BOM.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
-- Catalog Release：`rel_4ab5c48fcf65f8480df2bdb28e0bcc8a`
+- Catalog Release：`rel_db5fec04f77dd6835b325ef80c4da522`
 - Schema 精度：`typed`
 - 暂未开放原因：`experimental_lifecycle`
 
@@ -90,7 +90,7 @@ Request an immutable snapshot of the bound user's active VisMockup BOM.
 ```json
 {
   "capability_id": "simulation.document_snapshot.request",
-  "catalog_release": "rel_4ab5c48fcf65f8480df2bdb28e0bcc8a",
+  "catalog_release": "rel_db5fec04f77dd6835b325ef80c4da522",
   "major_version": 1,
   "payload": {
     "device_id": "example",
