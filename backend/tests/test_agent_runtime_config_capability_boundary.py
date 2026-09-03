@@ -4,7 +4,10 @@ import ast
 from pathlib import Path
 from types import SimpleNamespace
 
+from backend.capabilities.registry_next import CapabilityRegistry
+from backend.capabilities.validation_next import validate_payload
 from plugins.agent.agent_backend.application.service import AgentApplication
+from plugins.agent.agent_backend.capabilities import register_capabilities
 from plugins.agent.agent_backend.capabilities.descriptors import specs
 from plugins.agent.agent_backend.capabilities.provider import descriptor_for
 
@@ -41,3 +44,15 @@ def test_runtime_config_application_delegates_to_repository():
 def test_runtime_config_read_does_not_require_write_evidence():
     spec = next(item for item in specs() if item.id == "agent.runtime.config.read")
     assert descriptor_for(spec).evidence_policy == "optional"
+
+
+def test_registered_runtime_config_handler_matches_its_output_contract(monkeypatch):
+    monkeypatch.setenv("AI00_AGENT_RUNTIME_MODE", "pi")
+    registry = CapabilityRegistry()
+    register_capabilities(registry, canvas_runtime=None)
+    provider = registry.get("agent.runtime.config.read", 1)
+    value = provider.handler(
+        {}, SimpleNamespace(user_gid="u1", team_gid="t1", active_roles=("super_admin",))
+    )
+    assert "data" not in value
+    validate_payload(dict(provider.descriptor.output_schema), value, label="output")

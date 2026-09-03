@@ -91,10 +91,10 @@ def register_capabilities(registry, *, canvas_runtime=_DEFAULT_RUNTIME) -> None:
         capability_id = spec.id
         if capability_id in _CANVAS_CAPABILITIES:
             async def handler(payload, context, *, _capability_id=capability_id):
-                return {"data": await provider.invoke(_capability_id, payload, context)}
+                return await provider.invoke(_capability_id, payload, context)
         else:
             def handler(payload, context, *, _capability_id=capability_id):
-                return {"data": provider.invoke(_capability_id, payload, context)}
+                return provider.invoke(_capability_id, payload, context)
         governed = spec.model_copy(update={"plugin_callable": True})
         registry.register(governed, handler, descriptor=descriptor_for(governed))
     register_interaction_chat_change_capability(registry)
