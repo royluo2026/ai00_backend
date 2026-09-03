@@ -8,7 +8,7 @@ Execute the reviewed base.authorization.grant.change.apply Base outcome.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_a3992af99a15f984f89bae199051b70c`
+- Catalog Release：`rel_a09dc46bd385dfe188e3236dd882f6b3`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -18,9 +18,9 @@ Execute the reviewed base.authorization.grant.change.apply Base outcome.
 |---|---|
 | web | 可用 |
 | plugin | 可用 |
-| agent | 可用 |
+| agent | 不可用 |
 | api | 可用 |
-| mcp | 可用 |
+| mcp | 不可用 |
 | worker | 不可用 |
 | local_runtime | 不可用 |
 
@@ -99,7 +99,7 @@ Execute the reviewed base.authorization.grant.change.apply Base outcome.
 ```json
 {
   "capability_id": "base.authorization.grant.change.apply",
-  "catalog_release": "rel_a3992af99a15f984f89bae199051b70c",
+  "catalog_release": "rel_a09dc46bd385dfe188e3236dd882f6b3",
   "major_version": 1,
   "payload": {
     "operation": "example"

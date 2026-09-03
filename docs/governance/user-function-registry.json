@@ -1556,7 +1556,8 @@
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
-        "plugins/agent/agent_backend/capabilities/contracts.py"
+        "plugins/agent/agent_backend/capabilities/contracts.py",
+        "plugins/agent/agent_backend/capabilities/provider.py"
       ]
     },
     "capability:agent.script.generate": {

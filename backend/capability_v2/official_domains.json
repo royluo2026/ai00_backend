@@ -7,7 +7,7 @@
         "plugin_id": "official.agent",
         "module": "agent_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:13dfa0871f68308fbf1739ae3936726290e2c04861d58d585100cdfa0517005b"
+        "artifact_hash": "sha256:85fca6140f62fde691b7d7e75c82e7ba8281709f1b21afdf46f9b1f48f818ba1"
       },
       "artifact_path": "plugins/agent/agent_backend",
       "allowed_owners": [
@@ -36,7 +36,7 @@
         "plugin_id": "official.base",
         "module": "backend.base.official_provider",
         "version": "1.0.0",
-        "artifact_hash": "sha256:e4fe99f64700faf73e0b1433c2d68327e94a73ab4552c11b4271b9f16a503ad9"
+        "artifact_hash": "sha256:bfa72712a7cc8aec7768f08b3206c5f68004f62ad14c6035ea06f67f82db3a3c"
       },
       "artifact_path": "backend/base",
       "allowed_owners": [
@@ -252,7 +252,7 @@
         "plugin_id": "official.ontology",
         "module": "ontology_backend.capabilities",
         "version": "2.0.0",
-        "artifact_hash": "sha256:db1bd171864568e3a16d1c31f81ad54cfd9ea43f5c815c0d7bac147aed444185"
+        "artifact_hash": "sha256:20601f83eef0097a51d18e7f6a683e3e4dd97f43be9fa0aa09e2755c3fb3ccd7"
       },
       "artifact_path": "plugins/ontology/ontology_backend",
       "allowed_owners": [

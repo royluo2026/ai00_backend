@@ -407,6 +407,54 @@
         }
       }
     },
+    "agent.catalog_tool.confirm.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:agent.catalog_tool.confirm.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/capabilities/catalog_tool_confirmation.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The fixed confirmation boundary is registered in the frozen Capability Catalog and is invoked only by reviewed Web routes.",
+          "reviewer": "agent-capability-remediation",
+          "reviewed_at": "2026-09-03"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "Reviewed Agent confirmation routes invoke this boundary through the shared Gateway.",
+          "policy_ref": "agent.catalog_tool.confirm.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "The reviewed /api/ai/confirm routes are the only transport adapters.",
+          "policy_ref": "agent.catalog_tool.confirm.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "Plugins cannot mint or consume user-confirmation tokens.",
+          "policy_ref": "agent.catalog_tool.confirm.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "The model cannot call its own confirmation boundary.",
+          "policy_ref": "agent.catalog_tool.confirm.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "MCP clients cannot mint or consume user-confirmation tokens.",
+          "policy_ref": "agent.catalog_tool.confirm.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local-runtime consumer exists.",
+          "policy_ref": "agent.catalog_tool.confirm.apply"
+        }
+      }
+    },
     "agent.flow.change.apply": {
       "kind": "existing",
       "function_dispositions": {
@@ -1154,7 +1202,8 @@
         "capability:agent.runtime.config.read": {
           "resolution": "existing_capability",
           "source_paths": [
-            "plugins/agent/agent_backend/capabilities/contracts.py"
+            "plugins/agent/agent_backend/capabilities/contracts.py",
+            "plugins/agent/agent_backend/capabilities/provider.py"
           ],
           "owner": "Agent",
           "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",

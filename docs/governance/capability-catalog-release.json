@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_a3992af99a15f984f89bae199051b70c",
-  "catalog_hash": "sha256:a3992af99a15f984f89bae199051b70c5ed195256785886b0f29dcda6ad01fa8",
+  "release_id": "rel_a09dc46bd385dfe188e3236dd882f6b3",
+  "catalog_hash": "sha256:a09dc46bd385dfe188e3236dd882f6b3454df2d616de3c82fb91d37c1af39436",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -4178,9 +4178,9 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": true,
+        "plugin": false,
         "agent": false,
-        "api": true,
+        "api": false,
         "mcp": false,
         "worker": false,
         "local_runtime": false
@@ -4454,8 +4454,19 @@
         "mode": "provider",
         "boundary": "owning_domain"
       },
-      "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "consumer_refs": [
+        {
+          "consumer_id": "dist/packages/agent-plugin/web/wfc_window/wfc_window.js",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        },
+        {
+          "consumer_id": "dist/packages/agent-plugin/web/automation_hub/ai_assistant.js",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "no_consumer_reason": null,
       "provider_ref": "agent.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/agent.catalog_tool.confirm.apply:invoke"
@@ -6476,7 +6487,7 @@
       "business_acceptance_criteria": [
         "Each accepted request executes as the authenticated actor and never as a caller-supplied user identity.",
         "A supplied chat session is used only when it belongs to the authenticated actor.",
-        "The caller receives a schema-valid bounded synchronous result or at most 500 serialized stream events."
+        "The caller receives a schema-valid bounded synchronous result or a single-use stream channel capped at 500 events."
       ],
       "business_invariants": [
         {
@@ -6601,12 +6612,9 @@
           "data": {
             "type": "object",
             "properties": {
-              "events": {
-                "type": "array",
-                "maxItems": 500,
-                "items": {
-                  "type": "string"
-                }
+              "stream_id": {
+                "type": "string",
+                "pattern": "^agent-stream-[0-9a-f]{32}$"
               },
               "media_type": {
                 "type": "string"
@@ -6630,12 +6638,9 @@
           "data": {
             "type": "object",
             "properties": {
-              "events": {
-                "type": "array",
-                "maxItems": 500,
-                "items": {
-                  "type": "string"
-                }
+              "stream_id": {
+                "type": "string",
+                "pattern": "^agent-stream-[0-9a-f]{32}$"
               },
               "media_type": {
                 "type": "string"
@@ -6650,7 +6655,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:243f531aa03db0db96a842e4b438ab678797125b821ecd372098aa9bf5993c2b",
+      "schema_hash": "sha256:3b3163495910e9cc5ff3bda46499112de1ee0bc94544c735022c94fd5a3086d9",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -6882,7 +6887,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:b535a8028d7972ee575982b811ceff503e10cc520da9f8277f74b95f34610e5c"
+      "business_definition_hash": "sha256:c82bf025525f5626431a63008c8a1fe8c646dbb08c0c2def6ebb63287574d4d9"
     },
     {
       "id": "agent.interaction.request",
@@ -10074,9 +10079,9 @@
       "exposure": {
         "web": true,
         "plugin": true,
-        "agent": true,
+        "agent": false,
         "api": true,
-        "mcp": true,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -16637,9 +16642,9 @@
       "exposure": {
         "web": true,
         "plugin": true,
-        "agent": true,
+        "agent": false,
         "api": true,
-        "mcp": true,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -16915,9 +16920,9 @@
       "exposure": {
         "web": true,
         "plugin": true,
-        "agent": true,
+        "agent": false,
         "api": true,
-        "mcp": true,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -17990,9 +17995,9 @@
       "exposure": {
         "web": true,
         "plugin": true,
-        "agent": true,
+        "agent": false,
         "api": true,
-        "mcp": true,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -23813,9 +23818,9 @@
       "exposure": {
         "web": true,
         "plugin": true,
-        "agent": true,
+        "agent": false,
         "api": true,
-        "mcp": true,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -24148,9 +24153,9 @@
       "exposure": {
         "web": true,
         "plugin": true,
-        "agent": true,
+        "agent": false,
         "api": true,
-        "mcp": true,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -184972,9 +184977,9 @@
       "exposure": {
         "web": true,
         "plugin": true,
-        "agent": true,
+        "agent": false,
         "api": true,
-        "mcp": true,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -188395,9 +188400,9 @@
       "exposure": {
         "web": true,
         "plugin": true,
-        "agent": true,
+        "agent": false,
         "api": true,
-        "mcp": true,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -188668,9 +188673,9 @@
       "exposure": {
         "web": true,
         "plugin": true,
-        "agent": true,
+        "agent": false,
         "api": true,
-        "mcp": true,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -188941,9 +188946,9 @@
       "exposure": {
         "web": true,
         "plugin": true,
-        "agent": true,
+        "agent": false,
         "api": true,
-        "mcp": true,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -189225,9 +189230,9 @@
       "exposure": {
         "web": true,
         "plugin": true,
-        "agent": true,
+        "agent": false,
         "api": true,
-        "mcp": true,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -189498,9 +189503,9 @@
       "exposure": {
         "web": true,
         "plugin": true,
-        "agent": true,
+        "agent": false,
         "api": true,
-        "mcp": true,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -190912,9 +190917,9 @@
       "exposure": {
         "web": true,
         "plugin": true,
-        "agent": true,
+        "agent": false,
         "api": true,
-        "mcp": true,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -191185,9 +191190,9 @@
       "exposure": {
         "web": true,
         "plugin": true,
-        "agent": true,
+        "agent": false,
         "api": true,
-        "mcp": true,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -271417,13 +271422,13 @@
       "plugin_id": "official.agent",
       "module": "agent_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:13dfa0871f68308fbf1739ae3936726290e2c04861d58d585100cdfa0517005b"
+      "artifact_hash": "sha256:85fca6140f62fde691b7d7e75c82e7ba8281709f1b21afdf46f9b1f48f818ba1"
     },
     {
       "plugin_id": "official.base",
       "module": "backend.base.official_provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:e4fe99f64700faf73e0b1433c2d68327e94a73ab4552c11b4271b9f16a503ad9"
+      "artifact_hash": "sha256:bfa72712a7cc8aec7768f08b3206c5f68004f62ad14c6035ea06f67f82db3a3c"
     },
     {
       "plugin_id": "official.craft",
@@ -271465,7 +271470,7 @@
       "plugin_id": "official.ontology",
       "module": "ontology_backend.capabilities",
       "version": "2.0.0",
-      "artifact_hash": "sha256:db1bd171864568e3a16d1c31f81ad54cfd9ea43f5c815c0d7bac147aed444185"
+      "artifact_hash": "sha256:20601f83eef0097a51d18e7f6a683e3e4dd97f43be9fa0aa09e2755c3fb3ccd7"
     },
     {
       "plugin_id": "official.project-management",
@@ -271480,5 +271485,5 @@
       "artifact_hash": "sha256:d28a4821d92322f3adbc4df8157dc86e56e0fabf93b21219ce33eca3727d7f2c"
     }
   ],
-  "created_at": "2026-09-03T08:48:32.171430Z"
+  "created_at": "2026-09-03T09:28:33.118534Z"
 }

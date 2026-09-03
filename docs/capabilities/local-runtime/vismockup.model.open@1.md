@@ -8,7 +8,7 @@ Materialize and open an authorized model ArtifactRef.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`deprecated`
 - 所属领域：`device`
-- Catalog Release：`rel_a3992af99a15f984f89bae199051b70c`
+- Catalog Release：`rel_a09dc46bd385dfe188e3236dd882f6b3`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -128,7 +128,7 @@ Materialize and open an authorized model ArtifactRef.
 ```json
 {
   "capability_id": "vismockup.model.open",
-  "catalog_release": "rel_a3992af99a15f984f89bae199051b70c",
+  "catalog_release": "rel_a09dc46bd385dfe188e3236dd882f6b3",
   "major_version": 1,
   "payload": {
     "artifact_ref": {
